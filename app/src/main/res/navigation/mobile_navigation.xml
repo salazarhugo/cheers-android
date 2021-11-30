@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/homeFragment">
+
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.salazar.cheers.ui.home.HomeFragment"
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_mapFragment"
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/in_from_left"
+            app:exitAnim="@anim/out_to_right"
+            app:popEnterAnim="@anim/in_from_right"
+            app:popExitAnim="@anim/out_to_left" />
+        <action
+            android:id="@+id/action_homeFragment_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.salazar.cheers.ui.profile.ProfileFragment"
+        android:label="ProfileFragment" />
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.salazar.cheers.ui.map.MapFragment"
+        android:label="MapFragment" >
+        <action
+            android:id="@+id/action_mapFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.salazar.cheers.ui.search.SearchFragment"
+        android:label="SearchFragment" >
+        <action
+            android:id="@+id/action_searchFragment_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment"
+            app:enterAnim="@anim/in_from_right"
+            app:exitAnim="@anim/out_to_left"
+            app:popEnterAnim="@anim/in_from_left"
+            app:popExitAnim="@anim/out_to_right" />
+    </fragment>
+    <dialog
+        android:id="@+id/addDialogFragment"
+        android:name="com.salazar.cheers.ui.add.AddDialogFragment"
+        android:label="AddDialogFragment" />
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.salazar.cheers.ui.messages.MessagesFragment"
+        android:label="MessagesFragment" />
+    <fragment
+        android:id="@+id/otherProfileFragment"
+        android:name="com.salazar.cheers.ui.otherprofile.OtherProfileFragment"
+        android:label="OtherProfileFragment" >
+        <argument
+            android:name="otherUserId"
+            app:argType="string" />
+    </fragment>
+    <dialog
+        android:id="@+id/editProfileFragment"
+        android:name="com.salazar.cheers.ui.profile.EditProfileFragment"
+        android:label="EditProfileFragment" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.salazar.cheers.ui.chat.ChatFragment"
+        android:label="ChatFragment" />
+</navigation>
