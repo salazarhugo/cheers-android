@@ -16,7 +16,8 @@ private val DarkColorPalette = darkColorScheme(
 )
 
 private val LightColorPalette = lightColorScheme(
-
+    background = Color.White,
+    surface = Color.White,
 )
 
 @Composable

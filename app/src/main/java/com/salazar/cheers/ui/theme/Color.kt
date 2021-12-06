@@ -1,5 +1,7 @@
 package com.salazar.cheers.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val Purple200 = Color(0xFFBB86FC)

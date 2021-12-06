@@ -122,10 +122,15 @@ dependencies {
     // Firestore
     implementation 'com.google.firebase:firebase-firestore-ktx'
 
+    // Firebase Storage
+    implementation 'com.google.firebase:firebase-storage-ktx'
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.37")
     implementation 'com.google.android.gms:play-services-maps:18.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.hilt:hilt-work:1.0.0'
+    implementation 'androidx.work:work-multiprocess:2.7.1'
     kapt("com.google.dagger:hilt-android-compiler:2.37")
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
@@ -135,6 +140,12 @@ dependencies {
 
     // Google's Fused Location Provider
     implementation "com.google.android.gms:play-services-location:18.0.0"
+
+    // Work Manager
+    implementation "androidx.work:work-runtime-ktx:2.7.1"
+
+    // Datastore
+    implementation("androidx.datastore:datastore:1.0.0")
 
     // Debugging
     testImplementation 'junit:junit:4.+'

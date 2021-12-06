@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.AddBox
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
@@ -43,6 +44,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.SignInActivity
+import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -99,7 +101,7 @@ class ProfileFragment : Fragment() {
                         Icon(Icons.Outlined.BookmarkBorder, "")
                     }
                 }
-                Divider()
+                DividerM3()
                 OutlinedButton(onClick = { signOut() }) {
                     Text("Logout")
                 }
@@ -124,12 +126,18 @@ class ProfileFragment : Fragment() {
                     IconButton(onClick = {}) {
                         Icon(Icons.Outlined.AddBox, "")
                     }
+                    IconButton(onClick = {
+                        val action = ProfileFragmentDirections.actionProfileFragmentToSettingsFragment()
+                        findNavController().navigate(action)
+                    }) {
+                        Icon(Icons.Outlined.Settings, "")
+                    }
                     IconButton(onClick = {}) {
                         Icon(Icons.Rounded.Menu, "")
                     }
                 },
             )
-            Divider()
+            DividerM3()
         }
     }
 

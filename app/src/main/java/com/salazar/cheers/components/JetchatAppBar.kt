@@ -19,7 +19,8 @@ fun CheersAppBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavIconPressed: () -> Unit = { },
     title: @Composable () -> Unit,
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
+    navigationIcon: @Composable () -> Unit = {}
 ) {
     val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
     val backgroundColor = backgroundColors.containerColor(
@@ -36,15 +37,7 @@ fun CheersAppBar(
             title = title,
             scrollBehavior = scrollBehavior,
             colors = foregroundColors,
-            navigationIcon = {
-//                CheersIcon(
-//                    contentDescription = stringResource(id = R.string.navigation_drawer_open),
-//                    modifier = Modifier
-//                        .size(64.dp)
-//                        .clickable(onClick = onNavIconPressed)
-//                        .padding(16.dp)
-//                )
-            }
+            navigationIcon = navigationIcon
         )
     }
 }

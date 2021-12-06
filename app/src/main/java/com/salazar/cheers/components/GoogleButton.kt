@@ -1,4 +1,4 @@
-package com.salazar.workout.components
+package com.salazar.cheers.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -6,7 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,10 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.theme.Roboto
 
-@ExperimentalMaterialApi
 @Composable
 fun GoogleButton(
     text: String = "Sign in with Google",
@@ -32,7 +33,7 @@ fun GoogleButton(
 //        shape = shape,
 //        border = BorderStroke(width = 1.dp, color = borderColor),
         color = Color(0xFF4285F4),
-        elevation = 8.dp,
+        shadowElevation = 0.dp,
         shape = RoundedCornerShape(2.dp)
     ) {
         Row(
@@ -86,7 +87,6 @@ fun GoogleButton(
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 @Preview
 private fun GoogleButtonPreview() {

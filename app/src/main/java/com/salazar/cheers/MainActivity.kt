@@ -37,16 +37,23 @@ import org.neo4j.driver.Values.parameters
 import java.lang.Exception
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.systemBarsPadding
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.Neo4jUtil
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
 
 @ExperimentalMaterial3Api
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
@@ -56,51 +63,28 @@ class MainActivity : AppCompatActivity() {
 
         // Turn off the decor fitting system windows, which allows us to handle insets,
         // including IME animations
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
+         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val policy = ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        val splashScreen = installSplashScreen()
-        initDatabase()
-
         setContent {
-            // Provide WindowInsets to our content. We don't want to consume them, so that
-            // they keep being pass down the view hierarchy (since we're using fragments).
-//            ProvideWindowInsets(consumeWindowInsets = false) {
-                CheersTheme() {
-                    Surface(color = MaterialTheme.colorScheme.background) {
+            // Update the system bars to be translucent
+            val systemUiController = rememberSystemUiController()
+            val useDarkIcons = !isSystemInDarkTheme()
+            SideEffect {
+                systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
+            }
+
+            CheersTheme() {
+                ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
+                    Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.systemBarsPadding()) {
                         MainActivityScreen()
                     }
                 }
-//            }
+            }
         }
     }
-
-    private fun initDatabase()
-    {
-        val driver: Driver = GraphDatabase.driver(
-            Environment.DEFAULT_URL,
-            AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
-            Config.builder()
-                .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
-                .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
-        )
-        addUser(driver, "Hugo")
-    }
-
-     private fun addUser(driver: Driver, user: String)
-     {
-         val session = driver.session(SessionConfig.forDatabase(Environment.DEFAULT_DATABASE))
-         try {
-             session.writeTransaction(TransactionWork {
-                 it.run("MERGE (n:User {name: 'Hugo'})")
-             })
-         }catch (e: Exception)
-         {
-             Log.e("TKTJkl", e.toString());
-         }
-     }
 
     @OptIn(ExperimentalCoilApi::class)
     @Composable
@@ -109,9 +93,7 @@ class MainActivity : AppCompatActivity() {
         val state = rememberScaffoldState()
 
         Scaffold(
-            topBar = { },
             bottomBar = { BottomBar() },
-            drawerContent = {},
             scaffoldState = state,
         ) {
                 innerPadding ->
@@ -143,10 +125,12 @@ class MainActivity : AppCompatActivity() {
                 items.forEachIndexed { index, frag ->
                     NavigationBarItem(
                         icon = {
-                            if(selectedItem == index)
-                                Icon(frag.selectedIcon, contentDescription = null)
-                            else
-                                Icon(frag.icon, contentDescription = null)
+//                            BadgedBox(badge = { Badge { Text("") } }) {
+                                if(selectedItem == index)
+                                    Icon(frag.selectedIcon, contentDescription = null)
+                                else
+                                    Icon(frag.icon, contentDescription = null)
+//                            }
                         },
                         selected = selectedItem == index,
                         onClick = {
@@ -161,16 +145,17 @@ class MainActivity : AppCompatActivity() {
                 }
                 NavigationBarItem(
                     icon = {
-                        Image(
-                            painter = rememberImagePainter(
-                                data = user.photoUrl,
-                                builder = {
-                                    transformations(CircleCropTransformation())
-                                }
-                            ),
-                            contentDescription = null,
-//                            modifier = Modifier.size(30.dp)
-                        )
+                        BadgedBox(badge = { Badge { Text("") } }) {
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = user.photoUrl,
+                                    builder = {
+                                        transformations(CircleCropTransformation())
+                                    }
+                                ),
+                                contentDescription = null,
+                            )
+                        }
                     },
                     selected = selectedItem == 4,
                     onClick = {

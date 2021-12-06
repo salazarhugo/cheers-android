@@ -21,10 +21,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +38,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.insets.*
@@ -51,14 +50,16 @@ import com.salazar.cheers.internal.ImageMessage
 import com.salazar.cheers.internal.Message
 import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.internal.TextMessage
+import com.salazar.cheers.ui.otherprofile.OtherProfileFragmentArgs
 import com.salazar.cheers.ui.theme.CheersTheme
 import kotlinx.coroutines.launch
+import java.util.*
 
 const val ConversationTestTag = "ConversationTestTag"
 
 class ChatFragment : Fragment() {
 
-    private val viewModel: ChatViewModel by viewModels()
+    private val chatViewModel: ChatViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,12 +70,15 @@ class ChatFragment : Fragment() {
         val windowInsets = ViewWindowInsetObserver(this)
             .start(windowInsetsAnimationsEnabled = true)
 
+        val channelId = "OEZAbSsTMRlmFVyd2lti"//chatViewModel.channelId.value
+
         setContent {
             CompositionLocalProvider(
                 LocalWindowInsets provides windowInsets,
             ) {
                 CheersTheme {
                     ChatScreen(
+                        channelId = channelId,
                         modifier = Modifier.navigationBarsPadding(bottom = false)
                     )
                 }
@@ -85,44 +89,10 @@ class ChatFragment : Fragment() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ChatScreen(
+        channelId: String,
         modifier: Modifier
     ) {
-        val messages = listOf<Message>(
-            TextMessage(text = "@Hugo Hey!"),
-            TextMessage("What's up?", senderId = "dw"),
-            TextMessage(text = "Not much"),
-            TextMessage(text = "Wbu?"),
-            TextMessage("Just chilling haha", senderId = "dw"),
-            TextMessage("Ainsi, toujours, vers l'azur noir\n" +
-                    "Où tremble la mer des topazes,\n" +
-                    "Fonctionneront dans ton soir\n" +
-                    "Les Lys, ces clystères d'extases !\n" +
-                    "\n" +
-                    "À notre époque de sagous,\n" +
-                    "Quand les Plantes sont travailleuses,\n" +
-                    "Le Lys boira les bleus dégoûts\n" +
-                    "Dans tes Proses religieuses !\n" +
-                    "\n" +
-                    "- Le lys de monsieur de Kerdrel,\n" +
-                    "Le Sonnet de mil huit cent trente,\n" +
-                    "Le Lys qu'on donne au Ménestrel\n" +
-                    "Avec l'oeillet et l'amarante !\n" +
-                    "\n" +
-                    "Des lys ! Des lys ! On n'en voit pas !\n" +
-                    "Et dans ton Vers, tel que les manches\n" +
-                    "Des Pécheresses aux doux pas,\n" +
-                    "Toujours frissonnent ces fleurs blanches !\n" +
-                    "\n" +
-                    "Toujours, Cher, quand tu prends un bain,\n" +
-                    "Ta chemise aux aisselles blondes\n" +
-                    "Se gonfle aux brises du matin\n" +
-                    "Sur les myosotis immondes !\n" +
-                    "\n" +
-                    "L'amour ne passe à tes octrois\n" +
-                    "Que les Lilas, - ô balançoires !\n" +
-                    "Et les Violettes du Bois,\n" +
-                    "Crachats sucrés des Nymphes noires !..."),
-        )
+        val messages = chatViewModel.messages(channelId).collectAsState(initial = listOf()).value
         val scrollState = rememberLazyListState()
         val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
         val scope = rememberCoroutineScope()
@@ -142,7 +112,14 @@ class ChatFragment : Fragment() {
                         scrollState = scrollState,
                     )
                     UserInput(
-                        onMessageSent = {},
+                        onMessageSent = {
+                            val a = TextMessage(
+                                "", channelId, it, Date(), "", "", "", "", "",
+                                arrayListOf(),
+                                arrayListOf(),
+                            )
+                            chatViewModel.sendMessage(a, channelId)
+                        },
                         resetScroll = {
                             scope.launch {
                                 scrollState.scrollToItem(0)
@@ -152,9 +129,9 @@ class ChatFragment : Fragment() {
                     )
                 }
                 ChannelNameBar(
-                    channelName = "",
+                    channelName = channelId,
                     channelMembers = 2,
-                    onNavIconPressed = {},
+                    onNavIconPressed = { findNavController().popBackStack() },
                     scrollBehavior = scrollBehavior,
                     modifier = Modifier.statusBarsPadding(),
                 )
@@ -364,7 +341,7 @@ class ChatFragment : Fragment() {
                 )
             }
 
-            message.authorImage?.let {
+            message.authorImage.let {
                 Spacer(modifier = Modifier.height(4.dp))
                 Surface(
                     color = backgroundBubbleColor,
@@ -391,8 +368,14 @@ class ChatFragment : Fragment() {
     ) {
         val uriHandler = LocalUriHandler.current
 
+        val textMessage =
+            if (message.type == MessageType.TEXT)
+                message as TextMessage
+            else
+                null
+
         val styledMessage = messageFormatter(
-            text = message.chatChannelId,
+            text = textMessage?.text ?: "Not a text message",
             primary = isUserMe
         )
 

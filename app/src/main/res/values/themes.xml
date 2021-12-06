@@ -9,12 +9,19 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Theme.Cheers.SignIn">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
     <style name="Theme.DialogFullScreen" parent="Theme.MaterialComponents.DayNight.Dialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
-    <style name="Theme.Cheers.Slide">
+    <style name="Theme.Cheers.Slide" parent="Theme.MaterialComponents.DayNight.Dialog">
         <item name="android:windowEnterAnimation">@anim/slide_up</item>
         <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>

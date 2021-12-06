@@ -8,7 +8,7 @@ data class TextMessage(
     override var chatChannelId: String,
     var text: String,
     override val time: Date,
-    override var senderId: String,
+    override val senderId: String,
     override val recipientId: String,
     override val senderName: String,
     override val senderUsername: String,
@@ -18,7 +18,7 @@ data class TextMessage(
     override val type: String = MessageType.TEXT
 ) : Message {
 
-    constructor(text: String = "", senderId: String = "") : this(
+    constructor() : this(
         "",
         "",
         "",
@@ -30,9 +30,4 @@ data class TextMessage(
         arrayListOf(),
         arrayListOf()
     )
-    {
-        this.text = text
-        this.chatChannelId = text
-        this.senderId = senderId
-    }
 }

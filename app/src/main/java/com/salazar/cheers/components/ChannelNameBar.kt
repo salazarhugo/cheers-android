@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
@@ -34,6 +35,9 @@ fun ChannelNameBar(
         modifier = modifier,
         scrollBehavior = scrollBehavior,
         onNavIconPressed = onNavIconPressed,
+        navigationIcon = {
+            Icon(Icons.Default.ArrowBack, "")
+        },
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 // Channel name

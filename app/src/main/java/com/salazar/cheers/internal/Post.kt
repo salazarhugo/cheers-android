@@ -12,5 +12,6 @@ data class Post(
     val comments: Int = 0,
     val shares: Int = 0,
     var username: String = "",
-    var photoUrl: String = "",
+    var photoPath: String = "",
+    var userPhotoUrl: String = "",
 )

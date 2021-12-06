@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.messages
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,31 +20,36 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.rounded.Camera
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.salazar.cheers.R
+import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.chat.ChatActivity
 import com.salazar.cheers.ui.theme.Typography
+import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.util.StorageUtil
 import org.jetbrains.anko.support.v4.startActivity
+import org.jetbrains.anko.support.v4.toast
 
 class MessagesFragment : Fragment() {
 
@@ -62,31 +68,44 @@ class MessagesFragment : Fragment() {
 
     @Composable
     fun MessagesScreen() {
-        viewModel.queryUsers("")
-        val conversations = viewModel.conversation.value
+        val conversations = viewModel.conversations.collectAsState(initial = listOf()).value
+
         Column() {
             Text("Chats", modifier= Modifier.padding(15.dp))
-            ConversationList(user = conversations)
+            ConversationList(channels = conversations)
         }
     }
 
     @Composable
-    fun ConversationList(user: List<User>) {
+    fun ConversationList(channels: List<ChatChannel>) {
         LazyColumn() {
-            items(user) { user ->
-                Conversation(user)
+            items(channels) { channel ->
+                Conversation(channel)
             }
         }
     }
 
     @Composable
-    fun Conversation(user: User) {
+    fun LinkContactsItem() {
+        Row() {
+            Button(onClick = { /*TODO*/ }) {
+                
+            }
+        }
+    }
+    
+    @ExperimentalCoilApi
+    @Composable
+    fun Conversation(channel: ChatChannel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    startActivity<ChatActivity>()
-//                    findNavController().navigate(R.id.chatFragment2)
+                    val action =
+                        MessagesFragmentDirections.actionMessagesFragmentToChatActivity(
+                            chatChannelId = channel.id,
+                        )
+                    findNavController().navigate(action)
                 }
                 .padding(15.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -96,17 +115,34 @@ class MessagesFragment : Fragment() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val photo = remember { mutableStateOf<Uri?>(null) }
+
+                if (channel.recentMessage.authorImage.isNotBlank())
+                    StorageUtil.pathToReference(channel.recentMessage.authorImage).downloadUrl.addOnSuccessListener {
+                        photo.value = it
+                    }
                 Image(
-                    painter = rememberImagePainter(data = user.photoUrl),
+                    painter = rememberImagePainter(data = photo.value),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(50.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, Color.Gray)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
                 Column() {
-                    Text( text = user.username, style = Typography.bodyMedium)
-                    Text( text = "Mdr", style = Typography.bodySmall)
+                    var title = channel.name
+                    var subtitle = "${channel.recentMessage.senderUsername}: ${channel.recentMessage.text}"
+                    if (channel.type == ChatChannelType.DIRECT)
+                    {
+                        title = channel.recentMessage.senderUsername
+                        subtitle = channel.recentMessage.text
+                    }
+
+                    Text(text = title, style = Typography.bodyMedium)
+                    Text(
+                        text = subtitle,
+                        style = Typography.bodySmall
+                    )
                 }
             }
             IconButton(onClick = {}) {

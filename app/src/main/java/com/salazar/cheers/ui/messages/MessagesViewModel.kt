@@ -4,11 +4,14 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.FirestoreUtil
 import com.salazar.cheers.util.Neo4jUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,15 +26,6 @@ class MessagesViewModel @Inject constructor(): ViewModel() {
         this.name.value = name
     }
 
-    val conversation = mutableStateOf(listOf(User()))
-
-    fun queryUsers(query: String) {
-        viewModelScope.launch {
-            try {
-                conversation.value = Neo4jUtil.queryUsers(query)
-            } catch(e: Exception) {
-                Log.e("HomeViewModel", e.toString())
-            }
-        }
-    }
+    val conversations: Flow<List<ChatChannel>> =
+        FirestoreChat.getChatChannels()
 }

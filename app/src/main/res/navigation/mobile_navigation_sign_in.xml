@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/signInFragment">
+    <fragment
+        android:id="@+id/emailPasswordFragment"
+        android:name="com.salazar.cheers.ui.signin.EmailPasswordFragment"
+        android:label="EmailPasswordFragment" >
+        <action
+            android:id="@+id/action_emailPasswordFragment_to_chooseUsernameFragment"
+            app:destination="@id/chooseUsernameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.salazar.cheers.ui.signin.SignInFragment"
+        android:label="SignInFragment" >
+        <action
+            android:id="@+id/action_signInFragment_to_emailPasswordFragment"
+            app:destination="@id/emailPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chooseUsernameFragment"
+        android:name="com.salazar.cheers.ui.signin.ChooseUsernameFragment"
+        android:label="ChooseUsernameFragment" >
+        <action
+            android:id="@+id/action_chooseUsernameFragment_to_createPasswordFragment"
+            app:destination="@id/createPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createPasswordFragment"
+        android:name="com.salazar.cheers.ui.signin.CreatePasswordFragment"
+        android:label="CreatePasswordFragment" >
+        <argument
+            android:name="username"
+            app:argType="string" />
+    </fragment>
+</navigation>

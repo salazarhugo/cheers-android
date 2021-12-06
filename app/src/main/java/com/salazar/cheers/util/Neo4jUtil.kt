@@ -1,25 +1,19 @@
 package com.salazar.cheers.util
 
-import android.graphics.PorterDuff
-import android.os.Build
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Environment
 import com.salazar.cheers.internal.Post
-import org.neo4j.driver.*
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
-import com.google.gson.JsonObject
 
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.neo4j.driver.Values.parameters
+import org.neo4j.driver.*
 
 
 object Neo4jUtil {
@@ -65,16 +59,14 @@ object Neo4jUtil {
         }
     }
 
-    suspend fun addPost(post: Post) {
-        return withContext(Dispatchers.IO) {
-            val params: MutableMap<String, Any> = mutableMapOf()
-            params["userId"] = FirebaseAuth.getInstance().uid!!
-            params["post"] = toMap(post)
-            write(
-                "MATCH (u:User) WHERE u.id = \$userId CREATE (p: Post \$post) SET p += {id: randomUUID(), createdTime: datetime() }CREATE (u)-[:POSTED]->(p)",
-                params = params
-            )
-        }
+    fun addPost(post: Post) {
+        val params: MutableMap<String, Any> = mutableMapOf()
+        params["userId"] = FirebaseAuth.getInstance().uid!!
+        params["post"] = toMap(post)
+        write(
+            "MATCH (u:User) WHERE u.id = \$userId CREATE (p: Post \$post) SET p += {id: randomUUID(), createdTime: datetime() }CREATE (u)-[:POSTED]->(p)",
+            params = params
+        )
     }
 
     suspend fun deletePost(postId: String) {
@@ -151,6 +143,24 @@ object Neo4jUtil {
         }
     }
 
+    suspend fun isUsernameAvailable(username: String): Result<Boolean> {
+        return withContext(Dispatchers.IO)
+        {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["username"] = username
+
+                val records = query(
+                    "MATCH (u:User) WHERE u.username = \$username RETURN u",
+                    params
+                )
+                return@withContext Result.Success(records.isEmpty())
+            } catch(e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
     suspend fun posts(): List<Post> {
         return withContext(Dispatchers.IO)
         {
@@ -173,7 +183,7 @@ object Neo4jUtil {
                 val post = gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
                 val user = gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
                 post.username = user.username
-                post.photoUrl = user.photoUrl
+                post.userPhotoUrl = user.photoUrl
                 post.userId = user.id
 
                 posts.add(post)
@@ -181,7 +191,6 @@ object Neo4jUtil {
             return@withContext posts.toList()
         }
     }
-
 
     private fun query(query: String, params: MutableMap<String, Any>): List<Record> {
         getSession().use { session ->

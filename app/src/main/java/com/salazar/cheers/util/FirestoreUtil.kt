@@ -31,7 +31,12 @@ object FirestoreUtil {
             }"
         )
 
-    fun initCurrentUserIfFirstTime(acct: GoogleSignInAccount? = null, onComplete: (User) -> Unit) {
+    fun initCurrentUserIfFirstTime(
+        acct: GoogleSignInAccount? = null,
+        email: String = "",
+        username: String = "",
+        onComplete: (User) -> Unit,
+    ) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
                 onComplete(documentSnapshot.toObject(User::class.java)!!)
@@ -43,13 +48,13 @@ object FirestoreUtil {
                 acct?.givenName ?: "",
                  acct?.familyName ?: "",
                 "",
-                "",
+                username,
                 0,
                 0,
                 0,
                 "",
                 false,
-                FirebaseAuth.getInstance().currentUser?.email ?: "",
+                FirebaseAuth.getInstance().currentUser?.email ?: email,
                 "",
                 acct?.photoUrl?.toString() ?: "defaultPicture/default_profile_picture.jpg",
                 "",

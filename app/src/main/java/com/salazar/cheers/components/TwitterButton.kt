@@ -1,4 +1,4 @@
-package com.salazar.workout.components
+package com.salazar.cheers.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing

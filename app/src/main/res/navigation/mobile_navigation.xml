@@ -24,7 +24,15 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.salazar.cheers.ui.profile.ProfileFragment"
-        android:label="ProfileFragment" />
+        android:label="ProfileFragment" >
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/in_from_right"
+            app:exitAnim="@anim/out_to_left"
+            app:popEnterAnim="@anim/in_from_left"
+            app:popExitAnim="@anim/out_to_right" />
+    </fragment>
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.salazar.cheers.ui.map.MapFragment"
@@ -52,7 +60,11 @@
     <fragment
         android:id="@+id/messagesFragment"
         android:name="com.salazar.cheers.ui.messages.MessagesFragment"
-        android:label="MessagesFragment" />
+        android:label="MessagesFragment" >
+        <action
+            android:id="@+id/action_messagesFragment_to_chatActivity"
+            app:destination="@id/chatActivity" />
+    </fragment>
     <fragment
         android:id="@+id/otherProfileFragment"
         android:name="com.salazar.cheers.ui.otherprofile.OtherProfileFragment"
@@ -60,13 +72,26 @@
         <argument
             android:name="otherUserId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_otherProfileFragment_to_chatActivity"
+            app:destination="@id/chatActivity" />
     </fragment>
     <dialog
         android:id="@+id/editProfileFragment"
         android:name="com.salazar.cheers.ui.profile.EditProfileFragment"
         android:label="EditProfileFragment" />
+    <activity
+        android:id="@+id/chatActivity"
+        android:name="com.salazar.cheers.ui.chat.ChatActivity"
+        android:label="activity_chat"
+        tools:layout="@layout/activity_chat" >
+        <argument
+            android:name="chatChannelId"
+            app:argType="string" />
+    </activity>
+    <include app:graph="@navigation/mobile_navigation_chat" />
     <fragment
-        android:id="@+id/chatFragment"
-        android:name="com.salazar.cheers.ui.chat.ChatFragment"
-        android:label="ChatFragment" />
+        android:id="@+id/settingsFragment"
+        android:name="com.salazar.cheers.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

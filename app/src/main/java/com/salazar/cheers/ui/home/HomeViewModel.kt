@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
 
-    val posts = mutableStateOf(listOf(Post()))
+    val posts = mutableStateOf<List<Post>>(emptyList())
 
     fun updatePosts() {
         viewModelScope.launch {

@@ -1,7 +1,10 @@
 package com.salazar.cheers.ui.map
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,22 +12,29 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.maps.model.CameraPosition
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.common.HttpServiceFactory.getInstance
@@ -35,11 +45,13 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.Plugin
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.attribution.attribution
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.scalebar.scalebar
 import com.salazar.cheers.R
 import org.jetbrains.anko.support.v4.toast
 
@@ -49,10 +61,16 @@ class MapFragment : Fragment() {
 //    private val viewModel: MapViewModel by viewModels()
     private lateinit var mapView: MapView
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+//        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+//        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -78,16 +96,28 @@ class MapFragment : Fragment() {
             }
         }
 
+    fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+    }
+
     private fun onMapReady() {
         mapView.gestures.rotateEnabled = false
+        mapView.attribution.enabled = false
+        mapView.scalebar.enabled = false
+
         mapView.getMapboxMap().setCamera(
             CameraOptions.Builder()
-                .zoom(14.0)
+                .zoom(13.0)
                 .build()
         )
 
-        mapView.getMapboxMap().loadStyleUri("mapbox://styles/mapbox/dark-v10")
-//        mapView.getMapboxMap().loadStyleUri("mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k")
+        val style = if (requireContext().isDarkThemeOn())
+            "mapbox://styles/mapbox/dark-v10"
+        else
+           "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
+
+        mapView.getMapboxMap().loadStyleUri(style)
         {
             initLocationComponent()
             setupGesturesListener()
@@ -107,12 +137,26 @@ class MapFragment : Fragment() {
                 }
             }
         ) {
-            AndroidView(factory = ::MapView, Modifier.fillMaxSize()) {
-                mapView = it
-                enableMyLocation()
+            Box() {
+                AndroidView(factory = ::MapView, Modifier.fillMaxSize()) {
+                    mapView = it
+                    enableMyLocation()
+                }
+                var sliderPosition by remember { mutableStateOf(0f) }
+                Slider(
+                    modifier = Modifier.height(100.dp).width(1.dp),
+                    value = sliderPosition,
+                    onValueChange = { sliderPosition = it },
+                    steps = 6,
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.secondary,
+                        activeTrackColor = MaterialTheme.colorScheme.secondary
+                    ),
+                )
             }
         }
     }
+
     private fun initLocationComponent() {
         val locationComponentPlugin = mapView.location
         locationComponentPlugin.updateSettings {

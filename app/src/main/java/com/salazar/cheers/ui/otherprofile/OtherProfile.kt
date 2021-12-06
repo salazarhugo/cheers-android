@@ -26,6 +26,7 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.messages.MessagesFragmentDirections
 import com.salazar.cheers.ui.profile.EditProfileViewModel
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -154,10 +155,16 @@ class OtherProfileFragment : Fragment() {
             Spacer(modifier = Modifier.width(12.dp))
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = { /*TODO*/ }
+                onClick = {
+//                    val action =
+//                        OtherProfileFragmentDirections.actionOtherProfileFragmentToChatActivity(
+//                            otherUserId = otherUser.id
+//                        )
+//                    findNavController().navigate(action)
+                }
             ) {
-                Text("Message")
-            }
+            Text("Message")
+        }
         }
     }
 }
