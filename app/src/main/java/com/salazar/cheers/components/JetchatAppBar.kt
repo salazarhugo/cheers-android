@@ -37,7 +37,7 @@ fun CheersAppBar(
             title = title,
             scrollBehavior = scrollBehavior,
             colors = foregroundColors,
-            navigationIcon = navigationIcon
+            navigationIcon = navigationIcon,
         )
     }
 }

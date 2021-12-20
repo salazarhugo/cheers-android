@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.signin
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Result
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class HomeViewModelState(
+data class ChooseUsernameState(
     val isLoading: Boolean = false,
     val isAvailable: Boolean? = null,
     val errorMessage: String = "",
@@ -19,9 +18,9 @@ data class HomeViewModelState(
 )
 
 @HiltViewModel
-class ChooseUsernameViewModel @Inject constructor(): ViewModel() {
+class ChooseUsernameViewModel @Inject constructor() : ViewModel() {
 
-    val uiState = MutableStateFlow(HomeViewModelState(isLoading = false))
+    val uiState = MutableStateFlow(ChooseUsernameState(isLoading = false))
 
     fun clearUsername() {
         uiState.update {
@@ -37,11 +36,11 @@ class ChooseUsernameViewModel @Inject constructor(): ViewModel() {
 
     fun reset() {
         uiState.update {
-            HomeViewModelState()
+            ChooseUsernameState()
         }
     }
 
-    fun isUsernameAvailable()  {
+    fun isUsernameAvailable() {
         val username = uiState.value.username
         // Ui state is refreshing
         uiState.update { it.copy(isLoading = true) }
@@ -49,11 +48,18 @@ class ChooseUsernameViewModel @Inject constructor(): ViewModel() {
         viewModelScope.launch {
             val result = Neo4jUtil.isUsernameAvailable(username)
             uiState.update {
-                when(result)
-                {
-                    is Result.Success -> it.copy(isAvailable = result.data, username = username, isLoading = false)
+                when (result) {
+                    is Result.Success -> it.copy(
+                        isAvailable = result.data,
+                        username = username,
+                        isLoading = false
+                    )
                     is Result.Error -> {
-                        it.copy(isAvailable = false, errorMessage = it.errorMessage, isLoading = false)
+                        it.copy(
+                            isAvailable = false,
+                            errorMessage = it.errorMessage,
+                            isLoading = false
+                        )
                     }
                 }
             }

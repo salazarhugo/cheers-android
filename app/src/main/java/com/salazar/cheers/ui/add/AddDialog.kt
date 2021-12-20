@@ -3,79 +3,77 @@ package com.salazar.cheers.ui.add
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.view.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.ChatBubbleOutline
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.*
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
-import androidx.fragment.app.DialogFragment
-import com.salazar.cheers.R
-import com.salazar.cheers.ui.theme.Typography
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.view.Window
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import coil.annotation.ExperimentalCoilApi
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
+import com.mapbox.search.*
+import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.MainViewModel
+import com.salazar.cheers.R
+import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.internal.Post
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.util.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.ByteArrayOutputStream
-import java.io.File
 
 
 @AndroidEntryPoint
 class AddDialogFragment : DialogFragment() {
 
+    private val args: AddDialogFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by viewModels()
-    private val viewModel: AddPostDialogViewModel by viewModels()
+    private val viewModel: AddPostDialogViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_DialogFullScreen)
+        reverseGeocoding = MapboxSearchSdk.getReverseGeocodingSearchEngine()
     }
 
     override fun onStart() {
@@ -89,13 +87,42 @@ class AddDialogFragment : DialogFragment() {
         }
     }
 
+    private lateinit var reverseGeocoding: ReverseGeocodingSearchEngine
+    private lateinit var searchRequestTask: SearchRequestTask
+
+    private val searchCallback = object : SearchCallback {
+
+        override fun onResults(results: List<SearchResult>, responseInfo: ResponseInfo) {
+            if (results.isEmpty()) {
+                Log.i("SearchApiExample", "No reverse geocoding results")
+            } else {
+                Log.i("SearchApiExample", "Reverse geocoding results: $results")
+                viewModel.updateLocationResults(results)
+                viewModel.updateLocation("On Pin")
+            }
+        }
+
+        override fun onError(e: Exception) {
+            Log.i("SearchApiExample", "Reverse geocoding error", e)
+        }
+
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        if (args.location != null) {
+            val options = ReverseGeoOptions(
+                center = args.location!!,
+            )
+            searchRequestTask = reverseGeocoding.search(options, searchCallback)
+        }
+
         return ComposeView(requireContext()).apply {
             setContent {
-                CheersTheme() {
+                CheersTheme {
                     Surface(color = MaterialTheme.colorScheme.background) {
                         AddDialogScreen()
                     }
@@ -127,7 +154,7 @@ class AddDialogFragment : DialogFragment() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AddDialogScreen() {
-        val user = mainViewModel.user.observeAsState(User()).value
+        val user = mainViewModel.user2.value
 
         Scaffold(
             topBar = { TopAppBar() },
@@ -136,14 +163,23 @@ class AddDialogFragment : DialogFragment() {
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                AddPhoto()
-                DividerM3()
-                CaptionSection(user = user)
-                DividerM3()
-                TagSection(user = user)
-                DividerM3()
-                LocationSection(user = user)
-                DividerM3()
+                if (user == null)
+                    LoadingScreen()
+                else {
+                    AddPhoto()
+//                    if (viewModel.photoUri.value == null) DividerM3()
+                    Spacer(Modifier.height(8.dp))
+                    CaptionSection(user = user)
+                    DividerM3()
+                    TagSection()
+                    DividerM3()
+                    if (viewModel.selectedLocation.value != null)
+                        SelectedLocation(location = viewModel.selectedLocation.value!!)
+                    else
+                        LocationSection()
+                    DividerM3()
+                    LocationResultsSection(results = viewModel.locationResults.value)
+                }
             }
         }
     }
@@ -167,20 +203,92 @@ class AddDialogFragment : DialogFragment() {
     }
 
     @Composable
-    fun LocationSection(user: User) {
-        Column(
-            modifier = Modifier.padding(15.dp)
+    fun LocationSection() {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    findNavController().navigate(R.id.chooseOnMap)
+                }
+                .padding(15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = "Location", fontSize = 14.sp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(Icons.Outlined.MyLocation, null)
+                Text(text = viewModel.location.value, fontSize = 14.sp)
+            }
         }
     }
 
     @Composable
-    fun TagSection(user: User) {
-        Column(
-            modifier = Modifier.padding(15.dp)
+    fun LocationResultsSection(results: List<SearchResult>) {
+        LocationResult(results = results)
+    }
+
+    @Composable
+    fun LocationResult(results: List<SearchResult>) {
+        ChipGroup(
+            users = results.map { it.name },
+            onSelectedChanged = { name ->
+                val location = results.find { it.name == name }
+                if (location != null)
+                    viewModel.selectLocation(location)
+            },
+            unselectedColor = MaterialTheme.colorScheme.outline,
+        )
+    }
+
+    @Composable
+    fun SelectedLocation(location: SearchResult) {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    findNavController().navigate(R.id.chooseOnMap)
+                }
+                .padding(15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.tertiary)
+                Text(text = location.name, fontSize = 14.sp)
+            }
+            Icon(
+                Icons.Outlined.Close,
+                null,
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.clickable {
+                    viewModel.unselectLocation()
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun TagSection() {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    findNavController().navigate(R.id.tagUser)
+                }
+                .padding(15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = "Tag people", fontSize = 14.sp)
+            val tagUsers = viewModel.selectedTagUsers
+            if (tagUsers.size == 1)
+                Text(text = tagUsers[0].username, style = MaterialTheme.typography.labelLarge)
+            if (tagUsers.size > 1)
+                Text(text = "${tagUsers.size} people", style = MaterialTheme.typography.labelLarge)
         }
     }
 
@@ -190,12 +298,21 @@ class AddDialogFragment : DialogFragment() {
             modifier = Modifier.padding(15.dp, 0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+
+            val photo = remember { mutableStateOf<Uri?>(null) }
+
+            if (user.profilePicturePath.isNotBlank())
+                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                    photo.value = it
+                }
             Image(
-                painter = rememberImagePainter(data = user.photoUrl),
+                painter = rememberImagePainter(data = photo.value),
                 contentDescription = "Profile image",
                 modifier = Modifier
+                    .clip(CircleShape)
                     .size(40.dp)
                     .border(BorderStroke(1.dp, Color.LightGray), CircleShape),
+                contentScale = ContentScale.Crop,
             )
             val caption = viewModel.caption
 
@@ -210,7 +327,7 @@ class AddDialogFragment : DialogFragment() {
                     .align(Alignment.CenterVertically)
                     .fillMaxWidth(),
                 onValueChange = {
-                        viewModel.onCaptionChanged(it)
+                    viewModel.onCaptionChanged(it)
                 },
                 singleLine = false,
                 keyboardOptions = KeyboardOptions(
@@ -241,8 +358,7 @@ class AddDialogFragment : DialogFragment() {
         }
     }
 
-    private fun openPhotoChooser()
-    {
+    private fun openPhotoChooser() {
         Utils.openPhotoChooser(singleImageResultLauncher)
     }
 
@@ -252,7 +368,7 @@ class AddDialogFragment : DialogFragment() {
                 val data: Intent? = result.data
                 val selectedImageUri: Uri? = data?.data
                 if (selectedImageUri != null) {
-                   viewModel.photoUri.value = selectedImageUri
+                    viewModel.photoUri.value = selectedImageUri
                 }
             }
         }

@@ -25,9 +25,9 @@ object FirestoreChat {
         )
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
 
-    fun getOrCreateChatChannel(otherUserId: String, onComplete: (channelId: String) -> Unit) {
+    fun getOrCreateChatChannel(otherUser: User, onComplete: (channelId: String) -> Unit) {
         currentUserDocRef.collection("engagedChatChannels")
-            .document(otherUserId).get().addOnSuccessListener {
+            .document(otherUser.id).get().addOnSuccessListener {
                 if (it.exists()) {
                     onComplete(it["channelId"] as String)
                     return@addOnSuccessListener
@@ -39,7 +39,8 @@ object FirestoreChat {
                     ChatChannel(
                         newChannel.id,
                         "Channel 1",
-                         mutableListOf(currentUserId, otherUserId),
+                        listOf(currentUserId, otherUser.id),
+                        User(),
                         Timestamp.now(),
                         "",
                         TextMessage(),
@@ -48,11 +49,11 @@ object FirestoreChat {
                 )
 
                 currentUserDocRef.collection("engagedChatChannels")
-                    .document(otherUserId)
+                    .document(otherUser.id)
                     .set(mapOf("channelId" to newChannel.id))
 
                 firestoreInstance.collection("users") //ADDS channelId for the otherUser
-                    .document(otherUserId)
+                    .document(otherUser.id)
                     .collection("engagedChatChannels")
                     .document(currentUserId)
                     .set(mapOf("channelId" to newChannel.id))
@@ -61,11 +62,10 @@ object FirestoreChat {
             }
     }
 
-    fun getChatChannels(): Flow<List<ChatChannel>> = callbackFlow {
-
+    suspend fun getChatChannels(): Flow<List<ChatChannel>> = callbackFlow {
         val channelCol = chatChannelsCollectionRef
             .whereArrayContains("members", FirebaseAuth.getInstance().currentUser!!.uid)
-//            .orderBy("recentMessage.time", Query.Direction.DESCENDING)
+            .orderBy("recentMessageTime", Query.Direction.DESCENDING)
 
         val subscription = channelCol.addSnapshotListener { snapshot, _ ->
             val chatChannels = ArrayList<ChatChannel>()
@@ -85,7 +85,7 @@ object FirestoreChat {
         val messagesDocument = chatChannelsCollectionRef
             .document(channelId)
             .collection("messages")
-            .orderBy("time")
+            .orderBy("time", Query.Direction.DESCENDING)
 
         val subscription = messagesDocument.addSnapshotListener { snapshot, _ ->
             val items = mutableListOf<Message>()
@@ -116,22 +116,30 @@ object FirestoreChat {
         chatChannelsCollectionRef.document(channelId).update(mapOf("seenBy" to FieldValue.delete()))
         when (message.type) {
             MessageType.TEXT -> chatChannelsCollectionRef.document(channelId).update(
+                "recentMessage",
                 mapOf(
                     "text" to (message as TextMessage).text,
                     "senderId" to message.senderId,
+                    "senderUsername" to message.senderUsername,
+                    "senderProfilePicturePath" to message.senderProfilePicturePath,
                     "recipientId" to message.recipientId,
-                    "time" to message.time,
+                    "time" to FieldValue.serverTimestamp(),
                     "seenBy" to listOf(currentUserId)
-                )
+                ),
+                "recentMessageTime", FieldValue.serverTimestamp()
             )
             MessageType.IMAGE -> chatChannelsCollectionRef.document(channelId).update(
+                "recentMessage",
                 mapOf(
                     "text" to "sent an image",
                     "senderId" to (message as ImageMessage).senderId,
+                    "senderUsername" to message.senderUsername,
+                    "senderProfilePicturePath" to message.senderProfilePicturePath,
                     "recipientId" to message.recipientId,
-                    "time" to message.time,
+                    "time" to FieldValue.serverTimestamp(),
                     "seenBy" to listOf(currentUserId)
-                )
+                ),
+                "recentMessageTime", FieldValue.serverTimestamp()
             )
         }
     }

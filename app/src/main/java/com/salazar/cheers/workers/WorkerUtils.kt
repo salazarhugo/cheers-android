@@ -38,17 +38,17 @@ fun makeStatusNotification(message: String, context: Context) {
 
     // Add the channel
     val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
 
     notificationManager?.createNotificationChannel(channel)
 
     // Create the notification
     val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Working...")
-            .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVibrate(LongArray(0))
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setContentTitle("Working...")
+        .setContentText(message)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setVibrate(LongArray(0))
 
     // Show the notification
     NotificationManagerCompat.from(context).notify(1, builder.build())

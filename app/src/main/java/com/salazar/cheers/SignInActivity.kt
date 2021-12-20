@@ -1,55 +1,27 @@
 package com.salazar.cheers
 
-import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.*
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
-import com.salazar.cheers.components.GoogleButton
-import com.salazar.cheers.components.TwitterButton
-import com.salazar.cheers.databinding.ContentMainBinding
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.OAuthProvider
 import com.salazar.cheers.databinding.ContentSignInBinding
 import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
-import org.jetbrains.anko.toast
 
 
 @AndroidEntryPoint
@@ -62,7 +34,7 @@ class SignInActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         setContent {
-            CheersTheme() {
+            CheersTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     AndroidViewBinding(ContentSignInBinding::inflate)
                 }
@@ -103,6 +75,7 @@ class SignInActivity : AppCompatActivity() {
             }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @ExperimentalMaterial3Api
     private fun signInAnonymously() {
         auth.signInAnonymously().addOnSuccessListener {
@@ -111,7 +84,7 @@ class SignInActivity : AppCompatActivity() {
     }
 
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterialApi::class)
     fun signInSuccessful(acct: GoogleSignInAccount? = null) {
         FirestoreUtil.initCurrentUserIfFirstTime(acct) { user ->
             startActivity(intentFor<MainActivity>("user" to user).newTask().clearTask())

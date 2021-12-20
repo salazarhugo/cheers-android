@@ -1,17 +1,20 @@
 package com.salazar.cheers.ui.otherprofile
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -24,21 +27,18 @@ import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.internal.Counter
-import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.messages.MessagesFragmentDirections
-import com.salazar.cheers.ui.profile.EditProfileViewModel
+import com.salazar.cheers.ui.profile.OtherProfileUiState
+import com.salazar.cheers.ui.profile.OtherProfileViewModel
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.util.FirestoreChat
+import com.salazar.cheers.util.StorageUtil
 
 class OtherProfileFragment : Fragment() {
 
-    private val viewModel: EditProfileViewModel by viewModels()
-
-    val args: OtherProfileFragmentArgs by navArgs()
-
-    lateinit var otherUser: User
+    private val viewModel: OtherProfileViewModel by viewModels()
+    private val args: OtherProfileFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,24 +54,30 @@ class OtherProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val otherUserId = args.otherUserId
-        viewModel.getUser(otherUserId)
-        otherUser = viewModel.user2.value
+        viewModel.refreshUser(args.otherUserId)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun OtherProfileScreen() {
-//        val a =  other
+        val uiState = viewModel.uiState.collectAsState().value
+
         Scaffold(
-            topBar = { Toolbar(otherUser)}
+            topBar = { Toolbar(uiState.user) }
         ) {
             Column(
                 modifier = Modifier.padding(15.dp)
             ) {
-                Section1(otherUser)
-                Section2(otherUser)
-                HeaderButtons(otherUser)
+                if (uiState.isLoading)
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp),
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                Section1(uiState)
+                Section2(uiState.user)
+                HeaderButtons(uiState)
             }
         }
     }
@@ -91,15 +97,18 @@ class OtherProfileFragment : Fragment() {
 
     @Composable
     fun Section2(otherUser: User) {
-        Column() {
-            Text( text = "${otherUser.firstName} ${otherUser.lastName}", style = Typography.bodyMedium)
+        Column {
+            Text(
+                text = "${otherUser.firstName} ${otherUser.lastName}",
+                style = Typography.bodyMedium
+            )
             Text(otherUser.bio)
             Text(otherUser.website)
         }
     }
 
     @Composable
-    fun Section1(otherUser: User) {
+    fun Section1(uiState: OtherProfileUiState) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -107,9 +116,15 @@ class OtherProfileFragment : Fragment() {
                 .padding(bottom = 15.dp)
                 .fillMaxWidth()
         ) {
+            val photo = remember { mutableStateOf<Uri?>(null) }
+
+            if (uiState.user.profilePicturePath.isNotBlank())
+                StorageUtil.pathToReference(uiState.user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                    photo.value = it
+                }
             Image(
                 painter = rememberImagePainter(
-                    data = otherUser.photoUrl,
+                    data = photo.value,
                     builder = {
                         transformations(CircleCropTransformation())
                     }
@@ -117,22 +132,23 @@ class OtherProfileFragment : Fragment() {
                 modifier = Modifier.size(70.dp),
                 contentDescription = null,
             )
-            Counters(otherUser)
+            Counters(uiState)
         }
     }
 
     @Composable
-    fun Counters(otherUser: User) {
+    fun Counters(uiState: OtherProfileUiState) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(26.dp)
         ) {
+            val otherUser = uiState.user
             val items = listOf(
                 Counter("Posts", otherUser.posts),
                 Counter("Followers", otherUser.followers),
                 Counter("Following", otherUser.following),
             )
 
-            items.forEach { item->
+            items.forEach { item ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -144,27 +160,34 @@ class OtherProfileFragment : Fragment() {
     }
 
     @Composable
-    fun HeaderButtons(otherUser: User) {
-        Row() {
+    fun HeaderButtons(uiState: OtherProfileUiState) {
+        Row {
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = { Neo4jUtil.followUser(otherUser.id)}
+                onClick = {
+                    viewModel.followUser(uiState.user.id)
+                }
             ) {
-                Text("Follow")
+                if (uiState.isFollowing)
+                    Text("Following")
+                else
+                    Text("Follow")
             }
             Spacer(modifier = Modifier.width(12.dp))
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = {
-//                    val action =
-//                        OtherProfileFragmentDirections.actionOtherProfileFragmentToChatActivity(
-//                            otherUserId = otherUser.id
-//                        )
-//                    findNavController().navigate(action)
+                    FirestoreChat.getOrCreateChatChannel(uiState.user) { channelId ->
+                        val action =
+                            OtherProfileFragmentDirections.actionOtherProfileFragmentToChatActivity(
+                                chatChannelId = channelId
+                            )
+                        findNavController().navigate(action)
+                    }
                 }
             ) {
-            Text("Message")
-        }
+                Text("Message")
+            }
         }
     }
 }

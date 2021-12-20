@@ -5,73 +5,75 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.graphics.*
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.fragment.app.Fragment
-import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.maps.model.CameraPosition
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.common.HttpServiceFactory.getInstance
-import com.mapbox.common.OfflineSwitch.getInstance
+import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.dsl.cameraOptions
+import com.mapbox.maps.MapView
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.Plugin
-import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.attribution.attribution
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.salazar.cheers.R
-import org.jetbrains.anko.support.v4.toast
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.util.StorageUtil
+import com.salazar.cheers.util.Utils.convertDrawableToBitmap
+import com.salazar.cheers.util.Utils.getCircledBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URL
 
 
 class MapFragment : Fragment() {
 
-//    private val viewModel: MapViewModel by viewModels()
+    private val viewModel: MapViewModel by activityViewModels()
     private lateinit var mapView: MapView
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-//        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-
         return ComposeView(requireContext()).apply {
             setContent {
                 MapScreen()
@@ -80,8 +82,12 @@ class MapFragment : Fragment() {
     }
 
     private fun enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        )
             onMapReady()
         else
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -115,18 +121,52 @@ class MapFragment : Fragment() {
         val style = if (requireContext().isDarkThemeOn())
             "mapbox://styles/mapbox/dark-v10"
         else
-           "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
+            "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
 
-        mapView.getMapboxMap().loadStyleUri(style)
-        {
+        mapView.getMapboxMap().loadStyleUri(style) {
             initLocationComponent()
             setupGesturesListener()
+            val uiState = viewModel.uiState.value
+            lifecycleScope.launch {
+                uiState.posts.forEach {
+                    addPostToMap(it)
+                }
+            }
+        }
+    }
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+    fun Scrollbar() {
+        // actual composable state
+        val zoom by remember { mutableStateOf(0f) }
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .width(45.dp)
+                .pointerInteropFilter { motionEvent ->
+                    when(motionEvent.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            false
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            false
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            false
+                        }
+                        else -> false
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(zoom.toString())
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MapScreen() {
+
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {
@@ -137,22 +177,25 @@ class MapFragment : Fragment() {
                 }
             }
         ) {
-            Box() {
+            Box(contentAlignment = Alignment.TopEnd) {
                 AndroidView(factory = ::MapView, Modifier.fillMaxSize()) {
                     mapView = it
                     enableMyLocation()
                 }
-                var sliderPosition by remember { mutableStateOf(0f) }
-                Slider(
-                    modifier = Modifier.height(100.dp).width(1.dp),
-                    value = sliderPosition,
-                    onValueChange = { sliderPosition = it },
-                    steps = 6,
-                    colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.secondary,
-                        activeTrackColor = MaterialTheme.colorScheme.secondary
-                    ),
-                )
+//                var sliderPosition by remember { mutableStateOf(0f) }
+//                Slider(
+//                    modifier = Modifier
+//                        .height(100.dp)
+//                        .width(1.dp),
+//                    value = sliderPosition,
+//                    onValueChange = { sliderPosition = it },
+//                    steps = 6,
+//                    colors = SliderDefaults.colors(
+//                        thumbColor = MaterialTheme.colorScheme.secondary,
+//                        activeTrackColor = MaterialTheme.colorScheme.secondary
+//                    ),
+//                )
+                Scrollbar()
             }
         }
     }
@@ -184,8 +227,49 @@ class MapFragment : Fragment() {
                 }.toJson()
             )
         }
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(
+            onIndicatorPositionChangedListener
+        )
     }
+
+    private suspend fun addPostToMap(post: Post) =
+        withContext(Dispatchers.IO) {
+            getBitmapFromUrl(post) { postPhoto ->
+                if (postPhoto == null)
+                    return@getBitmapFromUrl
+
+                val annotationApi = mapView.annotations
+                val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
+                val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
+                    .withPoint(Point.fromLngLat(post.locationLongitude, post.locationLatitude))
+                    .withIconImage(postPhoto)
+                    .withIconSize(0.1)
+                pointAnnotationManager.create(pointAnnotationOptions)
+                pointAnnotationManager.addClickListener(onPostAnnotationClick(post))
+            }
+        }
+
+    private fun getBitmapFromUrl(post: Post, onDone: (Bitmap?) -> Unit) {
+        StorageUtil.pathToReference(post.photoPath)?.downloadUrl?.addOnSuccessListener {
+            val urlObj = URL(it.toString())
+            onDone(
+                BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
+                    .getCircledBitmap()
+            )
+        }
+    }
+
+    private fun onPostAnnotationClick(post: Post): OnPointAnnotationClickListener {
+        return OnPointAnnotationClickListener {
+            viewModel.selectPost(post)
+            findNavController().navigate(R.id.postMapDialog)
+            true
+        }
+    }
+
+    private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
+        convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
+
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
         mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())

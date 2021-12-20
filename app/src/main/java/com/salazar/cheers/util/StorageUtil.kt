@@ -49,6 +49,12 @@ object StorageUtil {
             }
     }
 
-    fun pathToReference(path: String) = storageInstance.getReference(path)
+    fun pathToReference(path: String): StorageReference? {
+        return try {
+            storageInstance.getReference(path)
+        } catch (e: Exception) {
+            null
+        }
+    }
 
 }

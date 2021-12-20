@@ -1,0 +1,65 @@
+package com.salazar.cheers.ui.map
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.Result
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.User
+import com.salazar.cheers.util.Neo4jUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class MapViewModel @Inject constructor() : ViewModel() {
+
+    private val viewModelState = MutableStateFlow(MapViewModelState(isLoading = true))
+
+    val uiState = viewModelState
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            viewModelState.value
+        )
+
+    init {
+        refreshPosts()
+    }
+
+    fun refreshPosts() {
+        viewModelState.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            viewModelState.update {
+                val result = Neo4jUtil.posts()
+                when (result) {
+                    is Result.Success -> it.copy(posts = result.data, isLoading = false)
+                    is Result.Error -> it.copy(
+                        isLoading = false,
+                        errorMessages = listOf(result.exception.toString())
+                    )
+                }
+            }
+        }
+    }
+
+    fun selectPost(post: Post) {
+        viewModelState.update {
+            it.copy(selectedPost = post)
+        }
+    }
+}
+
+data class MapViewModelState(
+    val users: List<User> = emptyList(),
+    val posts: List<Post> = emptyList(),
+    val selectedPost: Post? = null,
+    val isLoading: Boolean = false,
+    val errorMessages: List<String> = emptyList(),
+    val searchInput: String = "",
+)
+

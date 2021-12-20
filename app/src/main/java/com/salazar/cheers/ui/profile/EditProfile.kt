@@ -16,37 +16,32 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.salazar.cheers.MainViewModel
+import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.MyTopAppBar
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
+import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditProfileFragment : DialogFragment() {
 
-    private val mainViewModel: MainViewModel by viewModels()
     private val viewModel: EditProfileViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +66,7 @@ class EditProfileFragment : DialogFragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                CheersTheme() {
+                CheersTheme {
                     Surface(color = MaterialTheme.colorScheme.background) {
                         EditProfileScreen()
                     }
@@ -83,14 +78,23 @@ class EditProfileFragment : DialogFragment() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun EditProfileScreen() {
-        val user = mainViewModel.user.observeAsState(User()).value
+        val uiState = viewModel.uiState.collectAsState().value
 
         Scaffold(
-            topBar = { MyTopAppBar("Edit Profile", { dismiss() }, { dismiss() }) },
+            topBar = {
+                MyTopAppBar("Edit Profile", { dismiss() }, {
+                    viewModel.updateUser(uiState.user)
+                    dismiss()
+                })
+            },
         ) {
             Column {
-                EditProfileHeader(user)
-                EditProfileBody(user)
+                if (uiState.isLoading)
+                    LoadingScreen()
+                else {
+                    EditProfileHeader(uiState.user)
+                    EditProfileBody(uiState.user)
+                }
             }
         }
     }
@@ -98,7 +102,7 @@ class EditProfileFragment : DialogFragment() {
     @ExperimentalCoilApi
     @Composable
     fun EditProfileHeader(user: User) {
-        val openDialog = remember { mutableStateOf(false)  }
+        val openDialog = remember { mutableStateOf(false) }
 
         if (openDialog.value)
             EditProfilePhotoDialog(openDialog)
@@ -107,8 +111,22 @@ class EditProfileFragment : DialogFragment() {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(),
         ) {
+
+            val photo = remember { mutableStateOf<Uri?>(null) }
+
+            if (viewModel.photoUri.value != null)
+                photo.value = viewModel.photoUri.value
+            else if (user.profilePicturePath.isNotBlank())
+                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                    photo.value = it
+                }
             Image(
-                painter = rememberImagePainter(data = user.photoUrl),
+                painter = rememberImagePainter(
+                    data = photo.value,
+                    builder = {
+                        transformations(CircleCropTransformation())
+                    }
+                ),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(96.dp)
@@ -118,6 +136,7 @@ class EditProfileFragment : DialogFragment() {
 //                        openDialog.value = true
                     },
             )
+            Spacer(Modifier.height(8.dp))
             Text("Change profile photo")
         }
 
@@ -129,7 +148,7 @@ class EditProfileFragment : DialogFragment() {
                 val data: Intent? = result.data
                 val selectedImageUri: Uri? = data?.data
                 if (selectedImageUri != null) {
-//                    viewModel.photoUri.value = selectedImageUri
+                    viewModel.photoUri.value = selectedImageUri
                 }
             }
         }
@@ -153,25 +172,83 @@ class EditProfileFragment : DialogFragment() {
             }
         )
     }
+
     @Composable
     fun EditProfileBody(user: User) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
-            val items = listOf("Name", "Username", "Bio")
 
-            val name = viewModel.name
-            viewModel.onNameChanged(user.fullName)
-
-            items.forEach { item ->
-                TextField(
-                    label = { Text(item) },
-                    value = name.value,
-                    onValueChange = {
-                        viewModel.onNameChanged(it)
-                    },
-                )
-            }
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = {
+                    Text(
+                        "Name",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    textColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                value = user.fullName,
+                onValueChange = {
+                    viewModel.onNameChanged(it)
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = {
+                    Text(
+                        "Username",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    textColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                value = user.username,
+                onValueChange = {
+                    viewModel.onBioChanged(it)
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = {
+                    Text(
+                        "Website",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    textColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                value = user.website,
+                onValueChange = {
+                    viewModel.onWebsiteChanged(it)
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Bio", style = MaterialTheme.typography.labelMedium) },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    textColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                value = user.bio,
+                onValueChange = {
+                    viewModel.onBioChanged(it)
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 

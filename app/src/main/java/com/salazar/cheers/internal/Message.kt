@@ -11,11 +11,11 @@ object MessageType {
 interface Message {
     var id: String
     var chatChannelId: String
-    val time: Date
+    val time: Date?
     val senderId: String
     val recipientId: String
     val senderName: String
-    val authorImage: String
+    val senderProfilePicturePath: String
     val senderUsername: String
     val type: String
     val likedBy: ArrayList<String>

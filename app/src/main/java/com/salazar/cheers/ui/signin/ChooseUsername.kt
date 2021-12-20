@@ -47,10 +47,9 @@ class ChooseUsernameFragment : Fragment() {
 
     @Composable
     fun ChooseUsernameScreen() {
-        val uiState = viewModel.uiState.collectAsState(HomeViewModelState()).value
+        val uiState = viewModel.uiState.collectAsState(ChooseUsernameState()).value
 
-        if (uiState.isAvailable == true)
-        {
+        if (uiState.isAvailable == true) {
             val action =
                 ChooseUsernameFragmentDirections
                     .actionChooseUsernameFragmentToCreatePasswordFragment(uiState.username)
@@ -73,7 +72,7 @@ class ChooseUsernameFragment : Fragment() {
     }
 
     @Composable
-    fun NextButton(uiState: HomeViewModelState) {
+    fun NextButton(uiState: ChooseUsernameState) {
         Button(
             shape = RoundedCornerShape(8.dp),
             onClick = {
@@ -86,7 +85,9 @@ class ChooseUsernameFragment : Fragment() {
         ) {
             if (uiState.isLoading)
                 CircularProgressIndicator(
-                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.CenterVertically),
                     color = MaterialTheme.colorScheme.onSurface,
                     strokeWidth = 1.dp
                 )
@@ -96,7 +97,7 @@ class ChooseUsernameFragment : Fragment() {
     }
 
     @Composable
-    fun UsernameTextField(uiState: HomeViewModelState) {
+    fun UsernameTextField(uiState: ChooseUsernameState) {
         TextField(
             value = uiState.username,
             colors = TextFieldDefaults.textFieldColors(
@@ -129,7 +130,7 @@ class ChooseUsernameFragment : Fragment() {
             },
             isError = uiState.isAvailable == false,
         )
-        if(uiState.errorMessage.isNotEmpty())
+        if (uiState.errorMessage.isNotEmpty())
             Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
     }
 

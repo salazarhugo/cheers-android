@@ -32,15 +32,14 @@
             app:exitAnim="@anim/out_to_left"
             app:popEnterAnim="@anim/in_from_left"
             app:popExitAnim="@anim/out_to_right" />
+        <action
+            android:id="@+id/action_profileFragment_to_followersFollowingFragment"
+            app:destination="@id/followersFollowingFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.salazar.cheers.ui.map.MapFragment"
-        android:label="MapFragment" >
-        <action
-            android:id="@+id/action_mapFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-    </fragment>
+        android:label="MapFragment" />
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.salazar.cheers.ui.search.SearchFragment"
@@ -56,10 +55,16 @@
     <dialog
         android:id="@+id/addDialogFragment"
         android:name="com.salazar.cheers.ui.add.AddDialogFragment"
-        android:label="AddDialogFragment" />
+        android:label="AddDialogFragment" >
+        <argument
+            android:name="location"
+            app:argType="com.mapbox.geojson.Point"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+    </dialog>
     <fragment
         android:id="@+id/messagesFragment"
-        android:name="com.salazar.cheers.ui.messages.MessagesFragment"
+        android:name="com.salazar.cheers.ui.chats.MessagesFragment"
         android:label="MessagesFragment" >
         <action
             android:id="@+id/action_messagesFragment_to_chatActivity"
@@ -94,4 +99,44 @@
         android:id="@+id/settingsFragment"
         android:name="com.salazar.cheers.ui.settings.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/followersFollowingFragment"
+        android:name="com.salazar.cheers.ui.profile.FollowersFollowingFragment"
+        android:label="FollowersFollowingFragment" >
+        <action
+            android:id="@+id/action_followersFollowingFragment_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment" />
+        <argument
+            android:name="username"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/activityFragment"
+        android:name="com.salazar.cheers.ui.activity.ActivityFragment"
+        android:label="ActivityFragment" />
+    <dialog
+        android:id="@+id/newMessageFragment"
+        android:name="com.salazar.cheers.ui.chats.NewMessageFragment"
+        android:label="NewMessageFragment" >
+        <action
+            android:id="@+id/action_dialogFragmentScreen_to_chatActivity"
+            app:destination="@id/chatActivity"
+            app:popUpTo="@id/messagesFragment" />
+    </dialog>
+    <dialog
+        android:id="@+id/chooseOnMap"
+        android:name="com.salazar.cheers.ui.map.ChooseOnMap"
+        android:label="ChooseOnMap" >
+        <action
+            android:id="@+id/action_chooseOnMap_to_addDialogFragment"
+            app:destination="@id/addDialogFragment" />
+    </dialog>
+    <dialog
+        android:id="@+id/tagUser"
+        android:name="com.salazar.cheers.ui.taguser.TagUser"
+        android:label="TagUser" />
+    <dialog
+        android:id="@+id/postMapDialog"
+        android:name="com.salazar.cheers.ui.map.PostMapDialog"
+        android:label="PostMapDialog" />
 </navigation>

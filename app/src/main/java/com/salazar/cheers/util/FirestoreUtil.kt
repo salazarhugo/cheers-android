@@ -2,21 +2,15 @@ package com.salazar.cheers.util
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.salazar.cheers.SignInActivity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.clearTask
-import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.newTask
 import java.util.*
 
 
@@ -46,8 +40,8 @@ object FirestoreUtil {
             val newUser = User(
                 FirebaseAuth.getInstance().currentUser!!.uid,
                 acct?.givenName ?: "",
-                 acct?.familyName ?: "",
-                "",
+                acct?.familyName ?: "",
+                "${acct?.givenName} ${acct?.familyName}",
                 username,
                 0,
                 0,
@@ -56,11 +50,10 @@ object FirestoreUtil {
                 false,
                 FirebaseAuth.getInstance().currentUser?.email ?: email,
                 "",
-                acct?.photoUrl?.toString() ?: "defaultPicture/default_profile_picture.jpg",
+                "defaultPicture/default_profile_picture.jpg", //acct?.photoUrl?.toString() ?: "defaultPicture/default_profile_picture.jpg",
                 "",
                 false,
                 false,
-                mutableListOf(),
             )
             currentUserDocRef.set(newUser)
             GlobalScope.launch {
@@ -107,15 +100,15 @@ object FirestoreUtil {
     }
 
     fun updateName(firstName: String, lastName: String) {
-        if(firstName.isBlank() && lastName.isBlank())
+        if (firstName.isBlank() && lastName.isBlank())
             return
 
         val updates = mutableMapOf<String, String>()
 
-        if(firstName.isNotBlank())
+        if (firstName.isNotBlank())
             updates["firstName"] = firstName
 
-        if(lastName.isNotBlank())
+        if (lastName.isNotBlank())
             updates["lastName"] = lastName
 
         currentUserDocRef

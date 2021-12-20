@@ -7,14 +7,34 @@ object ChatChannelType {
     const val GROUP = "GROUP"
 }
 
+sealed interface ChatChannel2 {
+    val id: String
+    val name: String
+    var members: MutableList<String>
+    val createdAt: Timestamp
+    val createdBy: String
+    val recentMessage: TextMessage
+    val type: String
+}
+
 data class ChatChannel(
     val id: String,
     val name: String,
-    var members: MutableList<String>,
+    var members: List<String>,
+    val otherUser: User,
     val createdAt: Timestamp,
     val createdBy: String,
     val recentMessage: TextMessage,
     val type: String,
-){
-    constructor() : this("", "", mutableListOf(), Timestamp.now(), "", TextMessage(), ChatChannelType.DIRECT)
+) {
+    constructor() : this(
+        "",
+        "",
+        listOf(),
+        User(),
+        Timestamp.now(),
+        "",
+        TextMessage(),
+        ChatChannelType.DIRECT
+    )
 }

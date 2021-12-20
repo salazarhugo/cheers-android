@@ -5,22 +5,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.viewModels
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.R
-import com.salazar.cheers.databinding.ContentChatBinding
 import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.util.FirestoreChat
-import org.jetbrains.anko.toast
 
 class ChatActivity : AppCompatActivity() {
 
@@ -35,6 +28,7 @@ class ChatActivity : AppCompatActivity() {
         val channelId = intent.getStringExtra("chatChannelId").toString()
         chatViewModel.channelId.value = channelId
 
+
         setContent {
             // Update the system bars to be translucent
             val systemUiController = rememberSystemUiController()
@@ -45,25 +39,19 @@ class ChatActivity : AppCompatActivity() {
 
             ProvideWindowInsets(consumeWindowInsets = false, windowInsetsAnimationsEnabled = true) {
                 CompositionLocalProvider {
-                    val scaffoldState = rememberScaffoldState()
-
-                    Scaffold(
-                        scaffoldState = scaffoldState,
-                    ) {
-                        AndroidViewBinding(ContentChatBinding::inflate)
+                    CheersTheme {
+                        val messages = chatViewModel.messages(channelId)
+                            .collectAsState(initial = listOf()).value
+                        ChatScreen(channelId = channelId, messages = messages, ::senMessage) {
+//                            Navigation.findNavController(this).popBackStack()
+                        }
                     }
                 }
             }
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return findNavController().navigateUp() || super.onSupportNavigateUp()
-    }
-
-    private fun findNavController(): NavController {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        return navHostFragment.navController
+    private fun senMessage(channelId: String, msg: String) {
+        chatViewModel.sendTextMessage(msg, channelId)
     }
 }

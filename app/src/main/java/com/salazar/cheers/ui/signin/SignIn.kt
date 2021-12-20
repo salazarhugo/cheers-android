@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -45,7 +46,6 @@ import com.salazar.cheers.components.GoogleButton
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask
-import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.support.v4.intentFor
 
@@ -117,7 +117,8 @@ class SignInFragment : Fragment() {
                         onClick = {},
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF00ACEE),
-                        )
+                        ),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Icon(Icons.Default.Login, "")
                         Spacer(Modifier.width(12.dp))
@@ -127,9 +128,11 @@ class SignInFragment : Fragment() {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            val action = SignInFragmentDirections.actionSignInFragmentToEmailPasswordFragment()
+                            val action =
+                                SignInFragmentDirections.actionSignInFragmentToEmailPasswordFragment()
                             findNavController().navigate(action)
                         },
+                        shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF800000),
                         )
@@ -144,7 +147,8 @@ class SignInFragment : Fragment() {
                         onClick = {},
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF008800),
-                        )
+                        ),
+                        shape = RoundedCornerShape(8.dp),
                     ) {
                         Icon(Icons.Default.Phone, "")
                         Spacer(Modifier.width(12.dp))
@@ -186,6 +190,7 @@ class SignInFragment : Fragment() {
             Line()
         }
     }
+
     @Composable
     private fun RowScope.Line() {
         // TODO (M3): No Divider, replace when available
@@ -215,7 +220,8 @@ class SignInFragment : Fragment() {
                     firebaseAuthWithGoogle(account!!)
                 } catch (e: ApiException) {
                     Log.w("GoogleSignIn", "Google sign in failed", e)
-                    Toast.makeText(requireContext(), "Google sign in failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Google sign in failed", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }

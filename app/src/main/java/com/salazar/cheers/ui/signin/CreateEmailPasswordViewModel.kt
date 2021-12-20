@@ -1,19 +1,9 @@
 package com.salazar.cheers.ui.signin
 
-import android.content.ContentValues
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.util.Neo4jUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CreateEmailPasswordViewModelState(
@@ -25,7 +15,7 @@ data class CreateEmailPasswordViewModelState(
 )
 
 @HiltViewModel
-class CreateEmailPasswordViewModel @Inject constructor(): ViewModel() {
+class CreateEmailPasswordViewModel @Inject constructor() : ViewModel() {
 
     val uiState = MutableStateFlow(CreateEmailPasswordViewModelState(isLoading = false))
 

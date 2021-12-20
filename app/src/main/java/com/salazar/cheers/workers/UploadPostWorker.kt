@@ -11,10 +11,8 @@ import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
-import androidx.lifecycle.viewModelScope
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
@@ -23,10 +21,6 @@ import com.salazar.cheers.util.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
@@ -47,12 +41,31 @@ class UploadPostWorker @AssistedInject constructor(
         val photoCaption =
             inputData.getString("PHOTO_CAPTION") ?: ""
 
+        val locationName =
+            inputData.getString("LOCATION_NAME") ?: ""
+
+        val latitude =
+            inputData.getDouble("LOCATION_LATITUDE", 0.0)
+
+        val longitude =
+            inputData.getDouble("LOCATION_LONGITUDE", 0.0)
+
+        val tagUserIds =
+            inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
+
+
         try {
 
             val photoBytes = extractImage(Uri.parse(photoUriInput))
 
             StorageUtil.uploadPostImage(photoBytes) { imagePath ->
-                val post = Post(caption = photoCaption, photoPath = imagePath)
+                val post = Post(
+                    caption = photoCaption,
+                    photoPath = imagePath,
+                    locationName = locationName,
+                    locationLatitude = latitude,
+                    locationLongitude = longitude,
+                )
                 Neo4jUtil.addPost(post)
                 makeStatusNotification("Output is $imagePath", appContext)
             }
@@ -66,10 +79,14 @@ class UploadPostWorker @AssistedInject constructor(
     @OptIn(ExperimentalMaterial3Api::class)
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val notification = NotificationCompat.Builder(applicationContext, "CHANNEL_ID")
-            .setContentIntent(PendingIntent.getActivity(
-                applicationContext,
-                0,
-                Intent(applicationContext, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    Intent(applicationContext, MainActivity::class.java),
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             .setOngoing(true)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.cheers)

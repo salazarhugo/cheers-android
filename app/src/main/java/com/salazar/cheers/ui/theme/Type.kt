@@ -1,14 +1,12 @@
 package com.salazar.cheers.ui.theme
 
-import com.salazar.cheers.R
-
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.salazar.cheers.R
 
 val Google = FontFamily(
     Font(R.font.google),
@@ -108,15 +106,15 @@ val Typography = Typography(
     ),
     labelMedium = TextStyle(
         fontFamily = Roboto,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
     ),
     labelSmall = TextStyle(
         fontFamily = Roboto,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 11.sp,
         lineHeight = 16.sp,
     ),
 
-)
+    )

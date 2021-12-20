@@ -8,10 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +33,9 @@ fun ChannelNameBar(
         scrollBehavior = scrollBehavior,
         onNavIconPressed = onNavIconPressed,
         navigationIcon = {
-            Icon(Icons.Default.ArrowBack, "")
+            IconButton(onClick = onNavIconPressed) {
+                Icon(Icons.Default.ArrowBack, "")
+            }
         },
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

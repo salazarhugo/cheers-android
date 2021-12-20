@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -34,21 +35,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.ui.otherprofile.OtherProfileFragmentArgs
 import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.support.v4.intentFor
 
+@ExperimentalMaterialApi
 class CreatePasswordFragment : Fragment() {
 
     private val viewModel: CreateEmailPasswordViewModel by viewModels()
@@ -104,7 +101,9 @@ class CreatePasswordFragment : Fragment() {
         ) {
             if (uiState.isLoading)
                 CircularProgressIndicator(
-                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.CenterVertically),
                     color = MaterialTheme.colorScheme.onSurface,
                     strokeWidth = 1.dp
                 )
@@ -187,7 +186,7 @@ class CreatePasswordFragment : Fragment() {
             },
             isError = uiState.isAvailable == false,
         )
-        if(uiState.errorMessage.isNotEmpty())
+        if (uiState.errorMessage.isNotEmpty())
             Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
     }
 
@@ -195,7 +194,7 @@ class CreatePasswordFragment : Fragment() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
-        if(currentUser != null){
+        if (currentUser != null) {
 //            reload();
         }
     }
