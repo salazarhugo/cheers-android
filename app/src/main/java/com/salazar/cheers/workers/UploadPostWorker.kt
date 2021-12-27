@@ -50,6 +50,9 @@ class UploadPostWorker @AssistedInject constructor(
         val longitude =
             inputData.getDouble("LOCATION_LONGITUDE", 0.0)
 
+        val showOnMap =
+            inputData.getBoolean("SHOW_ON_MAP", true)
+
         val tagUserIds =
             inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
 
@@ -65,6 +68,7 @@ class UploadPostWorker @AssistedInject constructor(
                     locationName = locationName,
                     locationLatitude = latitude,
                     locationLongitude = longitude,
+                    showOnMap = showOnMap,
                 )
                 Neo4jUtil.addPost(post)
                 makeStatusNotification("Output is $imagePath", appContext)

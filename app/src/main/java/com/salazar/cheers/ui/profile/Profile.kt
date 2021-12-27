@@ -5,24 +5,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddBox
-import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Grid3x3
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.materialIcon
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,16 +42,22 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.SignInActivity
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.Counter
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.StorageUtil
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.support.v4.intentFor
@@ -62,42 +77,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun Profile(user: User) {
-        Scaffold(
-            topBar = { Toolbar(user) }
-        ) {
-            Column(
-                modifier = Modifier.padding(15.dp)
-            ) {
-                Section1(user = user)
-                Section2(user = user)
-                Spacer(Modifier.height(4.dp))
-                Row {
-                    OutlinedButton(
-                        onClick = { findNavController().navigate(R.id.editProfileFragment) },
-                        shape = RoundedCornerShape(4.dp),
-                        modifier = Modifier.fillMaxWidth(),
-//                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
-                    ) {
-                        Text("Edit Profile", color = MaterialTheme.colorScheme.onBackground)
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.BookmarkBorder, "")
-                    }
-                }
-                OutlinedButton(
-                    onClick = { signOut() },
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Logout")
-                }
-            }
-        }
-    }
-
     @Composable
     fun ProfileScreen() {
         val uiState = viewModel.uiState.collectAsState().value
@@ -105,6 +84,126 @@ class ProfileFragment : Fragment() {
         when (uiState) {
             is ProfileUiState.Loading -> LoadingScreen()
             is ProfileUiState.HasUser -> Profile(uiState.user)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun Profile(user: User) {
+        Scaffold(
+            topBar = { Toolbar(user) }
+        ) {
+            Column() {
+                Column(
+                    modifier = Modifier.padding(15.dp)
+                ) {
+                    Section1(user = user)
+                    Section2(user = user)
+                    Spacer(Modifier.height(4.dp))
+                    Row {
+                        OutlinedButton(
+                            onClick = { findNavController().navigate(R.id.editProfileFragment) },
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.fillMaxWidth(),
+//                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
+                        ) {
+                            Text("Edit Profile", color = MaterialTheme.colorScheme.onBackground)
+                        }
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(Icons.Outlined.BookmarkBorder, "")
+                        }
+                    }
+                }
+                ProfilePostsAndTags()
+            }
+        }
+    }
+
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    fun ProfilePostsAndTags() {
+        val posts = viewModel.posts.value
+        val tabs = listOf(Icons.Default.GridView, Icons.Outlined.AssignmentInd)
+        val pagerState = rememberPagerState()
+        val scope = rememberCoroutineScope()
+
+        TabRow(
+            // Our selected tab is our current page
+            selectedTabIndex = pagerState.currentPage,
+            // Override the indicator, using the provided pagerTabIndicatorOffset modifier
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                )
+            },
+            backgroundColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+        ) {
+            // Add tabs for all of our pages
+            tabs.forEachIndexed { index, icon ->
+                Tab(
+                    icon = { Icon(icon, null)},
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        scope.launch {
+                            pagerState.scrollToPage(index)
+                        }
+//                        viewModel.toggle()
+                    },
+                )
+            }
+        }
+        HorizontalPager(
+            count = tabs.size,
+            state = pagerState,
+        ) { page ->
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when (page) {
+                    0 -> GridViewPosts(posts = posts)
+                    1 -> {}
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun GridViewPosts(posts: List<Post>) {
+        LazyVerticalGrid(
+            cells = GridCells.Adaptive(minSize = 100.dp),
+        ) {
+            items(posts) { post ->
+                PostItem(post)
+            }
+        }
+    }
+
+    @Composable
+    fun PostItem(post: Post) {
+        val photo = remember { mutableStateOf<Uri?>(null) }
+
+        if (post.photoPath.isNotBlank())
+            StorageUtil.pathToReference(post.photoPath)?.downloadUrl?.addOnSuccessListener {
+                photo.value = it
+            }
+
+        Box(
+            modifier = Modifier.padding(1.dp)
+        ) {
+            Image(
+                painter = rememberImagePainter(data = photo.value),
+                contentDescription = "avatar",
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .aspectRatio(1f)// or 4/5f
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = { },)
+                    }
+            )
         }
     }
 
@@ -228,11 +327,4 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    private fun signOut() {
-        FirebaseAuth.getInstance().signOut()
-        startActivity(intentFor<SignInActivity>().newTask().clearTask())
-    }
-
 }

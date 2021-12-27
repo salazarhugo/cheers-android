@@ -11,6 +11,7 @@ data class Post(
     val shares: Int = 0,
     var username: String = "",
     var verified: Boolean = false,
+    var showOnMap: Boolean = false,
     var photoPath: String = "",
     var userPhotoUrl: String = "",
     var locationLatitude: Double = 0.0,

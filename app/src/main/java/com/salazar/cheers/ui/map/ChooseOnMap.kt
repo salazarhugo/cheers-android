@@ -114,7 +114,7 @@ class ChooseOnMap : DialogFragment() {
 
         mapView.getMapboxMap().setCamera(
             CameraOptions.Builder()
-                .zoom(13.0)
+                .zoom(1.0)
                 .build()
         )
 

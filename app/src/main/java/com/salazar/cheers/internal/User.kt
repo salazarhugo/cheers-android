@@ -20,6 +20,7 @@ data class User(
     val website: String,
     val online: Boolean,
     val darkMode: Boolean,
+    val registrationTokens: MutableList<String>,
 ) : Serializable {
 
     constructor() : this(
@@ -39,5 +40,6 @@ data class User(
         "",
         false,
         false,
+        mutableListOf(),
     )
 }

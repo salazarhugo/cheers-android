@@ -33,6 +33,11 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun seenLastMessage(channelId: String) {
+        viewModelScope.launch {
+            FirestoreChat.seenLastMessage(channelId)
+        }
+    }
 
     fun sendTextMessage(text: String, channelId: String) {
         val user = user2.value ?: return

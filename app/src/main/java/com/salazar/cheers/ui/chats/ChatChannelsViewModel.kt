@@ -96,7 +96,6 @@ class ChatChannelsViewModel @Inject constructor() : ViewModel() {
 
             directChannels.forEach {
                 val otherUserId = it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! } ?: return@forEach
-
                 when (val result = Neo4jUtil.getUser(otherUserId)) {
                     is Result.Success ->  channels.add(it.copy(otherUser = result.data))
                     is Result.Error -> {}

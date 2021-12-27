@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.profile
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Result
@@ -52,6 +53,7 @@ private data class ProfileViewModelState(
 class ProfileViewModel @Inject constructor() : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
+    val posts = mutableStateOf<List<Post>>(emptyList())
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -63,6 +65,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
 
     init {
         refreshUser()
+        refreshUserPosts()
     }
 
     private fun refreshUser() {
@@ -76,6 +79,22 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                         errorMessages = listOf(result.exception.toString()),
                         isLoading = false
                     )
+                }
+            }
+        }
+    }
+
+    private fun refreshUserPosts() {
+        viewModelScope.launch {
+            when (val result = Neo4jUtil.getCurrentUserPosts()) {
+                is Result.Success -> posts.value = result.data
+                is Result.Error -> {
+                    viewModelState.update {
+                        it.copy(
+                            errorMessages = listOf(result.exception.toString()),
+                            isLoading = false
+                        )
+                    }
                 }
             }
         }

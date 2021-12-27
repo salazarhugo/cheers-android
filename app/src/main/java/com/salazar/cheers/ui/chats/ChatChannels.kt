@@ -139,6 +139,7 @@ class MessagesFragment : Fragment() {
                 val photo = remember { mutableStateOf<Uri?>(null) }
 
                 val image = channel.otherUser.profilePicturePath
+                val seen = channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
 
                 if (image.isNotBlank())
                     StorageUtil.pathToReference(image)?.downloadUrl?.addOnSuccessListener {
@@ -158,10 +159,12 @@ class MessagesFragment : Fragment() {
                     val subtitle =
                         "${channel.recentMessage.senderUsername}: ${channel.recentMessage.text}"
 
-                    Text(text = title, style = Typography.bodyMedium)
+                    val fontWeight = if (seen) FontWeight.Normal else FontWeight.Bold
+                    Text(text = title, style = Typography.bodyMedium, fontWeight = fontWeight)
                     Text(
                         text = subtitle,
-                        style = Typography.bodySmall
+                        style = Typography.bodySmall,
+                        fontWeight = fontWeight,
                     )
                 }
             }

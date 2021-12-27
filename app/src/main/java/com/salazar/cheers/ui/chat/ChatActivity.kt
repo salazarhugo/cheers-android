@@ -27,6 +27,7 @@ class ChatActivity : AppCompatActivity() {
 
         val channelId = intent.getStringExtra("chatChannelId").toString()
         chatViewModel.channelId.value = channelId
+        chatViewModel.seenLastMessage(channelId)
 
 
         setContent {

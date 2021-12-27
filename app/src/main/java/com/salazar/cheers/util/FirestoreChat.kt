@@ -1,5 +1,6 @@
 package com.salazar.cheers.util
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -67,7 +68,11 @@ object FirestoreChat {
             .whereArrayContains("members", FirebaseAuth.getInstance().currentUser!!.uid)
             .orderBy("recentMessageTime", Query.Direction.DESCENDING)
 
-        val subscription = channelCol.addSnapshotListener { snapshot, _ ->
+        val subscription = channelCol.addSnapshotListener { snapshot, firebaseFirestoreException ->
+            if (firebaseFirestoreException != null) {
+                Log.e("FIRESTORE", "Users listener error.", firebaseFirestoreException)
+                return@addSnapshotListener
+            }
             val chatChannels = ArrayList<ChatChannel>()
             snapshot!!.forEach {
                 chatChannels.add(it.toObject(ChatChannel::class.java))
@@ -87,7 +92,11 @@ object FirestoreChat {
             .collection("messages")
             .orderBy("time", Query.Direction.DESCENDING)
 
-        val subscription = messagesDocument.addSnapshotListener { snapshot, _ ->
+        val subscription = messagesDocument.addSnapshotListener { snapshot, firebaseFirestoreException ->
+            if (firebaseFirestoreException != null) {
+                Log.e("FIRESTORE", "Users listener error.", firebaseFirestoreException)
+                return@addSnapshotListener
+            }
             val items = mutableListOf<Message>()
             snapshot!!.forEach {
                 if (it["type"] == MessageType.TEXT)
@@ -102,6 +111,14 @@ object FirestoreChat {
         awaitClose {
             subscription.remove()
         }
+    }
+
+    fun seenLastMessage(channelId: String) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+
+        chatChannelsCollectionRef.document(channelId).update(
+                mapOf("recentMessage.seenBy" to FieldValue.arrayUnion(currentUserId)),
+            )
     }
 
     fun sendMessage(message: Message, channelId: String) {

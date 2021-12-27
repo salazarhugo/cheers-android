@@ -73,9 +73,9 @@ class MainActivity : AppCompatActivity() {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = !isSystemInDarkTheme()
             SideEffect {
-                systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
-//                systemUiController.setNavigationBarColor(MaterialTheme.colorScheme.primary)
+                systemUiController.setStatusBarColor(Color.Transparent, darkIcons = useDarkIcons)
             }
+//            systemUiController.setNavigationBarColor(MaterialTheme.colorScheme.surface)
 
             CheersTheme {
                 ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity() {
                         label = {
                             if (frag.label != null)
                                 Text(frag.label)
-                        }
+                        },
                     )
                 }
                 NavigationBarItem(

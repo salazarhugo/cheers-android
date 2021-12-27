@@ -131,6 +131,12 @@ dependencies {
     // Firebase Firestore
     implementation 'com.google.firebase:firebase-firestore-ktx'
 
+    // Firebase Messaging
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+
+    // Firebase In-App Messaging
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
+
     // Firebase Storage
     implementation 'com.google.firebase:firebase-storage-ktx'
 

@@ -54,6 +54,7 @@ object FirestoreUtil {
                 "",
                 false,
                 false,
+                mutableListOf(),
             )
             currentUserDocRef.set(newUser)
             GlobalScope.launch {
@@ -122,5 +123,18 @@ object FirestoreUtil {
             .addOnSuccessListener { }
             .addOnFailureListener { }
     }
+
+    //region FCM
+    fun getFCMRegistrationTokens(onComplete: (tokens: MutableList<String>) -> Unit) {
+        currentUserDocRef.get().addOnSuccessListener {
+            val user = it.toObject(User::class.java)!!
+            onComplete(user.registrationTokens)
+        }
+    }
+
+    fun setFCMRegistrationTokens(registrationTokens: MutableList<String>) {
+        currentUserDocRef.update(mapOf("registrationTokens" to registrationTokens))
+    }
+    //endregion FCM
 
 }

@@ -138,7 +138,9 @@ class FollowersFollowingFragment : Fragment() {
             count = pages.size,
             state = pagerState,
         ) { page ->
-            Column {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 when (uiState) {
                     is FollowersFollowingUiState.HasFollowers -> Followers(followers = uiState.followers)
                     is FollowersFollowingUiState.HasFollowing -> Followers(followers = uiState.following)

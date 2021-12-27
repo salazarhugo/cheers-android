@@ -35,7 +35,7 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
         viewModelScope.launch {
             viewModelState.update {
-                val result = Neo4jUtil.posts()
+                val result = Neo4jUtil.getMapPosts()
                 when (result) {
                     is Result.Success -> it.copy(posts = result.data, isLoading = false)
                     is Result.Error -> it.copy(

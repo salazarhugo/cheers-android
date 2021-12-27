@@ -18,8 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Close
@@ -27,6 +26,12 @@ import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +60,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
@@ -179,11 +185,32 @@ class AddDialogFragment : DialogFragment() {
                         LocationSection()
                     DividerM3()
                     LocationResultsSection(results = viewModel.locationResults.value)
+                    Preferences()
                 }
             }
         }
     }
 
+    @Composable
+    fun Preferences() {
+        val checkedState = viewModel.showOnMap
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(text = "Show on map", fontSize = 14.sp)
+            SwitchM3(
+                checked = checkedState.value,
+                onCheckedChange = {
+                    viewModel.onShowOnMapChanged(it)
+                }
+            )
+        }
+    }
+    
     @Composable
     fun AddPhoto() {
         if (viewModel.photoUri.value != null)
@@ -226,7 +253,8 @@ class AddDialogFragment : DialogFragment() {
 
     @Composable
     fun LocationResultsSection(results: List<SearchResult>) {
-        LocationResult(results = results)
+        if(results.isNotEmpty())
+            LocationResult(results = results)
     }
 
     @Composable

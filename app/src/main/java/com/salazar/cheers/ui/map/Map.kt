@@ -111,10 +111,11 @@ class MapFragment : Fragment() {
         mapView.gestures.rotateEnabled = false
         mapView.attribution.enabled = false
         mapView.scalebar.enabled = false
+//        mapView.getMapboxMap().addCo
 
         mapView.getMapboxMap().setCamera(
             CameraOptions.Builder()
-                .zoom(13.0)
+                .zoom(1.0)
                 .build()
         )
 
@@ -272,7 +273,12 @@ class MapFragment : Fragment() {
 
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        mapView.getMapboxMap().setCamera(
+            CameraOptions.Builder()
+                .center(it)
+                .zoom(13.0)
+                .build()
+        )
         mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
     }
 

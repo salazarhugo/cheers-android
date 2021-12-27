@@ -341,6 +341,82 @@ object Neo4jUtil {
         }
     }
 
+    suspend fun getCurrentUserPosts(): Result<List<Post>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = FirebaseAuth.getInstance().uid!!
+
+                val records = query(
+                    "MATCH (u:User {id: \$userId})-[:POSTED]->(p) \n" +
+                            "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
+                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"HH:mm\")}," +
+                            " properties(u) ORDER BY p.createdTime DESC",
+                    params
+                )
+
+                val posts = mutableListOf<Post>()
+
+                records.forEach { record ->
+                    val gson = Gson()
+                    val parser = JsonParser()
+
+                    val post =
+                        gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
+                    val user =
+                        gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
+                    post.username = user.username
+                    post.verified = user.verified
+                    post.userPhotoUrl = user.profilePicturePath
+                    post.userId = user.id
+
+                    posts.add(post)
+                }
+                return@withContext Result.Success(posts.toList())
+            } catch (e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
+    suspend fun getMapPosts(): Result<List<Post>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = FirebaseAuth.getInstance().uid!!
+
+                val records = query(
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p) WHERE p.showOnMap = true \n" +
+                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p) \n" +
+                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"HH:mm\")}," +
+                            " properties(f) ORDER BY p.createdTime DESC",
+                    params
+                )
+
+                val posts = mutableListOf<Post>()
+
+                records.forEach { record ->
+                    val gson = Gson()
+                    val parser = JsonParser()
+
+                    val post =
+                        gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
+                    val user =
+                        gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
+                    post.username = user.username
+                    post.verified = user.verified
+                    post.userPhotoUrl = user.profilePicturePath
+                    post.userId = user.id
+
+                    posts.add(post)
+                }
+                return@withContext Result.Success(posts.toList())
+            } catch (e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
     suspend fun posts(): Result<List<Post>> {
         return withContext(Dispatchers.IO)
         {

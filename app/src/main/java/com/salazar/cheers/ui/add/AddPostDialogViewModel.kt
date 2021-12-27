@@ -23,6 +23,11 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
     val locationResults = mutableStateOf<List<SearchResult>>(emptyList())
     val selectedLocation = mutableStateOf<SearchResult?>(null)
     val selectedTagUsers = mutableStateListOf<User>()
+    val showOnMap = mutableStateOf(true)
+
+    fun onShowOnMapChanged(showOnMap: Boolean) {
+        this.showOnMap.value = showOnMap
+    }
 
     fun selectTagUser(user: User) {
         if (selectedTagUsers.contains(user))
@@ -59,6 +64,7 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
                         "LOCATION_LATITUDE" to selectedLocation.value?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to selectedLocation.value?.coordinate?.longitude(),
                         "TAG_USER_IDS" to selectedTagUsers.map { it.id }.toTypedArray(),
+                        "SHOW_ON_MAP" to showOnMap.value,
                     )
                 )
             }

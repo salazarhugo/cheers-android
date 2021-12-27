@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -45,9 +46,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.compose.rememberImagePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.PullRefresh
+import com.salazar.cheers.components.rememberPullRefreshState
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -73,7 +78,7 @@ class HomeFragment : Fragment() {
                     state = rememberSwipeRefreshState(isRefreshing = false),
                     onRefresh = {
                         viewModel.refreshPosts()
-                    }
+                    },
                 ) {
                     HomeScreen()
                 }
