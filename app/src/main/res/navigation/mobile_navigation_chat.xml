@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
+    android:id="@+id/mobile_navigation_chat"
     app:startDestination="@id/chatFragment2">
 
     <fragment
@@ -14,4 +14,8 @@
         android:name="com.salazar.cheers.ui.chat.ChatActivity"
         android:label="activity_chat"
         tools:layout="@layout/activity_chat" />
+    <dialog
+        android:id="@+id/imageSelectorBottomSheetDialog"
+        android:name="com.salazar.cheers.ui.chat.ImageSelectorBottomSheetDialog"
+        android:label="ImageSelectorBottomSheetDialog" />
 </navigation>

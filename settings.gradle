@@ -16,6 +16,9 @@ dependencyResolutionManagement {
                 password = 'sk.eyJ1Ijoic2FsYXphcmJyb2NrIiwiYSI6ImNrd2F0dmU5cDBmemsycG13eW1tcXUycjEifQ.cWYnBOKVlQ6_3TLVKn-z-g'//rootProject.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
             }
         }
+        maven {
+            url "https://storage.googleapis.com/snap-kit-build/maven"
+        }
     }
 }
 rootProject.name = "Cheers"

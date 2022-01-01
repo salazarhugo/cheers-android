@@ -27,13 +27,6 @@ sealed interface FollowersFollowingUiState {
 
     data class HasFollowers(
         val followers: List<User>,
-        override val isLoading: Boolean,
-        override val isFollowers: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : FollowersFollowingUiState
-
-    data class HasFollowing(
         val following: List<User>,
         override val isLoading: Boolean,
         override val isFollowers: Boolean,
@@ -51,16 +44,9 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
     val searchInput: String = "",
 ) {
     fun toUiState(): FollowersFollowingUiState =
-        if (isFollowers && (followers != null)) {
+        if (followers != null && following != null) {
             FollowersFollowingUiState.HasFollowers(
                 followers = followers,
-                isLoading = isLoading,
-                isFollowers = isFollowers,
-                errorMessages = errorMessages,
-                searchInput = searchInput
-            )
-        } else if (!isFollowers && (following != null)) {
-            FollowersFollowingUiState.HasFollowing(
                 following = following,
                 isLoading = isLoading,
                 isFollowers = isFollowers,

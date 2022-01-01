@@ -19,6 +19,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.icons.Icons
@@ -28,6 +29,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.ComposeView
@@ -108,6 +110,8 @@ class MapFragment : Fragment() {
     }
 
     private fun onMapReady() {
+        val uiState = viewModel.uiState.value
+
         mapView.gestures.rotateEnabled = false
         mapView.attribution.enabled = false
         mapView.scalebar.enabled = false
@@ -120,19 +124,18 @@ class MapFragment : Fragment() {
         )
 
         val style = if (requireContext().isDarkThemeOn())
-            "mapbox://styles/mapbox/dark-v10"
+            "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0"
         else
             "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
 
         mapView.getMapboxMap().loadStyleUri(style) {
-            initLocationComponent()
-            setupGesturesListener()
-            val uiState = viewModel.uiState.value
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 uiState.posts.forEach {
                     addPostToMap(it)
                 }
             }
+            initLocationComponent()
+            setupGesturesListener()
         }
     }
     @OptIn(ExperimentalComposeUiApi::class)
@@ -145,7 +148,7 @@ class MapFragment : Fragment() {
                 .fillMaxHeight()
                 .width(45.dp)
                 .pointerInteropFilter { motionEvent ->
-                    when(motionEvent.action) {
+                    when (motionEvent.action) {
                         MotionEvent.ACTION_DOWN -> {
                             false
                         }
@@ -178,25 +181,25 @@ class MapFragment : Fragment() {
                 }
             }
         ) {
-            Box(contentAlignment = Alignment.TopEnd) {
+            Box(contentAlignment = Alignment.BottomCenter) {
                 AndroidView(factory = ::MapView, Modifier.fillMaxSize()) {
                     mapView = it
                     enableMyLocation()
                 }
-//                var sliderPosition by remember { mutableStateOf(0f) }
-//                Slider(
-//                    modifier = Modifier
-//                        .height(100.dp)
-//                        .width(1.dp),
-//                    value = sliderPosition,
-//                    onValueChange = { sliderPosition = it },
-//                    steps = 6,
-//                    colors = SliderDefaults.colors(
-//                        thumbColor = MaterialTheme.colorScheme.secondary,
-//                        activeTrackColor = MaterialTheme.colorScheme.secondary
-//                    ),
-//                )
-                Scrollbar()
+                Button(
+                    shape = RoundedCornerShape(12.dp),
+                    onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFFC00)
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 12.dp
+                    ),
+                    modifier = Modifier.padding(bottom = 45.dp)
+                ) {
+                    Text("Connect my Snapchat avatar")
+                }
+//                Scrollbar()
             }
         }
     }

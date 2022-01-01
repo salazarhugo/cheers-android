@@ -43,7 +43,7 @@ class CheersApplication : Application(), Configuration.Provider {
     lateinit var workerFactory: HiltWorkerFactory
 
     private fun initDatabase() {
-        val driver: Driver = GraphDatabase.driver(
+        GraphDatabase.driver(
             Environment.DEFAULT_URL,
             AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
             Config.builder()

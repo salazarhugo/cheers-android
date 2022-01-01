@@ -48,3 +48,22 @@ fun Animate(content: @Composable () -> Unit) {
         content()
     }
 }
+
+@Composable
+fun AnimateHeart(content: @Composable () -> Unit) {
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
+    val density = LocalDensity.current
+    AnimatedVisibility(
+        visibleState = state,
+        enter = slideInVertically(
+            initialOffsetY = { with(density) { 40.dp.roundToPx() } }
+        ),
+        exit = slideOutVertically(),
+    ) {
+        content()
+    }
+}

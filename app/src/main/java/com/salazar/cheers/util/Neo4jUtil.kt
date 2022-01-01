@@ -155,6 +155,34 @@ object Neo4jUtil {
         }
     }
 
+    suspend fun getUserWithUsername(username: String): Result<User> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["username"] = username
+
+                val records = query(
+                    "MATCH (u:User) WHERE u.username = \$username\n" +
+                            "OPTIONAL MATCH (u)-[r:POSTED]->(:Post)\n" +
+                            "OPTIONAL MATCH (u)-[f:FOLLOWS]->(:User)\n" +
+                            "OPTIONAL MATCH (:User)-[f2:FOLLOWS]->(u)\n" +
+                            "RETURN u {.*, posts: count(DISTINCT r), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
+                    params
+                )
+
+                val gson = Gson()
+                val parser = JsonParser()
+                val user =
+                    gson.fromJson(parser.parse(records[0].values()[0].toString()), User::class.java)
+                Log.d("HAHA", user.toString())
+                return@withContext Result.Success(user)
+            } catch (e: Exception) {
+                Log.e("HAHA", e.toString())
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
     suspend fun getUser(userId: String): Result<User> {
         return withContext(Dispatchers.IO) {
             try {
@@ -427,7 +455,7 @@ object Neo4jUtil {
                 val records = query(
                     "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p)\n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]-(p) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"HH:mm\")}," +
+                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"dd/MM/YYYY HH:mm\")}," +
                             " properties(f) ORDER BY p.createdTime DESC",
                     params
                 )

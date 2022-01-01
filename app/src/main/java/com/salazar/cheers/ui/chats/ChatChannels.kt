@@ -6,46 +6,55 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.StorageUtil
+import kotlinx.coroutines.launch
 
 class MessagesFragment : Fragment() {
 
     private val viewModel: ChatChannelsViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,11 +71,12 @@ class MessagesFragment : Fragment() {
     @Composable
     fun MessagesScreen() {
         val uiState = viewModel.uiState.collectAsState().value
+        val user = mainViewModel.user2.value
 
         Scaffold(
             topBar = {
                 Column {
-                    MyAppBar()
+                    MyAppBar(user?.username ?: "Chat")
                 }
             },
             floatingActionButton = {
@@ -78,25 +88,75 @@ class MessagesFragment : Fragment() {
             }
         ) {
             Column {
-                if (uiState.isLoading)
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp),
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                when (uiState) {
-                    is ChatChannelUiState.HasChannels -> ConversationList(channels = uiState.channels)
-                    is ChatChannelUiState.NoChannels -> {
-                        Text("No Channels")
-                    }
-                }
+                Tabs(uiState)
             }
         }
     }
 
+    @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun ConversationList(channels: List<ChatChannel>) {
+    fun Tabs(uiState: ChatChannelUiState) {
+        val tabs = listOf("Primary", "General", "Requests")
+        val pagerState = rememberPagerState()
+        val scope = rememberCoroutineScope()
+
+        TabRow(
+            // Our selected tab is our current page
+            selectedTabIndex = pagerState.currentPage,
+            // Override the indicator, using the provided pagerTabIndicatorOffset modifier
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                )
+            },
+            backgroundColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+        ) {
+            // Add tabs for all of our pages
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    icon = { Text(title, style = MaterialTheme.typography.titleSmall) },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        scope.launch {
+                            pagerState.scrollToPage(index)
+                        }
+//                        viewModel.toggle()
+                    },
+                )
+            }
+        }
+        HorizontalPager(
+            count = tabs.size,
+            state = pagerState,
+        ) { page ->
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when (page) {
+                    0 -> {
+                        when (uiState) {
+                            is ChatChannelUiState.HasChannels -> ConversationList(uiState)
+                            is ChatChannelUiState.NoChannels -> {
+                                Text("No Channels")
+                            }
+                        }
+                    }
+                    1 -> {}
+                }
+            }
+        }
+    }
+    @Composable
+    fun ConversationList(uiState: ChatChannelUiState.HasChannels) {
+        if (uiState.isLoading)
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp),
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+        val channels = uiState.channels
         LazyColumn {
             items(channels) { channel ->
                 when (channel.type) {
@@ -125,7 +185,10 @@ class MessagesFragment : Fragment() {
                 .clickable {
                     val action =
                         MessagesFragmentDirections.actionMessagesFragmentToChatActivity(
-                            chatChannelId = channel.id,
+                            channelId = channel.id,
+                            name = channel.otherUser.fullName,
+                            username = channel.otherUser.username,
+                            profilePicturePath = channel.otherUser.profilePicturePath,
                         )
                     findNavController().navigate(action)
                 }
@@ -133,13 +196,14 @@ class MessagesFragment : Fragment() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+            val photo = remember { mutableStateOf<Uri?>(null) }
+            val image = channel.otherUser.profilePicturePath
+            val seen = channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
+            val isLastMessageMe = channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                val image = channel.otherUser.profilePicturePath
-                val seen = channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
 
                 if (image.isNotBlank())
                     StorageUtil.pathToReference(image)?.downloadUrl?.addOnSuccessListener {
@@ -155,8 +219,8 @@ class MessagesFragment : Fragment() {
                 )
                 Spacer(modifier = Modifier.width(14.dp))
                 Column {
-                    val title = channel.otherUser.username
-                    val subtitle =
+                    val title = channel.otherUser.fullName
+                    val subtitle = if (isLastMessageMe) channel.recentMessage.text else
                         "${channel.recentMessage.senderUsername}: ${channel.recentMessage.text}"
 
                     val fontWeight = if (seen) FontWeight.Normal else FontWeight.Bold
@@ -165,15 +229,28 @@ class MessagesFragment : Fragment() {
                         text = subtitle,
                         style = Typography.bodySmall,
                         fontWeight = fontWeight,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
                     )
                 }
             }
-            IconButton(onClick = {}) {
-                Icon(
-                    Icons.Outlined.PhotoCamera,
-                    "Camera Icon",
-                    tint = MaterialTheme.colorScheme.outline,
-                )
+            val tint = if (seen) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (!seen) {
+                    Box( modifier = Modifier .size(8.dp) .clip(CircleShape) .background(Color(0xFF0095F6)))
+                    Spacer(Modifier.width(12.dp))
+                }
+
+                IconButton(onClick = {}) {
+                    Icon(
+                        Icons.Outlined.PhotoCamera,
+                        "Camera Icon",
+                        tint = tint,
+                    )
+                }
             }
         }
     }
@@ -187,7 +264,10 @@ class MessagesFragment : Fragment() {
                 .clickable {
                     val action =
                         MessagesFragmentDirections.actionMessagesFragmentToChatActivity(
-                            chatChannelId = channel.id,
+                            channelId = channel.id,
+                            name = channel.otherUser.fullName,
+                            username = channel.otherUser.username,
+                            profilePicturePath = channel.otherUser.profilePicturePath,
                         )
                     findNavController().navigate(action)
                 }
@@ -237,11 +317,11 @@ class MessagesFragment : Fragment() {
     }
 
     @Composable
-    fun MyAppBar() {
+    fun MyAppBar(username: String) {
         SmallTopAppBar(
             title = {
                 Text(
-                    text = "Chat",
+                    text = username,
                     fontWeight = FontWeight.Bold,
                     fontFamily = Roboto,
                 )

@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.SignInActivity
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -233,10 +235,10 @@ class ProfileFragment : Fragment() {
 //                backgroundColor = MaterialTheme.colorScheme.surface,
 //                elevation = 0.dp,
                 title = {
-                    Text(
-                        otherUser.username,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Roboto,
+                    Username(
+                        username = otherUser.username,
+                        verified = otherUser.verified,
+                        textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontFamily = Roboto),
                     )
                 },
                 actions = {

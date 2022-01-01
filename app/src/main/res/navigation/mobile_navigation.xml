@@ -73,13 +73,16 @@
     <fragment
         android:id="@+id/otherProfileFragment"
         android:name="com.salazar.cheers.ui.otherprofile.OtherProfileFragment"
-        android:label="OtherProfileFragment" >
-        <argument
-            android:name="otherUserId"
-            app:argType="string" />
+        android:label="OtherProfileFragment">
         <action
             android:id="@+id/action_otherProfileFragment_to_chatActivity"
             app:destination="@id/chatActivity" />
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="https://cheers.app/{username}" />
+        <argument
+            android:name="username"
+            app:argType="string" />
     </fragment>
     <dialog
         android:id="@+id/editProfileFragment"
@@ -91,7 +94,15 @@
         android:label="activity_chat"
         tools:layout="@layout/activity_chat" >
         <argument
-            android:name="chatChannelId"
+            android:name="channelId"
+            app:argType="string" />
+        <argument android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="username"
+            app:argType="string" />
+        <argument
+            android:name="profilePicturePath"
             app:argType="string" />
     </activity>
     <include app:graph="@navigation/mobile_navigation_chat" />
@@ -139,4 +150,8 @@
         android:id="@+id/postMapDialog"
         android:name="com.salazar.cheers.ui.map.PostMapDialog"
         android:label="PostMapDialog" />
+    <dialog
+        android:id="@+id/moreOtherProfileBottomSheet"
+        android:name="com.salazar.cheers.ui.otherprofile.MoreOtherProfileBottomSheet"
+        android:label="MoreOtherProfileBottomSheet" />
 </navigation>

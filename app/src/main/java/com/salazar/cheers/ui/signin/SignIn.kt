@@ -42,7 +42,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
+import com.salazar.cheers.components.FacebookButton
 import com.salazar.cheers.components.GoogleButton
+import com.salazar.cheers.components.TwitterButton
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask
@@ -111,18 +113,8 @@ class SignInFragment : Fragment() {
                     Spacer(modifier = Modifier.height(16.dp))
                     TextDivider(dayString = "OR")
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF00ACEE),
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(Icons.Default.Login, "")
-                        Spacer(Modifier.width(12.dp))
-                        Text("Sign in with Twitter")
+                    FacebookButton() {
+
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(

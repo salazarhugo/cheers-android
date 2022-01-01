@@ -2,6 +2,7 @@ package com.salazar.cheers.service
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.util.FirestoreUtil
@@ -16,7 +17,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             addTokenToFirestore(newRegistrationToken)
     }
 
-    fun addTokenToFirestore(newRegistrationToken: String?) {
+    private fun addTokenToFirestore(newRegistrationToken: String?) {
         if (newRegistrationToken == null) throw NullPointerException("FCM token is null.")
 
         FirestoreUtil.getFCMRegistrationTokens { tokens ->

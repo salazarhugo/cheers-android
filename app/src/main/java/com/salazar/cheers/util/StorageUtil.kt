@@ -3,6 +3,7 @@ package com.salazar.cheers.util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import java.util.*
 
 
@@ -25,6 +26,13 @@ object StorageUtil {
             .addOnSuccessListener {
                 onSuccess(ref.path)
             }
+    }
+
+    fun uploadMessageImageBeta(
+        imageBytes: ByteArray,
+    ): UploadTask {
+        val ref = currentUserRef.child("messages/${UUID.nameUUIDFromBytes(imageBytes)}")
+        return ref.putBytes(imageBytes)
     }
 
     fun uploadMessageImage(

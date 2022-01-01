@@ -5,15 +5,16 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.activity.result.ActivityResultLauncher
+import java.util.*
 
 
 object Utils {
 
-    fun openPhotoChooser(resultLauncher: ActivityResultLauncher<Intent>) {
+    fun openPhotoChooser(resultLauncher: ActivityResultLauncher<Intent>, allowMultiple: Boolean = false) {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple)
         resultLauncher.launch(Intent.createChooser(intent, "Select Picture"))
     }
 
@@ -47,6 +48,19 @@ object Utils {
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
         canvas.drawBitmap(this, rect, rect, paint)
         return output
+    }
+
+    fun Date.isToday(): Boolean {
+        val c = Calendar.getInstance()
+
+        c[Calendar.HOUR_OF_DAY] = 0
+        c[Calendar.MINUTE] = 0
+        c[Calendar.SECOND] = 0
+        c[Calendar.MILLISECOND] = 0
+
+        val today = c.time
+
+        return this.after(today)
     }
 
 }

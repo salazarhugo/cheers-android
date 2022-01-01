@@ -128,6 +128,9 @@ dependencies {
     // Firebase Crashlytics
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
+    //Firebase Dynamic-Links
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx'
+
     // Firebase Firestore
     implementation 'com.google.firebase:firebase-firestore-ktx'
 
@@ -176,6 +179,13 @@ dependencies {
 
     // Datastore
     implementation("androidx.datastore:datastore:1.0.0")
+
+    // Snapchat
+    implementation ([
+            'com.snapchat.kit.sdk:bitmoji:1.13.0',
+            'com.snapchat.kit.sdk:login:1.13.0',
+            'com.snapchat.kit.sdk:core:1.13.0',
+    ])
 
     // Debugging
     testImplementation 'junit:junit:4.+'

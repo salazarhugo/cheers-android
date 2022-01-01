@@ -30,16 +30,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.compose.rememberImagePainter
+import com.mapbox.maps.extension.style.style
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Typography
@@ -138,7 +142,7 @@ class SearchFragment : Fragment() {
                 .fillMaxWidth()
                 .clickable {
                     val action =
-                        SearchFragmentDirections.actionSearchFragmentToOtherProfileFragment(user.id)
+                        SearchFragmentDirections.actionSearchFragmentToOtherProfileFragment(username = user.username)
                     findNavController().navigate(action)
                 }
                 .padding(12.dp),
@@ -164,7 +168,7 @@ class SearchFragment : Fragment() {
                 Column {
                     if (user.fullName.isNotBlank())
                         Text(text = user.fullName, style = Typography.bodyMedium)
-                    Text(text = user.username, style = Typography.bodyMedium)
+                    Username(username = user.username, verified = user.verified, textStyle = Typography.bodyMedium)
                 }
             }
             IconButton(onClick = { viewModel.deleteRecentUser(user) }) {
@@ -181,7 +185,7 @@ class SearchFragment : Fragment() {
                 .clickable {
                     viewModel.insertRecentUser(user)
                     val action =
-                        SearchFragmentDirections.actionSearchFragmentToOtherProfileFragment(user.id)
+                        SearchFragmentDirections.actionSearchFragmentToOtherProfileFragment(username = user.username)
                     findNavController().navigate(action)
                 }
                 .padding(12.dp),
@@ -207,7 +211,8 @@ class SearchFragment : Fragment() {
                 Column {
                     if (user.fullName.isNotBlank())
                         Text(text = user.fullName, style = Typography.bodyMedium)
-                    Text(text = user.username, style = Typography.bodyMedium)
+                    Username(username = user.username, verified = user.verified, textStyle = Typography.bodyMedium)
+//                    Text(text = user.username, style = Typography.bodyMedium)
                 }
             }
             IconButton(onClick = {}) {
@@ -218,12 +223,19 @@ class SearchFragment : Fragment() {
 
     @Composable
     fun SearchBar() {
-        Card(
-            elevation = 0.dp,
-            shape = RoundedCornerShape(8.dp),
+        Box(
             modifier = Modifier.padding(15.dp),
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+            contentAlignment = Alignment.Center,
         ) {
+            Card(
+                elevation = 0.dp,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp),
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            ) {}
+
             val query = viewModel.query.value
             val focusManager = LocalFocusManager.current
 
@@ -244,11 +256,19 @@ class SearchFragment : Fragment() {
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Search
                 ),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                    fontSize = 13.sp
+                ),
                 keyboardActions = KeyboardActions(onSearch = {
                     focusManager.clearFocus()
                 }),
-                placeholder = { Text("Search") }
+                placeholder = { Text("Search") },
+                trailingIcon = {
+                    if (query.isNotBlank())
+                       Icon(Icons.Filled.Close, null,
+                           Modifier.clickable { viewModel.onQueryChanged("") })
+                }
             )
         }
     }

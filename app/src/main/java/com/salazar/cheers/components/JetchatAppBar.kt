@@ -3,10 +3,7 @@ package com.salazar.cheers.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +16,7 @@ fun CheersAppBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavIconPressed: () -> Unit = { },
     title: @Composable () -> Unit,
+    center: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {},
     navigationIcon: @Composable () -> Unit = {}
 ) {
@@ -31,14 +29,24 @@ fun CheersAppBar(
         scrolledContainerColor = Color.Transparent
     )
     Box(modifier = Modifier.background(backgroundColor)) {
-        CenterAlignedTopAppBar(
-            modifier = modifier,
-            actions = actions,
-            title = title,
-            scrollBehavior = scrollBehavior,
-            colors = foregroundColors,
-            navigationIcon = navigationIcon,
-        )
+        if (center)
+            CenterAlignedTopAppBar(
+                modifier = modifier,
+                actions = actions,
+                title = title,
+                scrollBehavior = scrollBehavior,
+                colors = foregroundColors,
+                navigationIcon = navigationIcon,
+            )
+        else
+            SmallTopAppBar(
+                modifier = modifier,
+                actions = actions,
+                title = title,
+                scrollBehavior = scrollBehavior,
+                colors = foregroundColors,
+                navigationIcon = navigationIcon,
+            )
     }
 }
 

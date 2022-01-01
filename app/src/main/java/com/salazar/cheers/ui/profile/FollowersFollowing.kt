@@ -16,6 +16,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -96,7 +98,11 @@ class FollowersFollowingFragment : Fragment() {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun Tabs(uiState: FollowersFollowingUiState) {
-        val pages = listOf("Followers", "Following")
+        val pages = if (uiState is FollowersFollowingUiState.HasFollowers)
+            listOf("${uiState.followers.size} followers", "${uiState.following.size} following")
+        else
+            listOf("Followers", "Following")
+
         val pagerState = rememberPagerState()
         val scope = rememberCoroutineScope()
 
@@ -115,7 +121,7 @@ class FollowersFollowingFragment : Fragment() {
             // Add tabs for all of our pages
             pages.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
+                    text = { Text(title, style = MaterialTheme.typography.bodyMedium) },
                     selected = pagerState.currentPage == index,
                     onClick = {
                         scope.launch {
@@ -138,14 +144,15 @@ class FollowersFollowingFragment : Fragment() {
             count = pages.size,
             state = pagerState,
         ) { page ->
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                when (uiState) {
-                    is FollowersFollowingUiState.HasFollowers -> Followers(followers = uiState.followers)
-                    is FollowersFollowingUiState.HasFollowing -> Followers(followers = uiState.following)
-                    is FollowersFollowingUiState.NoUsers -> {
-                        Text("No Users")
+            Column(modifier = Modifier.fillMaxSize()) {
+                when (page) {
+                    0 -> {
+                        if (uiState is FollowersFollowingUiState.HasFollowers)
+                            Followers(followers = uiState.followers)
+                    }
+                    1 -> {
+                        if (uiState is FollowersFollowingUiState.HasFollowers)
+                            Following(following = uiState.following)
                     }
                 }
             }
@@ -170,20 +177,29 @@ class FollowersFollowingFragment : Fragment() {
     fun Followers(followers: List<User>) {
         LazyColumn {
             items(followers) { follower ->
-                UserCard(follower)
+                FollowerCard(follower)
             }
         }
     }
 
     @Composable
-    fun UserCard(user: User) {
+    fun Following(following: List<User>) {
+        LazyColumn {
+            items(following) { following ->
+                FollowingCard(following)
+            }
+        }
+    }
+
+    @Composable
+    fun FollowerCard(user: User) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
                     val action =
                         FollowersFollowingFragmentDirections.actionFollowersFollowingFragmentToOtherProfileFragment(
-                            user.id
+                            username = user.username
                         )
                     findNavController().navigate(action)
                 }
@@ -213,22 +229,81 @@ class FollowersFollowingFragment : Fragment() {
                     Text(text = user.username, style = Typography.bodyMedium)
                 }
             }
-            OutlinedButton(onClick = {
-                viewModel.unfollow(user.id)
-            }) {
+            OutlinedButton(
+                shape = RoundedCornerShape(8.dp),
+                onClick = { /* TODO */ }
+            ) {
                 Text("Remove")
             }
         }
     }
 
     @Composable
-    fun SearchBar() {
-        Card(
-            elevation = 0.dp,
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.padding(15.dp),
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+    fun FollowingCard(user: User) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val action =
+                        FollowersFollowingFragmentDirections.actionFollowersFollowingFragmentToOtherProfileFragment(
+                            username = user.username
+                        )
+                    findNavController().navigate(action)
+                }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val photo = remember { mutableStateOf<Uri?>(null) }
+
+                if (user.profilePicturePath.isNotBlank())
+                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                        photo.value = it
+                    }
+                Image(
+                    painter = rememberImagePainter(data = photo.value),
+                    contentDescription = "Profile image",
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    if (user.fullName.isNotBlank())
+                        Text(text = user.fullName, style = Typography.bodyMedium)
+                    Text(text = user.username, style = Typography.bodyMedium)
+                }
+            }
+            Row {
+                OutlinedButton(
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = { viewModel.unfollow(user.id) }
+                ) {
+                    Text("Following")
+                }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(Icons.Default.MoreVert, null)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun SearchBar() {
+        Box(
+            modifier = Modifier.padding(15.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Card(
+                elevation = 0.dp,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp),
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            ) {}
             val query = remember { mutableStateOf("") }
             val focusManager = LocalFocusManager.current
 
@@ -253,12 +328,16 @@ class FollowersFollowingFragment : Fragment() {
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 12.sp
                 ),
                 keyboardActions = KeyboardActions(onSearch = {
                     focusManager.clearFocus()
                 }),
-                placeholder = { Text("Search") }
+                placeholder = { Text("Search") },
+                trailingIcon = {
+                    if (query.value.isNotBlank())
+                        Icon(Icons.Filled.Close, null,
+                            Modifier.clickable { query.value = "" })
+                }
             )
         }
     }

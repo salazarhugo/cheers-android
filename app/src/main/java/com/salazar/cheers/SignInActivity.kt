@@ -1,8 +1,10 @@
 package com.salazar.cheers
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
@@ -22,6 +24,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
+import com.snapchat.kit.sdk.login.api.FirebaseCustomTokenResultError
+
+import com.snapchat.kit.sdk.login.api.FirebaseCustomTokenResultCallback
+
+import com.snapchat.kit.sdk.SnapLogin
+
+import com.snapchat.kit.sdk.login.api.SnapLoginApi
+import org.jetbrains.anko.toast
+import com.snapchat.kit.sdk.core.controller.LoginStateController
+import com.snapchat.kit.sdk.core.controller.LoginStateController.OnLoginStateChangedListener
 
 
 @AndroidEntryPoint
@@ -40,8 +52,32 @@ class SignInActivity : AppCompatActivity() {
                 }
             }
         }
-
+//        signInWithSnapchat()
 //        checkGithubCallback()
+    }
+
+    private fun signInWithSnapchat() {
+        SnapLogin.getAuthTokenManager(this).startTokenGrant()
+
+        val mLoginStateChangedListener: OnLoginStateChangedListener =
+            object : OnLoginStateChangedListener {
+                override fun onLoginSucceeded() {
+                    // Here you could update UI to show login success
+                    Log.e("SNAPCHAT DEBUG", "FWF")
+                }
+
+                override fun onLoginFailed() {
+                    Log.e("SNAPCHAT DEBUG", "FWF")
+                    // Here you could update UI to show login failure
+                }
+
+                override fun onLogout() {
+                    // Here you could update UI to reflect logged out state
+                    Log.e("SNAPCHAT DEBUG", "FWF")
+                }
+            }
+
+        SnapLogin.getLoginStateController(this).addOnLoginStateChangedListener(mLoginStateChangedListener);
     }
 
     override fun onStart() {

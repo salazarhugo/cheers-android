@@ -1,9 +1,13 @@
 package com.salazar.cheers.components
 
+import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -37,6 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.R
+import android.provider.MediaStore
+import androidx.compose.ui.platform.LocalContext
+
 
 enum class InputSelector {
     NONE,
@@ -55,13 +62,14 @@ enum class EmojiStickerSelector {
 @Preview
 @Composable
 fun UserInputPreview() {
-    UserInput(onMessageSent = {})
+    UserInput(onMessageSent = {}, onImageSelectorClick = {})
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserInput(
     onMessageSent: (String) -> Unit,
+    onImageSelectorClick: () -> Unit,
     modifier: Modifier = Modifier,
     resetScroll: () -> Unit = {},
 ) {
@@ -114,12 +122,13 @@ fun UserInput(
                     resetScroll()
                     dismissKeyboard()
                 },
-                currentInputSelector = currentInputSelector
+                currentInputSelector = currentInputSelector,
+                onImageSelectorClick = onImageSelectorClick
             )
             SelectorExpanded(
                 onCloseRequested = dismissKeyboard,
                 onTextAdded = { textState = textState.addText(it) },
-                currentSelector = currentInputSelector
+                currentSelector = currentInputSelector,
             )
         }
     }
@@ -160,7 +169,7 @@ private fun SelectorExpanded(
         when (currentSelector) {
             InputSelector.EMOJI -> EmojiSelector(onTextAdded, focusRequester)
             InputSelector.DM -> NotAvailablePopup(onCloseRequested)
-            InputSelector.PICTURE -> FunctionalityNotAvailablePanel()
+            InputSelector.PICTURE -> { }//onImageSelectorClick() }
             InputSelector.MAP -> FunctionalityNotAvailablePanel()
             InputSelector.PHONE -> FunctionalityNotAvailablePanel()
             else -> {
@@ -205,6 +214,7 @@ private fun UserInputSelector(
     onSelectorChange: (InputSelector) -> Unit,
     sendMessageEnabled: Boolean,
     onMessageSent: () -> Unit,
+    onImageSelectorClick: () -> Unit,
     currentInputSelector: InputSelector,
     modifier: Modifier = Modifier
 ) {
@@ -228,7 +238,10 @@ private fun UserInputSelector(
             description = stringResource(id = R.string.dm_desc)
         )
         InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.PICTURE) },
+            onClick = {
+                onSelectorChange(InputSelector.PICTURE)
+                onImageSelectorClick()
+                      },
             icon = Icons.Outlined.InsertPhoto,
             selected = currentInputSelector == InputSelector.PICTURE,
             description = stringResource(id = R.string.attach_photo_desc)
@@ -395,6 +408,37 @@ private fun UserInputText(
 }
 
 @Composable
+fun ImageSelector(
+    onTextAdded: (String) -> Unit,
+    focusRequester: FocusRequester
+) {
+    var selected by remember { mutableStateOf("Gallery") }
+
+    Column(
+        modifier = Modifier
+            .focusRequester(focusRequester) // Requests focus when the Emoji selector is displayed
+            // Make the emoji selector focusable so it can steal focus from TextField
+            .focusTarget()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
+            ExtendedSelectorInnerButton(
+                text = selected,
+                onClick = { selected = "Snapchat" },
+                selected = false,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(modifier = Modifier.verticalScroll(rememberScrollState())) {
+//            ImageGrid()
+        }
+    }
+}
+
+@Composable
 fun EmojiSelector(
     onTextAdded: (String) -> Unit,
     focusRequester: FocusRequester
@@ -465,6 +509,19 @@ fun ExtendedSelectorInnerButton(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ImageGrid(images: List<String>) {
+    LazyVerticalGrid(
+        cells = GridCells.Adaptive(minSize = 100.dp),
+    ) {
+        items(images) { uri ->
+            Text(uri.toString())
+        }
+    }
+}
+
+// get all images from external storage
 @Composable
 fun EmojiTable(
     onTextAdded: (String) -> Unit,

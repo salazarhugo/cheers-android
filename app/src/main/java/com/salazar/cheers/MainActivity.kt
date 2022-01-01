@@ -4,8 +4,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -30,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
@@ -43,6 +46,9 @@ import coil.transform.CircleCropTransformation
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.databinding.ContentMainBinding
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Fragment
@@ -51,6 +57,12 @@ import com.salazar.cheers.util.StorageUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
+import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
+
+import com.snapchat.kit.sdk.Bitmoji
+
+
+
 
 
 @AndroidEntryPoint
@@ -62,32 +74,58 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Turn off the decor fitting system windows, which allows us to handle insets,
-        // including IME animations
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val policy = ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-
         setContent {
-            // Update the system bars to be translucent
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = !isSystemInDarkTheme()
+            val color = if (isSystemInDarkTheme()) Color.Black else Color.White
             SideEffect {
-                systemUiController.setStatusBarColor(Color.Transparent, darkIcons = useDarkIcons)
+                systemUiController.setSystemBarsColor(color, darkIcons = useDarkIcons)
             }
-//            systemUiController.setNavigationBarColor(MaterialTheme.colorScheme.surface)
 
             CheersTheme {
-                ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.background,
-                        modifier = Modifier.systemBarsPadding()
-                    ) {
-                        MainActivityScreen()
-                    }
+                Surface(
+                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.systemBarsPadding(),
+                ) {
+                    MainActivityScreen()
                 }
             }
         }
+
+        val policy = ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+
+        setupDynamicLinks()
+    }
+
+    private fun getBitmojiAvatar() {
+        Bitmoji.fetchAvatarUrl(this, object : FetchAvatarUrlCallback {
+            override fun onSuccess(@Nullable avatarUrl: String?) {
+                if (avatarUrl != null)
+                    toast(avatarUrl)
+            }
+
+            override fun onFailure(isNetworkError: Boolean, statusCode: Int) {
+                toast(statusCode.toString())
+            }
+        })
+    }
+
+    private fun setupDynamicLinks() {
+        Firebase.dynamicLinks
+            .getDynamicLink(intent)
+            .addOnSuccessListener(this) { pendingDynamicLinkData: PendingDynamicLinkData? ->
+                var deepLink: Uri? = null
+                if (pendingDynamicLinkData != null)
+                    deepLink = pendingDynamicLinkData.link
+
+                // TODO(change deep ling url to salazar-ci.com/add/username)
+                if (deepLink != null) {
+                    findNavController().navigate(deepLink)
+                }
+
+            }
+            .addOnFailureListener(this) { e -> Log.w("Main Activity", "getDynamicLink:onFailure", e) }
     }
 
     @ExperimentalMaterial3Api
@@ -102,7 +140,11 @@ class MainActivity : AppCompatActivity() {
         Scaffold(
             bottomBar = { BottomBar(bottomSheetState) },
         ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+            ) {
                 AndroidViewBinding(ContentMainBinding::inflate)
             }
         }
@@ -135,16 +177,18 @@ class MainActivity : AppCompatActivity() {
         CompositionLocalProvider(
             LocalRippleTheme provides ClearRippleTheme
         ) {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.background,
+                tonalElevation = 0.dp,
+                modifier = Modifier.height(52.dp)
+            ) {
                 items.forEachIndexed { index, frag ->
                     NavigationBarItem(
                         icon = {
-//                            BadgedBox(badge = { Badge { Text("") } }) {
                             if (selectedItem == index)
                                 Icon(frag.selectedIcon, contentDescription = null)
                             else
                                 Icon(frag.icon, contentDescription = null)
-//                            }
                         },
                         selected = selectedItem == index,
                         onClick = {
@@ -159,10 +203,10 @@ class MainActivity : AppCompatActivity() {
                                 .build()
                             findNavController().navigate(frag.navigationId, null, options)
                         },
-                        label = {
-                            if (frag.label != null)
-                                Text(frag.label)
-                        },
+//                        label = {
+//                            if (frag.label != null)
+//                                Text(frag.label)
+//                        },
                     )
                 }
                 NavigationBarItem(
@@ -175,25 +219,23 @@ class MainActivity : AppCompatActivity() {
                         }
                     ),
                     icon = {
-                        BadgedBox(badge = { Badge { Text("") } }) {
-                            if (user != null) {
-                                val photo = remember { mutableStateOf<Uri?>(null) }
-                                if (user.profilePicturePath.isNotBlank())
-                                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                                        photo.value = it
+                        if (user != null) {
+                            val photo = remember { mutableStateOf<Uri?>(null) }
+                            if (user.profilePicturePath.isNotBlank())
+                                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                                    photo.value = it
+                                }
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = photo.value,
+                                    builder = {
+                                        transformations(CircleCropTransformation())
+                                        placeholder(R.drawable.default_profile_picture)
                                     }
-                                Image(
-                                    painter = rememberImagePainter(
-                                        data = photo.value,
-                                        builder = {
-                                            transformations(CircleCropTransformation())
-                                            placeholder(R.drawable.default_profile_picture)
-                                        }
-                                    ),
-                                    modifier = Modifier.size(35.dp),
-                                    contentDescription = null,
-                                )
-                            }
+                                ),
+                                modifier = Modifier.size(30.dp),
+                                contentDescription = null,
+                            )
                         }
                     },
                     selected = selectedItem == 4,

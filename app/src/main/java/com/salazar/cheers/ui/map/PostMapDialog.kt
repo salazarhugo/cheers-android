@@ -33,6 +33,7 @@ import coil.compose.rememberImagePainter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Typography
@@ -120,17 +121,9 @@ class PostMapDialog : BottomSheetDialogFragment() {
             )
             Spacer(Modifier.width(8.dp))
             Column {
-                Text(text = post.username, style = Typography.bodyMedium)
+                Username(username = post.username, verified = post.verified, textStyle = Typography.bodyMedium)
                 if (post.locationName.isNotBlank())
                     Text(text = post.locationName, style = Typography.labelSmall)
-            }
-            if (post.verified) {
-                Spacer(Modifier.width(4.dp))
-                Image(
-                    painter = rememberImagePainter(R.drawable.ic_verified),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                )
             }
         }
         PostBody(post = post)

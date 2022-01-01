@@ -52,6 +52,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.PullRefresh
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.rememberPullRefreshState
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.theme.Roboto
@@ -256,7 +257,9 @@ class HomeFragment : Fragment() {
                 .padding(14.dp, 11.dp)
                 .clickable {
                     val action =
-                        HomeFragmentDirections.actionHomeFragmentToOtherProfileFragment(post.userId)
+                        HomeFragmentDirections.actionHomeFragmentToOtherProfileFragment(
+                            username = post.username
+                        )
                     findNavController().navigate(action)
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -291,17 +294,9 @@ class HomeFragment : Fragment() {
                 )
                 Spacer(Modifier.width(8.dp))
                 Column {
-                    Text(text = post.username, style = Typography.bodyMedium)
+                    Username(username = post.username, verified = post.verified, textStyle = Typography.bodyMedium)
                     if (post.locationName.isNotBlank())
                         Text(text = post.locationName, style = Typography.labelSmall)
-                }
-                if (post.verified) {
-                    Spacer(Modifier.width(4.dp))
-                    Image(
-                        painter = rememberImagePainter(R.drawable.ic_verified),
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                    )
                 }
             }
             Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
@@ -409,7 +404,7 @@ class HomeFragment : Fragment() {
                 style = Typography.bodyMedium
             )
             Spacer(Modifier.height(4.dp))
-            Text("${post.createdTime} minutes ago", style = Typography.labelSmall)
+            Text(post.createdTime, style = Typography.labelSmall)
         }
         Spacer(Modifier.height(12.dp))
     }

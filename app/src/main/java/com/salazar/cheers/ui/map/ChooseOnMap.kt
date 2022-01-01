@@ -195,7 +195,12 @@ class ChooseOnMap : DialogFragment() {
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        mapView.getMapboxMap().setCamera(
+            CameraOptions.Builder()
+                .center(it)
+                .zoom(13.0)
+                .build()
+        )
         mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
     }
 

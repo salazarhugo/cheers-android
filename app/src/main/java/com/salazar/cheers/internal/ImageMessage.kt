@@ -4,7 +4,7 @@ import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 
 data class ImageMessage(
-    val imagePath: String,
+    val imagesPath: List<String>,
     override var id: String,
     override var chatChannelId: String,
     @ServerTimestamp
@@ -20,7 +20,7 @@ data class ImageMessage(
 ) : Message {
 
     constructor() : this(
-        "",
+        listOf(),
         "",
         "",
         null,

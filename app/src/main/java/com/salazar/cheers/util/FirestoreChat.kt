@@ -161,11 +161,25 @@ object FirestoreChat {
         }
     }
 
-    fun deleteMessage(channelId: String, messageId: String) {
+    fun unsendMessage(channelId: String, messageId: String) {
         chatChannelsCollectionRef.document(channelId).collection("messages").document(messageId)
-            .delete().addOnSuccessListener {
+            .delete()
+    }
 
-            }
+    fun likeMessage(channelId: String, messageId: String) {
+        chatChannelsCollectionRef
+            .document(channelId)
+            .collection("messages")
+            .document(messageId)
+            .update("likedBy", FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.uid!!))
+    }
+
+    fun unlikeMessage(channelId: String, messageId: String) {
+        chatChannelsCollectionRef
+            .document(channelId)
+            .collection("messages")
+            .document(messageId)
+            .update("likedBy", FieldValue.arrayRemove(FirebaseAuth.getInstance().currentUser?.uid!!))
     }
 
 }

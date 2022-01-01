@@ -1,5 +1,8 @@
 package com.salazar.cheers.ui.otherprofile
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,25 +10,38 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.google.firebase.dynamiclinks.ShortDynamicLink
+import com.google.firebase.dynamiclinks.ktx.*
+import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.R
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.profile.OtherProfileUiState
@@ -34,6 +50,8 @@ import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.StorageUtil
+import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.toast
 
 class OtherProfileFragment : Fragment() {
 
@@ -54,10 +72,11 @@ class OtherProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.refreshUser(args.otherUserId)
+        viewModel.refreshUser(args.username)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
+
     @Composable
     fun OtherProfileScreen() {
         val uiState = viewModel.uiState.collectAsState().value
@@ -82,17 +101,105 @@ class OtherProfileFragment : Fragment() {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun Toolbar(otherUser: User) {
+        val openDialog = remember { mutableStateOf(false)  }
         SmallTopAppBar(
-            title = { Text(otherUser.username, fontWeight = FontWeight.Bold, fontFamily = Roboto) },
+            title = {
+                Username(
+                    username = otherUser.username,
+                    verified = otherUser.verified,
+                    textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontFamily = Roboto),
+                )
+            },
             navigationIcon = {
                 IconButton(onClick = { findNavController().popBackStack() }) {
                     Icon(Icons.Default.ArrowBack, "")
                 }
             },
-            actions = { },
+            actions = {
+                IconButton(onClick = {
+//                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
+                    openDialog.value = true
+                }) {
+                    Icon(Icons.Default.MoreVert, "")
+                }
+            },
         )
+        if (openDialog.value)
+            MoreDialog(openDialog = openDialog)
+    }
+
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun MoreDialog(
+        openDialog: MutableState<Boolean>,
+    ) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            text = {
+                Column() {
+                    TextButton(
+                        onClick = { openDialog.value = false },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Report")
+                    }
+                    TextButton(
+                        onClick = { openDialog.value = false },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Report")
+                    }
+                    TextButton(
+                        onClick = {
+                            openDialog.value = false
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Block")
+                    }
+                    TextButton(
+                        onClick = {
+                            copyProfileUrl(args.username)
+                            openDialog.value = false
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Copy Profile URL")
+                    }
+                    TextButton(
+                        onClick = { openDialog.value = false },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Send Profile as Message")
+                    }
+                }
+            },
+            confirmButton = {
+            },
+        )
+    }
+
+    private fun copyProfileUrl(username: String) {
+        Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
+            link = Uri.parse("https://cheers.app/$username")
+            domainUriPrefix = "https://console.salazar-ci.com/link"
+            // Open links with this app on Android
+            androidParameters {
+            }
+        }.addOnSuccessListener { (shortLink, flowchartLink) ->
+            val clipboardManager = activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("text", shortLink.toString())
+            clipboardManager.setPrimaryClip(clipData)
+            toast("Copied profile URL to clipboard")
+        }.addOnFailureListener {
+            toast(it.toString())
+        }
     }
 
     @Composable
@@ -180,7 +287,10 @@ class OtherProfileFragment : Fragment() {
                     FirestoreChat.getOrCreateChatChannel(uiState.user) { channelId ->
                         val action =
                             OtherProfileFragmentDirections.actionOtherProfileFragmentToChatActivity(
-                                chatChannelId = channelId
+                                channelId = channelId,
+                                name = uiState.user.fullName,
+                                username = uiState.user.username,
+                                profilePicturePath = uiState.user.profilePicturePath,
                             )
                         findNavController().navigate(action)
                     }

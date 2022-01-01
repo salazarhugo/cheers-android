@@ -9,7 +9,6 @@
     </style>
 
     <style name="Theme.DialogFullScreen" parent="Theme.MaterialComponents.DayNight.Dialog">
-        <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 

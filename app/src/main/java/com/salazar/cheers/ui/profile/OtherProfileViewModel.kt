@@ -90,12 +90,12 @@ class OtherProfileViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun refreshUser(otherUserId: String) {
+    fun refreshUser(username: String) {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             viewModelState.update {
-                when (val result = Neo4jUtil.getUser(otherUserId)) {
+                when (val result = Neo4jUtil.getUserWithUsername(username)) {
                     is Result.Success -> it.copy(user = result.data, isLoading = false)
                     is Result.Error -> it.copy(
                         isLoading = false,

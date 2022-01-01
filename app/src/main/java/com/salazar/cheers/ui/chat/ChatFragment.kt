@@ -1,28 +1,27 @@
 package com.salazar.cheers.ui.chat
 
+import OnMessageLongClickDialog
 import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalDensity
@@ -30,6 +29,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.LocalWindowInsets
@@ -37,13 +37,13 @@ import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.components.ChannelNameBar
-import com.salazar.cheers.components.JumpToBottom
-import com.salazar.cheers.components.UserInput
+import com.salazar.cheers.components.*
+import com.salazar.cheers.internal.ImageMessage
 import com.salazar.cheers.internal.Message
 import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.internal.TextMessage
 import com.salazar.cheers.util.StorageUtil
+import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,17 +54,26 @@ const val ConversationTestTag = "ConversationTestTag"
 @Composable
 fun ChatScreen(
     channelId: String,
+    name: String,
+    username: String,
+    profilePicturePath: String,
     messages: List<Message>,
     onMessageSent: (channelId: String, msg: String) -> Unit,
-    onPoBackStack: () -> Unit,
+    onUnsendMessage: (Message) -> Unit = {},
+    onDoubleTapMessage: (Message) -> Unit = {},
+    onUnlike: (Message) -> Unit = {},
+    onCopyText: (String) -> Unit = {},
+    onImageSelectorClick: () -> Unit = {},
+    onPoBackStack: () -> Unit = {},
 ) {
     val scrollState = rememberLazyListState()
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
     val scope = rememberCoroutineScope()
+    val openDialog = remember { mutableStateOf(false)  }
+    val selectedMessage = remember { mutableStateOf<Message?>(null)  }
 
     Surface(color = MaterialTheme.colorScheme.background) {
-        Box(modifier = Modifier.fillMaxSize())
-        {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -75,6 +84,11 @@ fun ChatScreen(
                     navigateToProfile = {},
                     modifier = Modifier.weight(1f),
                     scrollState = scrollState,
+                    onLongClickMessage = {
+                        openDialog.value = true
+                        selectedMessage.value = it
+                    },
+                    onDoubleTapMessage = onDoubleTapMessage
                 )
                 UserInput(
                     onMessageSent = {
@@ -86,24 +100,37 @@ fun ChatScreen(
                         }
                     },
                     modifier = Modifier.navigationBarsWithImePadding(),
+                    onImageSelectorClick = onImageSelectorClick,
                 )
             }
-            ChannelNameBar(
-                channelName = channelId,
-                channelMembers = 2,
+            DirectChatBar(
+                name = name,
+                username = username,
+                profilePicturePath = profilePicturePath,
                 onNavIconPressed = { onPoBackStack() },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.statusBarsPadding(),
             )
         }
-
     }
+
+    if (openDialog.value)
+        OnMessageLongClickDialog(
+            openDialog,
+            msg = selectedMessage.value ?: TextMessage(),
+            onUnsendMessage = onUnsendMessage,
+            onCopyText = onCopyText,
+            onLike = onDoubleTapMessage,
+            onUnlike = onUnlike,
+        )
 }
 
 @Composable
 fun Messages(
     messages: List<Message>,
     navigateToProfile: (String) -> Unit,
+    onLongClickMessage: (Message) -> Unit,
+    onDoubleTapMessage: (Message) -> Unit,
     scrollState: LazyListState,
     modifier: Modifier = Modifier
 ) {
@@ -123,16 +150,13 @@ fun Messages(
             for (index in messages.indices) {
                 val prevAuthor = messages.getOrNull(index - 1)?.senderId
                 val nextAuthor = messages.getOrNull(index + 1)?.senderId
-                val content = messages[index]
-                val isFirstMessageByAuthor = prevAuthor != content.senderId
-                val isLastMessageByAuthor = nextAuthor != content.senderId
+                val prevMessage = messages.getOrNull(index -1)
+                val message = messages[index]
+                val isFirstMessageByAuthor = prevAuthor != message.senderId
+                val isLastMessageByAuthor = nextAuthor != message.senderId
 
                 // Hardcode day dividers for simplicity
-                if (index == messages.size - 1) {
-                    item {
-                        DayHeader("20 Aug")
-                    }
-                } else if (index == 2) {
+                if (message.time?.isToday() == false && prevMessage?.time?.isToday() == true) {
                     item {
                         DayHeader("Today")
                     }
@@ -142,10 +166,12 @@ fun Messages(
 //                    AnimateMessage {
                     Message(
                         onAuthorClick = { name -> navigateToProfile(name) },
-                        message = content,
-                        isUserMe = content.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                        onLongClickMessage = onLongClickMessage,
+                        onDoubleTapMessage = onDoubleTapMessage,
+                        message = message,
+                        isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
                         isFirstMessageByAuthor = isFirstMessageByAuthor,
-                        isLastMessageByAuthor = isLastMessageByAuthor
+                        isLastMessageByAuthor = isLastMessageByAuthor,
                     )
 //                    }
                 }
@@ -182,19 +208,20 @@ fun Messages(
 @Composable
 fun Message(
     onAuthorClick: (String) -> Unit,
+    onLongClickMessage: (Message) -> Unit,
+    onDoubleTapMessage: (Message) -> Unit,
     isUserMe: Boolean,
     message: Message,
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean
 ) {
-    val borderColor = if (isUserMe) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.tertiary
-    }
     val spaceBetweenAuthors = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
-    Row(modifier = spaceBetweenAuthors) {
-        if (isLastMessageByAuthor) {
+    val horizontalAlignment = if (isUserMe) Arrangement.End else Arrangement.Start
+    Row(
+        modifier = spaceBetweenAuthors.fillMaxWidth(),
+        horizontalArrangement = horizontalAlignment
+    ) {
+        if (isLastMessageByAuthor && !isUserMe) {
             // Avatar
             val photo = remember { mutableStateOf<Uri?>(null) }
 
@@ -203,17 +230,16 @@ fun Message(
                     photo.value = it
                 }
             Image(
+                painter = rememberImagePainter(
+                    data = photo.value,
+                ),
                 modifier = Modifier
                     .clickable(onClick = { onAuthorClick(message.senderId) })
                     .padding(horizontal = 16.dp)
                     .size(42.dp)
-                    .border(1.5.dp, borderColor, CircleShape)
                     .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                     .clip(CircleShape)
                     .align(Alignment.Top),
-                painter = rememberImagePainter(
-                    data = message.senderProfilePicturePath,
-                ),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
             )
@@ -227,9 +253,10 @@ fun Message(
             isFirstMessageByAuthor = isFirstMessageByAuthor,
             isLastMessageByAuthor = isLastMessageByAuthor,
             authorClicked = onAuthorClick,
+            onLongClickMessage = onLongClickMessage,
+            onDoubleTapMessage = onDoubleTapMessage,
             modifier = Modifier
                 .padding(end = 16.dp)
-                .weight(1f)
         )
     }
 }
@@ -241,13 +268,28 @@ fun AuthorAndTextMessage(
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean,
     authorClicked: (String) -> Unit,
+    onLongClickMessage: (Message) -> Unit,
+    onDoubleTapMessage: (Message) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        if (isLastMessageByAuthor && !isUserMe) {
+        if (isLastMessageByAuthor && !isUserMe && false) {
             AuthorNameTimestamp(msg)
         }
-        ChatItemBubble(msg, isUserMe, authorClicked = authorClicked)
+        if (msg is TextMessage)
+            ChatItemBubble(
+                msg,
+                isUserMe,
+                authorClicked = authorClicked,
+                onLongClickMessage = onLongClickMessage,
+                onDoubleTapMessage = onDoubleTapMessage
+            )
+        else if (msg is ImageMessage)
+            ImageMessageBubble(
+                msg,
+                onLongClickMessage = onLongClickMessage,
+                onDoubleTapMessage = onDoubleTapMessage,
+            )
         if (isFirstMessageByAuthor) {
             // Last bubble before next author
             Spacer(modifier = Modifier.height(8.dp))
@@ -257,6 +299,7 @@ fun AuthorAndTextMessage(
         }
     }
 }
+
 
 @Composable
 private fun AuthorNameTimestamp(msg: Message) {
@@ -281,7 +324,8 @@ private fun AuthorNameTimestamp(msg: Message) {
     }
 }
 
-private val ChatBubbleShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+private val ChatBubbleStartShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+private val ChatBubbleEndShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp)
 
 @Composable
 fun DayHeader(dayString: String) {
@@ -313,10 +357,46 @@ private fun RowScope.DayHeaderLine() {
 }
 
 @Composable
+fun ImageMessageBubble(
+    message: ImageMessage,
+    onLongClickMessage: (Message) -> Unit,
+    onDoubleTapMessage: (Message) -> Unit,
+) {
+    Column() {
+        message.imagesPath.forEach { imagePath ->
+            val photo = remember { mutableStateOf<Uri?>(null) }
+
+            StorageUtil.pathToReference(imagePath)?.downloadUrl?.addOnSuccessListener {
+                photo.value = it
+            }
+
+            Image(
+                painter = rememberImagePainter(data = photo.value),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp)
+                    .padding(3.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                        onLongPress = { onLongClickMessage(message) },
+                        onDoubleTap = { onDoubleTapMessage(message) }
+                    )
+                },
+                contentScale = ContentScale.Crop,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
 fun ChatItemBubble(
     message: Message,
     isUserMe: Boolean,
-    authorClicked: (String) -> Unit
+    authorClicked: (String) -> Unit,
+    onLongClickMessage: (Message) -> Unit,
+    onDoubleTapMessage: (Message) -> Unit,
 ) {
 
     val backgroundBubbleColor = if (isUserMe)
@@ -324,17 +404,37 @@ fun ChatItemBubble(
     else
         MaterialTheme.colorScheme.surfaceVariant
 
+    val shape = if (isUserMe) ChatBubbleEndShape else ChatBubbleStartShape
 
-    Column {
+    Column(
+    ) {
         Surface(
             color = backgroundBubbleColor,
-            shape = ChatBubbleShape
+            shape = shape,
+            modifier = Modifier.pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongClickMessage(message) },
+                    onDoubleTap = { onDoubleTapMessage(message) }
+                )
+            }
         ) {
             ClickableMessage(
                 message = message,
                 isUserMe = isUserMe,
                 authorClicked = authorClicked
             )
+        }
+
+        if (message.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)) {
+            AnimateHeart {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.offset(y = (-4).dp)
+                ) {
+                    Text("❤", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                }
+            }
         }
 
 //            message.senderProfilePicturePath.let {
@@ -382,23 +482,28 @@ fun ClickableMessage(
     val color = if (isUserMe) MaterialTheme.colorScheme.onPrimary else
         MaterialTheme.colorScheme.onSurfaceVariant
 
-    ClickableText(
+    Text(
         text = styledMessage,
         style = MaterialTheme.typography.bodyLarge.copy(color = color),
-        modifier = Modifier.padding(12.dp),
-        onClick = {
-            styledMessage
-                .getStringAnnotations(start = it, end = it)
-                .firstOrNull()
-                ?.let { annotation ->
-                    when (annotation.tag) {
-                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
-                        else -> Unit
-                    }
-                }
-        }
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
     )
+//    ClickableText(
+//        text = styledMessage,
+//        style = MaterialTheme.typography.bodyLarge.copy(color = color),
+//        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+//        onClick = {
+//            styledMessage
+//                .getStringAnnotations(start = it, end = it)
+//                .firstOrNull()
+//                ?.let { annotation ->
+//                    when (annotation.tag) {
+//                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+//                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
+//                        else -> Unit
+//                    }
+//                }
+//        }
+//    )
 }
 
 private val JumpToBottomThreshold = 56.dp

@@ -1,6 +1,7 @@
 package com.salazar.cheers.internal
 
 import com.google.firebase.firestore.ServerTimestamp
+import java.io.Serializable
 import java.util.*
 
 
@@ -18,7 +19,7 @@ data class TextMessage(
     override val likedBy: ArrayList<String>,
     override val seenBy: ArrayList<String>,
     override val type: String = MessageType.TEXT
-) : Message {
+) : Message, Serializable {
 
     constructor() : this(
         "",

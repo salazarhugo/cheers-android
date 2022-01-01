@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
@@ -19,7 +20,7 @@ import com.salazar.cheers.ui.theme.Roboto
 @ExperimentalMaterialApi
 @Composable
 fun FacebookButton(
-    text: String = "Login with Facebook",
+    text: String = "Continue with Facebook",
     loadingText: String = "Fetching data...",
     onClicked: () -> Unit
 ) {
@@ -29,18 +30,14 @@ fun FacebookButton(
         onClick = { clicked = !clicked },
 //        shape = shape,
 //        border = BorderStroke(width = 1.dp, color = borderColor),
-        color = Color(0xFF1877F2),
+        color = Color(0xFF0091ea),
         elevation = 0.dp,
         shape = RoundedCornerShape(4.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(
-                    start = 8.dp,
-                    end = 16.dp,
-                    top = 8.dp,
-                    bottom = 8.dp
-                )
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
                 .animateContentSize(
                     animationSpec = tween(
                         durationMillis = 300,
@@ -51,15 +48,17 @@ fun FacebookButton(
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_outline_face_24),
-                contentDescription = "Google Button",
+                painter = painterResource(id = R.drawable.ic_f_logo_rgb_white_1024),
+                contentDescription = null,
                 tint = Color.Unspecified,
+                modifier = Modifier.size(32.dp)
             )
-            Spacer(modifier = Modifier.width(24.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = if (clicked) loadingText else text,
                 color = Color.White,
-                fontFamily = Roboto
+                fontFamily = Roboto,
+                fontWeight = FontWeight.Bold
             )
             if (clicked) {
                 Spacer(modifier = Modifier.width(16.dp))
