@@ -46,8 +46,11 @@ import coil.transform.CircleCropTransformation
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.tasks.Task
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.databinding.ContentMainBinding
 import com.salazar.cheers.internal.ClearRippleTheme
@@ -227,11 +230,11 @@ class MainActivity : AppCompatActivity() {
                                 }
                             Image(
                                 painter = rememberImagePainter(
-                                    data = photo.value,
+                                    data = photo.value ?: R.drawable.default_profile_picture,
                                     builder = {
                                         transformations(CircleCropTransformation())
-                                        placeholder(R.drawable.default_profile_picture)
-                                    }
+                                        error(R.drawable.red_marker)
+                                    },
                                 ),
                                 modifier = Modifier.size(30.dp),
                                 contentDescription = null,

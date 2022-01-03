@@ -118,7 +118,7 @@ class SignInFragment : Fragment() {
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
                         onClick = {
                             val action =
                                 SignInFragmentDirections.actionSignInFragmentToEmailPasswordFragment()
@@ -126,25 +126,25 @@ class SignInFragment : Fragment() {
                         },
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF800000),
+                            containerColor = Color(0xFFF32B2B),
                         )
                     ) {
-                        Icon(Icons.Default.Email, "")
+                        Icon(Icons.Default.Email, "", tint = Color.White)
                         Spacer(Modifier.width(12.dp))
-                        Text("Sign in with Email")
+                        Text("Sign in with Email", color = Color.White)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
                         onClick = {},
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF008800),
+                            containerColor = Color(0xFF27F34E),
                         ),
                         shape = RoundedCornerShape(8.dp),
                     ) {
-                        Icon(Icons.Default.Phone, "")
+                        Icon(Icons.Default.Phone, "", tint = Color.White)
                         Spacer(Modifier.width(12.dp))
-                        Text("Sign in with Phone")
+                        Text("Sign in with Phone", color = Color.White)
                     }
                 }
                 Footer()

@@ -4,12 +4,16 @@ import android.app.Application
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,7 +22,10 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
     private val workManager = WorkManager.getInstance(application)
 
     val caption = mutableStateOf("")
+
     val photoUri = mutableStateOf<Uri?>(null)
+    val videoUri = mutableStateOf<Uri?>(null)
+
     val location = mutableStateOf("Current Location")
     val locationResults = mutableStateOf<List<SearchResult>>(emptyList())
     val selectedLocation = mutableStateOf<SearchResult?>(null)
@@ -52,6 +59,8 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
         this.caption.value = caption
     }
 
+    var uploadWorkerState: Flow<WorkInfo>? = null
+
     fun uploadPost() {
         val uploadWorkRequest: WorkRequest =
             OneTimeWorkRequestBuilder<UploadPostWorker>().apply {
@@ -59,6 +68,7 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
                 setInputData(
                     workDataOf(
                         "PHOTO_URI" to photoUri.value.toString(),
+                        "VIDEO_URI" to videoUri.value.toString(),
                         "PHOTO_CAPTION" to caption.value,
                         "LOCATION_NAME" to selectedLocation.value?.name,
                         "LOCATION_LATITUDE" to selectedLocation.value?.coordinate?.latitude(),
@@ -72,7 +82,10 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
 
         // Actually start the work
         workManager.enqueue(uploadWorkRequest)
+
+        uploadWorkerState = workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).asFlow()
     }
+
 
     fun updateLocation(location: String) {
         this.location.value = location

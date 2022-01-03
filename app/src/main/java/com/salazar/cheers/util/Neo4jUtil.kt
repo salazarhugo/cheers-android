@@ -1,17 +1,25 @@
 package com.salazar.cheers.util
 
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import com.google.gson.reflect.TypeToken
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Environment
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.PostNeo4j
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.neo4j.driver.*
+import java.lang.reflect.Type
 import java.util.*
+import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit
 
 
@@ -96,12 +104,44 @@ object Neo4jUtil {
     fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = FirebaseAuth.getInstance().uid!!
-        params["post"] = toMap(post)
+        val post2 = PostNeo4j(
+            id = randomUUID().toString(),
+            caption = post.caption,
+            createdTime = post.createdTime,
+            likes = post.likes,
+            liked = post.liked,
+            comments = post.comments,
+            shares = post.shares,
+            showOnMap = post.showOnMap,
+            photoPath = post.photoPath,
+            videoPath = post.videoPath,
+            locationLatitude = post.locationLatitude,
+            locationLongitude = post.locationLatitude,
+            locationName = post.locationName,
+        )
+        params["post"] = toMap(post2)
+        params["tagUsersId"] = tagUsers
         write(
             "MATCH (u:User) WHERE u.id = \$userId CREATE (p: Post \$post)" +
-                    " SET p += {id: randomUUID(), createdTime: datetime() }CREATE (u)-[:POSTED]->(p)",
+                    " SET p += { createdTime: datetime() } CREATE (u)-[:POSTED]->(p)" +
+                    " WITH p UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
             params = params
         )
+        sendPostNotification(post2.id)
+    }
+
+    private fun sendPostNotification(postId: String): Task<String> {
+        val data = hashMapOf(
+            "postId" to postId,
+        )
+
+        return FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("postNotification")
+            .call(data)
+            .continueWith { task ->
+                val result = task.result?.data as String
+                result
+            }
     }
 
     suspend fun deletePost(postId: String) {
@@ -393,12 +433,16 @@ object Neo4jUtil {
                         gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
                     val user =
                         gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-                    post.username = user.username
-                    post.verified = user.verified
-                    post.userPhotoUrl = user.profilePicturePath
-                    post.userId = user.id
+//                    post.username = user.username
+//                    post.verified = user.verified
+//                    post.userPhotoUrl = user.profilePicturePath
+//                    post.userId = user.id
 
-                    posts.add(post)
+                    posts.add(
+                        post.copy(
+                            creator = user,
+                        )
+                    )
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
@@ -431,12 +475,11 @@ object Neo4jUtil {
                         gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
                     val user =
                         gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-                    post.username = user.username
-                    post.verified = user.verified
-                    post.userPhotoUrl = user.profilePicturePath
-                    post.userId = user.id
-
-                    posts.add(post)
+                    posts.add(
+                        post.copy(
+                            creator = user
+                        )
+                    )
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
@@ -455,8 +498,9 @@ object Neo4jUtil {
                 val records = query(
                     "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p)\n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]-(p) \n" +
+                            "OPTIONAL MATCH (p)-[:WITH]-(w:User) \n" +
                             "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"dd/MM/YYYY HH:mm\")}," +
-                            " properties(f) ORDER BY p.createdTime DESC",
+                            " properties(f), collect(properties(w)) ORDER BY p.createdTime DESC",
                     params
                 )
 
@@ -470,12 +514,20 @@ object Neo4jUtil {
                         gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
                     val user =
                         gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-                    post.username = user.username
-                    post.verified = user.verified
-                    post.userPhotoUrl = user.profilePicturePath
-                    post.userId = user.id
 
-                    posts.add(post)
+                    val userListType: Type =
+                        object : TypeToken<ArrayList<User>>() {}.type
+
+                    val s = record.values()[2].toString()
+                    val tagUsers =
+                        gson.fromJson<ArrayList<User>>(s, userListType)
+
+                    posts.add(
+                        post.copy(
+                            creator = user,
+                            tagUsers = tagUsers,
+                        )
+                    )
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {

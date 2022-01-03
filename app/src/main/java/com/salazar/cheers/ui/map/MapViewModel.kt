@@ -30,7 +30,7 @@ class MapViewModel @Inject constructor() : ViewModel() {
         refreshPosts()
     }
 
-    fun refreshPosts() {
+    private fun refreshPosts() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -47,6 +47,12 @@ class MapViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun updateCity(city: String) {
+        viewModelState.update {
+            it.copy(city = city)
+        }
+    }
+
     fun selectPost(post: Post) {
         viewModelState.update {
             it.copy(selectedPost = post)
@@ -56,7 +62,8 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
 data class MapViewModelState(
     val users: List<User> = emptyList(),
-    val posts: List<Post> = emptyList(),
+    val posts: List<Post>? = null,
+    val city: String = "",
     val selectedPost: Post? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),

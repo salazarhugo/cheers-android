@@ -102,8 +102,8 @@ class PostMapDialog : BottomSheetDialogFragment() {
             )
         )
 
-        if (post.userPhotoUrl.isNotBlank())
-            StorageUtil.pathToReference(post.userPhotoUrl)?.downloadUrl?.addOnSuccessListener {
+        if (post.creator.profilePicturePath.isNotBlank())
+            StorageUtil.pathToReference(post.creator.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
                 photo.value = it
             }
         Row(
@@ -121,7 +121,7 @@ class PostMapDialog : BottomSheetDialogFragment() {
             )
             Spacer(Modifier.width(8.dp))
             Column {
-                Username(username = post.username, verified = post.verified, textStyle = Typography.bodyMedium)
+                Username(username = post.creator.username, verified = post.creator.verified, textStyle = Typography.bodyMedium)
                 if (post.locationName.isNotBlank())
                     Text(text = post.locationName, style = Typography.labelSmall)
             }

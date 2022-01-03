@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.FirestoreUtil
 import com.salazar.cheers.util.Neo4jUtil
@@ -16,25 +17,12 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface ChatChannelUiState {
-
-    val isLoading: Boolean
-    val errorMessages: List<String>
-    val searchInput: String
-
-    data class NoChannels(
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : ChatChannelUiState
-
-    data class HasChannels(
-        val channels: List<ChatChannel>,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : ChatChannelUiState
-}
+data class ChatChannelUiState(
+    val isLoading: Boolean,
+    val errorMessages: List<String>,
+    val searchInput: String,
+    val channels: List<ChatChannel>?,
+)
 
 private data class ChatChannelsViewModelState(
     val channels: List<ChatChannel>? = null,
@@ -43,20 +31,12 @@ private data class ChatChannelsViewModelState(
     val searchInput: String = "",
 ) {
     fun toUiState(): ChatChannelUiState =
-        if (channels == null) {
-            ChatChannelUiState.NoChannels(
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                searchInput = searchInput
-            )
-        } else {
-            ChatChannelUiState.HasChannels(
-                channels = channels,
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                searchInput = searchInput
-            )
-        }
+        ChatChannelUiState(
+            channels = channels,
+            isLoading = isLoading,
+            errorMessages = errorMessages,
+            searchInput = searchInput
+        )
 }
 
 @HiltViewModel
@@ -66,7 +46,8 @@ class ChatChannelsViewModel @Inject constructor() : ViewModel() {
 
     val name = mutableStateOf("")
 
-    private val viewModelState = MutableStateFlow(ChatChannelsViewModelState(isLoading = true))
+    private val viewModelState =
+        MutableStateFlow(ChatChannelsViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -98,7 +79,7 @@ class ChatChannelsViewModel @Inject constructor() : ViewModel() {
                 val otherUserId = it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! } ?: return@forEach
                 when (val result = Neo4jUtil.getUser(otherUserId)) {
                     is Result.Success ->  channels.add(it.copy(otherUser = result.data))
-                    is Result.Error -> {}
+                    is Result.Error -> channels.add(it.copy(otherUser = User().copy(username = "User not found", fullName = "User not found")))
                 }
             }
 

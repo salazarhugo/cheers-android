@@ -37,6 +37,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
@@ -44,6 +45,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
+import com.salazar.cheers.components.CircularProgressIndicatorM3
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.ui.theme.Roboto
@@ -134,13 +137,12 @@ class MessagesFragment : Fragment() {
                 modifier = Modifier.fillMaxSize(),
             ) {
                 when (page) {
-                    0 -> {
-                        when (uiState) {
-                            is ChatChannelUiState.HasChannels -> ConversationList(uiState)
-                            is ChatChannelUiState.NoChannels -> {
-                                Text("No Channels")
-                            }
-                        }
+                    0 ->  {
+                        val channels = uiState.channels
+                        if (uiState.isLoading)
+                            LoadingScreen()
+                        if (channels != null)
+                            ConversationList(channels)
                     }
                     1 -> {}
                 }
@@ -148,15 +150,9 @@ class MessagesFragment : Fragment() {
         }
     }
     @Composable
-    fun ConversationList(uiState: ChatChannelUiState.HasChannels) {
-        if (uiState.isLoading)
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp),
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-        val channels = uiState.channels
+    fun ConversationList(channels: List<ChatChannel>) {
+        if (channels.isEmpty())
+            Text("No chat channels")
         LazyColumn {
             items(channels) { channel ->
                 when (channel.type) {
@@ -210,7 +206,13 @@ class MessagesFragment : Fragment() {
                         photo.value = it
                     }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(
+                        data = photo.value ?: R.drawable.default_profile_picture,
+                        builder = {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.red_marker)
+                        },
+                    ),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(56.dp)
@@ -240,7 +242,10 @@ class MessagesFragment : Fragment() {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (!seen) {
-                    Box( modifier = Modifier .size(8.dp) .clip(CircleShape) .background(Color(0xFF0095F6)))
+                    Box( modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF0095F6)))
                     Spacer(Modifier.width(12.dp))
                 }
 

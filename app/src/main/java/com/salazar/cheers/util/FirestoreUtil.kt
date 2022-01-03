@@ -60,6 +60,7 @@ object FirestoreUtil {
             GlobalScope.launch {
                 Neo4jUtil.addUser(newUser)
             }
+            onComplete(newUser)
         }
     }
 

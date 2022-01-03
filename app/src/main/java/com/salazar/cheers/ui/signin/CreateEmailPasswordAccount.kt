@@ -61,7 +61,7 @@ class CreatePasswordFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                Text(username)
+//                Text(username)
                 CreatePasswordScreen()
             }
         }

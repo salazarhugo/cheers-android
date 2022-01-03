@@ -17,6 +17,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -33,26 +34,43 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT
+import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.MainViewModel
@@ -67,6 +85,9 @@ import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
+import org.jetbrains.anko.support.v4.toast
+import java.net.URLConnection
+import javax.sql.DataSource
 
 
 @AndroidEntryPoint
@@ -146,14 +167,6 @@ class AddDialogFragment : DialogFragment() {
                     Icon(Icons.Default.ArrowBack, "")
                 }
             },
-            actions = {
-                Button(onClick = {
-                    viewModel.uploadPost()
-                    dismiss()
-                }) {
-                    Text("Save")
-                }
-            },
         )
     }
 
@@ -172,9 +185,8 @@ class AddDialogFragment : DialogFragment() {
                 if (user == null)
                     LoadingScreen()
                 else {
-                    AddPhoto()
-//                    if (viewModel.photoUri.value == null) DividerM3()
-                    Spacer(Modifier.height(8.dp))
+                    AddPhotoOrVideo()
+//                    DividerM3()
                     CaptionSection(user = user)
                     DividerM3()
                     TagSection()
@@ -185,14 +197,42 @@ class AddDialogFragment : DialogFragment() {
                         LocationSection()
                     DividerM3()
                     LocationResultsSection(results = viewModel.locationResults.value)
-                    Preferences()
+                    SwitchPreference(text = "Show on map") { viewModel.onShowOnMapChanged(it) }
+                    DividerM3()
+                    SwitchPreference(text = "Allow repost") {}
+                    ShareButton()
                 }
             }
         }
     }
 
     @Composable
-    fun Preferences() {
+    fun ShareButton() {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Bottom,
+        ) {
+            DividerM3()
+            Button(
+                onClick = {
+                    viewModel.uploadPost()
+                    dismiss()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text("Share")
+            }
+        }
+    }
+
+    @Composable
+    fun SwitchPreference(
+        text: String,
+        onCheckedChange: (Boolean) -> Unit = {},
+    ) {
         val checkedState = viewModel.showOnMap
         Row(
             modifier = Modifier
@@ -201,30 +241,30 @@ class AddDialogFragment : DialogFragment() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = "Show on map", fontSize = 14.sp)
+            Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
             SwitchM3(
                 checked = checkedState.value,
-                onCheckedChange = {
-                    viewModel.onShowOnMapChanged(it)
-                }
+                onCheckedChange = onCheckedChange
             )
         }
     }
     
     @Composable
-    fun AddPhoto() {
+    fun AddPhotoOrVideo() {
         if (viewModel.photoUri.value != null)
             return
 
         Row(
-            modifier = Modifier.padding(15.dp, 0.dp),
+            modifier = Modifier
+                .padding(15.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         )
         {
-            FilledTonalButton(onClick = { openPhotoChooser() }) {
+            FilledTonalButton(onClick = { openPhotoVideoChooser() }) {
                 Icon(Icons.Outlined.PhotoCamera, "")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Add Photo")
+                Text(text = "Add photo or video")
             }
         }
     }
@@ -239,14 +279,15 @@ class AddDialogFragment : DialogFragment() {
                 .padding(15.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "Location", fontSize = 14.sp)
+            Text(text = "Location", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Icon(Icons.Outlined.MyLocation, null)
-                Text(text = viewModel.location.value, fontSize = 14.sp)
+                Text(text = viewModel.location.value, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
             }
         }
     }
@@ -311,7 +352,7 @@ class AddDialogFragment : DialogFragment() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "Tag people", fontSize = 14.sp)
+            Text(text = "Tag people", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
             val tagUsers = viewModel.selectedTagUsers
             if (tagUsers.size == 1)
                 Text(text = tagUsers[0].username, style = MaterialTheme.typography.labelLarge)
@@ -323,25 +364,26 @@ class AddDialogFragment : DialogFragment() {
     @Composable
     fun CaptionSection(user: User) {
         Row(
-            modifier = Modifier.padding(15.dp, 0.dp),
+            modifier = Modifier
+                .padding(start = 15.dp, end = 15.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val videoUri = viewModel.videoUri.value
 
-            val photo = remember { mutableStateOf<Uri?>(null) }
-
-            if (user.profilePicturePath.isNotBlank())
-                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                    photo.value = it
-                }
-            Image(
-                painter = rememberImagePainter(data = photo.value),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(40.dp)
-                    .border(BorderStroke(1.dp, Color.LightGray), CircleShape),
-                contentScale = ContentScale.Crop,
-            )
+            if (videoUri != null) {
+                VideoPlayer(
+                    uri = videoUri,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .height(120.dp)
+                        .aspectRatio(9f / 16f)
+                )
+                viewModel.photoUri.value = null
+            }
+            else
+                ProfilePicture(user)
             val caption = viewModel.caption
 
             TextField(
@@ -352,8 +394,8 @@ class AddDialogFragment : DialogFragment() {
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .offset(y = 4.dp),
                 onValueChange = {
                     viewModel.onCaptionChanged(it)
                 },
@@ -367,16 +409,19 @@ class AddDialogFragment : DialogFragment() {
                     Text(text = "Write a caption...", fontSize = 13.sp)
                 },
                 trailingIcon = {
-                    if (viewModel.photoUri.value != null)
+                    val photoUri = viewModel.photoUri.value
+                    if (photoUri != null) {
+                        viewModel.videoUri.value = null
                         Image(
                             modifier = Modifier
-                                .clickable(onClick = { openPhotoChooser() })
+                                .clickable(onClick = { openPhotoVideoChooser() })
                                 .padding(horizontal = 16.dp)
                                 .size(50.dp),
                             painter = rememberImagePainter(data = viewModel.photoUri.value),
                             contentDescription = null,
                             contentScale = ContentScale.Crop
                         )
+                    }
                 }
 //                keyboardActions = KeyboardActions(onSearch = {
 //                    focusManager.clearFocus()
@@ -386,17 +431,21 @@ class AddDialogFragment : DialogFragment() {
         }
     }
 
-    private fun openPhotoChooser() {
-        Utils.openPhotoChooser(singleImageResultLauncher)
+    private fun openPhotoVideoChooser() {
+        Utils.openPhotoVideoChooser(singleImageResultLauncher)
     }
 
     private val singleImageResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
-                val selectedImageUri: Uri? = data?.data
-                if (selectedImageUri != null) {
-                    viewModel.photoUri.value = selectedImageUri
+                val imageOrVideoUri: Uri? = data?.data
+                if (imageOrVideoUri != null) {
+                    val type = data.resolveType(requireContext()) ?: ""
+                    if (type.startsWith("image"))
+                        viewModel.photoUri.value = imageOrVideoUri
+                    else if (type.startsWith("video"))
+                        viewModel.videoUri.value = imageOrVideoUri
                 }
             }
         }
@@ -412,5 +461,55 @@ class AddDialogFragment : DialogFragment() {
     companion object {
         private const val TAG = "AddDialogFragment"
     }
+
+    @Composable
+    fun VideoPlayer(
+        uri: Uri,
+        modifier: Modifier = Modifier,
+    ) {
+        val context = LocalContext.current
+        val player = ExoPlayer.Builder(context).build()
+        val playerView = PlayerView(context)
+        val mediaItem = MediaItem.fromUri(uri)
+        val playWhenReady = remember { mutableStateOf(true) }
+        player.setMediaItem(mediaItem)
+        playerView.player = player
+
+        LaunchedEffect(player) {
+            player.prepare()
+            player.playWhenReady = playWhenReady.value
+            player.volume = 0f
+            player.videoScalingMode = VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+        }
+        AndroidView(factory = {playerView}, modifier = modifier) {
+            it.useController = false
+            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+        }
+    }
+
+    @Composable
+    fun ProfilePicture(user: User) {
+        val photo = remember { mutableStateOf<Uri?>(null) }
+
+        if (user.profilePicturePath.isNotBlank())
+            StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                photo.value = it
+            }
+        Image(
+            painter = rememberImagePainter(
+                data = photo.value ?: R.drawable.default_profile_picture,
+                builder = {
+                    transformations(CircleCropTransformation())
+                    error(R.drawable.red_marker)
+                },
+            ),
+            contentDescription = "Profile image",
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(40.dp),
+            contentScale = ContentScale.Crop,
+        )
+    }
+
 }
 

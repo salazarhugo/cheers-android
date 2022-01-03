@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.CameraOptions
@@ -123,8 +124,7 @@ class ChooseOnMap : DialogFragment() {
         else
             "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
 
-        mapView.getMapboxMap().loadStyleUri(style)
-        {
+        mapView.getMapboxMap().loadStyleUri(style) {
             initLocationComponent()
             setupGesturesListener()
         }
@@ -260,7 +260,7 @@ class ChooseOnMap : DialogFragment() {
                     val location = mapView.getMapboxMap().cameraState.center
                     val action =
                         ChooseOnMapDirections.actionChooseOnMapToAddDialogFragment(location)
-                    findNavController().navigate(action)
+                    findNavController().navigate(action, NavOptions.Builder().setPopUpTo(R.id.homeFragment, true).build())
                 }) {
                     Text("OK")
                 }

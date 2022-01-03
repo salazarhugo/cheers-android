@@ -1,5 +1,6 @@
 package com.salazar.cheers.util
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -52,6 +53,17 @@ object StorageUtil {
     ) {
         val ref = currentUserRef.child("posts/${UUID.nameUUIDFromBytes(imageBytes)}")
         ref.putBytes(imageBytes)
+            .addOnSuccessListener {
+                onSuccess(ref.path)
+            }
+    }
+
+    fun uploadPostVideo(
+        videoUri: Uri,
+        onSuccess: (videoPath: String) -> Unit
+    ) {
+        val ref = currentUserRef.child("posts/${Calendar.getInstance().timeInMillis}")
+        ref.putFile(videoUri)
             .addOnSuccessListener {
                 onSuccess(ref.path)
             }

@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
@@ -63,6 +64,23 @@ fun AnimateHeart(content: @Composable () -> Unit) {
             initialOffsetY = { with(density) { 40.dp.roundToPx() } }
         ),
         exit = slideOutVertically(),
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun AnimateVisibilityFade(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
+    AnimatedVisibility(
+        modifier = modifier,
+        visibleState = state,
+        enter = fadeIn(),
+        exit = fadeOut(),
     ) {
         content()
     }

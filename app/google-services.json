@@ -1,41 +1,33 @@
 {
   "project_info": {
-    "project_number": "776069696826",
-    "project_id": "salazar-capital-investment",
-    "storage_bucket": "salazar-capital-investment.appspot.com"
+    "project_number": "988221557023",
+    "project_id": "cheers-a275e",
+    "storage_bucket": "cheers-a275e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:776069696826:android:06e0b2d26d0d66cb0ad403",
+        "mobilesdk_app_id": "1:988221557023:android:11b57447f2bda4fe0a482a",
         "android_client_info": {
           "package_name": "com.salazar.cheers"
         }
       },
       "oauth_client": [
         {
-          "client_id": "776069696826-54aa9rf7tonc9m0m1t9507m8v4tra1cf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.salazar.cheers",
-            "certificate_hash": "860d3a4a4c342a55e4fcb1d6e6dc3bc3e4c85d92"
-          }
-        },
-        {
-          "client_id": "776069696826-ldoat6mlq3pe0fhb8ut5ofinqcjqf6lt.apps.googleusercontent.com",
+          "client_id": "988221557023-pm398iukhbqb3i6g6vs6bl6q4887r4nk.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDFNzWKK3c-V9Q1wGXlQftua1MB6uwzy5s"
+          "current_key": "AIzaSyC0bUAODoUA6ap-4u8N1fvwtDZXH23VXRU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "776069696826-ldoat6mlq3pe0fhb8ut5ofinqcjqf6lt.apps.googleusercontent.com",
+              "client_id": "988221557023-pm398iukhbqb3i6g6vs6bl6q4887r4nk.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

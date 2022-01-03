@@ -1,5 +1,9 @@
 package com.salazar.cheers.ui.profile
 
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,28 +16,33 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalMaterialApi::class)
 sealed interface ProfileUiState {
 
     val isLoading: Boolean
     val errorMessages: List<String>
+    val sheetState: ModalBottomSheetState
 
     data class Loading(
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
+        override val sheetState: ModalBottomSheetState,
     ) : ProfileUiState
 
     data class HasUser(
         val user: User,
+        override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : ProfileUiState
 }
 
-private data class ProfileViewModelState(
+private data class ProfileViewModelState  @ExperimentalMaterialApi constructor(
     val user: User? = null,
     val posts: List<Post>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
+    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 ) {
     fun toUiState(): ProfileUiState =
         if (user != null)
@@ -41,14 +50,17 @@ private data class ProfileViewModelState(
                 user = user,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
+                sheetState = sheetState,
             )
         else
             ProfileUiState.Loading(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
+                sheetState = sheetState,
             )
 }
 
+@ExperimentalMaterialApi
 @HiltViewModel
 class ProfileViewModel @Inject constructor() : ViewModel() {
 
@@ -66,6 +78,15 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     init {
         refreshUser()
         refreshUserPosts()
+    }
+
+    fun openDialog() {
+        viewModelScope.launch {
+            viewModelState.value.sheetState.show()
+        }
+//        viewModelState.update {
+//            it.copy(sheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded))
+//        }
     }
 
     private fun refreshUser() {
@@ -99,4 +120,5 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
 }

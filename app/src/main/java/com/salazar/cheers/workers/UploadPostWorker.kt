@@ -14,6 +14,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.Post
@@ -21,6 +22,8 @@ import com.salazar.cheers.util.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
@@ -30,13 +33,17 @@ class UploadPostWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters
 ) : CoroutineWorker(appContext, params) {
 
-    override suspend fun doWork(): Result {
+
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val appContext = applicationContext
 
         makeStatusNotification("Uploading", appContext)
 
         val photoUriInput =
-            inputData.getString("PHOTO_URI") ?: return Result.failure()
+            inputData.getString("PHOTO_URI") ?: ""
+
+        val videoUriInput =
+            inputData.getString("VIDEO_URI") ?: ""
 
         val photoCaption =
             inputData.getString("PHOTO_CAPTION") ?: ""
@@ -59,24 +66,41 @@ class UploadPostWorker @AssistedInject constructor(
 
         try {
 
-            val photoBytes = extractImage(Uri.parse(photoUriInput))
+            setProgress(workDataOf("Progress" to 0))
 
-            StorageUtil.uploadPostImage(photoBytes) { imagePath ->
-                val post = Post(
-                    caption = photoCaption,
-                    photoPath = imagePath,
-                    locationName = locationName,
-                    locationLatitude = latitude,
-                    locationLongitude = longitude,
-                    showOnMap = showOnMap,
-                )
-                Neo4jUtil.addPost(post)
-                makeStatusNotification("Output is $imagePath", appContext)
+            if (videoUriInput.isNotBlank() && videoUriInput != "null") {
+                StorageUtil.uploadPostVideo(Uri.parse(videoUriInput)) { videoPath ->
+                    val post = Post(
+                        caption = photoCaption,
+                        videoPath = videoPath,
+                        locationName = locationName,
+                        locationLatitude = latitude,
+                        locationLongitude = longitude,
+                        showOnMap = showOnMap,
+                    )
+                    Neo4jUtil.addPost(post, tagUserIds.toList())
+                    makeStatusNotification("Successfully uploaded", appContext)
+                }
             }
-            return Result.success()
+            else {
+                val photoBytes = extractImage(Uri.parse(photoUriInput))
+                StorageUtil.uploadPostImage(photoBytes) { imagePath ->
+                    val post = Post(
+                        caption = photoCaption,
+                        photoPath = imagePath,
+                        locationName = locationName,
+                        locationLatitude = latitude,
+                        locationLongitude = longitude,
+                        showOnMap = showOnMap,
+                    )
+                    Neo4jUtil.addPost(post, tagUserIds.toList())
+                    makeStatusNotification("Successfully uploaded", appContext)
+                }
+            }
+            return@withContext Result.success()
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")
-            return Result.failure()
+            return@withContext Result.failure()
         }
     }
 

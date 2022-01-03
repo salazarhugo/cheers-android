@@ -2,7 +2,6 @@ package com.salazar.cheers.internal
 
 import java.io.Serializable
 
-
 data class User(
     val id: String,
     val firstName: String,

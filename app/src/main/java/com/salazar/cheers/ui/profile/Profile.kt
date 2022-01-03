@@ -15,15 +15,15 @@ import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Grid3x3
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.materialIcon
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.AddBox
+import androidx.compose.material.icons.outlined.AssignmentInd
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,11 +46,10 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.SignInActivity
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
@@ -60,9 +58,6 @@ import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.StorageUtil
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.clearTask
-import org.jetbrains.anko.newTask
-import org.jetbrains.anko.support.v4.intentFor
 
 class ProfileFragment : Fragment() {
 
@@ -83,24 +78,31 @@ class ProfileFragment : Fragment() {
     fun ProfileScreen() {
         val uiState = viewModel.uiState.collectAsState().value
 
-        when (uiState) {
-            is ProfileUiState.Loading -> LoadingScreen()
-            is ProfileUiState.HasUser -> Profile(uiState.user)
+        ProfileBottomSheet(
+            sheetState = uiState.sheetState,
+            onSettingsClick = {
+                findNavController().navigate(R.id.settingsFragment)
+            }
+        ) {
+            when (uiState) {
+                is ProfileUiState.Loading -> LoadingScreen()
+                is ProfileUiState.HasUser -> Profile(uiState)
+            }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun Profile(user: User) {
+    fun Profile(uiState: ProfileUiState.HasUser) {
         Scaffold(
-            topBar = { Toolbar(user) }
+            topBar = { Toolbar(uiState = uiState) }
         ) {
             Column() {
                 Column(
                     modifier = Modifier.padding(15.dp)
                 ) {
-                    Section1(user = user)
-                    Section2(user = user)
+                    Section1(user = uiState.user)
+                    Section2(user = uiState.user)
                     Spacer(Modifier.height(4.dp))
                     Row {
                         OutlinedButton(
@@ -144,7 +146,7 @@ class ProfileFragment : Fragment() {
             // Add tabs for all of our pages
             tabs.forEachIndexed { index, icon ->
                 Tab(
-                    icon = { Icon(icon, null)},
+                    icon = { Icon(icon, null) },
                     selected = pagerState.currentPage == index,
                     onClick = {
                         scope.launch {
@@ -194,8 +196,8 @@ class ProfileFragment : Fragment() {
         Box(
             modifier = Modifier.padding(1.dp)
         ) {
-            Image(
-                painter = rememberImagePainter(data = photo.value),
+            PrettyImage(
+                data = photo.value,
                 contentDescription = "avatar",
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
@@ -203,7 +205,7 @@ class ProfileFragment : Fragment() {
                     .aspectRatio(1f)// or 4/5f
                     .fillMaxWidth()
                     .pointerInput(Unit) {
-                        detectTapGestures(onDoubleTap = { },)
+                        detectTapGestures(onDoubleTap = { })
                     }
             )
         }
@@ -228,7 +230,9 @@ class ProfileFragment : Fragment() {
     }
 
     @Composable
-    fun Toolbar(otherUser: User) {
+    fun Toolbar(uiState: ProfileUiState.HasUser) {
+        val otherUser = uiState.user
+        val scope = rememberCoroutineScope()
         Column {
             SmallTopAppBar(
 //                modifier = Modifier.height(55.dp),
@@ -238,7 +242,10 @@ class ProfileFragment : Fragment() {
                     Username(
                         username = otherUser.username,
                         verified = otherUser.verified,
-                        textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontFamily = Roboto),
+                        textStyle = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Roboto
+                        ),
                     )
                 },
                 actions = {
@@ -246,13 +253,10 @@ class ProfileFragment : Fragment() {
                         Icon(Icons.Outlined.AddBox, "")
                     }
                     IconButton(onClick = {
-                        val action =
-                            ProfileFragmentDirections.actionProfileFragmentToSettingsFragment()
-                        findNavController().navigate(action)
+                        scope.launch {
+                            uiState.sheetState.show()
+                        }
                     }) {
-                        Icon(Icons.Outlined.Settings, "")
-                    }
-                    IconButton(onClick = {}) {
                         Icon(Icons.Rounded.Menu, "")
                     }
                 },
@@ -273,16 +277,19 @@ class ProfileFragment : Fragment() {
 
             val photo = remember { mutableStateOf<Uri?>(null) }
 
-            if (user.profilePicturePath.isNotBlank())
-                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                    photo.value = it
+            if (user.profilePicturePath.isNotBlank()) {
+                LaunchedEffect(Unit) {
+                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
+                        photo.value = it
+                    }
                 }
+            }
             Image(
                 painter = rememberImagePainter(
-                    data = photo.value,
+                    data = photo.value ?: R.drawable.default_profile_picture,
                     builder = {
                         transformations(CircleCropTransformation())
-                        placeholder(R.drawable.default_profile_picture)
+                        error(R.drawable.red_marker)
                     },
                 ),
                 modifier = Modifier
