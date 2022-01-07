@@ -25,42 +25,44 @@ object FirestoreUtil {
             }"
         )
 
+    fun checkIfUserExists(
+        onComplete: (exists: Boolean) -> Unit,
+    ) {
+        currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
+            onComplete(documentSnapshot.exists())
+            return@addOnSuccessListener
+        }
+    }
+
     fun initCurrentUserIfFirstTime(
         acct: GoogleSignInAccount? = null,
         email: String = "",
-        username: String = "",
-        onComplete: (User) -> Unit,
+        username: String,
+        onComplete: (exists: Boolean) -> Unit,
     ) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
-                onComplete(documentSnapshot.toObject(User::class.java)!!)
+                onComplete(true)
                 return@addOnSuccessListener
             }
 
-            val newUser = User(
-                FirebaseAuth.getInstance().currentUser!!.uid,
-                acct?.givenName ?: "",
-                acct?.familyName ?: "",
-                "${acct?.givenName} ${acct?.familyName}",
-                username,
-                0,
-                0,
-                0,
-                "",
-                false,
-                FirebaseAuth.getInstance().currentUser?.email ?: email,
-                "",
-                "defaultPicture/default_profile_picture.jpg", //acct?.photoUrl?.toString() ?: "defaultPicture/default_profile_picture.jpg",
-                "",
-                false,
-                false,
-                mutableListOf(),
+            val id = FirebaseAuth.getInstance().currentUser!!.uid
+            val fullName = if (acct != null) "${acct.givenName} ${acct.familyName}" else ""
+
+            val newUser = User().copy(
+                id = id,
+                fullName = fullName,
+                username = username,
+                profilePictureUrl = acct?.photoUrl.toString(),
+                email = FirebaseAuth.getInstance().currentUser?.email ?: email,
             )
             currentUserDocRef.set(newUser)
             GlobalScope.launch {
                 Neo4jUtil.addUser(newUser)
             }
-            onComplete(newUser)
+            onComplete(false)
+        }.addOnFailureListener {
+            Log.e("Firestore", it.toString())
         }
     }
 

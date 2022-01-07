@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.profile
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
@@ -23,16 +23,19 @@ import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.AssignmentInd
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,10 +56,10 @@ import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
@@ -81,7 +84,8 @@ class ProfileFragment : Fragment() {
         ProfileBottomSheet(
             sheetState = uiState.sheetState,
             onSettingsClick = {
-                findNavController().navigate(R.id.settingsFragment)
+                val action = ProfileFragmentDirections.actionProfileFragmentToSettingsFragment()
+                findNavController().navigate(action)
             }
         ) {
             when (uiState) {
@@ -97,7 +101,7 @@ class ProfileFragment : Fragment() {
         Scaffold(
             topBar = { Toolbar(uiState = uiState) }
         ) {
-            Column() {
+            Column {
                 Column(
                     modifier = Modifier.padding(15.dp)
                 ) {
@@ -186,18 +190,13 @@ class ProfileFragment : Fragment() {
 
     @Composable
     fun PostItem(post: Post) {
-        val photo = remember { mutableStateOf<Uri?>(null) }
-
-        if (post.photoPath.isNotBlank())
-            StorageUtil.pathToReference(post.photoPath)?.downloadUrl?.addOnSuccessListener {
-                photo.value = it
-            }
-
         Box(
-            modifier = Modifier.padding(1.dp)
+            modifier = Modifier.padding(1.dp),
+            contentAlignment = Alignment.TopEnd
         ) {
+            val url = if (post.type == PostType.VIDEO) post.videoThumbnailUrl else post.photoUrl
             PrettyImage(
-                data = photo.value,
+                data = url,
                 contentDescription = "avatar",
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
@@ -208,7 +207,20 @@ class ProfileFragment : Fragment() {
                         detectTapGestures(onDoubleTap = { })
                     }
             )
+
+            if (post.type == PostType.VIDEO)
+                PlayIcon()
+
         }
+    }
+
+    @Composable
+    fun PlayIcon() {
+        Icon(
+            Icons.Rounded.PlayArrow,
+            null,
+            modifier = Modifier.padding(8.dp)
+        )
     }
 
     @Composable
@@ -218,13 +230,18 @@ class ProfileFragment : Fragment() {
                 text = user.fullName,
                 style = Typography.bodyMedium
             )
-            Text(user.bio)
             Text(
-                user.website,
+                user.bio,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
+            )
+            ClickableText(
+                text = AnnotatedString(user.website),
                 style = TextStyle(
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Normal
-                )
+                ),
+                onClick = { offset ->
+                },
             )
         }
     }
@@ -275,21 +292,12 @@ class ProfileFragment : Fragment() {
                 .fillMaxWidth()
         ) {
 
-            val photo = remember { mutableStateOf<Uri?>(null) }
-
-            if (user.profilePicturePath.isNotBlank()) {
-                LaunchedEffect(Unit) {
-                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
-                }
-            }
             Image(
                 painter = rememberImagePainter(
-                    data = photo.value ?: R.drawable.default_profile_picture,
+                    data = user.profilePictureUrl,
                     builder = {
                         transformations(CircleCropTransformation())
-                        error(R.drawable.red_marker)
+                        error(R.drawable.default_profile_picture)
                     },
                 ),
                 modifier = Modifier

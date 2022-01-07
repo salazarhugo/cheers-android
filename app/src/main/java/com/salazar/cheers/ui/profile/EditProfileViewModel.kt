@@ -20,13 +20,15 @@ sealed interface EditProfileUiState {
     val isLoading: Boolean
     val errorMessages: List<String>
     val isFollowing: Boolean
+    val done: Boolean
     val user: User
 
     data class HasPosts(
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val isFollowing: Boolean,
-        override val user: User
+        override val user: User,
+        override val done: Boolean,
     ) : EditProfileUiState
 }
 
@@ -35,13 +37,15 @@ private data class EditProfileViewModelState(
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
+    val done: Boolean = false,
 ) {
     fun toUiState(): EditProfileUiState =
         EditProfileUiState.HasPosts(
             user = user ?: User(),
             isLoading = isLoading,
             errorMessages = errorMessages,
-            isFollowing = isFollowing
+            isFollowing = isFollowing,
+            done = done,
         )
 }
 
@@ -108,6 +112,9 @@ class EditProfileViewModel @Inject constructor(application: Application) : ViewM
 
         viewModelScope.launch {
             Neo4jUtil.updateUser(user)
+            viewModelState.update {
+                it.copy(done = true)
+            }
         }
         uploadProfilePicture()
     }

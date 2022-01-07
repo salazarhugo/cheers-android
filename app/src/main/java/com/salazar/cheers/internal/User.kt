@@ -15,11 +15,12 @@ data class User(
     val verified: Boolean,
     val email: String,
     var bio: String,
-    val profilePicturePath: String,
+    val profilePictureUrl: String,
     val website: String,
     val online: Boolean,
     val darkMode: Boolean,
     val registrationTokens: MutableList<String>,
+    val isFollowed: Boolean,
 ) : Serializable {
 
     constructor() : this(
@@ -40,5 +41,6 @@ data class User(
         false,
         false,
         mutableListOf(),
+        false,
     )
 }

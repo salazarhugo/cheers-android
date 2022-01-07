@@ -17,6 +17,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     val user2: MutableState<User?> = mutableStateOf(null)
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
+    val unreadMessages = mutableStateOf(0)
 
     init {
         refreshUser()
@@ -29,5 +30,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 is Result.Error -> user2.value = null
             }
         }
+    }
+
+    fun onNewMessage() {
+        unreadMessages.value += 1
     }
 }

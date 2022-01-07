@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.chats
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,16 +11,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,13 +46,11 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
-import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 import kotlinx.coroutines.launch
 
 class MessagesFragment : Fragment() {
@@ -137,7 +136,7 @@ class MessagesFragment : Fragment() {
                 modifier = Modifier.fillMaxSize(),
             ) {
                 when (page) {
-                    0 ->  {
+                    0 -> {
                         val channels = uiState.channels
                         if (uiState.isLoading)
                             LoadingScreen()
@@ -149,6 +148,7 @@ class MessagesFragment : Fragment() {
             }
         }
     }
+
     @Composable
     fun ConversationList(channels: List<ChatChannel>) {
         if (channels.isEmpty())
@@ -184,7 +184,7 @@ class MessagesFragment : Fragment() {
                             channelId = channel.id,
                             name = channel.otherUser.fullName,
                             username = channel.otherUser.username,
-                            profilePicturePath = channel.otherUser.profilePicturePath,
+                            profilePicturePath = channel.otherUser.profilePictureUrl,
                         )
                     findNavController().navigate(action)
                 }
@@ -192,25 +192,22 @@ class MessagesFragment : Fragment() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            val photo = remember { mutableStateOf<Uri?>(null) }
-            val image = channel.otherUser.profilePicturePath
-            val seen = channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
-            val isLastMessageMe = channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
+            val image = channel.otherUser.profilePictureUrl
+            val seen =
+                channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
+            val isLastMessageMe =
+                channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
 
-                if (image.isNotBlank())
-                    StorageUtil.pathToReference(image)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
                     painter = rememberImagePainter(
-                        data = photo.value ?: R.drawable.default_profile_picture,
+                        data = image,
                         builder = {
                             transformations(CircleCropTransformation())
-                            error(R.drawable.red_marker)
+                            error(R.drawable.default_profile_picture)
                         },
                     ),
                     contentDescription = "Profile image",
@@ -236,16 +233,19 @@ class MessagesFragment : Fragment() {
                     )
                 }
             }
-            val tint = if (seen) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
+            val tint =
+                if (seen) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (!seen) {
-                    Box( modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF0095F6)))
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF0095F6))
+                    )
                     Spacer(Modifier.width(12.dp))
                 }
 
@@ -272,7 +272,7 @@ class MessagesFragment : Fragment() {
                             channelId = channel.id,
                             name = channel.otherUser.fullName,
                             username = channel.otherUser.username,
-                            profilePicturePath = channel.otherUser.profilePicturePath,
+                            profilePicturePath = channel.otherUser.profilePictureUrl,
                         )
                     findNavController().navigate(action)
                 }
@@ -283,16 +283,10 @@ class MessagesFragment : Fragment() {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
+                val image = channel.recentMessage.senderProfilePictureUrl
 
-                val image = channel.recentMessage.senderProfilePicturePath
-
-                if (image.isNotBlank())
-                    StorageUtil.pathToReference(image)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(data = image),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(50.dp)
@@ -348,12 +342,6 @@ class MessagesFragment : Fragment() {
                     Icon(
                         imageVector = Icons.Outlined.Notifications,
                         contentDescription = "Activity icon"
-                    )
-                }
-                IconButton(onClick = { /* doSomething() */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Chat,
-                        contentDescription = "Localized description"
                     )
                 }
             },

@@ -260,7 +260,10 @@ class ChooseOnMap : DialogFragment() {
                     val location = mapView.getMapboxMap().cameraState.center
                     val action =
                         ChooseOnMapDirections.actionChooseOnMapToAddDialogFragment(location)
-                    findNavController().navigate(action, NavOptions.Builder().setPopUpTo(R.id.homeFragment, true).build())
+                    findNavController().navigate(
+                        action,
+                        NavOptions.Builder().setPopUpTo(R.id.homeFragment, true).build()
+                    )
                 }) {
                     Text("OK")
                 }

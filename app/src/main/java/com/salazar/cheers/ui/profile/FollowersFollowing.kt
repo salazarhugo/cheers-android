@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.profile
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -54,7 +52,6 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 import kotlinx.coroutines.launch
 
 class FollowersFollowingFragment : Fragment() {
@@ -208,14 +205,8 @@ class FollowersFollowingFragment : Fragment() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                if (user.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(data = user.profilePictureUrl),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(56.dp)
@@ -255,14 +246,8 @@ class FollowersFollowingFragment : Fragment() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                if (user.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(data = user.profilePictureUrl),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(56.dp)

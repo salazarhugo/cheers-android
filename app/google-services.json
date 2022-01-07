@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "988221557023-tesorgnkjtn6k87fapu859qedstt4jci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salazar.cheers",
+            "certificate_hash": "860d3a4a4c342a55e4fcb1d6e6dc3bc3e4c85d92"
+          }
+        },
+        {
           "client_id": "988221557023-pm398iukhbqb3i6g6vs6bl6q4887r4nk.apps.googleusercontent.com",
           "client_type": 3
         }

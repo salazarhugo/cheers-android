@@ -8,21 +8,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.util.Neo4jUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface HomeUiState {
 
     val isLoading: Boolean
     val errorMessages: List<String>
     val searchInput: String
-    val suggestions: List<User>?
+    val suggestions: List<SuggestionUser>?
     val postSheetState: ModalBottomSheetState
 
     data class NoPosts(
-        override val suggestions: List<User>?,
+        override val suggestions: List<SuggestionUser>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String,
@@ -35,7 +37,7 @@ sealed interface HomeUiState {
         val selectedPost: Post,
         val favorites: Set<String>,
         override val postSheetState: ModalBottomSheetState,
-        override val suggestions: List<User>?,
+        override val suggestions: List<SuggestionUser>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String,
@@ -45,7 +47,7 @@ sealed interface HomeUiState {
 private data class HomeViewModelState(
     val posts: List<Post>? = null,
     val listState: LazyListState = LazyListState(),
-    val suggestions: List<User>? = null,
+    val suggestions: List<SuggestionUser>? = null,
     val selectedPostId: String? = null,
     val favorites: Set<String> = emptySet(),
     val isLoading: Boolean = false,
@@ -79,7 +81,8 @@ private data class HomeViewModelState(
         }
 }
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(): ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
 
@@ -96,9 +99,9 @@ class HomeViewModel : ViewModel() {
         refreshSuggestions()
     }
 
-    private fun refreshSuggestions() {
+    fun refreshSuggestions() {
         viewModelScope.launch {
-            val result = Neo4jUtil.getUserRecommendations()
+            val result = Neo4jUtil.getSuggestions()
             viewModelState.update {
                 when (result) {
                     is Result.Success -> it.copy(suggestions = result.data)
@@ -127,7 +130,6 @@ class HomeViewModel : ViewModel() {
 
     fun toggleLike(postId: String, liked: Boolean) {
         viewModelState.value.posts?.find { it.id == postId }?.liked = true
-        viewModelState.value.posts?.find { it.id == postId }?.likes = 99
 //        viewModelState.update {
 ////            val post = post.copy(liked = !post.liked, likes = post.likes+1)
 //            it.copy(posts)
@@ -158,7 +160,17 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun deletePost(postId: String) {
+    fun selectPost(postId: String) {
+        viewModelState.update {
+            it.copy(selectedPostId = postId)
+        }
+    }
+
+    fun deletePost() {
+        val postId = viewModelState.value.selectedPostId ?: return
+        viewModelState.update {
+            it.copy(posts = it.posts?.filter { post -> post.id != postId })
+        }
         viewModelScope.launch {
             try {
                 Neo4jUtil.deletePost(postId = postId)

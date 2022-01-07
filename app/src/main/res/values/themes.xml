@@ -17,7 +17,7 @@
     </style>
 
     <style name="Theme.DialogFullScreen" parent="Theme.MaterialComponents.DayNight.Dialog">
-<!--        <item name="android:windowIsFloating">false</item>-->
+        <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/white</item>
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>

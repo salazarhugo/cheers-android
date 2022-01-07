@@ -1,5 +1,9 @@
 package com.salazar.cheers
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.os.StrictMode
@@ -11,6 +15,7 @@ import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,44 +33,35 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.core.view.WindowCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.tasks.Task
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
-import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.databinding.ContentMainBinding
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Fragment
 import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.util.StorageUtil
+import com.snapchat.kit.sdk.Bitmoji
+import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
-import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
-
-import com.snapchat.kit.sdk.Bitmoji
-
-
-
 
 
 @AndroidEntryPoint
@@ -89,6 +85,8 @@ class MainActivity : AppCompatActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier.systemBarsPadding(),
+                    shadowElevation = 0.dp,
+                    tonalElevation = 0.dp
                 ) {
                     MainActivityScreen()
                 }
@@ -128,11 +126,17 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
-            .addOnFailureListener(this) { e -> Log.w("Main Activity", "getDynamicLink:onFailure", e) }
+            .addOnFailureListener(this) { e ->
+                Log.w(
+                    "Main Activity",
+                    "getDynamicLink:onFailure",
+                    e
+                )
+            }
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @ExperimentalMaterial3Api
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MainActivityScreen() {
 
@@ -154,8 +158,8 @@ class MainActivity : AppCompatActivity() {
         ChangeProfileBottomSheet(bottomSheetState)
     }
 
+    @ExperimentalFoundationApi
     @ExperimentalMaterialApi
-    @OptIn(ExperimentalFoundationApi::class)
     @ExperimentalCoilApi
     @Composable
     fun BottomBar(bottomSheetState: ModalBottomSheetState) {
@@ -181,17 +185,21 @@ class MainActivity : AppCompatActivity() {
             LocalRippleTheme provides ClearRippleTheme
         ) {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.background,
+                containerColor = MaterialTheme.colorScheme.background.compositeOver(Color.White),
+                modifier = Modifier.height(52.dp),
                 tonalElevation = 0.dp,
-                modifier = Modifier.height(52.dp)
             ) {
                 items.forEachIndexed { index, frag ->
                     NavigationBarItem(
                         icon = {
-                            if (selectedItem == index)
-                                Icon(frag.selectedIcon, contentDescription = null)
+                            val icon = if (selectedItem == index) frag.selectedIcon else frag.icon
+                            val unreadMessageCount = mainViewModel.unreadMessages.value
+                            if (index == 3 && unreadMessageCount > 0)
+                                BadgedBox(badge = { Badge { Text(unreadMessageCount.toString()) } }) {
+                                    Icon(icon, contentDescription = null)
+                                }
                             else
-                                Icon(frag.icon, contentDescription = null)
+                                Icon(icon, contentDescription = null)
                         },
                         selected = selectedItem == index,
                         onClick = {
@@ -223,20 +231,17 @@ class MainActivity : AppCompatActivity() {
                     ),
                     icon = {
                         if (user != null) {
-                            val photo = remember { mutableStateOf<Uri?>(null) }
-                            if (user.profilePicturePath.isNotBlank())
-                                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                                    photo.value = it
-                                }
                             Image(
                                 painter = rememberImagePainter(
-                                    data = photo.value ?: R.drawable.default_profile_picture,
+                                    data = user.profilePictureUrl,
                                     builder = {
                                         transformations(CircleCropTransformation())
-                                        error(R.drawable.red_marker)
+                                        error(R.drawable.default_profile_picture)
                                     },
                                 ),
-                                modifier = Modifier.size(30.dp),
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape),
                                 contentDescription = null,
                             )
                         }
@@ -290,7 +295,6 @@ class MainActivity : AppCompatActivity() {
             },
             sheetState = bottomSheetState
         ) {
-
         }
     }
 
@@ -302,5 +306,24 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         return navHostFragment.navController
+    }
+
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            (mMessageReceiver),
+            IntentFilter("NewMessage")
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+    }
+
+    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            mainViewModel.onNewMessage()
+        }
     }
 }

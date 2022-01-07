@@ -11,7 +11,7 @@ import java.util.*
 object StorageUtil {
     private val storageInstance: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
 
-    private val currentUserRef: StorageReference
+    val currentUserRef: StorageReference
         get() = storageInstance.reference
             .child(
                 FirebaseAuth.getInstance().currentUser?.uid
@@ -20,53 +20,62 @@ object StorageUtil {
 
     fun uploadProfilePhoto(
         imageBytes: ByteArray,
-        onSuccess: (imagePath: String) -> Unit
+        onSuccess: (downloadUrl: String) -> Unit
     ) {
         val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
         ref.putBytes(imageBytes)
             .addOnSuccessListener {
-                onSuccess(ref.path)
+                ref.downloadUrl.addOnSuccessListener { downloadUri ->
+                    onSuccess(downloadUri.toString())
+                }
             }
-    }
-
-    fun uploadMessageImageBeta(
-        imageBytes: ByteArray,
-    ): UploadTask {
-        val ref = currentUserRef.child("messages/${UUID.nameUUIDFromBytes(imageBytes)}")
-        return ref.putBytes(imageBytes)
     }
 
     fun uploadMessageImage(
         imageBytes: ByteArray,
-        onSuccess: (imagePath: String) -> Unit
+        onSuccess: (downloadUrl: String) -> Unit,
     ) {
-        val ref = currentUserRef.child("messages/${UUID.nameUUIDFromBytes(imageBytes)}")
+        val ref = currentUserRef.child("messages/${UUID.randomUUID()}")
         ref.putBytes(imageBytes)
             .addOnSuccessListener {
-                onSuccess(ref.path)
+                ref.downloadUrl.addOnSuccessListener { downloadUri ->
+                    onSuccess(downloadUri.toString())
+                }
             }
+    }
+
+    fun uploadPostImage2(
+        imageBytes: ByteArray,
+    ): UploadTask {
+        val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
+        return ref.putBytes(imageBytes)
     }
 
     fun uploadPostImage(
         imageBytes: ByteArray,
-        onSuccess: (imagePath: String) -> Unit
+        onSuccess: (downloadUrl: String) -> Unit,
     ) {
-        val ref = currentUserRef.child("posts/${UUID.nameUUIDFromBytes(imageBytes)}")
+        val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
         ref.putBytes(imageBytes)
-            .addOnSuccessListener {
-                onSuccess(ref.path)
+            .continueWithTask {
+                ref.downloadUrl
+            }
+            .addOnSuccessListener { downloadUri ->
+                onSuccess(downloadUri.toString())
             }
     }
 
     fun uploadPostVideo(
         videoUri: Uri,
-        onSuccess: (videoPath: String) -> Unit
-    ) {
-        val ref = currentUserRef.child("posts/${Calendar.getInstance().timeInMillis}")
-        ref.putFile(videoUri)
-            .addOnSuccessListener {
-                onSuccess(ref.path)
-            }
+//        onSuccess: (videoUrl: String) -> Unit
+    ): UploadTask {
+        val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
+        return ref.putFile(videoUri)
+//            .addOnSuccessListener {
+//                ref.downloadUrl.addOnSuccessListener { downloadUri ->
+//                    onSuccess(downloadUri.toString())
+//                }
+//            }
     }
 
     fun pathToReference(path: String): StorageReference? {

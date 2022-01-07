@@ -1,10 +1,6 @@
 package com.salazar.cheers.ui.chat
 
 import OnMessageLongClickDialog
-import android.net.Uri
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -15,7 +11,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +28,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.LocalWindowInsets
@@ -37,12 +35,14 @@ import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.components.*
+import com.salazar.cheers.components.AnimateHeart
+import com.salazar.cheers.components.DirectChatBar
+import com.salazar.cheers.components.JumpToBottom
+import com.salazar.cheers.components.UserInput
 import com.salazar.cheers.internal.ImageMessage
 import com.salazar.cheers.internal.Message
 import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.internal.TextMessage
-import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -53,6 +53,7 @@ const val ConversationTestTag = "ConversationTestTag"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
+    uiState: ChatUiState.HasChannel,
     channelId: String,
     name: String,
     username: String,
@@ -62,6 +63,7 @@ fun ChatScreen(
     onUnsendMessage: (Message) -> Unit = {},
     onDoubleTapMessage: (Message) -> Unit = {},
     onUnlike: (Message) -> Unit = {},
+    onTitleClick: (username: String) -> Unit = {},
     onCopyText: (String) -> Unit = {},
     onImageSelectorClick: () -> Unit = {},
     onPoBackStack: () -> Unit = {},
@@ -69,8 +71,8 @@ fun ChatScreen(
     val scrollState = rememberLazyListState()
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
     val scope = rememberCoroutineScope()
-    val openDialog = remember { mutableStateOf(false)  }
-    val selectedMessage = remember { mutableStateOf<Message?>(null)  }
+    val openDialog = remember { mutableStateOf(false) }
+    val selectedMessage = remember { mutableStateOf<Message?>(null) }
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -80,6 +82,7 @@ fun ChatScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 Messages(
+                    uiState = uiState,
                     messages = messages,
                     navigateToProfile = {},
                     modifier = Modifier.weight(1f),
@@ -106,8 +109,9 @@ fun ChatScreen(
             DirectChatBar(
                 name = name,
                 username = username,
-                profilePicturePath = profilePicturePath,
+                profilePictureUrl = profilePicturePath,
                 onNavIconPressed = { onPoBackStack() },
+                onTitleClick = onTitleClick,
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.statusBarsPadding(),
             )
@@ -127,6 +131,7 @@ fun ChatScreen(
 
 @Composable
 fun Messages(
+    uiState: ChatUiState.HasChannel,
     messages: List<Message>,
     navigateToProfile: (String) -> Unit,
     onLongClickMessage: (Message) -> Unit,
@@ -150,7 +155,7 @@ fun Messages(
             for (index in messages.indices) {
                 val prevAuthor = messages.getOrNull(index - 1)?.senderId
                 val nextAuthor = messages.getOrNull(index + 1)?.senderId
-                val prevMessage = messages.getOrNull(index -1)
+                val prevMessage = messages.getOrNull(index - 1)
                 val message = messages[index]
                 val isFirstMessageByAuthor = prevAuthor != message.senderId
                 val isLastMessageByAuthor = nextAuthor != message.senderId
@@ -165,6 +170,7 @@ fun Messages(
                 item {
 //                    AnimateMessage {
                     Message(
+                        uiState = uiState,
                         onAuthorClick = { name -> navigateToProfile(name) },
                         onLongClickMessage = onLongClickMessage,
                         onDoubleTapMessage = onDoubleTapMessage,
@@ -207,6 +213,7 @@ fun Messages(
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun Message(
+    uiState: ChatUiState.HasChannel,
     onAuthorClick: (String) -> Unit,
     onLongClickMessage: (Message) -> Unit,
     onDoubleTapMessage: (Message) -> Unit,
@@ -223,15 +230,9 @@ fun Message(
     ) {
         if (isLastMessageByAuthor && !isUserMe) {
             // Avatar
-            val photo = remember { mutableStateOf<Uri?>(null) }
-
-            if (message.senderProfilePicturePath.isNotBlank())
-                StorageUtil.pathToReference(message.senderProfilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                    photo.value = it
-                }
             Image(
                 painter = rememberImagePainter(
-                    data = photo.value,
+                    data = message.senderProfilePictureUrl,
                 ),
                 modifier = Modifier
                     .clickable(onClick = { onAuthorClick(message.senderId) })
@@ -248,6 +249,7 @@ fun Message(
             Spacer(modifier = Modifier.width(74.dp))
         }
         AuthorAndTextMessage(
+            uiState = uiState,
             msg = message,
             isUserMe = isUserMe,
             isFirstMessageByAuthor = isFirstMessageByAuthor,
@@ -263,6 +265,7 @@ fun Message(
 
 @Composable
 fun AuthorAndTextMessage(
+    uiState: ChatUiState.HasChannel,
     msg: Message,
     isUserMe: Boolean,
     isFirstMessageByAuthor: Boolean,
@@ -278,6 +281,7 @@ fun AuthorAndTextMessage(
         }
         if (msg is TextMessage)
             ChatItemBubble(
+                uiState = uiState,
                 msg,
                 isUserMe,
                 authorClicked = authorClicked,
@@ -362,16 +366,10 @@ fun ImageMessageBubble(
     onLongClickMessage: (Message) -> Unit,
     onDoubleTapMessage: (Message) -> Unit,
 ) {
-    Column() {
-        message.imagesPath.forEach { imagePath ->
-            val photo = remember { mutableStateOf<Uri?>(null) }
-
-            StorageUtil.pathToReference(imagePath)?.downloadUrl?.addOnSuccessListener {
-                photo.value = it
-            }
-
+    Column {
+        message.imagesDownloadUrl.forEach { downloadUrl ->
             Image(
-                painter = rememberImagePainter(data = photo.value),
+                painter = rememberImagePainter(data = downloadUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(200.dp)
@@ -379,10 +377,10 @@ fun ImageMessageBubble(
                     .clip(RoundedCornerShape(12.dp))
                     .pointerInput(Unit) {
                         detectTapGestures(
-                        onLongPress = { onLongClickMessage(message) },
-                        onDoubleTap = { onDoubleTapMessage(message) }
-                    )
-                },
+                            onLongPress = { onLongClickMessage(message) },
+                            onDoubleTap = { onDoubleTapMessage(message) }
+                        )
+                    },
                 contentScale = ContentScale.Crop,
             )
         }
@@ -392,6 +390,7 @@ fun ImageMessageBubble(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatItemBubble(
+    uiState: ChatUiState.HasChannel,
     message: Message,
     isUserMe: Boolean,
     authorClicked: (String) -> Unit,
@@ -406,8 +405,7 @@ fun ChatItemBubble(
 
     val shape = if (isUserMe) ChatBubbleEndShape else ChatBubbleStartShape
 
-    Column(
-    ) {
+    Column {
         Surface(
             color = backgroundBubbleColor,
             shape = shape,
@@ -425,6 +423,11 @@ fun ChatItemBubble(
             )
         }
 
+        if (isUserMe && message.id == uiState.channel.recentMessage.id &&
+            uiState.channel.recentMessage.seenBy.containsAll(uiState.channel.members)
+        ) {
+            Text("Seen")
+        }
         if (message.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)) {
             AnimateHeart {
                 Surface(
@@ -443,12 +446,6 @@ fun ChatItemBubble(
 //                    color = backgroundBubbleColor,
 //                    shape = ChatBubbleShape
 //                ) {
-//                    val photo = remember { mutableStateOf<Uri?>(null) }
-//
-//                    if (message.senderProfilePicturePath.isNotBlank())
-//                        StorageUtil.pathToReference(message.senderProfilePicturePath)?.downloadUrl?.addOnSuccessListener {
-//                            photo.value = it
-//                        }
 //                    Image(
 //                        painter = rememberImagePainter(data = photo.value),
 //                        contentScale = ContentScale.Fit,

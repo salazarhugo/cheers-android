@@ -8,6 +8,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!--    Notifications-->
+    <string name="default_notification_channel_id">DEFAULT_CHANNEL</string>
+    <string name="default_notification_channel_name">Messages</string>
+    <string name="default_notification_channel_description">Channel for chat messages</string>
+
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>

@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
@@ -35,7 +36,6 @@ import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.MyTopAppBar
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -80,11 +80,13 @@ class EditProfileFragment : DialogFragment() {
     fun EditProfileScreen() {
         val uiState = viewModel.uiState.collectAsState().value
 
+        if (uiState.done) {
+            findNavController().navigate(R.id.profileFragment)
+        }
         Scaffold(
             topBar = {
                 MyTopAppBar("Edit Profile", { dismiss() }, {
                     viewModel.updateUser(uiState.user)
-                    dismiss()
                 })
             },
         ) {
@@ -112,19 +114,17 @@ class EditProfileFragment : DialogFragment() {
             modifier = Modifier.fillMaxWidth(),
         ) {
 
-            val photo = remember { mutableStateOf<Uri?>(null) }
+            val photo = if (viewModel.photoUri.value != null)
+                viewModel.photoUri.value
+            else
+                user.profilePictureUrl
 
-            if (viewModel.photoUri.value != null)
-                photo.value = viewModel.photoUri.value
-            else if (user.profilePicturePath.isNotBlank())
-                StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                    photo.value = it
-                }
             Image(
                 painter = rememberImagePainter(
-                    data = photo.value,
+                    data = photo,
                     builder = {
                         transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
                     }
                 ),
                 contentDescription = "Profile image",

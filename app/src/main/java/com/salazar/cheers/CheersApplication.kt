@@ -1,17 +1,21 @@
 package com.salazar.cheers
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.search.MapboxSearchSdk
 import com.salazar.cheers.internal.Environment
 import dagger.hilt.android.HiltAndroidApp
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Config
-import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -29,8 +33,9 @@ class CheersApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
-        FirebaseApp.initializeApp(this)
+        initFirebase()
         initDatabase()
+        createNotificationChannel()
 
         MapboxSearchSdk.initialize(
             application = this,
@@ -42,6 +47,15 @@ class CheersApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    private fun initFirebase() {
+        FirebaseApp.initializeApp(this)
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        firebaseAppCheck.installAppCheckProviderFactory(
+            DebugAppCheckProviderFactory.getInstance() // For debug
+//            SafetyNetAppCheckProviderFactory.getInstance() // For Prod
+        )
+    }
+
     private fun initDatabase() {
         GraphDatabase.driver(
             Environment.DEFAULT_URL,
@@ -50,6 +64,22 @@ class CheersApplication : Application(), Configuration.Provider {
                 .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
                 .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
         )
+    }
+
+    private fun createNotificationChannel() {
+        val name = getString(R.string.default_notification_channel_name)
+        val descriptionText = getString(R.string.default_notification_channel_description)
+        val importance = NotificationManager.IMPORTANCE_MAX
+        val channel = NotificationChannel(
+            getString(R.string.default_notification_channel_id),
+            name,
+            importance
+        ).apply {
+            description = descriptionText
+        }
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     override fun getWorkManagerConfiguration() =

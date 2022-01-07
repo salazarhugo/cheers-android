@@ -13,11 +13,10 @@ interface Message {
     var chatChannelId: String
     val time: Date?
     val senderId: String
-    val recipientId: String
     val senderName: String
-    val senderProfilePicturePath: String
+    val senderProfilePictureUrl: String
     val senderUsername: String
     val type: String
     val likedBy: ArrayList<String>
-    val seenBy: ArrayList<String>
+    val seenBy: List<String>
 }

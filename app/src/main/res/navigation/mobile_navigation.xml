@@ -83,8 +83,11 @@
         <argument
             android:name="username"
             app:argType="string" />
+        <action
+            android:id="@+id/action_otherProfileFragment_to_otherFollowersFollowing"
+            app:destination="@id/otherFollowersFollowing" />
     </fragment>
-    <dialog
+    <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.salazar.cheers.ui.profile.EditProfileFragment"
         android:label="EditProfileFragment" />
@@ -154,4 +157,17 @@
         android:id="@+id/moreOtherProfileBottomSheet"
         android:name="com.salazar.cheers.ui.otherprofile.MoreOtherProfileBottomSheet"
         android:label="MoreOtherProfileBottomSheet" />
+    <fragment
+        android:id="@+id/otherFollowersFollowing"
+        android:name="com.salazar.cheers.ui.otherprofile.OtherFollowersFollowing"
+        android:label="OtherFollowersFollowing" >
+        <argument
+            android:name="username"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_otherFollowersFollowing_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment" />
+        <argument android:name="goToFollowing"
+            app:argType="boolean" />
+    </fragment>
 </navigation>

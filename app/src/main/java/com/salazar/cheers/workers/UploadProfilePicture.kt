@@ -32,8 +32,6 @@ class UploadProfilePicture @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val appContext = applicationContext
 
-        makeStatusNotification("Uploading", appContext)
-
         val photoUriInput =
             inputData.getString("PHOTO_URI") ?: return Result.failure()
 
@@ -41,8 +39,8 @@ class UploadProfilePicture @AssistedInject constructor(
 
             val photoBytes = extractImage(Uri.parse(photoUriInput))
 
-            StorageUtil.uploadProfilePhoto(photoBytes) { imagePath ->
-                Neo4jUtil.updateProfilePicture(imagePath)
+            StorageUtil.uploadProfilePhoto(photoBytes) { downloadUrl ->
+                Neo4jUtil.updateProfilePicture(downloadUrl)
             }
             return Result.success()
         } catch (throwable: Throwable) {
@@ -53,7 +51,7 @@ class UploadProfilePicture @AssistedInject constructor(
 
     @OptIn(ExperimentalMaterial3Api::class)
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat.Builder(applicationContext, "CHANNEL_ID")
+        val notification = NotificationCompat.Builder(applicationContext, applicationContext.getString(R.string.default_notification_channel_id))
             .setContentIntent(
                 PendingIntent.getActivity(
                     applicationContext,
@@ -62,9 +60,9 @@ class UploadProfilePicture @AssistedInject constructor(
                     PendingIntent.FLAG_IMMUTABLE
                 )
             )
-            .setOngoing(true)
+            .setOngoing(false)
             .setAutoCancel(true)
-            .setSmallIcon(R.drawable.cheers)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setLocalOnly(true)

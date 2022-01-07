@@ -9,23 +9,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Switch
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.SignInActivity
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
+import com.salazar.cheers.ui.theme.Roboto
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.support.v4.intentFor
@@ -45,13 +46,21 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun SettingsScreen() {
         val settings = listOf("Theme", "Notifications", "About")
-        Column {
-            Settings(settings = settings)
-            SignOutButton()
+
+        Scaffold(
+            topBar = { Toolbar() },
+        ) {
+            Column {
+                Settings(settings = settings)
+                SignOutButton()
+                DeleteAccountButton()
+            }
         }
+
     }
 
     @Composable
@@ -61,6 +70,38 @@ class SettingsFragment : Fragment() {
                 Setting(setting)
                 DividerM3()
             }
+        }
+    }
+
+    @Composable
+    fun Toolbar() {
+        SmallTopAppBar(
+            title = {
+                Text(
+                    "Settings",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Roboto
+                    )
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = { findNavController().popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, "")
+                }
+            },
+        )
+    }
+
+    @Composable
+    fun DeleteAccountButton() {
+        OutlinedButton(
+            onClick = {},
+            shape = RoundedCornerShape(4.dp),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false,
+        ) {
+            Text("Delete account")
         }
     }
 

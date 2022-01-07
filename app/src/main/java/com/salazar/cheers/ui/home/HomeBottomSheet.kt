@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ListItem
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
@@ -24,7 +23,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PostBottomSheet(
     sheetState: ModalBottomSheetState,
-    onSettingsClick: () -> Unit = {},
+    onDelete: () -> Unit = {},
     onCopyProfileUrlClick: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
@@ -33,7 +32,7 @@ fun PostBottomSheet(
         sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetContent = {
-            Column( horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -43,6 +42,7 @@ fun PostBottomSheet(
                         .background(MaterialTheme.colorScheme.outline)
                 )
                 Item(sheetState, text = "Link", icon = Icons.Outlined.Link)
+                Item(sheetState, text = "Delete", icon = Icons.Outlined.Delete) { onDelete() }
                 Item(sheetState, text = "Share", icon = Icons.Outlined.Share)
                 Item(sheetState, text = "Report", icon = Icons.Outlined.Report)
                 Item(sheetState, text = "Unfollow", icon = Icons.Outlined.UnfoldLess)

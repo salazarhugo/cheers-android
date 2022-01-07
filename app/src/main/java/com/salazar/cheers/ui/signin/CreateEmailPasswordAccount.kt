@@ -39,7 +39,9 @@ import androidx.navigation.fragment.navArgs
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.MainActivity
+import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.newTask
@@ -214,7 +216,6 @@ class CreatePasswordFragment : Fragment() {
                         requireContext(), "Authentication failed.",
                         Toast.LENGTH_SHORT
                     ).show()
-//                    updateUI(null)
                 }
             }
     }
@@ -223,6 +224,19 @@ class CreatePasswordFragment : Fragment() {
     private fun signInSuccessful(email: String) {
         FirestoreUtil.initCurrentUserIfFirstTime(email = email, username = args.username) { user ->
             startActivity(intentFor<MainActivity>("user" to user).newTask().clearTask())
+            getAndSaveRegistrationToken()
+        }
+    }
+
+    private fun getAndSaveRegistrationToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            // Get new FCM registration token
+            val token = task.result
+            MyFirebaseMessagingService.addTokenToFirestore(token)
         }
     }
 //    private fun sendEmailVerification(email: String) {

@@ -1,19 +1,21 @@
 package com.salazar.cheers.ui.add
 
 import android.app.Application
+import android.media.ThumbnailUtils
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,8 +25,10 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
 
     val caption = mutableStateOf("")
 
-    val photoUri = mutableStateOf<Uri?>(null)
-    val videoUri = mutableStateOf<Uri?>(null)
+    val postType = mutableStateOf(PostType.TEXT)
+    val mediaUri = mutableStateOf<Uri?>(null)
+
+    val videoThumbnail = mutableStateOf<Uri?>(null)
 
     val location = mutableStateOf("Current Location")
     val locationResults = mutableStateOf<List<SearchResult>>(emptyList())
@@ -59,7 +63,20 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
         this.caption.value = caption
     }
 
+    fun setPostImage(image: Uri) {
+        mediaUri.value = image
+        postType.value = PostType.IMAGE
+    }
+
+    fun setPostVideo(video: Uri) {
+        mediaUri.value = video
+        postType.value = PostType.VIDEO
+//        videoThumbnail.value = ;
+        ThumbnailUtils.createVideoThumbnail(video.path!!, MediaStore.Images.Thumbnails.MINI_KIND)
+    }
+
     var uploadWorkerState: Flow<WorkInfo>? = null
+    val id = mutableStateOf<UUID?>(null)
 
     fun uploadPost() {
         val uploadWorkRequest: WorkRequest =
@@ -67,8 +84,8 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(
                     workDataOf(
-                        "PHOTO_URI" to photoUri.value.toString(),
-                        "VIDEO_URI" to videoUri.value.toString(),
+                        "MEDIA_URI" to mediaUri.value.toString(),
+                        "POST_TYPE" to postType.value,
                         "PHOTO_CAPTION" to caption.value,
                         "LOCATION_NAME" to selectedLocation.value?.name,
                         "LOCATION_LATITUDE" to selectedLocation.value?.coordinate?.latitude(),
@@ -79,6 +96,8 @@ class AddPostDialogViewModel @Inject constructor(application: Application) : Vie
                 )
             }
                 .build()
+
+        id.value = uploadWorkRequest.id
 
         // Actually start the work
         workManager.enqueue(uploadWorkRequest)

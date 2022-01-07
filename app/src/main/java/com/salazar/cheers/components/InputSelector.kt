@@ -1,6 +1,5 @@
 package com.salazar.cheers.components
 
-import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.*
@@ -41,8 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.R
-import android.provider.MediaStore
-import androidx.compose.ui.platform.LocalContext
 
 
 enum class InputSelector {
@@ -169,7 +166,7 @@ private fun SelectorExpanded(
         when (currentSelector) {
             InputSelector.EMOJI -> EmojiSelector(onTextAdded, focusRequester)
             InputSelector.DM -> NotAvailablePopup(onCloseRequested)
-            InputSelector.PICTURE -> { }//onImageSelectorClick() }
+            InputSelector.PICTURE -> {}//onImageSelectorClick() }
             InputSelector.MAP -> FunctionalityNotAvailablePanel()
             InputSelector.PHONE -> FunctionalityNotAvailablePanel()
             else -> {
@@ -241,7 +238,7 @@ private fun UserInputSelector(
             onClick = {
                 onSelectorChange(InputSelector.PICTURE)
                 onImageSelectorClick()
-                      },
+            },
             icon = Icons.Outlined.InsertPhoto,
             selected = currentInputSelector == InputSelector.PICTURE,
             description = stringResource(id = R.string.attach_photo_desc)

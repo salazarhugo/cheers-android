@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.chats
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,10 +75,19 @@ class ChatChannelsViewModel @Inject constructor() : ViewModel() {
             val channels = mutableListOf<ChatChannel>()
 
             directChannels.forEach {
-                val otherUserId = it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! } ?: return@forEach
+                val otherUserId =
+                    it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! }
+                        ?: return@forEach
                 when (val result = Neo4jUtil.getUser(otherUserId)) {
-                    is Result.Success ->  channels.add(it.copy(otherUser = result.data))
-                    is Result.Error -> channels.add(it.copy(otherUser = User().copy(username = "User not found", fullName = "User not found")))
+                    is Result.Success -> channels.add(it.copy(otherUser = result.data))
+                    is Result.Error -> channels.add(
+                        it.copy(
+                            otherUser = User().copy(
+                                username = "User not found",
+                                fullName = "User not found"
+                            )
+                        )
+                    )
                 }
             }
 

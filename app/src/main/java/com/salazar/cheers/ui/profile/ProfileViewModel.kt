@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.profile
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,7 +36,7 @@ sealed interface ProfileUiState {
     ) : ProfileUiState
 }
 
-private data class ProfileViewModelState  @ExperimentalMaterialApi constructor(
+private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val user: User? = null,
     val posts: List<Post>? = null,
     val isLoading: Boolean = false,

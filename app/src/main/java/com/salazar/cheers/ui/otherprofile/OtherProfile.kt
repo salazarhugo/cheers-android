@@ -8,55 +8,78 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.icons.outlined.AssignmentInd
 import androidx.compose.material3.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.dynamiclinks.ShortDynamicLink
 import com.google.firebase.dynamiclinks.ktx.*
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.R
+import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Counter
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.profile.OtherProfileUiState
 import com.salazar.cheers.ui.profile.OtherProfileViewModel
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreChat
-import com.salazar.cheers.util.StorageUtil
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.toast
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OtherProfileFragment : Fragment() {
 
-    private val viewModel: OtherProfileViewModel by viewModels()
     private val args: OtherProfileFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var otherProfileViewModelFactory: OtherProfileViewModel.OtherProfileViewModelFactory
+
+    private val viewModel: OtherProfileViewModel by viewModels {
+        OtherProfileViewModel.provideFactory(otherProfileViewModelFactory, args.username)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,14 +92,7 @@ class OtherProfileFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.refreshUser(args.username)
-    }
-
     @OptIn(ExperimentalMaterial3Api::class)
-
     @Composable
     fun OtherProfileScreen() {
         val uiState = viewModel.uiState.collectAsState().value
@@ -84,33 +100,127 @@ class OtherProfileFragment : Fragment() {
         Scaffold(
             topBar = { Toolbar(uiState.user) }
         ) {
-            Column(
-                modifier = Modifier.padding(15.dp)
-            ) {
-                if (uiState.isLoading)
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp),
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                Section1(uiState)
-                Section2(uiState.user)
-                HeaderButtons(uiState)
+            Column {
+                ProfileHeader(uiState)
+                Tabs(uiState)
             }
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun ProfileHeader(uiState: OtherProfileUiState) {
+        Column(
+            modifier = Modifier.padding(15.dp)
+        ) {
+            if (uiState.isLoading)
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            Section1(uiState)
+            Section2(uiState.user)
+            HeaderButtons(uiState)
+        }
+    }
+
+    @Composable
+    fun Tabs(uiState: OtherProfileUiState) {
+        val tabs = listOf(Icons.Default.GridView, Icons.Outlined.AssignmentInd)
+        val pagerState = rememberPagerState()
+        val scope = rememberCoroutineScope()
+
+        TabRow(
+            // Our selected tab is our current page
+            selectedTabIndex = pagerState.currentPage,
+            // Override the indicator, using the provided pagerTabIndicatorOffset modifier
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                )
+            },
+            backgroundColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+        ) {
+            // Add tabs for all of our pages
+            tabs.forEachIndexed { index, icon ->
+                Tab(
+                    icon = { Icon(icon, null) },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        scope.launch {
+                            pagerState.scrollToPage(index)
+                        }
+//                        viewModel.toggle()
+                    },
+                )
+            }
+        }
+        HorizontalPager(
+            count = tabs.size,
+            state = pagerState,
+        ) { page ->
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when (page) {
+                    0 -> {
+                        if (uiState is OtherProfileUiState.HasPosts)
+                            GridViewPosts(posts = uiState.posts)
+                    }
+                    1 -> {}
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun GridViewPosts(posts: List<Post>) {
+        LazyVerticalGrid(
+            cells = GridCells.Fixed(3),
+            modifier = Modifier,
+        ) {
+            val imagePosts = posts.filter { it.type == PostType.IMAGE }
+            items(imagePosts) { post ->
+                PostItem(post)
+            }
+        }
+    }
+
+    @Composable
+    fun PostItem(post: Post) {
+        Box(
+            modifier = Modifier.padding(1.dp)
+        ) {
+            PrettyImage(
+                data = post.photoUrl,
+                contentDescription = "avatar",
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .aspectRatio(1f)// or 4/5f
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = { })
+                    }
+            )
+        }
+    }
+
     @Composable
     fun Toolbar(otherUser: User) {
-        val openDialog = remember { mutableStateOf(false)  }
+        val openDialog = remember { mutableStateOf(false) }
         SmallTopAppBar(
             title = {
                 Username(
                     username = otherUser.username,
                     verified = otherUser.verified,
-                    textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontFamily = Roboto),
+                    textStyle = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Roboto
+                    ),
                 )
             },
             navigationIcon = {
@@ -131,8 +241,6 @@ class OtherProfileFragment : Fragment() {
             MoreDialog(openDialog = openDialog)
     }
 
-
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MoreDialog(
         openDialog: MutableState<Boolean>,
@@ -142,7 +250,7 @@ class OtherProfileFragment : Fragment() {
                 openDialog.value = false
             },
             text = {
-                Column() {
+                Column {
                     TextButton(
                         onClick = { openDialog.value = false },
                         modifier = Modifier.fillMaxWidth(),
@@ -187,13 +295,14 @@ class OtherProfileFragment : Fragment() {
 
     private fun copyProfileUrl(username: String) {
         Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
-            link = Uri.parse("https://cheers.app/$username")
-            domainUriPrefix = "https://console.salazar-ci.com/link"
+            link = Uri.parse("https://cheers-a275e.web.app/$username")
+            domainUriPrefix = "https://cheers2cheers.page.link"
             // Open links with this app on Android
             androidParameters {
             }
         }.addOnSuccessListener { (shortLink, flowchartLink) ->
-            val clipboardManager = activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboardManager =
+                activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData = ClipData.newPlainText("text", shortLink.toString())
             clipboardManager.setPrimaryClip(clipData)
             toast("Copied profile URL to clipboard")
@@ -209,8 +318,19 @@ class OtherProfileFragment : Fragment() {
                 text = "${otherUser.firstName} ${otherUser.lastName}",
                 style = Typography.bodyMedium
             )
-            Text(otherUser.bio)
-            Text(otherUser.website)
+            Text(
+                otherUser.bio,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
+            )
+            ClickableText(
+                text = AnnotatedString(otherUser.website),
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Normal
+                ),
+                onClick = { offset ->
+                },
+            )
         }
     }
 
@@ -223,20 +343,17 @@ class OtherProfileFragment : Fragment() {
                 .padding(bottom = 15.dp)
                 .fillMaxWidth()
         ) {
-            val photo = remember { mutableStateOf<Uri?>(null) }
-
-            if (uiState.user.profilePicturePath.isNotBlank())
-                StorageUtil.pathToReference(uiState.user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                    photo.value = it
-                }
             Image(
                 painter = rememberImagePainter(
-                    data = photo.value,
+                    data = uiState.user.profilePictureUrl,
                     builder = {
                         transformations(CircleCropTransformation())
-                    }
+                        error(R.drawable.default_profile_picture)
+                    },
                 ),
-                modifier = Modifier.size(70.dp),
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape),
                 contentDescription = null,
             )
             Counters(uiState)
@@ -257,10 +374,22 @@ class OtherProfileFragment : Fragment() {
 
             items.forEach { item ->
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable {
+                        val action =
+                            OtherProfileFragmentDirections.actionOtherProfileFragmentToOtherFollowersFollowing(
+                                username = otherUser.username,
+                                goToFollowing = item.name == "Following"
+                            )
+                        findNavController().navigate(action)
+                    }
                 ) {
-                    Text(text = item.value.toString(), fontWeight = FontWeight.Bold)
-                    Text(text = item.name)
+                    Text(
+                        text = item.value.toString(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Roboto
+                    )
+                    Text(text = item.name, fontSize = 14.sp, fontFamily = Roboto)
                 }
             }
         }
@@ -269,19 +398,22 @@ class OtherProfileFragment : Fragment() {
     @Composable
     fun HeaderButtons(uiState: OtherProfileUiState) {
         Row {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    viewModel.followUser(uiState.user.id)
+            if (uiState.user.isFollowed)
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = { viewModel.unfollowUser() },
+                ) {
+                    Text(text = "Following")
                 }
-            ) {
-                if (uiState.isFollowing)
-                    Text("Following")
-                else
+            else
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = { viewModel.followUser() }
+                ) {
                     Text("Follow")
-            }
+                }
             Spacer(modifier = Modifier.width(12.dp))
-            Button(
+            OutlinedButton(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     FirestoreChat.getOrCreateChatChannel(uiState.user) { channelId ->
@@ -290,7 +422,7 @@ class OtherProfileFragment : Fragment() {
                                 channelId = channelId,
                                 name = uiState.user.fullName,
                                 username = uiState.user.username,
-                                profilePicturePath = uiState.user.profilePicturePath,
+                                profilePicturePath = uiState.user.profilePictureUrl,
                             )
                         findNavController().navigate(action)
                     }

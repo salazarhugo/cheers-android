@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.map
 
 import android.app.Dialog
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +34,6 @@ import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -93,8 +89,6 @@ class PostMapDialog : BottomSheetDialogFragment() {
     @OptIn(ExperimentalCoilApi::class)
     @Composable
     fun Post(post: Post) {
-        val photo = remember { mutableStateOf<Uri?>(null) }
-
         val brush = Brush.verticalGradient(
             colors = listOf(
                 Color(0xFFD41668),
@@ -102,15 +96,11 @@ class PostMapDialog : BottomSheetDialogFragment() {
             )
         )
 
-        if (post.creator.profilePicturePath.isNotBlank())
-            StorageUtil.pathToReference(post.creator.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                photo.value = it
-            }
         Row(
             modifier = Modifier.padding(16.dp)
         ) {
             Image(
-                painter = rememberImagePainter(data = photo.value),
+                painter = rememberImagePainter(data = post.creator.profilePictureUrl),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .border(1.2.dp, brush, CircleShape)
@@ -121,7 +111,11 @@ class PostMapDialog : BottomSheetDialogFragment() {
             )
             Spacer(Modifier.width(8.dp))
             Column {
-                Username(username = post.creator.username, verified = post.creator.verified, textStyle = Typography.bodyMedium)
+                Username(
+                    username = post.creator.username,
+                    verified = post.creator.verified,
+                    textStyle = Typography.bodyMedium
+                )
                 if (post.locationName.isNotBlank())
                     Text(text = post.locationName, style = Typography.labelSmall)
             }
@@ -133,15 +127,8 @@ class PostMapDialog : BottomSheetDialogFragment() {
 
     @Composable
     fun PostBody(post: Post) {
-        val photo = remember { mutableStateOf<Uri?>(null) }
-
-        if (post.photoPath.isNotBlank())
-            StorageUtil.pathToReference(post.photoPath)?.downloadUrl?.addOnSuccessListener {
-                photo.value = it
-            }
-
         Image(
-            painter = rememberImagePainter(data = photo.value),
+            painter = rememberImagePainter(data = post.photoUrl),
             contentDescription = "avatar",
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop,

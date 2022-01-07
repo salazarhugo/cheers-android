@@ -13,6 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -20,17 +21,26 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.navArgs
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.toast
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class ChatActivity : AppCompatActivity() {
 
-    private val chatViewModel: ChatViewModel by viewModels()
     private val args: ChatActivityArgs by navArgs()
+
+    @Inject
+    lateinit var chatViewModelFactory: ChatViewModel.ChatViewModelFactory
+
+    private val chatViewModel: ChatViewModel by viewModels {
+        ChatViewModel.provideFactory(chatViewModelFactory, args.channelId)
+    }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +49,6 @@ class ChatActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val channelId = args.channelId
-        chatViewModel.channelId.value = channelId
-        chatViewModel.seenLastMessage(channelId)
 
         setContent {
             // Update the system bars to be translucent
@@ -56,42 +64,56 @@ class ChatActivity : AppCompatActivity() {
                         val messages = chatViewModel.messages(channelId)
                             .collectAsState(initial = listOf()).value
                         val localClipboardManager = LocalClipboardManager.current
-                        ChatScreen(
-                            channelId = channelId,
-                            name = args.name,
-                            username = args.username,
-                            profilePicturePath = args.profilePicturePath,
-                            messages = messages,
-                            onMessageSent = ::senMessage,
-                            onUnsendMessage = {
-                                chatViewModel.unsendMessage(
+                        val uiState by chatViewModel.uiState.collectAsState()
+
+                        when (uiState) {
+                            is ChatUiState.HasChannel -> {
+                                ChatScreen(
+                                    uiState = uiState as ChatUiState.HasChannel,
                                     channelId = channelId,
-                                    messageId = it.id
+                                    name = args.name,
+                                    username = args.username,
+                                    profilePicturePath = args.profilePicturePath,
+                                    messages = messages,
+                                    onMessageSent = ::senMessage,
+                                    onUnsendMessage = {
+                                        chatViewModel.unsendMessage(
+                                            channelId = channelId,
+                                            messageId = it.id
+                                        )
+                                    },
+                                    onDoubleTapMessage = {
+                                        chatViewModel.likeMessage(
+                                            channelId = channelId,
+                                            messageId = it.id
+                                        )
+                                    },
+                                    onUnlike = {
+                                        chatViewModel.unlikeMessage(
+                                            channelId = channelId,
+                                            messageId = it.id
+                                        )
+                                    },
+                                    onCopyText = {
+                                        localClipboardManager.setText(AnnotatedString(it))
+                                        toast("Copied text to clipboard")
+                                    },
+                                    onImageSelectorClick = {
+                                        Utils.openPhotoChooser(
+                                            multipleImageResultLauncher,
+                                            false
+                                        ) // TODO (Allow multiple images)
+                                    },
+                                    onPoBackStack = {
+                                        finish()
+                                    },
+                                    onTitleClick = {
+//                                       findNavController().navigate()
+                                    },
                                 )
-                            },
-                            onDoubleTapMessage = {
-                                chatViewModel.likeMessage(
-                                    channelId = channelId,
-                                    messageId = it.id
-                                )
-                            },
-                            onUnlike = {
-                                chatViewModel.unlikeMessage(
-                                    channelId = channelId,
-                                    messageId = it.id
-                                )
-                            },
-                            onCopyText = {
-                                localClipboardManager.setText(AnnotatedString(it))
-                                toast("Copied text to clipboard")
-                            },
-                            onImageSelectorClick = {
-                                Utils.openPhotoChooser(multipleImageResultLauncher, false) // TODO (Allow multiple images)
-                            },
-                            onPoBackStack = {
-                                finish()
                             }
-                        )
+                            is ChatUiState.NoChannel -> LoadingScreen()
+                        }
                     }
                 }
             }
@@ -110,14 +132,11 @@ class ChatActivity : AppCompatActivity() {
                         val imageUri: Uri = clipData.getItemAt(i).uri
                         imagesUri.add(imageUri)
                     }
-                    chatViewModel.sendImageMessage(images = imagesUri, channelId = args.channelId)
+                    chatViewModel.sendImageMessage(images = imagesUri)
                 } else if (data != null) {
                     val selectedImageUri: Uri? = data.data
                     if (selectedImageUri != null)
-                        chatViewModel.sendImageMessage(
-                            images = listOf(selectedImageUri),
-                            channelId = args.channelId
-                        )
+                        chatViewModel.sendImageMessage(images = listOf(selectedImageUri))
                 }
             }
         }

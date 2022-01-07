@@ -1,6 +1,5 @@
 package com.salazar.cheers.components
 
-import androidx.compose.material.Divider
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material3.MaterialTheme
@@ -10,7 +9,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SwitchM3(
     checked: Boolean,
-    onCheckedChange: (Boolean)->Unit,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
 //     TODO (M3): No Switch, replace when available

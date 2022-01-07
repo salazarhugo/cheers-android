@@ -1,17 +1,16 @@
 package com.salazar.cheers.ui.home
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.animation.*
-import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
@@ -23,16 +22,17 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,15 +40,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerScope
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -64,34 +71,35 @@ import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.ui.add.AddPostDialogViewModel
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
+import kotlin.math.absoluteValue
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.refreshPosts()
-    }
+    private val el: AddPostDialogViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        viewModel.refreshPosts()
+
         return ComposeView(requireContext()).apply {
             setContent {
                 SwipeRefresh(
                     state = rememberSwipeRefreshState(isRefreshing = false),
                     onRefresh = {
                         viewModel.refreshPosts()
+                        viewModel.refreshSuggestions()
                     },
                 ) {
                     HomeScreen()
@@ -109,13 +117,13 @@ class HomeFragment : Fragment() {
 
         val showDivider =
             if (uiState is HomeUiState.HasPosts)
-                 uiState.listState.firstVisibleItemIndex > 0
+                uiState.listState.firstVisibleItemIndex > 0
             else
                 false
 
         PostBottomSheet(
             sheetState = uiState.postSheetState,
-            onSettingsClick = {}
+            onDelete = { viewModel.deletePost() },
         ) {
             Scaffold(
                 topBar = {
@@ -132,8 +140,15 @@ class HomeFragment : Fragment() {
                 }
             ) {
                 Column {
-//                    val uploadWorkState = postViewModel.uploadWorkerState?.collectAsState(null)?.value
-//                    Text(uploadWorkState?.progress.toString())
+                    val id = el.id.value
+                    if (id != null) {
+                        val workInfo = WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(id).observeAsState().value
+                        val progress = workInfo?.progress
+                        val value = progress?.getDouble("Progress", 0.0)
+                        val isFinish = workInfo?.state?.isFinished
+                        if ((isFinish == null || !isFinish) && value != null)
+                            UploadIndicator(value)
+                    }
                     if (uiState.isLoading)
                         LinearProgressIndicator(
                             modifier = Modifier
@@ -141,23 +156,35 @@ class HomeFragment : Fragment() {
                                 .height(1.dp),
                             color = MaterialTheme.colorScheme.onBackground,
                         )
+                    val suggestions = uiState.suggestions
+                    if (suggestions != null)
+                        Suggestions(suggestions = suggestions)
                     when (uiState) {
                         is HomeUiState.HasPosts -> PostList(uiState = uiState)
                         is HomeUiState.NoPosts -> NoPosts(uiState = uiState)
                     }
-                    val suggestions = uiState.suggestions
-                    if (suggestions != null)
-                        Suggestions(suggestions = suggestions)
                 }
             }
         }
+    }
+
+    private @Composable
+    fun UploadIndicator(progress: Double) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            LinearProgressIndicator(progress = progress.toFloat()/100f)
+        }
+        DividerM3()
     }
 
     @Composable
     fun NoPosts(uiState: HomeUiState.NoPosts) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(22.dp)
+            modifier = Modifier.padding(22.dp),
         ) {
             Text(
                 "Welcome to Cheers",
@@ -174,86 +201,105 @@ class HomeFragment : Fragment() {
 //            Spacer(Modifier.height(24.dp))
 //            ConnectContacts()
         }
-        if (uiState.suggestions != null)
-            Suggestions(uiState.suggestions)
     }
 
     @Composable
-    fun Suggestions(suggestions: List<User>) {
+    fun Suggestions(suggestions: List<SuggestionUser>) {
         val pagerState = rememberPagerState()
 
         HorizontalPager(
             count = suggestions.size,
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 76.dp),
-            itemSpacing = 22.dp
         ) { page ->
-            Suggestion(suggestions[page])
+            Suggestion(suggestions[page], this, page)
         }
 
-//        LazyColumn {
-//            items(suggestions) { user ->
-//                Suggestion(user)
-//            }
-//        }
     }
 
     @Composable
-    fun Suggestion(user: User) {
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
+    fun Suggestion(suggestedUser: SuggestionUser, scope: PagerScope, page: Int) {
+        scope.apply {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shadowElevation = 8.dp,
+                tonalElevation = 8.dp,
+                modifier = Modifier
+                    .graphicsLayer {
+                        val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
 
-                if (user.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
+                        // We animate the scaleX + scaleY, between 85% and 100%
+                        lerp(
+                            start = 0.85f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        ).also { scale ->
+                            scaleX = scale
+                            scaleY = scale
+                        }
 
-                Image(
-                    painter = rememberImagePainter(data = photo.value),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(16.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                )
-                Text(
-                    text = user.username,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                )
-                Text(
-                    text = user.fullName,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                )
-                Row() {
-                    repeat(3) {
-                        Image(
-                            painter = painterResource(id = R.drawable.cheers),
-                            contentDescription = "Profile image",
-                            modifier = Modifier
-                                .padding(1.dp)
-                                .weight(1f)
-                                .aspectRatio(1.0f),
-                            contentScale = ContentScale.Crop,
+                        // We animate the alpha, between 50% and 100%
+                        alpha = lerp(
+                            start = 0.5f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
                         )
+                    },
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable {
+                        val action =
+                            HomeFragmentDirections.actionHomeFragmentToOtherProfileFragment(
+                                username = suggestedUser.user.username
+                            )
+                        findNavController().navigate(action)
                     }
-                }
-                Text(
-                    text = "Suggested for you",
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.padding(16.dp)
-
                 ) {
-                    Text("Follow")
+
+                    Image(
+                        painter = rememberImagePainter(data = suggestedUser.user.profilePictureUrl),
+                        contentDescription = "Profile image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(16.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                    )
+                    Text(
+                        text = suggestedUser.user.username,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    )
+                    Text(
+                        text = suggestedUser.user.fullName,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    )
+                    Row(
+                        modifier = Modifier.padding(0.dp, 12.dp)
+                    ) {
+                        repeat(3) {
+                            Image(
+                                painter = rememberImagePainter(suggestedUser.posts.getOrNull(it)?.photoUrl),
+                                contentDescription = "Profile image",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(1.0f),
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
+                    }
+                    Text(
+                        text = "Suggested for you",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.padding(16.dp)
+
+                    ) {
+                        Text("Follow")
+                    }
                 }
             }
         }
@@ -291,36 +337,13 @@ class HomeFragment : Fragment() {
     @Composable
     fun PostList(uiState: HomeUiState.HasPosts) {
         LazyColumn(state = uiState.listState) {
-            uiState.posts.forEachIndexed { index, post ->
-                item {
-                    val isPostVisible = uiState.listState.firstVisibleItemIndex == index
-//                    if (index == 0)
-//                        Animate(post, isPostVisible)
-//                    else
-                    Post(post, isPostVisible)
+            items(uiState.posts) { post ->
+                when (post.type) {
+                    PostType.TEXT -> Post(post, true)
+                    PostType.IMAGE -> Post(post, true)
+                    PostType.VIDEO -> Post(post, true)
                 }
             }
-        }
-    }
-
-    @Composable
-    fun Animate(uiState: HomeUiState.HasPosts, index: Int) {
-        val state = remember {
-            MutableTransitionState(false).apply {
-                targetState = true
-            }
-        }
-        val density = LocalDensity.current
-        AnimatedVisibility(
-            visibleState = state,
-            enter = slideInVertically(
-                initialOffsetY = { with(density) { -400.dp.roundToPx() } }
-            ) + fadeIn(
-                initialAlpha = 0.3f
-            ),
-            exit = slideOutHorizontally() + fadeOut()
-        ) {
-//            Post(uiState = uiState, index)
         }
     }
 
@@ -332,7 +355,8 @@ class HomeFragment : Fragment() {
         ) {
             val liked = remember { mutableStateOf(post.liked) }
             PostHeader(post)
-            DividerM3()
+            if (post.type != PostType.TEXT)
+                DividerM3()
             PostBody(post, liked, isPostVisible)
             PostFooter(post, liked)
         }
@@ -367,18 +391,12 @@ class HomeFragment : Fragment() {
                     )
                 )
 
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                if (post.creator.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(post.creator.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
                     painter = rememberImagePainter(
-                        data = photo.value ?: R.drawable.default_profile_picture,
+                        data = post.creator.profilePictureUrl,
                         builder = {
                             transformations(CircleCropTransformation())
-                            error(R.drawable.red_marker)
+                            error(R.drawable.default_profile_picture)
                         },
                     ),
                     contentDescription = "Profile image",
@@ -401,6 +419,7 @@ class HomeFragment : Fragment() {
                 }
             }
             Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
+                viewModel.selectPost(post.id)
                 scope.launch {
                     viewModel.uiState.value.postSheetState.show()
                 }
@@ -414,30 +433,17 @@ class HomeFragment : Fragment() {
         liked: MutableState<Boolean>,
         isPostVisible: Boolean,
     ) {
-        val photo = remember { mutableStateOf<Uri?>(null) }
-        val video = remember { mutableStateOf<Uri?>(null) }
-
-        if (post.photoPath.isNotBlank())
-            StorageUtil.pathToReference(post.photoPath)?.downloadUrl?.addOnSuccessListener {
-                photo.value = it
-            }
-
-        if (post.videoPath.isNotBlank())
-            StorageUtil.pathToReference(post.videoPath)?.downloadUrl?.addOnSuccessListener {
-                video.value = it
-            }
-
         Box {
-            if (video.value != null)
+            if (post.videoUrl.isNotBlank())
                 VideoPlayer(
-                    uri = video.value!!,
+                    uri = post.videoUrl,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(4 / 5f)
                 )
-            else
+            else if (post.photoUrl.isNotBlank())
                 PrettyImage(
-                    data = photo.value,
+                    data = post.photoUrl,
                     contentDescription = "avatar",
                     alignment = Alignment.Center,
                     contentScale = ContentScale.Crop,
@@ -453,6 +459,12 @@ class HomeFragment : Fragment() {
                             )
                         }
                 )
+            else
+                Text(
+                    text = post.caption,
+                    modifier = Modifier.padding(14.dp)
+                )
+
             if (post.tagUsers.isNotEmpty())
                 InThisPhotoAnnotation(modifier = Modifier.align(Alignment.BottomStart))
         }
@@ -534,16 +546,24 @@ class HomeFragment : Fragment() {
                 .padding(12.dp),
         ) {
             PostFooterButtons(post, liked)
-            LikedBy(post = post)
-            if (post.tagUsers.isNotEmpty())
-                TagUsers(post.tagUsers)
-            if (post.caption.isNotBlank())
-                Caption(post)
+            if (post.type != PostType.TEXT) {
+                LikedBy(post = post)
+                if (post.tagUsers.isNotEmpty())
+                    TagUsers(post.tagUsers)
+                if (post.caption.isNotBlank())
+                    Caption(post)
 
-            Spacer(Modifier.height(4.dp))
-            Text(post.createdTime, style = Typography.labelSmall)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    post.createdTime.format(DateTimeFormatter.ISO_DATE),
+                    style = Typography.labelSmall
+                )
+            }
         }
-        Spacer(Modifier.height(12.dp))
+        if (post.type == PostType.TEXT)
+            DividerM3()
+        else
+            Spacer(Modifier.height(12.dp))
     }
 
     @Composable
@@ -571,18 +591,13 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun TagUsers(tagUsers: List<User>) {
-        Row() {
+        Row {
             val n = Math.min(tagUsers.size, 3)
             repeat(n) { i ->
                 val u = tagUsers[i]
-                val photo = remember { mutableStateOf<Uri?>(null) }
-                if (u.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(u.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
                     painter = rememberImagePainter(
-                        data = photo.value,
+                        data = u.profilePictureUrl,
                         builder = {
                             transformations(CircleCropTransformation())
                             crossfade(true)
@@ -610,25 +625,17 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun MyAppBar() {
-        SmallTopAppBar(
+        CenterAlignedTopAppBar(
 //            modifier = Modifier.height(55.dp),
 //            backgroundColor = MaterialTheme.colorScheme.surface,
 //            elevation = 0.dp,
             title = {
-                if (isSystemInDarkTheme())
-                    Image(
-                        painter = painterResource(R.drawable.cheers),
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(8.dp),
-                        contentDescription = "",
-                    )
-                else
-                    Text(
-                        text = "Cheers",
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Roboto,
-                    )
+                Image(
+                    painter = painterResource(R.drawable.ic_cocktail),
+                    modifier = Modifier
+                        .size(32.dp),
+                    contentDescription = "",
+                )
             },
             actions = {
                 IconButton(onClick = {
@@ -637,12 +644,6 @@ class HomeFragment : Fragment() {
                     Icon(
                         imageVector = Icons.Outlined.Notifications,
                         contentDescription = "Activity icon"
-                    )
-                }
-                IconButton(onClick = { /* doSomething() */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.ChatBubbleOutline,
-                        contentDescription = "Localized description"
                     )
                 }
             },
@@ -697,44 +698,44 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun VideoPlayer(
-        uri: Uri,
+        uri: String,
         modifier: Modifier = Modifier,
     ) {
         val context = LocalContext.current
 
-        val player = remember(context) { ExoPlayer.Builder(context).build() }
-        val playerView = remember { PlayerView(context) }
+        // Create media item
+        val mediaItem = MediaItem.fromUri(uri)
 
-        DisposableEffect(player) {
-            val lifecycleObserver = LifecycleEventObserver { _, event ->
-                when (event) {
-                    Lifecycle.Event.ON_START -> player.play()
-                    Lifecycle.Event.ON_STOP -> player.pause()
-                    else -> {}
-                }
+        // Create the player
+        val player = remember {
+            ExoPlayer.Builder(context).build().apply {
+                this.setMediaItem(mediaItem)
+                this.prepare()
+                this.playWhenReady = true
+                this.repeatMode = Player.REPEAT_MODE_ALL
+                this.volume = 0f
+                this.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
             }
+        }
 
-            viewLifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+        DisposableEffect(
+            AndroidView(
+                factory = {
+                    PlayerView(context).apply {
+                        this.player = player
+                    }
+                },
+                modifier = modifier.clickable {
+                    if (player.volume == 0f) player.volume = 1f else player.volume = 0f
+                }
+            ) {
+                it.useController = false
+                it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+            }
+        ) {
             onDispose {
-                viewLifecycleOwner.lifecycle.removeObserver(lifecycleObserver)
                 player.release()
             }
-        }
-
-        LaunchedEffect(player) {
-            val mediaItem = MediaItem.fromUri(uri)
-            player.setMediaItem(mediaItem)
-            playerView.player = player
-            player.prepare()
-            player.playWhenReady = true
-            player.repeatMode = Player.REPEAT_MODE_ALL
-            player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-        }
-        AndroidView(factory = { playerView }, modifier = modifier.clickable {
-            if (player.volume == 0f) player.volume = 1f else player.volume = 0f
-        }) {
-            it.useController = false
-            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
         }
     }
 }

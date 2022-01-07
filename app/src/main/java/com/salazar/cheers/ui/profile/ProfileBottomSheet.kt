@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ListItem
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
@@ -33,7 +32,7 @@ fun ProfileBottomSheet(
         sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetContent = {
-            Column( horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -42,11 +41,21 @@ fun ProfileBottomSheet(
                         .clip(RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colorScheme.outline)
                 )
-                Item(sheetState, text = "Settings", icon = Icons.Outlined.Settings, onClick = onSettingsClick)
+                Item(
+                    sheetState,
+                    text = "Settings",
+                    icon = Icons.Outlined.Settings,
+                    onClick = onSettingsClick
+                )
                 Item(sheetState, text = "Archive", icon = Icons.Outlined.Archive)
                 Item(sheetState, text = "QR code", icon = Icons.Outlined.QrCode)
                 Item(sheetState, text = "Saved", icon = Icons.Outlined.BookmarkBorder)
-                Item(sheetState, text = "Copy Profile URL", icon = Icons.Outlined.ContentCopy, onClick = onCopyProfileUrlClick)
+                Item(
+                    sheetState,
+                    text = "Copy Profile URL",
+                    icon = Icons.Outlined.ContentCopy,
+                    onClick = onCopyProfileUrlClick
+                )
             }
         }
     ) {

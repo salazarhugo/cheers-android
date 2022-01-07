@@ -11,15 +11,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Close
@@ -30,20 +29,14 @@ import androidx.compose.material3.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -60,17 +53,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT
 import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.MainViewModel
@@ -79,15 +67,12 @@ import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.SwitchM3
+import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
-import org.jetbrains.anko.support.v4.toast
-import java.net.URLConnection
-import javax.sql.DataSource
 
 
 @AndroidEntryPoint
@@ -248,10 +233,10 @@ class AddDialogFragment : DialogFragment() {
             )
         }
     }
-    
+
     @Composable
     fun AddPhotoOrVideo() {
-        if (viewModel.photoUri.value != null)
+        if (viewModel.mediaUri.value != null)
             return
 
         Row(
@@ -281,20 +266,26 @@ class AddDialogFragment : DialogFragment() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "Location", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
+            Text(
+                text = "Location",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Icon(Icons.Outlined.MyLocation, null)
-                Text(text = viewModel.location.value, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
+                Text(
+                    text = viewModel.location.value,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+                )
             }
         }
     }
 
     @Composable
     fun LocationResultsSection(results: List<SearchResult>) {
-        if(results.isNotEmpty())
+        if (results.isNotEmpty())
             LocationResult(results = results)
     }
 
@@ -352,7 +343,10 @@ class AddDialogFragment : DialogFragment() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "Tag people", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
+            Text(
+                text = "Tag people",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+            )
             val tagUsers = viewModel.selectedTagUsers
             if (tagUsers.size == 1)
                 Text(text = tagUsers[0].username, style = MaterialTheme.typography.labelLarge)
@@ -369,9 +363,9 @@ class AddDialogFragment : DialogFragment() {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val videoUri = viewModel.videoUri.value
+            val videoUri = viewModel.mediaUri.value
 
-            if (videoUri != null) {
+            if (videoUri != null && viewModel.postType.value == PostType.VIDEO)
                 VideoPlayer(
                     uri = videoUri,
                     modifier = Modifier
@@ -380,8 +374,6 @@ class AddDialogFragment : DialogFragment() {
                         .height(120.dp)
                         .aspectRatio(9f / 16f)
                 )
-                viewModel.photoUri.value = null
-            }
             else
                 ProfilePicture(user)
             val caption = viewModel.caption
@@ -409,15 +401,14 @@ class AddDialogFragment : DialogFragment() {
                     Text(text = "Write a caption...", fontSize = 13.sp)
                 },
                 trailingIcon = {
-                    val photoUri = viewModel.photoUri.value
+                    val photoUri = viewModel.mediaUri.value
                     if (photoUri != null) {
-                        viewModel.videoUri.value = null
                         Image(
                             modifier = Modifier
                                 .clickable(onClick = { openPhotoVideoChooser() })
                                 .padding(horizontal = 16.dp)
                                 .size(50.dp),
-                            painter = rememberImagePainter(data = viewModel.photoUri.value),
+                            painter = rememberImagePainter(data = viewModel.mediaUri.value),
                             contentDescription = null,
                             contentScale = ContentScale.Crop
                         )
@@ -439,14 +430,13 @@ class AddDialogFragment : DialogFragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
-                val imageOrVideoUri: Uri? = data?.data
-                if (imageOrVideoUri != null) {
-                    val type = data.resolveType(requireContext()) ?: ""
-                    if (type.startsWith("image"))
-                        viewModel.photoUri.value = imageOrVideoUri
-                    else if (type.startsWith("video"))
-                        viewModel.videoUri.value = imageOrVideoUri
-                }
+                val imageOrVideoUri: Uri = data?.data ?: return@registerForActivityResult
+
+                val type = data.resolveType(requireContext()) ?: ""
+                if (type.startsWith("image")) {
+                    viewModel.setPostImage(imageOrVideoUri)
+                } else if (type.startsWith("video"))
+                    viewModel.setPostVideo(imageOrVideoUri)
             }
         }
 
@@ -468,39 +458,49 @@ class AddDialogFragment : DialogFragment() {
         modifier: Modifier = Modifier,
     ) {
         val context = LocalContext.current
-        val player = ExoPlayer.Builder(context).build()
-        val playerView = PlayerView(context)
-        val mediaItem = MediaItem.fromUri(uri)
-        val playWhenReady = remember { mutableStateOf(true) }
-        player.setMediaItem(mediaItem)
-        playerView.player = player
 
-        LaunchedEffect(player) {
-            player.prepare()
-            player.playWhenReady = playWhenReady.value
-            player.volume = 0f
-            player.videoScalingMode = VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+        // Create media item
+        val mediaItem = MediaItem.fromUri(uri)
+
+        // Create the player
+        val player = remember {
+            ExoPlayer.Builder(context).build().apply {
+                this.setMediaItem(mediaItem)
+                this.prepare()
+                this.playWhenReady = true
+                this.repeatMode = Player.REPEAT_MODE_ALL
+                this.volume = 0f
+                this.videoScalingMode = VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+            }
         }
-        AndroidView(factory = {playerView}, modifier = modifier) {
-            it.useController = false
-            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+
+        DisposableEffect(
+            AndroidView(
+                factory = {
+                  PlayerView(context).apply {
+                      this.player = player
+                  }
+                },
+                modifier = modifier
+            ) {
+                it.useController = false
+                it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+            }
+        ) {
+            onDispose {
+                player.release()
+            }
         }
     }
 
     @Composable
     fun ProfilePicture(user: User) {
-        val photo = remember { mutableStateOf<Uri?>(null) }
-
-        if (user.profilePicturePath.isNotBlank())
-            StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                photo.value = it
-            }
         Image(
             painter = rememberImagePainter(
-                data = photo.value ?: R.drawable.default_profile_picture,
+                data = user.profilePictureUrl,
                 builder = {
                     transformations(CircleCropTransformation())
-                    error(R.drawable.red_marker)
+                    error(R.drawable.default_profile_picture)
                 },
             ),
             contentDescription = "Profile image",

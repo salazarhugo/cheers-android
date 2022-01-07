@@ -19,6 +19,14 @@
         <action
             android:id="@+id/action_signInFragment_to_emailPasswordFragment"
             app:destination="@id/emailPasswordFragment" />
+        <action
+            android:id="@+id/action_signInFragment_to_chooseUsernameFragment"
+            app:destination="@id/chooseUsernameFragment" />
+        <argument
+            android:name="username"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/chooseUsernameFragment"
@@ -27,6 +35,13 @@
         <action
             android:id="@+id/action_chooseUsernameFragment_to_createPasswordFragment"
             app:destination="@id/createPasswordFragment" />
+        <argument
+            android:name="isFromGoogle"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_chooseUsernameFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
     </fragment>
     <fragment
         android:id="@+id/createPasswordFragment"

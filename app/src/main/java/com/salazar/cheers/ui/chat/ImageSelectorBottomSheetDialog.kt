@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.chat
 
 import android.app.Dialog
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -24,8 +23,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +46,6 @@ import com.salazar.cheers.ui.add.AddPostDialogViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -73,7 +69,7 @@ class ImageSelectorBottomSheetDialog : BottomSheetDialogFragment() {
     private fun getAllImages(): MutableList<String> {
         val images = mutableListOf<String>()
         val projection = arrayOf(MediaStore.MediaColumns.DATA)
-        val cursor  = requireContext().contentResolver.query(
+        val cursor = requireContext().contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             projection,
             null,
@@ -170,14 +166,8 @@ class ImageSelectorBottomSheetDialog : BottomSheetDialogFragment() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                if (user.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(data = user.profilePictureUrl),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(56.dp)

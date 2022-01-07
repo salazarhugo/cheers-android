@@ -29,10 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 
 class ChooseUsernameFragment : Fragment() {
 
     private val viewModel: ChooseUsernameViewModel by viewModels()
+    private val args: ChooseUsernameFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,9 +52,12 @@ class ChooseUsernameFragment : Fragment() {
         val uiState = viewModel.uiState.collectAsState(ChooseUsernameState()).value
 
         if (uiState.isAvailable == true) {
-            val action =
+            val action = if (args.isFromGoogle)
                 ChooseUsernameFragmentDirections
-                    .actionChooseUsernameFragmentToCreatePasswordFragment(uiState.username)
+                    .actionChooseUsernameFragmentToSignInFragment(username = uiState.username)
+            else
+                ChooseUsernameFragmentDirections
+                    .actionChooseUsernameFragmentToCreatePasswordFragment(username = uiState.username)
             findNavController().navigate(action)
             viewModel.reset()
         }
@@ -64,7 +69,7 @@ class ChooseUsernameFragment : Fragment() {
             Text("Choose username", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(8.dp))
             Text("You can't change it later")
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(36.dp))
             UsernameTextField(uiState)
             Spacer(Modifier.height(8.dp))
             NextButton(uiState)

@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -155,6 +154,7 @@ private class PullRefreshNestedScrollConnection(
         return Velocity.Zero
     }
 }
+
 @Composable
 fun PullRefresh(
     state: PullRefreshState,

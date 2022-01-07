@@ -19,31 +19,25 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.SliderDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.LightGray
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.extension.style.expressions.dsl.generated.zoom
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
@@ -64,9 +58,7 @@ import com.salazar.cheers.util.Utils.convertDrawableToBitmap
 import com.salazar.cheers.util.Utils.getCircledBitmap
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.support.v4.toast
 import java.net.URL
 
 
@@ -263,7 +255,7 @@ class MapFragment : Fragment() {
         }
 
     private fun getBitmapFromUrl(post: Post, onDone: (Bitmap?) -> Unit) {
-        StorageUtil.pathToReference(post.photoPath)?.downloadUrl?.addOnSuccessListener {
+        StorageUtil.pathToReference(post.photoUrl)?.downloadUrl?.addOnSuccessListener {
             val urlObj = URL(it.toString())
             onDone(
 //                Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);

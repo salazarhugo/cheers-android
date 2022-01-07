@@ -10,7 +10,10 @@ import java.util.*
 
 object Utils {
 
-    fun openPhotoVideoChooser(resultLauncher: ActivityResultLauncher<Intent>, allowMultiple: Boolean = false) {
+    fun openPhotoVideoChooser(
+        resultLauncher: ActivityResultLauncher<Intent>,
+        allowMultiple: Boolean = false
+    ) {
         val intent = Intent()
         intent.type = "image/* video/*"
         intent.action = Intent.ACTION_GET_CONTENT
@@ -18,7 +21,10 @@ object Utils {
         resultLauncher.launch(Intent.createChooser(intent, "Select Picture"))
     }
 
-    fun openPhotoChooser(resultLauncher: ActivityResultLauncher<Intent>, allowMultiple: Boolean = false) {
+    fun openPhotoChooser(
+        resultLauncher: ActivityResultLauncher<Intent>,
+        allowMultiple: Boolean = false
+    ) {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT

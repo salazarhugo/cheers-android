@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -16,14 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.theme.Roboto
 
 @Composable
 fun GoogleButton(
-    text: String = "Sign in with Google",
+    text: String = "Continue with Google",
     loadingText: String = "Fetching data...",
     onClicked: () -> Unit
 ) {
@@ -33,8 +34,9 @@ fun GoogleButton(
         onClick = { clicked = !clicked },
 //        shape = shape,
 //        border = BorderStroke(width = 1.dp, color = borderColor),
-        color = Color(0xFF4285F4),
-        shadowElevation = 0.dp,
+        modifier = Modifier.fillMaxWidth(),
+        color = Color.White,//Color(0xFF4285F4),
+        shadowElevation = 2.dp,
         shape = RoundedCornerShape(2.dp)
     ) {
         Row(
@@ -67,11 +69,11 @@ fun GoogleButton(
                     modifier = Modifier.size(30.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(24.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = if (clicked) loadingText else text,
-                color = Color.White,
-                fontFamily = Roboto
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                color = Color.Black
             )
             if (clicked) {
                 Spacer(modifier = Modifier.width(16.dp))
@@ -80,7 +82,7 @@ fun GoogleButton(
                         .height(16.dp)
                         .width(16.dp),
                     strokeWidth = 2.dp,
-                    color = Color.White
+                    color = Color.Black
                 )
                 onClicked()
             }

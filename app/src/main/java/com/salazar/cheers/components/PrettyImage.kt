@@ -1,10 +1,9 @@
 package com.salazar.cheers.components
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -18,7 +17,7 @@ import coil.compose.rememberImagePainter
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun PrettyImage(
-    data: Uri?,
+    data: String?,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.Center,
@@ -57,7 +56,7 @@ fun PrettyImage(
             is ImagePainter.State.Empty -> {
                 Text("Empty", modifier = Modifier.align(Alignment.Center))
             }
-            is ImagePainter.State.Success -> { }
+            is ImagePainter.State.Success -> {}
             else -> {}
         }
     }
@@ -66,5 +65,5 @@ fun PrettyImage(
 @Composable
 @Preview
 private fun PrettyImagePreview() {
-    PrettyImage(data = Uri.parse("https://media.gqmagazine.fr/photos/616d7569d4bd52e104c66bca/16:9/w_2560%2Cc_limit/GettyImages-1216515595%2520(1).jpg"))
+    PrettyImage(data = "https://media.gqmagazine.fr/photos/616d7569d4bd52e104c66bca/16:9/w_2560%2Cc_limit/GettyImages-1216515595%2520(1).jpg")
 }

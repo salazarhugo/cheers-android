@@ -16,6 +16,8 @@ import kotlin.collections.ArrayList
 @OptIn(ExperimentalCoroutinesApi::class)
 object FirestoreChat {
 
+    const val TAG = "Firestore"
+
     private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document(
@@ -63,14 +65,36 @@ object FirestoreChat {
             }
     }
 
+    suspend fun getChatChannel(channelId: String): Flow<ChatChannel> = callbackFlow {
+        val channelCol = chatChannelsCollectionRef
+            .document(channelId)
+
+        val subscription = channelCol.addSnapshotListener { doc, e ->
+            if (e != null) {
+                Log.e(TAG, "Listen failed", e)
+                return@addSnapshotListener
+            }
+
+            if (doc == null || !doc.exists())
+                return@addSnapshotListener
+
+            val channel = doc.toObject(ChatChannel::class.java)!!
+            trySend(channel).isSuccess
+        }
+
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
     suspend fun getChatChannels(): Flow<List<ChatChannel>> = callbackFlow {
         val channelCol = chatChannelsCollectionRef
             .whereArrayContains("members", FirebaseAuth.getInstance().currentUser!!.uid)
             .orderBy("recentMessageTime", Query.Direction.DESCENDING)
 
-        val subscription = channelCol.addSnapshotListener { snapshot, firebaseFirestoreException ->
-            if (firebaseFirestoreException != null) {
-                Log.e("FIRESTORE", "Users listener error.", firebaseFirestoreException)
+        val subscription = channelCol.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e(TAG, "Users listener error.", e)
                 return@addSnapshotListener
             }
             val chatChannels = ArrayList<ChatChannel>()
@@ -92,9 +116,9 @@ object FirestoreChat {
             .collection("messages")
             .orderBy("time", Query.Direction.DESCENDING)
 
-        val subscription = messagesDocument.addSnapshotListener { snapshot, firebaseFirestoreException ->
-            if (firebaseFirestoreException != null) {
-                Log.e("FIRESTORE", "Users listener error.", firebaseFirestoreException)
+        val subscription = messagesDocument.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e(TAG, "Users listener error.", e)
                 return@addSnapshotListener
             }
             val items = mutableListOf<Message>()
@@ -117,8 +141,8 @@ object FirestoreChat {
         val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
 
         chatChannelsCollectionRef.document(channelId).update(
-                mapOf("recentMessage.seenBy" to FieldValue.arrayUnion(currentUserId)),
-            )
+            mapOf("recentMessage.seenBy" to FieldValue.arrayUnion(currentUserId)),
+        )
     }
 
     fun sendMessage(message: Message, channelId: String) {
@@ -135,11 +159,11 @@ object FirestoreChat {
             MessageType.TEXT -> chatChannelsCollectionRef.document(channelId).update(
                 "recentMessage",
                 mapOf(
+                    "id" to doc.id,
                     "text" to (message as TextMessage).text,
                     "senderId" to message.senderId,
                     "senderUsername" to message.senderUsername,
-                    "senderProfilePicturePath" to message.senderProfilePicturePath,
-                    "recipientId" to message.recipientId,
+                    "senderProfilePictureUrl" to message.senderProfilePictureUrl,
                     "time" to FieldValue.serverTimestamp(),
                     "seenBy" to listOf(currentUserId)
                 ),
@@ -148,11 +172,11 @@ object FirestoreChat {
             MessageType.IMAGE -> chatChannelsCollectionRef.document(channelId).update(
                 "recentMessage",
                 mapOf(
+                    "id" to doc.id,
                     "text" to "sent an image",
                     "senderId" to (message as ImageMessage).senderId,
                     "senderUsername" to message.senderUsername,
-                    "senderProfilePicturePath" to message.senderProfilePicturePath,
-                    "recipientId" to message.recipientId,
+                    "senderProfilePictureUrl" to message.senderProfilePictureUrl,
                     "time" to FieldValue.serverTimestamp(),
                     "seenBy" to listOf(currentUserId)
                 ),
@@ -179,7 +203,10 @@ object FirestoreChat {
             .document(channelId)
             .collection("messages")
             .document(messageId)
-            .update("likedBy", FieldValue.arrayRemove(FirebaseAuth.getInstance().currentUser?.uid!!))
+            .update(
+                "likedBy",
+                FieldValue.arrayRemove(FirebaseAuth.getInstance().currentUser?.uid!!)
+            )
     }
 
 }

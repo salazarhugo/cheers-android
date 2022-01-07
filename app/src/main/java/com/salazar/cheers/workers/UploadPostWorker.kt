@@ -7,7 +7,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import android.util.Size
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -18,14 +21,18 @@ import androidx.work.workDataOf
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 @HiltWorker
 class UploadPostWorker @AssistedInject constructor(
@@ -34,16 +41,16 @@ class UploadPostWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
 
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+    override suspend fun doWork(): Result {
         val appContext = applicationContext
 
         makeStatusNotification("Uploading", appContext)
 
-        val photoUriInput =
-            inputData.getString("PHOTO_URI") ?: ""
+        val mediaUri =
+            inputData.getString("MEDIA_URI") ?: ""
 
-        val videoUriInput =
-            inputData.getString("VIDEO_URI") ?: ""
+        val postType =
+            inputData.getString("POST_TYPE") ?: return Result.failure()
 
         val photoCaption =
             inputData.getString("PHOTO_CAPTION") ?: ""
@@ -65,14 +72,78 @@ class UploadPostWorker @AssistedInject constructor(
 
 
         try {
+            when (postType) {
+                PostType.VIDEO -> {
+                    val videoUri = Uri.parse(mediaUri) ?: return Result.failure()
 
-            setProgress(workDataOf("Progress" to 0))
+                    val ref = StorageUtil.currentUserRef.child("posts/${UUID.randomUUID()}")
+                    val uploadTask = ref.putFile(videoUri)
 
-            if (videoUriInput.isNotBlank() && videoUriInput != "null") {
-                StorageUtil.uploadPostVideo(Uri.parse(videoUriInput)) { videoPath ->
+                    uploadTask.addOnProgressListener {
+                        val progress = (100.0 * it.bytesTransferred) / it.totalByteCount
+                        setProgressAsync(workDataOf("Progress" to progress))
+                    }.continueWithTask {
+                        ref.downloadUrl
+                    }.addOnSuccessListener { downloadUri ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                            val videoThumbnail: Bitmap = ThumbnailUtils.createVideoThumbnail(File(videoUri.path), Size(120, 120), null)
+                            val videoThumbnail: Bitmap = appContext.contentResolver.loadThumbnail(
+                                videoUri,
+                                Size(1080, 1080),
+                                null
+                            )
+                            val thumbnailBytes = extractBitmap(videoThumbnail)
+
+                            StorageUtil.uploadPostImage(thumbnailBytes) { thumbnailUrl ->
+                                val post = Post(
+                                    type = postType,
+                                    caption = photoCaption,
+                                    videoUrl = downloadUri.toString(),
+                                    videoThumbnailUrl = thumbnailUrl,
+                                    locationName = locationName,
+                                    locationLatitude = latitude,
+                                    locationLongitude = longitude,
+                                    showOnMap = showOnMap,
+                                )
+                                Neo4jUtil.addPost(post, tagUserIds.toList())
+                                makeStatusNotification("Successfully uploaded", appContext)
+                            }
+                        } else {
+                            val post = Post(
+                                type = postType,
+                                caption = photoCaption,
+                                videoUrl = downloadUri.toString(),
+                                locationName = locationName,
+                                locationLatitude = latitude,
+                                locationLongitude = longitude,
+                                showOnMap = showOnMap,
+                            )
+                            Neo4jUtil.addPost(post, tagUserIds.toList())
+                            makeStatusNotification("Successfully uploaded", appContext)
+                        }
+                    }
+
+                }
+                PostType.IMAGE -> {
+                    val photoBytes = extractImage(Uri.parse(mediaUri))
+                    StorageUtil.uploadPostImage(photoBytes) { downloadUrl ->
+                        val post = Post(
+                            type = postType,
+                            caption = photoCaption,
+                            photoUrl = downloadUrl,
+                            locationName = locationName,
+                            locationLatitude = latitude,
+                            locationLongitude = longitude,
+                            showOnMap = showOnMap,
+                        )
+                        Neo4jUtil.addPost(post, tagUserIds.toList())
+                        makeStatusNotification("Successfully uploaded", appContext)
+                    }
+                }
+                PostType.TEXT -> {
                     val post = Post(
+                        type = postType,
                         caption = photoCaption,
-                        videoPath = videoPath,
                         locationName = locationName,
                         locationLatitude = latitude,
                         locationLongitude = longitude,
@@ -82,25 +153,16 @@ class UploadPostWorker @AssistedInject constructor(
                     makeStatusNotification("Successfully uploaded", appContext)
                 }
             }
-            else {
-                val photoBytes = extractImage(Uri.parse(photoUriInput))
-                StorageUtil.uploadPostImage(photoBytes) { imagePath ->
-                    val post = Post(
-                        caption = photoCaption,
-                        photoPath = imagePath,
-                        locationName = locationName,
-                        locationLatitude = latitude,
-                        locationLongitude = longitude,
-                        showOnMap = showOnMap,
-                    )
-                    Neo4jUtil.addPost(post, tagUserIds.toList())
-                    makeStatusNotification("Successfully uploaded", appContext)
-                }
-            }
-            return@withContext Result.success()
+//            setProgressAsync(workDataOf("Progress" to 0.0))
+//            delay(2000)
+//            setProgressAsync(workDataOf("Progress" to 50.0))
+//            delay(2000)
+//            setProgressAsync(workDataOf("Progress" to 100.0))
+//            delay(2000)
+            return Result.success()
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")
-            return@withContext Result.failure()
+            return Result.failure()
         }
     }
 
@@ -134,6 +196,13 @@ class UploadPostWorker @AssistedInject constructor(
 
         val outputStream = ByteArrayOutputStream()
         selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+
+        return outputStream.toByteArray()
+    }
+
+    private fun extractBitmap(bitmap: Bitmap): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
 
         return outputStream.toByteArray()
     }

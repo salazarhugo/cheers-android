@@ -15,13 +15,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.UploadTask
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ImageMessage
 import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.util.FirestoreChat
-import com.salazar.cheers.util.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -61,21 +59,20 @@ class UploadImageMessage @AssistedInject constructor(
 //            imagesUri.forEach {
 //            }
 
-            val first = if(imagesUri.isNotEmpty()) imagesUri.first() else return Result.failure()
+            val first = if (imagesUri.isNotEmpty()) imagesUri.first() else return Result.failure()
 
             val photoBytes = extractImage(Uri.parse(first))
 
-            StorageUtil.uploadMessageImage(photoBytes) {
+            StorageUtil.uploadMessageImage(photoBytes) { downloadUrl ->
                 val imageMessage =
                     ImageMessage().copy(
-                        imagesPath = listOf(it),
+                        imagesDownloadUrl = listOf(downloadUrl),
                         senderId = FirebaseAuth.getInstance().currentUser?.uid!!,
                         senderName = fullName,
                         senderUsername = username,
                         chatChannelId = channelId,
-                        senderProfilePicturePath = profilePicturePath,
+                        senderProfilePictureUrl = profilePicturePath,
                         type = MessageType.IMAGE,
-                        recipientId = ""
                     )
 
                 FirestoreChat.sendMessage(imageMessage, channelId)

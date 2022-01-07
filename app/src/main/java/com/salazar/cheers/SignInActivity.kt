@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
@@ -17,23 +16,16 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.databinding.ContentSignInBinding
+import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.util.FirestoreUtil
+import com.snapchat.kit.sdk.SnapLogin
+import com.snapchat.kit.sdk.core.controller.LoginStateController.OnLoginStateChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
-import com.snapchat.kit.sdk.login.api.FirebaseCustomTokenResultError
-
-import com.snapchat.kit.sdk.login.api.FirebaseCustomTokenResultCallback
-
-import com.snapchat.kit.sdk.SnapLogin
-
-import com.snapchat.kit.sdk.login.api.SnapLoginApi
-import org.jetbrains.anko.toast
-import com.snapchat.kit.sdk.core.controller.LoginStateController
-import com.snapchat.kit.sdk.core.controller.LoginStateController.OnLoginStateChangedListener
 
 
 @AndroidEntryPoint
@@ -77,7 +69,8 @@ class SignInActivity : AppCompatActivity() {
                 }
             }
 
-        SnapLogin.getLoginStateController(this).addOnLoginStateChangedListener(mLoginStateChangedListener);
+        SnapLogin.getLoginStateController(this)
+            .addOnLoginStateChangedListener(mLoginStateChangedListener)
     }
 
     override fun onStart() {
@@ -87,7 +80,6 @@ class SignInActivity : AppCompatActivity() {
             signInSuccessful()
     }
 
-    @ExperimentalMaterial3Api
     private fun checkGithubCallback() {
         val pendingResultTask: Task<AuthResult> = auth.pendingAuthResult ?: return
         pendingResultTask
@@ -99,7 +91,6 @@ class SignInActivity : AppCompatActivity() {
             }
     }
 
-    @ExperimentalMaterial3Api
     private fun signInWithGithub() {
         val provider = OAuthProvider.newBuilder("github.com")
         auth.startActivityForSignInWithProvider(this, provider.build())
@@ -122,8 +113,21 @@ class SignInActivity : AppCompatActivity() {
 
     @OptIn(ExperimentalMaterialApi::class)
     fun signInSuccessful(acct: GoogleSignInAccount? = null) {
-        FirestoreUtil.initCurrentUserIfFirstTime(acct) { user ->
-            startActivity(intentFor<MainActivity>("user" to user).newTask().clearTask())
+//        FirestoreUtil.initCurrentUserIfFirstTime(acct) { user ->
+//            startActivity(intentFor<MainActivity>().newTask().clearTask())
+//            getAndSaveRegistrationToken()
+//        }
+    }
+
+    private fun getAndSaveRegistrationToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            // Get new FCM registration token
+            val token = task.result
+            MyFirebaseMessagingService.addTokenToFirestore(token)
         }
     }
 

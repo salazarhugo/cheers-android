@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.chats
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +44,6 @@ import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import com.salazar.cheers.util.StorageUtil
 
 class NewMessageFragment : DialogFragment() {
 
@@ -132,14 +130,8 @@ class NewMessageFragment : DialogFragment() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                if (user.profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(user.profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(data = user.profilePictureUrl),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(56.dp)

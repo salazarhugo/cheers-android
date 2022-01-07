@@ -26,7 +26,7 @@ fun OnMessageLongClickDialog(
             openDialog.value = false
         },
         text = {
-            Column() {
+            Column {
                 val text = if (msg is TextMessage) msg.text else ""
                 Text(
                     text = text,
@@ -65,7 +65,7 @@ fun OnMessageLongClickDialog(
                         onClick = {
                             onUnlike(msg)
                             openDialog.value = false
-                                  },
+                        },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text("Unlike")

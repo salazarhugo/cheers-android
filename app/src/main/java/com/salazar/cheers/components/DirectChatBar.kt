@@ -1,20 +1,15 @@
 package com.salazar.cheers.components
 
-import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,16 +18,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.util.StorageUtil
 
 @Composable
 fun DirectChatBar(
     name: String,
     username: String,
-    profilePicturePath: String,
+    profilePictureUrl: String,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    onNavIconPressed: () -> Unit = { }
+    onNavIconPressed: () -> Unit = { },
+    onTitleClick: (username: String) -> Unit = { },
 ) {
     CheersAppBar(
         modifier = modifier,
@@ -46,16 +41,13 @@ fun DirectChatBar(
         },
         title = {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable {
+                    onTitleClick(username)
+                }
             ) {
-                val photo = remember { mutableStateOf<Uri?>(null) }
-
-                if (profilePicturePath.isNotBlank())
-                    StorageUtil.pathToReference(profilePicturePath)?.downloadUrl?.addOnSuccessListener {
-                        photo.value = it
-                    }
                 Image(
-                    painter = rememberImagePainter(data = photo.value),
+                    painter = rememberImagePainter(data = profilePictureUrl),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(33.dp)
@@ -64,7 +56,7 @@ fun DirectChatBar(
                     contentScale = ContentScale.Crop,
                 )
                 Spacer(Modifier.width(8.dp))
-                Column() {
+                Column {
                     // Name
                     Text(
                         text = name,
