@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.FirestoreChat
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.workers.UploadImageMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

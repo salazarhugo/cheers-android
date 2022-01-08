@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.util.Size
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -22,14 +21,10 @@ import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 import java.util.*

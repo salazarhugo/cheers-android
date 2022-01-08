@@ -8,7 +8,7 @@ import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.backend.Neo4jUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant

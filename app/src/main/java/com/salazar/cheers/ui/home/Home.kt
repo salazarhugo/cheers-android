@@ -49,6 +49,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
+import androidx.paging.compose.itemsIndexed
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import coil.compose.rememberImagePainter
@@ -66,10 +71,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
 import com.salazar.cheers.R
-import com.salazar.cheers.components.AnimateVisibilityFade
-import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.PrettyImage
-import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.SuggestionUser
@@ -84,22 +86,21 @@ import kotlin.math.absoluteValue
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by activityViewModels()
     private val el: AddPostDialogViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel.refreshPosts()
 
         return ComposeView(requireContext()).apply {
             setContent {
                 SwipeRefresh(
                     state = rememberSwipeRefreshState(isRefreshing = false),
                     onRefresh = {
-                        viewModel.refreshPosts()
                         viewModel.refreshSuggestions()
+                        viewModel.refreshPostsFlow()
                     },
                 ) {
                     HomeScreen()
@@ -336,12 +337,35 @@ class HomeFragment : Fragment() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun PostList(uiState: HomeUiState.HasPosts) {
+        val posts: LazyPagingItems<Post> = uiState.postsFlow.collectAsLazyPagingItems()
+
         LazyColumn(state = uiState.listState) {
-            items(uiState.posts) { post ->
-                when (post.type) {
+            itemsIndexed(posts) { i, post ->
+                Text(i.toString())
+                when (post?.type) {
                     PostType.TEXT -> Post(post, true)
                     PostType.IMAGE -> Post(post, true)
                     PostType.VIDEO -> Post(post, true)
+                }
+            }
+            posts.apply {
+                when {
+                    loadState.refresh is LoadState.Loading -> {
+                        item {
+                            CircularProgressIndicatorM3(modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.Center))
+                        }
+                    }
+                    loadState.append is LoadState.Loading -> {
+                        item {
+                            CircularProgressIndicatorM3(modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally))
+                        }
+                    }
+                    loadState.append is LoadState.Error -> {
+                        val e = posts.loadState.append as LoadState.Error
+                        item {
+                            Text( text = e.error.localizedMessage!!, modifier = Modifier.fillParentMaxSize())
+                        }
+                    }
                 }
             }
         }
@@ -571,7 +595,13 @@ class HomeFragment : Fragment() {
         Text(
             "${post.likes} ${if (post.likes > 1) "likes" else "like"}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.clickable {
+                val action = HomeFragmentDirections.actionHomeFragmentToLikesFragment(
+                    postId = post.id
+                )
+                findNavController().navigate(action)
+            }
         )
     }
 

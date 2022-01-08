@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.backend.Neo4jUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

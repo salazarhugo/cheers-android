@@ -16,11 +16,10 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
 @HiltWorker

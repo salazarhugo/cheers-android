@@ -20,6 +20,13 @@
         <action
             android:id="@+id/action_homeFragment_to_otherProfileFragment"
             app:destination="@id/otherProfileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_likesFragment"
+            app:destination="@id/likesFragment"
+            app:enterAnim="@anim/in_from_right"
+            app:exitAnim="@anim/out_to_left"
+            app:popEnterAnim="@anim/in_from_left"
+            app:popExitAnim="@anim/out_to_right" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -169,5 +176,16 @@
             app:destination="@id/otherProfileFragment" />
         <argument android:name="goToFollowing"
             app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/likesFragment"
+        android:name="com.salazar.cheers.ui.home.likes.LikesFragment"
+        android:label="LikesFragment" >
+        <argument
+            android:name="postId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_likesFragment_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment" />
     </fragment>
 </navigation>

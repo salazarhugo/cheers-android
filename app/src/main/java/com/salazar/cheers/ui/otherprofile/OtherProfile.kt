@@ -59,8 +59,6 @@ import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.profile.OtherProfileUiState
-import com.salazar.cheers.ui.profile.OtherProfileViewModel
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreChat

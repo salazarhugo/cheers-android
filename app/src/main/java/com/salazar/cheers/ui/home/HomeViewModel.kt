@@ -6,10 +6,13 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
-import com.salazar.cheers.util.Neo4jUtil
+import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.Neo4jRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,9 +35,8 @@ sealed interface HomeUiState {
     ) : HomeUiState
 
     data class HasPosts(
-        val posts: List<Post>,
+        val postsFlow: Flow<PagingData<Post>>,
         val listState: LazyListState = LazyListState(),
-        val selectedPost: Post,
         val favorites: Set<String>,
         override val postSheetState: ModalBottomSheetState,
         override val suggestions: List<SuggestionUser>?,
@@ -45,10 +47,9 @@ sealed interface HomeUiState {
 }
 
 private data class HomeViewModelState(
-    val posts: List<Post>? = null,
+    val postsFlow: Flow<PagingData<Post>>? = null,
     val listState: LazyListState = LazyListState(),
     val suggestions: List<SuggestionUser>? = null,
-    val selectedPostId: String? = null,
     val favorites: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
@@ -56,7 +57,7 @@ private data class HomeViewModelState(
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
 ) {
     fun toUiState(): HomeUiState =
-        if (posts == null || posts.isEmpty()) {
+        if (postsFlow == null) {
             HomeUiState.NoPosts(
                 postSheetState = sheetState,
                 isLoading = isLoading,
@@ -66,12 +67,9 @@ private data class HomeViewModelState(
             )
         } else {
             HomeUiState.HasPosts(
+                postsFlow = postsFlow,
                 listState = listState,
                 postSheetState = sheetState,
-                posts = posts,
-                selectedPost = posts.find {
-                    it.id == selectedPostId
-                } ?: posts.last(),
                 favorites = favorites,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
@@ -82,7 +80,9 @@ private data class HomeViewModelState(
 }
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(): ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val repository: Neo4jRepository
+): ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
 
@@ -95,8 +95,15 @@ class HomeViewModel @Inject constructor(): ViewModel() {
         )
 
     init {
-        refreshPosts()
+        refreshPostsFlow()
         refreshSuggestions()
+    }
+
+    fun refreshPostsFlow() {
+        viewModelState.update { it.copy(isLoading = true) }
+        viewModelState.update {
+            it.copy(postsFlow = repository.getPosts(), isLoading = false)
+        }
     }
 
     fun refreshSuggestions() {
@@ -111,25 +118,8 @@ class HomeViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun refreshPosts() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            viewModelState.update {
-                val result = Neo4jUtil.posts()
-                when (result) {
-                    is Result.Success -> it.copy(posts = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
-            }
-        }
-    }
-
     fun toggleLike(postId: String, liked: Boolean) {
-        viewModelState.value.posts?.find { it.id == postId }?.liked = true
+//        viewModelState.value.posts?.find { it.id == postId }?.liked = true
 //        viewModelState.update {
 ////            val post = post.copy(liked = !post.liked, likes = post.likes+1)
 //            it.copy(posts)
@@ -161,19 +151,19 @@ class HomeViewModel @Inject constructor(): ViewModel() {
     }
 
     fun selectPost(postId: String) {
-        viewModelState.update {
-            it.copy(selectedPostId = postId)
-        }
+//        viewModelState.update {
+//            it.copy(selectedPostId = postId)
+//        }
     }
 
     fun deletePost() {
-        val postId = viewModelState.value.selectedPostId ?: return
-        viewModelState.update {
-            it.copy(posts = it.posts?.filter { post -> post.id != postId })
-        }
+//        val postId = viewModelState.value.selectedPostId ?: return
+//        viewModelState.update {
+//            it.copy(posts = it.posts?.filter { post -> post.id != postId })
+//        }
         viewModelScope.launch {
             try {
-                Neo4jUtil.deletePost(postId = postId)
+//                Neo4jUtil.deletePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }

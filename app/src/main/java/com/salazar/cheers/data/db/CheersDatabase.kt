@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.internal.Post
 
 @Database(entities = [RecentUser::class], version = 1, exportSchema = false)
 abstract class CheersDatabase : RoomDatabase() {

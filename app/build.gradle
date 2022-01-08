@@ -199,6 +199,10 @@ dependencies {
     implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.23"
 //    implementation "com.mapbox.search:mapbox-search-android-ui:1.0.0-beta.23"
 
+    // Paging
+    implementation("androidx.paging:paging-runtime-ktx:3.1.0")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
+
     // Google's Fused Location Provider
     implementation "com.google.android.gms:play-services-location:19.0.0"
 

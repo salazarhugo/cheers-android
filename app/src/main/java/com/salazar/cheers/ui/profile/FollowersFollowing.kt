@@ -49,6 +49,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -261,13 +262,13 @@ class FollowersFollowingFragment : Fragment() {
                     Text(text = user.username, style = Typography.bodyMedium)
                 }
             }
-            Row {
-                OutlinedButton(
-                    shape = RoundedCornerShape(8.dp),
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FollowButton(
+                    isFollowing = true,
                     onClick = { viewModel.unfollow(user.id) }
-                ) {
-                    Text("Following")
-                }
+                )
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Default.MoreVert, null)
                 }

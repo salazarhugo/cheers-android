@@ -8,6 +8,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

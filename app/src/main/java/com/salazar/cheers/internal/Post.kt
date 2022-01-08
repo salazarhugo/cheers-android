@@ -1,5 +1,7 @@
 package com.salazar.cheers.internal
 
+import androidx.room.Entity
+
 object PostType {
     const val TEXT = "TEXT"
     const val IMAGE = "IMAGE"

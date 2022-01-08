@@ -1,4 +1,4 @@
-package com.salazar.cheers.util
+package com.salazar.cheers.backend
 
 import android.util.Log
 import com.google.android.gms.tasks.Task
@@ -20,16 +20,18 @@ import java.util.concurrent.TimeUnit
 
 object Neo4jUtil {
 
-    private val driver: Driver by lazy {
-        GraphDatabase.driver(
-            Environment.DEFAULT_URL,
-            AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
-            Config.builder()
-                .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
-                .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
-        )
-    }
-    private const val database: String = Environment.DEFAULT_DATABASE
+//    companion object {
+        private val driver: Driver by lazy {
+            GraphDatabase.driver(
+                Environment.DEFAULT_URL,
+                AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
+                Config.builder()
+                    .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
+                    .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
+            )
+        }
+        const val database: String = Environment.DEFAULT_DATABASE
+//    }
 
     fun toMap(obj: Any): Map<String, Any> {
         val map: MutableMap<String, Any> = HashMap()
@@ -154,6 +156,31 @@ object Neo4jUtil {
 
     suspend fun getCurrentUser(): Result<User> {
         return getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+    }
+
+    suspend fun getPostLikes(postId: String): Result<List<User>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["postId"] = postId
+
+                val records = query(
+                    "MATCH (p:Post { id: \$postId})<-[:LIKED]-(u:User) " +
+                            "RETURN properties(u)",
+                    params)
+
+                val users = mutableListOf<User>()
+
+                records.forEach { record ->
+                    val gson = Gson()
+                    val user = gson.fromJson(record.values()[0].toString(), User::class.java)
+                    users.add(user)
+                }
+                return@withContext Result.Success(users.toList())
+            } catch (e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
     }
 
     suspend fun getSuggestions(): Result<List<SuggestionUser>> {
@@ -306,7 +333,7 @@ object Neo4jUtil {
             val records = query(
                 "MATCH (u:User)-[:FOLLOWS]->(u2:User) " +
                         "WHERE u.id = \$userId AND u2.username CONTAINS \$query " +
-                        "RETURN properties(u2) LIMIT 10",
+                        "RETURN properties(u2) LIMIT 20",
                 params
             )
 

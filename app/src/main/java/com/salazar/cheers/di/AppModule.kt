@@ -2,6 +2,8 @@ package com.salazar.cheers.di
 
 import android.content.Context
 import androidx.room.Room
+import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.data.Neo4jRepository
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.CheersDatabase
 import dagger.Module
@@ -28,5 +30,11 @@ object AppModule {
     @Provides
     fun provideCheersDao(@ApplicationContext appContext: Context): CheersDao {
         return CheersDatabase.invoke(appContext).forexDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideNeo4jService(): Neo4jService {
+        return Neo4jService()
     }
 }
