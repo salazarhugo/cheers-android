@@ -28,8 +28,9 @@ fun PostBottomSheet(
     content: @Composable () -> Unit
 ) {
     ModalBottomSheetLayout(
+        sheetElevation = 0.dp,
         sheetState = sheetState,
-        sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+        sheetBackgroundColor = MaterialTheme.colorScheme.background,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetContent = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -76,8 +77,9 @@ fun Item(
         Icon(
             icon,
             contentDescription = null,
+            tint = MaterialTheme.colorScheme.onBackground,
         )
         Spacer(Modifier.width(22.dp))
-        Text(text, style = MaterialTheme.typography.titleMedium)
+        Text(text, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
     }
 }

@@ -53,11 +53,13 @@ import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils.convertDrawableToBitmap
 import com.salazar.cheers.util.Utils.getCircledBitmap
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URL
 
@@ -75,7 +77,6 @@ class MapFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 MapScreen()
-
             }
         }
     }
@@ -156,13 +157,13 @@ class MapFragment : Fragment() {
     fun UiLayer(scope: BoxScope) {
         scope.apply {
             val uiState = viewModel.uiState.collectAsState().value
-            val scope = rememberCoroutineScope()
 
-//            scope.launch {
-//                uiState.posts?.forEach {
-//                    addPostToMap(it)
-//                }
-//            }
+            rememberCoroutineScope().launch {
+                uiState.posts?.forEach {
+                    if (it.type == PostType.IMAGE)
+                        addPostToMap(it)
+                }
+            }
 
             Surface(
                 shape = RoundedCornerShape(22.dp),
@@ -237,33 +238,23 @@ class MapFragment : Fragment() {
         )
     }
 
-    private suspend fun addPostToMap(post: Post) =
-        withContext(Dispatchers.IO) {
-            getBitmapFromUrl(post) { postPhoto ->
-                if (postPhoto == null)
-                    return@getBitmapFromUrl
+    private suspend fun addPostToMap(post: Post) = withContext(Dispatchers.IO) {
+            val postPhoto = getBitmapFromUrl(post)
 
-                val annotationApi = mapView.annotations
-                val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
-                val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
-                    .withPoint(Point.fromLngLat(post.locationLongitude, post.locationLatitude))
-                    .withIconImage(postPhoto)
-                    .withIconSize(0.1)
-                pointAnnotationManager.create(pointAnnotationOptions)
-                pointAnnotationManager.addClickListener(onPostAnnotationClick(post))
-            }
+            val annotationApi = mapView.annotations
+            val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
+            val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
+                .withPoint(Point.fromLngLat(post.locationLongitude, post.locationLatitude))
+                .withIconImage(postPhoto)
+                .withIconSize(0.1)
+            pointAnnotationManager.create(pointAnnotationOptions)
+            pointAnnotationManager.addClickListener(onPostAnnotationClick(post))
         }
 
-    private fun getBitmapFromUrl(post: Post, onDone: (Bitmap?) -> Unit) {
-        StorageUtil.pathToReference(post.photoUrl)?.downloadUrl?.addOnSuccessListener {
-            val urlObj = URL(it.toString())
-            onDone(
-//                Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
-//            BitmapFactory.decodeResource(requireContext().resources, R.drawable.ic_google_logo)
-                BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
-                    .getCircledBitmap()
-            )
-        }
+    private fun getBitmapFromUrl(post: Post): Bitmap {
+        val urlObj = URL(post.photoUrl)
+        return BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
+            .getCircledBitmap()
     }
 
     private fun onPostAnnotationClick(post: Post): OnPointAnnotationClickListener {

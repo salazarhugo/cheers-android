@@ -21,6 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cheers">
 
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7182026441345500~5053837395"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_cocktail" />
@@ -75,6 +79,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".PhoneAuthActivity" />
 
         <service
             android:name=".service.MyFirebaseMessagingService"

@@ -172,7 +172,6 @@ class MessagesFragment : Fragment() {
         }
     }
 
-    @ExperimentalCoilApi
     @Composable
     fun DirectConversation(channel: ChatChannel) {
         Row(
@@ -260,7 +259,6 @@ class MessagesFragment : Fragment() {
         }
     }
 
-    @ExperimentalCoilApi
     @Composable
     fun GroupConversation(channel: ChatChannel) {
         Row(

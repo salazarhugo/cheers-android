@@ -102,8 +102,6 @@ class SignInActivity : AppCompatActivity() {
             }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
-    @ExperimentalMaterial3Api
     private fun signInAnonymously() {
         auth.signInAnonymously().addOnSuccessListener {
             startActivity(intentFor<MainActivity>().newTask().clearTask())
@@ -131,7 +129,6 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    @ExperimentalMaterial3Api
     private fun emailPasswordSignIn(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->

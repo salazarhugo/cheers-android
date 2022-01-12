@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.google.android.gms.ads.nativead.NativeAd
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
@@ -25,6 +26,7 @@ sealed interface HomeUiState {
     val searchInput: String
     val suggestions: List<SuggestionUser>?
     val postSheetState: ModalBottomSheetState
+    val nativeAd: NativeAd?
 
     data class NoPosts(
         override val suggestions: List<SuggestionUser>?,
@@ -32,6 +34,7 @@ sealed interface HomeUiState {
         override val errorMessages: List<String>,
         override val searchInput: String,
         override val postSheetState: ModalBottomSheetState,
+        override val nativeAd: NativeAd?,
     ) : HomeUiState
 
     data class HasPosts(
@@ -43,6 +46,7 @@ sealed interface HomeUiState {
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String,
+        override val nativeAd: NativeAd?,
     ) : HomeUiState
 }
 
@@ -55,10 +59,12 @@ private data class HomeViewModelState(
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    val nativeAd: NativeAd? = null,
 ) {
     fun toUiState(): HomeUiState =
         if (postsFlow == null) {
             HomeUiState.NoPosts(
+                nativeAd = nativeAd,
                 postSheetState = sheetState,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
@@ -67,6 +73,7 @@ private data class HomeViewModelState(
             )
         } else {
             HomeUiState.HasPosts(
+                nativeAd = nativeAd,
                 postsFlow = postsFlow,
                 listState = listState,
                 postSheetState = sheetState,
@@ -118,16 +125,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike(postId: String, liked: Boolean) {
-//        viewModelState.value.posts?.find { it.id == postId }?.liked = true
-//        viewModelState.update {
-////            val post = post.copy(liked = !post.liked, likes = post.likes+1)
-//            it.copy(posts)
-//        }
-        if (liked)
-            likePost(postId)
+    fun toggleLike(post: Post) {
+        if (post.liked)
+            unlikePost(post.id)
         else
-            unlikePost(postId)
+            likePost(post.id)
     }
 
     private fun unlikePost(postId: String) {
@@ -173,6 +175,12 @@ class HomeViewModel @Inject constructor(
     fun deleteErrorMessage() {
         viewModelState.update {
             it.copy(errorMessages = emptyList())
+        }
+    }
+
+    fun setNativeAd(nativeAd: NativeAd) {
+        viewModelState.update {
+            it.copy(nativeAd = nativeAd)
         }
     }
 }

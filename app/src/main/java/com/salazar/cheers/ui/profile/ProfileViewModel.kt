@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.profile
 
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -10,6 +11,7 @@ import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.util.addOrRemove
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,6 +32,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
+        val posts: List<Post>,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -44,8 +47,9 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 ) {
     fun toUiState(): ProfileUiState =
-        if (user != null)
+        if (user != null && posts != null)
             ProfileUiState.HasUser(
+                posts = posts,
                 user = user,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
@@ -64,7 +68,6 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
 class ProfileViewModel @Inject constructor() : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
-    val posts = mutableStateOf<List<Post>>(emptyList())
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -75,17 +78,45 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         )
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         refreshUser()
         refreshUserPosts()
     }
+    /**
+     * Toggle like of a post
+     */
+    fun toggleLike(post: Post) {
+        val posts = viewModelState.value.posts ?: return
+        val mPosts = posts.toMutableList()
+        val post = mPosts.find { it.id == post.id } ?: return
 
-    fun openDialog() {
+        val updatedPost = if (post.liked)
+            post.copy(likes = post.likes - 1, liked = false)
+        else
+            post.copy(likes = post.likes + 1, liked = true)
+
+        mPosts[mPosts.indexOf(post)] = updatedPost
+
+        toggleLike(postId = post.id, like = updatedPost.liked)
+        updatePosts(mPosts)
+    }
+
+    private fun toggleLike(postId: String, like: Boolean) {
         viewModelScope.launch {
-            viewModelState.value.sheetState.show()
+            if (like)
+                Neo4jUtil.likePost(postId = postId)
+            else
+                Neo4jUtil.unlikePost(postId = postId)
         }
-//        viewModelState.update {
-//            it.copy(sheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded))
-//        }
+    }
+
+    private fun updatePosts(posts: List<Post>) {
+        viewModelState.update {
+            it.copy(posts = posts)
+        }
     }
 
     private fun refreshUser() {
@@ -106,15 +137,13 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
 
     private fun refreshUserPosts() {
         viewModelScope.launch {
-            when (val result = Neo4jUtil.getCurrentUserPosts()) {
-                is Result.Success -> posts.value = result.data
-                is Result.Error -> {
-                    viewModelState.update {
-                        it.copy(
-                            errorMessages = listOf(result.exception.toString()),
-                            isLoading = false
-                        )
-                    }
+            viewModelState.update {
+                when (val result = Neo4jUtil.getCurrentUserPosts()) {
+                    is Result.Success ->  it.copy(posts = result.data)
+                    is Result.Error -> it.copy(
+                        errorMessages = listOf(result.exception.toString()),
+                        isLoading = false
+                    )
                 }
             }
         }

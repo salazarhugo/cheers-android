@@ -1,5 +1,7 @@
 package com.salazar.cheers
 
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -18,6 +20,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val user2: MutableState<User?> = mutableStateOf(null)
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
     val unreadMessages = mutableStateOf(0)
+    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     init {
         refreshUser()

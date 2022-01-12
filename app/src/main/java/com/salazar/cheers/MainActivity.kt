@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Log
+import android.view.Window
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.Nullable
@@ -19,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
@@ -41,11 +41,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowCompat.setDecorFitsSystemWindows
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.insets.systemBarsPadding
@@ -53,9 +54,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.databinding.ContentMainBinding
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Fragment
+import com.salazar.cheers.ui.home.PostBottomSheet
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.snapchat.kit.sdk.Bitmoji
 import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
@@ -69,10 +72,10 @@ class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
-    @ExperimentalMaterial3Api
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = !isSystemInDarkTheme()
@@ -85,8 +88,6 @@ class MainActivity : AppCompatActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier.systemBarsPadding(),
-                    shadowElevation = 0.dp,
-                    tonalElevation = 0.dp
                 ) {
                     MainActivityScreen()
                 }
@@ -135,32 +136,35 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
-    @ExperimentalMaterial3Api
     @Composable
     fun MainActivityScreen() {
-
 //        val state = rememberScaffoldState()
         val bottomSheetState =
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
         Scaffold(
-            bottomBar = { BottomBar(bottomSheetState) },
+            bottomBar = {
+                Column {
+                    DividerM3()
+                    BottomBar(bottomSheetState)
+                }
+            },
         ) { innerPadding ->
             Box(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
             ) {
                 AndroidViewBinding(ContentMainBinding::inflate)
             }
         }
-        ChangeProfileBottomSheet(bottomSheetState)
+//        ChangeProfileBottomSheet(bottomSheetState)
+        PostBottomSheet(
+            sheetState = mainViewModel.sheetState,
+            onDelete = {},
+        ) {
+        }
     }
 
-    @ExperimentalFoundationApi
-    @ExperimentalMaterialApi
-    @ExperimentalCoilApi
     @Composable
     fun BottomBar(bottomSheetState: ModalBottomSheetState) {
 
@@ -169,16 +173,10 @@ class MainActivity : AppCompatActivity() {
 
         var selectedItem by remember { mutableStateOf(0) }
         val items = listOf(
-            Fragment(R.id.homeFragment, Icons.Outlined.Home, Icons.Rounded.Home, "Home"),
-            Fragment(R.id.mapFragment, Icons.Outlined.Place, Icons.Filled.Place, "Maps"),
-            Fragment(R.id.searchFragment, Icons.Outlined.Search, Icons.Filled.Search, "Search"),
-//            Fragment(R.id.homeFragment, Icons.Outlined.AddBox, Icons.Rounded.AddBox, "Post"),
-            Fragment(
-                R.id.messagesFragment,
-                Icons.Outlined.ChatBubbleOutline,
-                Icons.Filled.ChatBubble,
-                "Messages"
-            ),
+            Fragment(R.id.homeFragment, { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground)}, {Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground)}, "Home"),
+            Fragment(R.id.mapFragment, { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(Icons.Filled.Place, null, tint = MaterialTheme.colorScheme.onBackground)}, "Map"),
+            Fragment(R.id.searchFragment, { Icon(Icons.Outlined.Search, null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onBackground)}, "Search"),
+            Fragment( R.id.messagesFragment, { Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground) }, "Messages"),
         )
 
         CompositionLocalProvider(
@@ -196,10 +194,10 @@ class MainActivity : AppCompatActivity() {
                             val unreadMessageCount = mainViewModel.unreadMessages.value
                             if (index == 3 && unreadMessageCount > 0)
                                 BadgedBox(badge = { Badge { Text(unreadMessageCount.toString()) } }) {
-                                    Icon(icon, contentDescription = null)
+                                    icon()
                                 }
                             else
-                                Icon(icon, contentDescription = null)
+                                icon()
                         },
                         selected = selectedItem == index,
                         onClick = {

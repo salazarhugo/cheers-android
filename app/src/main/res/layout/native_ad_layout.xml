@@ -1,0 +1,26 @@
+<com.google.android.gms.ads.nativead.NativeAdView
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:contentDescription="@null">
+            <ImageView
+                android:id="@+id/ad_app_icon"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:contentDescription="@null" />
+            <TextView
+                android:id="@+id/ad_headline"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.gms.ads.nativead.NativeAdView>

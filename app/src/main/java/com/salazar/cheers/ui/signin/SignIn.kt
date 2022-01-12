@@ -53,6 +53,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.MainActivity
+import com.salazar.cheers.PhoneAuthActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.service.MyFirebaseMessagingService
@@ -61,6 +62,7 @@ import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.newTask
 import org.jetbrains.anko.support.v4.intentFor
+import org.jetbrains.anko.support.v4.startActivity
 
 class SignInFragment : Fragment() {
 
@@ -167,12 +169,13 @@ class SignInFragment : Fragment() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        onClick = {},
+                        onClick = {
+                              startActivity<PhoneAuthActivity>()
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF27F34E),
                         ),
                         shape = RoundedCornerShape(4.dp),
-                        enabled = false,
                     ) {
                         Icon(Icons.Default.Phone, "", tint = Color.White)
                         Spacer(Modifier.width(12.dp))
@@ -363,7 +366,6 @@ class SignInFragment : Fragment() {
             }
         }
 
-    @ExperimentalMaterial3Api
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         auth.signInWithCredential(credential)

@@ -115,7 +115,7 @@ object Neo4jUtil {
             videoUrl = post.videoUrl,
             videoThumbnailUrl = post.videoThumbnailUrl,
             locationLatitude = post.locationLatitude,
-            locationLongitude = post.locationLatitude,
+            locationLongitude = post.locationLongitude,
             locationName = post.locationName,
         )
         params["post"] = toMap(post2)
@@ -321,6 +321,25 @@ object Neo4jUtil {
                 Log.e("HAHA", e.toString())
                 return@withContext Result.Error(e)
             }
+        }
+    }
+
+    suspend fun getPost(postId: String): Result<Post> {
+        return withContext(Dispatchers.IO) {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["postId"] = postId
+
+            val records = query(
+                "MATCH (u:User)-[:POSTED]->(p:Post { id: \$postId }) " +
+                        "RETURN properties(apoc.map.removeKey(p,\"createdTime\")), properties(u)",
+                params
+            )
+
+            val gson = Gson()
+            val post = gson.fromJson(records[0].values()[0].toString(), Post::class.java)
+            val creator = gson.fromJson(records[0].values()[1].toString(), User::class.java)
+
+            return@withContext Result.Success(post.copy(creator = creator))
         }
     }
 

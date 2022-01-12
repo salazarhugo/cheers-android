@@ -10,10 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.TextField
@@ -90,7 +87,7 @@ class EditProfileFragment : DialogFragment() {
                 })
             },
         ) {
-            Column {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 if (uiState.isLoading)
                     LoadingScreen()
                 else {
@@ -101,7 +98,6 @@ class EditProfileFragment : DialogFragment() {
         }
     }
 
-    @ExperimentalCoilApi
     @Composable
     fun EditProfileHeader(user: User) {
         val openDialog = remember { mutableStateOf(false) }
@@ -194,7 +190,8 @@ class EditProfileFragment : DialogFragment() {
                 ),
                 value = user.fullName,
                 onValueChange = {
-                    viewModel.onNameChanged(it)
+                    if (it.length <= NAME_MAX_CHAR)
+                        viewModel.onNameChanged(it)
                 },
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -215,6 +212,7 @@ class EditProfileFragment : DialogFragment() {
                 onValueChange = {
                     viewModel.onBioChanged(it)
                 },
+                enabled = false,
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
@@ -232,7 +230,8 @@ class EditProfileFragment : DialogFragment() {
                 ),
                 value = user.website,
                 onValueChange = {
-                    viewModel.onWebsiteChanged(it)
+                    if (it.length <= 500)
+                        viewModel.onWebsiteChanged(it)
                 },
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -245,7 +244,8 @@ class EditProfileFragment : DialogFragment() {
                 ),
                 value = user.bio,
                 onValueChange = {
-                    viewModel.onBioChanged(it)
+                    if (it.length <= BIO_MAX_CHAR)
+                        viewModel.onBioChanged(it)
                 },
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -256,5 +256,9 @@ class EditProfileFragment : DialogFragment() {
         val dialog: Dialog = super.onCreateDialog(savedInstanceState)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         return dialog
+    }
+    companion object {
+        const val NAME_MAX_CHAR = 30
+        const val BIO_MAX_CHAR = 150
     }
 }

@@ -312,10 +312,20 @@ class OtherProfileFragment : Fragment() {
     @Composable
     fun Section2(otherUser: User) {
         Column {
-            Text(
-                text = "${otherUser.firstName} ${otherUser.lastName}",
-                style = Typography.bodyMedium
-            )
+            Row() {
+                Text(
+                    text = otherUser.fullName,
+                    style = Typography.bodyMedium
+                )
+                if (otherUser.verified) {
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "VIP",
+                        style = Typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+            }
             Text(
                 otherUser.bio,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)

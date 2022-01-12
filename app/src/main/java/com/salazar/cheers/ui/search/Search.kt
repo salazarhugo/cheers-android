@@ -66,7 +66,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MyAppBar() {
         Scaffold(

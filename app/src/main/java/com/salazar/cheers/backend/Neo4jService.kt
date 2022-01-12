@@ -38,11 +38,11 @@ class Neo4jService {
                 params["skip"] = page * pageSize
 
                 val records = query(
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p)\n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p) \n" +
-                            "OPTIONAL MATCH (p)-[:WITH]-(w:User) \n" +
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f:User)-[:POSTED]->(p:Post)\n" +
+                            "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
+                            "OPTIONAL MATCH (p)-[:WITH]->(w:User) \n" +
                             "RETURN p {.*, likes: count(DISTINCT r), liked: exists((u)-[:LIKED]->(p)), createdTime: toString(p.createdTime)}," +
-                            " properties(f), collect(properties(w)) ORDER BY datetime(p.createdTime) DESC SKIP \$skip LIMIT \$pageSize",
+                            " properties(f), collect(DISTINCT properties(w)) ORDER BY datetime(p.createdTime) DESC SKIP \$skip LIMIT \$pageSize",
                     params
                 )
 

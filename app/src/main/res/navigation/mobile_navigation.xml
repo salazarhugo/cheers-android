@@ -27,6 +27,13 @@
             app:exitAnim="@anim/out_to_left"
             app:popEnterAnim="@anim/in_from_left"
             app:popExitAnim="@anim/out_to_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment"
+            app:enterAnim="@anim/in_from_right"
+            app:exitAnim="@anim/out_to_left"
+            app:popEnterAnim="@anim/in_from_left"
+            app:popExitAnim="@anim/out_to_right" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -42,6 +49,9 @@
         <action
             android:id="@+id/action_profileFragment_to_followersFollowingFragment"
             app:destination="@id/followersFollowingFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
@@ -188,4 +198,19 @@
             android:id="@+id/action_likesFragment_to_otherProfileFragment"
             app:destination="@id/otherProfileFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="com.salazar.cheers.ui.detail.PostDetailFragment"
+        android:label="PostDetailFragment" >
+        <argument
+            android:name="postId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_postDetailFragment_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/addEventFragment"
+        android:name="com.salazar.cheers.ui.event.AddEventFragment"
+        android:label="AddEventFragment" />
 </navigation>

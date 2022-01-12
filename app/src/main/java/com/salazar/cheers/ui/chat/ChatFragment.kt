@@ -426,7 +426,7 @@ fun ChatItemBubble(
         if (isUserMe && message.id == uiState.channel.recentMessage.id &&
             uiState.channel.recentMessage.seenBy.containsAll(uiState.channel.members)
         ) {
-            Text("Seen")
+            Text("Seen", color = MaterialTheme.colorScheme.onBackground)
         }
         if (message.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)) {
             AnimateHeart {

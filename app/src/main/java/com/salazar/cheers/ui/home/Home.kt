@@ -4,27 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.updateTransition
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -44,17 +42,11 @@ import androidx.compose.ui.util.lerp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
@@ -70,6 +62,12 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.nativead.MediaView
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.google.android.gms.ads.nativead.NativeAdView
+import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.Post
@@ -80,19 +78,27 @@ import com.salazar.cheers.ui.add.AddPostDialogViewModel
 import com.salazar.cheers.ui.theme.Typography
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.image
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.*
 import kotlin.math.absoluteValue
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: HomeViewModel by activityViewModels()
     private val el: AddPostDialogViewModel by activityViewModels()
+    lateinit var adLoader: AdLoader
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        initNativeAdd()
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -109,7 +115,88 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    private fun initNativeAdd() {
+        val configuration = RequestConfiguration.Builder().setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
+        MobileAds.setRequestConfiguration(configuration)
+        val adLoader = AdLoader.Builder(requireContext(), "ca-app-pub-7182026441345500/3409583237")
+            .forNativeAd { ad : NativeAd ->
+                viewModel.setNativeAd(ad)
+            }
+            .withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                }
+            })
+            .withNativeAdOptions(
+                NativeAdOptions.Builder()
+                .build())
+            .build()
+
+        adLoader.loadAd(AdRequest.Builder().build())
+    }
+
+    @Composable
+    fun NativeAdPost(ad: NativeAd) {
+        Column() {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp, 11.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (ad.icon != null) {
+                    Image(
+                        rememberImagePainter(data = ad.icon.uri),
+                        null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(ad.headline)
+                Spacer(Modifier.width(12.dp))
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                ) {
+                    Text(
+                        text = "Sponsored",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+            }
+            DividerM3()
+            AndroidView(
+                factory = {
+                    val adView = NativeAdView(it)
+                    adView.setNativeAd(ad)
+                    adView.addView(TextView(it).apply {
+                        text = ad.headline
+                    })
+
+                    ad.images.forEach {
+                        adView.addView(ImageView(requireContext()).apply {
+                            scaleType = ImageView.ScaleType.CENTER_CROP
+                            this.image = it.drawable
+                        })
+                    }
+
+                    if (ad.mediaContent.hasVideoContent()) {
+                        val mediaView =  MediaView(requireContext()).apply {
+                            setMediaContent(ad.mediaContent!!)
+                            setImageScaleType(ImageView.ScaleType.CENTER_CROP)
+                        }
+                        adView.addView(mediaView)
+                        adView.mediaView = mediaView
+                    }
+                    adView
+                },
+                modifier = Modifier.clickable {
+                }
+            )
+            Spacer(Modifier.height(32.dp))
+        }
+    }
+
     @Composable
     fun HomeScreen() {
         val uiState = viewModel.uiState.collectAsState().value
@@ -122,10 +209,7 @@ class HomeFragment : Fragment() {
             else
                 false
 
-        PostBottomSheet(
-            sheetState = uiState.postSheetState,
-            onDelete = { viewModel.deletePost() },
-        ) {
+            var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
             Scaffold(
                 topBar = {
                     Column {
@@ -135,9 +219,29 @@ class HomeFragment : Fragment() {
                     }
                 },
                 floatingActionButton = {
-                    FloatingActionButton(onClick = { findNavController().navigate(R.id.addDialogFragment) }) {
-                        Icon(Icons.Default.Edit, "")
-                    }
+                    MultiFloatingActionButton(
+                        Icons.Default.Add,
+                        listOf(
+                            MultiFabItem(
+                                "event",
+                                Icons.Outlined.Event,
+                                "Event",
+                            ),
+                            MultiFabItem(
+                                "post",
+                                Icons.Outlined.PostAdd,
+                                "Post",
+                            )
+                        ), toState, true, { state ->
+                            toState = state
+                        },
+                        onFabItemClicked = {
+                            if (it.identifier == "event")
+                                findNavController().navigate(R.id.addEventFragment)
+                            else
+                                findNavController().navigate(R.id.addDialogFragment)
+                        }
+                    )
                 }
             ) {
                 Column {
@@ -165,14 +269,22 @@ class HomeFragment : Fragment() {
                         is HomeUiState.NoPosts -> NoPosts(uiState = uiState)
                     }
                 }
+                val alpha = if (toState == MultiFabState.EXPANDED) 0.9f else 0f
+                Box(
+                    modifier = Modifier
+                        .alpha(animateFloatAsState(alpha).value)
+                        .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
+                        .fillMaxSize()
+                )
             }
-        }
     }
 
     private @Composable
     fun UploadIndicator(progress: Double) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
@@ -334,14 +446,17 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun PostList(uiState: HomeUiState.HasPosts) {
         val posts: LazyPagingItems<Post> = uiState.postsFlow.collectAsLazyPagingItems()
 
         LazyColumn(state = uiState.listState) {
+            if (uiState.nativeAd != null)
             itemsIndexed(posts) { i, post ->
-                Text(i.toString())
+                if (i != 0 && i % 4 == 0) {
+                    DividerM3()
+                    NativeAdPost(ad = uiState.nativeAd)
+                }
                 when (post?.type) {
                     PostType.TEXT -> Post(post, true)
                     PostType.IMAGE -> Post(post, true)
@@ -352,12 +467,16 @@ class HomeFragment : Fragment() {
                 when {
                     loadState.refresh is LoadState.Loading -> {
                         item {
-                            CircularProgressIndicatorM3(modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.Center))
+                            CircularProgressIndicatorM3(modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentSize(Alignment.Center))
                         }
                     }
                     loadState.append is LoadState.Loading -> {
                         item {
-                            CircularProgressIndicatorM3(modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally))
+                            CircularProgressIndicatorM3(modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally))
                         }
                     }
                     loadState.append is LoadState.Error -> {
@@ -382,7 +501,7 @@ class HomeFragment : Fragment() {
             if (post.type != PostType.TEXT)
                 DividerM3()
             PostBody(post, liked, isPostVisible)
-            PostFooter(post, liked)
+            PostFooter(post)
         }
     }
 
@@ -392,7 +511,6 @@ class HomeFragment : Fragment() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
                 .padding(14.dp, 11.dp)
                 .clickable {
                     val action =
@@ -442,12 +560,28 @@ class HomeFragment : Fragment() {
                         Text(text = post.locationName, style = Typography.labelSmall)
                 }
             }
-            Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
-                viewModel.selectPost(post.id)
-                scope.launch {
-                    viewModel.uiState.value.postSheetState.show()
-                }
-            })
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .size(4.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onBackground)
+                )
+                Text(
+                    post.createdTime,
+                    style = Typography.labelMedium
+                )
+                Spacer(Modifier.width(8.dp))
+                Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
+                    viewModel.selectPost(post.id)
+                    scope.launch {
+                        mainViewModel.sheetState.show()
+                    }
+                })
+            }
         }
     }
 
@@ -457,7 +591,8 @@ class HomeFragment : Fragment() {
         liked: MutableState<Boolean>,
         isPostVisible: Boolean,
     ) {
-        Box {
+        Box(
+        ) {
             if (post.videoUrl.isNotBlank())
                 VideoPlayer(
                     uri = post.videoUrl,
@@ -478,9 +613,16 @@ class HomeFragment : Fragment() {
                             detectTapGestures(
                                 onDoubleTap = {
                                     liked.value = !liked.value
-                                    viewModel.toggleLike(post.id, liked.value)
+                                    viewModel.toggleLike(post)
                                 },
                             )
+                        }
+                        .clickable {
+                            val action =
+                                HomeFragmentDirections.actionHomeFragmentToPostDetailFragment(
+                                    postId = post.id
+                                )
+                            findNavController().navigate(action)
                         }
                 )
             else
@@ -516,7 +658,7 @@ class HomeFragment : Fragment() {
     }
 
     @Composable
-    fun PostFooterButtons(post: Post, liked: MutableState<Boolean>) {
+    fun PostFooterButtons(post: Post) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
@@ -524,64 +666,28 @@ class HomeFragment : Fragment() {
                 .padding(bottom = 12.dp),
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-
-                val icon =
-                    if (liked.value) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder
-
-//                var count by remember { mutableStateOf(0) }
-                val transition = updateTransition(
-                    targetState = liked.value, label = ""
-                )
-//                transition.animateSize(label = "Size") { state ->
-//                    when(state)                    {
-//                        true -> Size(36f, 36f)
-//                        false -> Size.Unspecified
-//                    }
-//                }
-
-                val color by transition.animateColor(label = "Color") { state ->
-                    when (state) {
-                        true -> Color.Red
-                        false -> MaterialTheme.colorScheme.onBackground
-                    }
-                }
-
-                Icon(
-                    icon,
-                    "",
-                    modifier = Modifier.clickable {
-                        liked.value = !liked.value
-                        viewModel.toggleLike(post.id, liked.value)
-                    }, color
-                )
-
-                Icon(Icons.Outlined.ChatBubbleOutline, "")
-                Icon(Icons.Outlined.Share, "")
+                LikeButton(like = post.liked, likes = post.likes, onToggle = { viewModel.toggleLike(post)})
+                Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
+                Icon(Icons.Outlined.Share, null)
             }
-            Icon(Icons.Outlined.BookmarkBorder, "")
+            Icon(Icons.Outlined.BookmarkBorder, null)
         }
     }
 
     @Composable
-    fun PostFooter(post: Post, liked: MutableState<Boolean>) {
+    fun PostFooter(post: Post) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
         ) {
-            PostFooterButtons(post, liked)
+            PostFooterButtons(post)
             if (post.type != PostType.TEXT) {
                 LikedBy(post = post)
                 if (post.tagUsers.isNotEmpty())
                     TagUsers(post.tagUsers)
                 if (post.caption.isNotBlank())
                     Caption(post)
-
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    post.createdTime.format(DateTimeFormatter.ISO_DATE),
-                    style = Typography.labelSmall
-                )
             }
         }
         if (post.type == PostType.TEXT)
@@ -655,13 +761,14 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun MyAppBar() {
+        val icon = if (isSystemInDarkTheme()) R.drawable.ic_cheers_white else R.drawable.ic_cheers_icon_black
         CenterAlignedTopAppBar(
 //            modifier = Modifier.height(55.dp),
 //            backgroundColor = MaterialTheme.colorScheme.surface,
 //            elevation = 0.dp,
             title = {
                 Image(
-                    painter = painterResource(R.drawable.ic_cocktail),
+                    painter = painterResource(icon),
                     modifier = Modifier
                         .size(32.dp),
                     contentDescription = "",
@@ -767,5 +874,9 @@ class HomeFragment : Fragment() {
                 player.release()
             }
         }
+    }
+
+    @Composable
+    fun Event() {
     }
 }
