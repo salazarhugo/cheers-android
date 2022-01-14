@@ -20,20 +20,20 @@ import java.util.concurrent.TimeUnit
 
 object Neo4jUtil {
 
-//    companion object {
-        private val driver: Driver by lazy {
-            GraphDatabase.driver(
-                Environment.DEFAULT_URL,
-                AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
-                Config.builder()
-                    .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
-                    .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
-            )
-        }
-        const val database: String = Environment.DEFAULT_DATABASE
+    //    companion object {
+    private val driver: Driver by lazy {
+        GraphDatabase.driver(
+            Environment.DEFAULT_URL,
+            AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
+            Config.builder()
+                .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
+                .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
+        )
+    }
+    const val database: String = Environment.DEFAULT_DATABASE
 //    }
 
-    fun toMap(obj: Any): Map<String, Any> {
+    private fun toMap(obj: Any): Map<String, Any> {
         val map: MutableMap<String, Any> = HashMap()
         for (field in obj.javaClass.declaredFields) {
             field.isAccessible = true
@@ -96,6 +96,18 @@ object Neo4jUtil {
 
             write("MATCH (u:User { id: \$userId }) SET u = \$user", params)
         }
+    }
+
+    fun addEvent(event: Event) {
+        val params: MutableMap<String, Any> = mutableMapOf()
+        params["userId"] = FirebaseAuth.getInstance().uid!!
+        params["event"] = toMap(event)
+        write(
+            "MATCH (u:User { id: \$userId}) CREATE (e: Event \$event)" +
+                    " SET e += { createdTime: datetime() } CREATE (u)-[:POSTED]->(e)" +
+                    " WITH e UNWIND e.participants as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
+            params = params
+        )
     }
 
     fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
@@ -167,7 +179,8 @@ object Neo4jUtil {
                 val records = query(
                     "MATCH (p:Post { id: \$postId})<-[:LIKED]-(u:User) " +
                             "RETURN properties(u)",
-                    params)
+                    params
+                )
 
                 val users = mutableListOf<User>()
 
@@ -191,10 +204,11 @@ object Neo4jUtil {
 
                 val records = query(
                     "MATCH (u:User { id: \$userId})-[:FOLLOWS]->(f:User)-[:FOLLOWS]->(r:User) " +
+//                            " MATCH (r:User) " +
                             "WHERE r.id <> \$userId " +
                             "AND NOT (u)-[:FOLLOWS]->(r) " +
-                            "MATCH (r)-[:POSTED]->(p:Post) " +
-                            "RETURN DISTINCT properties(r), collect(properties(p { photoUrl: p.photoUrl }))",
+                            "OPTIONAL MATCH (r)-[:POSTED]->(p:Post) " +
+                            "RETURN DISTINCT properties(r), collect(properties(p { photoUrl: p.photoUrl })) LIMIT 10",
                     params
                 )
 

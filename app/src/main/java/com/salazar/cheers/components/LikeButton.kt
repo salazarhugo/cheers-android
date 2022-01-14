@@ -57,13 +57,14 @@ fun LikeButton(
                 },
             tint = color
         )
-        Spacer(modifier = Modifier.width(6.dp))
-        if (likes > 0)
+        if (likes > 0) {
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = likes.toString(),
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                 color = color
             )
+        }
     }
 }
 

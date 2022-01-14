@@ -59,7 +59,7 @@ class SearchViewModel @Inject constructor(
                 id = user.id,
                 fullName = user.fullName,
                 username = user.username,
-                profilePicturePath = user.profilePictureUrl,
+                profilePictureUrl = user.profilePictureUrl,
                 verified = user.verified,
                 date = Instant.now().epochSecond
             )

@@ -46,13 +46,13 @@ class PostsPagingSource(
         val diff = ChronoUnit.SECONDS.between(date, now)
 
         return if (diff < 60)
-            "${diff}s"
+            "${diff}s ago"
         else if (diff < 60 * 60)
-            "${diff / 60}m"
+            "${diff / 60}m ago"
         else if (diff < 60 * 60 * 24)
-            "${diff / 60 / 60}h"
+            "${diff / 60 / 60} ${if ((diff / 60 / 60) > 1) "hours" else "hour" } ago"
         else if (diff < 60 * 60 * 24 * 7)
-            "${diff / 60 / 60 / 24}d"
+            "${diff / 60 / 60 / 24} ${if ((diff / 60 / 60 / 24) > 1) "days" else "day"} ago"
         else if (diff < 60 * 60 * 24 * 30)
             "${diff / 60 / 60 / 24 / 7}w"
         else if (diff < 60 * 60 * 24 * 30 * 12)

@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
@@ -126,6 +127,7 @@ class EditProfileFragment : DialogFragment() {
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(96.dp)
+                    .clip(CircleShape)
                     .border(BorderStroke(2.dp, Color.LightGray), CircleShape)
                     .clickable {
                         Utils.openPhotoChooser(singleImageResultLauncher)

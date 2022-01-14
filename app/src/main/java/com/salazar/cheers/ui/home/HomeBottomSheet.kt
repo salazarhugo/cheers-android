@@ -31,7 +31,7 @@ fun PostBottomSheet(
         sheetElevation = 0.dp,
         sheetState = sheetState,
         sheetBackgroundColor = MaterialTheme.colorScheme.background,
-        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         sheetContent = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(

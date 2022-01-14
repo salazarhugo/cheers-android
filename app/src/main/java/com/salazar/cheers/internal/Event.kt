@@ -1,12 +1,11 @@
 package com.salazar.cheers.internal
 
-import androidx.room.Entity
-
-//object PostType {
-//    const val TEXT = "TEXT"
-//    const val IMAGE = "IMAGE"
-//    const val VIDEO = "VIDEO"
-//}
+object EventType {
+    const val PRIVATE = "PRIVATE"
+    const val PUBLIC = "PUBLIC"
+    const val FRIENDS = "FRIENDS"
+    const val GROUP = "GROUP"
+}
 
 data class Event(
     val id: String = "",
@@ -14,16 +13,19 @@ data class Event(
     val description: String = "",
     val startDate: String = "",
     val endDate: String = "",
-    val duration: Long,
     val createdTime: String = "",
-    val hosts: List<User> = emptyList(),
+    val host: String = "",
+    val participants: List<String> = emptyList(),
     val showOnMap: Boolean = false,
-    val photoUrl: String = "",
-    val location: Location,
-)
-
-data class Location(
-    val name: String = "",
+    val imageUrl: String = "",
+    val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
+    val type: String = EventType.PUBLIC,
+)
+
+data class EventUi(
+    val event: Event,
+    val host: User,
+    val participants: List<User>,
 )

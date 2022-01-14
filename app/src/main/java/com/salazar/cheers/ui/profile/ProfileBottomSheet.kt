@@ -30,6 +30,7 @@ fun ProfileBottomSheet(
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+        sheetElevation = 0.dp,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetContent = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

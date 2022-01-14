@@ -4,29 +4,69 @@ import android.app.Application
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.workers.UploadEventWorker
 import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
+
+
+
+data class AddEventUiState(
+    val isLoading: Boolean,
+    val errorMessage: String? = null,
+    val name: String = "",
+    val participants: List<String> = emptyList(),
+    val startDate: String = "Start date",
+    val startTime: String = "Start time",
+    val endDate: String = "End date",
+    val endTime: String = "End time",
+    val imageUri: Uri? = null,
+    val description: String = "",
+    val allDay: Boolean = false,
+    val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    val selectedPrivacy: PrivacyItem = PrivacyItem("Privacy", "Choose a privacy", Icons.Filled.Lock, "NONE"),
+)
+
+data class PrivacyItem(
+    val title: String,
+    val subtitle: String,
+    val icon: ImageVector,
+    val type: String,
+)
 
 @HiltViewModel
 class AddEventViewModel @Inject constructor(application: Application) : ViewModel() {
 
     private val workManager = WorkManager.getInstance(application)
 
+    private val viewModelState = MutableStateFlow(AddEventUiState(isLoading = false))
+
+    val uiState = viewModelState
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            viewModelState.value
+        )
+
     val caption = mutableStateOf("")
 
     val postType = mutableStateOf(PostType.TEXT)
-    val mediaUri = mutableStateOf<Uri?>(null)
 
     val videoThumbnail = mutableStateOf<Uri?>(null)
 
@@ -36,8 +76,55 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
     val selectedTagUsers = mutableStateListOf<User>()
     val showOnMap = mutableStateOf(true)
 
+    fun selectPrivacy(privacy: PrivacyItem) {
+        viewModelState.update {
+            it.copy(selectedPrivacy = privacy)
+        }
+    }
+
+    fun onAllDayChange(allDay: Boolean) {
+        viewModelState.update {
+            it.copy(allDay = allDay)
+        }
+    }
+
+    fun onDescriptionChange(description: String) {
+        viewModelState.update {
+            it.copy(description = description)
+        }
+    }
+
     fun onShowOnMapChanged(showOnMap: Boolean) {
         this.showOnMap.value = showOnMap
+    }
+
+    fun onEndTimeChange(endTime: String) {
+        viewModelState.update {
+            it.copy(endTime = endTime)
+        }
+    }
+    fun onEndDateChange(endDate: String) {
+        viewModelState.update {
+            it.copy(endDate = endDate)
+        }
+    }
+
+    fun onStartTimeChange(startTime: String) {
+        viewModelState.update {
+            it.copy(startTime = startTime)
+        }
+    }
+
+    fun onStartDateChange(startDate: String) {
+        viewModelState.update {
+            it.copy(startDate = startDate)
+        }
+    }
+
+    fun onEventNameChange(eventName: String) {
+        viewModelState.update {
+            it.copy(name = eventName)
+        }
     }
 
     fun selectTagUser(user: User) {
@@ -63,35 +150,32 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
         this.caption.value = caption
     }
 
-    fun setPostImage(image: Uri) {
-        mediaUri.value = image
-        postType.value = PostType.IMAGE
-    }
-
-    fun setPostVideo(video: Uri) {
-        mediaUri.value = video
-        postType.value = PostType.VIDEO
-//        videoThumbnail.value = ;
-        ThumbnailUtils.createVideoThumbnail(video.path!!, MediaStore.Images.Thumbnails.MINI_KIND)
+    fun setImage(imageUri: Uri) {
+        viewModelState.update {
+            it.copy(imageUri = imageUri)
+        }
     }
 
     var uploadWorkerState: Flow<WorkInfo>? = null
     val id = mutableStateOf<UUID?>(null)
 
-    fun uploadPost() {
+    fun uploadEvent() {
+        val state = viewModelState.value
+
         val uploadWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadPostWorker>().apply {
+            OneTimeWorkRequestBuilder<UploadEventWorker>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(
                     workDataOf(
-                        "MEDIA_URI" to mediaUri.value.toString(),
-                        "POST_TYPE" to postType.value,
-                        "PHOTO_CAPTION" to caption.value,
+                        "NAME" to state.name,
+                        "DESCRIPTION" to state.description,
                         "LOCATION_NAME" to selectedLocation.value?.name,
                         "LOCATION_LATITUDE" to selectedLocation.value?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to selectedLocation.value?.coordinate?.longitude(),
-                        "TAG_USER_IDS" to selectedTagUsers.map { it.id }.toTypedArray(),
+                        "PARTICIPANTS" to state.participants.toTypedArray(),
                         "SHOW_ON_MAP" to showOnMap.value,
+                        "EVENT_TYPE" to state.selectedPrivacy.type,
+                        "IMAGE_URI" to state.imageUri.toString(),
                     )
                 )
             }
@@ -109,14 +193,4 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
     fun updateLocation(location: String) {
         this.location.value = location
     }
-
-//    fun addPost(post: Post) {
-//        viewModelScope.launch {
-//            try {
-//                Neo4jUtil.addPost(post)
-//            } catch(e: Exception) {
-//                Log.e("HomeViewModel", e.toString())
-//            }
-//        }
-//    }
 }

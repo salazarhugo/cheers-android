@@ -6,6 +6,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
+import com.salazar.cheers.service.MyFirebaseMessagingService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -63,6 +65,18 @@ class SignInViewModel @Inject constructor(
         if (email.isBlank() || password.isBlank())
             return false
         return true
+    }
+
+    fun getAndSaveRegistrationToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            // Get new FCM registration token
+            val token = task.result
+            MyFirebaseMessagingService.addTokenToFirestore(token)
+        }
     }
 
     fun signInWithEmailPassword() {

@@ -62,6 +62,8 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string name="snap_oauth_client_id">0116b79f-8299-4398-9247-568e4fd71cee</string>
-    <string name="snap_redirect_url">https://cheers.app/hugolsalazar</string>
+    <string name="snap_oauth_client_id">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
+    <string name="snap_oauth_client_id_staging">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
+
+    <string name="snap_redirect_url">cheers://snap-kit/oauth2</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.salazar.cheers
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -8,20 +7,29 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.systemBarsPadding
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -32,20 +40,27 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.ui.signin.ChooseUsernameState
+import com.salazar.cheers.ui.signin.SignInViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
+import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.clearTask
+import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.newTask
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class PhoneAuthActivity : AppCompatActivity() {
 
+    private val signInViewModel: SignInViewModel by viewModels()
     private val viewModel: PhoneAuthViewModel by viewModels()
 
     private lateinit var auth: FirebaseAuth
-
-    private var storedVerificationId: String? = ""
-    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +68,6 @@ class PhoneAuthActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        initCallback()
         setContent {
             CheersTheme {
                 Surface(
@@ -71,34 +85,111 @@ class PhoneAuthActivity : AppCompatActivity() {
     @Composable
     fun PhoneAuthScreen() {
         val uiState = viewModel.uiState.collectAsState().value
-        val phoneNumber = uiState.phoneNumber
+        initCallback(uiState)
+        Tabs(uiState)
+    }
 
+    @Composable
+    fun PhoneNumberScreen(uiState: PhoneAuthViewModelState) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            OutlinedTextField(
-                value = phoneNumber,
-                onValueChange = { viewModel.onPhoneNumberChange(it) },
-                label = { Text("Phone number") },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone
-                )
-            )
-            VerificationCodeTextField(uiState = uiState)
-            SendVerificationCodeButton(phoneNumber = phoneNumber)
-            NextButton()
+            PhoneNumberInput(uiState = uiState)
+            Spacer(Modifier.height(16.dp))
+            SendVerificationCodeButton(uiState = uiState)
         }
     }
 
     @Composable
-    fun VerificationCodeTextField(uiState: PhoneAuthViewModelState) {
+    fun VerificationCodeScreen(uiState: PhoneAuthViewModelState) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            VerificationCodeInput(uiState = uiState)
+        }
+    }
+
+    @Composable
+    fun Tabs(uiState: PhoneAuthViewModelState) {
+        val tabs = 2
+        val pagerState = uiState.pagerState
+
+        Column(modifier = Modifier.fillMaxSize()){
+            HorizontalPager(
+                count = tabs,
+                state = pagerState,
+                modifier = Modifier.height(300.dp)
+            ) { page ->
+                Column(
+                    modifier = Modifier.fillMaxHeight().padding(22.dp),
+                ) {
+                    when (page) {
+                        0 -> PhoneNumberScreen(uiState = uiState)
+                        1 -> VerificationCodeScreen(uiState = uiState)
+                    }
+                }
+            }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(16.dp),
+            )
+            VerifyButton(uiState = uiState)
+        }
+    }
+
+    @Composable
+    fun ChooseUsernameScreen(uiState: PhoneAuthViewModelState) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(32.dp),
+        ) {
+            Text("Choose username", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(8.dp))
+            Text("You can't change it later")
+            Spacer(Modifier.height(36.dp))
+//            UsernameTextField(uiState)
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+
+    @Composable
+    fun PhoneNumberInput(uiState: PhoneAuthViewModelState) {
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.phoneNumber,
+            onValueChange = { viewModel.onPhoneNumberChange(it) },
+            label = { Text("Phone number") },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Phone
+            ),
+            enabled = !uiState.isLoading
+        )
+    }
+
+    @Composable
+    fun VerificationCodeInput(uiState: PhoneAuthViewModelState) {
         val verificationCode = uiState.verificationCode
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Verification code") },
             singleLine = true,
             value = verificationCode,
             onValueChange = { viewModel.onVerificationCodeChange(it) },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
@@ -107,7 +198,7 @@ class PhoneAuthActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun NextButton() {
+    fun VerifyButton(uiState: PhoneAuthViewModelState) {
         Column(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Bottom,
@@ -115,37 +206,40 @@ class PhoneAuthActivity : AppCompatActivity() {
             DividerM3()
             Button(
                 onClick = {
-                      verifyPhoneNumberWithCode(storedVerificationId, viewModel.uiState.value.phoneNumber)
+                      verifyPhoneNumberWithCode(uiState.verificationId, uiState.verificationCode)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
                 shape = RoundedCornerShape(8.dp),
+                enabled = uiState.verificationCode.isNotBlank()
             ) {
-                Text("Next")
+                Text("Verify")
             }
         }
     }
 
     @Composable
-    fun SendVerificationCodeButton(phoneNumber: String) {
-        Column(
-//            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.Bottom,
-        ) {
+    fun SendVerificationCodeButton(uiState: PhoneAuthViewModelState) {
+        Column {
             Button(
-                onClick = { startPhoneNumberVerification(phoneNumber = phoneNumber) },
+                onClick = {
+                    startPhoneNumberVerification(phoneNumber = uiState.phoneNumber)
+                    viewModel.isLoadingChange(true)
+                          },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
             ) {
-                Text("Send verification code")
+                if (uiState.isLoading)
+                    CircularProgressIndicatorM3()
+                else
+                    Text("Send verification code")
             }
         }
     }
 
-    private fun initCallback() {
+    private fun initCallback(uiState: PhoneAuthViewModelState) {
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
@@ -166,9 +260,7 @@ class PhoneAuthActivity : AppCompatActivity() {
                 token: PhoneAuthProvider.ForceResendingToken
             ) {
                 Log.d(TAG, "onCodeSent:$verificationId")
-
-                storedVerificationId = verificationId
-                resendToken = token
+                viewModel.onCodeSent(verificationId = verificationId, token)
             }
         }
     }
@@ -192,6 +284,7 @@ class PhoneAuthActivity : AppCompatActivity() {
 
     private fun verifyPhoneNumberWithCode(verificationId: String?, code: String) {
         val credential = PhoneAuthProvider.getCredential(verificationId!!, code)
+        signInWithPhoneAuthCredential(credential)
     }
 
     private fun resendVerificationCode(
@@ -216,6 +309,7 @@ class PhoneAuthActivity : AppCompatActivity() {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success")
                         val user = task.result?.user
+                        signInSuccessful()
                     } else {
                         // Sign in failed, display a message and update the UI
                         Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -227,6 +321,19 @@ class PhoneAuthActivity : AppCompatActivity() {
                 }
     }
 
+    private fun signInSuccessful(acct: GoogleSignInAccount? = null) {
+        FirestoreUtil.checkIfUserExists { exists ->
+            if (exists) {
+                startActivity(intentFor<MainActivity>().newTask().clearTask())
+                signInViewModel.getAndSaveRegistrationToken()
+            } else {
+                FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = UUID.randomUUID().toString()) {
+                    startActivity(intentFor<MainActivity>().newTask().clearTask())
+                    signInViewModel.getAndSaveRegistrationToken()
+                }
+            }
+        }
+    }
     private fun updateUI(user: FirebaseUser? = auth.currentUser) {
 
     }

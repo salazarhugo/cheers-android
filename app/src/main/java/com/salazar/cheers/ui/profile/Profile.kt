@@ -343,7 +343,7 @@ class ProfileFragment : Fragment() {
                             uiState.sheetState.show()
                         }
                     }) {
-                        Icon(Icons.Rounded.Menu, "")
+                        Icon(painter = painterResource(id = R.drawable.ic_more_vert_icon), "")
                     }
                 },
             )

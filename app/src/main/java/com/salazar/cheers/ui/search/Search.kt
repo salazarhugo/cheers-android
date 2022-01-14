@@ -37,6 +37,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
+import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
@@ -143,7 +145,13 @@ class SearchFragment : Fragment() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = rememberImagePainter(data = user.profilePicturePath),
+                    painter = rememberImagePainter(
+                        data = user.profilePictureUrl,
+                        builder = {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        },
+                    ),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(54.dp)
@@ -184,7 +192,13 @@ class SearchFragment : Fragment() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = rememberImagePainter(data = user.profilePictureUrl),
+                    painter = rememberImagePainter(
+                        data = user.profilePictureUrl,
+                        builder = {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        },
+                    ),
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .size(54.dp)

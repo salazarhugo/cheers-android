@@ -1,7 +1,9 @@
 package com.salazar.cheers.ui.event
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,24 +12,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -45,9 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
@@ -61,24 +60,23 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.internal.EventType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.util.*
 
 
 @AndroidEntryPoint
 class AddEventFragment : DialogFragment() {
 
-//    private val args: AddEventFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by viewModels()
     private val viewModel: AddEventViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -148,32 +146,40 @@ class AddEventFragment : DialogFragment() {
 
     @Composable
     fun AddEventScreen() {
-        val user = mainViewModel.user2.value
-
-        Scaffold(
-            topBar = { TopAppBar() },
-        ) {
-            Tabs()
+//        val user = mainViewModel.user2.value
+        val uiState = viewModel.uiState.collectAsState().value
+        PrivacyBottomSheet(uiState = uiState) {
+            Scaffold(
+                topBar = { TopAppBar() },
+            ) {
+                Tabs(uiState = uiState)
+            }
         }
     }
 
     @Composable
-    fun Tabs() {
+    fun Tabs(uiState: AddEventUiState) {
         val tabs = 4
         val pagerState = rememberPagerState()
 
-        Column(modifier = Modifier.fillMaxSize()){
+        Column(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(
                 count = tabs,
                 state = pagerState,
-                modifier = Modifier.height(500.dp)
+                modifier = Modifier.height(600.dp)
             ) { page ->
                 Column(modifier = Modifier.fillMaxHeight()) {
                     when (page) {
-                        0 -> FirstScreen()
-                        1 -> { Text("1 wd")}
-                        2 -> { Text("2 wd")}
-                        3 -> { Text("3 wd")}
+                        0 -> FirstScreen(uiState = uiState)
+                        1 -> {
+                            Text("1 wd")
+                        }
+                        2 -> {
+                            Text("2 wd")
+                        }
+                        3 -> {
+                            Text("3 wd")
+                        }
                     }
                 }
             }
@@ -188,24 +194,333 @@ class AddEventFragment : DialogFragment() {
     }
 
     @Composable
-    fun FirstScreen() {
-        Column() {
-            AddPhotoOrVideo()
-//            CaptionSection(user = user)
+    fun FirstScreen(uiState: AddEventUiState) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AddPhotoOrVideo(uiState = uiState)
+            NameTextField(uiState = uiState)
+            DividerM3()
+            StartDateInput(uiState = uiState)
             DividerM3()
             TagSection()
             DividerM3()
-            if (viewModel.selectedLocation.value != null)
-                SelectedLocation(location = viewModel.selectedLocation.value!!)
-            else
-                LocationSection()
+            LocationSection()
             DividerM3()
-            LocationResultsSection(results = viewModel.locationResults.value)
-            SwitchPreference(text = "Show on map") { viewModel.onShowOnMapChanged(it) }
+            Description(uiState = uiState)
             DividerM3()
-            SwitchPreference(text = "Allow repost") {}
+            Privacy(uiState = uiState)
         }
     }
+
+    @Composable
+    fun Privacy(uiState: AddEventUiState) {
+        val scope = rememberCoroutineScope()
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clickable {
+                    scope.launch {
+                        uiState.privacyState.show()
+                    }
+                },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val privacy = uiState.selectedPrivacy
+                Icon(privacy.icon, null)
+                Column(modifier = Modifier.padding(start = 16.dp)) {
+                    Text(privacy.title)
+                    Text(privacy.subtitle)
+                }
+            }
+            Icon(Icons.Filled.KeyboardArrowRight, null)
+        }
+    }
+
+    @Composable
+    fun PrivacyBottomSheet(uiState: AddEventUiState, content: @Composable () -> Unit) {
+        val state = uiState.privacyState
+        ModalBottomSheetLayout(
+            sheetElevation = 0.dp,
+            sheetState = state,
+            sheetBackgroundColor = MaterialTheme.colorScheme.background,
+            sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+            sheetContent = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                        .fillMaxSize(),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .width(36.dp)
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.outline)
+                    )
+                    Text(
+                        "Event privacy",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                    DividerM3()
+                    Text(
+                        "Choose who can see and join this event. You'll be able to invite people later.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    )
+                    val items = listOf(
+                        PrivacyItem(
+                            icon = Icons.Filled.Lock,
+                            title = "Private",
+                            subtitle = "Only people who are invited",
+                            type = EventType.PRIVATE
+                        ),
+                        PrivacyItem(
+                            icon = Icons.Filled.Public,
+                            title = "Public",
+                            subtitle = "Anyone on Cheers",
+                            type = EventType.PUBLIC
+                        ),
+                        PrivacyItem(
+                            icon = Icons.Filled.People,
+                            title = "Friends",
+                            subtitle = "Your friends on Cheers",
+                            type = EventType.FRIENDS
+                        ),
+                        PrivacyItem(
+                            icon = Icons.Filled.Groups,
+                            title = "Group",
+                            subtitle = "Members of a group that you're in",
+                            type = EventType.GROUP
+                        ),
+                    )
+                    items.forEach { Item(it, it == uiState.selectedPrivacy) }
+
+                    val scope = rememberCoroutineScope()
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                uiState.privacyState.hide()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                    ) {
+                        Text("Done")
+                    }
+                }
+            }
+        ) {
+            content()
+        }
+    }
+
+    @Composable
+    fun Item(
+        item: PrivacyItem,
+        selected: Boolean,
+    ) {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    viewModel.selectPrivacy(privacy = item)
+                }
+                .padding(vertical = 12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(item.icon, null)
+                Column(modifier = Modifier.padding(start = 16.dp)) {
+                    Text(item.title)
+                    Text(item.subtitle)
+                }
+            }
+            Checkbox(
+                checked = selected,
+                onCheckedChange = {
+                    viewModel.selectPrivacy(privacy = item)
+                },
+            )
+        }
+    }
+
+    @Composable
+    fun StartDateInput(uiState: AddEventUiState) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+        calendar.time = Date()
+        viewModel.onStartDateChange("$day/$month/$year")
+        viewModel.onStartTimeChange("$hourOfDay:$minute")
+        viewModel.onEndDateChange("$day/$month/$year")
+        viewModel.onEndTimeChange("$hourOfDay:$minute")
+
+        val startDatePicker = DatePickerDialog(
+            requireContext(), { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                viewModel.onStartDateChange("$dayOfMonth/$month/$year")
+            }, year, month, day
+        )
+        val endDatePicker = DatePickerDialog(
+            requireContext(), { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                viewModel.onEndDateChange("$dayOfMonth/$month/$year")
+            }, year, month, day
+        )
+        val startTimePicker = TimePickerDialog(
+            requireContext(), { _: TimePicker, hourOfDay: Int, minute: Int ->
+                viewModel.onStartTimeChange("$hourOfDay:$minute")
+            }, hourOfDay, minute, true
+        )
+
+        val endTimePicker = TimePickerDialog(
+            requireContext(), { _: TimePicker, hourOfDay: Int, minute: Int ->
+                viewModel.onEndTimeChange("$hourOfDay:$minute")
+            }, hourOfDay, minute, true
+        )
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp)),
+        ) {
+            Row(modifier = Modifier.padding(16.dp)) {
+                Icon(Icons.Default.Schedule, null, modifier = Modifier.offset(y = 12.dp))
+                Column() {
+                    SwitchPreference(
+                        value = uiState.allDay,
+                        text = "All-day"
+                    ) { viewModel.onAllDayChange(it) }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clickable { startDatePicker.show() },
+                            text = uiState.startDate,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (!uiState.allDay)
+                            Text(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .clickable { startTimePicker.show() },
+                                text = uiState.startTime,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clickable { endDatePicker.show() },
+                            text = uiState.endDate,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (!uiState.allDay)
+                            Text(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .clickable { endTimePicker.show() },
+                                text = uiState.endTime,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun DescriptionInput(uiState: AddEventUiState) {
+        val description = uiState.description
+        val focusManager = LocalFocusManager.current
+        TextField(
+            value = description,
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp)),
+            onValueChange = {
+                viewModel.onDescriptionChange(it)
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
+            placeholder = { Text("Description") },
+            enabled = !uiState.isLoading,
+        )
+    }
+
+    @Composable
+    fun NameTextField(uiState: AddEventUiState) {
+        val eventName = uiState.name
+        val focusManager = LocalFocusManager.current
+        TextField(
+            value = eventName,
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            modifier = Modifier
+                .padding(start = 36.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp)),
+            onValueChange = {
+                viewModel.onEventNameChange(it)
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            textStyle = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
+            placeholder = { Text("Add title", style = MaterialTheme.typography.titleLarge) },
+            enabled = !uiState.isLoading,
+            trailingIcon = {
+                val photoUri = uiState.imageUri
+                if (photoUri != null) {
+                    Image(
+                        modifier = Modifier
+                            .clickable(onClick = { openPhotoVideoChooser() })
+                            .padding(horizontal = 16.dp)
+                            .size(50.dp),
+                        painter = rememberImagePainter(data = uiState.imageUri),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        )
+    }
+
     @Composable
     fun ShareButton() {
         Column(
@@ -215,7 +530,7 @@ class AddEventFragment : DialogFragment() {
             DividerM3()
             Button(
                 onClick = {
-                    viewModel.uploadPost()
+                    viewModel.uploadEvent()
                     dismiss()
                 },
                 modifier = Modifier
@@ -230,33 +545,34 @@ class AddEventFragment : DialogFragment() {
 
     @Composable
     fun SwitchPreference(
+        value: Boolean,
         text: String,
         onCheckedChange: (Boolean) -> Unit = {},
     ) {
-        val checkedState = viewModel.showOnMap
         Row(
             modifier = Modifier
-                .padding(horizontal = 15.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
+            Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp))
             SwitchM3(
-                checked = checkedState.value,
+                modifier = Modifier.background(Color.Red),
+                checked = value,
                 onCheckedChange = onCheckedChange
             )
         }
     }
 
     @Composable
-    fun AddPhotoOrVideo() {
-        if (viewModel.mediaUri.value != null)
+    fun AddPhotoOrVideo(uiState: AddEventUiState) {
+        if (uiState.imageUri != null)
             return
 
         Row(
             modifier = Modifier
-                .padding(15.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         )
@@ -271,29 +587,34 @@ class AddEventFragment : DialogFragment() {
 
     @Composable
     fun LocationSection() {
-        Row(
-            modifier = Modifier
-                .clickable {
-                    findNavController().navigate(R.id.chooseOnMap)
+        Row(modifier = Modifier.padding(16.dp)) {
+            Icon(Icons.Outlined.LocationOn, null)
+            Column() {
+                Row(
+                    modifier = Modifier
+                        .clickable {
+                            findNavController().navigate(R.id.chooseOnMap)
+                        }
+                        .padding(start = 16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Location",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(Icons.Outlined.MyLocation, null)
+                        Text(
+                            text = viewModel.location.value,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
+                        )
+                    }
                 }
-                .padding(15.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "Location",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Icon(Icons.Outlined.MyLocation, null)
-                Text(
-                    text = viewModel.location.value,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-                )
             }
         }
     }
@@ -324,7 +645,7 @@ class AddEventFragment : DialogFragment() {
                 .clickable {
                     findNavController().navigate(R.id.chooseOnMap)
                 }
-                .padding(15.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -347,50 +668,72 @@ class AddEventFragment : DialogFragment() {
     }
 
     @Composable
-    fun TagSection() {
+    fun Description(uiState: AddEventUiState) {
         Row(
-            modifier = Modifier
-                .clickable {
-                    findNavController().navigate(R.id.tagUser)
-                }
-                .padding(15.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Tag people",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-            )
-            val tagUsers = viewModel.selectedTagUsers
-            if (tagUsers.size == 1)
-                Text(text = tagUsers[0].username, style = MaterialTheme.typography.labelLarge)
-            if (tagUsers.size > 1)
-                Text(text = "${tagUsers.size} people", style = MaterialTheme.typography.labelLarge)
+            Icon(Icons.Outlined.Description, null)
+            DescriptionInput(uiState = uiState)
         }
     }
 
     @Composable
-    fun CaptionSection(user: User) {
+    fun TagSection() {
+        Row(modifier = Modifier.padding(16.dp)) {
+            Icon(Icons.Outlined.People, null)
+            Column() {
+                Row(
+                    modifier = Modifier
+                        .clickable {
+                            findNavController().navigate(R.id.tagUser)
+                        }
+                        .padding(horizontal = 15.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Add people",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+                    )
+                    val tagUsers = viewModel.selectedTagUsers
+                    if (tagUsers.size == 1)
+                        Text(
+                            text = tagUsers[0].username,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    if (tagUsers.size > 1)
+                        Text(
+                            text = "${tagUsers.size} people",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun CaptionSection(user: User, uiState: AddEventUiState) {
         Row(
             modifier = Modifier
                 .padding(start = 15.dp, end = 15.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val videoUri = viewModel.mediaUri.value
+//            val videoUri = uiState..value
 
-            if (videoUri != null && viewModel.postType.value == PostType.VIDEO)
-                VideoPlayer(
-                    uri = videoUri,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .height(120.dp)
-                        .aspectRatio(9f / 16f)
-                )
-            else
-                ProfilePicture(user)
+//            if (videoUri != null && viewModel.postType.value == PostType.VIDEO)
+//                VideoPlayer(
+//                    uri = videoUri,
+//                    modifier = Modifier
+//                        .padding(bottom = 8.dp)
+//                        .clip(RoundedCornerShape(8.dp))
+//                        .height(120.dp)
+//                        .aspectRatio(9f / 16f)
+//                )
+//            else
+            ProfilePicture(user)
             val caption = viewModel.caption
 
             TextField(
@@ -416,24 +759,20 @@ class AddEventFragment : DialogFragment() {
                     Text(text = "Write a caption...", fontSize = 13.sp)
                 },
                 trailingIcon = {
-                    val photoUri = viewModel.mediaUri.value
+                    val photoUri = uiState.imageUri
                     if (photoUri != null) {
                         Image(
                             modifier = Modifier
                                 .clickable(onClick = { openPhotoVideoChooser() })
                                 .padding(horizontal = 16.dp)
                                 .size(50.dp),
-                            painter = rememberImagePainter(data = viewModel.mediaUri.value),
+                            painter = rememberImagePainter(data = uiState.imageUri),
                             contentDescription = null,
                             contentScale = ContentScale.Crop
                         )
                     }
                 }
-//                keyboardActions = KeyboardActions(onSearch = {
-//                    focusManager.clearFocus()
-//                })
             )
-
         }
     }
 
@@ -448,10 +787,8 @@ class AddEventFragment : DialogFragment() {
                 val imageOrVideoUri: Uri = data?.data ?: return@registerForActivityResult
 
                 val type = data.resolveType(requireContext()) ?: ""
-                if (type.startsWith("image")) {
-                    viewModel.setPostImage(imageOrVideoUri)
-                } else if (type.startsWith("video"))
-                    viewModel.setPostVideo(imageOrVideoUri)
+                if (type.startsWith("image"))
+                    viewModel.setImage(imageOrVideoUri)
             }
         }
 
@@ -492,9 +829,9 @@ class AddEventFragment : DialogFragment() {
         DisposableEffect(
             AndroidView(
                 factory = {
-                  PlayerView(context).apply {
-                      this.player = player
-                  }
+                    PlayerView(context).apply {
+                        this.player = player
+                    }
                 },
                 modifier = modifier
             ) {

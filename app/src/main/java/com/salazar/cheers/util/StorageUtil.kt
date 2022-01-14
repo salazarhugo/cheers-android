@@ -86,4 +86,17 @@ object StorageUtil {
         }
     }
 
+    fun uploadEventImage(
+        imageBytes: ByteArray,
+        onSuccess: (downloadUrl: String) -> Unit,
+    ) {
+        val ref = currentUserRef.child("events/${UUID.randomUUID()}")
+        ref.putBytes(imageBytes)
+            .continueWithTask {
+                ref.downloadUrl
+            }
+            .addOnSuccessListener { downloadUri ->
+                onSuccess(downloadUri.toString())
+            }
+    }
 }

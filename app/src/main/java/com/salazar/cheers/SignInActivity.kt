@@ -7,8 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -37,15 +39,19 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
+
         setContent {
             CheersTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
+//                    Button(onClick = { signInWithSnapchat()}) {
+//                       Text("SNAP")
+//                    }
                     AndroidViewBinding(ContentSignInBinding::inflate)
                 }
             }
         }
-//        signInWithSnapchat()
 //        checkGithubCallback()
+        signInWithSnapchat()
     }
 
     private fun signInWithSnapchat() {

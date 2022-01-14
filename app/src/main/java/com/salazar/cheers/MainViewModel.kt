@@ -1,5 +1,6 @@
 package com.salazar.cheers
 
+import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.MutableState
@@ -21,9 +22,14 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
     val unreadMessages = mutableStateOf(0)
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    var selectedPostId = mutableStateOf("")
 
     init {
         refreshUser()
+    }
+
+    fun selectPost(postId: String) {
+        selectedPostId.value = postId
     }
 
     private fun refreshUser() {
@@ -37,5 +43,15 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun onNewMessage() {
         unreadMessages.value += 1
+    }
+
+    fun deletePost() {
+        viewModelScope.launch {
+            try {
+                Neo4jUtil.deletePost(postId = selectedPostId.value)
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", e.toString())
+            }
+        }
     }
 }

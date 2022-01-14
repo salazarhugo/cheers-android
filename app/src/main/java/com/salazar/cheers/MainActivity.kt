@@ -100,19 +100,6 @@ class MainActivity : AppCompatActivity() {
         setupDynamicLinks()
     }
 
-    private fun getBitmojiAvatar() {
-        Bitmoji.fetchAvatarUrl(this, object : FetchAvatarUrlCallback {
-            override fun onSuccess(@Nullable avatarUrl: String?) {
-                if (avatarUrl != null)
-                    toast(avatarUrl)
-            }
-
-            override fun onFailure(isNetworkError: Boolean, statusCode: Int) {
-                toast(statusCode.toString())
-            }
-        })
-    }
-
     private fun setupDynamicLinks() {
         Firebase.dynamicLinks
             .getDynamicLink(intent)
@@ -143,12 +130,7 @@ class MainActivity : AppCompatActivity() {
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
         Scaffold(
-            bottomBar = {
-                Column {
-                    DividerM3()
-                    BottomBar(bottomSheetState)
-                }
-            },
+            bottomBar = { BottomBar(bottomSheetState) },
         ) { innerPadding ->
             Box(
                 modifier = Modifier
@@ -160,7 +142,9 @@ class MainActivity : AppCompatActivity() {
 //        ChangeProfileBottomSheet(bottomSheetState)
         PostBottomSheet(
             sheetState = mainViewModel.sheetState,
-            onDelete = {},
+            onDelete = {
+                       mainViewModel.deletePost()
+            },
         ) {
         }
     }
@@ -175,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         val items = listOf(
             Fragment(R.id.homeFragment, { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground)}, {Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground)}, "Home"),
             Fragment(R.id.mapFragment, { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(Icons.Filled.Place, null, tint = MaterialTheme.colorScheme.onBackground)}, "Map"),
-            Fragment(R.id.searchFragment, { Icon(Icons.Outlined.Search, null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onBackground)}, "Search"),
+            Fragment(R.id.searchFragment, { Icon(painter = rememberImagePainter(R.drawable.ic_search_icon), null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(painter = rememberImagePainter(R.drawable.ic_search_icon_full), null, tint = MaterialTheme.colorScheme.onBackground)}, "Search"),
             Fragment( R.id.messagesFragment, { Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground) }, "Messages"),
         )
 

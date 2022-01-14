@@ -14,6 +14,7 @@ import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Neo4jRepository
+import com.salazar.cheers.internal.EventUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,6 +28,7 @@ sealed interface HomeUiState {
     val suggestions: List<SuggestionUser>?
     val postSheetState: ModalBottomSheetState
     val nativeAd: NativeAd?
+    val selectedTab: Int
 
     data class NoPosts(
         override val suggestions: List<SuggestionUser>?,
@@ -35,10 +37,12 @@ sealed interface HomeUiState {
         override val searchInput: String,
         override val postSheetState: ModalBottomSheetState,
         override val nativeAd: NativeAd?,
+        override val selectedTab: Int,
     ) : HomeUiState
 
     data class HasPosts(
         val postsFlow: Flow<PagingData<Post>>,
+        val eventsFlow: Flow<PagingData<EventUi>>,
         val listState: LazyListState = LazyListState(),
         val favorites: Set<String>,
         override val postSheetState: ModalBottomSheetState,
@@ -47,11 +51,13 @@ sealed interface HomeUiState {
         override val errorMessages: List<String>,
         override val searchInput: String,
         override val nativeAd: NativeAd?,
+        override val selectedTab: Int,
     ) : HomeUiState
 }
 
 private data class HomeViewModelState(
     val postsFlow: Flow<PagingData<Post>>? = null,
+    val eventsFlow: Flow<PagingData<EventUi>>? = null,
     val listState: LazyListState = LazyListState(),
     val suggestions: List<SuggestionUser>? = null,
     val favorites: Set<String> = emptySet(),
@@ -60,9 +66,10 @@ private data class HomeViewModelState(
     val searchInput: String = "",
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     val nativeAd: NativeAd? = null,
+    val selectedTab: Int = 0,
 ) {
     fun toUiState(): HomeUiState =
-        if (postsFlow == null) {
+        if (postsFlow == null || eventsFlow == null) {
             HomeUiState.NoPosts(
                 nativeAd = nativeAd,
                 postSheetState = sheetState,
@@ -70,11 +77,13 @@ private data class HomeViewModelState(
                 errorMessages = errorMessages,
                 searchInput = searchInput,
                 suggestions = suggestions,
+                selectedTab = selectedTab,
             )
         } else {
             HomeUiState.HasPosts(
                 nativeAd = nativeAd,
                 postsFlow = postsFlow,
+                eventsFlow = eventsFlow,
                 listState = listState,
                 postSheetState = sheetState,
                 favorites = favorites,
@@ -82,6 +91,7 @@ private data class HomeViewModelState(
                 errorMessages = errorMessages,
                 searchInput = searchInput,
                 suggestions = suggestions,
+                selectedTab = selectedTab,
             )
         }
 }
@@ -103,7 +113,21 @@ class HomeViewModel @Inject constructor(
 
     init {
         refreshPostsFlow()
+        refreshEventsFlow()
         refreshSuggestions()
+    }
+
+    fun selectTab(index: Int) {
+        viewModelState.update {
+            it.copy(selectedTab = index)
+        }
+    }
+
+    fun refreshEventsFlow() {
+        viewModelState.update { it.copy(isLoading = true) }
+        viewModelState.update {
+            it.copy(eventsFlow = repository.getEvents(), isLoading = false)
+        }
     }
 
     fun refreshPostsFlow() {

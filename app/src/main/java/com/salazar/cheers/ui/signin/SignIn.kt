@@ -51,12 +51,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.PhoneAuthActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
-import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask
@@ -97,7 +95,6 @@ class SignInFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun SignInScreen() {
 
@@ -147,43 +144,30 @@ class SignInFragment : Fragment() {
                     Spacer(modifier = Modifier.height(16.dp))
                     FacebookButton { }
                     Spacer(modifier = Modifier.height(16.dp))
-//                    Button(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(50.dp),
-//                        onClick = {
-//                            val action =
-//                                SignInFragmentDirections.actionSignInFragmentToEmailPasswordFragment()
-//                            findNavController().navigate(action)
-//                        },
-//                        shape = RoundedCornerShape(4.dp),
-//                        colors = ButtonDefaults.buttonColors(
-//                            containerColor = Color(0xFFF32B2B),
-//                        )
-//                    ) {
-//                        Icon(Icons.Default.Email, "", tint = Color.White)
-//                        Spacer(Modifier.width(12.dp))
-//                        Text("Sign in with Email", color = Color.White)
-//                    }
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        onClick = {
-                              startActivity<PhoneAuthActivity>()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF27F34E),
-                        ),
-                        shape = RoundedCornerShape(4.dp),
-                    ) {
-                        Icon(Icons.Default.Phone, "", tint = Color.White)
-                        Spacer(Modifier.width(12.dp))
-                        Text("Sign in with Phone", color = Color.White)
-                    }
+                    PhoneButton()
                 }
                 Footer()
             }
+        }
+    }
+
+    @Composable
+    fun PhoneButton() {
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            onClick = {
+                startActivity<PhoneAuthActivity>()
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF27814E),
+            ),
+            shape = RoundedCornerShape(4.dp),
+        ) {
+            Icon(Icons.Default.Phone, "", tint = Color.White)
+            Spacer(Modifier.width(12.dp))
+            Text("Sign in with Phone", color = Color.White)
         }
     }
 
@@ -342,13 +326,11 @@ class SignInFragment : Fragment() {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     private fun signInWithGoogle() {
         val signInIntent = mGoogleSignInClient.signInIntent
         startForResult.launch(signInIntent)
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     private val startForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -388,20 +370,20 @@ class SignInFragment : Fragment() {
 
     private fun signIn() {
         startActivity(intentFor<MainActivity>().newTask().clearTask())
-        getAndSaveRegistrationToken()
+        viewModel.getAndSaveRegistrationToken()
     }
 
     private fun signInSuccessful(acct: GoogleSignInAccount? = null) {
         FirestoreUtil.checkIfUserExists { exists ->
             if (exists) {
                 startActivity(intentFor<MainActivity>().newTask().clearTask())
-                getAndSaveRegistrationToken()
+                viewModel.getAndSaveRegistrationToken()
             } else {
                 val username = args.username
                 if (username != null)
                     FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = username) {
                         startActivity(intentFor<MainActivity>().newTask().clearTask())
-                        getAndSaveRegistrationToken()
+                        viewModel.getAndSaveRegistrationToken()
                     }
                 else {
                     val action =
@@ -411,18 +393,6 @@ class SignInFragment : Fragment() {
                     findNavController().navigate(action)
                 }
             }
-        }
-    }
-
-    private fun getAndSaveRegistrationToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            // Get new FCM registration token
-            val token = task.result
-            MyFirebaseMessagingService.addTokenToFirestore(token)
         }
     }
 }

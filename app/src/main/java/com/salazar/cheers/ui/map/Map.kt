@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.annotation.Nullable
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -57,10 +59,14 @@ import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import com.salazar.cheers.util.Utils.convertDrawableToBitmap
 import com.salazar.cheers.util.Utils.getCircledBitmap
+import com.snapchat.kit.sdk.Bitmoji
+import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.toast
 import java.net.URL
 
 
@@ -130,7 +136,19 @@ class MapFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    private fun getBitmojiAvatar(onSuccess: (String) -> Unit) {
+        Bitmoji.fetchAvatarUrl(requireContext(), object : FetchAvatarUrlCallback {
+            override fun onSuccess(@Nullable avatarUrl: String?) {
+                if (avatarUrl != null)
+                    onSuccess(avatarUrl)
+            }
+
+            override fun onFailure(isNetworkError: Boolean, statusCode: Int) {
+                toast(statusCode.toString())
+            }
+        })
+    }
+
     @Composable
     fun MapScreen() {
         Scaffold(
@@ -207,31 +225,30 @@ class MapFragment : Fragment() {
     }
 
     private fun initLocationComponent() {
+
         val locationComponentPlugin = mapView.location
         locationComponentPlugin.updateSettings {
             this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                bearingImage = AppCompatResources.getDrawable(
-                    requireContext(),
-                    R.drawable.mapbox_user_puck_icon,
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    requireContext(),
-                    R.drawable.mapbox_user_icon_shadow,
-                ),
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
+            getBitmojiAvatar {
+                Log.d("BITMOJI", it)
+                val bitmap = getBitmapFromUrl(it)
+                this.locationPuck = LocationPuck2D(
+                    bearingImage = bitmap.toDrawable(resources),
+                    shadowImage = bitmap.toDrawable(resources),
+                    scaleExpression = interpolate {
+                        linear()
+                        zoom()
+                        stop {
+                            literal(0.0)
+                            literal(0.6)
+                        }
+                        stop {
+                            literal(20.0)
+                            literal(1.0)
+                        }
+                    }.toJson()
+                )
+            }
         }
         locationComponentPlugin.addOnIndicatorPositionChangedListener(
             onIndicatorPositionChangedListener
@@ -239,7 +256,7 @@ class MapFragment : Fragment() {
     }
 
     private suspend fun addPostToMap(post: Post) = withContext(Dispatchers.IO) {
-            val postPhoto = getBitmapFromUrl(post)
+            val postPhoto = getBitmapFromUrl(post.photoUrl)
 
             val annotationApi = mapView.annotations
             val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
@@ -251,8 +268,8 @@ class MapFragment : Fragment() {
             pointAnnotationManager.addClickListener(onPostAnnotationClick(post))
         }
 
-    private fun getBitmapFromUrl(post: Post): Bitmap {
-        val urlObj = URL(post.photoUrl)
+    private fun getBitmapFromUrl(url: String): Bitmap {
+        val urlObj = URL(url)
         return BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
             .getCircledBitmap()
     }

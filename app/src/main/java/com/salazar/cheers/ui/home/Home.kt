@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -27,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -46,14 +50,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
 import androidx.work.WorkManager
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerScope
-import com.google.accompanist.pager.calculateCurrentOffsetForPage
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.exoplayer2.C
@@ -70,10 +72,7 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.internal.SuggestionUser
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.add.AddPostDialogViewModel
 import com.salazar.cheers.ui.theme.Typography
 import dagger.hilt.android.AndroidEntryPoint
@@ -107,6 +106,7 @@ class HomeFragment : Fragment() {
                     onRefresh = {
                         viewModel.refreshSuggestions()
                         viewModel.refreshPostsFlow()
+                        viewModel.refreshEventsFlow()
                     },
                 ) {
                     HomeScreen()
@@ -151,7 +151,8 @@ class HomeFragment : Fragment() {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-                Text(ad.headline)
+                if (ad.headline != null)
+                    Text(ad.headline, style = MaterialTheme.typography.bodyMedium)
                 Spacer(Modifier.width(12.dp))
                 Surface(
                     shape = RoundedCornerShape(12.dp),
@@ -213,7 +214,8 @@ class HomeFragment : Fragment() {
             Scaffold(
                 topBar = {
                     Column {
-                        MyAppBar()
+                        MyAppBar(uiState)
+                        TopTabs(uiState = uiState)
                         if (showDivider)
                             DividerM3()
                     }
@@ -236,6 +238,7 @@ class HomeFragment : Fragment() {
                             toState = state
                         },
                         onFabItemClicked = {
+                            toState = MultiFabState.COLLAPSED
                             if (it.identifier == "event")
                                 findNavController().navigate(R.id.addEventFragment)
                             else
@@ -261,12 +264,13 @@ class HomeFragment : Fragment() {
                                 .height(1.dp),
                             color = MaterialTheme.colorScheme.onBackground,
                         )
-                    val suggestions = uiState.suggestions
-                    if (suggestions != null)
-                        Suggestions(suggestions = suggestions)
                     when (uiState) {
-                        is HomeUiState.HasPosts -> PostList(uiState = uiState)
-                        is HomeUiState.NoPosts -> NoPosts(uiState = uiState)
+                        is HomeUiState.HasPosts -> {
+                            if (uiState.postsFlow.collectAsLazyPagingItems().itemSnapshotList.size == 0)
+                                NoPosts(uiState = uiState)
+                            else
+                                PostList(uiState = uiState)
+                        }
                     }
                 }
                 val alpha = if (toState == MultiFabState.EXPANDED) 0.9f else 0f
@@ -279,6 +283,23 @@ class HomeFragment : Fragment() {
             }
     }
 
+    @Composable
+    fun TopTabs(uiState: HomeUiState) {
+        val tabs = listOf("Posts", "Parties")
+        val selectedTab = uiState.selectedTab
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            tabs.forEachIndexed { index, s ->
+                if (index == selectedTab)
+                    FilledTonalButton(onClick = { viewModel.selectTab(index)}) {
+                        Text(s)
+                    }
+                else
+                    TextButton(onClick = {  viewModel.selectTab(index)}) {
+                        Text(s)
+                    }
+            }
+        }
+    }
     private @Composable
     fun UploadIndicator(progress: Double) {
         Row(
@@ -294,11 +315,14 @@ class HomeFragment : Fragment() {
     }
 
     @Composable
-    fun NoPosts(uiState: HomeUiState.NoPosts) {
+    fun NoPosts(uiState: HomeUiState) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(22.dp),
         ) {
+            val suggestions = uiState.suggestions
+//            if (suggestions != null)
+//                Suggestions(suggestions = suggestions)
             Text(
                 "Welcome to Cheers",
                 textAlign = TextAlign.Center,
@@ -372,7 +396,13 @@ class HomeFragment : Fragment() {
                 ) {
 
                     Image(
-                        painter = rememberImagePainter(data = suggestedUser.user.profilePictureUrl),
+                        painter = rememberImagePainter(
+                            data = suggestedUser.user.profilePictureUrl,
+                            builder = {
+                                transformations(CircleCropTransformation())
+                                error(R.drawable.default_profile_picture)
+                            },
+                        ),
                         contentDescription = "Profile image",
                         modifier = Modifier
                             .size(100.dp)
@@ -448,21 +478,28 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun PostList(uiState: HomeUiState.HasPosts) {
-        val posts: LazyPagingItems<Post> = uiState.postsFlow.collectAsLazyPagingItems()
+        val posts = uiState.postsFlow.collectAsLazyPagingItems()
+        val events = uiState.eventsFlow.collectAsLazyPagingItems()
 
         LazyColumn(state = uiState.listState) {
-            if (uiState.nativeAd != null)
-            itemsIndexed(posts) { i, post ->
-                if (i != 0 && i % 4 == 0) {
-                    DividerM3()
-                    NativeAdPost(ad = uiState.nativeAd)
+            if (uiState.selectedTab == 1)
+                items(events) { event ->
+                    Event(event!!)
                 }
-                when (post?.type) {
-                    PostType.TEXT -> Post(post, true)
-                    PostType.IMAGE -> Post(post, true)
-                    PostType.VIDEO -> Post(post, true)
+            else {
+                itemsIndexed(posts) { i, post ->
+                    if (i != 0 && i % 4 == 0 && uiState.nativeAd != null) {
+                        DividerM3()
+                        NativeAdPost(ad = uiState.nativeAd)
+                    }
+                    when (post?.type) {
+                        PostType.TEXT -> Post(post, true)
+                        PostType.IMAGE -> Post(post, true)
+                        PostType.VIDEO -> Post(post, true)
+                    }
                 }
             }
+
             posts.apply {
                 when {
                     loadState.refresh is LoadState.Loading -> {
@@ -498,8 +535,8 @@ class HomeFragment : Fragment() {
         ) {
             val liked = remember { mutableStateOf(post.liked) }
             PostHeader(post)
-            if (post.type != PostType.TEXT)
-                DividerM3()
+//            if (post.type != PostType.TEXT)
+//                DividerM3()
             PostBody(post, liked, isPostVisible)
             PostFooter(post)
         }
@@ -511,7 +548,7 @@ class HomeFragment : Fragment() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp, 11.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 .clickable {
                     val action =
                         HomeFragmentDirections.actionHomeFragmentToOtherProfileFragment(
@@ -544,7 +581,7 @@ class HomeFragment : Fragment() {
                     contentDescription = "Profile image",
                     modifier = Modifier
                         .border(1.2.dp, brush, CircleShape)
-                        .size(33.dp)
+                        .size(36.dp)
                         .padding(3.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
@@ -556,31 +593,45 @@ class HomeFragment : Fragment() {
                         verified = post.creator.verified,
                         textStyle = Typography.bodyMedium
                     )
-                    if (post.locationName.isNotBlank())
+                    if (post.locationName.isBlank())
+                        Text(
+                            post.createdTime,
+                            style = Typography.labelMedium
+                        )
+                    else
                         Text(text = post.locationName, style = Typography.labelSmall)
                 }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .size(4.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onBackground)
-                )
-                Text(
-                    post.createdTime,
-                    style = Typography.labelMedium
-                )
+//                Box(
+//                    modifier = Modifier
+//                        .padding(end = 4.dp)
+//                        .size(4.dp)
+//                        .clip(CircleShape)
+//                        .background(MaterialTheme.colorScheme.onBackground)
+//                )
+                if (post.locationName.isNotBlank())
+                    Text(
+                        post.createdTime,
+                        style = Typography.labelMedium
+                    )
                 Spacer(Modifier.width(8.dp))
-                Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
-                    viewModel.selectPost(post.id)
-                    scope.launch {
-                        mainViewModel.sheetState.show()
+                IconButton(
+                    onClick = {
+                        viewModel.selectPost(post.id)
+                        mainViewModel.selectPost(post.id)
+                        scope.launch {
+                            mainViewModel.sheetState.show()
+                        }
                     }
-                })
+                ) {
+                    Icon(Icons.Default.MoreHoriz, null,
+                        modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant).padding(4.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
@@ -591,8 +642,7 @@ class HomeFragment : Fragment() {
         liked: MutableState<Boolean>,
         isPostVisible: Boolean,
     ) {
-        Box(
-        ) {
+        Box {
             if (post.videoUrl.isNotBlank())
                 VideoPlayer(
                     uri = post.videoUrl,
@@ -608,6 +658,8 @@ class HomeFragment : Fragment() {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .aspectRatio(1f)// or 4/5f
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(16.dp))
                         .fillMaxWidth()
                         .pointerInput(Unit) {
                             detectTapGestures(
@@ -628,7 +680,7 @@ class HomeFragment : Fragment() {
             else
                 Text(
                     text = post.caption,
-                    modifier = Modifier.padding(14.dp)
+                    modifier = Modifier.padding(16.dp)
                 )
 
             if (post.tagUsers.isNotEmpty())
@@ -641,7 +693,7 @@ class HomeFragment : Fragment() {
         AnimateVisibilityFade(modifier = modifier) {
             Surface(
                 modifier = Modifier
-                    .padding(14.dp)
+                    .padding(32.dp)
                     .clickable {},
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)
@@ -665,7 +717,8 @@ class HomeFragment : Fragment() {
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically) {
                 LikeButton(like = post.liked, likes = post.likes, onToggle = { viewModel.toggleLike(post)})
                 Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
                 Icon(Icons.Outlined.Share, null)
@@ -679,7 +732,7 @@ class HomeFragment : Fragment() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
         ) {
             PostFooterButtons(post)
             if (post.type != PostType.TEXT) {
@@ -760,12 +813,11 @@ class HomeFragment : Fragment() {
     }
 
     @Composable
-    fun MyAppBar() {
-        val icon = if (isSystemInDarkTheme()) R.drawable.ic_cheers_white else R.drawable.ic_cheers_icon_black
+    fun MyAppBar(uiState: HomeUiState) {
+        val icon = if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
+//        SmallTopAppBar(
         CenterAlignedTopAppBar(
-//            modifier = Modifier.height(55.dp),
-//            backgroundColor = MaterialTheme.colorScheme.surface,
-//            elevation = 0.dp,
+//            modifier = Modifier.height(50.dp),
             title = {
                 Image(
                     painter = painterResource(icon),
@@ -868,6 +920,7 @@ class HomeFragment : Fragment() {
             ) {
                 it.useController = false
                 it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+                it.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
             }
         ) {
             onDispose {
@@ -877,6 +930,71 @@ class HomeFragment : Fragment() {
     }
 
     @Composable
-    fun Event() {
+    fun Event(post: EventUi) {
+        val event = post.event
+        Column() {
+            Image(
+                painter = rememberImagePainter(
+                    data = event.imageUrl,
+                    builder = {
+                        error(R.drawable.image_placeholder)
+                    }
+                ),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f),
+            contentScale = ContentScale.Crop,
+            )
+            Column(
+                modifier = Modifier.padding(16.dp),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        painter = rememberImagePainter(
+                            data = post.host.profilePictureUrl,
+                            builder = {
+                                transformations(CircleCropTransformation())
+                                error(R.drawable.default_profile_picture)
+                            },
+                        ),
+                        contentDescription = "Profile image",
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                    )
+                    Spacer(Modifier.width(16.dp))
+                    Username(
+                        username = post.host.username,
+                        verified = post.host.verified,
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+
+                Text(event.name, style = MaterialTheme.typography.titleLarge)
+                Text(event.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 8.dp))
+                Text(text = event.locationName, style = Typography.labelSmall)
+                Text("4.8k interested - 567 going", modifier = Modifier.padding(vertical = 8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    FilledTonalButton(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.StarBorder, null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Interested")
+                    }
+                    FilledTonalButton(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Going")
+                    }
+                }
+            }
+        }
     }
 }

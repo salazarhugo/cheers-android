@@ -37,9 +37,26 @@
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
-        <meta-data android:name="com.snapchat.kit.sdk.clientId" android:value="@string/snap_oauth_client_id" />
+
+        <meta-data android:name="com.snapchat.kit.sdk.clientId" android:value="@string/snap_oauth_client_id_staging" />
         <meta-data android:name="com.snapchat.kit.sdk.redirectUrl" android:value="@string/snap_redirect_url" />
-        <meta-data android:name="com.snapchat.kit.sdk.scopes" android:resource="@array/snap_kit_scopes" />
+        <meta-data android:name="com.snapchat.kit.sdk.scopes" android:resource="@array/snap_connect_scopes" />
+
+        <activity
+            android:name="com.snapchat.kit.sdk.SnapKitActivity"
+            android:launchMode="singleTask"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="cheers"
+                    android:host="snap-kit"
+                    android:path="/oauth2"
+                    />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".SplashActivity"
@@ -80,7 +97,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PhoneAuthActivity" />
+        <activity android:name=".PhoneAuthActivity"
+            android:theme="@style/Theme.Cheers.SignIn" />
 
         <service
             android:name=".service.MyFirebaseMessagingService"
