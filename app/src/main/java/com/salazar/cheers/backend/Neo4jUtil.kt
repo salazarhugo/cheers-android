@@ -99,18 +99,22 @@ object Neo4jUtil {
     }
 
     fun addEvent(event: Event) {
-        val params: MutableMap<String, Any> = mutableMapOf()
-        params["userId"] = FirebaseAuth.getInstance().uid!!
-        params["event"] = toMap(event)
-        write(
-            "MATCH (u:User { id: \$userId}) CREATE (e: Event \$event)" +
-                    " SET e += { createdTime: datetime() } CREATE (u)-[:POSTED]->(e)" +
-                    " WITH e UNWIND e.participants as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
-            params = params
-        )
+        try {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["userId"] = FirebaseAuth.getInstance().uid!!
+            params["event"] = toMap(event)
+            write(
+                "MATCH (u:User { id: \$userId}) CREATE (e: Event \$event)" +
+                        " SET e += { createdTime: datetime(), startDate: datetime(e.startDate), endDate: datetime(e.endDate)} CREATE (u)-[:POSTED]->(e)" +
+                        " WITH e UNWIND e.participants as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
+                params = params
+            )
+        } catch (e: Exception) {
+            Log.e("HAHA", e.toString())
+        }
     }
 
-    fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
+fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = FirebaseAuth.getInstance().uid!!
         val post2 = PostNeo4j(
@@ -335,6 +339,32 @@ object Neo4jUtil {
                 Log.e("HAHA", e.toString())
                 return@withContext Result.Error(e)
             }
+        }
+    }
+
+    suspend fun getEvent(eventId: String): Result<EventUi> {
+        return withContext(Dispatchers.IO) {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["eventId"] = eventId
+
+            val records = query(
+                "MATCH (u:User)-[:POSTED]->(e:Event { id: \$eventId }) " +
+                        "RETURN properties(e { .*, createdTime: toString(e.createdTime), startDate: toString(e.startDate), endDate: toString(e.endDate) })" +
+                        ", properties(u)",
+                params
+            )
+
+            val gson = Gson()
+            val event = gson.fromJson(records[0].values()[0].toString(), Event::class.java)
+            val host = gson.fromJson(records[0].values()[1].toString(), User::class.java)
+
+            val eventUi = EventUi(
+                event = event,
+                host = host,
+                participants = emptyList()
+            )
+
+            return@withContext Result.Success(eventUi)
         }
     }
 
@@ -580,7 +610,7 @@ object Neo4jUtil {
                 params["userId"] = FirebaseAuth.getInstance().uid!!
 
                 val records = query(
-                    "MATCH (u:User {id: \$userId})-[:POSTED]->(p) \n" +
+                    "MATCH (u:User {id: \$userId})-[:POSTED]->(p:Post) \n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
                             "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"HH:mm\")}," +
                             " properties(u) ORDER BY p.createdTime DESC",

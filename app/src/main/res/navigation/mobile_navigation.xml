@@ -34,6 +34,9 @@
             app:exitAnim="@anim/out_to_left"
             app:popEnterAnim="@anim/in_from_left"
             app:popExitAnim="@anim/out_to_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_eventDetailFragment"
+            app:destination="@id/eventDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -213,4 +216,12 @@
         android:id="@+id/addEventFragment"
         android:name="com.salazar.cheers.ui.event.AddEventFragment"
         android:label="AddEventFragment" />
+    <fragment
+        android:id="@+id/eventDetailFragment"
+        android:name="com.salazar.cheers.ui.event.detail.EventDetailFragment"
+        android:label="EventDetailFragment" >
+        <argument
+            android:name="eventId"
+            app:argType="string" />
+    </fragment>
 </navigation>

@@ -22,6 +22,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 @HiltWorker
 class UploadEventWorker @AssistedInject constructor(
@@ -62,20 +63,28 @@ class UploadEventWorker @AssistedInject constructor(
         val participants =
             inputData.getStringArray("PARTICIPANTS") ?: emptyArray()
 
+        val startDateTime =
+            inputData.getString("START_DATETIME") ?: ""
+
+        val endDateTime =
+            inputData.getString("END_DATETIME") ?: ""
 
         try {
             val event = Event(
+                id = UUID.randomUUID().toString(),
                 host = FirebaseAuth.getInstance().currentUser?.uid!!,
                 name = name,
                 description = description,
                 type = eventType,
+                startDate = startDateTime,
+                endDate = endDateTime,
                 locationName = locationName,
                 latitude = latitude,
                 longitude = longitude,
                 showOnMap = showOnMap,
             )
 
-            if (imageUri == null)
+            if (imageUri == null || imageUri == "null")
                 Neo4jUtil.addEvent(event)
             else {
                 val photoBytes = extractImage(Uri.parse(imageUri))

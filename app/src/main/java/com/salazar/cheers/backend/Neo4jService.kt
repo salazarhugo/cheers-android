@@ -41,7 +41,7 @@ class Neo4jService {
                     "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f:User)-[:POSTED]->(e:Event)\n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(e) \n" +
                             "OPTIONAL MATCH (e)-[:WITH]->(e:Event) \n" +
-                            "RETURN DISTINCT e { .*, createdTime: apoc.temporal.format(e.createdTime)}, properties(f) " +
+                            "RETURN DISTINCT e { .*, createdTime: toString(e.createdTime), startDate: toString(e.startDate), endDate: toString(e.endDate)}, properties(f) " +
                             "ORDER BY datetime(e.createdTime) DESC " +
                             "SKIP \$skip LIMIT \$pageSize",
                     params

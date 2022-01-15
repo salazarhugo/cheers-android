@@ -129,7 +129,7 @@ class ProfileFragment : Fragment() {
 
     @Composable
     fun ProfilePostsAndTags(uiState: ProfileUiState.HasUser) {
-        val tabs = listOf(Icons.Default.GridView, Icons.Outlined.Email, Icons.Outlined.AssignmentInd)
+        val tabs = listOf(Icons.Default.GridView, Icons.Outlined.Email, Icons.Outlined.Celebration)
         val pagerState = rememberPagerState()
         val scope = rememberCoroutineScope()
 

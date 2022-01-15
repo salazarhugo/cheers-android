@@ -189,7 +189,7 @@ class AddEventFragment : DialogFragment() {
                     .align(Alignment.CenterHorizontally)
                     .padding(16.dp),
             )
-            ShareButton()
+            ShareButton(uiState = uiState)
         }
     }
 
@@ -353,37 +353,38 @@ class AddEventFragment : DialogFragment() {
 
     @Composable
     fun StartDateInput(uiState: AddEventUiState) {
-        val calendar = Calendar.getInstance()
+        val calendar = remember { Calendar.getInstance() }
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
-        calendar.time = Date()
-        viewModel.onStartDateChange("$day/$month/$year")
-        viewModel.onStartTimeChange("$hourOfDay:$minute")
-        viewModel.onEndDateChange("$day/$month/$year")
-        viewModel.onEndTimeChange("$hourOfDay:$minute")
+        calendar.time = remember {Date() }
+//        viewModel.onStartDateChange("$day/$month/$year")
+//        viewModel.onStartTimeChange("$hourOfDay:$minute")
+//        viewModel.onEndDateChange("$day/$month/$year")
+//        viewModel.onEndTimeChange("$hourOfDay:$minute")
 
         val startDatePicker = DatePickerDialog(
             requireContext(), { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                viewModel.onStartDateChange("$dayOfMonth/$month/$year")
+                viewModel.onStartDateChange("$year-${(month + 1).toString().padStart(2, '0')}-${dayOfMonth.toString().padStart(2, '0')}")
+
             }, year, month, day
         )
         val endDatePicker = DatePickerDialog(
             requireContext(), { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                viewModel.onEndDateChange("$dayOfMonth/$month/$year")
+                viewModel.onEndDateChange("$year-${(month + 1).toString().padStart(2, '0')}-${dayOfMonth.toString().padStart(2, '0')}")
             }, year, month, day
         )
         val startTimePicker = TimePickerDialog(
             requireContext(), { _: TimePicker, hourOfDay: Int, minute: Int ->
-                viewModel.onStartTimeChange("$hourOfDay:$minute")
+                viewModel.onStartTimeChange("${hourOfDay.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}")
             }, hourOfDay, minute, true
         )
 
         val endTimePicker = TimePickerDialog(
             requireContext(), { _: TimePicker, hourOfDay: Int, minute: Int ->
-                viewModel.onEndTimeChange("$hourOfDay:$minute")
+                viewModel.onEndTimeChange("${hourOfDay.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}")
             }, hourOfDay, minute, true
         )
 
@@ -495,7 +496,7 @@ class AddEventFragment : DialogFragment() {
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
+                keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
             ),
             textStyle = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
@@ -522,7 +523,7 @@ class AddEventFragment : DialogFragment() {
     }
 
     @Composable
-    fun ShareButton() {
+    fun ShareButton(uiState: AddEventUiState) {
         Column(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Bottom,
@@ -537,6 +538,7 @@ class AddEventFragment : DialogFragment() {
                     .fillMaxWidth()
                     .padding(12.dp),
                 shape = RoundedCornerShape(8.dp),
+                enabled = uiState.name.isNotBlank()
             ) {
                 Text("Share")
             }

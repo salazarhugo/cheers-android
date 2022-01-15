@@ -176,6 +176,8 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
                         "SHOW_ON_MAP" to showOnMap.value,
                         "EVENT_TYPE" to state.selectedPrivacy.type,
                         "IMAGE_URI" to state.imageUri.toString(),
+                        "START_DATETIME" to "${state.startDate}T${state.startTime}",
+                        "END_DATETIME" to "${state.endDate}T${state.endTime}",
                     )
                 )
             }

@@ -20,6 +20,7 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -78,6 +79,8 @@ import com.salazar.cheers.ui.theme.Typography
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.image
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -627,8 +630,12 @@ class HomeFragment : Fragment() {
                         }
                     }
                 ) {
-                    Icon(Icons.Default.MoreHoriz, null,
-                        modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant).padding(4.dp),
+                    Icon(
+                        Icons.Default.MoreHoriz, null,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(4.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -743,9 +750,7 @@ class HomeFragment : Fragment() {
                     Caption(post)
             }
         }
-        if (post.type == PostType.TEXT)
-            DividerM3()
-        else
+        if (post.type != PostType.TEXT)
             Spacer(Modifier.height(12.dp))
     }
 
@@ -815,8 +820,8 @@ class HomeFragment : Fragment() {
     @Composable
     fun MyAppBar(uiState: HomeUiState) {
         val icon = if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
-//        SmallTopAppBar(
-        CenterAlignedTopAppBar(
+        SmallTopAppBar(
+//        CenterAlignedTopAppBar(
 //            modifier = Modifier.height(50.dp),
             title = {
                 Image(
@@ -832,6 +837,13 @@ class HomeFragment : Fragment() {
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Notifications,
+                        contentDescription = "Activity icon"
+                    )
+                }
+                IconButton(onClick = {
+                    findNavController().navigate(R.id.activityFragment)
+                }) {
+                    Icon(rememberImagePainter(R.drawable.ic_bubble_icon),
                         contentDescription = "Activity icon"
                     )
                 }
@@ -932,7 +944,14 @@ class HomeFragment : Fragment() {
     @Composable
     fun Event(post: EventUi) {
         val event = post.event
-        Column() {
+        Column(
+            modifier = Modifier.clickable {
+                val action = HomeFragmentDirections.actionHomeFragmentToEventDetailFragment(
+                    eventId = post.event.id
+                )
+                findNavController().navigate(action)
+            }
+        ) {
             Image(
                 painter = rememberImagePainter(
                     data = event.imageUrl,
@@ -974,16 +993,21 @@ class HomeFragment : Fragment() {
                     )
                 }
 
-                Text(event.name, style = MaterialTheme.typography.titleLarge)
-                Text(event.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 8.dp))
-                Text(text = event.locationName, style = Typography.labelSmall)
+                val d = remember { ZonedDateTime.parse(event.startDate) }
+                Text(d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")), style = MaterialTheme.typography.bodyMedium)
+                if (event.name.isNotBlank())
+                    Text(event.name, style = MaterialTheme.typography.titleLarge)
+                if (event.description.isNotBlank())
+                    Text(event.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 8.dp))
+                if (event.locationName.isNotBlank())
+                    Text(text = event.locationName, style = Typography.labelSmall)
                 Text("4.8k interested - 567 going", modifier = Modifier.padding(vertical = 8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     FilledTonalButton(
                         onClick = { /*TODO*/ },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Icon(Icons.Default.StarBorder, null)
+                        Icon(Icons.Rounded.Star, null)
                         Spacer(Modifier.width(8.dp))
                         Text("Interested")
                     }
