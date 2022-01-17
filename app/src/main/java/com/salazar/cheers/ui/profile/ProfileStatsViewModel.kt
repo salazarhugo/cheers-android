@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface FollowersFollowingUiState {
+sealed interface ProfileStatsUiState {
 
     val isLoading: Boolean
     val isFollowers: Boolean
@@ -23,7 +23,7 @@ sealed interface FollowersFollowingUiState {
         override val isFollowers: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String
-    ) : FollowersFollowingUiState
+    ) : ProfileStatsUiState
 
     data class HasFollowers(
         val followers: List<User>,
@@ -32,10 +32,10 @@ sealed interface FollowersFollowingUiState {
         override val isFollowers: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String
-    ) : FollowersFollowingUiState
+    ) : ProfileStatsUiState
 }
 
-private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi::class) constructor(
+private data class ProfileStatsViewModelState @OptIn(ExperimentalPagerApi::class) constructor(
     val followers: List<User>? = null,
     val following: List<User>? = null,
     val isLoading: Boolean = false,
@@ -43,9 +43,9 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 ) {
-    fun toUiState(): FollowersFollowingUiState =
+    fun toUiState(): ProfileStatsUiState =
         if (followers != null && following != null) {
-            FollowersFollowingUiState.HasFollowers(
+            ProfileStatsUiState.HasFollowers(
                 followers = followers,
                 following = following,
                 isLoading = isLoading,
@@ -54,7 +54,7 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
                 searchInput = searchInput
             )
         } else {
-            FollowersFollowingUiState.NoUsers(
+            ProfileStatsUiState.NoUsers(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 isFollowers = isFollowers,
@@ -64,10 +64,10 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
 }
 
 @HiltViewModel
-class FollowersFollowingViewModel @Inject constructor() : ViewModel() {
+class ProfileStatsViewModel @Inject constructor() : ViewModel() {
 
     private val viewModelState =
-        MutableStateFlow(FollowersFollowingViewModelState(isLoading = true))
+        MutableStateFlow(ProfileStatsViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }

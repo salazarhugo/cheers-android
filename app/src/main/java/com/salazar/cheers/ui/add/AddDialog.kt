@@ -11,6 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -46,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -250,6 +256,13 @@ class AddDialogFragment : DialogFragment() {
                 Icon(Icons.Outlined.PhotoCamera, "")
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Add photo or video")
+            }
+            FilledTonalButton(onClick = {
+                findNavController().navigate(R.id.cameraFragment)
+            }) {
+                Icon(Icons.Outlined.PhotoCamera, "")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Take a photo")
             }
         }
     }

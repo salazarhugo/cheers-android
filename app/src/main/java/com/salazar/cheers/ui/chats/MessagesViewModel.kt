@@ -4,33 +4,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.FirestoreUtil
-import com.salazar.cheers.backend.Neo4jUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class ChatChannelUiState(
+data class MessagesUiState(
     val isLoading: Boolean,
     val errorMessages: List<String>,
     val searchInput: String,
     val channels: List<ChatChannel>?,
 )
 
-private data class ChatChannelsViewModelState(
+private data class MessagesViewModelState(
     val channels: List<ChatChannel>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 ) {
-    fun toUiState(): ChatChannelUiState =
-        ChatChannelUiState(
+    fun toUiState(): MessagesUiState =
+        MessagesUiState(
             channels = channels,
             isLoading = isLoading,
             errorMessages = errorMessages,
@@ -39,14 +39,14 @@ private data class ChatChannelsViewModelState(
 }
 
 @HiltViewModel
-class ChatChannelsViewModel @Inject constructor() : ViewModel() {
+class MessagesViewModel @Inject constructor() : ViewModel() {
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
 
     val name = mutableStateOf("")
 
     private val viewModelState =
-        MutableStateFlow(ChatChannelsViewModelState(isLoading = true))
+        MutableStateFlow(MessagesViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -57,10 +57,10 @@ class ChatChannelsViewModel @Inject constructor() : ViewModel() {
         )
 
     init {
-        refreshChatChannels()
+        refreshMessages()
     }
 
-    private fun refreshChatChannels() {
+    private fun refreshMessages() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {

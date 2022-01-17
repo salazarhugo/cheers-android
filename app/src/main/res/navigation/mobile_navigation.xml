@@ -224,4 +224,8 @@
             android:name="eventId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.salazar.cheers.ui.camera.CameraFragment"
+        android:label="CameraFragment" />
 </navigation>

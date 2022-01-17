@@ -14,11 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
@@ -31,7 +30,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -49,14 +47,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
 import androidx.work.WorkManager
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerScope
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.exoplayer2.C
@@ -79,12 +79,8 @@ import com.salazar.cheers.ui.theme.Typography
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.image
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.*
 import kotlin.math.absoluteValue
 
 @AndroidEntryPoint
@@ -119,10 +115,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun initNativeAdd() {
-        val configuration = RequestConfiguration.Builder().setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
         MobileAds.setRequestConfiguration(configuration)
         val adLoader = AdLoader.Builder(requireContext(), "ca-app-pub-7182026441345500/3409583237")
-            .forNativeAd { ad : NativeAd ->
+            .forNativeAd { ad: NativeAd ->
                 viewModel.setNativeAd(ad)
             }
             .withAdListener(object : AdListener() {
@@ -131,7 +128,8 @@ class HomeFragment : Fragment() {
             })
             .withNativeAdOptions(
                 NativeAdOptions.Builder()
-                .build())
+                    .build()
+            )
             .build()
 
         adLoader.loadAd(AdRequest.Builder().build())
@@ -185,7 +183,7 @@ class HomeFragment : Fragment() {
                     }
 
                     if (ad.mediaContent.hasVideoContent()) {
-                        val mediaView =  MediaView(requireContext()).apply {
+                        val mediaView = MediaView(requireContext()).apply {
                             setMediaContent(ad.mediaContent!!)
                             setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                         }
@@ -213,77 +211,79 @@ class HomeFragment : Fragment() {
             else
                 false
 
-            var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
-            Scaffold(
-                topBar = {
-                    Column {
-                        MyAppBar(uiState)
-                        TopTabs(uiState = uiState)
-                        if (showDivider)
-                            DividerM3()
-                    }
-                },
-                floatingActionButton = {
-                    MultiFloatingActionButton(
-                        Icons.Default.Add,
-                        listOf(
-                            MultiFabItem(
-                                "event",
-                                Icons.Outlined.Event,
-                                "Event",
-                            ),
-                            MultiFabItem(
-                                "post",
-                                Icons.Outlined.PostAdd,
-                                "Post",
-                            )
-                        ), toState, true, { state ->
-                            toState = state
-                        },
-                        onFabItemClicked = {
-                            toState = MultiFabState.COLLAPSED
-                            if (it.identifier == "event")
-                                findNavController().navigate(R.id.addEventFragment)
-                            else
-                                findNavController().navigate(R.id.addDialogFragment)
-                        }
-                    )
-                }
-            ) {
+        var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
+        Scaffold(
+            topBar = {
                 Column {
-                    val id = el.id.value
-                    if (id != null) {
-                        val workInfo = WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(id).observeAsState().value
-                        val progress = workInfo?.progress
-                        val value = progress?.getDouble("Progress", 0.0)
-                        val isFinish = workInfo?.state?.isFinished
-                        if ((isFinish == null || !isFinish) && value != null)
-                            UploadIndicator(value)
-                    }
-                    if (uiState.isLoading)
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp),
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                    when (uiState) {
-                        is HomeUiState.HasPosts -> {
-                            if (uiState.postsFlow.collectAsLazyPagingItems().itemSnapshotList.size == 0)
-                                NoPosts(uiState = uiState)
-                            else
-                                PostList(uiState = uiState)
-                        }
-                    }
+                    MyAppBar(uiState)
+                    TopTabs(uiState = uiState)
+                    if (showDivider)
+                        DividerM3()
                 }
-                val alpha = if (toState == MultiFabState.EXPANDED) 0.9f else 0f
-                Box(
-                    modifier = Modifier
-                        .alpha(animateFloatAsState(alpha).value)
-                        .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
-                        .fillMaxSize()
+            },
+            floatingActionButton = {
+                MultiFloatingActionButton(
+                    Icons.Default.Add,
+                    listOf(
+                        MultiFabItem(
+                            "event",
+                            Icons.Outlined.Event,
+                            "Event",
+                        ),
+                        MultiFabItem(
+                            "post",
+                            Icons.Outlined.PostAdd,
+                            "Post",
+                        )
+                    ), toState, true, { state ->
+                        toState = state
+                    },
+                    onFabItemClicked = {
+                        toState = MultiFabState.COLLAPSED
+                        if (it.identifier == "event")
+                            findNavController().navigate(R.id.addEventFragment)
+                        else
+                            findNavController().navigate(R.id.addDialogFragment)
+                    }
                 )
             }
+        ) {
+            Column {
+                val id = el.id.value
+                if (id != null) {
+                    val workInfo =
+                        WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(id)
+                            .observeAsState().value
+                    val progress = workInfo?.progress
+                    val value = progress?.getDouble("Progress", 0.0)
+                    val isFinish = workInfo?.state?.isFinished
+                    if ((isFinish == null || !isFinish) && value != null)
+                        UploadIndicator(value)
+                }
+                if (uiState.isLoading)
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp),
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                when (uiState) {
+                    is HomeUiState.HasPosts -> {
+                        if (uiState.postsFlow.collectAsLazyPagingItems().itemSnapshotList.size == 0)
+                            NoPosts(uiState = uiState)
+                        else
+                            PostList(uiState = uiState)
+                    }
+                }
+            }
+            val alpha = if (toState == MultiFabState.EXPANDED) 0.9f else 0f
+            Box(
+                modifier = Modifier
+                    .alpha(animateFloatAsState(alpha).value)
+                    .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
+                    .fillMaxSize()
+            )
+        }
     }
 
     @Composable
@@ -293,16 +293,17 @@ class HomeFragment : Fragment() {
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             tabs.forEachIndexed { index, s ->
                 if (index == selectedTab)
-                    FilledTonalButton(onClick = { viewModel.selectTab(index)}) {
+                    FilledTonalButton(onClick = { viewModel.selectTab(index) }) {
                         Text(s)
                     }
                 else
-                    TextButton(onClick = {  viewModel.selectTab(index)}) {
+                    TextButton(onClick = { viewModel.selectTab(index) }) {
                         Text(s)
                     }
             }
         }
     }
+
     private @Composable
     fun UploadIndicator(progress: Double) {
         Row(
@@ -312,7 +313,7 @@ class HomeFragment : Fragment() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
-            LinearProgressIndicator(progress = progress.toFloat()/100f)
+            LinearProgressIndicator(progress = progress.toFloat() / 100f)
         }
         DividerM3()
     }
@@ -507,22 +508,29 @@ class HomeFragment : Fragment() {
                 when {
                     loadState.refresh is LoadState.Loading -> {
                         item {
-                            CircularProgressIndicatorM3(modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentSize(Alignment.Center))
+                            CircularProgressIndicatorM3(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.Center)
+                            )
                         }
                     }
                     loadState.append is LoadState.Loading -> {
                         item {
-                            CircularProgressIndicatorM3(modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally))
+                            CircularProgressIndicatorM3(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentWidth(Alignment.CenterHorizontally)
+                            )
                         }
                     }
                     loadState.append is LoadState.Error -> {
                         val e = posts.loadState.append as LoadState.Error
                         item {
-                            Text( text = e.error.localizedMessage!!, modifier = Modifier.fillParentMaxSize())
+                            Text(
+                                text = e.error.localizedMessage!!,
+                                modifier = Modifier.fillParentMaxSize()
+                            )
                         }
                     }
                 }
@@ -724,9 +732,14 @@ class HomeFragment : Fragment() {
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-                LikeButton(like = post.liked, likes = post.likes, onToggle = { viewModel.toggleLike(post)})
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LikeButton(
+                    like = post.liked,
+                    likes = post.likes,
+                    onToggle = { viewModel.toggleLike(post) })
                 Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
                 Icon(Icons.Outlined.Share, null)
             }
@@ -819,7 +832,8 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun MyAppBar(uiState: HomeUiState) {
-        val icon = if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
+        val icon =
+            if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
         SmallTopAppBar(
 //        CenterAlignedTopAppBar(
 //            modifier = Modifier.height(50.dp),
@@ -841,9 +855,10 @@ class HomeFragment : Fragment() {
                     )
                 }
                 IconButton(onClick = {
-                    findNavController().navigate(R.id.activityFragment)
+                    findNavController().navigate(R.id.cameraFragment)
                 }) {
-                    Icon(rememberImagePainter(R.drawable.ic_bubble_icon),
+                    Icon(
+                        Icons.Outlined.Camera,
                         contentDescription = "Activity icon"
                     )
                 }
@@ -926,13 +941,16 @@ class HomeFragment : Fragment() {
                         this.player = player
                     }
                 },
-                modifier = modifier.clickable {
-                    if (player.volume == 0f) player.volume = 1f else player.volume = 0f
-                }
+                modifier = modifier
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable {
+                        if (player.volume == 0f) player.volume = 1f else player.volume = 0f
+                    }
             ) {
                 it.useController = false
                 it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-                it.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+//                it.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
             }
         ) {
             onDispose {
@@ -963,7 +981,7 @@ class HomeFragment : Fragment() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(2f),
-            contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Crop,
             )
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -994,11 +1012,18 @@ class HomeFragment : Fragment() {
                 }
 
                 val d = remember { ZonedDateTime.parse(event.startDate) }
-                Text(d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 if (event.name.isNotBlank())
                     Text(event.name, style = MaterialTheme.typography.titleLarge)
                 if (event.description.isNotBlank())
-                    Text(event.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 8.dp))
+                    Text(
+                        event.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                 if (event.locationName.isNotBlank())
                     Text(text = event.locationName, style = Typography.labelSmall)
                 Text("4.8k interested - 567 going", modifier = Modifier.padding(vertical = 8.dp))

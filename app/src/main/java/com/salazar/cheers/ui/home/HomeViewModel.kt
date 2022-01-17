@@ -137,6 +137,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun refresh() {
+        viewModelState.update { it.copy(isLoading = true) }
+        viewModelState.update {
+            it.copy(
+                postsFlow = repository.getPosts(),
+                eventsFlow = repository.getEvents(),
+                isLoading = false
+            )
+        }
+        refreshSuggestions()
+    }
+
     fun refreshSuggestions() {
         viewModelScope.launch {
             val result = Neo4jUtil.getSuggestions()

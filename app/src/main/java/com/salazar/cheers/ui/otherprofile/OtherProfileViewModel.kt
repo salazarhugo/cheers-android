@@ -1,8 +1,13 @@
 package com.salazar.cheers.ui.otherprofile
 
+import android.app.Activity
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -11,6 +16,7 @@ import com.salazar.cheers.backend.Neo4jUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -78,6 +84,10 @@ class OtherProfileViewModel @AssistedInject constructor(
         )
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         refreshUser(username = username)
         refreshUserPosts(username = username)
     }
@@ -155,4 +165,14 @@ class OtherProfileViewModel @AssistedInject constructor(
             }
         }
     }
+}
+
+@Composable
+fun otherProfileViewModel(username: String): OtherProfileViewModel {
+    val factory = EntryPointAccessors.fromActivity(
+        LocalContext.current as Activity,
+        MainActivity.ViewModelFactoryProvider::class.java
+    ).otherProfileViewModelFactory()
+
+    return viewModel(factory = OtherProfileViewModel.provideFactory(factory, username = username))
 }

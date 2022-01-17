@@ -1,48 +1,66 @@
 package com.salazar.cheers.ui.search
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.backend.Neo4jUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
+
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private var cheersDao: CheersDao,
 ) : ViewModel() {
 
-    val name = mutableStateOf("")
-    val userRecommendations = mutableStateOf<List<User>>(emptyList())
-    val errorMessage = mutableStateOf("")
-    val recentUsers = cheersDao.getRecentUsers()
-    val query = mutableStateOf("")
+    private val viewModelState = MutableStateFlow(SearchUiState(isLoading = true))
+
+    val uiState = viewModelState
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            viewModelState.value
+        )
 
     init {
         refreshUserRecommendations()
-        queryUsers(query.value)
+        cheersDao.getRecentUsers()
+        updateRecentUser()
     }
 
-    fun onQueryChanged(query: String) {
-        this.query.value = query
-        queryUsers(query)
-    }
-
-    val resultUsers = mutableStateOf<List<User>>(emptyList())
-
-    fun queryUsers(query: String) {
+    private fun updateRecentUser() {
         viewModelScope.launch {
-            try {
-                resultUsers.value = Neo4jUtil.queryUsers(query)
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", e.toString())
+            cheersDao.getRecentUsers().collect { recentUsers ->
+                viewModelState.update {
+                    it.copy(recentUsers = recentUsers)
+                }
+            }
+        }
+    }
+
+    fun onSearchInputChanged(searchInput: String) {
+        viewModelState.update {
+            it.copy(searchInput = searchInput)
+        }
+        refreshUsers(searchInput = searchInput)
+    }
+
+    fun refreshUsers(searchInput: String) {
+        viewModelScope.launch {
+            viewModelState.update {
+                try {
+                    it.copy(users = Neo4jUtil.queryUsers(searchInput))
+                } catch (e: Exception) {
+                    Log.e("HomeViewModel", e.toString())
+                    it.copy(errorMessage = e.toString())
+                }
             }
         }
     }
@@ -69,11 +87,24 @@ class SearchViewModel @Inject constructor(
 
     private fun refreshUserRecommendations() {
         viewModelScope.launch {
-            val result = Neo4jUtil.getUserRecommendations()
-            when (result) {
-                is Result.Success -> userRecommendations.value = result.data
-                is Result.Error -> errorMessage.value = result.exception.toString()
+            viewModelState.update {
+                val result = Neo4jUtil.getUserRecommendations()
+                when (result) {
+                    is Result.Success -> it.copy(userRecommendations = result.data)
+                    is Result.Error -> it.copy(errorMessage = result.exception.toString())
+                }
             }
         }
     }
 }
+
+data class SearchUiState(
+    val name: String = "",
+    val users: List<User> = emptyList(),
+    val userRecommendations: List<User> = emptyList(),
+    val recentUsers: List<RecentUser> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String = "",
+    val searchInput: String = "",
+)
+

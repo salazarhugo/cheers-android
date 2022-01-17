@@ -118,6 +118,9 @@ class MapFragment : Fragment() {
         mapView.gestures.rotateEnabled = false
         mapView.attribution.enabled = false
         mapView.scalebar.enabled = false
+        mapView.attribution.updateSettings {
+            enabled = false
+        }
 
         mapView.getMapboxMap().setCamera(
             CameraOptions.Builder()

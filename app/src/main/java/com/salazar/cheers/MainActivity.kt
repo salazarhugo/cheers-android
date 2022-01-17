@@ -9,30 +9,29 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Log
-import android.view.Window
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material3.*
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -42,27 +41,25 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowCompat.setDecorFitsSystemWindows
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.insets.systemBarsPadding
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.databinding.ContentMainBinding
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Fragment
+import com.salazar.cheers.ui.detail.PostDetailViewModel
 import com.salazar.cheers.ui.home.PostBottomSheet
-import com.salazar.cheers.ui.theme.CheersTheme
-import com.snapchat.kit.sdk.Bitmoji
-import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
+import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.components.ActivityComponent
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 
@@ -70,28 +67,37 @@ import org.jetbrains.anko.toast
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    @EntryPoint
+    @InstallIn(ActivityComponent::class)
+    interface ViewModelFactoryProvider {
+        fun postDetailViewModelFactory(): PostDetailViewModel.PostDetailViewModelFactory
+        fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
+    }
+
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val systemUiController = rememberSystemUiController()
-            val useDarkIcons = !isSystemInDarkTheme()
-            val color = if (isSystemInDarkTheme()) Color.Black else Color.White
-            SideEffect {
-                systemUiController.setSystemBarsColor(color, darkIcons = useDarkIcons)
-            }
+            CheersApp()
 
-            CheersTheme {
-                Surface(
-                    color = MaterialTheme.colorScheme.background,
-                    modifier = Modifier.systemBarsPadding(),
-                ) {
-                    MainActivityScreen()
-                }
-            }
+//            val systemUiController = rememberSystemUiController()
+//            val useDarkIcons = !isSystemInDarkTheme()
+//            val color = if (isSystemInDarkTheme()) Color.Black else Color.White
+//            SideEffect {
+//                systemUiController.setSystemBarsColor(color, darkIcons = useDarkIcons)
+//            }
+
+//            CheersTheme {
+//                Surface(
+//                    color = MaterialTheme.colorScheme.background,
+//                    modifier = Modifier.systemBarsPadding(),
+//                ) {
+//                    MainActivityScreen()
+//                }
+//            }
         }
 
         val policy = ThreadPolicy.Builder().permitAll().build()
@@ -143,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         PostBottomSheet(
             sheetState = mainViewModel.sheetState,
             onDelete = {
-                       mainViewModel.deletePost()
+                mainViewModel.deletePost()
             },
         ) {
         }
@@ -157,10 +163,54 @@ class MainActivity : AppCompatActivity() {
 
         var selectedItem by remember { mutableStateOf(0) }
         val items = listOf(
-            Fragment(R.id.homeFragment, { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground)}, {Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground)}, "Home"),
-            Fragment(R.id.mapFragment, { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(Icons.Filled.Place, null, tint = MaterialTheme.colorScheme.onBackground)}, "Map"),
-            Fragment(R.id.searchFragment, { Icon(painter = rememberImagePainter(R.drawable.ic_search_icon), null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(painter = rememberImagePainter(R.drawable.ic_search_icon_full), null, tint = MaterialTheme.colorScheme.onBackground)}, "Search"),
-            Fragment( R.id.messagesFragment, { Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground)}, { Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground) }, "Messages"),
+            Fragment(
+                R.id.homeFragment,
+                { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
+                { Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
+                "Home"
+            ),
+            Fragment(
+                R.id.mapFragment,
+                { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onBackground) },
+                { Icon(Icons.Filled.Place, null, tint = MaterialTheme.colorScheme.onBackground) },
+                "Map"
+            ),
+            Fragment(
+                R.id.searchFragment,
+                {
+                    Icon(
+                        painter = rememberImagePainter(R.drawable.ic_search_icon),
+                        null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                {
+                    Icon(
+                        painter = rememberImagePainter(R.drawable.ic_search_icon_full),
+                        null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                "Search"
+            ),
+            Fragment(
+                R.id.messagesFragment,
+                {
+                    Icon(
+                        painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+                        null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                {
+                    Icon(
+                        painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+                        null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                "Messages"
+            ),
         )
 
         CompositionLocalProvider(

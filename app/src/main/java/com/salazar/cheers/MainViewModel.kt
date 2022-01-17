@@ -19,7 +19,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor() : ViewModel() {
 
     val user2: MutableState<User?> = mutableStateOf(null)
-    val user = FirestoreUtil.getCurrentUserDocumentLiveData()
+//    val user = FirestoreUtil.getCurrentUserDocumentLiveData()
     val unreadMessages = mutableStateOf(0)
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     var selectedPostId = mutableStateOf("")

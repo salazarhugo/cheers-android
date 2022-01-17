@@ -1,14 +1,19 @@
 package com.salazar.cheers.ui.detail
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
@@ -18,6 +23,7 @@ import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -153,4 +159,14 @@ class PostDetailViewModel @AssistedInject constructor(
             }
         }
     }
+}
+
+@Composable
+fun postDetailViewModel(postId: String): PostDetailViewModel {
+    val factory = EntryPointAccessors.fromActivity(
+        LocalContext.current as Activity,
+        MainActivity.ViewModelFactoryProvider::class.java
+    ).postDetailViewModelFactory()
+
+    return viewModel(factory = PostDetailViewModel.provideFactory(factory, postId = postId))
 }

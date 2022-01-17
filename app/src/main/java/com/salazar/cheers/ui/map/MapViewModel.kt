@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor() : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(MapViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(MapUiState(isLoading = true))
 
     val uiState = viewModelState
         .stateIn(
@@ -60,7 +60,7 @@ class MapViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-data class MapViewModelState(
+data class MapUiState(
     val users: List<User> = emptyList(),
     val posts: List<Post>? = null,
     val city: String = "",
