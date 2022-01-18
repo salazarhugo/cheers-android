@@ -22,5 +22,7 @@ fun HomeRoute(
         navActions = navActions,
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onUserClicked = { navActions.navigateToOtherProfile(it) },
+        navigateToAddEvent = {},
+        navigateToAddPost = { navActions.navigateToAddPostSheet() },
     )
 }

@@ -21,6 +21,7 @@ object CheersDestinations {
     const val SETTINGS_ROUTE = "settings"
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
+    const val ADD_POST_SHEET = "addPostSheet"
 }
 
 /**
@@ -29,6 +30,12 @@ object CheersDestinations {
 class CheersNavigationActions(navController: NavHostController) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+    val navigateToAddPostSheet: () -> Unit = {
+        navController.navigate(CheersDestinations.ADD_POST_SHEET) {
+            launchSingleTop = true
+            restoreState = true
+        }
     }
     val navigateToHome: () -> Unit = {
         navController.navigate(CheersDestinations.HOME_ROUTE) {

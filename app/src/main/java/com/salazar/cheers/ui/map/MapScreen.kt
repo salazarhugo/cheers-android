@@ -240,18 +240,18 @@ private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int
 private fun onIndicatorPositionChangedListener(
     mapView: MapView,
 ) = OnIndicatorPositionChangedListener {
-    mapView.getMapboxMap().setCamera(
-        CameraOptions.Builder()
-            .center(it)
-            .zoom(13.0)
-            .build()
-    )
+//    mapView.getMapboxMap().setCamera(
+//        CameraOptions.Builder()
+//            .center(it)
+//            .zoom(13.0)
+//            .build()
+//    )
     mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
 }
 
 private fun onMoveListener(mapView: MapView) = object : OnMoveListener {
     override fun onMoveBegin(detector: MoveGestureDetector) {
-        onCameraTrackingDismissed(mapView)
+        onCameraTrackingDismissed(mapView, this)
     }
 
     override fun onMove(detector: MoveGestureDetector): Boolean {
@@ -280,9 +280,10 @@ private fun setupGesturesListener(mapView: MapView) {
     mapView.gestures.addOnMoveListener(onMoveListener(mapView))
 }
 
-private fun onCameraTrackingDismissed(mapView: MapView) {
+private fun onCameraTrackingDismissed(mapView: MapView, onMoveListener: OnMoveListener) {
     mapView.location
         .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener(mapView))
+    mapView.gestures.removeOnMoveListener(onMoveListener)
 }
 
 private lateinit var reverseGeocoding: ReverseGeocodingSearchEngine

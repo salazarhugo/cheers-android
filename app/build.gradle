@@ -71,6 +71,7 @@ android {
                         "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
                         "-Xuse-experimental=com.google.accompanist.pager.ExperimentalPagerApi",
                         "-Xuse-experimental=com.google.accompanist.permissions.ExperimentalPermissionsApi",
+                        "-Xuse-experimental=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
                 ]
             }
         }
@@ -91,6 +92,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
 
+
+    implementation "com.google.accompanist:accompanist-navigation-material:0.22.0-rc"
     implementation "com.google.accompanist:accompanist-navigation-animation:0.22.0-rc"
 
     // Jetpack Compose

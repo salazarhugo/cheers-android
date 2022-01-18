@@ -1,17 +1,7 @@
 package com.salazar.cheers.ui.map
 
-import android.Manifest
-import android.app.Dialog
 import android.content.Context
-import android.content.pm.PackageManager
-import android.content.res.Configuration
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,258 +12,197 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
 import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.attribution.attribution
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
-import com.salazar.cheers.R
-import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
 
+@Composable
+fun ChooseOnMapScreen(
+    onBackPressed: () -> Unit,
+    onSelectLocation: (Point) -> Unit,
+) {
+    val context = LocalContext.current
+    val mapView = remember { MapView(context = context) }
 
-class ChooseOnMap : DialogFragment() {
-
-    private lateinit var mapView: MapView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.Theme_DialogFullScreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.MATCH_PARENT
-            dialog.window!!.setLayout(width, height)
-            dialog.window!!.setWindowAnimations(R.style.Theme_Cheers_Slide)
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                CheersTheme {
-                    Surface(color = MaterialTheme.colorScheme.background) {
-                        MapScreen()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
+    Scaffold(
+        topBar = {
+            ChooseOnMapAppBar(
+                onBackPressed = onBackPressed,
+                onSelectLocation = onSelectLocation,
+                mapView = mapView,
             )
-            == PackageManager.PERMISSION_GRANTED
-        )
-            onMapReady()
-        else
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                onMapReady()
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+            }) {
+                Icon(Icons.Default.MyLocation, "w")
             }
         }
-
-    fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
-    }
-
-    private fun onMapReady() {
-        mapView.gestures.rotateEnabled = false
-        mapView.attribution.enabled = false
-        mapView.scalebar.enabled = false
-
-        mapView.getMapboxMap().setCamera(
-            CameraOptions.Builder()
-                .zoom(1.0)
-                .build()
-        )
-
-        val style = if (requireContext().isDarkThemeOn())
-            "mapbox://styles/mapbox/dark-v10"
-        else
-            "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
-
-        mapView.getMapboxMap().loadStyleUri(style) {
-            initLocationComponent()
-            setupGesturesListener()
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            AndroidView(factory = { mapView }, Modifier.fillMaxSize()) {
+                onMapReady(it, context)
+            }
+            Icon(
+                Icons.Default.Place,
+                "",
+                modifier = Modifier.size(52.dp),
+                tint = MaterialTheme.colorScheme.error,
+            )
         }
     }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun MapScreen() {
-        Scaffold(
-            topBar = { MyAppBar() },
-            floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    initLocationComponent()
-                    setupGesturesListener()
-                }) {
-                    Icon(Icons.Default.MyLocation, "w")
+private fun onMapReady(
+    mapView: MapView,
+    context: Context
+) {
+    mapView.gestures.rotateEnabled = false
+    mapView.attribution.enabled = false
+    mapView.scalebar.enabled = false
+
+
+    mapView.getMapboxMap().setCamera(
+        CameraOptions.Builder()
+            .zoom(1.0)
+            .build()
+    )
+
+    val style = if (false)
+        "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0"
+    else
+        "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
+
+    mapView.getMapboxMap().loadStyleUri(style) {
+        val positionChangedListener = onIndicatorPositionChangedListener(mapView)
+        initLocationComponent(mapView, context, positionChangedListener)
+        setupGesturesListener(mapView, positionChangedListener)
+    }
+}
+
+private fun setupGesturesListener(
+    mapView: MapView,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
+) {
+    mapView.gestures.addOnMoveListener(onMoveListener(mapView, onIndicatorPositionChangedListener))
+}
+
+private fun onMoveListener(mapView: MapView, onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener) = object : OnMoveListener {
+    override fun onMoveBegin(detector: MoveGestureDetector) {
+        onCameraTrackingDismissed(mapView, this, onIndicatorPositionChangedListener)
+    }
+
+    override fun onMove(detector: MoveGestureDetector): Boolean {
+        return false
+    }
+
+    override fun onMoveEnd(detector: MoveGestureDetector) {}
+}
+
+private fun onCameraTrackingDismissed(
+    mapView: MapView,
+    onMoveListener: OnMoveListener,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
+) {
+    mapView.location
+        .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+    mapView.gestures.removeOnMoveListener(onMoveListener)
+}
+
+private fun initLocationComponent(
+    mapView: MapView,
+    context: Context,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
+) {
+    val locationComponentPlugin = mapView.location
+    locationComponentPlugin.updateSettings {
+        this.enabled = true
+        this.locationPuck = LocationPuck2D(
+            topImage = AppCompatResources.getDrawable(
+                context,
+                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
+            ),
+            bearingImage = AppCompatResources.getDrawable(
+                context,
+                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_bearing_icon
+            ),
+            scaleExpression = interpolate {
+                linear()
+                zoom()
+                stop {
+                    literal(0.0)
+                    literal(0.6)
                 }
+                stop {
+                    literal(20.0)
+                    literal(1.0)
+                }
+            }.toJson()
+        )
+    }
+    locationComponentPlugin.addOnIndicatorPositionChangedListener(
+        onIndicatorPositionChangedListener
+    )
+}
+
+private fun onIndicatorPositionChangedListener(
+    mapView: MapView,
+) = OnIndicatorPositionChangedListener {
+    mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).zoom(13.0).build())
+    mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
+}
+
+@Composable
+fun ChooseOnMapAppBar(
+    mapView: MapView,
+    onBackPressed: () -> Unit,
+    onSelectLocation: (Point) -> Unit,
+) {
+    SmallTopAppBar(
+        navigationIcon = {
+            IconButton(onClick = onBackPressed) {
+                Icon(Icons.Default.ArrowBack, null)
             }
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-            ) {
-                AndroidView(factory = ::MapView, Modifier.fillMaxSize()) {
-                    mapView = it
-                    enableMyLocation()
-                }
-                Icon(
-                    Icons.Default.Place,
-                    "",
-                    modifier = Modifier.size(52.dp),
-                    tint = MaterialTheme.colorScheme.error,
+        },
+        title = {
+            Column {
+                Text(
+                    text = "Choose post location",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Pan and zoom map under pin",
+                    fontSize = 14.sp
                 )
             }
-        }
-    }
-
-    private fun initLocationComponent() {
-        val locationComponentPlugin = mapView.location
-        locationComponentPlugin.updateSettings {
-            this.enabled = true
-//            this.locationPuck =
-//            this.locationPuck = LocationPuck2D(
-//                bearingImage = AppCompatResources.getDrawable(
-//                    requireContext(),
-//                    R.drawable.mapbox_user_puck_icon,
-//                ),
-//                shadowImage = AppCompatResources.getDrawable(
-//                    requireContext(),
-//                    R.drawable.mapbox_user_icon_shadow,
-//                ),
-//                scaleExpression = interpolate {
-//                    linear()
-//                    zoom()
-//                    stop {
-//                        literal(0.0)
-//                        literal(0.6)
-//                    }
-//                    stop {
-//                        literal(20.0)
-//                        literal(1.0)
-//                    }
-//                }.toJson()
-//            )
-        }
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(
-            onIndicatorPositionChangedListener
-        )
-    }
-
-    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        mapView.getMapboxMap().setCamera(
-            CameraOptions.Builder()
-                .center(it)
-                .zoom(13.0)
-                .build()
-        )
-        mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
-    }
-
-    private val onMoveListener = object : OnMoveListener {
-        override fun onMoveBegin(detector: MoveGestureDetector) {
-            onCameraTrackingDismissed()
-        }
-
-        override fun onMove(detector: MoveGestureDetector): Boolean {
-            return false
-        }
-
-        override fun onMoveEnd(detector: MoveGestureDetector) {}
-    }
-
-    private fun setupGesturesListener() {
-        mapView.gestures.addOnMoveListener(onMoveListener)
-    }
-
-    private fun onCameraTrackingDismissed() {
-        mapView.location
-            .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        mapView.gestures.removeOnMoveListener(onMoveListener)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.location
-            .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        mapView.gestures.removeOnMoveListener(onMoveListener)
-    }
-
-    @Composable
-    fun MyAppBar() {
-        SmallTopAppBar(
-            navigationIcon = {
-                IconButton(onClick = { dismiss() }) {
-                    Icon(Icons.Default.ArrowBack, null)
-                }
-            },
-            title = {
-                Column {
-                    Text(
-                        text = "Choose post location",
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Roboto,
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = "Pan and zoom map under pin",
-                        fontSize = 14.sp
-                    )
-                }
-            },
-            actions = {
-                TextButton(onClick = {
-                    val location = mapView.getMapboxMap().cameraState.center
-                    val action =
-                        ChooseOnMapDirections.actionChooseOnMapToAddDialogFragment(location)
-                    findNavController().navigate(
-                        action,
-                        NavOptions.Builder().setPopUpTo(R.id.homeFragment, true).build()
-                    )
-                }) {
-                    Text("OK")
-                }
-            },
-        )
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog: Dialog = super.onCreateDialog(savedInstanceState)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        return dialog
-    }
+        },
+        actions = {
+            TextButton(onClick = {
+                val center = mapView.getMapboxMap().cameraState.center
+                onSelectLocation(center)
+            }) {
+                Text("OK")
+            }
+        },
+    )
 }

@@ -42,7 +42,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.add.AddPostDialogViewModel
+import com.salazar.cheers.ui.add.AddPostViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -53,7 +53,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class ImageSelectorBottomSheetDialog : BottomSheetDialogFragment() {
 
     private val viewModel: ImageSelectorViewModel by viewModels()
-    private val sharedViewModel: AddPostDialogViewModel by activityViewModels()
+    private val sharedViewModel: AddPostViewModel by activityViewModels()
 
     override fun onStart() {
         super.onStart()
@@ -77,9 +77,9 @@ class ImageSelectorBottomSheetDialog : BottomSheetDialogFragment() {
             null
         )
         while (cursor?.moveToNext() == true) {
-            val absolutePathOfImage: String =
-                cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.RELATIVE_PATH))
-            images.add(absolutePathOfImage)
+//            val absolutePathOfImage: String =
+//                cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.RELATIVE_PATH))
+//            images.add(absolutePathOfImage)
         }
         cursor?.close()
         return images
@@ -136,7 +136,7 @@ class ImageSelectorBottomSheetDialog : BottomSheetDialogFragment() {
                 when (uiState) {
                     is TagUserUiState.HasChannels -> {
                         ChipInput(uiState)
-                        Users(users = uiState.users, sharedViewModel.selectedTagUsers)
+//                        Users(users = uiState.users, sharedViewModel.selectedTagUsers)
                     }
                     is TagUserUiState.NoChannels -> Text("No Users")
                 }
@@ -200,12 +200,12 @@ class ImageSelectorBottomSheetDialog : BottomSheetDialogFragment() {
     fun ChipInput(uiState: TagUserUiState.HasChannels) {
         val focusManager = LocalFocusManager.current
 
-        val selectedUsers = sharedViewModel.selectedTagUsers
-        ChipGroup(
-            users = selectedUsers.map { it.username },
-            onSelectedChanged = {
-            }
-        )
+//        val selectedUsers = sharedViewModel.selectedTagUsers
+//        ChipGroup(
+//            users = selectedUsers.map { it.username },
+//            onSelectedChanged = {
+//            }
+//        )
         TextField(
             value = uiState.searchInput,
             leadingIcon = { Icon(Icons.Filled.Search, "Search icon") },

@@ -1,13 +1,18 @@
 package com.salazar.cheers
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.bottomSheet
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.salazar.cheers.ui.add.AddPostRoute
+import com.salazar.cheers.ui.add.AddPostViewModel
 import com.salazar.cheers.ui.camera.CameraRoute
 import com.salazar.cheers.ui.camera.CameraViewModel
 import com.salazar.cheers.ui.chats.MessagesRoute
@@ -31,6 +36,7 @@ import com.salazar.cheers.ui.settings.SettingsViewModel
 
 @Composable
 fun CheersNavGraph(
+    profilePictureUrl: String,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
     navActions: CheersNavigationActions,
@@ -41,6 +47,14 @@ fun CheersNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
+        composable(route = CheersDestinations.ADD_POST_SHEET) {
+            val viewModel = hiltViewModel<AddPostViewModel>()
+            AddPostRoute(
+                addPostViewModel = viewModel,
+                navActions = navActions,
+                profilePictureUrl = profilePictureUrl,
+            )
+        }
         composable(CheersDestinations.HOME_ROUTE) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
             HomeRoute(

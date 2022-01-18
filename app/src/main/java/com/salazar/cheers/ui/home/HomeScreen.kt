@@ -75,6 +75,8 @@ fun HomeScreen(
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
+    navigateToAddEvent: () -> Unit,
+    navigateToAddPost: () -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
@@ -117,11 +119,10 @@ fun HomeScreen(
                     },
                     onFabItemClicked = {
                         toState = MultiFabState.COLLAPSED
-//                        if (it.identifier == "event")
-////                            navActions.na
-//                            findNavController().navigate(R.id.addEventFragment)
-//                        else
-//                            findNavController().navigate(R.id.addDialogFragment)
+                        if (it.identifier == "event")
+                            navigateToAddEvent()
+                        else
+                            navigateToAddPost()
                     }
                 )
             }

@@ -74,7 +74,7 @@ import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.ui.add.AddPostDialogViewModel
+import com.salazar.cheers.ui.add.AddPostViewModel
 import com.salazar.cheers.ui.theme.Typography
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -88,7 +88,7 @@ class HomeFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: HomeViewModel by activityViewModels()
-    private val el: AddPostDialogViewModel by activityViewModels()
+    private val el: AddPostViewModel by activityViewModels()
     lateinit var adLoader: AdLoader
 
     override fun onCreateView(
