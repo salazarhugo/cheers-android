@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.add
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,10 +14,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.MyLocation
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -54,6 +52,7 @@ import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.util.Utils
 
 @Composable
 fun AddPostScreen(
@@ -216,6 +215,15 @@ fun AddPhotoOrVideo(
     navigateToCamera: () -> Unit,
     onSelectMedia: (Uri) -> Unit,
 ) {
+    val context = LocalContext.current
+    val takePictureLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
+            if (it != null) {
+                val uri = Utils.getImageUri(context, it)
+                if (uri != null)
+                    onSelectMedia(uri)
+            }
+        }
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
             if (it != null)
@@ -226,21 +234,28 @@ fun AddPhotoOrVideo(
         return
     Row(
         modifier = Modifier
-            .padding(15.dp)
+            .padding(16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     )
     {
-        FilledTonalButton(onClick = {
-            launcher.launch(
-                "image/*"
-            )
-        }) {
-            Icon(Icons.Outlined.PhotoCamera, "")
+        FilledTonalButton(
+            onClick = {
+                launcher.launch(
+                    "image/*"
+                )
+            },
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(Icons.Outlined.PhotoAlbum, "")
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Add photo or video")
+            Text(text = "Add from gallery")
         }
-        FilledTonalButton(onClick = navigateToCamera) {
+        Spacer(Modifier.width(8.dp))
+        FilledTonalButton(
+            onClick = { takePictureLauncher.launch() },
+            modifier = Modifier.weight(1f)
+        ) {
             Icon(Icons.Outlined.PhotoCamera, "")
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Take a photo")

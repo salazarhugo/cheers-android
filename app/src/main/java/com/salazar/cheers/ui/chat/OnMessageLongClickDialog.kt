@@ -15,11 +15,11 @@ import com.salazar.cheers.internal.TextMessage
 fun OnMessageLongClickDialog(
     openDialog: MutableState<Boolean>,
     msg: Message,
-    onUnsendMessage: (Message) -> Unit = {},
+    onUnsendMessage: (String) -> Unit = {},
     onCopyText: (String) -> Unit,
     onSaveReply: () -> Unit = {},
-    onLike: (Message) -> Unit = {},
-    onUnlike: (Message) -> Unit = {},
+    onLike: (String) -> Unit = {},
+    onUnlike: (String) -> Unit = {},
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -37,7 +37,7 @@ fun OnMessageLongClickDialog(
                     TextButton(
                         onClick = {
                             openDialog.value = false
-                            onUnsendMessage(msg)
+                            onUnsendMessage(msg.id)
                         },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -63,7 +63,7 @@ fun OnMessageLongClickDialog(
                 if (msg.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!))
                     TextButton(
                         onClick = {
-                            onUnlike(msg)
+                            onUnlike(msg.id)
                             openDialog.value = false
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -73,7 +73,7 @@ fun OnMessageLongClickDialog(
                 else
                     TextButton(
                         onClick = {
-                            onLike(msg)
+                            onLike(msg.id)
                             openDialog.value = false
                         },
                         modifier = Modifier.fillMaxWidth(),

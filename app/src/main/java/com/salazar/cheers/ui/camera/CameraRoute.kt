@@ -6,9 +6,9 @@ import androidx.compose.runtime.getValue
 import com.salazar.cheers.CheersNavigationActions
 
 /**
- * Stateful composable that displays the Navigation route for the Interests screen.
+ * Stateful composable that displays the Navigation route for the Camera screen.
  *
- * @param homeViewModel ViewModel that handles the business logic of this screen
+ * @param cameraViewModel ViewModel that handles the business logic of this screen
  */
 @Composable
 fun CameraRoute(
@@ -16,9 +16,12 @@ fun CameraRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by cameraViewModel.uiState.collectAsState()
+
     CameraScreen(
         uiState = uiState,
-        navActions = navActions,
-        onTakePhoto = { cameraViewModel.setImageUri(it) }
+        onTakePhoto = {
+            cameraViewModel.setImageUri(it)
+            navActions.navigateToAddPostSheetWithPhotoUri(it.toString())
+        }
     )
 }

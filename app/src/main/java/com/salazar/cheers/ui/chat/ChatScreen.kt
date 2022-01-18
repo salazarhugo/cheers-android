@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -30,10 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsWithImePadding
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.AnimateHeart
 import com.salazar.cheers.components.DirectChatBar
@@ -50,23 +46,20 @@ import java.util.*
 
 const val ConversationTestTag = "ConversationTestTag"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     uiState: ChatUiState.HasChannel,
-    channelId: String,
     name: String,
     username: String,
     profilePicturePath: String,
-    messages: List<Message>,
-    onMessageSent: (channelId: String, msg: String) -> Unit,
-    onUnsendMessage: (Message) -> Unit = {},
-    onDoubleTapMessage: (Message) -> Unit = {},
-    onUnlike: (Message) -> Unit = {},
-    onTitleClick: (username: String) -> Unit = {},
-    onCopyText: (String) -> Unit = {},
-    onImageSelectorClick: () -> Unit = {},
-    onPoBackStack: () -> Unit = {},
+    onMessageSent: (msg: String) -> Unit,
+    onUnsendMessage: (msgId: String) -> Unit,
+    onLike: (msgId: String) -> Unit,
+    onUnlike: (msgId: String) -> Unit,
+    onTitleClick: (username: String) -> Unit,
+    onCopyText: (String) -> Unit,
+    onImageSelectorClick: () -> Unit,
+    onPoBackStack: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
@@ -83,26 +76,26 @@ fun ChatScreen(
             ) {
                 Messages(
                     uiState = uiState,
-                    messages = messages,
+                    messages = uiState.messages,
                     navigateToProfile = {},
                     modifier = Modifier.weight(1f),
                     scrollState = scrollState,
                     onLongClickMessage = {
                         openDialog.value = true
-                        selectedMessage.value = it
+//                        selectedMessage.value = it
                     },
-                    onDoubleTapMessage = onDoubleTapMessage
+                    onDoubleTapMessage = onLike
                 )
                 UserInput(
                     onMessageSent = {
-                        onMessageSent(channelId, it)
+                        onMessageSent(it)
                     },
                     resetScroll = {
                         scope.launch {
                             scrollState.scrollToItem(0)
                         }
                     },
-                    modifier = Modifier.navigationBarsWithImePadding(),
+                    modifier = Modifier.imePadding(),
                     onImageSelectorClick = onImageSelectorClick,
                 )
             }
@@ -113,7 +106,7 @@ fun ChatScreen(
                 onNavIconPressed = { onPoBackStack() },
                 onTitleClick = onTitleClick,
                 scrollBehavior = scrollBehavior,
-                modifier = Modifier.statusBarsPadding(),
+//                modifier = Modifier.statusBarsPadding(),
             )
         }
     }
@@ -124,7 +117,7 @@ fun ChatScreen(
             msg = selectedMessage.value ?: TextMessage(),
             onUnsendMessage = onUnsendMessage,
             onCopyText = onCopyText,
-            onLike = onDoubleTapMessage,
+            onLike = onLike,
             onUnlike = onUnlike,
         )
 }
@@ -134,8 +127,8 @@ fun Messages(
     uiState: ChatUiState.HasChannel,
     messages: List<Message>,
     navigateToProfile: (String) -> Unit,
-    onLongClickMessage: (Message) -> Unit,
-    onDoubleTapMessage: (Message) -> Unit,
+    onLongClickMessage: (String) -> Unit,
+    onDoubleTapMessage: (String) -> Unit,
     scrollState: LazyListState,
     modifier: Modifier = Modifier
 ) {
@@ -210,13 +203,12 @@ fun Messages(
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun Message(
     uiState: ChatUiState.HasChannel,
     onAuthorClick: (String) -> Unit,
-    onLongClickMessage: (Message) -> Unit,
-    onDoubleTapMessage: (Message) -> Unit,
+    onLongClickMessage: (String) -> Unit,
+    onDoubleTapMessage: (String) -> Unit,
     isUserMe: Boolean,
     message: Message,
     isFirstMessageByAuthor: Boolean,
@@ -271,8 +263,8 @@ fun AuthorAndTextMessage(
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean,
     authorClicked: (String) -> Unit,
-    onLongClickMessage: (Message) -> Unit,
-    onDoubleTapMessage: (Message) -> Unit,
+    onLongClickMessage: (String) -> Unit,
+    onDoubleTapMessage: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -363,8 +355,8 @@ private fun RowScope.DayHeaderLine() {
 @Composable
 fun ImageMessageBubble(
     message: ImageMessage,
-    onLongClickMessage: (Message) -> Unit,
-    onDoubleTapMessage: (Message) -> Unit,
+    onLongClickMessage: (String) -> Unit,
+    onDoubleTapMessage: (String) -> Unit,
 ) {
     Column {
         message.imagesDownloadUrl.forEach { downloadUrl ->
@@ -377,8 +369,8 @@ fun ImageMessageBubble(
                     .clip(RoundedCornerShape(12.dp))
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onLongPress = { onLongClickMessage(message) },
-                            onDoubleTap = { onDoubleTapMessage(message) }
+                            onLongPress = { onLongClickMessage(message.id) },
+                            onDoubleTap = { onDoubleTapMessage(message.id) }
                         )
                     },
                 contentScale = ContentScale.Crop,
@@ -394,8 +386,8 @@ fun ChatItemBubble(
     message: Message,
     isUserMe: Boolean,
     authorClicked: (String) -> Unit,
-    onLongClickMessage: (Message) -> Unit,
-    onDoubleTapMessage: (Message) -> Unit,
+    onLongClickMessage: (String) -> Unit,
+    onDoubleTapMessage: (String) -> Unit,
 ) {
 
     val backgroundBubbleColor = if (isUserMe)
@@ -411,8 +403,8 @@ fun ChatItemBubble(
             shape = shape,
             modifier = Modifier.pointerInput(Unit) {
                 detectTapGestures(
-                    onLongPress = { onLongClickMessage(message) },
-                    onDoubleTap = { onDoubleTapMessage(message) }
+                    onLongPress = { onLongClickMessage(message.id) },
+                    onDoubleTap = { onDoubleTapMessage(message.id) }
                 )
             }
         ) {

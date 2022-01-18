@@ -69,7 +69,7 @@ class CheersApplication : Application(), Configuration.Provider {
     private fun createNotificationChannel() {
         val name = getString(R.string.default_notification_channel_name)
         val descriptionText = getString(R.string.default_notification_channel_description)
-        val importance = NotificationManager.IMPORTANCE_MAX
+        val importance = NotificationManager.IMPORTANCE_HIGH
         val channel = NotificationChannel(
             getString(R.string.default_notification_channel_id),
             name,

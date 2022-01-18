@@ -14,14 +14,18 @@ import com.salazar.cheers.CheersNavigationActions
 fun MessagesRoute(
     messagesViewModel: MessagesViewModel,
     navActions: CheersNavigationActions,
+    username: String,
 ) {
     val uiState by messagesViewModel.uiState.collectAsState()
     MessagesScreen(
         uiState = uiState,
+        username = username,
         onBackPressed = {},
         onActivityIconClicked = {
         },
-        onChannelClicked = { a, b, c, d -> },
+        onChannelClicked = { a, b, c, d ->
+            navActions.navigateToChat(a, b, c, d)
+        },
         onNewMessageClicked = {
 //                              navActions.navigateToChat()
         },

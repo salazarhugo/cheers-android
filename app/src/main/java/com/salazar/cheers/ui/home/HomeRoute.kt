@@ -24,5 +24,6 @@ fun HomeRoute(
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         navigateToAddEvent = {},
         navigateToAddPost = { navActions.navigateToAddPostSheet() },
+        onSelectTab = homeViewModel::selectTab,
     )
 }

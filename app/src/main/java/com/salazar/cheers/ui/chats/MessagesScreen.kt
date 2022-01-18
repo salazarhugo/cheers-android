@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MessagesScreen(
     uiState: MessagesUiState,
+    username: String,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onNewMessageClicked: () -> Unit,
@@ -51,7 +52,7 @@ fun MessagesScreen(
     Scaffold(
         topBar = {
             Column {
-                MyAppBar("TODO" ?: "Chat", onBackPressed, onActivityIconClicked)
+                MyAppBar(username, onBackPressed, onActivityIconClicked)
             }
         },
         floatingActionButton = {

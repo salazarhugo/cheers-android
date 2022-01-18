@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.profile
+package com.salazar.cheers.ui.editprofile
 
 import android.app.Activity
 import android.app.Dialog

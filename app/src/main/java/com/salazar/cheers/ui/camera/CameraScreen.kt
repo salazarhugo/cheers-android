@@ -37,6 +37,9 @@ import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
 import com.salazar.cheers.CheersNavigationActions
 import com.salazar.cheers.R
+import com.salazar.cheers.util.Utils.createFile
+import com.salazar.cheers.util.Utils.getOutputDirectory
+import com.salazar.cheers.util.Utils.getOutputFileOptions
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,7 +57,6 @@ sealed class CameraUIAction {
 fun CameraScreen(
     uiState: CameraUiState,
     modifier: Modifier = Modifier,
-    navActions: CheersNavigationActions,
     onTakePhoto: (Uri) -> Unit,
 ) {
     CameraPermission { }
@@ -212,7 +214,6 @@ private fun CameraPermission(
             }
         }
     ) {
-//            Text("Camera permission Granted")
     }
 }
 
@@ -255,34 +256,3 @@ fun ImageCapture.takePicture(
         })
 }
 
-private fun getOutputFileOptions(
-    lensFacing: Int,
-    photoFile: File
-): ImageCapture.OutputFileOptions {
-
-    // Setup image capture metadata
-    val metadata = ImageCapture.Metadata().apply {
-        // Mirror image when using the front camera
-        isReversedHorizontal = lensFacing == CameraSelector.LENS_FACING_FRONT
-    }
-    // Create output options object which contains file + metadata
-
-    return ImageCapture.OutputFileOptions.Builder(photoFile)
-        .setMetadata(metadata)
-        .build()
-}
-
-private fun createFile(baseFolder: File, format: String, extension: String) =
-    File(
-        baseFolder, SimpleDateFormat(format, Locale.US)
-            .format(System.currentTimeMillis()) + extension
-    )
-
-
-private fun Context.getOutputDirectory(): File {
-    val mediaDir = this.externalMediaDirs.firstOrNull()?.let {
-        File(it, this.resources.getString(R.string.app_name)).apply { mkdirs() }
-    }
-    return if (mediaDir != null && mediaDir.exists())
-        mediaDir else this.filesDir
-}

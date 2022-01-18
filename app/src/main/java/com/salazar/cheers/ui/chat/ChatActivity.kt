@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -41,8 +40,6 @@ class ChatActivity : AppCompatActivity() {
         ChatViewModel.provideFactory(chatViewModelFactory, args.channelId)
     }
 
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,59 +58,6 @@ class ChatActivity : AppCompatActivity() {
             ProvideWindowInsets(consumeWindowInsets = false, windowInsetsAnimationsEnabled = true) {
                 CompositionLocalProvider {
                     CheersTheme {
-                        val messages = chatViewModel.messages(channelId)
-                            .collectAsState(initial = listOf()).value
-                        val localClipboardManager = LocalClipboardManager.current
-                        val uiState by chatViewModel.uiState.collectAsState()
-
-                        when (uiState) {
-                            is ChatUiState.HasChannel -> {
-                                ChatScreen(
-                                    uiState = uiState as ChatUiState.HasChannel,
-                                    channelId = channelId,
-                                    name = args.name,
-                                    username = args.username,
-                                    profilePicturePath = args.profilePicturePath,
-                                    messages = messages,
-                                    onMessageSent = ::senMessage,
-                                    onUnsendMessage = {
-                                        chatViewModel.unsendMessage(
-                                            channelId = channelId,
-                                            messageId = it.id
-                                        )
-                                    },
-                                    onDoubleTapMessage = {
-                                        chatViewModel.likeMessage(
-                                            channelId = channelId,
-                                            messageId = it.id
-                                        )
-                                    },
-                                    onUnlike = {
-                                        chatViewModel.unlikeMessage(
-                                            channelId = channelId,
-                                            messageId = it.id
-                                        )
-                                    },
-                                    onCopyText = {
-                                        localClipboardManager.setText(AnnotatedString(it))
-                                        toast("Copied text to clipboard")
-                                    },
-                                    onImageSelectorClick = {
-                                        Utils.openPhotoChooser(
-                                            multipleImageResultLauncher,
-                                            false
-                                        ) // TODO (Allow multiple images)
-                                    },
-                                    onPoBackStack = {
-                                        finish()
-                                    },
-                                    onTitleClick = {
-//                                       findNavController().navigate()
-                                    },
-                                )
-                            }
-                            is ChatUiState.NoChannel -> LoadingScreen()
-                        }
                     }
                 }
             }
@@ -140,18 +84,4 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
         }
-
-    private fun senMessage(channelId: String, msg: String) {
-        chatViewModel.sendTextMessage(msg, channelId)
-    }
-
-//    override fun onSupportNavigateUp(): Boolean {
-//        return findNavController().navigateUp() || super.onSupportNavigateUp()
-//    }
-//
-//    private fun findNavController(): NavController {
-//        val navHostFragment =
-//            supportFragmentManager.findFragmentById(R.id.mobile_navigation_chat) as NavHostFragment
-//        return navHostFragment.navController
-//    }
 }

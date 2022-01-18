@@ -77,6 +77,7 @@ fun HomeScreen(
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
+    onSelectTab: (Int) -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
@@ -95,7 +96,7 @@ fun HomeScreen(
             topBar = {
                 Column {
                     MyAppBar(uiState, navActions)
-                    TopTabs(uiState = uiState)
+                    TopTabs(uiState = uiState, onSelectTab = onSelectTab)
                     if (showDivider)
                         DividerM3()
                 }
@@ -222,17 +223,20 @@ fun NativeAdPost(ad: NativeAd) {
 }
 
 @Composable
-fun TopTabs(uiState: HomeUiState) {
+fun TopTabs(
+    uiState: HomeUiState,
+    onSelectTab: (Int) -> Unit,
+) {
     val tabs = listOf("Posts", "Parties")
     val selectedTab = uiState.selectedTab
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
         tabs.forEachIndexed { index, s ->
             if (index == selectedTab)
-                FilledTonalButton(onClick = { }) {//viewModel.selectTab(index) }) {
+                FilledTonalButton(onClick = { onSelectTab(index) }) {
                     Text(s)
                 }
             else
-                TextButton(onClick = { }) {//viewModel.selectTab(index) }) {
+                TextButton(onClick = { onSelectTab(index) }) {
                     Text(s)
                 }
         }

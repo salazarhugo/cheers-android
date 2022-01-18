@@ -62,7 +62,6 @@ fun UserInputPreview() {
     UserInput(onMessageSent = {}, onImageSelectorClick = {})
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserInput(
     onMessageSent: (String) -> Unit,

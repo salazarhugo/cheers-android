@@ -173,16 +173,23 @@ fun UiLayer(scope: BoxScope, uiState: MapUiState, mapView: MapView) {
     }
 }
 
-private fun initLocationComponent(mapView: MapView, context: Context) {
+private fun initLocationComponent(
+    mapView: MapView,
+    context: Context,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
+) {
     val locationComponentPlugin = mapView.location
     locationComponentPlugin.updateSettings {
         this.enabled = true
-        getBitmojiAvatar(context) {
-            Log.d("BITMOJI", it)
-            val bitmap = getBitmapFromUrl(it)
             this.locationPuck = LocationPuck2D(
-//                bearingImage = bitmap.toDrawable(resources),
-//                shadowImage = bitmap.toDrawable(resources),
+                topImage = AppCompatResources.getDrawable(
+                    context,
+                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
+                ),
+                bearingImage = AppCompatResources.getDrawable(
+                    context,
+                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_bearing_icon
+                ),
                 scaleExpression = interpolate {
                     linear()
                     zoom()
@@ -196,10 +203,9 @@ private fun initLocationComponent(mapView: MapView, context: Context) {
                     }
                 }.toJson()
             )
-        }
     }
     locationComponentPlugin.addOnIndicatorPositionChangedListener(
-        onIndicatorPositionChangedListener(mapView)
+        onIndicatorPositionChangedListener
     )
 }
 
@@ -240,16 +246,11 @@ private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int
 private fun onIndicatorPositionChangedListener(
     mapView: MapView,
 ) = OnIndicatorPositionChangedListener {
-//    mapView.getMapboxMap().setCamera(
-//        CameraOptions.Builder()
-//            .center(it)
-//            .zoom(13.0)
-//            .build()
-//    )
+    mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).zoom(13.0).build())
     mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
 }
 
-private fun onMoveListener(mapView: MapView) = object : OnMoveListener {
+private fun onMoveListener(mapView: MapView, onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener) = object : OnMoveListener {
     override fun onMoveBegin(detector: MoveGestureDetector) {
         onCameraTrackingDismissed(mapView, this)
     }
@@ -276,8 +277,11 @@ private fun onMoveListener(mapView: MapView) = object : OnMoveListener {
     }
 }
 
-private fun setupGesturesListener(mapView: MapView) {
-    mapView.gestures.addOnMoveListener(onMoveListener(mapView))
+private fun setupGesturesListener(
+    mapView: MapView,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
+) {
+    mapView.gestures.addOnMoveListener(onMoveListener(mapView, onIndicatorPositionChangedListener))
 }
 
 private fun onCameraTrackingDismissed(mapView: MapView, onMoveListener: OnMoveListener) {
@@ -325,8 +329,9 @@ private fun onMapReady(mapView: MapView, context: Context) {
         "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
 
     mapView.getMapboxMap().loadStyleUri(style) {
-        initLocationComponent(mapView, context)
-        setupGesturesListener(mapView)
+        val positionChangedListener = onIndicatorPositionChangedListener(mapView)
+        initLocationComponent(mapView, context, positionChangedListener)
+        setupGesturesListener(mapView, positionChangedListener)
     }
 }
 

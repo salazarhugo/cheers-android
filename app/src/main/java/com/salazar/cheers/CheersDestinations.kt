@@ -1,7 +1,8 @@
 package com.salazar.cheers
 
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Destinations used in the [CheersApp].
@@ -22,6 +23,7 @@ object CheersDestinations {
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val ADD_POST_SHEET = "addPostSheet"
+    const val PROFILE_MORE_SHEET = "profileMoreSheet"
 }
 
 /**
@@ -30,6 +32,18 @@ object CheersDestinations {
 class CheersNavigationActions(navController: NavHostController) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+    val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
+        navController.navigate("${CheersDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+    val navigateToProfileMoreSheet: () -> Unit = {
+        navController.navigate(CheersDestinations.PROFILE_MORE_SHEET) {
+            launchSingleTop = true
+            restoreState = true
+        }
     }
     val navigateToAddPostSheet: () -> Unit = {
         navController.navigate(CheersDestinations.ADD_POST_SHEET) {
@@ -105,8 +119,9 @@ class CheersNavigationActions(navController: NavHostController) {
         username: String,
         name: String,
         profilePictureUrl: String
-    ) -> Unit = { channelId, username, name, pictureUrl ->
-        navController.navigate("${CheersDestinations.CHAT_ROUTE}/$channelId") {
+    ) -> Unit = { channelId, username, name, profilePictureUrl ->
+        val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
+        navController.navigate("${CheersDestinations.CHAT_ROUTE}/$channelId/$username/$name/$encodedUrl") {
             launchSingleTop = true
             restoreState = true
         }

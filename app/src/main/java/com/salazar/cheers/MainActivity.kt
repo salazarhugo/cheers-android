@@ -53,6 +53,7 @@ import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.databinding.ContentMainBinding
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Fragment
+import com.salazar.cheers.ui.chat.ChatViewModel
 import com.salazar.cheers.ui.detail.PostDetailViewModel
 import com.salazar.cheers.ui.home.PostBottomSheet
 import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     interface ViewModelFactoryProvider {
         fun postDetailViewModelFactory(): PostDetailViewModel.PostDetailViewModelFactory
         fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
+        fun chatViewModelFactory(): ChatViewModel.ChatViewModelFactory
     }
 
     private val mainViewModel: MainViewModel by viewModels()

@@ -59,26 +59,23 @@ fun ProfileScreen(
     onEditProfileClicked: () -> Unit,
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
-    onStatClicked: (statName: String, username: String) -> Unit
+    onStatClicked: (statName: String, username: String) -> Unit,
+    navigateToProfileMoreSheet: () -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
         onRefresh = onSwipeRefresh,
     ) {
-        ProfileBottomSheet(
-            sheetState = uiState.sheetState,
-            onSettingsClick = onSettingsClicked,
-        ) {
-            when (uiState) {
-                is ProfileUiState.Loading -> LoadingScreen()
-                is ProfileUiState.HasUser -> Profile(
-                    uiState = uiState,
-                    onEditProfileClicked = onEditProfileClicked,
-                    onLikeClicked = onLikeClicked,
-                    onPostClicked = onPostClicked,
-                    onStatClicked = onStatClicked
-                )
-            }
+        when (uiState) {
+            is ProfileUiState.Loading -> LoadingScreen()
+            is ProfileUiState.HasUser -> Profile(
+                uiState = uiState,
+                onEditProfileClicked = onEditProfileClicked,
+                onLikeClicked = onLikeClicked,
+                onPostClicked = onPostClicked,
+                onStatClicked = onStatClicked,
+                navigateToProfileMoreSheet = navigateToProfileMoreSheet,
+            )
         }
     }
 }
@@ -89,10 +86,11 @@ fun Profile(
     onEditProfileClicked: () -> Unit,
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
-    onStatClicked: (statName: String, username: String) -> Unit
+    onStatClicked: (statName: String, username: String) -> Unit,
+    navigateToProfileMoreSheet: () -> Unit
 ) {
     Scaffold(
-        topBar = { Toolbar(uiState = uiState) }
+        topBar = { Toolbar(uiState = uiState, navigateToProfileMoreSheet) }
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column(
@@ -336,7 +334,10 @@ fun Section2(user: User) {
 }
 
 @Composable
-fun Toolbar(uiState: ProfileUiState.HasUser) {
+fun Toolbar(
+    uiState: ProfileUiState.HasUser,
+    navigateToProfileMoreSheet: () -> Unit,
+) {
     val otherUser = uiState.user
     val scope = rememberCoroutineScope()
     Column {
@@ -358,11 +359,7 @@ fun Toolbar(uiState: ProfileUiState.HasUser) {
                 IconButton(onClick = {}) {
                     Icon(painter = painterResource(id = R.drawable.ic_add_box_white), "")
                 }
-                IconButton(onClick = {
-                    scope.launch {
-                        uiState.sheetState.show()
-                    }
-                }) {
+                IconButton(onClick = navigateToProfileMoreSheet) {
                     Icon(painter = painterResource(id = R.drawable.ic_more_vert_icon), "")
                 }
             },

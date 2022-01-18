@@ -2,6 +2,7 @@ package com.salazar.cheers
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,8 +24,11 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.components.CheersNavigationBar
+import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.chats.MessagesViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
+import com.salazar.cheers.ui.theme.GreySheet
 
 @Composable
 fun CheersApp() {
@@ -56,7 +60,8 @@ fun CheersApp() {
 
             ModalBottomSheetLayout(
                 bottomSheetNavigator = bottomSheetNavigator,
-//                sheetShape = RoundedCornerShape(22.dp),
+                sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+                sheetBackgroundColor = if (darkIcons) MaterialTheme.colorScheme.surface else GreySheet,
                 sheetElevation = 0.dp,
                 modifier = Modifier
                     .fillMaxSize()
@@ -65,19 +70,22 @@ fun CheersApp() {
             ) {
                 Scaffold(
                     bottomBar = {
-                        CheersNavigationBar(
-                            profilePictureUrl = mainViewModel.user2.value?.profilePictureUrl?: "",
-                            currentRoute = currentRoute,
-                            navigateToHome = navigationActions.navigateToHome,
-                            navigateToMap = navigationActions.navigateToMap,
-                            navigateToSearch = navigationActions.navigateToSearch,
-                            navigateToMessages = navigationActions.navigateToMessages,
-                            navigateToProfile = navigationActions.navigateToProfile,
-                        )
+                        Column {
+                            DividerM3()
+                            CheersNavigationBar(
+                                profilePictureUrl = mainViewModel.user2.value?.profilePictureUrl?: "",
+                                currentRoute = currentRoute,
+                                navigateToHome = navigationActions.navigateToHome,
+                                navigateToMap = navigationActions.navigateToMap,
+                                navigateToSearch = navigationActions.navigateToSearch,
+                                navigateToMessages = navigationActions.navigateToMessages,
+                                navigateToProfile = navigationActions.navigateToProfile,
+                            )
+                        }
                     },
                 ) { innerPadding ->
                     CheersNavGraph(
-                        profilePictureUrl = mainViewModel.user2.value?.profilePictureUrl?: "",
+                        user = mainViewModel.user2.value ?: User(),
                         navController = navController,
                         navActions = navigationActions,
                         modifier = Modifier

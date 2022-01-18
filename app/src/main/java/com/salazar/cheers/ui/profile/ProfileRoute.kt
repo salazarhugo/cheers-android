@@ -18,11 +18,12 @@ fun ProfileRoute(
     val uiState by profileViewModel.uiState.collectAsState()
     ProfileScreen(
         uiState = uiState,
-        onSwipeRefresh = { profileViewModel.refresh() },
+        onSwipeRefresh = profileViewModel::refresh,
         onStatClicked = { statName, username ->  navActions.navigateToProfileStats(statName, username) },
         onPostClicked = { navActions.navigateToPostDetail(it) },
-        onLikeClicked = { profileViewModel.toggleLike(it) },
+        onLikeClicked = profileViewModel::toggleLike,
         onEditProfileClicked = {},
-        onSettingsClicked = navActions.navigateToSettings
+        onSettingsClicked = navActions.navigateToSettings,
+        navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
     )
 }

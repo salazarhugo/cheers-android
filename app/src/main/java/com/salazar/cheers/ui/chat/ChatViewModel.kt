@@ -1,22 +1,29 @@
 package com.salazar.cheers.ui.chat
 
+import android.app.Activity
 import android.app.Application
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.workers.UploadImageMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -32,6 +39,7 @@ sealed interface ChatUiState {
 
     data class HasChannel(
         val channel: ChatChannel,
+        val messages: List<Message>,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : ChatUiState
@@ -41,11 +49,13 @@ private data class ChatViewModelState(
     val channel: ChatChannel? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
+    val messages: List<Message> = emptyList(),
 ) {
     fun toUiState(): ChatUiState =
         if (channel != null) {
             ChatUiState.HasChannel(
                 channel = channel,
+                messages = messages,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
@@ -77,10 +87,13 @@ class ChatViewModel @AssistedInject constructor(
         refreshChannel()
         refreshCurrentUser()
         seenLastMessage()
-    }
 
-    fun messages(channelId: String): Flow<List<Message>> =
-        FirestoreChat.getChatMessages(channelId = channelId)
+        viewModelScope.launch {
+            FirestoreChat.getChatMessages(channelId).collect { messages ->
+                viewModelState.update { it.copy(messages = messages) }
+            }
+        }
+    }
 
     private val user2 = mutableStateOf<User?>(null)
 
@@ -129,7 +142,7 @@ class ChatViewModel @AssistedInject constructor(
         workManager.enqueue(uploadImageMessageWorkRequest)
     }
 
-    fun sendTextMessage(text: String, channelId: String) {
+    fun sendTextMessage(text: String) {
         val user = user2.value ?: return
         viewModelScope.launch {
             val textMessage =
@@ -147,19 +160,19 @@ class ChatViewModel @AssistedInject constructor(
         }
     }
 
-    fun unsendMessage(channelId: String, messageId: String) {
+    fun unsendMessage(messageId: String) {
         viewModelScope.launch {
             FirestoreChat.unsendMessage(channelId = channelId, messageId = messageId)
         }
     }
 
-    fun likeMessage(channelId: String, messageId: String) {
+    fun likeMessage(messageId: String) {
         viewModelScope.launch {
             FirestoreChat.likeMessage(channelId = channelId, messageId = messageId)
         }
     }
 
-    fun unlikeMessage(channelId: String, messageId: String) {
+    fun unlikeMessage(messageId: String) {
         viewModelScope.launch {
             FirestoreChat.unlikeMessage(channelId = channelId, messageId = messageId)
         }
@@ -181,4 +194,14 @@ class ChatViewModel @AssistedInject constructor(
             }
         }
     }
+}
+
+@Composable
+fun chatViewModel(channelId: String): ChatViewModel {
+    val factory = EntryPointAccessors.fromActivity(
+        LocalContext.current as Activity,
+        MainActivity.ViewModelFactoryProvider::class.java
+    ).chatViewModelFactory()
+
+    return viewModel(factory = ChatViewModel.provideFactory(factory, channelId = channelId))
 }
