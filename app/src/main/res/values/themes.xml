@@ -27,7 +27,7 @@
     </style>
 
     <style name="Theme.Cheers.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="windowSplashScreenBackground">@color/white</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_artboard_1cheers_logo_svg</item>
         <item name="windowSplashScreenAnimationDuration">200</item>
         <item name="postSplashScreenTheme">@style/Theme.Cheers</item>

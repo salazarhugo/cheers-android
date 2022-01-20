@@ -1,5 +1,7 @@
 package com.salazar.cheers
 
+import android.net.Uri
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,10 +52,11 @@ fun CheersNavGraph(
         modifier = modifier
     ) {
         bottomSheet(
-            route = "${CheersDestinations.CHAT_ROUTE}/{channelId}/{username}/{name}/{profilePictureUrl}",
+            route = "${CheersDestinations.CHAT_ROUTE}/{channelId}/{username}/{verified}/{name}/{profilePictureUrl}",
         ) {
             val channelId = it.arguments?.getString("channelId")!!
             val username = it.arguments?.getString("username")!!
+            val verified = it.arguments?.getBoolean("verified")!!
             val name = it.arguments?.getString("name")!!
             val profilePictureUrl2 = it.arguments?.getString("profilePictureUrl")!!
 
@@ -62,6 +65,7 @@ fun CheersNavGraph(
                 chatViewModel = chatViewModel,
                 navActions = navActions,
                 username = username,
+                verified = verified,
                 name = name,
                 profilePictureUrl = profilePictureUrl2,
             )
@@ -98,6 +102,8 @@ fun CheersNavGraph(
                 profilePictureUrl = user.profilePictureUrl,
             )
             val photoUri = it.arguments?.getString("photoUri")
+            if (photoUri != null)
+                viewModel.setPostImage(Uri.parse(photoUri))
         }
 
         composable(CheersDestinations.HOME_ROUTE) {
@@ -115,7 +121,7 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.CAMERA_ROUTE) {
+        bottomSheet(CheersDestinations.CAMERA_ROUTE) {
             val cameraViewModel = hiltViewModel<CameraViewModel>()
             CameraRoute(
                 cameraViewModel = cameraViewModel,
@@ -176,6 +182,7 @@ fun CheersNavGraph(
                 messagesViewModel = messagesViewModel,
                 navActions = navActions,
                 username = user.username,
+                verified = user.verified,
             )
         }
 

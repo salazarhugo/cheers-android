@@ -51,7 +51,7 @@ class SignInActivity : AppCompatActivity() {
             }
         }
 //        checkGithubCallback()
-        signInWithSnapchat()
+//        signInWithSnapchat()
     }
 
     private fun signInWithSnapchat() {

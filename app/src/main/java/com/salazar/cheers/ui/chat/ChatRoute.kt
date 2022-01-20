@@ -1,5 +1,7 @@
 package com.salazar.cheers.ui.chat
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,24 +18,32 @@ fun ChatRoute(
     chatViewModel: ChatViewModel,
     navActions: CheersNavigationActions,
     username: String,
+    verified: Boolean,
     name: String,
     profilePictureUrl: String,
 ) {
     val uiState by chatViewModel.uiState.collectAsState()
 
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+            if (it != null)
+                chatViewModel.sendImageMessage(listOf(it))
+        }
+
     when(uiState) {
         is ChatUiState.HasChannel -> {
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,
-                onTitleClick = {},
+                onTitleClick = { navActions.navigateToOtherProfile(it) },
                 onPoBackStack = { navActions.navigateBack() },
                 onUnlike = chatViewModel::unlikeMessage,
                 onLike = chatViewModel::likeMessage,
                 onUnsendMessage = chatViewModel::unsendMessage,
                 onMessageSent = chatViewModel::sendTextMessage,
-                onImageSelectorClick = {},
+                onImageSelectorClick = { launcher.launch("image/*") },
                 onCopyText = {},
                 username = username,
+                verified = verified,
                 name = name,
                 profilePicturePath = profilePictureUrl,
             )

@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +45,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import coil.compose.rememberImagePainter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -125,11 +127,11 @@ class SignInFragment : Fragment() {
                 Column(
                     modifier = Modifier.padding(22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
                 ) {
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
                     Text("Cheers", style = Typography.displayLarge, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(60.dp))
+                    AnimatedLogo()
+                    Spacer(modifier = Modifier.height(30.dp))
                     EmailTextField(uiState)
                     Spacer(Modifier.height(8.dp))
                     PasswordTextField(uiState)

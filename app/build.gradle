@@ -16,8 +16,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "0.6.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -159,6 +159,9 @@ dependencies {
 
     // ExoPlayer 2
     implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
+
+    // Facebook SDK
+    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
 
     // Firebase BOM
     implementation platform('com.google.firebase:firebase-bom:29.0.0')

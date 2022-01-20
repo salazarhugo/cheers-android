@@ -1,8 +1,12 @@
 package com.salazar.cheers.ui.camera
 
+import androidx.camera.core.AspectRatio.RATIO_16_9
+import androidx.camera.core.ImageCapture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.salazar.cheers.CheersNavigationActions
 
 /**
@@ -15,13 +19,31 @@ fun CameraRoute(
     cameraViewModel: CameraViewModel,
     navActions: CheersNavigationActions,
 ) {
+    val context = LocalContext.current
     val uiState by cameraViewModel.uiState.collectAsState()
+    val imageCapture: ImageCapture = remember {
+        ImageCapture.Builder().setTargetAspectRatio(RATIO_16_9).build()
+    }
 
     CameraScreen(
         uiState = uiState,
-        onTakePhoto = {
-            cameraViewModel.setImageUri(it)
-            navActions.navigateToAddPostSheetWithPhotoUri(it.toString())
-        }
+        imageCapture = imageCapture,
+        onPostClicked = {
+            if (uiState.imageUri != null)
+                navActions.navigateToAddPostSheetWithPhotoUri(uiState.imageUri.toString())
+        },
+        onCameraUIAction = { cameraUIAction ->
+               when(cameraUIAction) {
+                   is CameraUIAction.OnSwitchCameraClick ->
+                       cameraViewModel.onSwitchCameraClicked()
+                   is CameraUIAction.OnCameraClick -> {
+                        imageCapture.takePicture(context, uiState.lensFacing, { uri, fromGallery ->
+                            cameraViewModel.setImageUri(uri)
+                        }, {})
+                   }
+                   is CameraUIAction.OnGalleryViewClick -> {}
+                   is CameraUIAction.OnCloseClick -> navActions.navigateBack()
+               }
+        },
     )
 }

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ fun Username(
     username: String,
     verified: Boolean = false,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    color: Color = Color.Unspecified,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -37,6 +39,7 @@ fun Username(
         Text(
             text = username,
             style = textStyle,
+            color = color,
         )
         if (verified) {
             Spacer(Modifier.width(4.dp))

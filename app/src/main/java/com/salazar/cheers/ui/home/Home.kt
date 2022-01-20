@@ -288,24 +288,30 @@ class HomeFragment : Fragment() {
 
     @Composable
     fun TopTabs(uiState: HomeUiState) {
-        val tabs = listOf("Posts", "Parties")
+        val tabs = listOf("Posts", "Parties", "Tweets")
         val selectedTab = uiState.selectedTab
-        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
             tabs.forEachIndexed { index, s ->
                 if (index == selectedTab)
-                    FilledTonalButton(onClick = { viewModel.selectTab(index) }) {
+                    FilledTonalButton(
+                        onClick = { viewModel.selectTab(index) },
+                        modifier = Modifier.weight(1f),
+                    ) {
                         Text(s)
                     }
                 else
-                    TextButton(onClick = { viewModel.selectTab(index) }) {
+                    TextButton(
+                        onClick = { viewModel.selectTab(index) },
+                        modifier = Modifier.weight(1f),
+                    ) {
                         Text(s)
                     }
             }
         }
     }
 
-    private @Composable
-    fun UploadIndicator(progress: Double) {
+    @Composable
+    private fun UploadIndicator(progress: Double) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

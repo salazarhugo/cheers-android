@@ -84,13 +84,18 @@ class ChatViewModel @AssistedInject constructor(
         )
 
     init {
-        refreshChannel()
         refreshCurrentUser()
         seenLastMessage()
 
         viewModelScope.launch {
             FirestoreChat.getChatMessages(channelId).collect { messages ->
                 viewModelState.update { it.copy(messages = messages) }
+            }
+        }
+
+        viewModelScope.launch {
+            FirestoreChat.getChatChannel(channelId).collect { channel ->
+                viewModelState.update { it.copy(channel = channel) }
             }
         }
     }
@@ -102,14 +107,6 @@ class ChatViewModel @AssistedInject constructor(
             when (val result = Neo4jUtil.getCurrentUser()) {
                 is Result.Success -> user2.value = result.data
                 is Result.Error -> Log.e("NEO4J", result.exception.toString())
-            }
-        }
-    }
-
-    private fun refreshChannel() {
-        viewModelScope.launch {
-            FirestoreChat.getChatChannel(channelId).collect { channel ->
-                viewModelState.value = ChatViewModelState(channel = channel)
             }
         }
     }

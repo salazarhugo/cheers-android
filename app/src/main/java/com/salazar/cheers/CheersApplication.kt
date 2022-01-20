@@ -10,6 +10,7 @@ import androidx.work.Configuration
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.search.MapboxSearchSdk
 import com.salazar.cheers.internal.Environment
@@ -51,8 +52,8 @@ class CheersApplication : Application(), Configuration.Provider {
         FirebaseApp.initializeApp(this)
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance() // For debug
-//            SafetyNetAppCheckProviderFactory.getInstance() // For Prod
+//            DebugAppCheckProviderFactory.getInstance() // For debug
+            SafetyNetAppCheckProviderFactory.getInstance() // For Prod
         )
     }
 

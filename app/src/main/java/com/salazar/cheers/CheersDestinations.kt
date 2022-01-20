@@ -47,7 +47,6 @@ class CheersNavigationActions(navController: NavHostController) {
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
         navController.navigate("${CheersDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
             launchSingleTop = true
-            restoreState = true
         }
     }
 
@@ -138,11 +137,12 @@ class CheersNavigationActions(navController: NavHostController) {
     val navigateToChat: (
         channelId: String,
         username: String,
+        verified: Boolean,
         name: String,
-        profilePictureUrl: String
-    ) -> Unit = { channelId, username, name, profilePictureUrl ->
+        profilePictureUrl: String,
+    ) -> Unit = { channelId, username, verified, name, profilePictureUrl ->
         val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
-        navController.navigate("${CheersDestinations.CHAT_ROUTE}/$channelId/$username/$name/$encodedUrl") {
+        navController.navigate("${CheersDestinations.CHAT_ROUTE}/$channelId/$username/${verified}/$name/$encodedUrl") {
             launchSingleTop = true
             restoreState = true
         }

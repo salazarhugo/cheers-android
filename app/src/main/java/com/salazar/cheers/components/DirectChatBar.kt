@@ -23,6 +23,7 @@ import com.salazar.cheers.R
 fun DirectChatBar(
     name: String,
     username: String,
+    verified: Boolean,
     profilePictureUrl: String,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
@@ -63,9 +64,10 @@ fun DirectChatBar(
                         style = MaterialTheme.typography.titleMedium
                     )
                     // Username
-                    Text(
-                        text = username,
-                        style = MaterialTheme.typography.bodySmall,
+                    Username(
+                        username = username,
+                        verified = verified,
+                        textStyle = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

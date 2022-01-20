@@ -26,8 +26,9 @@ fun OtherProfileRoute(
                 FirestoreChat.getOrCreateChatChannel(uiState.user) { channelId ->
                     navActions.navigateToChat(
                         channelId,
-                        uiState.user.fullName,
                         uiState.user.username,
+                        uiState.user.verified,
+                        uiState.user.fullName,
                         uiState.user.profilePictureUrl,
                     )
                 }

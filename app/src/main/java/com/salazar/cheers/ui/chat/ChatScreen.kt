@@ -51,6 +51,7 @@ fun ChatScreen(
     uiState: ChatUiState.HasChannel,
     name: String,
     username: String,
+    verified: Boolean,
     profilePicturePath: String,
     onMessageSent: (msg: String) -> Unit,
     onUnsendMessage: (msgId: String) -> Unit,
@@ -102,6 +103,7 @@ fun ChatScreen(
             DirectChatBar(
                 name = name,
                 username = username,
+                verified = verified,
                 profilePictureUrl = profilePicturePath,
                 onNavIconPressed = { onPoBackStack() },
                 onTitleClick = onTitleClick,

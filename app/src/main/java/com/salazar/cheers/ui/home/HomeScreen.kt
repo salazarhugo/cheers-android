@@ -64,6 +64,9 @@ import com.salazar.cheers.CheersNavigationActions
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.*
+import com.salazar.cheers.ui.theme.GreySheet
+import com.salazar.cheers.ui.theme.Purple200
+import com.salazar.cheers.ui.theme.Purple500
 import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.image
@@ -83,6 +86,7 @@ fun HomeScreen(
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
     onSelectTab: (Int) -> Unit,
+    onLike: (post: Post) -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
@@ -99,8 +103,10 @@ fun HomeScreen(
         var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
         Scaffold(
             topBar = {
-                Column {
-                    MyAppBar(uiState, navActions)
+                Column(
+//                    modifier = Modifier.background(Purple200)
+                ) {
+                    MyAppBar(navActions)
                     TopTabs(uiState = uiState, onSelectTab = onSelectTab)
                     if (showDivider)
                         DividerM3()
@@ -133,7 +139,11 @@ fun HomeScreen(
                 )
             }
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                    .background(MaterialTheme.colorScheme.background),
+            ) {
                 if (uiState.isLoading)
                     LinearProgressIndicator(
                         modifier = Modifier
@@ -152,6 +162,7 @@ fun HomeScreen(
                                 onPostClicked = onPostClicked,
                                 onUserClicked = onUserClicked,
                                 onPostMoreClicked = onPostMoreClicked,
+                                onLike = onLike,
                             )
                     }
                 }
@@ -240,14 +251,21 @@ fun TopTabs(
 ) {
     val tabs = listOf("Posts", "Parties")
     val selectedTab = uiState.selectedTab
-    Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+    ) {
         tabs.forEachIndexed { index, s ->
             if (index == selectedTab)
-                FilledTonalButton(onClick = { onSelectTab(index) }) {
-                    Text(s)
-                }
+                FilledTonalButton(
+                    onClick = { onSelectTab(index) },
+                    modifier = Modifier.weight(1f),
+                ) { Text(s) }
             else
-                TextButton(onClick = { onSelectTab(index) }) {
+                TextButton(
+                    onClick = { onSelectTab(index) },
+                    modifier = Modifier.weight(1f),
+                ) {
                     Text(s)
                 }
         }
@@ -423,6 +441,7 @@ fun PostList(
     onPostClicked: (postId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
+    onLike: (post: Post) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
     val events = uiState.eventsFlow.collectAsLazyPagingItems()
@@ -444,7 +463,8 @@ fun PostList(
                     navActions = navActions,
                     onPostClicked = onPostClicked,
                     onUserClicked = onUserClicked,
-                    onPostMoreClicked = onPostMoreClicked
+                    onPostMoreClicked = onPostMoreClicked,
+                    onLike = onLike,
                 )
                 when (post.type) {
                     PostType.TEXT -> p
@@ -496,6 +516,7 @@ fun Post(
     onPostClicked: (postId: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onUserClicked: (username: String) -> Unit,
+    onLike: (post: Post) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -506,7 +527,7 @@ fun Post(
 //            if (post.type != PostType.TEXT)
 //                DividerM3()
         PostBody(post, liked, isPostVisible, onPostClicked = onPostClicked)
-        PostFooter(post, navActions)
+        PostFooter(post, navActions, onLike = onLike)
     }
 }
 
@@ -669,7 +690,10 @@ fun InThisPhotoAnnotation(modifier: Modifier) {
 }
 
 @Composable
-fun PostFooterButtons(post: Post) {
+fun PostFooterButtons(
+    post: Post,
+    onLike: (post: Post) -> Unit,
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -683,7 +707,7 @@ fun PostFooterButtons(post: Post) {
             LikeButton(
                 like = post.liked,
                 likes = post.likes,
-                onToggle = {}
+                onToggle = { onLike(post) },
             )
             Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
             Icon(Icons.Outlined.Share, null)
@@ -693,13 +717,17 @@ fun PostFooterButtons(post: Post) {
 }
 
 @Composable
-fun PostFooter(post: Post, navActions: CheersNavigationActions) {
+fun PostFooter(
+    post: Post,
+    navActions: CheersNavigationActions,
+    onLike: (post: Post) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
     ) {
-        PostFooterButtons(post)
+        PostFooterButtons(post, onLike = onLike)
         if (post.type != PostType.TEXT) {
             LikedBy(post = post, navActions)
             if (post.tagUsers.isNotEmpty())
@@ -773,10 +801,14 @@ fun TagUsers(tagUsers: List<User>) {
 }
 
 @Composable
-fun MyAppBar(uiState: HomeUiState, navActions: CheersNavigationActions) {
+fun MyAppBar(navActions: CheersNavigationActions) {
     val icon =
         if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
     SmallTopAppBar(
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior { true },
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+//            containerColor = Purple200
+        ),
 //        CenterAlignedTopAppBar(
 //            modifier = Modifier.height(50.dp),
         title = {

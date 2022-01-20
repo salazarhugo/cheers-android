@@ -12,15 +12,25 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.PhotoAlbum
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.FlipCameraAndroid
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -35,19 +46,16 @@ import androidx.core.net.toFile
 import coil.compose.rememberImagePainter
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
-import com.salazar.cheers.CheersNavigationActions
-import com.salazar.cheers.R
 import com.salazar.cheers.util.Utils.createFile
 import com.salazar.cheers.util.Utils.getOutputDirectory
 import com.salazar.cheers.util.Utils.getOutputFileOptions
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 sealed class CameraUIAction {
+    object OnSettingsClick : CameraUIAction()
+    object OnCloseClick : CameraUIAction()
     object OnCameraClick : CameraUIAction()
     object OnGalleryViewClick : CameraUIAction()
     object OnSwitchCameraClick : CameraUIAction()
@@ -56,40 +64,97 @@ sealed class CameraUIAction {
 @Composable
 fun CameraScreen(
     uiState: CameraUiState,
+    imageCapture: ImageCapture,
     modifier: Modifier = Modifier,
-    onTakePhoto: (Uri) -> Unit,
+    onCameraUIAction: (CameraUIAction) -> Unit,
+    onPostClicked: () -> Unit,
 ) {
+
     CameraPermission { }
-    Column {
-        if (uiState.imageUri != null) {
-            Image(painter = rememberImagePainter(uiState.imageUri), contentDescription = null)
-        } else
-            Box(contentAlignment = Alignment.BottomCenter) {
-                val context = LocalContext.current
-                var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
 
-                val imageCapture: ImageCapture = remember {
-                    ImageCapture.Builder().build()
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+    ) {
+        CameraPreview(
+            imageCapture = imageCapture,
+            lensFacing = uiState.lensFacing,
+            onCameraUIAction = onCameraUIAction,
+            uiState = uiState,
+        )
+        CameraFooter(
+            imageTaken = uiState.imageUri != null,
+            cameraUIAction = onCameraUIAction,
+            onPostClicked = onPostClicked,
+        )
+    }
+}
 
-                CameraPreview(
-                    imageCapture = imageCapture,
-                    lensFacing = lensFacing
-                ) { cameraUIAction ->
-                    when (cameraUIAction) {
-                        is CameraUIAction.OnCameraClick -> {
-                            imageCapture.takePicture(context, lensFacing, { uri, fromGallery ->
-                                onTakePhoto(uri)
-                            }, {})
-                        }
-                        is CameraUIAction.OnSwitchCameraClick -> {
-                            lensFacing =
-                                if (lensFacing == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK
-                        }
-                        is CameraUIAction.OnGalleryViewClick -> {}
-                    }
-                }
-            }
+@Composable
+fun CameraFooter(
+    imageTaken: Boolean,
+    cameraUIAction: (CameraUIAction) -> Unit,
+    onPostClicked: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (imageTaken)
+            CameraFooterSendTo(onPostClicked = onPostClicked)
+        else
+            CameraFooterIdle(cameraUIAction)
+    }
+}
+
+@Composable
+fun CameraFooterSendTo(
+    onPostClicked: () -> Unit,
+) {
+    FilledTonalButton(
+        modifier = Modifier,
+        onClick = onPostClicked,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("Post")
+            Spacer(Modifier.width(4.dp))
+            Icon(Icons.Filled.ChevronRight, null)
+        }
+    }
+}
+
+@Composable
+fun CameraFooterIdle(
+    cameraUIAction: (CameraUIAction) -> Unit,
+) {
+    IconButton(
+        onClick = { cameraUIAction(CameraUIAction.OnGalleryViewClick) },
+    ) {
+        Icon(
+            Icons.Default.PhotoAlbum,
+            contentDescription = null,
+            tint = Color.White,
+        )
+    }
+    Text(
+        text = "POST",
+        textAlign = TextAlign.Center,
+        color = Color.White,
+    )
+    IconButton(
+        onClick = { cameraUIAction(CameraUIAction.OnSwitchCameraClick) },
+    ) {
+        Icon(
+            Icons.Outlined.FlipCameraAndroid,
+            contentDescription = null,
+            tint = Color.White,
+        )
     }
 }
 
@@ -103,37 +168,61 @@ private suspend fun Context.getCameraProvider(): ProcessCameraProvider =
     }
 
 @Composable
-fun CameraControls(cameraUIAction: (CameraUIAction) -> Unit) {
-    IconButton(
-        onClick = { cameraUIAction(CameraUIAction.OnSwitchCameraClick) },
-    ) {
-        Icon(
-            Icons.Outlined.FlipCameraAndroid,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = Color.White
-        )
-    }
-    Surface(
-        shape = CircleShape,
-        color = Color.Transparent,
-        shadowElevation = 0.dp,
+fun CameraControls(
+    cameraUIAction: (CameraUIAction) -> Unit,
+) {
+    Box(
         modifier = Modifier
-            .padding(bottom = 26.dp)
-            .clip(CircleShape)
-            .size(90.dp)
-            .border(4.dp, Color.White, CircleShape)
-            .clickable {
-                cameraUIAction(CameraUIAction.OnCameraClick)
-            }
-    ) {}
+            .fillMaxSize()
+            .padding(8.dp),
+    ) {
+        IconButton(
+            onClick = { cameraUIAction(CameraUIAction.OnSettingsClick) },
+            modifier = Modifier.align(Alignment.TopStart)
+        ) {
+            Icon(
+                Icons.Outlined.Settings,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = Color.White
+            )
+        }
+        IconButton(
+            onClick = { cameraUIAction(CameraUIAction.OnCloseClick) },
+            modifier = Modifier.align(Alignment.TopEnd)
+        ) {
+            Icon(
+                Icons.Outlined.Close,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = Color.White
+            )
+        }
+        Surface(
+            shape = CircleShape,
+            color = Color.Transparent,
+            shadowElevation = 0.dp,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 18.dp)
+                .clip(CircleShape)
+                .size(80.dp)
+                .border(4.dp, Color.White, CircleShape)
+                .padding(7.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape)
+                .clickable {
+                    cameraUIAction(CameraUIAction.OnCameraClick)
+                }
+        ) {}
+    }
 }
 
 @Composable
 fun CameraPreview(
+    uiState: CameraUiState,
     imageCapture: ImageCapture,
-    lensFacing: Int = CameraSelector.LENS_FACING_BACK,
-    cameraUIAction: (CameraUIAction) -> Unit
+    lensFacing: Int,
+    onCameraUIAction: (CameraUIAction) -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -156,18 +245,29 @@ fun CameraPreview(
         )
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
-    Box(modifier = Modifier.fillMaxSize()) {
-        AndroidView(
-            factory = { previewView },
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(16.dp)),
-        )
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            CameraControls(cameraUIAction)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(9 / 16f)
+            .clip(RoundedCornerShape(16.dp)),
+    ) {
+        if (uiState.imageUri != null)
+            Image(
+                painter = rememberImagePainter(uiState.imageUri),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(9 / 16f)
+            )
+        else {
+            AndroidView(
+                factory = { previewView },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(9 / 16f)
+            )
+            CameraControls(onCameraUIAction)
         }
     }
 }

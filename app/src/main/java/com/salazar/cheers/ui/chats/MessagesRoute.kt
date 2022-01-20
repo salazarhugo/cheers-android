@@ -15,16 +15,18 @@ fun MessagesRoute(
     messagesViewModel: MessagesViewModel,
     navActions: CheersNavigationActions,
     username: String,
+    verified: Boolean,
 ) {
     val uiState by messagesViewModel.uiState.collectAsState()
     MessagesScreen(
         uiState = uiState,
         username = username,
+        verified = verified,
         onBackPressed = {},
         onActivityIconClicked = {
         },
         onChannelClicked = { a, b, c, d ->
-            navActions.navigateToChat(a, b, c, d)
+            navActions.navigateToChat(a, b, verified, c, d)
         },
         onNewMessageClicked = {
 //                              navActions.navigateToChat()

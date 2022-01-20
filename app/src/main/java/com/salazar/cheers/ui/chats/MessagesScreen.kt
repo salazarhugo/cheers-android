@@ -33,6 +33,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.ui.theme.Roboto
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
 fun MessagesScreen(
     uiState: MessagesUiState,
     username: String,
+    verified: Boolean,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onNewMessageClicked: () -> Unit,
@@ -52,7 +54,7 @@ fun MessagesScreen(
     Scaffold(
         topBar = {
             Column {
-                MyAppBar(username, onBackPressed, onActivityIconClicked)
+                MyAppBar(username, verified, onBackPressed, onActivityIconClicked)
             }
         },
         floatingActionButton = {
@@ -295,15 +297,19 @@ fun GroupConversation(
 @Composable
 fun MyAppBar(
     username: String,
+    verified: Boolean,
     onBackPressed: () -> Unit,
     onActivityIconClicked: () -> Unit,
 ) {
     SmallTopAppBar(
         title = {
-            Text(
-                text = username,
-                fontWeight = FontWeight.Bold,
-                fontFamily = Roboto,
+            Username(
+                username = username,
+                verified = verified,
+                textStyle = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto
+                ),
             )
         },
         navigationIcon = {
