@@ -70,24 +70,24 @@ fun CameraScreen(
     onPostClicked: () -> Unit,
 ) {
 
-    CameraPermission { }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
     ) {
-        CameraPreview(
-            imageCapture = imageCapture,
-            lensFacing = uiState.lensFacing,
-            onCameraUIAction = onCameraUIAction,
-            uiState = uiState,
-        )
-        CameraFooter(
-            imageTaken = uiState.imageUri != null,
-            cameraUIAction = onCameraUIAction,
-            onPostClicked = onPostClicked,
-        )
+        CameraPermission {
+            CameraPreview(
+                imageCapture = imageCapture,
+                lensFacing = uiState.lensFacing,
+                onCameraUIAction = onCameraUIAction,
+                uiState = uiState,
+            )
+            CameraFooter(
+                imageTaken = uiState.imageUri != null,
+                cameraUIAction = onCameraUIAction,
+                onPostClicked = onPostClicked,
+            )
+        }
     }
 }
 
@@ -274,7 +274,8 @@ fun CameraPreview(
 
 @Composable
 private fun CameraPermission(
-    navigateToSettingsScreen: () -> Unit
+    navigateToSettingsScreen: () -> Unit = {},
+    content: @Composable () -> Unit,
 ) {
     // Track if the user doesn't want to see the rationale any more.
     val doNotShowRationale = rememberSaveable { mutableStateOf(false) }
@@ -291,11 +292,11 @@ private fun CameraPermission(
                     Spacer(modifier = Modifier.height(8.dp))
                     Row {
                         Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                            Text("Ok!")
+                            Text("Ok")
                         }
                         Spacer(Modifier.width(8.dp))
                         Button(onClick = { doNotShowRationale.value = true }) {
-                            Text("Nope")
+                            Text("No")
                         }
                     }
                 }
@@ -314,6 +315,7 @@ private fun CameraPermission(
             }
         }
     ) {
+        content()
     }
 }
 

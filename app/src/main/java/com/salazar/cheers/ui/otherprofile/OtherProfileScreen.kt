@@ -317,6 +317,7 @@ fun Section2(otherUser: User) {
                 )
             }
         }
+        Spacer(Modifier.height(4.dp))
         Text(
             otherUser.bio,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)

@@ -23,6 +23,7 @@ fun SearchRoute(
         onUserClicked = {
             searchViewModel.insertRecentUser(it)
             navActions.navigateToOtherProfile(it.username)
-        }
+        },
+        onRecentUserClicked = { navActions.navigateToOtherProfile(it) },
     )
 }

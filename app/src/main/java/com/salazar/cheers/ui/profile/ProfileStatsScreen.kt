@@ -38,10 +38,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import com.salazar.cheers.R
 import com.salazar.cheers.components.FollowButton
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -50,12 +53,20 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileStatsScreen(
     uiState: ProfileStatsUiState,
+    username: String,
+    verified: Boolean,
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
     onUnfollow: (id: String) -> Unit,
 ) {
     Scaffold(
-        topBar = { Toolbar(username = "", onBackPressed = onBackPressed) }
+        topBar = {
+            Toolbar(
+                username = username,
+                verified = verified,
+                onBackPressed = onBackPressed
+            )
+        }
     ) {
         Column {
             Tabs(uiState, onUserClicked = onUserClicked, onUnfollow)
@@ -170,7 +181,13 @@ fun FollowerCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(data = user.profilePictureUrl),
+                painter = rememberImagePainter(
+                    data = user.profilePictureUrl,
+                    builder = {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }
+                ),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(56.dp)
@@ -181,7 +198,11 @@ fun FollowerCard(
             Column {
                 if (user.fullName.isNotBlank())
                     Text(text = user.fullName, style = Typography.bodyMedium)
-                Text(text = user.username, style = Typography.bodyMedium)
+                Username(
+                    username = user.username,
+                    verified = user.verified,
+                    textStyle = Typography.bodyMedium,
+                )
             }
         }
         OutlinedButton(
@@ -209,7 +230,13 @@ fun FollowingCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(data = user.profilePictureUrl),
+                painter = rememberImagePainter(
+                    data = user.profilePictureUrl,
+                    builder = {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }
+                ),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(56.dp)
@@ -220,7 +247,11 @@ fun FollowingCard(
             Column {
                 if (user.fullName.isNotBlank())
                     Text(text = user.fullName, style = Typography.bodyMedium)
-                Text(text = user.username, style = Typography.bodyMedium)
+                Username(
+                    username = user.username,
+                    verified = user.verified,
+                    textStyle = Typography.bodyMedium,
+                )
             }
         }
         Row(
@@ -292,15 +323,19 @@ fun SearchBar() {
 @Composable
 fun Toolbar(
     username: String,
+    verified: Boolean,
     onBackPressed: () -> Unit,
 ) {
     Column {
         SmallTopAppBar(
             title = {
-                Text(
-                    username,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
+                Username(
+                    username = username,
+                    verified = verified,
+                    textStyle = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Roboto
+                    ),
                 )
             },
             navigationIcon = {

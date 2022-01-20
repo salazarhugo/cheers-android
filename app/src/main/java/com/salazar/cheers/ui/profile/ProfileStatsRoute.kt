@@ -6,18 +6,22 @@ import androidx.compose.runtime.getValue
 import com.salazar.cheers.CheersNavigationActions
 
 /**
- * Stateful composable that displays the Navigation route for the Profile screen.
+ * Stateful composable that displays the Navigation route for the Profile stats screen.
  *
- * @param profileViewModel ViewModel that handles the business logic of this screen
+ * @param profileStatsViewModel ViewModel that handles the business logic of this screen
  */
 @Composable
 fun ProfileStatsRoute(
     profileStatsViewModel: ProfileStatsViewModel,
     navActions: CheersNavigationActions,
+    username: String,
+    verified: Boolean,
 ) {
     val uiState by profileStatsViewModel.uiState.collectAsState()
     ProfileStatsScreen(
         uiState = uiState,
+        username = username,
+        verified = verified,
         onUnfollow = { profileStatsViewModel.unfollow(it) },
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         onBackPressed = navActions.navigateBack,

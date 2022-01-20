@@ -1,14 +1,17 @@
 package com.salazar.cheers.ui.profile
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
@@ -39,7 +42,6 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.mapbox.search.*
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.Counter
@@ -61,6 +63,7 @@ fun ProfileScreen(
     onPostClicked: (postId: String) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
     navigateToProfileMoreSheet: () -> Unit,
+    onWebsiteClicked: (String) -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
@@ -75,6 +78,7 @@ fun ProfileScreen(
                 onPostClicked = onPostClicked,
                 onStatClicked = onStatClicked,
                 navigateToProfileMoreSheet = navigateToProfileMoreSheet,
+                onWebsiteClicked = onWebsiteClicked,
             )
         }
     }
@@ -87,7 +91,8 @@ fun Profile(
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
-    navigateToProfileMoreSheet: () -> Unit
+    navigateToProfileMoreSheet: () -> Unit,
+    onWebsiteClicked: (String) -> Unit,
 ) {
     Scaffold(
         topBar = { Toolbar(uiState = uiState, navigateToProfileMoreSheet) }
@@ -97,7 +102,7 @@ fun Profile(
                 modifier = Modifier.padding(15.dp)
             ) {
                 Section1(user = uiState.user, onStatClicked = onStatClicked)
-                Section2(user = uiState.user)
+                Section2(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
                 Spacer(Modifier.height(4.dp))
                 Row {
                     OutlinedButton(
@@ -184,7 +189,10 @@ fun ProfilePostsAndTags(
 }
 
 @Composable
-fun Tweets(tweets: List<Post>, onLikeClicked: (Post) -> Unit) {
+fun Tweets(
+    tweets: List<Post>,
+    onLikeClicked: (Post) -> Unit
+) {
     LazyColumn(Modifier.height(800.dp)) {
         items(tweets) { tweet ->
             Tweet(tweet, onLikeClicked = onLikeClicked)
@@ -301,7 +309,10 @@ fun PlayIcon() {
 }
 
 @Composable
-fun Section2(user: User) {
+fun Section2(
+    user: User,
+    onWebsiteClicked: (String) -> Unit,
+) {
     Column {
         Row() {
             Text(
@@ -313,10 +324,11 @@ fun Section2(user: User) {
                 Text(
                     text = "VIP",
                     style = Typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
+        Spacer(Modifier.height(4.dp))
         Text(
             user.bio,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
@@ -328,6 +340,7 @@ fun Section2(user: User) {
                 fontWeight = FontWeight.Normal
             ),
             onClick = { offset ->
+                onWebsiteClicked(user.website)
             },
         )
     }
@@ -339,12 +352,9 @@ fun Toolbar(
     navigateToProfileMoreSheet: () -> Unit,
 ) {
     val otherUser = uiState.user
-    val scope = rememberCoroutineScope()
+
     Column {
         SmallTopAppBar(
-//                modifier = Modifier.height(55.dp),
-//                backgroundColor = MaterialTheme.colorScheme.surface,
-//                elevation = 0.dp,
             title = {
                 Username(
                     username = otherUser.username,

@@ -42,6 +42,7 @@ fun SearchScreen(
     onSearchInputChanged: (String) -> Unit,
     onUserClicked: (User) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
+    onRecentUserClicked: (String) -> Unit,
 ) {
     Scaffold(
         topBar = { SearchBar(uiState, onSearchInputChanged) },
@@ -51,7 +52,12 @@ fun SearchScreen(
             }
         }
     ) {
-        SearchBody(uiState = uiState, onUserClicked = onUserClicked, onDeleteRecentUser = onDeleteRecentUser)
+        SearchBody(
+            uiState = uiState,
+            onUserClicked = onUserClicked,
+            onDeleteRecentUser = onDeleteRecentUser,
+            onRecentUserClicked = onRecentUserClicked,
+        )
     }
 }
 
@@ -59,7 +65,8 @@ fun SearchScreen(
 private fun SearchBody(
     uiState: SearchUiState,
     onUserClicked: (User) -> Unit,
-    onDeleteRecentUser: (RecentUser) -> Unit
+    onDeleteRecentUser: (RecentUser) -> Unit,
+    onRecentUserClicked: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(15.dp)
@@ -76,6 +83,7 @@ private fun SearchBody(
             recommendations = recommendation,
             onUserClicked = onUserClicked,
             onDeleteRecentUser = onDeleteRecentUser,
+            onRecentUserClicked = onRecentUserClicked,
         )
     }
 }
@@ -98,13 +106,14 @@ fun RecentUserList(
     recommendations: List<User>,
     onUserClicked: (User) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
+    onRecentUserClicked: (String) -> Unit,
 ) {
     LazyColumn {
         item {
             Text("Recent")
         }
         items(recent) { user ->
-            RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser)
+            RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
         }
         item {
             Text("Suggestions")
@@ -116,15 +125,15 @@ fun RecentUserList(
 }
 
 @Composable
-fun RecentUserCard(user: RecentUser, onDeleteRecentUser: (RecentUser) -> Unit) {
+fun RecentUserCard(
+    user: RecentUser,
+    onDeleteRecentUser: (RecentUser) -> Unit,
+    onRecentUserClicked: (String) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-//                val action =
-//                    SearchFragmentDirections.actionSearchFragmentToOtherProfileFragment(username = user.username)
-//                findNavController().navigate(action)
-            }
+            .clickable { onRecentUserClicked(user.username) }
             .padding(6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

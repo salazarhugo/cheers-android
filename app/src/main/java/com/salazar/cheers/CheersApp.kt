@@ -78,6 +78,7 @@ fun CheersApp() {
                                 navigateToHome = navigationActions.navigateToHome,
                                 navigateToMap = navigationActions.navigateToMap,
                                 navigateToSearch = navigationActions.navigateToSearch,
+                                navigateToCamera = navigationActions.navigateToCamera,
                                 navigateToMessages = navigationActions.navigateToMessages,
                                 navigateToProfile = navigationActions.navigateToProfile,
                             )

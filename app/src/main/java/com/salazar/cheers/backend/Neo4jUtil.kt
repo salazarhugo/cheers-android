@@ -572,7 +572,7 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
                 params["username"] = username
 
                 val records = query(
-                    "MATCH (u:User {username: \$username})-[:POSTED]->(p) \n" +
+                    "MATCH (u:User {username: \$username})-[:POSTED]->(p:Post) \n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
                             "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"HH:mm\")}," +
                             " properties(u) ORDER BY p.createdTime DESC",

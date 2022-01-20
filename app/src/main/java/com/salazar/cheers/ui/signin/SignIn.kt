@@ -14,9 +14,11 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -99,7 +101,6 @@ class SignInFragment : Fragment() {
 
     @Composable
     fun SignInScreen() {
-
         val uiState = viewModel.uiState.collectAsState().value
 
         if (uiState.isSignedIn)
@@ -122,13 +123,15 @@ class SignInFragment : Fragment() {
             exit = slideOutHorizontally() + fadeOut()
         ) {
             Column(
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Column(
-                    modifier = Modifier.padding(22.dp),
+                    modifier = Modifier
+                        .padding(22.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Spacer(modifier = Modifier.height(30.dp))
                     Text("Cheers", style = Typography.displayLarge, fontWeight = FontWeight.Bold)
                     AnimatedLogo()
                     Spacer(modifier = Modifier.height(30.dp))

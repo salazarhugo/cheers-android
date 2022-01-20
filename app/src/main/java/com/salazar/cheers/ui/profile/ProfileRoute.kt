@@ -1,8 +1,12 @@
 package com.salazar.cheers.ui.profile
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalUriHandler
 import com.salazar.cheers.CheersNavigationActions
 
 /**
@@ -16,6 +20,7 @@ fun ProfileRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
+    val uriHandler = LocalUriHandler.current
     ProfileScreen(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::refresh,
@@ -25,5 +30,6 @@ fun ProfileRoute(
         onEditProfileClicked = { navActions.navigateToEditProfile() },
         onSettingsClicked = navActions.navigateToSettings,
         navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
+        onWebsiteClicked = { uriHandler.openUri(it) }
     )
 }

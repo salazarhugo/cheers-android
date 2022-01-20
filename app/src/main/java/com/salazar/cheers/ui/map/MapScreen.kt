@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -97,26 +98,14 @@ private fun LocationPermission(
     val doNotShowRationale = rememberSaveable { mutableStateOf(false) }
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+
     PermissionRequired(
         permissionState = cameraPermissionState,
         permissionNotGrantedContent = {
-            if (doNotShowRationale.value) {
+            if (doNotShowRationale.value)
                 Text("Feature not available")
-            } else {
-                Column {
-                    Text("The location is needed for the map. Please grant the permission.")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row {
-                        Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                            Text("Ok!")
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Button(onClick = { doNotShowRationale.value = true }) {
-                            Text("Nope")
-                        }
-                    }
-                }
-            }
+            else
+                LaunchedEffect(Unit) { cameraPermissionState.launchPermissionRequest() }
         },
         permissionNotAvailableContent = {
             Column {
@@ -136,7 +125,11 @@ private fun LocationPermission(
 }
 
 @Composable
-fun UiLayer(scope: BoxScope, uiState: MapUiState, mapView: MapView) {
+fun UiLayer(
+    scope: BoxScope,
+    uiState: MapUiState,
+    mapView: MapView
+) {
     scope.apply {
         rememberCoroutineScope().launch {
             uiState.posts?.forEach {
@@ -181,28 +174,28 @@ private fun initLocationComponent(
     val locationComponentPlugin = mapView.location
     locationComponentPlugin.updateSettings {
         this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                topImage = AppCompatResources.getDrawable(
-                    context,
-                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
-                ),
-                bearingImage = AppCompatResources.getDrawable(
-                    context,
-                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_bearing_icon
-                ),
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
+        this.locationPuck = LocationPuck2D(
+            topImage = AppCompatResources.getDrawable(
+                context,
+                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
+            ),
+            bearingImage = AppCompatResources.getDrawable(
+                context,
+                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_bearing_icon
+            ),
+            scaleExpression = interpolate {
+                linear()
+                zoom()
+                stop {
+                    literal(0.0)
+                    literal(0.6)
+                }
+                stop {
+                    literal(20.0)
+                    literal(1.0)
+                }
+            }.toJson()
+        )
     }
     locationComponentPlugin.addOnIndicatorPositionChangedListener(
         onIndicatorPositionChangedListener
@@ -239,7 +232,10 @@ private fun onPostAnnotationClick(post: Post): OnPointAnnotationClickListener {
     }
 }
 
-private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
+private fun bitmapFromDrawableRes(
+    context: Context,
+    @DrawableRes resourceId: Int
+) =
     Utils.convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
 
 
@@ -250,7 +246,10 @@ private fun onIndicatorPositionChangedListener(
     mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
 }
 
-private fun onMoveListener(mapView: MapView, onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener) = object : OnMoveListener {
+private fun onMoveListener(
+    mapView: MapView,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
+) = object : OnMoveListener {
     override fun onMoveBegin(detector: MoveGestureDetector) {
         onCameraTrackingDismissed(mapView, this)
     }
@@ -284,7 +283,10 @@ private fun setupGesturesListener(
     mapView.gestures.addOnMoveListener(onMoveListener(mapView, onIndicatorPositionChangedListener))
 }
 
-private fun onCameraTrackingDismissed(mapView: MapView, onMoveListener: OnMoveListener) {
+private fun onCameraTrackingDismissed(
+    mapView: MapView,
+    onMoveListener: OnMoveListener
+) {
     mapView.location
         .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener(mapView))
     mapView.gestures.removeOnMoveListener(onMoveListener)
@@ -295,7 +297,10 @@ private lateinit var searchRequestTask: SearchRequestTask
 
 private val searchCallback = object : SearchCallback {
 
-    override fun onResults(results: List<SearchResult>, responseInfo: ResponseInfo) {
+    override fun onResults(
+        results: List<SearchResult>,
+        responseInfo: ResponseInfo
+    ) {
         if (results.isEmpty()) {
             Log.i("SearchApiExample", "No reverse geocoding results")
         } else {
@@ -311,7 +316,10 @@ private val searchCallback = object : SearchCallback {
 
 }
 
-private fun onMapReady(mapView: MapView, context: Context) {
+private fun onMapReady(
+    mapView: MapView,
+    context: Context
+) {
     reverseGeocoding = MapboxSearchSdk.getReverseGeocodingSearchEngine()
     mapView.gestures.rotateEnabled = false
     mapView.attribution.enabled = false
@@ -335,14 +343,20 @@ private fun onMapReady(mapView: MapView, context: Context) {
     }
 }
 
-private fun getBitmojiAvatar(context: Context, onSuccess: (String) -> Unit) {
+private fun getBitmojiAvatar(
+    context: Context,
+    onSuccess: (String) -> Unit
+) {
     Bitmoji.fetchAvatarUrl(context, object : FetchAvatarUrlCallback {
         override fun onSuccess(@Nullable avatarUrl: String?) {
             if (avatarUrl != null)
                 onSuccess(avatarUrl)
         }
 
-        override fun onFailure(isNetworkError: Boolean, statusCode: Int) {
+        override fun onFailure(
+            isNetworkError: Boolean,
+            statusCode: Int
+        ) {
 //            toast(statusCode.toString())
         }
     })

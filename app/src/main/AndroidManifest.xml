@@ -66,14 +66,15 @@
             android:theme="@style/Theme.Cheers.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SignInActivity"
             android:exported="true"
             android:theme="@style/Theme.Cheers.SignIn" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -81,20 +82,9 @@
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Cheers.NoActionBar">
-        </activity>
 
-        <activity
-            android:name=".ui.chat.ChatActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize"
-            android:label="@string/title_activity_chat"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Cheers.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
             <intent-filter>
-                <action android:name="ChatActivity"/>
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>

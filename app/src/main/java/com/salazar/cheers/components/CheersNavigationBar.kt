@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Badge
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterCenterFocus
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Place
@@ -34,6 +35,7 @@ fun CheersNavigationBar(
     navigateToHome: () -> Unit,
     navigateToMap: () -> Unit,
     navigateToSearch: () -> Unit,
+    navigateToCamera: () -> Unit,
     navigateToMessages: () -> Unit,
     navigateToProfile: () -> Unit,
     modifier: Modifier = Modifier
@@ -54,23 +56,23 @@ fun CheersNavigationBar(
             "Map"
         ),
         Screen(
-            CheersDestinations.SEARCH_ROUTE,
-            navigateToSearch,
+            CheersDestinations.CAMERA_ROUTE,
+            navigateToCamera,
             {
                 Icon(
-                    painter = rememberImagePainter(R.drawable.ic_search_icon),
+                    Icons.Default.FilterCenterFocus,
                     null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             },
             {
                 Icon(
-                    painter = rememberImagePainter(R.drawable.ic_search_icon_full),
+                    Icons.Default.FilterCenterFocus,
                     null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             },
-            "Search"
+            "Camera"
         ),
         Screen(
             CheersDestinations.MESSAGES_ROUTE,

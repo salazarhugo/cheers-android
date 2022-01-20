@@ -19,6 +19,6 @@ fun PostDetailRoute(
     PostDetailScreen(
         uiState = uiState,
         onHeaderClicked = { navActions.navigateToOtherProfile(it) },
-        onBackPressed = {}
+        onBackPressed = { navActions.navigateBack() },
     )
 }

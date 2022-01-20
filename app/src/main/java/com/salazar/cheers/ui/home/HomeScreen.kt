@@ -55,20 +55,14 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.CheersNavigationActions
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.ui.theme.GreySheet
-import com.salazar.cheers.ui.theme.Purple200
-import com.salazar.cheers.ui.theme.Purple500
 import com.salazar.cheers.ui.theme.Typography
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.image
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -221,7 +215,8 @@ fun NativeAdPost(ad: NativeAd) {
                 })
 
                 ad.images.forEach {
-                    adView.addView(ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP
+                    adView.addView(ImageView(context).apply {
+                        scaleType = ImageView.ScaleType.CENTER_CROP
                         this.image = it.drawable
                     })
                 }
@@ -249,25 +244,17 @@ fun TopTabs(
     uiState: HomeUiState,
     onSelectTab: (Int) -> Unit,
 ) {
-    val tabs = listOf("Posts", "Parties")
-    val selectedTab = uiState.selectedTab
     Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        tabs.forEachIndexed { index, s ->
-            if (index == selectedTab)
-                FilledTonalButton(
-                    onClick = { onSelectTab(index) },
-                    modifier = Modifier.weight(1f),
-                ) { Text(s) }
-            else
-                TextButton(
-                    onClick = { onSelectTab(index) },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(s)
-                }
+        FilledTonalButton(
+            onClick = { onSelectTab(0) },
+        ) { Text("Posts") }
+        Spacer(Modifier.width(8.dp))
+        BadgedBox(badge = { Badge { Text("Coming soon") } }) {
+            Text("Parties")
         }
     }
 }
@@ -313,7 +300,11 @@ fun Suggestions(suggestions: List<SuggestionUser>) {
 }
 
 @Composable
-fun Suggestion(suggestedUser: SuggestionUser, scope: PagerScope, page: Int) {
+fun Suggestion(
+    suggestedUser: SuggestionUser,
+    scope: PagerScope,
+    page: Int
+) {
     scope.apply {
         Surface(
             shape = RoundedCornerShape(24.dp),
@@ -606,7 +597,12 @@ fun PostHeader(
                 )
             Spacer(Modifier.width(8.dp))
             IconButton(
-                onClick = { onPostMoreClicked(post.id, post.creator.id == FirebaseAuth.getInstance().currentUser?.uid) }
+                onClick = {
+                    onPostMoreClicked(
+                        post.id,
+                        post.creator.id == FirebaseAuth.getInstance().currentUser?.uid
+                    )
+                }
             ) {
                 Icon(
                     Icons.Default.MoreHoriz, null,
@@ -741,7 +737,10 @@ fun PostFooter(
 }
 
 @Composable
-fun LikedBy(post: Post, navActions: CheersNavigationActions) {
+fun LikedBy(
+    post: Post,
+    navActions: CheersNavigationActions
+) {
     Text(
         "${post.likes} ${if (post.likes > 1) "likes" else "like"}",
         style = MaterialTheme.typography.bodyMedium,
@@ -820,20 +819,26 @@ fun MyAppBar(navActions: CheersNavigationActions) {
             )
         },
         actions = {
+            IconButton(onClick = { navActions.navigateToSearch() }) {
+                Icon(
+                    painter = rememberImagePainter(data = R.drawable.ic_search_icon),
+                    contentDescription = "Search icon"
+                )
+            }
             IconButton(onClick = { navActions.navigateToActivity() }) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Activity icon"
                 )
             }
-            IconButton(onClick = {
-                navActions.navigateToCamera()
-            }) {
-                Icon(
-                    Icons.Outlined.Camera,
-                    contentDescription = "Activity icon"
-                )
-            }
+//            IconButton(onClick = {
+//                navActions.navigateToCamera()
+//            }) {
+//                Icon(
+//                    Icons.Outlined.Camera,
+//                    contentDescription = "Activity icon"
+//                )
+//            }
         },
     )
 }

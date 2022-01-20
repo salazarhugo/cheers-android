@@ -44,7 +44,7 @@ fun CheersNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
     navActions: CheersNavigationActions,
-    startDestination: String = CheersDestinations.HOME_ROUTE
+    startDestination: String = CheersDestinations.CAMERA_ROUTE
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -121,7 +121,7 @@ fun CheersNavGraph(
             )
         }
 
-        bottomSheet(CheersDestinations.CAMERA_ROUTE) {
+        composable(CheersDestinations.CAMERA_ROUTE) {
             val cameraViewModel = hiltViewModel<CameraViewModel>()
             CameraRoute(
                 cameraViewModel = cameraViewModel,
@@ -173,6 +173,8 @@ fun CheersNavGraph(
             ProfileStatsRoute(
                 profileStatsViewModel = profileStatsViewModel,
                 navActions = navActions,
+                username = user.username,
+                verified = user.verified,
             )
         }
 

@@ -1,5 +1,8 @@
 package com.salazar.cheers.ui.chats
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -130,8 +133,9 @@ fun ConversationList(
     channels: List<ChatChannel>,
     onChannelClicked: (String, String, String, String) -> Unit
 ) {
-    if (channels.isEmpty())
+    if (channels.isEmpty()) {
         Text("No chat channels")
+    }
     LazyColumn {
         items(channels) { channel ->
             when (channel.type) {
