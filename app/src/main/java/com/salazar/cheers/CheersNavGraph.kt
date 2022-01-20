@@ -10,6 +10,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.material.bottomSheet
+import com.salazar.cheers.components.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.add.AddPostRoute
 import com.salazar.cheers.ui.add.AddPostViewModel
@@ -21,6 +22,8 @@ import com.salazar.cheers.ui.chats.MessagesRoute
 import com.salazar.cheers.ui.chats.MessagesViewModel
 import com.salazar.cheers.ui.detail.PostDetailRoute
 import com.salazar.cheers.ui.detail.postDetailViewModel
+import com.salazar.cheers.ui.editprofile.EditProfileRoute
+import com.salazar.cheers.ui.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.home.HomeRoute
 import com.salazar.cheers.ui.home.HomeViewModel
 import com.salazar.cheers.ui.map.MapRoute
@@ -61,6 +64,19 @@ fun CheersNavGraph(
                 username = username,
                 name = name,
                 profilePictureUrl = profilePictureUrl2,
+            )
+        }
+
+        bottomSheet(route = "${CheersDestinations.POST_MORE_SHEET}/{postId}/{isAuthor}") {
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+            val postId = it.arguments?.getString("postId")!!
+            val isAuthor = it.arguments?.getBoolean("isAuthor")!!
+            PostMoreBottomSheet(
+                isAuthor = isAuthor,
+                onDelete = { homeViewModel.deletePost(postId) },
+                onUnfollow = {},
+                onReport = {},
+                onShare = {},
             )
         }
 
@@ -160,6 +176,14 @@ fun CheersNavGraph(
                 messagesViewModel = messagesViewModel,
                 navActions = navActions,
                 username = user.username,
+            )
+        }
+
+        dialog(CheersDestinations.EDIT_PROFILE_ROUTE) {
+            val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
+            EditProfileRoute(
+                editProfileViewModel = editProfileViewModel,
+                navActions = navActions,
             )
         }
 

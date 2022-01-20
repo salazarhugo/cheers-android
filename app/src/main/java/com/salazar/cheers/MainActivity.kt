@@ -55,7 +55,6 @@ import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Fragment
 import com.salazar.cheers.ui.chat.ChatViewModel
 import com.salazar.cheers.ui.detail.PostDetailViewModel
-import com.salazar.cheers.ui.home.PostBottomSheet
 import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -148,13 +147,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 //        ChangeProfileBottomSheet(bottomSheetState)
-        PostBottomSheet(
-            sheetState = mainViewModel.sheetState,
-            onDelete = {
-                mainViewModel.deletePost()
-            },
-        ) {
-        }
     }
 
     @Composable
@@ -356,7 +348,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
+        override fun onReceive(
+            context: Context?,
+            intent: Intent
+        ) {
             mainViewModel.onNewMessage()
         }
     }

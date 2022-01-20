@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.home
 
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
@@ -54,14 +55,18 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.CheersNavigationActions
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.image
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.absoluteValue
@@ -69,11 +74,11 @@ import kotlin.math.absoluteValue
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-//    homeListLazyListState: LazyListState,
     modifier: Modifier = Modifier,
     onRefreshPosts: () -> Unit,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
+    onPostMoreClicked: (postId: String, isAuthor: Boolean) -> Unit,
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
@@ -141,7 +146,13 @@ fun HomeScreen(
                         if (uiState.postsFlow.collectAsLazyPagingItems().itemSnapshotList.size == 0)
                             NoPosts(uiState = uiState)
                         else
-                            PostList(uiState = uiState, navActions, onPostClicked, onUserClicked)
+                            PostList(
+                                uiState = uiState,
+                                navActions = navActions,
+                                onPostClicked = onPostClicked,
+                                onUserClicked = onUserClicked,
+                                onPostMoreClicked = onPostMoreClicked,
+                            )
                     }
                 }
             }
@@ -159,7 +170,7 @@ fun HomeScreen(
 
 @Composable
 fun NativeAdPost(ad: NativeAd) {
-    Column() {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -189,6 +200,7 @@ fun NativeAdPost(ad: NativeAd) {
             }
         }
         DividerM3()
+        val context = LocalContext.current;
         AndroidView(
             factory = {
                 val adView = NativeAdView(it)
@@ -198,10 +210,9 @@ fun NativeAdPost(ad: NativeAd) {
                 })
 
                 ad.images.forEach {
-//                    adView.addView(ImageView(requireContext()).apply {
-//                        scaleType = ImageView.ScaleType.CENTER_CROP
-//                        this.image = it.drawable
-//                    })
+                    adView.addView(ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP
+                        this.image = it.drawable
+                    })
                 }
 
                 if (ad.mediaContent.hasVideoContent()) {
@@ -411,6 +422,7 @@ fun PostList(
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
+    onPostMoreClicked: (postId: String, Boolean) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
     val events = uiState.eventsFlow.collectAsLazyPagingItems()
@@ -426,10 +438,18 @@ fun PostList(
                     DividerM3()
                     NativeAdPost(ad = uiState.nativeAd)
                 }
-                when (post?.type) {
-                    PostType.TEXT -> Post(post, true, navActions, onPostClicked, onUserClicked)
-                    PostType.IMAGE -> Post(post, true, navActions, onPostClicked, onUserClicked)
-                    PostType.VIDEO -> Post(post, true, navActions, onPostClicked, onUserClicked)
+                val p = Post(
+                    post = post!!,
+                    isPostVisible = true,
+                    navActions = navActions,
+                    onPostClicked = onPostClicked,
+                    onUserClicked = onUserClicked,
+                    onPostMoreClicked = onPostMoreClicked
+                )
+                when (post.type) {
+                    PostType.TEXT -> p
+                    PostType.IMAGE -> p
+                    PostType.VIDEO -> p
                 }
             }
         }
@@ -474,6 +494,7 @@ fun Post(
     isPostVisible: Boolean,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
+    onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onUserClicked: (username: String) -> Unit,
 ) {
     Column(
@@ -481,7 +502,7 @@ fun Post(
             .fillMaxWidth()
     ) {
         val liked = remember { mutableStateOf(post.liked) }
-        PostHeader(post, onUserClicked)
+        PostHeader(post, onUserClicked, onPostMoreClicked)
 //            if (post.type != PostType.TEXT)
 //                DividerM3()
         PostBody(post, liked, isPostVisible, onPostClicked = onPostClicked)
@@ -493,6 +514,7 @@ fun Post(
 fun PostHeader(
     post: Post,
     onUserClicked: (username: String) -> Unit,
+    onPostMoreClicked: (postId: String, Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     Row(
@@ -563,13 +585,7 @@ fun PostHeader(
                 )
             Spacer(Modifier.width(8.dp))
             IconButton(
-                onClick = {
-//                    viewModel.selectPost(post.id)
-//                    mainViewModel.selectPost(post.id)
-                    scope.launch {
-//                        mainViewModel.sheetState.show()
-                    }
-                }
+                onClick = { onPostMoreClicked(post.id, post.creator.id == FirebaseAuth.getInstance().currentUser?.uid) }
             ) {
                 Icon(
                     Icons.Default.MoreHoriz, null,
@@ -970,3 +986,4 @@ fun Event(post: EventUi) {
         }
     }
 }
+

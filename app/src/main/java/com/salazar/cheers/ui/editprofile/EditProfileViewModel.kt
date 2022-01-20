@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.workers.UploadProfilePicture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -22,6 +22,7 @@ sealed interface EditProfileUiState {
     val isFollowing: Boolean
     val done: Boolean
     val user: User
+    val profilePictureUri: Uri?
 
     data class HasPosts(
         override val isLoading: Boolean,
@@ -29,6 +30,7 @@ sealed interface EditProfileUiState {
         override val isFollowing: Boolean,
         override val user: User,
         override val done: Boolean,
+        override val profilePictureUri: Uri?,
     ) : EditProfileUiState
 }
 
@@ -38,6 +40,7 @@ private data class EditProfileViewModelState(
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
     val done: Boolean = false,
+    val profilePictureUri: Uri? = null,
 ) {
     fun toUiState(): EditProfileUiState =
         EditProfileUiState.HasPosts(
@@ -46,11 +49,14 @@ private data class EditProfileViewModelState(
             errorMessages = errorMessages,
             isFollowing = isFollowing,
             done = done,
+            profilePictureUri = profilePictureUri,
         )
 }
 
 @HiltViewModel
-class EditProfileViewModel @Inject constructor(application: Application) : ViewModel() {
+class EditProfileViewModel @Inject constructor(
+    application: Application,
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EditProfileViewModelState(isLoading = true))
     private val workManager = WorkManager.getInstance(application)
@@ -86,6 +92,12 @@ class EditProfileViewModel @Inject constructor(application: Application) : ViewM
         }
     }
 
+    fun onSelectPicture(pictureUri: Uri) {
+        viewModelState.update {
+            it.copy(profilePictureUri = pictureUri)
+        }
+    }
+
     fun onNameChanged(name: String) {
         viewModelState.update {
             val newUser = it.user?.copy(fullName = name)
@@ -107,13 +119,15 @@ class EditProfileViewModel @Inject constructor(application: Application) : ViewM
         }
     }
 
-    fun updateUser(user: User) {
+    fun updateUser() {
         viewModelState.update { it.copy(isLoading = true) }
+
+        val user = viewModelState.value.user ?: return
 
         viewModelScope.launch {
             Neo4jUtil.updateUser(user)
             viewModelState.update {
-                it.copy(done = true)
+                it.copy(done = true, isLoading = false)
             }
         }
         uploadProfilePicture()
@@ -121,26 +135,18 @@ class EditProfileViewModel @Inject constructor(application: Application) : ViewM
 
 
     private fun uploadProfilePicture() {
-        if (photoUri.value == null)
-            return
+        val profilePicture = viewModelState.value.profilePictureUri ?: return
 
         val uploadWorkRequest: WorkRequest =
             OneTimeWorkRequestBuilder<UploadProfilePicture>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(
                     workDataOf(
-                        "PHOTO_URI" to photoUri.value.toString(),
+                        "PHOTO_URI" to profilePicture.toString(),
                     )
                 )
             }
                 .build()
         workManager.enqueue(uploadWorkRequest)
     }
-
-    fun onNameChanged() {
-        viewModelState.update {
-            it.copy()
-        }
-    }
-
 }

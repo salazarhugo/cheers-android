@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets
 object CheersDestinations {
     const val HOME_ROUTE = "home"
     const val PROFILE_ROUTE = "profile"
+    const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
     const val MAP_ROUTE = "map"
     const val SEARCH_ROUTE = "search"
@@ -24,33 +25,53 @@ object CheersDestinations {
     const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val ADD_POST_SHEET = "addPostSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
+    const val POST_MORE_SHEET = "postMoreSheet"
 }
 
 /**
  * Models the navigation actions in the app.
  */
 class CheersNavigationActions(navController: NavHostController) {
+
     val navigateBack: () -> Unit = {
         navController.popBackStack()
     }
+
+    val navigateToEditProfile: () -> Unit = {
+        navController.navigate(CheersDestinations.EDIT_PROFILE_ROUTE) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
         navController.navigate("${CheersDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
             launchSingleTop = true
             restoreState = true
         }
     }
+
+    val navigateToPostMoreSheet: (postId: String, isAuthor: Boolean) -> Unit = { postId, isAuthor ->
+        navController.navigate("${CheersDestinations.POST_MORE_SHEET}/$postId/$isAuthor") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToProfileMoreSheet: () -> Unit = {
         navController.navigate(CheersDestinations.PROFILE_MORE_SHEET) {
             launchSingleTop = true
             restoreState = true
         }
     }
+
     val navigateToAddPostSheet: () -> Unit = {
         navController.navigate(CheersDestinations.ADD_POST_SHEET) {
             launchSingleTop = true
             restoreState = true
         }
     }
+
     val navigateToHome: () -> Unit = {
         navController.navigate(CheersDestinations.HOME_ROUTE) {
 //            popUpTo(navController.graph.findStartDestination().id) {

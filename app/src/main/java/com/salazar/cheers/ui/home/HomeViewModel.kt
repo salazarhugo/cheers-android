@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.home
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
@@ -8,7 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
@@ -194,14 +197,13 @@ class HomeViewModel @Inject constructor(
 //        }
     }
 
-    fun deletePost() {
-//        val postId = viewModelState.value.selectedPostId ?: return
+    fun deletePost(postId: String) {
 //        viewModelState.update {
-//            it.copy(posts = it.posts?.filter { post -> post.id != postId })
+//            it.copy(postsFlow = it.postsFlow?.filter { p -> post.id != postId })
 //        }
         viewModelScope.launch {
             try {
-//                Neo4jUtil.deletePost(postId = postId)
+                Neo4jUtil.deletePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }
@@ -219,4 +221,26 @@ class HomeViewModel @Inject constructor(
             it.copy(nativeAd = nativeAd)
         }
     }
+
+    fun initNativeAdd(context: Context) {
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
+        MobileAds.setRequestConfiguration(configuration)
+        val adLoader = AdLoader.Builder(context, "ca-app-pub-7182026441345500/3409583237")
+            .forNativeAd { ad: NativeAd ->
+                setNativeAd(ad)
+            }
+            .withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                }
+            })
+            .withNativeAdOptions(
+                NativeAdOptions.Builder()
+                    .build()
+            )
+            .build()
+
+        adLoader.loadAd(AdRequest.Builder().build())
+    }
+
 }

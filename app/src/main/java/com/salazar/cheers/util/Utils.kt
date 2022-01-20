@@ -16,6 +16,9 @@ import android.provider.MediaStore
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import java.io.ByteArrayOutputStream
 
 

@@ -22,7 +22,7 @@ fun ProfileRoute(
         onStatClicked = { statName, username ->  navActions.navigateToProfileStats(statName, username) },
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onLikeClicked = profileViewModel::toggleLike,
-        onEditProfileClicked = {},
+        onEditProfileClicked = { navActions.navigateToEditProfile() },
         onSettingsClicked = navActions.navigateToSettings,
         navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
     )

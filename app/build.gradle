@@ -148,8 +148,11 @@ dependencies {
     // Google Ads
     implementation 'com.google.android.gms:play-services-ads:20.5.0'
 
+    // Google Billing
+    implementation "com.android.billingclient:billing-ktx:4.0.0"
+
     // Constraint layout
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     // Datastore
     implementation("androidx.datastore:datastore:1.0.0")
