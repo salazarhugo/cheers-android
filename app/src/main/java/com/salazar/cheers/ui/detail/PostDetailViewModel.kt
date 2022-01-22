@@ -124,13 +124,9 @@ class PostDetailViewModel @AssistedInject constructor(
     }
 
     fun deletePost() {
-//        val postId = viewModelState.value.selectedPostId ?: return
-//        viewModelState.update {
-//            it.copy(posts = it.posts?.filter { post -> post.id != postId })
-//        }
         viewModelScope.launch {
             try {
-//                Neo4jUtil.deletePost(postId = postId)
+                Neo4jUtil.deletePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("PostDetailViewModel", e.toString())
             }

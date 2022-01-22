@@ -35,5 +35,6 @@ fun HomeRoute(
         navigateToAddPost = { navActions.navigateToAddPostSheet() },
         onSelectTab = homeViewModel::selectTab,
         onLike = homeViewModel::toggleLike,
+        navigateToComments = { navActions.navigateToPostComments(it) },
     )
 }

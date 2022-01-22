@@ -1,23 +1,27 @@
 package com.salazar.cheers.ui.detail
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -29,7 +33,13 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.firebase.auth.FirebaseAuth
+import com.mapbox.api.staticmap.v1.MapboxStaticMap
+import com.mapbox.api.staticmap.v1.StaticMapCriteria
+import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
+import com.mapbox.geojson.Point
 import com.salazar.cheers.R
+import com.salazar.cheers.components.LikeButton
 import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Post
@@ -38,31 +48,110 @@ import com.salazar.cheers.ui.theme.Typography
 
 @Composable
 fun PostDetailScreen(
-    uiState: PostDetailUiState,
+    uiState: PostDetailUiState.HasPost,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
-    onHeaderClicked: (username: String) -> Unit
+    onHeaderClicked: (username: String) -> Unit,
+    onDelete: () -> Unit,
 ) {
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed) }
     ) {
-        when (uiState) {
-            is PostDetailUiState.HasPost -> Post(post = uiState.post, onHeaderClicked = onHeaderClicked)
-            is PostDetailUiState.NoPosts -> {
-                Text("No post")
-            }
+        Column(
+//            modifier = Modifier.verticalScroll(rememberScrollState())
+        ) {
+//            Post(
+//                post = uiState.post,
+//                onHeaderClicked = onHeaderClicked,
+//                onDelete = onDelete,
+//                isAuthor = uiState.post.creator.id == FirebaseAuth.getInstance().currentUser?.uid!!,
+//            )
+            if (uiState.post.locationName.isBlank())
+                Text("No location found")
+            else
+                StaticMap(
+                    longitude = uiState.post.locationLongitude,
+                    latitude = uiState.post.locationLatitude
+                )
         }
     }
 }
 
 @Composable
+fun StaticMap(
+    longitude: Double,
+    latitude: Double,
+) {
+    val configuration = LocalConfiguration.current
+    val token = stringResource(R.string.mapbox_access_token)
+    val staticImage = remember {
+        MapboxStaticMap.builder()
+            .accessToken(token)
+            .styleId(StaticMapCriteria.LIGHT_STYLE)
+            .cameraPoint(Point.fromLngLat(longitude, latitude)) // Image's center point on map
+            .staticMarkerAnnotations(
+                listOf(
+                    StaticMarkerAnnotation.builder().lnglat(Point.fromLngLat(longitude, latitude))
+                        .build()
+                )
+            )
+            .cameraZoom(13.0)
+            .width(640) // Image width
+            .height(640) // Image height
+            .retina(true) // Retina 2x image will be returned
+            .build()
+    }
+
+    val url = remember { staticImage.url().toString() }
+    PrettyImage(
+        data = url,
+    )
+}
+
+@Composable
 fun Post(
     post: Post,
-    onHeaderClicked: (username: String) -> Unit
+    onHeaderClicked: (username: String) -> Unit,
+    onDelete: () -> Unit,
+    isAuthor: Boolean,
 ) {
     Column {
         PostHeader(post = post, onHeaderClicked = onHeaderClicked)
         PostBody(post = post)
+        PostFooter(post = post, onDelete = onDelete, isAuthor = isAuthor)
+    }
+}
+
+@Composable
+fun PostFooter(
+    post: Post,
+    isAuthor: Boolean,
+    onDelete: () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            LikeButton(
+                like = post.liked,
+                likes = post.likes,
+                onToggle = {})
+            Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
+            Icon(Icons.Outlined.Share, null)
+        }
+        if (isAuthor)
+            Icon(
+                Icons.Outlined.Delete,
+                contentDescription = null,
+                modifier = Modifier.clickable { onDelete() },
+                tint = MaterialTheme.colorScheme.error,
+            )
     }
 }
 
@@ -150,30 +239,26 @@ fun PostHeader(
 fun PostBody(
     post: Post,
 ) {
-    Box(
-    ) {
-        if (post.videoUrl.isNotBlank())
-            VideoPlayer(
-                uri = post.videoUrl,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(4 / 5f)
-            )
-        else if (post.photoUrl.isNotBlank())
-            PrettyImage(
-                data = post.photoUrl,
-                contentDescription = "avatar",
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .aspectRatio(1f)// or 4/5f
-                    .fillMaxWidth()
-            )
-        else
-            Text(
-                text = post.caption,
-                modifier = Modifier.padding(14.dp)
-            )
+    when {
+        post.videoUrl.isNotBlank() -> VideoPlayer(
+            uri = post.videoUrl,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(4 / 5f)
+        )
+        post.photoUrl.isNotBlank() -> PrettyImage(
+            data = post.photoUrl,
+            contentDescription = "avatar",
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .aspectRatio(1f)// or 4/5f
+                .fillMaxWidth()
+        )
+        else -> Text(
+            text = post.caption,
+            modifier = Modifier.padding(14.dp)
+        )
     }
 }
 

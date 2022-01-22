@@ -30,6 +30,13 @@ fun ProfileRoute(
         onEditProfileClicked = { navActions.navigateToEditProfile() },
         onSettingsClicked = navActions.navigateToSettings,
         navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
-        onWebsiteClicked = { uriHandler.openUri(it) }
+        onWebsiteClicked = { website ->
+            var url = website
+            if (!url.startsWith("www.") && !url.startsWith("http://"))
+                url = "www.$url"
+            if (!url.startsWith("http://"))
+                url = "http://$url"
+            uriHandler.openUri(url)
+        }
     )
 }

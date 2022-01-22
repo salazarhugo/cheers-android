@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -22,6 +23,8 @@ import com.salazar.cheers.ui.chat.ChatRoute
 import com.salazar.cheers.ui.chat.chatViewModel
 import com.salazar.cheers.ui.chats.MessagesRoute
 import com.salazar.cheers.ui.chats.MessagesViewModel
+import com.salazar.cheers.ui.comment.CommentsRoute
+import com.salazar.cheers.ui.comment.commentsViewModel
 import com.salazar.cheers.ui.detail.PostDetailRoute
 import com.salazar.cheers.ui.detail.postDetailViewModel
 import com.salazar.cheers.ui.editprofile.EditProfileRoute
@@ -44,8 +47,10 @@ fun CheersNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
     navActions: CheersNavigationActions,
-    startDestination: String = CheersDestinations.CAMERA_ROUTE
+    startDestination: String = CheersDestinations.HOME_ROUTE
 ) {
+    val uri = "https://cheers-a275e.web.app"
+
     AnimatedNavHost(
         navController = navController,
         startDestination = startDestination,
@@ -77,8 +82,9 @@ fun CheersNavGraph(
             val isAuthor = it.arguments?.getBoolean("isAuthor")!!
             PostMoreBottomSheet(
                 isAuthor = isAuthor,
+                onDetails = { navActions.navigateToPostDetail(postId) },
                 onDelete = { homeViewModel.deletePost(postId) },
-                onUnfollow = {},
+                onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
                 onShare = {},
             )
@@ -121,7 +127,7 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.CAMERA_ROUTE) {
+        dialog(CheersDestinations.CAMERA_ROUTE) {
             val cameraViewModel = hiltViewModel<CameraViewModel>()
             CameraRoute(
                 cameraViewModel = cameraViewModel,
@@ -145,8 +151,22 @@ fun CheersNavGraph(
             )
         }
 
+        bottomSheet(
+            route = "${CheersDestinations.POST_COMMENTS}/{postId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
+        ) {
+
+            val postId = it.arguments?.getString("postId")!!
+            val commentsViewModel = commentsViewModel(postId = postId)
+            CommentsRoute(
+                commentsViewModel = commentsViewModel,
+                navActions = navActions,
+            )
+        }
+
         composable(
             route = "${CheersDestinations.OTHER_PROFILE_ROUTE}/{username}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/{username}" })
         ) {
 
             val username = it.arguments?.getString("username")!!

@@ -7,7 +7,9 @@ import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.EventUi
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.util.addOrRemove
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +17,8 @@ import javax.inject.Singleton
 class Neo4jRepository @Inject constructor(
     private val neo4JService: Neo4jService
 ){
+    private val likes = MutableStateFlow<Set<String>>(setOf())
+
     fun getPosts(): Flow<PagingData<Post>> {
         return Pager(
             config = PagingConfig(
@@ -35,6 +39,14 @@ class Neo4jRepository @Inject constructor(
             ),
             pagingSourceFactory = { EventsPagingSource(neo4JService) }
         ).flow
+    }
+
+    fun observeLikes(): Flow<Set<String>> = likes
+
+    suspend fun toggleLikes(postId: String) {
+        val set = likes.value.toMutableSet()
+        set.addOrRemove(postId)
+        likes.value = set
     }
 
     companion object {

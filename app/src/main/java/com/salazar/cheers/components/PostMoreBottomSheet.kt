@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PostMoreBottomSheet(
     isAuthor: Boolean,
+    onDetails: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
     onShare: () -> Unit,
@@ -33,6 +34,7 @@ fun PostMoreBottomSheet(
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.outline)
         )
+        Item(text = "Details", icon = Icons.Outlined.OpenInNew, onDetails)
         Item(text = "Link", icon = Icons.Outlined.Link)
         if (isAuthor)
             Item(text = "Delete", icon = Icons.Outlined.Delete, onDelete)

@@ -1,6 +1,7 @@
 package com.salazar.cheers.util
 
 import android.net.Uri
+import androidx.core.net.toFile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -10,6 +11,11 @@ import java.util.*
 
 object StorageUtil {
     private val storageInstance: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
+
+    // 5 MB
+    private const val IMAGE_SIZE_LIMIT = 5000000
+    // 4 GB
+    private const val VIDEO_SIZE_LIMIT = 4000000000
 
     val currentUserRef: StorageReference
         get() = storageInstance.reference
@@ -22,6 +28,8 @@ object StorageUtil {
         imageBytes: ByteArray,
         onSuccess: (downloadUrl: String) -> Unit
     ) {
+        if (imageBytes.size > IMAGE_SIZE_LIMIT)
+            return
         val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
         ref.putBytes(imageBytes)
             .addOnSuccessListener {
@@ -35,6 +43,8 @@ object StorageUtil {
         imageBytes: ByteArray,
         onSuccess: (downloadUrl: String) -> Unit,
     ) {
+        if (imageBytes.size > IMAGE_SIZE_LIMIT)
+            return
         val ref = currentUserRef.child("messages/${UUID.randomUUID()}")
         ref.putBytes(imageBytes)
             .addOnSuccessListener {
@@ -55,6 +65,8 @@ object StorageUtil {
         imageBytes: ByteArray,
         onSuccess: (downloadUrl: String) -> Unit,
     ) {
+        if (imageBytes.size > IMAGE_SIZE_LIMIT)
+            return
         val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
         ref.putBytes(imageBytes)
             .continueWithTask {
@@ -68,7 +80,9 @@ object StorageUtil {
     fun uploadPostVideo(
         videoUri: Uri,
 //        onSuccess: (videoUrl: String) -> Unit
-    ): UploadTask {
+    ): UploadTask? {
+        if (videoUri.toFile().length() > VIDEO_SIZE_LIMIT)
+            return null
         val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
         return ref.putFile(videoUri)
 //            .addOnSuccessListener {

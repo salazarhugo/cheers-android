@@ -183,6 +183,7 @@ fun ProfilePostsAndTags(
                     tweets = tweets,
                     onLikeClicked = onLikeClicked,
                 )
+                2 -> FunctionalityNotAvailablePanel()
             }
         }
     }

@@ -219,6 +219,7 @@ dependencies {
 
     // Map Box SDK
     implementation 'com.mapbox.maps:android:10.1.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.8.0'
 
     // MapBox Geocoding
     implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.23"

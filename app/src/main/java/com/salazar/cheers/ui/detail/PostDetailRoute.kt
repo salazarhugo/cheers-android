@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.components.LoadingScreen
 
 /**
  * Stateful composable that displays the Navigation route for the Post detail screen.
@@ -16,9 +17,18 @@ fun PostDetailRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by postDetailViewModel.uiState.collectAsState()
-    PostDetailScreen(
-        uiState = uiState,
-        onHeaderClicked = { navActions.navigateToOtherProfile(it) },
-        onBackPressed = { navActions.navigateBack() },
-    )
+
+
+    if (uiState is PostDetailUiState.HasPost)
+        PostDetailScreen(
+            uiState = uiState as PostDetailUiState.HasPost,
+            onHeaderClicked = { navActions.navigateToOtherProfile(it) },
+            onBackPressed = { navActions.navigateBack() },
+            onDelete = {
+                postDetailViewModel.deletePost()
+                navActions.navigateBack()
+            },
+        )
+    else
+        LoadingScreen()
 }

@@ -19,7 +19,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cheers">
 
@@ -84,8 +83,10 @@
             android:theme="@style/Theme.Cheers.NoActionBar">
 
             <intent-filter>
+                <data android:scheme="https" android:host="cheers-a275e.web.app" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
 

@@ -47,7 +47,7 @@ sealed interface HomeUiState {
         val postsFlow: Flow<PagingData<Post>>,
         val eventsFlow: Flow<PagingData<EventUi>>,
         val listState: LazyListState = LazyListState(),
-        val favorites: Set<String>,
+        val likes: Set<String>,
         override val postSheetState: ModalBottomSheetState,
         override val suggestions: List<SuggestionUser>?,
         override val isLoading: Boolean,
@@ -63,7 +63,7 @@ private data class HomeViewModelState(
     val eventsFlow: Flow<PagingData<EventUi>>? = null,
     val listState: LazyListState = LazyListState(),
     val suggestions: List<SuggestionUser>? = null,
-    val favorites: Set<String> = emptySet(),
+    val likes: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
@@ -89,7 +89,7 @@ private data class HomeViewModelState(
                 eventsFlow = eventsFlow,
                 listState = listState,
                 postSheetState = sheetState,
-                favorites = favorites,
+                likes = likes,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 searchInput = searchInput,
@@ -118,6 +118,13 @@ class HomeViewModel @Inject constructor(
         refreshPostsFlow()
         refreshEventsFlow()
         refreshSuggestions()
+
+        // Observe for like changes in the repo layer
+        viewModelScope.launch {
+            repository.observeLikes().collect { likes ->
+                viewModelState.update { it.copy(likes = likes) }
+            }
+        }
     }
 
     fun selectTab(index: Int) {
@@ -165,6 +172,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun toggleLike(post: Post) {
+        viewModelScope.launch {
+            repository.toggleLikes(post.id)
+        }
         if (post.liked)
             unlikePost(post.id)
         else
@@ -178,6 +188,12 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }
+        }
+    }
+
+    fun unfollowUser(username: String) {
+        viewModelScope.launch {
+            Neo4jUtil.unfollowUser(username = username)
         }
     }
 

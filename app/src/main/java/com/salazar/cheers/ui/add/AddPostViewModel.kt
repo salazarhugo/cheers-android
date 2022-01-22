@@ -26,6 +26,7 @@ data class AddPostUiState(
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
     val caption : String ="",
+    val beverage : String ="",
     val postType : String = PostType.TEXT,
     val mediaUri : Uri? = null,
     val locationPoint : Point? = null,
@@ -35,6 +36,7 @@ data class AddPostUiState(
     val selectedTagUsers : List<User> = emptyList(),
     val showOnMap : Boolean = true,
     val isChooseOnMapOpen : Boolean = false,
+    val isChooseBeverageOpen : Boolean = false,
 )
 
 @HiltViewModel
@@ -66,9 +68,15 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
         }
     }
 
+    fun interactedWithChooseBeverage() {
+        viewModelState.update {
+            it.copy(isChooseBeverageOpen = true)
+        }
+    }
+
     fun interactedWithAddPost() {
         viewModelState.update {
-            it.copy(isChooseOnMapOpen = false)
+            it.copy(isChooseOnMapOpen = false, isChooseBeverageOpen = false)
         }
     }
 

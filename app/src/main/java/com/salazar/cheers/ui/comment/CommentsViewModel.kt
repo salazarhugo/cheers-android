@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.otherprofile
+package com.salazar.cheers.ui.comment
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
@@ -20,7 +20,7 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-sealed interface OtherProfileUiState {
+sealed interface CommentsUiState {
 
     val isLoading: Boolean
     val errorMessages: List<String>
@@ -34,7 +34,7 @@ sealed interface OtherProfileUiState {
         override val isFollowing: Boolean,
         override val user: User,
         override val shortLink: String?,
-    ) : OtherProfileUiState
+    ) : CommentsUiState
 
     data class HasPosts(
         val posts: List<Post>,
@@ -43,10 +43,10 @@ sealed interface OtherProfileUiState {
         override val isFollowing: Boolean,
         override val user: User,
         override val shortLink: String?,
-    ) : OtherProfileUiState
+    ) : CommentsUiState
 }
 
-private data class OtherProfileViewModelState(
+private data class CommentsViewModelState(
     val user: User? = null,
     val posts: List<Post>? = null,
     val isLoading: Boolean = false,
@@ -54,9 +54,9 @@ private data class OtherProfileViewModelState(
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
 ) {
-    fun toUiState(): OtherProfileUiState =
+    fun toUiState(): CommentsUiState =
         if (posts == null || posts.isEmpty()) {
-            OtherProfileUiState.NoPosts(
+            CommentsUiState.NoPosts(
                 user = user ?: User(),
                 isLoading = isLoading,
                 errorMessages = errorMessages,
@@ -64,7 +64,7 @@ private data class OtherProfileViewModelState(
                 shortLink = shortLink,
             )
         } else {
-            OtherProfileUiState.HasPosts(
+            CommentsUiState.HasPosts(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 isFollowing = isFollowing,
@@ -75,11 +75,11 @@ private data class OtherProfileViewModelState(
         }
 }
 
-class OtherProfileViewModel @AssistedInject constructor(
-    @Assisted private val username: String
+class CommentsViewModel @AssistedInject constructor(
+    @Assisted private val postId: String
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(CommentsViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -94,8 +94,8 @@ class OtherProfileViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        refreshUser(username = username)
-        refreshUserPosts(username = username)
+        refreshUser(postId = postId)
+        refreshUserPosts(postId = postId)
     }
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
@@ -105,38 +105,18 @@ class OtherProfileViewModel @AssistedInject constructor(
         updateIsFollowed(isFollowed = !isFollowed)
     }
 
-    fun followUser() {
-        viewModelScope.launch {
-            Neo4jUtil.followUser(username = username)
-        }
-        toggleIsFollowed()
-    }
-
-    fun unfollowUser() {
-        viewModelScope.launch {
-            Neo4jUtil.unfollowUser(username = username)
-        }
-        toggleIsFollowed()
-    }
-
-    fun updateShortLink(shortLink: String) {
-        viewModelState.update {
-            it.copy(shortLink = shortLink)
-        }
-    }
-
     private fun updateIsFollowed(isFollowed: Boolean) {
         viewModelState.update {
             it.copy(user = it.user?.copy(isFollowed = isFollowed))
         }
     }
 
-    private fun refreshUser(username: String) {
+    private fun refreshUser(postId: String) {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             viewModelState.update {
-                when (val result = Neo4jUtil.getUserWithUsername(username)) {
+                when (val result = Neo4jUtil.getUserWithUsername(postId)) {
                     is Result.Success -> it.copy(user = result.data, isLoading = false)
                     is Result.Error -> it.copy(
                         isLoading = false,
@@ -147,44 +127,44 @@ class OtherProfileViewModel @AssistedInject constructor(
         }
     }
 
-    private fun refreshUserPosts(username: String) {
+    private fun refreshUserPosts(postId: String) {
         viewModelScope.launch {
-            viewModelState.update {
-                when (val result = Neo4jUtil.getUserPosts(username = username)) {
-                    is Result.Success -> it.copy(posts = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        errorMessages = listOf(result.exception.toString()),
-                        isLoading = false
-                    )
-                }
-            }
+//            viewModelState.update {
+//                when (val result = Neo4jUtil.getUserPosts(postId = postId)) {
+//                    is Result.Success -> it.copy(posts = result.data, isLoading = false)
+//                    is Result.Error -> it.copy(
+//                        errorMessages = listOf(result.exception.toString()),
+//                        isLoading = false
+//                    )
+//                }
+//            }
         }
     }
 
     @AssistedFactory
-    interface OtherProfileViewModelFactory {
-        fun create(username: String): OtherProfileViewModel
+    interface CommentsViewModelFactory {
+        fun create(postId: String): CommentsViewModel
     }
 
     companion object {
         fun provideFactory(
-            assistedFactory: OtherProfileViewModelFactory,
-            username: String
+            assistedFactory: CommentsViewModelFactory,
+            postId: String
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(username = username) as T
+                return assistedFactory.create(postId = postId) as T
             }
         }
     }
 }
 
 @Composable
-fun otherProfileViewModel(username: String): OtherProfileViewModel {
+fun commentsViewModel(postId: String): CommentsViewModel {
     val factory = EntryPointAccessors.fromActivity(
         LocalContext.current as Activity,
         MainActivity.ViewModelFactoryProvider::class.java
-    ).otherProfileViewModelFactory()
+    ).commentsViewModelFactory()
 
-    return viewModel(factory = OtherProfileViewModel.provideFactory(factory, username = username))
+    return viewModel(factory = CommentsViewModel.provideFactory(factory, postId = postId))
 }

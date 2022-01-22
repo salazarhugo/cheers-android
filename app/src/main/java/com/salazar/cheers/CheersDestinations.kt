@@ -15,6 +15,7 @@ object CheersDestinations {
     const val MAP_ROUTE = "map"
     const val SEARCH_ROUTE = "search"
     const val MESSAGES_ROUTE = "messages"
+    const val POST_COMMENTS = "comments"
     const val CAMERA_ROUTE = "camera"
     const val OTHER_PROFILE_ROUTE = "otherProfile"
     const val ACTIVITY_ROUTE = "activity"
@@ -110,6 +111,14 @@ class CheersNavigationActions(navController: NavHostController) {
             restoreState = true
         }
     }
+
+    val navigateToPostComments: (postId: String) -> Unit = { postId ->
+        navController.navigate("${CheersDestinations.POST_COMMENTS}/$postId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToOtherProfile: (username: String) -> Unit = { username ->
         navController.navigate("${CheersDestinations.OTHER_PROFILE_ROUTE}/$username") {
             launchSingleTop = true

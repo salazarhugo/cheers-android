@@ -62,6 +62,7 @@ fun AddPostScreen(
     onDismiss: () -> Unit,
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
+    interactWithChooseBeverage: () -> Unit,
     navigateToCamera: () -> Unit,
     navigateToTagUser: () -> Unit,
     onSelectLocation: (SearchResult) -> Unit,
@@ -70,6 +71,7 @@ fun AddPostScreen(
     unselectLocation: () -> Unit,
     updateLocationName: (String) -> Unit,
     updateLocationResults: (List<SearchResult>) -> Unit,
+    onMediaSelectorClicked: () -> Unit,
 ) {
     val searchCallback = object : SearchCallback {
         override fun onResults(
@@ -104,6 +106,7 @@ fun AddPostScreen(
                 mediaUri = uiState.mediaUri,
                 navigateToCamera = navigateToCamera,
                 onSelectMedia = onSelectMedia,
+                onMediaSelectorClicked = onMediaSelectorClicked,
             )
 //                    DividerM3()
             CaptionSection(
@@ -135,6 +138,11 @@ fun AddPostScreen(
                 results = uiState.locationResults,
                 onSelectLocation = onSelectLocation,
             )
+            BeverageSection(
+                beverage = uiState.beverage,
+                interactWithChooseBeverage = interactWithChooseBeverage
+            )
+            DividerM3()
             SwitchPreference(
                 text = "Show on map",
                 showOnMap = uiState.showOnMap,
@@ -145,6 +153,36 @@ fun AddPostScreen(
                 showOnMap = uiState.showOnMap,
             ) {}
             ShareButton(onDismiss, onUploadPost = onUploadPost)
+        }
+    }
+}
+
+@Composable
+fun BeverageSection(
+    beverage: String,
+    interactWithChooseBeverage: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clickable { interactWithChooseBeverage() }
+            .padding(15.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Add beverage",
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(Icons.Outlined.LocalBar, null)
+            Text(
+                text = beverage,
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+            )
         }
     }
 }
@@ -214,6 +252,7 @@ fun AddPhotoOrVideo(
     mediaUri: Uri?,
     navigateToCamera: () -> Unit,
     onSelectMedia: (Uri) -> Unit,
+    onMediaSelectorClicked: () -> Unit,
 ) {
     val context = LocalContext.current
     val takePictureLauncher =
@@ -224,12 +263,6 @@ fun AddPhotoOrVideo(
                     onSelectMedia(uri)
             }
         }
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-            if (it != null)
-                onSelectMedia(it)
-        }
-
     if (mediaUri != null)
         return
     Row(
@@ -240,11 +273,7 @@ fun AddPhotoOrVideo(
     )
     {
         FilledTonalButton(
-            onClick = {
-                launcher.launch(
-                    "image/*"
-                )
-            },
+            onClick = onMediaSelectorClicked,
             modifier = Modifier.weight(1f)
         ) {
             Icon(Icons.Outlined.PhotoAlbum, "")
@@ -361,7 +390,7 @@ fun TagSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Tag people",
+            text = "Add people",
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
         )
         if (selectedTagUsers.size == 1)

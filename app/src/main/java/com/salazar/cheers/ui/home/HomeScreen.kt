@@ -81,6 +81,7 @@ fun HomeScreen(
     navigateToAddPost: () -> Unit,
     onSelectTab: (Int) -> Unit,
     onLike: (post: Post) -> Unit,
+    navigateToComments: (String) -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
@@ -113,12 +114,12 @@ fun HomeScreen(
                         MultiFabItem(
                             "event",
                             Icons.Outlined.Event,
-                            "Event",
+                            "Party",
                         ),
                         MultiFabItem(
                             "post",
                             Icons.Outlined.PostAdd,
-                            "Post",
+                            "Hangout",
                         )
                     ), toState, true, { state ->
                         toState = state
@@ -157,6 +158,7 @@ fun HomeScreen(
                                 onUserClicked = onUserClicked,
                                 onPostMoreClicked = onPostMoreClicked,
                                 onLike = onLike,
+                                navigateToComments = navigateToComments
                             )
                     }
                 }
@@ -242,7 +244,7 @@ fun NativeAdPost(ad: NativeAd) {
 @Composable
 fun TopTabs(
     uiState: HomeUiState,
-    onSelectTab: (Int) -> Unit,
+    onSelectTab: (Int) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -251,7 +253,7 @@ fun TopTabs(
     ) {
         FilledTonalButton(
             onClick = { onSelectTab(0) },
-        ) { Text("Posts") }
+        ) { Text("Hangouts") }
         Spacer(Modifier.width(8.dp))
         BadgedBox(badge = { Badge { Text("Coming soon") } }) {
             Text("Parties")
@@ -433,6 +435,7 @@ fun PostList(
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onLike: (post: Post) -> Unit,
+    navigateToComments: (String) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
     val events = uiState.eventsFlow.collectAsLazyPagingItems()
@@ -450,6 +453,8 @@ fun PostList(
                 }
                 val p = Post(
                     post = post!!,
+                    navigateToComments = navigateToComments,
+                    likes = uiState.likes,
                     isPostVisible = true,
                     navActions = navActions,
                     onPostClicked = onPostClicked,
@@ -502,12 +507,14 @@ fun PostList(
 @Composable
 fun Post(
     post: Post,
+    likes: Set<String>,
     isPostVisible: Boolean,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onLike: (post: Post) -> Unit,
+    navigateToComments: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -518,7 +525,7 @@ fun Post(
 //            if (post.type != PostType.TEXT)
 //                DividerM3()
         PostBody(post, liked, isPostVisible, onPostClicked = onPostClicked)
-        PostFooter(post, navActions, onLike = onLike)
+        PostFooter(post, navActions, onLike = onLike, like = likes.contains(post.id), navigateToComments = navigateToComments)
     }
 }
 
@@ -688,7 +695,9 @@ fun InThisPhotoAnnotation(modifier: Modifier) {
 @Composable
 fun PostFooterButtons(
     post: Post,
+    like: Boolean,
     onLike: (post: Post) -> Unit,
+    navigateToComments: (String) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -701,11 +710,15 @@ fun PostFooterButtons(
             verticalAlignment = Alignment.CenterVertically
         ) {
             LikeButton(
-                like = post.liked,
+                like = like,
                 likes = post.likes,
                 onToggle = { onLike(post) },
             )
-            Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
+            Icon(
+                modifier = Modifier.clickable { navigateToComments(post.id) },
+                painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+                contentDescription = null
+            )
             Icon(Icons.Outlined.Share, null)
         }
         Icon(Icons.Outlined.BookmarkBorder, null)
@@ -717,13 +730,15 @@ fun PostFooter(
     post: Post,
     navActions: CheersNavigationActions,
     onLike: (post: Post) -> Unit,
+    like: Boolean,
+    navigateToComments: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
     ) {
-        PostFooterButtons(post, onLike = onLike)
+        PostFooterButtons(post, onLike = onLike, like = like, navigateToComments = navigateToComments)
         if (post.type != PostType.TEXT) {
             LikedBy(post = post, navActions)
             if (post.tagUsers.isNotEmpty())

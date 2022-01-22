@@ -282,27 +282,12 @@ fun MoreDialog(
     )
 }
 
-//private fun copyProfileUrl(username: String) {
-//    Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
-//        link = Uri.parse("https://cheers-a275e.web.app/$username")
-//        domainUriPrefix = "https://cheers2cheers.page.link"
-//        // Open links with this app on Android
-//        androidParameters {
-//        }
-//    }.addOnSuccessListener { (shortLink, flowchartLink) ->
-//        val clipboardManager =
-//            activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-//        val clipData = ClipData.newPlainText("text", shortLink.toString())
-//        clipboardManager.setPrimaryClip(clipData)
-//        toast("Copied profile URL to clipboard")
-//    }.addOnFailureListener {
-//        toast(it.toString())
-//    }
-//}
 
 @Composable
 fun Section2(otherUser: User) {
-    Column {
+    Column(
+        modifier = Modifier.padding(vertical = 16.dp)
+    ) {
         Row() {
             Text(
                 text = otherUser.fullName,
@@ -313,7 +298,7 @@ fun Section2(otherUser: User) {
                 Text(
                     text = "VIP",
                     style = Typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -343,7 +328,6 @@ fun Section1(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .padding(bottom = 15.dp)
             .fillMaxWidth()
     ) {
         Image(

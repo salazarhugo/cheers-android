@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.PhotoAlbum
 import androidx.compose.material.icons.outlined.Close
@@ -70,10 +68,17 @@ fun CameraScreen(
     onPostClicked: () -> Unit,
 ) {
 
-    Column(
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
+        bottomBar = {
+            CameraFooter(
+                imageTaken = uiState.imageUri != null,
+                cameraUIAction = onCameraUIAction,
+                onPostClicked = onPostClicked,
+            )
+        }
     ) {
         CameraPermission {
             CameraPreview(
@@ -81,11 +86,6 @@ fun CameraScreen(
                 lensFacing = uiState.lensFacing,
                 onCameraUIAction = onCameraUIAction,
                 uiState = uiState,
-            )
-            CameraFooter(
-                imageTaken = uiState.imageUri != null,
-                cameraUIAction = onCameraUIAction,
-                onPostClicked = onPostClicked,
             )
         }
     }
@@ -99,7 +99,7 @@ fun CameraFooter(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

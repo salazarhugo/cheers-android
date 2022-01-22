@@ -81,7 +81,7 @@ fun DeleteAccountButton() {
     OutlinedButton(
         onClick = {},
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         enabled = false,
     ) {
         Text("Delete account")
@@ -93,7 +93,7 @@ fun SignOutButton(onSignOut: () -> Unit) {
     OutlinedButton(
         onClick = onSignOut,
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
     ) {
         Text("Logout")
     }

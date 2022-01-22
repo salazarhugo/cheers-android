@@ -175,14 +175,10 @@ private fun SelectorExpanded(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FunctionalityNotAvailablePanel() {
     AnimatedVisibility(
         visibleState = remember { MutableTransitionState(false).apply { targetState = true } },
-        // Remove if https://issuetracker.google.com/190816173 is fixed
-        enter = expandHorizontally() + fadeIn(),
-        exit = shrinkHorizontally() + fadeOut()
     ) {
         Column(
             modifier = Modifier
