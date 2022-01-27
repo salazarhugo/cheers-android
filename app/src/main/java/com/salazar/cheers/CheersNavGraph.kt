@@ -1,7 +1,6 @@
 package com.salazar.cheers
 
 import android.net.Uri
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -76,14 +75,17 @@ fun CheersNavGraph(
             )
         }
 
-        bottomSheet(route = "${CheersDestinations.POST_MORE_SHEET}/{postId}/{isAuthor}") {
+        bottomSheet(
+            route = "${CheersDestinations.POST_MORE_SHEET}/{postId}/{isAuthor}",
+            arguments = listOf(navArgument("isAuthor") { defaultValue = false })
+        ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
             val postId = it.arguments?.getString("postId")!!
             val isAuthor = it.arguments?.getBoolean("isAuthor")!!
             PostMoreBottomSheet(
                 isAuthor = isAuthor,
                 onDetails = { navActions.navigateToPostDetail(postId) },
-                onDelete = { homeViewModel.deletePost(postId) },
+                onDelete = { homeViewModel.deletePost(postId); navActions.navigateBack() },
                 onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
                 onShare = {},

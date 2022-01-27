@@ -2,6 +2,7 @@ package com.salazar.cheers.internal
 
 data class PostNeo4j(
     val id: String = "",
+    val authorId: String = "",
     val type: String = PostType.TEXT,
     val caption: String = "",
     val createdTime: String = "",

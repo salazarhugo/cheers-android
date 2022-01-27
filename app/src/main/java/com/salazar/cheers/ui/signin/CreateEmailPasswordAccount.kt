@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -51,14 +50,13 @@ import org.jetbrains.anko.support.v4.intentFor
 class CreatePasswordFragment : Fragment() {
 
     private val viewModel: CreateEmailPasswordViewModel by viewModels()
-    val args: CreatePasswordFragmentArgs by navArgs()
     private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val username = args.username
+        val username = "username"
         auth = Firebase.auth
 
         return ComposeView(requireContext()).apply {
@@ -220,9 +218,8 @@ class CreatePasswordFragment : Fragment() {
             }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     private fun signInSuccessful(email: String) {
-        FirestoreUtil.initCurrentUserIfFirstTime(email = email, username = args.username) { user ->
+        FirestoreUtil.initCurrentUserIfFirstTime(email = email, username = "username") { user ->
             startActivity(intentFor<MainActivity>("user" to user).newTask().clearTask())
             getAndSaveRegistrationToken()
         }

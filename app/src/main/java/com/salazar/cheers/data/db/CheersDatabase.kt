@@ -1,15 +1,27 @@
 package com.salazar.cheers.data.db
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.entities.RemoteKey
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.User
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-@Database(entities = [RecentUser::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
+@Database(
+    entities = [RecentUser::class, Post::class, User::class, RemoteKey::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class CheersDatabase : RoomDatabase() {
-    abstract fun forexDao(): CheersDao
+
+    abstract fun cheersDao(): CheersDao
+    abstract fun postDao(): PostDao
+    abstract fun userDao(): UserDao
+    abstract fun remoteKeyDao(): RemoteKeyDao
 
     companion object {
         @Volatile
@@ -28,4 +40,12 @@ abstract class CheersDatabase : RoomDatabase() {
                 .fallbackToDestructiveMigration()
                 .build()
     }
+}
+
+class Converters {
+    @TypeConverter
+    fun fromList(value : List<String>) = Json.encodeToString(value)
+
+    @TypeConverter
+    fun toList(value: String) = Json.decodeFromString<List<String>>(value)
 }

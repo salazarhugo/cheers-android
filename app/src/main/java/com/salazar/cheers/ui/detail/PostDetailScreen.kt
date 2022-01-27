@@ -188,7 +188,7 @@ fun PostHeader(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
             .padding(14.dp, 11.dp)
-            .clickable { onHeaderClicked(post.creator.username) },
+            .clickable { },//onHeaderClicked(post.creator.username) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -205,7 +205,7 @@ fun PostHeader(
 
             Image(
                 painter = rememberImagePainter(
-                    data = post.creator.profilePictureUrl,
+                    data = null,//post.creator.profilePictureUrl,
                     builder = {
                         transformations(CircleCropTransformation())
                         error(R.drawable.default_profile_picture)
@@ -222,8 +222,8 @@ fun PostHeader(
             Spacer(Modifier.width(8.dp))
             Column {
                 Username(
-                    username = post.creator.username,
-                    verified = post.creator.verified,
+                    username = "username",//post.creator.username,
+                    verified = true,//post.creator.verified,
                     textStyle = Typography.bodyMedium
                 )
                 if (post.locationName.isNotBlank())

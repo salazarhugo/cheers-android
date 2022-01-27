@@ -25,6 +25,7 @@ object CheersDestinations {
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val ADD_POST_SHEET = "addPostSheet"
+    const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
 }
@@ -45,8 +46,16 @@ class CheersNavigationActions(navController: NavHostController) {
         }
     }
 
+    val navigateToAddEvent: () -> Unit = {
+        navController.navigate(CheersDestinations.ADD_EVENT_SHEET) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
         navController.navigate("${CheersDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
+            popUpTo(CheersDestinations.HOME_ROUTE)
             launchSingleTop = true
         }
     }
@@ -67,6 +76,7 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateToAddPostSheet: () -> Unit = {
         navController.navigate(CheersDestinations.ADD_POST_SHEET) {
+            popUpTo(CheersDestinations.HOME_ROUTE)
             launchSingleTop = true
             restoreState = true
         }
@@ -74,10 +84,6 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateToHome: () -> Unit = {
         navController.navigate(CheersDestinations.HOME_ROUTE) {
-//            popUpTo(navController.graph.findStartDestination().id) {
-//                saveState = true
-//            }
-            launchSingleTop = true
             restoreState = true
         }
     }

@@ -1,5 +1,6 @@
 package com.salazar.cheers.backend
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -9,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.neo4j.driver.*
 import java.lang.reflect.Type
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -80,7 +80,9 @@ class Neo4jService {
     }
 
     // page index zero
-    suspend fun posts(page: Int, pageSize: Int): Result<List<Post>> {
+    suspend fun posts(page: Int, pageSize: Int): Result<List<Pair<User, Post>>> {
+        Log.d("MONEY", "Page: $page")
+        Log.d("MONEY", "PageSize: $pageSize").toString()
         return withContext(Dispatchers.IO) {
             try {
                 val params: MutableMap<String, Any> = mutableMapOf()
@@ -99,14 +101,14 @@ class Neo4jService {
                     params
                 )
 
-                val posts = mutableListOf<Post>()
+                val posts = mutableListOf<Pair<User,Post>>()
 
                 records.forEach { record ->
                     val gson = Gson()
 
                     val post =
                         gson.fromJson(record.values()[0].toString(), Post::class.java)
-                    val user =
+                    val author =
                         gson.fromJson(record.values()[1].toString(), User::class.java)
 
                     val userListType: Type =
@@ -116,12 +118,7 @@ class Neo4jService {
                     val tagUsers =
                         gson.fromJson<ArrayList<User>>(s, userListType)
 
-                    posts.add(
-                        post.copy(
-                            creator = user,
-                            tagUsers = tagUsers,
-                        )
-                    )
+                    posts.add(Pair(author, post))
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {

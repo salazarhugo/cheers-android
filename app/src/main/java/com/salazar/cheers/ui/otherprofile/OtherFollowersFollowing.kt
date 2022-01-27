@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -63,12 +62,12 @@ class OtherFollowersFollowing : Fragment() {
     lateinit var otherDetailViewModelFactory: OtherFollowersFollowingViewModel.OtherFollowersFollowingViewModelFactory
 
     private val viewModel: OtherFollowersFollowingViewModel by viewModels {
-        OtherFollowersFollowingViewModel.provideFactory(otherDetailViewModelFactory, args.username)
+        OtherFollowersFollowingViewModel.provideFactory(otherDetailViewModelFactory, "username")
     }
-    private val args: OtherFollowersFollowingArgs by navArgs()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
@@ -84,7 +83,7 @@ class OtherFollowersFollowing : Fragment() {
             SmallTopAppBar(
                 title = {
                     Text(
-                        args.username,
+                        "",
                         fontWeight = FontWeight.Bold,
                         fontFamily = Roboto,
                     )
@@ -113,7 +112,7 @@ class OtherFollowersFollowing : Fragment() {
         else
             listOf("Mutual", "Followers", "Following", "Suggested")
 
-        val initialPage = if (args.goToFollowing) 2 else 0
+        val initialPage = 2
         val pagerState = rememberPagerState(initialPage = initialPage)
         val scope = rememberCoroutineScope()
 
@@ -213,11 +212,6 @@ class OtherFollowersFollowing : Fragment() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    val action =
-                        OtherFollowersFollowingDirections.actionOtherFollowersFollowingToOtherProfileFragment(
-                            username = user.username
-                        )
-                    findNavController().navigate(action)
                 }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -254,11 +248,6 @@ class OtherFollowersFollowing : Fragment() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    val action =
-                        OtherFollowersFollowingDirections.actionOtherFollowersFollowingToOtherProfileFragment(
-                            username = user.username
-                        )
-                    findNavController().navigate(action)
                 }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,

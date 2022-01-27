@@ -61,8 +61,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.CheersNavigationActions
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.theme.Typography
+import org.jetbrains.anko.collections.forEachWithIndex
 import org.jetbrains.anko.image
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -79,16 +81,15 @@ fun HomeScreen(
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
+    navigateToComments: (String) -> Unit,
+    navigateToSearch: () -> Unit,
     onSelectTab: (Int) -> Unit,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (String) -> Unit,
 ) {
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
         onRefresh = onRefreshPosts,
     ) {
-        ErrorDialog(uiState.errorMessages)
-
         val showDivider =
             if (uiState is HomeUiState.HasPosts)
                 uiState.listState.firstVisibleItemIndex > 0
@@ -101,8 +102,11 @@ fun HomeScreen(
                 Column(
 //                    modifier = Modifier.background(Purple200)
                 ) {
-                    MyAppBar(navActions)
-                    TopTabs(uiState = uiState, onSelectTab = onSelectTab)
+                    MyAppBar(
+                        navigateToSearch = navigateToSearch,
+                        onSelectTab = onSelectTab,
+                        tab = uiState.selectedTab,
+                    )
                     if (showDivider)
                         DividerM3()
                 }
@@ -136,7 +140,6 @@ fun HomeScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                     .background(MaterialTheme.colorScheme.background),
             ) {
                 if (uiState.isLoading)
@@ -243,20 +246,23 @@ fun NativeAdPost(ad: NativeAd) {
 
 @Composable
 fun TopTabs(
-    uiState: HomeUiState,
+    tab: Int,
     onSelectTab: (Int) -> Unit
 ) {
+    val tabs = listOf("Hangouts", "Parties")
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        FilledTonalButton(
-            onClick = { onSelectTab(0) },
-        ) { Text("Hangouts") }
-        Spacer(Modifier.width(8.dp))
-        BadgedBox(badge = { Badge { Text("Coming soon") } }) {
-            Text("Parties")
+        tabs.forEachWithIndex { i, s ->
+            val a = if (tab == tabs.indexOf(s)) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors()
+            FilledTonalButton(
+                onClick = { onSelectTab(i) },
+                colors = a,
+            ) { Text(s) }
+            if (i != tabs.size-1)
+                Spacer(Modifier.width(8.dp))
         }
     }
 }
@@ -338,11 +344,6 @@ fun Suggestion(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.clickable {
-                    val action =
-                        HomeFragmentDirections.actionHomeFragmentToOtherProfileFragment(
-                            username = suggestedUser.user.username
-                        )
-//                    findNavController().navigate(action)
                 }
             ) {
 
@@ -451,22 +452,34 @@ fun PostList(
                     DividerM3()
                     NativeAdPost(ad = uiState.nativeAd)
                 }
-                val p = Post(
-                    post = post!!,
-                    navigateToComments = navigateToComments,
-                    likes = uiState.likes,
-                    isPostVisible = true,
-                    navActions = navActions,
-                    onPostClicked = onPostClicked,
-                    onUserClicked = onUserClicked,
-                    onPostMoreClicked = onPostMoreClicked,
-                    onLike = onLike,
-                )
-                when (post.type) {
-                    PostType.TEXT -> p
-                    PostType.IMAGE -> p
-                    PostType.VIDEO -> p
+                when (post?.post?.type) {
+                    PostType.TEXT -> Post(
+                        modifier = Modifier.animateItemPlacement(),
+                        postFeed = post,
+                        navigateToComments = navigateToComments,
+                        likes = uiState.likes,
+                        isPostVisible = true,
+                        navActions = navActions,
+                        onPostClicked = onPostClicked,
+                        onUserClicked = onUserClicked,
+                        onPostMoreClicked = onPostMoreClicked,
+                        onLike = onLike,
+                    )
+                    PostType.IMAGE -> Post(
+                        modifier = Modifier.animateItemPlacement(),
+                        postFeed = post,
+                        navigateToComments = navigateToComments,
+                        likes = uiState.likes,
+                        isPostVisible = true,
+                        navActions = navActions,
+                        onPostClicked = onPostClicked,
+                        onUserClicked = onUserClicked,
+                        onPostMoreClicked = onPostMoreClicked,
+                        onLike = onLike,
+                    )
+                    PostType.VIDEO -> {}
                 }
+
             }
         }
 
@@ -506,8 +519,9 @@ fun PostList(
 
 @Composable
 fun Post(
-    post: Post,
+    postFeed: PostFeed,
     likes: Set<String>,
+    modifier: Modifier = Modifier,
     isPostVisible: Boolean,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
@@ -517,30 +531,31 @@ fun Post(
     navigateToComments: (String) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
-        val liked = remember { mutableStateOf(post.liked) }
-        PostHeader(post, onUserClicked, onPostMoreClicked)
+        PostHeader(postFeed, onUserClicked, onPostMoreClicked)
 //            if (post.type != PostType.TEXT)
 //                DividerM3()
-        PostBody(post, liked, isPostVisible, onPostClicked = onPostClicked)
-        PostFooter(post, navActions, onLike = onLike, like = likes.contains(post.id), navigateToComments = navigateToComments)
+        PostBody(postFeed.post, isPostVisible, onPostClicked = onPostClicked, onLike = onLike)
+        PostFooter(postFeed, navActions, onLike = onLike, navigateToComments = navigateToComments)
     }
 }
 
 @Composable
 fun PostHeader(
-    post: Post,
+    postFeed: PostFeed,
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val post = postFeed.post
+    val author = postFeed.author
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-            .clickable { onUserClicked(post.creator.username) },
+            .clickable { onUserClicked(author.username) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -557,7 +572,7 @@ fun PostHeader(
 
             Image(
                 painter = rememberImagePainter(
-                    data = post.creator.profilePictureUrl,
+                    data = author.profilePictureUrl,
                     builder = {
                         transformations(CircleCropTransformation())
                         error(R.drawable.default_profile_picture)
@@ -574,13 +589,13 @@ fun PostHeader(
             Spacer(Modifier.width(8.dp))
             Column {
                 Username(
-                    username = post.creator.username,
-                    verified = post.creator.verified,
+                    username = author.username,
+                    verified = author.verified,
                     textStyle = Typography.bodyMedium
                 )
                 if (post.locationName.isBlank())
                     Text(
-                        post.createdTime,
+                        post.relativeTime,
                         style = Typography.labelMedium
                     )
                 else
@@ -599,7 +614,7 @@ fun PostHeader(
 //                )
             if (post.locationName.isNotBlank())
                 Text(
-                    post.createdTime,
+                    post.relativeTime,
                     style = Typography.labelMedium
                 )
             Spacer(Modifier.width(8.dp))
@@ -607,7 +622,7 @@ fun PostHeader(
                 onClick = {
                     onPostMoreClicked(
                         post.id,
-                        post.creator.id == FirebaseAuth.getInstance().currentUser?.uid
+                        author.id == FirebaseAuth.getInstance().currentUser?.uid
                     )
                 }
             ) {
@@ -627,9 +642,9 @@ fun PostHeader(
 @Composable
 fun PostBody(
     post: Post,
-    liked: MutableState<Boolean>,
     isPostVisible: Boolean,
     onPostClicked: (postId: String) -> Unit,
+    onLike: (post: Post) -> Unit,
 ) {
     Box {
         if (post.videoUrl.isNotBlank())
@@ -652,10 +667,7 @@ fun PostBody(
                     .fillMaxWidth()
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onDoubleTap = {
-                                liked.value = !liked.value
-//                                viewModel.toggleLike(post)
-                            },
+                            onDoubleTap = { onLike(post) },
                         )
                     }
                     .clickable { onPostClicked(post.id) }
@@ -666,8 +678,8 @@ fun PostBody(
                 modifier = Modifier.padding(16.dp)
             )
 
-        if (post.tagUsers.isNotEmpty())
-            InThisPhotoAnnotation(modifier = Modifier.align(Alignment.BottomStart))
+//        if (post.tagUsers.isNotEmpty())
+//            InThisPhotoAnnotation(modifier = Modifier.align(Alignment.BottomStart))
     }
 }
 
@@ -695,7 +707,6 @@ fun InThisPhotoAnnotation(modifier: Modifier) {
 @Composable
 fun PostFooterButtons(
     post: Post,
-    like: Boolean,
     onLike: (post: Post) -> Unit,
     navigateToComments: (String) -> Unit,
 ) {
@@ -710,7 +721,7 @@ fun PostFooterButtons(
             verticalAlignment = Alignment.CenterVertically
         ) {
             LikeButton(
-                like = like,
+                like = post.liked,
                 likes = post.likes,
                 onToggle = { onLike(post) },
             )
@@ -727,10 +738,9 @@ fun PostFooterButtons(
 
 @Composable
 fun PostFooter(
-    post: Post,
+    postFeed: PostFeed,
     navActions: CheersNavigationActions,
     onLike: (post: Post) -> Unit,
-    like: Boolean,
     navigateToComments: (String) -> Unit,
 ) {
     Column(
@@ -738,16 +748,19 @@ fun PostFooter(
             .fillMaxWidth()
             .padding(16.dp),
     ) {
-        PostFooterButtons(post, onLike = onLike, like = like, navigateToComments = navigateToComments)
-        if (post.type != PostType.TEXT) {
-            LikedBy(post = post, navActions)
-            if (post.tagUsers.isNotEmpty())
-                TagUsers(post.tagUsers)
-            if (post.caption.isNotBlank())
-                Caption(post)
+        PostFooterButtons(postFeed.post, onLike = onLike, navigateToComments = navigateToComments)
+        if (postFeed.post.type != PostType.TEXT) {
+            LikedBy(post = postFeed.post, navActions)
+//            if (post.tagUsers.isNotEmpty())
+//                TagUsers(post.tagUsers)
+            if (postFeed.post.caption.isNotBlank())
+                Caption(
+                    username = postFeed.author.username,
+                    caption = postFeed.post.caption,
+                )
         }
     }
-    if (post.type != PostType.TEXT)
+    if (postFeed.post.type != PostType.TEXT)
         Spacer(Modifier.height(12.dp))
 }
 
@@ -756,25 +769,28 @@ fun LikedBy(
     post: Post,
     navActions: CheersNavigationActions
 ) {
-    Text(
-        "${post.likes} ${if (post.likes > 1) "likes" else "like"}",
-        style = MaterialTheme.typography.bodyMedium,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.clickable {
-            navActions.navigateToLikes(post.id)
-        }
-    )
+//    Text(
+//        "${post.likes} ${if (post.likes > 1) "likes" else "like"}",
+//        style = MaterialTheme.typography.bodyMedium,
+//        fontWeight = FontWeight.Bold,
+//        modifier = Modifier.clickable {
+//            navActions.navigateToLikes(post.id)
+//        }
+//    )
 }
 
 @Composable
-fun Caption(post: Post) {
+fun Caption(
+    username: String,
+    caption: String,
+) {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(post.creator.username)
+                append(username)
             }
             append(" ")
-            append(post.caption)
+            append(caption)
         },
         style = Typography.bodyMedium
     )
@@ -815,10 +831,14 @@ fun TagUsers(tagUsers: List<User>) {
 }
 
 @Composable
-fun MyAppBar(navActions: CheersNavigationActions) {
+fun MyAppBar(
+    tab: Int,
+    onSelectTab: (Int) -> Unit,
+    navigateToSearch: () -> Unit,
+) {
     val icon =
         if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
-    SmallTopAppBar(
+    CenterAlignedTopAppBar(
         scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior { true },
         colors = TopAppBarDefaults.smallTopAppBarColors(
 //            containerColor = Purple200
@@ -826,26 +846,41 @@ fun MyAppBar(navActions: CheersNavigationActions) {
 //        CenterAlignedTopAppBar(
 //            modifier = Modifier.height(50.dp),
         title = {
-            Image(
-                painter = painterResource(icon),
+            Row(
                 modifier = Modifier
-                    .size(32.dp),
-                contentDescription = "",
-            )
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Image(
+                    painter = painterResource(icon),
+                    modifier = Modifier
+                        .size(34.dp),
+                    contentDescription = "",
+                )
+                TopTabs(tab = tab, onSelectTab = onSelectTab)
+                IconButton(onClick = navigateToSearch) {
+                    Icon(
+                        painter = rememberImagePainter(data = R.drawable.ic_search_icon),
+                        contentDescription = "Search icon"
+                    )
+                }
+            }
         },
         actions = {
-            IconButton(onClick = { navActions.navigateToSearch() }) {
-                Icon(
-                    painter = rememberImagePainter(data = R.drawable.ic_search_icon),
-                    contentDescription = "Search icon"
-                )
-            }
-            IconButton(onClick = { navActions.navigateToActivity() }) {
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "Activity icon"
-                )
-            }
+//            IconButton(onClick = { navActions.navigateToSearch() }) {
+//                Icon(
+//                    painter = rememberImagePainter(data = R.drawable.ic_search_icon),
+//                    contentDescription = "Search icon"
+//                )
+//            }
+//            IconButton(onClick = { navActions.navigateToActivity() }) {
+//                Icon(
+//                    imageVector = Icons.Outlined.Notifications,
+//                    contentDescription = "Activity icon"
+//                )
+//            }
 //            IconButton(onClick = {
 //                navActions.navigateToCamera()
 //            }) {
@@ -856,52 +891,6 @@ fun MyAppBar(navActions: CheersNavigationActions) {
 //            }
         },
     )
-}
-
-@Composable
-fun ErrorDialog(errorMessages: List<String>) {
-    val openDialog = remember { mutableStateOf(false) }
-
-    if (errorMessages.isNotEmpty())
-        openDialog.value = true
-
-    if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = {
-//                viewModel.deleteErrorMessage()
-                openDialog.value = false
-            },
-            title = {
-                Text(text = "An error occured")
-            },
-            text = {
-                errorMessages.forEach {
-                    Text(text = it)
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-//                        viewModel.deleteErrorMessage()
-                        openDialog.value = false
-                    }
-                ) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-//                        viewModel.deleteErrorMessage()
-                        openDialog.value = false
-                    }
-                ) {
-                    Text("Dismiss")
-                }
-            }
-        )
-
-    }
 }
 
 @Composable
@@ -955,12 +944,7 @@ fun VideoPlayer(
 fun Event(post: EventUi) {
     val event = post.event
     Column(
-        modifier = Modifier.clickable {
-            val action = HomeFragmentDirections.actionHomeFragmentToEventDetailFragment(
-                eventId = post.event.id
-            )
-//            findNavController().navigate(action)
-        }
+        modifier = Modifier.clickable { }
     ) {
         Image(
             painter = rememberImagePainter(

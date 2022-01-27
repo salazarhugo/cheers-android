@@ -132,7 +132,7 @@ object FirestoreUtil {
     fun getFCMRegistrationTokens(onComplete: (tokens: MutableList<String>) -> Unit) {
         currentUserDocRef.get().addOnSuccessListener {
             val user = it.toObject(User::class.java)!!
-            onComplete(user.registrationTokens)
+//            onComplete(user.registrationTokens)
         }
     }
 

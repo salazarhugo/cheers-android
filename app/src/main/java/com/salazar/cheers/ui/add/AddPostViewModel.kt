@@ -1,10 +1,11 @@
 package com.salazar.cheers.ui.add
 
 import android.app.Application
-import android.media.ThumbnailUtils
 import android.net.Uri
-import android.provider.MediaStore
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -14,7 +15,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.camera.CameraUiState
+import com.salazar.cheers.ui.event.PrivacyItem
 import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -34,6 +35,8 @@ data class AddPostUiState(
     val locationResults : List<SearchResult> = emptyList(),
     val selectedLocation : SearchResult? = null,
     val selectedTagUsers : List<User> = emptyList(),
+    val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    val privacy: PrivacyItem = PrivacyItem("Privacy", "Choose a privacy", Icons.Filled.Lock, "NONE"),
     val showOnMap : Boolean = true,
     val isChooseOnMapOpen : Boolean = false,
     val isChooseBeverageOpen : Boolean = false,

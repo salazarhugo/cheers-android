@@ -1,5 +1,7 @@
 package com.salazar.cheers.ui.map
 
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Result
@@ -66,6 +68,7 @@ data class MapUiState(
     val city: String = "",
     val selectedPost: Post? = null,
     val isLoading: Boolean = false,
+    val postSheetState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 )

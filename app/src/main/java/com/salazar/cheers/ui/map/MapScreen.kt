@@ -10,20 +10,21 @@ import androidx.annotation.Nullable
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -47,15 +48,15 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.R
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
 import com.salazar.cheers.util.Utils.getCircledBitmap
 import com.snapchat.kit.sdk.Bitmoji
 import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.net.URL
 
 @Composable
@@ -67,23 +68,29 @@ fun MapScreen(
     navigateToSettingsScreen: () -> Unit,
 ) {
     val context = LocalContext.current
+    val mapView = remember { MapView(context) }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-//                initLocationComponent()
-//                setupGesturesListener()
-            }) {
-                Icon(Icons.Default.MyLocation, "w")
-            }
-        }
+    ModalBottomSheetLayout(
+        sheetState = uiState.postSheetState,
+        sheetContent = { PostMapScreen(uiState = uiState) },
+        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+        sheetElevation = 0.dp,
     ) {
-        LocationPermission(navigateToSettingsScreen) {
-            Box(contentAlignment = Alignment.BottomCenter) {
-                AndroidView(factory = ::MapView, Modifier.fillMaxSize()) {
-                    onMapReady(it, context)
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(onClick = {}) {
+                    Icon(Icons.Default.MyLocation, "w")
                 }
-//                UiLayer(this, uiState = uiState, mapView = mapView)
+            }
+        ) {
+            LocationPermission(navigateToSettingsScreen) {
+                Box(contentAlignment = Alignment.BottomCenter) {
+                    AndroidView(factory = { mapView }, Modifier.fillMaxSize()) {
+                        onMapReady(it, context)
+                    }
+                    UiLayer(this, uiState = uiState, mapView = mapView, onSelectPost = onSelectPost)
+                }
             }
         }
     }
@@ -128,14 +135,15 @@ private fun LocationPermission(
 fun UiLayer(
     scope: BoxScope,
     uiState: MapUiState,
-    mapView: MapView
+    mapView: MapView,
+    onSelectPost: (Post) -> Unit,
 ) {
+    val context = LocalContext.current
+    val scope2 = rememberCoroutineScope()
     scope.apply {
-        rememberCoroutineScope().launch {
-            uiState.posts?.forEach {
-                if (it.type == PostType.IMAGE)
-                    addPostToMap(it, mapView)
-            }
+        uiState.posts?.forEach {
+            if (it.type == PostType.IMAGE)
+                addPostToMap(it, postSheetState = uiState.postSheetState, mapView, context, onSelectPost = onSelectPost, scope = scope2)
         }
 
         Surface(
@@ -202,20 +210,29 @@ private fun initLocationComponent(
     )
 }
 
-private suspend fun addPostToMap(
+private fun addPostToMap(
     post: Post,
+    postSheetState: ModalBottomSheetState,
     mapView: MapView,
-) = withContext(Dispatchers.IO) {
-    val postPhoto = getBitmapFromUrl(post.photoUrl)
-
-    val annotationApi = mapView.annotations
-    val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
-    val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
-        .withPoint(Point.fromLngLat(post.locationLongitude, post.locationLatitude))
-        .withIconImage(postPhoto)
-        .withIconSize(0.1)
-    pointAnnotationManager.create(pointAnnotationOptions)
-    pointAnnotationManager.addClickListener(onPostAnnotationClick(post))
+    context: Context,
+    onSelectPost: (Post) -> Unit,
+    scope: CoroutineScope,
+) {
+//    val postPhoto = getBitmapFromUrl(post.photoUrl)
+    bitmapFromDrawableRes(
+        context,
+        R.drawable.ic_cheers_logo
+    )?.let {
+        val annotationApi = mapView.annotations
+        val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
+        val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
+            .withPoint(Point.fromLngLat(post.locationLongitude, post.locationLatitude))
+            .withIconImage(it)
+        pointAnnotationManager.create(pointAnnotationOptions)
+        pointAnnotationManager.addClickListener(
+            onPostAnnotationClick(post, postSheetState, scope, onSelectPost = onSelectPost)
+        )
+    }
 }
 
 private fun getBitmapFromUrl(url: String): Bitmap {
@@ -224,10 +241,17 @@ private fun getBitmapFromUrl(url: String): Bitmap {
         .getCircledBitmap()
 }
 
-private fun onPostAnnotationClick(post: Post): OnPointAnnotationClickListener {
+private fun onPostAnnotationClick(
+    post: Post,
+    postSheetState: ModalBottomSheetState,
+    scope: CoroutineScope,
+    onSelectPost: (Post) -> Unit,
+): OnPointAnnotationClickListener {
     return OnPointAnnotationClickListener {
-//        viewModel.selectPost(post)
-//        findNavController().navigate(R.id.postMapDialog)
+        onSelectPost(post)
+        scope.launch {
+            postSheetState.show()
+        }
         true
     }
 }
@@ -246,12 +270,22 @@ private fun onIndicatorPositionChangedListener(
     mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
 }
 
+private fun onCameraTrackingDismissed(
+    mapView: MapView,
+    onMoveListener: OnMoveListener,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
+) {
+    mapView.location
+        .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+    mapView.gestures.removeOnMoveListener(onMoveListener)
+}
+
 private fun onMoveListener(
     mapView: MapView,
     onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
 ) = object : OnMoveListener {
     override fun onMoveBegin(detector: MoveGestureDetector) {
-        onCameraTrackingDismissed(mapView, this)
+        onCameraTrackingDismissed(mapView, this, onIndicatorPositionChangedListener)
     }
 
     override fun onMove(detector: MoveGestureDetector): Boolean {
@@ -331,7 +365,7 @@ private fun onMapReady(
             .build()
     )
 
-    val style = if (false)
+    val style = if (true)
         "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0"
     else
         "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"

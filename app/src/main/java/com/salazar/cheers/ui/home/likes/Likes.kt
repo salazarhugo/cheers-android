@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -28,13 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import coil.compose.rememberImagePainter
 import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.otherprofile.OtherProfileFragmentArgs
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,17 +39,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class LikesFragment : Fragment() {
 
-    private val args: LikesFragmentArgs by navArgs()
-
     @Inject
     lateinit var likesViewModelFactory: LikesViewModel.LikesViewModelFactory
 
     private val viewModel: LikesViewModel by viewModels {
-        LikesViewModel.provideFactory(likesViewModelFactory, postId = args.postId)
+        LikesViewModel.provideFactory(likesViewModelFactory, postId = "fw")
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
@@ -118,10 +113,6 @@ class LikesFragment : Fragment() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    val action = LikesFragmentDirections.actionLikesFragmentToOtherProfileFragment(
-                        username = user.username
-                    )
-                    findNavController().navigate(action)
                 }
                 .padding(6.dp),
             verticalAlignment = Alignment.CenterVertically,

@@ -17,16 +17,17 @@ class PostsPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Post> {
         val position = params.key ?: POST_STARTING_PAGE_INDEX
         val response = service.posts(position, params.loadSize)
+
         return when (response) {
             is Result.Success -> {
-                val posts = response.data.map {
-                    it.copy(createdTime = prettyDate(it.createdTime))
-                }
+//                val posts = response.data.map {
+//                    it.copy(createdTime = prettyDate(it.createdTime))
+//                }
 
                 LoadResult.Page(
-                    data = posts,
+                    data = listOf(),
                     prevKey = if (position == POST_STARTING_PAGE_INDEX) null else position - 1,
-                    nextKey = if (posts.isEmpty()) null else position + (params.loadSize / NETWORK_PAGE_SIZE)
+                    nextKey = if (true) null else position + (params.loadSize / NETWORK_PAGE_SIZE)
                 )
             }
             is Result.Error -> LoadResult.Error(response.exception)

@@ -10,15 +10,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,8 +54,11 @@ import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.event.AddEventUiState
+import com.salazar.cheers.ui.event.PrivacyItem
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddPostScreen(
@@ -143,10 +149,16 @@ fun AddPostScreen(
                 interactWithChooseBeverage = interactWithChooseBeverage
             )
             DividerM3()
+
             SwitchPreference(
                 text = "Show on map",
                 showOnMap = uiState.showOnMap,
             ) { onShowOnMapChanged(it) }
+            DividerM3()
+            Privacy(
+                privacyState = uiState.privacyState,
+                privacy = uiState.privacy,
+            )
             DividerM3()
             SwitchPreference(
                 text = "Allow repost",
@@ -157,6 +169,32 @@ fun AddPostScreen(
     }
 }
 
+@Composable
+fun Privacy(
+    privacyState: ModalBottomSheetState,
+    privacy: PrivacyItem,
+) {
+    val scope = rememberCoroutineScope()
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .clickable {
+                scope.launch { privacyState.show() }
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(privacy.icon, null)
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                Text(privacy.title)
+                Text(privacy.subtitle)
+            }
+        }
+        Icon(Icons.Filled.KeyboardArrowRight, null)
+    }
+}
 @Composable
 fun BeverageSection(
     beverage: String,

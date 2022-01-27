@@ -214,7 +214,7 @@ fun Tweet(
     ) {
         Image(
             painter = rememberImagePainter(
-                data = post.creator.profilePictureUrl,
+                data = null,//post.creator.profilePictureUrl,
                 builder = {
                     transformations(CircleCropTransformation())
                     error(R.drawable.default_profile_picture)
@@ -226,11 +226,11 @@ fun Tweet(
             contentDescription = null,
         )
         Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-            Username(
-                username = post.creator.username,
-                verified = post.creator.verified,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
-            )
+//            Username(
+//                username = post.creator.username,
+//                verified = post.creator.verified,
+//                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
+//            )
             Text(
                 text = post.caption,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
@@ -419,7 +419,7 @@ fun ProfileStats(
         horizontalArrangement = Arrangement.spacedBy(26.dp)
     ) {
         val items = listOf(
-            Counter("Posts", user.posts, null),
+            Counter("Posts", user.postCount, null),
             Counter("Followers", user.followers, R.id.followersFollowingFragment),
             Counter("Following", user.following, R.id.followersFollowingFragment),
         )

@@ -17,11 +17,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -92,6 +93,7 @@ class UploadPostWorker @AssistedInject constructor(
                             StorageUtil.uploadPostImage(thumbnailBytes) { thumbnailUrl ->
                                 val post = Post(
                                     type = postType,
+                                    authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
                                     caption = photoCaption,
                                     videoUrl = downloadUri.toString(),
                                     videoThumbnailUrl = thumbnailUrl,
@@ -106,6 +108,7 @@ class UploadPostWorker @AssistedInject constructor(
                         } else {
                             val post = Post(
                                 type = postType,
+                                authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
                                 caption = photoCaption,
                                 videoUrl = downloadUri.toString(),
                                 locationName = locationName,

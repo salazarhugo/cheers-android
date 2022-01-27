@@ -26,7 +26,6 @@ import java.util.*
 import javax.inject.Inject
 
 
-
 data class AddEventUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,

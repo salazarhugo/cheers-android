@@ -34,7 +34,7 @@ import androidx.navigation.fragment.navArgs
 class ChooseUsernameFragment : Fragment() {
 
     private val viewModel: ChooseUsernameViewModel by viewModels()
-    private val args: ChooseUsernameFragmentArgs by navArgs()
+//    private val args: ChooseUsernameFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,13 +52,13 @@ class ChooseUsernameFragment : Fragment() {
         val uiState = viewModel.uiState.collectAsState(ChooseUsernameState()).value
 
         if (uiState.isAvailable == true) {
-            val action = if (args.isFromGoogle)
-                ChooseUsernameFragmentDirections
-                    .actionChooseUsernameFragmentToSignInFragment(username = uiState.username)
-            else
-                ChooseUsernameFragmentDirections
-                    .actionChooseUsernameFragmentToCreatePasswordFragment(username = uiState.username)
-            findNavController().navigate(action)
+//            val action = if (args.isFromGoogle)
+//                ChooseUsernameFragmentDirections
+//                    .actionChooseUsernameFragmentToSignInFragment(username = uiState.username)
+//            else
+//                ChooseUsernameFragmentDirections
+//                    .actionChooseUsernameFragmentToCreatePasswordFragment(username = uiState.username)
+//            findNavController().navigate(action)
             viewModel.reset()
         }
 

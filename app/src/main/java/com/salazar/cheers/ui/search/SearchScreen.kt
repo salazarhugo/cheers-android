@@ -116,7 +116,8 @@ fun RecentUserList(
             RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
         }
         item {
-            Text("Suggestions")
+            if (recommendations.isNotEmpty())
+                Text("Suggestions")
         }
         items(recommendations) { user ->
             UserCard(user, onUserClicked = onUserClicked)

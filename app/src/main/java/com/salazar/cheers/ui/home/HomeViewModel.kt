@@ -8,16 +8,16 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Neo4jRepository
+import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.EventUi
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.SuggestionUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ sealed interface HomeUiState {
     ) : HomeUiState
 
     data class HasPosts(
-        val postsFlow: Flow<PagingData<Post>>,
+        val postsFlow: Flow<PagingData<PostFeed>>,
         val eventsFlow: Flow<PagingData<EventUi>>,
         val listState: LazyListState = LazyListState(),
         val likes: Set<String>,
@@ -59,7 +59,7 @@ sealed interface HomeUiState {
 }
 
 private data class HomeViewModelState(
-    val postsFlow: Flow<PagingData<Post>>? = null,
+    val postsFlow: Flow<PagingData<PostFeed>>? = null,
     val eventsFlow: Flow<PagingData<EventUi>>? = null,
     val listState: LazyListState = LazyListState(),
     val suggestions: List<SuggestionUser>? = null,
@@ -172,8 +172,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun toggleLike(post: Post) {
+        val likes = if (post.liked) post.likes - 1 else post.likes + 1
         viewModelScope.launch {
-            repository.toggleLikes(post.id)
+            repository.postDao.update(post.copy(liked = !post.liked, likes = likes))
         }
         if (post.liked)
             unlikePost(post.id)
@@ -207,17 +208,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun selectPost(postId: String) {
-//        viewModelState.update {
-//            it.copy(selectedPostId = postId)
-//        }
-    }
-
     fun deletePost(postId: String) {
-//        viewModelState.update {
-//            it.copy(postsFlow = it.postsFlow?.filter { p -> post.id != postId })
-//        }
         viewModelScope.launch {
+            repository.postDao.deleteWithId(postId)
             try {
                 Neo4jUtil.deletePost(postId = postId)
             } catch (e: Exception) {

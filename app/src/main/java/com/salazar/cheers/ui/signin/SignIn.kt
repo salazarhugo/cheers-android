@@ -69,7 +69,6 @@ import org.jetbrains.anko.support.v4.startActivity
 class SignInFragment : Fragment() {
 
     private val viewModel: SignInViewModel by viewModels()
-    private val args: SignInFragmentArgs by navArgs()
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
@@ -90,10 +89,8 @@ class SignInFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                if (args.username != null) {
-                    val signInIntent = mGoogleSignInClient.signInIntent
-                    startForResult.launch(signInIntent)
-                }
+                val signInIntent = mGoogleSignInClient.signInIntent
+                startForResult.launch(signInIntent)
                 SignInScreen()
             }
         }
@@ -272,9 +269,6 @@ class SignInFragment : Fragment() {
     fun Footer() {
         Column(
             modifier = Modifier.clickable {
-                val action =
-                    SignInFragmentDirections.actionSignInFragmentToChooseUsernameFragment()
-                findNavController().navigate(action)
             }
         ) {
             DividerM3()
@@ -384,18 +378,13 @@ class SignInFragment : Fragment() {
                 startActivity(intentFor<MainActivity>().newTask().clearTask())
                 viewModel.getAndSaveRegistrationToken()
             } else {
-                val username = args.username
-                if (username != null)
-                    FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = username) {
-                        startActivity(intentFor<MainActivity>().newTask().clearTask())
-                        viewModel.getAndSaveRegistrationToken()
-                    }
-                else {
-                    val action =
-                        SignInFragmentDirections.actionSignInFragmentToChooseUsernameFragment(
-                            isFromGoogle = true
-                        )
-                    findNavController().navigate(action)
+//                if (username != null)
+                FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = "username") {
+                    startActivity(intentFor<MainActivity>().newTask().clearTask())
+                    viewModel.getAndSaveRegistrationToken()
+//                    }
+//                else {
+//                }
                 }
             }
         }

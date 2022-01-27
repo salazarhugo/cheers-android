@@ -1,13 +1,13 @@
 package com.salazar.cheers.data
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.data.db.CheersDatabase
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.EventUi
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.util.addOrRemove
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -15,27 +15,30 @@ import javax.inject.Singleton
 
 @Singleton
 class Neo4jRepository @Inject constructor(
-    private val neo4JService: Neo4jService
+    private val neo4JService: Neo4jService,
+    private val database: CheersDatabase
 ){
+    val postDao = database.postDao()
     private val likes = MutableStateFlow<Set<String>>(setOf())
 
-    fun getPosts(): Flow<PagingData<Post>> {
+    @OptIn(ExperimentalPagingApi::class)
+    fun getPosts(): Flow<PagingData<PostFeed>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
-//                maxSize = 100,
-                enablePlaceholders = false
+                enablePlaceholders = true,
             ),
-            pagingSourceFactory = { PostsPagingSource(neo4JService) }
-        ).flow
+            remoteMediator = PostRemoteMediator(database = database, networkService = neo4JService),
+        ) {
+            postDao.pagingSourceFeed()
+        }.flow
     }
 
     fun getEvents(): Flow<PagingData<EventUi>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
-//                maxSize = 100,
-                enablePlaceholders = false
+                enablePlaceholders = true,
             ),
             pagingSourceFactory = { EventsPagingSource(neo4JService) }
         ).flow
@@ -43,13 +46,7 @@ class Neo4jRepository @Inject constructor(
 
     fun observeLikes(): Flow<Set<String>> = likes
 
-    suspend fun toggleLikes(postId: String) {
-        val set = likes.value.toMutableSet()
-        set.addOrRemove(postId)
-        likes.value = set
-    }
-
     companion object {
-        const val NETWORK_PAGE_SIZE = 20
+        const val NETWORK_PAGE_SIZE = 10
     }
 }

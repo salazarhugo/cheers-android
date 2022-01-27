@@ -6,6 +6,7 @@ import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Neo4jRepository
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.CheersDatabase
+import com.salazar.cheers.data.db.PostDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,15 +22,21 @@ object AppModule {
     @Provides
     fun provideDb(@ApplicationContext context: Context): CheersDatabase {
         return Room
-            .databaseBuilder(context.applicationContext, CheersDatabase::class.java, "forex.db")
+            .databaseBuilder(context.applicationContext, CheersDatabase::class.java, "cheers.db")
             .fallbackToDestructiveMigration()
             .build()
     }
 
     @Singleton
     @Provides
+    fun providePostDao(@ApplicationContext appContext: Context): PostDao {
+        return CheersDatabase.invoke(appContext).postDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideCheersDao(@ApplicationContext appContext: Context): CheersDao {
-        return CheersDatabase.invoke(appContext).forexDao()
+        return CheersDatabase.invoke(appContext).cheersDao()
     }
 
     @Singleton

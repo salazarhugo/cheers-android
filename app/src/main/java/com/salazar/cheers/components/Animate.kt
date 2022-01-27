@@ -2,10 +2,12 @@ package com.salazar.cheers.components
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -13,10 +15,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.home.HomeUiState
 
 @Composable
-fun AnimatePost(uiState: HomeUiState.HasPosts, index: Int) {
+fun AnimatePost(
+    content: @Composable () -> Unit,
+) {
     val state = remember {
         MutableTransitionState(false).apply {
             targetState = true
@@ -25,14 +28,10 @@ fun AnimatePost(uiState: HomeUiState.HasPosts, index: Int) {
     val density = LocalDensity.current
     AnimatedVisibility(
         visibleState = state,
-        enter = slideInVertically(
-            initialOffsetY = { with(density) { -400.dp.roundToPx() } }
-        ) + fadeIn(
-            initialAlpha = 0.3f
-        ),
-        exit = slideOutHorizontally() + fadeOut()
+        enter = expandVertically(),
+        exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
     ) {
-//            Post(uiState = uiState, index)
+        content()
     }
 }
 

@@ -1,10 +1,7 @@
 package com.salazar.cheers.ui.otherprofile
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.net.Uri
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -20,7 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.AssignmentInd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,12 +35,9 @@ import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.google.firebase.dynamiclinks.ShortDynamicLink
-import com.google.firebase.dynamiclinks.ktx.*
-import com.google.firebase.ktx.Firebase
-import com.mapbox.search.*
 import com.salazar.cheers.R
-import com.salazar.cheers.components.*
+import com.salazar.cheers.components.PrettyImage
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
@@ -357,7 +351,7 @@ fun Counters(
     ) {
         val otherUser = uiState.user
         val items = listOf(
-            Counter("Posts", otherUser.posts),
+            Counter("Posts", otherUser.postCount),
             Counter("Followers", otherUser.followers),
             Counter("Following", otherUser.following),
         )

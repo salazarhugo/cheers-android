@@ -42,13 +42,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EventDetailFragment : Fragment() {
 
-    private val args: EventDetailFragmentArgs by navArgs()
-
     @Inject
     lateinit var eventDetailViewModelFactory: EventDetailViewModel.EventDetailViewModelFactory
 
     private val viewModel: EventDetailViewModel by viewModels {
-        EventDetailViewModel.provideFactory(eventDetailViewModelFactory, eventId = args.eventId)
+        EventDetailViewModel.provideFactory(eventDetailViewModelFactory, eventId = "eventId")
     }
 
     override fun onCreateView(

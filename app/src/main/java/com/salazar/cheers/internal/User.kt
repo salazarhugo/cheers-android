@@ -1,14 +1,18 @@
 package com.salazar.cheers.internal
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.io.Serializable
 
+@Entity(tableName = "users")
 data class User(
+    @PrimaryKey
     val id: String,
     val firstName: String,
     val lastName: String,
     var fullName: String,
     var username: String,
-    val posts: Int,
+    val postCount: Int,
     val followers: Int,
     val following: Int,
     val phoneNumber: String,
@@ -19,7 +23,7 @@ data class User(
     val website: String,
     val online: Boolean,
     val darkMode: Boolean,
-    val registrationTokens: MutableList<String>,
+    val registrationTokens: List<String>,
     val isFollowed: Boolean,
 ) : Serializable {
 
@@ -40,7 +44,7 @@ data class User(
         "",
         false,
         false,
-        mutableListOf(),
+        listOf(),
         false,
     )
 }

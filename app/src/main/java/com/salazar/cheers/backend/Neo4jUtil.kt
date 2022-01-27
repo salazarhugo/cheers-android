@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.neo4j.driver.*
 import java.lang.reflect.Type
-import java.util.*
 import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit
 
@@ -116,9 +115,10 @@ object Neo4jUtil {
 
 fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
         val params: MutableMap<String, Any> = mutableMapOf()
-        params["userId"] = FirebaseAuth.getInstance().uid!!
+        params["userId"] = FirebaseAuth.getInstance().currentUser?.uid!!
         val post2 = PostNeo4j(
             id = randomUUID().toString(),
+            authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
             type = post.type,
             caption = post.caption,
             createdTime = post.createdTime,
@@ -383,7 +383,7 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
             val post = gson.fromJson(records[0].values()[0].toString(), Post::class.java)
             val creator = gson.fromJson(records[0].values()[1].toString(), User::class.java)
 
-            return@withContext Result.Success(post.copy(creator = creator))
+            return@withContext Result.Success(post)
         }
     }
 
@@ -590,11 +590,7 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
                     val user =
                         gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
 
-                    posts.add(
-                        post.copy(
-                            creator = user,
-                        )
-                    )
+                    posts.add(post)
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
@@ -632,11 +628,7 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
 //                    post.userPhotoUrl = user.profilePicturePath
 //                    post.userId = user.id
 
-                    posts.add(
-                        post.copy(
-                            creator = user,
-                        )
-                    )
+                    posts.add(post)
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
@@ -652,10 +644,10 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
                 params["userId"] = FirebaseAuth.getInstance().uid!!
 
                 val records = query(
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p) WHERE p.showOnMap = true \n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: apoc.temporal.format(p.createdTime, \"HH:mm\")}," +
-                            " properties(f) ORDER BY p.createdTime DESC",
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p: Post) WHERE p.showOnMap = true \n" +
+                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p: Post) \n" +
+                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: toString(p.createdTime)}," +
+                            " properties(f) ORDER BY datetime(p.createdTime) DESC",
                     params
                 )
 
@@ -669,11 +661,7 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
                         gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
                     val user =
                         gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-                    posts.add(
-                        post.copy(
-                            creator = user
-                        )
-                    )
+                    posts.add( post )
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
@@ -712,15 +700,10 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
                         object : TypeToken<ArrayList<User>>() {}.type
 
                     val s = record.values()[2].toString()
-                    val tagUsers =
-                        gson.fromJson<ArrayList<User>>(s, userListType)
+//                    val tagUsers =
+//                        gson.fromJson<ArrayList<User>>(s, userListType)
 
-                    posts.add(
-                        post.copy(
-                            creator = user,
-                            tagUsers = tagUsers,
-                        )
-                    )
+                    posts.add(post)
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
