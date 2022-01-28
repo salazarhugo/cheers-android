@@ -7,7 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Camera screen.

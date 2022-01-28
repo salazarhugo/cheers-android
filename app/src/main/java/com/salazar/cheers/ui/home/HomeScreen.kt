@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -58,11 +59,11 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.CheersNavigationActions
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
+import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Typography
 import org.jetbrains.anko.collections.forEachWithIndex
 import org.jetbrains.anko.image
@@ -673,10 +674,12 @@ fun PostBody(
                     .clickable { onPostClicked(post.id) }
             )
         else
-            Text(
-                text = post.caption,
-                modifier = Modifier.padding(16.dp)
-            )
+            SelectionContainer() {
+                Text(
+                    text = post.caption,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
 //        if (post.tagUsers.isNotEmpty())
 //            InThisPhotoAnnotation(modifier = Modifier.align(Alignment.BottomStart))

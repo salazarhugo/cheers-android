@@ -83,6 +83,12 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
         }
     }
 
+    fun selectPrivacy(privacy: PrivacyItem) {
+        viewModelState.update {
+            it.copy(privacy = privacy)
+        }
+    }
+
     fun selectTagUser(user: User) {
         val l = viewModelState.value.selectedTagUsers.toMutableList()
         if (l.contains(user)) l.remove(user) else l.add(user)
@@ -167,3 +173,4 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
         uploadWorkerState = workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).asFlow()
     }
 }
+

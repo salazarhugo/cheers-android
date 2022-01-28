@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.chats
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Messages screen.

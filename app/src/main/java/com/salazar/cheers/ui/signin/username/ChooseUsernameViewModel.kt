@@ -1,9 +1,9 @@
-package com.salazar.cheers.ui.signin
+package com.salazar.cheers.ui.signin.username
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

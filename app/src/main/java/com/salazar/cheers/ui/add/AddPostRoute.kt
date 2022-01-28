@@ -5,7 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.map.ChooseOnMapScreen
 
 /**
@@ -55,6 +55,7 @@ fun AddPostRoute(
             updateLocationName = addPostViewModel::updateLocation,
             updateLocationResults = addPostViewModel::updateLocationResults,
             onSelectMedia = addPostViewModel::setPostImage,
-            onMediaSelectorClicked = { launcher.launch("image/* video/*") }
+            onMediaSelectorClicked = { launcher.launch("image/* video/*") },
+            onSelectPrivacy = addPostViewModel::selectPrivacy,
         )
 }

@@ -1,4 +1,4 @@
-package com.salazar.cheers
+package com.salazar.cheers.navigation
 
 import androidx.navigation.NavHostController
 import java.net.URLEncoder
@@ -8,13 +8,22 @@ import java.nio.charset.StandardCharsets
  * Destinations used in the [CheersApp].
  */
 object CheersDestinations {
+    const val ROOT_ROUTE = "root"
+    const val AUTH_ROUTE = "auth"
+    const val MAIN_ROUTE = "main"
+}
+
+/**
+ * Destinations used in the [MainGraph].
+ */
+object MainDestinations {
     const val HOME_ROUTE = "home"
+    const val SEARCH_ROUTE = "search"
+    const val MAP_ROUTE = "map"
+    const val MESSAGES_ROUTE = "messages"
     const val PROFILE_ROUTE = "profile"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
-    const val MAP_ROUTE = "map"
-    const val SEARCH_ROUTE = "search"
-    const val MESSAGES_ROUTE = "messages"
     const val POST_COMMENTS = "comments"
     const val CAMERA_ROUTE = "camera"
     const val OTHER_PROFILE_ROUTE = "otherProfile"
@@ -31,6 +40,15 @@ object CheersDestinations {
 }
 
 /**
+ * Destinations used in the [AuthGraph].
+ */
+object AuthDestinations {
+    const val SIGN_IN_ROUTE = "signIn"
+    const val SIGN_UP_ROUTE = "signUp"
+    const val CHOOSE_USERNAME = "chooseUsername"
+    const val PHONE_ROUTE = "phone"
+}
+/**
  * Models the navigation actions in the app.
  */
 class CheersNavigationActions(navController: NavHostController) {
@@ -39,112 +57,140 @@ class CheersNavigationActions(navController: NavHostController) {
         navController.popBackStack()
     }
 
+    val navigateToSignUp: () -> Unit = {
+        navController.navigate(AuthDestinations.SIGN_UP_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToMain: () -> Unit = {
+        navController.navigate(CheersDestinations.MAIN_ROUTE) {
+            navController.popBackStack(route = CheersDestinations.MAIN_ROUTE, inclusive = true)
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToPhone: () -> Unit = {
+        navController.navigate(AuthDestinations.PHONE_ROUTE) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToSignIn: () -> Unit = {
+        navController.navigate(AuthDestinations.SIGN_IN_ROUTE) {
+            navController.popBackStack(route = AuthDestinations.SIGN_IN_ROUTE, inclusive = true)
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToEditProfile: () -> Unit = {
-        navController.navigate(CheersDestinations.EDIT_PROFILE_ROUTE) {
+        navController.navigate(MainDestinations.EDIT_PROFILE_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToAddEvent: () -> Unit = {
-        navController.navigate(CheersDestinations.ADD_EVENT_SHEET) {
+        navController.navigate(MainDestinations.ADD_EVENT_SHEET) {
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
-        navController.navigate("${CheersDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
-            popUpTo(CheersDestinations.HOME_ROUTE)
+        navController.navigate("${MainDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
+            popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
         }
     }
 
     val navigateToPostMoreSheet: (postId: String, isAuthor: Boolean) -> Unit = { postId, isAuthor ->
-        navController.navigate("${CheersDestinations.POST_MORE_SHEET}/$postId/$isAuthor") {
+        navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postId/$isAuthor") {
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToProfileMoreSheet: () -> Unit = {
-        navController.navigate(CheersDestinations.PROFILE_MORE_SHEET) {
+        navController.navigate(MainDestinations.PROFILE_MORE_SHEET) {
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToAddPostSheet: () -> Unit = {
-        navController.navigate(CheersDestinations.ADD_POST_SHEET) {
-            popUpTo(CheersDestinations.HOME_ROUTE)
+        navController.navigate(MainDestinations.ADD_POST_SHEET) {
+            popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToHome: () -> Unit = {
-        navController.navigate(CheersDestinations.HOME_ROUTE) {
+        navController.navigate(MainDestinations.HOME_ROUTE) {
             restoreState = true
         }
     }
     val navigateToMap: () -> Unit = {
-        navController.navigate(CheersDestinations.MAP_ROUTE) {
+        navController.navigate(MainDestinations.MAP_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToSearch: () -> Unit = {
-        navController.navigate(CheersDestinations.SEARCH_ROUTE) {
+        navController.navigate(MainDestinations.SEARCH_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToMessages: () -> Unit = {
-        navController.navigate(CheersDestinations.MESSAGES_ROUTE) {
+        navController.navigate(MainDestinations.MESSAGES_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToProfile: () -> Unit = {
-        navController.navigate(CheersDestinations.PROFILE_ROUTE) {
+        navController.navigate(MainDestinations.PROFILE_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToActivity: () -> Unit = {
-        navController.navigate(CheersDestinations.ACTIVITY_ROUTE) {
+        navController.navigate(MainDestinations.ACTIVITY_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToPostComments: (postId: String) -> Unit = { postId ->
-        navController.navigate("${CheersDestinations.POST_COMMENTS}/$postId") {
+        navController.navigate("${MainDestinations.POST_COMMENTS}/$postId") {
             launchSingleTop = true
             restoreState = true
         }
     }
 
     val navigateToOtherProfile: (username: String) -> Unit = { username ->
-        navController.navigate("${CheersDestinations.OTHER_PROFILE_ROUTE}/$username") {
+        navController.navigate("${MainDestinations.OTHER_PROFILE_ROUTE}/$username") {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToPostDetail: (postId: String) -> Unit = { postId ->
-        navController.navigate("${CheersDestinations.POST_DETAIL_ROUTE}/$postId") {
+        navController.navigate("${MainDestinations.POST_DETAIL_ROUTE}/$postId") {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToLikes: (postId: String) -> Unit = { postId ->
-        navController.navigate("${CheersDestinations.LIKES_ROUTE}/$postId") {
+        navController.navigate("${MainDestinations.LIKES_ROUTE}/$postId") {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToSettings: () -> Unit = {
-        navController.navigate(CheersDestinations.SETTINGS_ROUTE) {
+        navController.navigate(MainDestinations.SETTINGS_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
@@ -157,19 +203,19 @@ class CheersNavigationActions(navController: NavHostController) {
         profilePictureUrl: String,
     ) -> Unit = { channelId, username, verified, name, profilePictureUrl ->
         val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
-        navController.navigate("${CheersDestinations.CHAT_ROUTE}/$channelId/$username/${verified}/$name/$encodedUrl") {
+        navController.navigate("${MainDestinations.CHAT_ROUTE}/$channelId/$username/${verified}/$name/$encodedUrl") {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToProfileStats: (statName: String, username: String) -> Unit = { s, u ->
-        navController.navigate(CheersDestinations.PROFILE_STATS_ROUTE) {
+        navController.navigate(MainDestinations.PROFILE_STATS_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
     }
     val navigateToCamera: () -> Unit = {
-        navController.navigate(CheersDestinations.CAMERA_ROUTE) {
+        navController.navigate(MainDestinations.CAMERA_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }

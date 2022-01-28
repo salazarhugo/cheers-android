@@ -1,17 +1,11 @@
 package com.salazar.cheers.ui.event
 
-import android.app.Activity
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.app.TimePickerDialog
-import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
 import android.util.Log
-import android.view.Window
 import android.widget.DatePicker
 import android.widget.TimePicker
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,9 +17,15 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.MyLocation
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,7 +51,10 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
-import com.mapbox.search.*
+import com.mapbox.search.ResponseInfo
+import com.mapbox.search.ReverseGeocodingSearchEngine
+import com.mapbox.search.SearchCallback
+import com.mapbox.search.SearchRequestTask
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
@@ -61,7 +64,6 @@ import com.salazar.cheers.internal.EventType
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.util.Utils
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -317,7 +319,7 @@ fun Item(
     Row(
         modifier = Modifier
             .clickable { onSelectPrivacy(item) }
-            .padding(vertical = 12.dp)
+            .padding(vertical = 12.dp, horizontal = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,

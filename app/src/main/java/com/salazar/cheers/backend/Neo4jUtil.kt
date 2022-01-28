@@ -113,7 +113,10 @@ object Neo4jUtil {
         }
     }
 
-fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
+    fun addPost(
+        post: Post,
+        tagUsers: List<String> = emptyList()
+    ) {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = FirebaseAuth.getInstance().currentUser?.uid!!
         val post2 = PostNeo4j(
@@ -171,7 +174,11 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
     }
 
     suspend fun getCurrentUser(): Result<User> {
-        return getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+        return try {
+            getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+        } catch (e: Exception) {
+            return Result.Error(e)
+        }
     }
 
     suspend fun getPostLikes(postId: String): Result<List<User>> {
@@ -661,7 +668,7 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
                         gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
                     val user =
                         gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-                    posts.add( post )
+                    posts.add(post)
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
@@ -712,7 +719,10 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
         }
     }
 
-    private fun query(query: String, params: MutableMap<String, Any>): List<Record> {
+    private fun query(
+        query: String,
+        params: MutableMap<String, Any>
+    ): List<Record> {
         getSession().use { session ->
             return session.readTransaction { tx ->
                 tx.run(query, params).list()
@@ -732,13 +742,19 @@ fun addPost(post: Post, tagUsers: List<String> = emptyList()) {
         return value.asObject()
     }
 
-    private fun read(query: String, params: Value) {
+    private fun read(
+        query: String,
+        params: Value
+    ) {
         getSession().writeTransaction { tx ->
             tx.run(query, params)
         }
     }
 
-    private fun write(query: String, params: MutableMap<String, Any>) {
+    private fun write(
+        query: String,
+        params: MutableMap<String, Any>
+    ) {
         getSession().writeTransaction { tx ->
             tx.run(query, params)
         }

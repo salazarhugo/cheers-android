@@ -1,13 +1,9 @@
 package com.salazar.cheers.ui.comment
 
-import androidx.camera.core.AspectRatio.RATIO_16_9
-import androidx.camera.core.ImageCapture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Comments screen.

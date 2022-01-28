@@ -58,21 +58,19 @@ fun PostDetailScreen(
         topBar = { Toolbar(onBackPressed = onBackPressed) }
     ) {
         Column(
-//            modifier = Modifier.verticalScroll(rememberScrollState())
+            modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
-//            Post(
-//                post = uiState.post,
-//                onHeaderClicked = onHeaderClicked,
-//                onDelete = onDelete,
-//                isAuthor = uiState.post.creator.id == FirebaseAuth.getInstance().currentUser?.uid!!,
-//            )
-            if (uiState.post.locationName.isBlank())
-                Text("No location found")
-            else
+            if (uiState.post.locationName.isNotBlank())
                 StaticMap(
                     longitude = uiState.post.locationLongitude,
                     latitude = uiState.post.locationLatitude
                 )
+            Post(
+                post = uiState.post,
+                onHeaderClicked = onHeaderClicked,
+                onDelete = onDelete,
+                isAuthor = uiState.post.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
+            )
         }
     }
 }
@@ -104,6 +102,7 @@ fun StaticMap(
 
     val url = remember { staticImage.url().toString() }
     PrettyImage(
+        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
         data = url,
     )
 }

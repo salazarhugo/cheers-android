@@ -1,13 +1,10 @@
 package com.salazar.cheers.ui.profile
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
-import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Profile screen.
@@ -24,7 +21,12 @@ fun ProfileRoute(
     ProfileScreen(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::refresh,
-        onStatClicked = { statName, username ->  navActions.navigateToProfileStats(statName, username) },
+        onStatClicked = { statName, username ->
+            navActions.navigateToProfileStats(
+                statName,
+                username
+            )
+        },
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onLikeClicked = profileViewModel::toggleLike,
         onEditProfileClicked = { navActions.navigateToEditProfile() },

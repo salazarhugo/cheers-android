@@ -1,8 +1,7 @@
 package com.salazar.cheers.ui.editprofile
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import com.salazar.cheers.CheersNavigationActions
+import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Edit profile screen.

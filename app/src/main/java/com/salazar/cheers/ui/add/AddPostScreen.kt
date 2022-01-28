@@ -5,19 +5,25 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -52,10 +58,12 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
+import com.salazar.cheers.internal.EventType
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.event.AddEventUiState
+import com.salazar.cheers.ui.event.Item
 import com.salazar.cheers.ui.event.PrivacyItem
+import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils
 import kotlinx.coroutines.launch
@@ -78,6 +86,7 @@ fun AddPostScreen(
     updateLocationName: (String) -> Unit,
     updateLocationResults: (List<SearchResult>) -> Unit,
     onMediaSelectorClicked: () -> Unit,
+    onSelectPrivacy: (PrivacyItem) -> Unit,
 ) {
     val searchCallback = object : SearchCallback {
         override fun onResults(
@@ -101,70 +110,72 @@ fun AddPostScreen(
         reverseGeocoding.search(options, searchCallback)
     }
 
-    Scaffold(
-        topBar = { TopAppBar(onDismiss = onDismiss) },
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+    PrivacyBottomSheet(uiState = uiState, onSelectPrivacy = onSelectPrivacy) {
+        Scaffold(
+            topBar = { TopAppBar(onDismiss = onDismiss) },
         ) {
-            AddPhotoOrVideo(
-                mediaUri = uiState.mediaUri,
-                navigateToCamera = navigateToCamera,
-                onSelectMedia = onSelectMedia,
-                onMediaSelectorClicked = onMediaSelectorClicked,
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                AddPhotoOrVideo(
+                    mediaUri = uiState.mediaUri,
+                    navigateToCamera = navigateToCamera,
+                    onSelectMedia = onSelectMedia,
+                    onMediaSelectorClicked = onMediaSelectorClicked,
+                )
 //                    DividerM3()
-            CaptionSection(
-                profilePictureUrl = profilePictureUrl,
-                caption = uiState.caption,
-                onCaptionChanged = onCaptionChanged,
-                mediaUri = uiState.mediaUri,
-                postType = uiState.postType,
-            )
-            DividerM3()
-            TagSection(
-                selectedTagUsers = uiState.selectedTagUsers,
-                navigateToTagUser = navigateToTagUser,
-            )
-            DividerM3()
-            if (uiState.selectedLocation != null)
-                SelectedLocation(
-                    location = uiState.selectedLocation,
-                    navigateToChooseOnMap = interactWithChooseOnMap,
-                    unselectLocation = unselectLocation,
+                CaptionSection(
+                    profilePictureUrl = profilePictureUrl,
+                    caption = uiState.caption,
+                    onCaptionChanged = onCaptionChanged,
+                    mediaUri = uiState.mediaUri,
+                    postType = uiState.postType,
                 )
-            else
-                LocationSection(
-                    location = uiState.location,
-                    navigateToChooseOnMap = interactWithChooseOnMap
+                DividerM3()
+                TagSection(
+                    selectedTagUsers = uiState.selectedTagUsers,
+                    navigateToTagUser = navigateToTagUser,
                 )
-            DividerM3()
-            LocationResultsSection(
-                results = uiState.locationResults,
-                onSelectLocation = onSelectLocation,
-            )
-            BeverageSection(
-                beverage = uiState.beverage,
-                interactWithChooseBeverage = interactWithChooseBeverage
-            )
-            DividerM3()
+                DividerM3()
+                if (uiState.selectedLocation != null)
+                    SelectedLocation(
+                        location = uiState.selectedLocation,
+                        navigateToChooseOnMap = interactWithChooseOnMap,
+                        unselectLocation = unselectLocation,
+                    )
+                else
+                    LocationSection(
+                        location = uiState.location,
+                        navigateToChooseOnMap = interactWithChooseOnMap
+                    )
+                DividerM3()
+                LocationResultsSection(
+                    results = uiState.locationResults,
+                    onSelectLocation = onSelectLocation,
+                )
+                BeverageSection(
+                    beverage = uiState.beverage,
+                    interactWithChooseBeverage = interactWithChooseBeverage
+                )
+                DividerM3()
 
-            SwitchPreference(
-                text = "Show on map",
-                showOnMap = uiState.showOnMap,
-            ) { onShowOnMapChanged(it) }
-            DividerM3()
-            Privacy(
-                privacyState = uiState.privacyState,
-                privacy = uiState.privacy,
-            )
-            DividerM3()
-            SwitchPreference(
-                text = "Allow repost",
-                showOnMap = uiState.showOnMap,
-            ) {}
-            ShareButton(onDismiss, onUploadPost = onUploadPost)
+                SwitchPreference(
+                    text = "Show on map",
+                    showOnMap = uiState.showOnMap,
+                ) { onShowOnMapChanged(it) }
+                DividerM3()
+                Privacy(
+                    privacyState = uiState.privacyState,
+                    privacy = uiState.privacy,
+                )
+                DividerM3()
+                SwitchPreference(
+                    text = "Allow repost",
+                    showOnMap = uiState.showOnMap,
+                ) {}
+                ShareButton(onDismiss, onUploadPost = onUploadPost)
+            }
         }
     }
 }
@@ -177,11 +188,11 @@ fun Privacy(
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxWidth()
             .clickable {
                 scope.launch { privacyState.show() }
-            },
+            }
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -195,6 +206,7 @@ fun Privacy(
         Icon(Icons.Filled.KeyboardArrowRight, null)
     }
 }
+
 @Composable
 fun BeverageSection(
     beverage: String,
@@ -316,7 +328,7 @@ fun AddPhotoOrVideo(
         ) {
             Icon(Icons.Outlined.PhotoAlbum, "")
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Add from gallery")
+            Text(text = "Gallery")
         }
         Spacer(Modifier.width(8.dp))
         FilledTonalButton(
@@ -325,7 +337,7 @@ fun AddPhotoOrVideo(
         ) {
             Icon(Icons.Outlined.PhotoCamera, "")
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Take a photo")
+            Text(text = "Take photo")
         }
     }
 }
@@ -589,3 +601,97 @@ fun ProfilePicture(profilePictureUrl: String) {
     )
 }
 
+@Composable
+fun PrivacyBottomSheet(
+    uiState: AddPostUiState,
+    onSelectPrivacy: (PrivacyItem) -> Unit,
+    content: @Composable () -> Unit
+) {
+    val state = uiState.privacyState
+    val scope = rememberCoroutineScope()
+
+    ModalBottomSheetLayout(
+        sheetState = state,
+        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+        sheetElevation = 0.dp,
+        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetContent = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .width(36.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(MaterialTheme.colorScheme.outline)
+                )
+                Text(
+                    "Event privacy",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(12.dp)
+                )
+                DividerM3()
+                Text(
+                    "Choose who can see and join this event. You'll be able to invite people later.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+            }
+
+            val items = listOf(
+                PrivacyItem(
+                    icon = Icons.Filled.Lock,
+                    title = "Private",
+                    subtitle = "Only people who are invited",
+                    type = EventType.PRIVATE
+                ),
+                PrivacyItem(
+                    icon = Icons.Filled.Public,
+                    title = "Public",
+                    subtitle = "Anyone on Cheers",
+                    type = EventType.PUBLIC
+                ),
+                PrivacyItem(
+                    icon = Icons.Filled.People,
+                    title = "Friends",
+                    subtitle = "Your friends on Cheers",
+                    type = EventType.FRIENDS
+                ),
+                PrivacyItem(
+                    icon = Icons.Filled.Groups,
+                    title = "Group",
+                    subtitle = "Members of a group that you're in",
+                    type = EventType.GROUP
+                ),
+            )
+
+            items.forEach {
+                Item(it, it == uiState.privacy, onSelectPrivacy = {
+                    onSelectPrivacy(it)
+                    scope.launch {
+                        state.animateTo(ModalBottomSheetValue.Expanded)
+                    }
+                })
+            }
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        uiState.privacyState.hide()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text("Done")
+            }
+        }
+    ) {
+        content()
+    }
+}

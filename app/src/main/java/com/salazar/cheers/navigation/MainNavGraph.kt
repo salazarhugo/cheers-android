@@ -1,16 +1,13 @@
-package com.salazar.cheers
+package com.salazar.cheers.navigation
 
 import android.net.Uri
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.salazar.cheers.components.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
@@ -40,23 +37,19 @@ import com.salazar.cheers.ui.search.SearchViewModel
 import com.salazar.cheers.ui.settings.SettingsRoute
 import com.salazar.cheers.ui.settings.SettingsViewModel
 
-@Composable
-fun CheersNavGraph(
+fun NavGraphBuilder.mainNavGraph(
     user: User,
-    modifier: Modifier = Modifier,
-    navController: NavHostController = rememberAnimatedNavController(),
     navActions: CheersNavigationActions,
-    startDestination: String = CheersDestinations.HOME_ROUTE
 ) {
     val uri = "https://cheers-a275e.web.app"
 
-    AnimatedNavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier
+    navigation(
+        route = CheersDestinations.MAIN_ROUTE,
+        startDestination = MainDestinations.HOME_ROUTE,
     ) {
+
         bottomSheet(
-            route = "${CheersDestinations.CHAT_ROUTE}/{channelId}/{username}/{verified}/{name}/{profilePictureUrl}",
+            route = "${MainDestinations.CHAT_ROUTE}/{channelId}/{username}/{verified}/{name}/{profilePictureUrl}",
         ) {
             val channelId = it.arguments?.getString("channelId")!!
             val username = it.arguments?.getString("username")!!
@@ -76,7 +69,7 @@ fun CheersNavGraph(
         }
 
         bottomSheet(
-            route = "${CheersDestinations.POST_MORE_SHEET}/{postId}/{isAuthor}",
+            route = "${MainDestinations.POST_MORE_SHEET}/{postId}/{isAuthor}",
             arguments = listOf(navArgument("isAuthor") { defaultValue = false })
         ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
@@ -92,7 +85,7 @@ fun CheersNavGraph(
             )
         }
 
-        bottomSheet(route = CheersDestinations.PROFILE_MORE_SHEET) {
+        bottomSheet(route = MainDestinations.PROFILE_MORE_SHEET) {
             ProfileMoreBottomSheet(
                 onSettingsClick = { navActions.navigateToSettings() },
                 onCopyProfileUrlClick = {}
@@ -100,7 +93,7 @@ fun CheersNavGraph(
         }
 
         dialog(
-            route = "${CheersDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
+            route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
             val viewModel = hiltViewModel<AddPostViewModel>()
@@ -114,7 +107,7 @@ fun CheersNavGraph(
                 viewModel.setPostImage(Uri.parse(photoUri))
         }
 
-        composable(CheersDestinations.HOME_ROUTE) {
+        composable(MainDestinations.HOME_ROUTE) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
             HomeRoute(
                 homeViewModel = homeViewModel,
@@ -122,14 +115,14 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.MAP_ROUTE) {
+        composable(MainDestinations.MAP_ROUTE) {
             val mapViewModel = hiltViewModel<MapViewModel>()
             MapRoute(
                 mapViewModel = mapViewModel,
             )
         }
 
-        dialog(CheersDestinations.CAMERA_ROUTE) {
+        dialog(MainDestinations.CAMERA_ROUTE) {
             val cameraViewModel = hiltViewModel<CameraViewModel>()
             CameraRoute(
                 cameraViewModel = cameraViewModel,
@@ -137,7 +130,7 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.SEARCH_ROUTE) {
+        composable(MainDestinations.SEARCH_ROUTE) {
             val searchViewModel = hiltViewModel<SearchViewModel>()
             SearchRoute(
                 searchViewModel = searchViewModel,
@@ -145,7 +138,7 @@ fun CheersNavGraph(
             )
         }
 
-        dialog(CheersDestinations.SETTINGS_ROUTE) {
+        dialog(MainDestinations.SETTINGS_ROUTE) {
             val settingsViewModel = hiltViewModel<SettingsViewModel>()
             SettingsRoute(
                 settingsViewModel = settingsViewModel,
@@ -154,7 +147,7 @@ fun CheersNavGraph(
         }
 
         bottomSheet(
-            route = "${CheersDestinations.POST_COMMENTS}/{postId}",
+            route = "${MainDestinations.POST_COMMENTS}/{postId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
         ) {
 
@@ -167,7 +160,7 @@ fun CheersNavGraph(
         }
 
         composable(
-            route = "${CheersDestinations.OTHER_PROFILE_ROUTE}/{username}",
+            route = "${MainDestinations.OTHER_PROFILE_ROUTE}/{username}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/{username}" })
         ) {
 
@@ -180,7 +173,7 @@ fun CheersNavGraph(
         }
 
         composable(
-            route = "${CheersDestinations.POST_DETAIL_ROUTE}/{postId}",
+            route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
         ) {
             val postId = it.arguments?.getString("postId")!!
             val postDetailViewModel = postDetailViewModel(postId = postId)
@@ -190,7 +183,7 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.PROFILE_STATS_ROUTE) {
+        composable(MainDestinations.PROFILE_STATS_ROUTE) {
             val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
             ProfileStatsRoute(
                 profileStatsViewModel = profileStatsViewModel,
@@ -200,7 +193,7 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.MESSAGES_ROUTE) {
+        composable(MainDestinations.MESSAGES_ROUTE) {
             val messagesViewModel = hiltViewModel<MessagesViewModel>()
             MessagesRoute(
                 messagesViewModel = messagesViewModel,
@@ -210,7 +203,7 @@ fun CheersNavGraph(
             )
         }
 
-        dialog(CheersDestinations.EDIT_PROFILE_ROUTE) {
+        dialog(MainDestinations.EDIT_PROFILE_ROUTE) {
             val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
             EditProfileRoute(
                 editProfileViewModel = editProfileViewModel,
@@ -218,7 +211,7 @@ fun CheersNavGraph(
             )
         }
 
-        composable(CheersDestinations.PROFILE_ROUTE) {
+        composable(MainDestinations.PROFILE_ROUTE) {
             val profileViewModel = hiltViewModel<ProfileViewModel>()
             ProfileRoute(
                 profileViewModel = profileViewModel,

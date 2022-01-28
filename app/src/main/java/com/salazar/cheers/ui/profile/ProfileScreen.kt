@@ -156,7 +156,7 @@ fun ProfilePostsAndTags(
                 selected = pagerState.currentPage == index,
                 onClick = {
                     scope.launch {
-                        pagerState.scrollToPage(index)
+                        pagerState.animateScrollToPage(index)
                     }
 //                        viewModel.toggle()
                 },

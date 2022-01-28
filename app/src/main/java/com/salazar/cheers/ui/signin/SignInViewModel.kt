@@ -1,13 +1,15 @@
 package com.salazar.cheers.ui.signin
 
-import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.service.MyFirebaseMessagingService
+import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -92,12 +94,8 @@ class SignInViewModel @Inject constructor(
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(ContentValues.TAG, "signInWithEmail:success")
                     signInSuccessful()
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(ContentValues.TAG, "signInWithEmail:failure", task.exception)
                     updateErrorMessage("Authentication failed")
                 }
 
@@ -105,9 +103,33 @@ class SignInViewModel @Inject constructor(
             }
     }
 
-    private fun signInSuccessful() {
-        updateIsSignedIn(true)
+    fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        FirebaseAuth.getInstance().signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                task.addOnFailureListener {
+                    Log.e("GOOGLE", it.toString())
+                }
+                if (task.isSuccessful) {
+                    signInSuccessful(acct)
+                } else {}
+            }
     }
+
+    private fun signInSuccessful(acct: GoogleSignInAccount? = null) {
+        FirestoreUtil.checkIfUserExists { exists ->
+            if (exists) {
+                updateIsSignedIn(true)
+                getAndSaveRegistrationToken()
+            } else {
+                FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = "username") {
+                    updateIsSignedIn(true)
+                    getAndSaveRegistrationToken()
+                }
+            }
+        }
+    }
+
 
 }
 

@@ -23,10 +23,10 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.salazar.cheers.CheersDestinations
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Screen
+import com.salazar.cheers.navigation.MainDestinations
 
 @Composable
 fun CheersNavigationBar(
@@ -42,21 +42,21 @@ fun CheersNavigationBar(
 ) {
     val items = listOf(
         Screen(
-            CheersDestinations.HOME_ROUTE,
+            MainDestinations.HOME_ROUTE,
             navigateToHome,
             { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
             { Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
             "Home"
         ),
         Screen(
-            CheersDestinations.MAP_ROUTE,
+            MainDestinations.MAP_ROUTE,
             navigateToMap,
             { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onBackground) },
             { Icon(Icons.Filled.Place, null, tint = MaterialTheme.colorScheme.onBackground) },
             "Map"
         ),
         Screen(
-            CheersDestinations.CAMERA_ROUTE,
+            MainDestinations.CAMERA_ROUTE,
             navigateToCamera,
             {
                 Icon(
@@ -75,7 +75,7 @@ fun CheersNavigationBar(
             "Camera"
         ),
         Screen(
-            CheersDestinations.MESSAGES_ROUTE,
+            MainDestinations.MESSAGES_ROUTE,
             navigateToMessages,
             {
                 Icon(
@@ -136,7 +136,7 @@ fun CheersNavigationBar(
                         contentDescription = null,
                     )
                 },
-                selected = currentRoute == CheersDestinations.PROFILE_ROUTE,
+                selected = currentRoute == MainDestinations.PROFILE_ROUTE,
                 onClick = navigateToProfile,
             )
         }

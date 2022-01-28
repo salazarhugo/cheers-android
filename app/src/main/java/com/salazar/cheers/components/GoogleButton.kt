@@ -31,7 +31,10 @@ fun GoogleButton(
     var clicked by remember { mutableStateOf(false) }
 
     Surface(
-        onClick = { clicked = !clicked },
+        onClick = {
+            clicked = !clicked
+            onClicked()
+        },
 //        shape = shape,
 //        border = BorderStroke(width = 1.dp, color = borderColor),
         modifier = Modifier.fillMaxWidth(),
@@ -84,7 +87,6 @@ fun GoogleButton(
                     strokeWidth = 2.dp,
                     color = Color.Black
                 )
-                onClicked()
             }
         }
     }

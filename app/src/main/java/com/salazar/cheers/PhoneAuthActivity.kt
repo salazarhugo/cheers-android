@@ -7,19 +7,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -28,26 +26,18 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.ui.signin.ChooseUsernameState
 import com.salazar.cheers.ui.signin.SignInViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
@@ -114,14 +104,16 @@ class PhoneAuthActivity : AppCompatActivity() {
         val tabs = 2
         val pagerState = uiState.pagerState
 
-        Column(modifier = Modifier.fillMaxSize()){
+        Column(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(
                 count = tabs,
                 state = pagerState,
                 modifier = Modifier.height(300.dp)
             ) { page ->
                 Column(
-                    modifier = Modifier.fillMaxHeight().padding(22.dp),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(22.dp),
                 ) {
                     when (page) {
                         0 -> PhoneNumberScreen(uiState = uiState)
@@ -206,7 +198,7 @@ class PhoneAuthActivity : AppCompatActivity() {
             DividerM3()
             Button(
                 onClick = {
-                      verifyPhoneNumberWithCode(uiState.verificationId, uiState.verificationCode)
+                    verifyPhoneNumberWithCode(uiState.verificationId, uiState.verificationCode)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -226,7 +218,7 @@ class PhoneAuthActivity : AppCompatActivity() {
                 onClick = {
                     startPhoneNumberVerification(phoneNumber = uiState.phoneNumber)
                     viewModel.isLoadingChange(true)
-                          },
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
@@ -282,7 +274,10 @@ class PhoneAuthActivity : AppCompatActivity() {
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-    private fun verifyPhoneNumberWithCode(verificationId: String?, code: String) {
+    private fun verifyPhoneNumberWithCode(
+        verificationId: String?,
+        code: String
+    ) {
         val credential = PhoneAuthProvider.getCredential(verificationId!!, code)
         signInWithPhoneAuthCredential(credential)
     }
@@ -304,21 +299,21 @@ class PhoneAuthActivity : AppCompatActivity() {
 
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
         auth.signInWithCredential(credential)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithCredential:success")
-                        val user = task.result?.user
-                        signInSuccessful()
-                    } else {
-                        // Sign in failed, display a message and update the UI
-                        Log.w(TAG, "signInWithCredential:failure", task.exception)
-                        if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                            // The verification code entered was invalid
-                        }
-                        // Update UI
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithCredential:success")
+                    val user = task.result?.user
+                    signInSuccessful()
+                } else {
+                    // Sign in failed, display a message and update the UI
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                        // The verification code entered was invalid
                     }
+                    // Update UI
                 }
+            }
     }
 
     private fun signInSuccessful(acct: GoogleSignInAccount? = null) {
@@ -327,13 +322,17 @@ class PhoneAuthActivity : AppCompatActivity() {
                 startActivity(intentFor<MainActivity>().newTask().clearTask())
                 signInViewModel.getAndSaveRegistrationToken()
             } else {
-                FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = UUID.randomUUID().toString()) {
+                FirestoreUtil.initCurrentUserIfFirstTime(
+                    acct = acct,
+                    username = UUID.randomUUID().toString()
+                ) {
                     startActivity(intentFor<MainActivity>().newTask().clearTask())
                     signInViewModel.getAndSaveRegistrationToken()
                 }
             }
         }
     }
+
     private fun updateUI(user: FirebaseUser? = auth.currentUser) {
 
     }

@@ -1,16 +1,11 @@
 package com.salazar.cheers.ui.settings
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat.startActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.CheersNavigationActions
-import com.salazar.cheers.SignInActivity
-import org.jetbrains.anko.clearTask
-import org.jetbrains.anko.newTask
+import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Settings screen.
@@ -30,7 +25,8 @@ fun SettingsRoute(
         onBackPressed = { navActions.navigateToProfile() },
         onSignOut = {
             FirebaseAuth.getInstance().signOut()
-            context.startActivity(Intent(context, SignInActivity::class.java).newTask().clearTask())
+            navActions.navigateToSignIn()
+//            context.startActivity(Intent(context, SignInActivity::class.java).newTask().clearTask())
         }
     )
 }

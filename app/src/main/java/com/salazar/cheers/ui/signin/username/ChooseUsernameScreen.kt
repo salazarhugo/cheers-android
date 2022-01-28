@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.signin
+package com.salazar.cheers.ui.signin.username
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,25 +20,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.ui.signin.signup.SignUpUiState
 
 @Composable
 fun ChooseUsernameScreen(
-    uiState: ChooseUsernameState,
-    isFromGoogle: Boolean,
-    onReset: () -> Unit,
+    uiState: SignUpUiState,
     onClearUsername: () -> Unit,
     onUsernameChanged: (String) -> Unit,
     onNextClicked: () -> Unit,
 ) {
-    if (uiState.isAvailable == true) {
-//        val action = if (isFromGoogle)
-//            ChooseUsernameFragmentDirections .actionChooseUsernameFragmentToSignInFragment(username = uiState.username)
-//        else
-//            ChooseUsernameFragmentDirections
-//                .actionChooseUsernameFragmentToCreatePasswordFragment(username = uiState.username)
-        onReset()
-    }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(32.dp),
@@ -48,13 +38,15 @@ fun ChooseUsernameScreen(
         Text("You can't change it later")
         Spacer(Modifier.height(36.dp))
         UsernameTextField(
-            uiState = uiState,
+            username = uiState.username,
+            isUsernameAvailable = uiState.isUsernameAvailable,
+            errorMessage = uiState.errorMessage,
             onClearUsername = onClearUsername,
             onUsernameChanged = onUsernameChanged,
         )
         Spacer(Modifier.height(8.dp))
         NextButton(
-            uiState = uiState,
+            isLoading = uiState.isLoading,
             onNextClicked = onNextClicked,
         )
     }
@@ -62,7 +54,7 @@ fun ChooseUsernameScreen(
 
 @Composable
 fun NextButton(
-    uiState: ChooseUsernameState,
+    isLoading: Boolean,
     onNextClicked: () -> Unit,
 ) {
     Button(
@@ -71,9 +63,9 @@ fun NextButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = !uiState.isLoading,
+        enabled = !isLoading,
     ) {
-        if (uiState.isLoading)
+        if (isLoading)
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(30.dp)
@@ -88,12 +80,14 @@ fun NextButton(
 
 @Composable
 fun UsernameTextField(
-    uiState: ChooseUsernameState,
+    username: String,
+    errorMessage: String?,
+    isUsernameAvailable: Boolean,
     onUsernameChanged: (String) -> Unit,
     onClearUsername: () -> Unit
 ) {
     TextField(
-        value = uiState.username,
+        value = username,
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             focusedIndicatorColor = Color.Transparent,
@@ -113,15 +107,15 @@ fun UsernameTextField(
         }),
         placeholder = { Text("Username") },
         trailingIcon = {
-            if (uiState.isAvailable == true)
+            if (isUsernameAvailable)
                 Icon(imageVector = Icons.Default.Check, "")
-            else if (uiState.username.isNotEmpty())
+            else if (username.isNotEmpty())
                 IconButton(onClick = onClearUsername) {
                     Icon(imageVector = Icons.Default.Close, "")
                 }
         },
-        isError = uiState.isAvailable == false,
+        isError = !isUsernameAvailable,
     )
-    if (uiState.errorMessage.isNotEmpty())
-        Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
+    if (errorMessage?.isNotEmpty() == true)
+        Text(errorMessage, color = MaterialTheme.colorScheme.error)
 }
