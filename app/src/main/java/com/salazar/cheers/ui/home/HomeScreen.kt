@@ -478,7 +478,18 @@ fun PostList(
                         onPostMoreClicked = onPostMoreClicked,
                         onLike = onLike,
                     )
-                    PostType.VIDEO -> {}
+                    PostType.VIDEO -> Post(
+                        modifier = Modifier.animateItemPlacement(),
+                        postFeed = post,
+                        navigateToComments = navigateToComments,
+                        likes = uiState.likes,
+                        isPostVisible = true,
+                        navActions = navActions,
+                        onPostClicked = onPostClicked,
+                        onUserClicked = onUserClicked,
+                        onPostMoreClicked = onPostMoreClicked,
+                        onLike = onLike,
+                    )
                 }
 
             }

@@ -70,11 +70,6 @@
         </activity>
 
         <activity
-            android:name=".SignInActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Cheers.SignIn" />
-
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -89,9 +84,6 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".PhoneAuthActivity"
-            android:theme="@style/Theme.Cheers.SignIn" />
 
         <service
             android:name=".service.MyFirebaseMessagingService"

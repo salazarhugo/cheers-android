@@ -49,7 +49,7 @@ fun CreateAccountScreen(
             password = uiState.password,
             onPasswordChanged = onPasswordChanged
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
         SignUpButton(
             uiState = uiState,
             onSignUp = onSignUp,
