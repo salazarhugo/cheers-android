@@ -1,6 +1,8 @@
 package com.salazar.cheers.ui.editprofile
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -25,6 +27,6 @@ fun EditProfileRoute(
         onSave = {
             editProfileViewModel.updateUser()
             navActions.navigateBack()
-         } ,
+        },
     )
 }

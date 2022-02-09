@@ -54,7 +54,9 @@ fun LikeButton(
             null,
             modifier = Modifier
                 .size(22.dp)
-                .clickable(indication = null, interactionSource = remember { MutableInteractionSource()}) {
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }) {
                     onToggle()
                 },
             tint = color

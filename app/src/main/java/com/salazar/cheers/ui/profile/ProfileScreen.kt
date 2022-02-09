@@ -315,7 +315,7 @@ fun Section2(
     onWebsiteClicked: (String) -> Unit,
 ) {
     Column {
-        Row() {
+        Row {
             Text(
                 text = user.fullName,
                 style = Typography.bodyMedium

@@ -61,6 +61,7 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
+import com.salazar.cheers.components.animations.AnimateVisibilityFade
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -100,9 +101,7 @@ fun HomeScreen(
         var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
         Scaffold(
             topBar = {
-                Column(
-//                    modifier = Modifier.background(Purple200)
-                ) {
+                Column {
                     MyAppBar(
                         navigateToSearch = navigateToSearch,
                         onSelectTab = onSelectTab,
@@ -211,7 +210,7 @@ fun NativeAdPost(ad: NativeAd) {
             }
         }
         DividerM3()
-        val context = LocalContext.current;
+        val context = LocalContext.current
         AndroidView(
             factory = {
                 val adView = NativeAdView(it)
@@ -257,12 +256,13 @@ fun TopTabs(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         tabs.forEachWithIndex { i, s ->
-            val a = if (tab == tabs.indexOf(s)) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors()
+            val a =
+                if (tab == tabs.indexOf(s)) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors()
             FilledTonalButton(
                 onClick = { onSelectTab(i) },
                 colors = a,
             ) { Text(s) }
-            if (i != tabs.size-1)
+            if (i != tabs.size - 1)
                 Spacer(Modifier.width(8.dp))
         }
     }
@@ -685,7 +685,7 @@ fun PostBody(
                     .clickable { onPostClicked(post.id) }
             )
         else
-            SelectionContainer() {
+            SelectionContainer {
                 Text(
                     text = post.caption,
                     modifier = Modifier.padding(16.dp)

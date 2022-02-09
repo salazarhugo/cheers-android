@@ -1,17 +1,16 @@
 package com.salazar.cheers.ui.profile
 
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.util.addOrRemove
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -41,13 +40,13 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val user: User? = null,
-    val posts: List<Post>? = null,
+    val posts: List<Post> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
-    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
 ) {
     fun toUiState(): ProfileUiState =
-        if (user != null && posts != null)
+        if (user != null)
             ProfileUiState.HasUser(
                 posts = posts,
                 user = user,
@@ -65,9 +64,11 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
 
 @ExperimentalMaterialApi
 @HiltViewModel
-class ProfileViewModel @Inject constructor() : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = false))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -85,11 +86,12 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         refreshUser()
         refreshUserPosts()
     }
+
     /**
      * Toggle like of a post
      */
     fun toggleLike(post: Post) {
-        val posts = viewModelState.value.posts ?: return
+        val posts = viewModelState.value.posts
         val mPosts = posts.toMutableList()
         val post = mPosts.find { it.id == post.id } ?: return
 
@@ -104,7 +106,10 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         updatePosts(mPosts)
     }
 
-    private fun toggleLike(postId: String, like: Boolean) {
+    private fun toggleLike(
+        postId: String,
+        like: Boolean
+    ) {
         viewModelScope.launch {
             if (like)
                 Neo4jUtil.likePost(postId = postId)
@@ -123,14 +128,9 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            val user = userRepository.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
             viewModelState.update {
-                when (val result = Neo4jUtil.getCurrentUser()) {
-                    is Result.Success -> it.copy(user = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        errorMessages = listOf(result.exception.toString()),
-                        isLoading = false
-                    )
-                }
+                it.copy(user = user, isLoading = false)
             }
         }
     }
@@ -139,7 +139,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             viewModelState.update {
                 when (val result = Neo4jUtil.getCurrentUserPosts()) {
-                    is Result.Success ->  it.copy(posts = result.data)
+                    is Result.Success -> it.copy(posts = result.data)
                     is Result.Error -> it.copy(
                         errorMessages = listOf(result.exception.toString()),
                         isLoading = false

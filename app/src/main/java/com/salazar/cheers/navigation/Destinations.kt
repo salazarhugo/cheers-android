@@ -48,6 +48,7 @@ object AuthDestinations {
     const val CHOOSE_USERNAME = "chooseUsername"
     const val PHONE_ROUTE = "phone"
 }
+
 /**
  * Models the navigation actions in the app.
  */

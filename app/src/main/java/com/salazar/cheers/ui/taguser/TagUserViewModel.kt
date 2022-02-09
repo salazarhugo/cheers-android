@@ -2,8 +2,8 @@ package com.salazar.cheers.ui.taguser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

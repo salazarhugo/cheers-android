@@ -3,14 +3,15 @@ package com.salazar.cheers.util
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.salazar.cheers.internal.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -28,7 +29,10 @@ object FirestoreChat {
         )
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
 
-    fun getOrCreateChatChannel(otherUser: User, onComplete: (channelId: String) -> Unit) {
+    fun getOrCreateChatChannel(
+        otherUser: User,
+        onComplete: (channelId: String) -> Unit
+    ) {
         currentUserDocRef.collection("engagedChatChannels")
             .document(otherUser.id).get().addOnSuccessListener {
                 if (it.exists()) {
@@ -145,7 +149,10 @@ object FirestoreChat {
         )
     }
 
-    fun sendMessage(message: Message, channelId: String) {
+    fun sendMessage(
+        message: Message,
+        channelId: String
+    ) {
         if (message is TextMessage && message.text.isBlank())
             return
 
@@ -185,12 +192,18 @@ object FirestoreChat {
         }
     }
 
-    fun unsendMessage(channelId: String, messageId: String) {
+    fun unsendMessage(
+        channelId: String,
+        messageId: String
+    ) {
         chatChannelsCollectionRef.document(channelId).collection("messages").document(messageId)
             .delete()
     }
 
-    fun likeMessage(channelId: String, messageId: String) {
+    fun likeMessage(
+        channelId: String,
+        messageId: String
+    ) {
         chatChannelsCollectionRef
             .document(channelId)
             .collection("messages")
@@ -198,7 +211,10 @@ object FirestoreChat {
             .update("likedBy", FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.uid!!))
     }
 
-    fun unlikeMessage(channelId: String, messageId: String) {
+    fun unlikeMessage(
+        channelId: String,
+        messageId: String
+    ) {
         chatChannelsCollectionRef
             .document(channelId)
             .collection("messages")

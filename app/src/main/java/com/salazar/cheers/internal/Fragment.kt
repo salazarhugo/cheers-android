@@ -1,7 +1,6 @@
 package com.salazar.cheers.internal
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 
 data class Screen(
     val route: String,

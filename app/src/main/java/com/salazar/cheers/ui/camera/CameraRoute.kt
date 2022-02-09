@@ -33,17 +33,17 @@ fun CameraRoute(
                 navActions.navigateToAddPostSheetWithPhotoUri(uiState.imageUri.toString())
         },
         onCameraUIAction = { cameraUIAction ->
-               when(cameraUIAction) {
-                   is CameraUIAction.OnSwitchCameraClick ->
-                       cameraViewModel.onSwitchCameraClicked()
-                   is CameraUIAction.OnCameraClick -> {
-                        imageCapture.takePicture(context, uiState.lensFacing, { uri, fromGallery ->
-                            cameraViewModel.setImageUri(uri)
-                        }, {})
-                   }
-                   is CameraUIAction.OnGalleryViewClick -> {}
-                   is CameraUIAction.OnCloseClick -> navActions.navigateBack()
-               }
+            when (cameraUIAction) {
+                is CameraUIAction.OnSwitchCameraClick ->
+                    cameraViewModel.onSwitchCameraClicked()
+                is CameraUIAction.OnCameraClick -> {
+                    imageCapture.takePicture(context, uiState.lensFacing, { uri, fromGallery ->
+                        cameraViewModel.setImageUri(uri)
+                    }, {})
+                }
+                is CameraUIAction.OnGalleryViewClick -> {}
+                is CameraUIAction.OnCloseClick -> navActions.navigateBack()
+            }
         },
     )
 }

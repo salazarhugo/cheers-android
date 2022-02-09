@@ -1,4 +1,4 @@
-package com.salazar.cheers.components
+package com.salazar.cheers.components.chat
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,6 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.salazar.cheers.R
+import com.salazar.cheers.components.CheersAppBar
+import com.salazar.cheers.components.Username
 
 @Composable
 fun DirectChatBar(

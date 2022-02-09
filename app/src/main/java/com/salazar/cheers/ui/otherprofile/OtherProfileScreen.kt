@@ -282,7 +282,7 @@ fun Section2(otherUser: User) {
     Column(
         modifier = Modifier.padding(vertical = 16.dp)
     ) {
-        Row() {
+        Row {
             Text(
                 text = otherUser.fullName,
                 style = Typography.bodyMedium

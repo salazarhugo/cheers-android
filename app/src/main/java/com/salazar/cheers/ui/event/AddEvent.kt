@@ -64,7 +64,6 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.internal.EventType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
@@ -101,7 +100,10 @@ class AddEventFragment : DialogFragment() {
 
     private val searchCallback = object : SearchCallback {
 
-        override fun onResults(results: List<SearchResult>, responseInfo: ResponseInfo) {
+        override fun onResults(
+            results: List<SearchResult>,
+            responseInfo: ResponseInfo
+        ) {
             if (results.isEmpty()) {
                 Log.i("SearchApiExample", "No reverse geocoding results")
             } else {
@@ -118,7 +120,8 @@ class AddEventFragment : DialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
@@ -239,7 +242,10 @@ class AddEventFragment : DialogFragment() {
     }
 
     @Composable
-    fun PrivacyBottomSheet(uiState: AddEventUiState, content: @Composable () -> Unit) {
+    fun PrivacyBottomSheet(
+        uiState: AddEventUiState,
+        content: @Composable () -> Unit
+    ) {
         val state = uiState.privacyState
         ModalBottomSheetLayout(
             sheetElevation = 0.dp,
@@ -277,25 +283,25 @@ class AddEventFragment : DialogFragment() {
                             icon = Icons.Filled.Lock,
                             title = "Private",
                             subtitle = "Only people who are invited",
-                            type = EventType.PRIVATE
+                            type = com.salazar.cheers.ui.add.Privacy.PRIVATE
                         ),
                         PrivacyItem(
                             icon = Icons.Filled.Public,
                             title = "Public",
                             subtitle = "Anyone on Cheers",
-                            type = EventType.PUBLIC
+                            type = com.salazar.cheers.ui.add.Privacy.PUBLIC
                         ),
                         PrivacyItem(
                             icon = Icons.Filled.People,
                             title = "Friends",
                             subtitle = "Your friends on Cheers",
-                            type = EventType.FRIENDS
+                            type = com.salazar.cheers.ui.add.Privacy.FRIENDS
                         ),
                         PrivacyItem(
                             icon = Icons.Filled.Groups,
                             title = "Group",
                             subtitle = "Members of a group that you're in",
-                            type = EventType.GROUP
+                            type = com.salazar.cheers.ui.add.Privacy.GROUP
                         ),
                     )
                     items.forEach { Item(it, it == uiState.selectedPrivacy) }
@@ -359,7 +365,7 @@ class AddEventFragment : DialogFragment() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
-        calendar.time = remember {Date() }
+        calendar.time = remember { Date() }
 //        viewModel.onStartDateChange("$day/$month/$year")
 //        viewModel.onStartTimeChange("$hourOfDay:$minute")
 //        viewModel.onEndDateChange("$day/$month/$year")
@@ -367,24 +373,40 @@ class AddEventFragment : DialogFragment() {
 
         val startDatePicker = DatePickerDialog(
             requireContext(), { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                viewModel.onStartDateChange("$year-${(month + 1).toString().padStart(2, '0')}-${dayOfMonth.toString().padStart(2, '0')}")
+                viewModel.onStartDateChange(
+                    "$year-${
+                        (month + 1).toString().padStart(2, '0')
+                    }-${dayOfMonth.toString().padStart(2, '0')}"
+                )
 
             }, year, month, day
         )
         val endDatePicker = DatePickerDialog(
             requireContext(), { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                viewModel.onEndDateChange("$year-${(month + 1).toString().padStart(2, '0')}-${dayOfMonth.toString().padStart(2, '0')}")
+                viewModel.onEndDateChange(
+                    "$year-${
+                        (month + 1).toString().padStart(2, '0')
+                    }-${dayOfMonth.toString().padStart(2, '0')}"
+                )
             }, year, month, day
         )
         val startTimePicker = TimePickerDialog(
             requireContext(), { _: TimePicker, hourOfDay: Int, minute: Int ->
-                viewModel.onStartTimeChange("${hourOfDay.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}")
+                viewModel.onStartTimeChange(
+                    "${
+                        hourOfDay.toString().padStart(2, '0')
+                    }:${minute.toString().padStart(2, '0')}"
+                )
             }, hourOfDay, minute, true
         )
 
         val endTimePicker = TimePickerDialog(
             requireContext(), { _: TimePicker, hourOfDay: Int, minute: Int ->
-                viewModel.onEndTimeChange("${hourOfDay.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}")
+                viewModel.onEndTimeChange(
+                    "${
+                        hourOfDay.toString().padStart(2, '0')
+                    }:${minute.toString().padStart(2, '0')}"
+                )
             }, hourOfDay, minute, true
         )
 
@@ -395,7 +417,7 @@ class AddEventFragment : DialogFragment() {
         ) {
             Row(modifier = Modifier.padding(16.dp)) {
                 Icon(Icons.Default.Schedule, null, modifier = Modifier.offset(y = 12.dp))
-                Column() {
+                Column {
                     SwitchPreference(
                         value = uiState.allDay,
                         text = "All-day"
@@ -591,7 +613,7 @@ class AddEventFragment : DialogFragment() {
     fun LocationSection() {
         Row(modifier = Modifier.padding(16.dp)) {
             Icon(Icons.Outlined.LocationOn, null)
-            Column() {
+            Column {
                 Row(
                     modifier = Modifier
                         .clickable {
@@ -684,7 +706,7 @@ class AddEventFragment : DialogFragment() {
     fun TagSection() {
         Row(modifier = Modifier.padding(16.dp)) {
             Icon(Icons.Outlined.People, null)
-            Column() {
+            Column {
                 Row(
                     modifier = Modifier
                         .clickable {
@@ -716,7 +738,10 @@ class AddEventFragment : DialogFragment() {
     }
 
     @Composable
-    fun CaptionSection(user: User, uiState: AddEventUiState) {
+    fun CaptionSection(
+        user: User,
+        uiState: AddEventUiState
+    ) {
         Row(
             modifier = Modifier
                 .padding(start = 15.dp, end = 15.dp)

@@ -58,7 +58,6 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.internal.EventType
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.event.Item
@@ -72,7 +71,6 @@ import kotlinx.coroutines.launch
 fun AddPostScreen(
     uiState: AddPostUiState,
     profilePictureUrl: String,
-    onShowOnMapChanged: (showOnMap: Boolean) -> Unit,
     onDismiss: () -> Unit,
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
@@ -158,12 +156,6 @@ fun AddPostScreen(
                     beverage = uiState.beverage,
                     interactWithChooseBeverage = interactWithChooseBeverage
                 )
-                DividerM3()
-
-                SwitchPreference(
-                    text = "Show on map",
-                    showOnMap = uiState.showOnMap,
-                ) { onShowOnMapChanged(it) }
                 DividerM3()
                 Privacy(
                     privacyState = uiState.privacyState,
@@ -646,25 +638,25 @@ fun PrivacyBottomSheet(
                     icon = Icons.Filled.Lock,
                     title = "Private",
                     subtitle = "Only people who are invited",
-                    type = EventType.PRIVATE
+                    type = Privacy.PRIVATE
                 ),
                 PrivacyItem(
                     icon = Icons.Filled.Public,
                     title = "Public",
                     subtitle = "Anyone on Cheers",
-                    type = EventType.PUBLIC
+                    type = Privacy.PUBLIC
                 ),
                 PrivacyItem(
                     icon = Icons.Filled.People,
                     title = "Friends",
                     subtitle = "Your friends on Cheers",
-                    type = EventType.FRIENDS
+                    type = Privacy.FRIENDS
                 ),
                 PrivacyItem(
                     icon = Icons.Filled.Groups,
                     title = "Group",
                     subtitle = "Members of a group that you're in",
-                    type = EventType.GROUP
+                    type = Privacy.GROUP
                 ),
             )
 

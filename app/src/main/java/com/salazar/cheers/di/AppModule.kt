@@ -3,10 +3,10 @@ package com.salazar.cheers.di
 import android.content.Context
 import androidx.room.Room
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.Neo4jRepository
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PostDao
+import com.salazar.cheers.data.db.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,6 +25,12 @@ object AppModule {
             .databaseBuilder(context.applicationContext, CheersDatabase::class.java, "cheers.db")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserDao(@ApplicationContext appContext: Context): UserDao {
+        return CheersDatabase.invoke(appContext).userDao()
     }
 
     @Singleton

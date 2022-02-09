@@ -18,13 +18,14 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.PublicOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -56,7 +57,8 @@ import com.salazar.cheers.util.Utils
 import com.salazar.cheers.util.Utils.getCircledBitmap
 import com.snapchat.kit.sdk.Bitmoji
 import com.snapchat.kit.sdk.bitmoji.networking.FetchAvatarUrlCallback
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 @Composable
@@ -65,7 +67,9 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     onCityChanged: (String) -> Unit,
     onSelectPost: (Post) -> Unit,
+    onTogglePublic: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
+    onAddPostClicked: () -> Unit,
 ) {
     val context = LocalContext.current
     val mapView = remember { MapView(context) }
@@ -89,7 +93,15 @@ fun MapScreen(
                     AndroidView(factory = { mapView }, Modifier.fillMaxSize()) {
                         onMapReady(it, context)
                     }
-                    UiLayer(this, uiState = uiState, mapView = mapView, onSelectPost = onSelectPost)
+                    UiLayer(
+                        this,
+                        uiState = uiState,
+                        mapView = mapView,
+                        onSelectPost = onSelectPost,
+                        onTogglePublic = onTogglePublic,
+                        isPublic = uiState.isPublic,
+                        onAddPostClicked = onAddPostClicked,
+                    )
                 }
             }
         }
@@ -136,14 +148,27 @@ fun UiLayer(
     scope: BoxScope,
     uiState: MapUiState,
     mapView: MapView,
+    isPublic: Boolean,
     onSelectPost: (Post) -> Unit,
+    onTogglePublic: () -> Unit,
+    onAddPostClicked: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope2 = rememberCoroutineScope()
+
+
     scope.apply {
+
         uiState.posts?.forEach {
             if (it.type == PostType.IMAGE)
-                addPostToMap(it, postSheetState = uiState.postSheetState, mapView, context, onSelectPost = onSelectPost, scope = scope2)
+                addPostToMap(
+                    it,
+                    postSheetState = uiState.postSheetState,
+                    mapView,
+                    context,
+                    onSelectPost = onSelectPost,
+                    scope = scope2
+                )
         }
 
         Surface(
@@ -160,6 +185,21 @@ fun UiLayer(
             )
         }
         Surface(
+            shape = RoundedCornerShape(22.dp),
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .clickable { onTogglePublic() },
+        ) {
+            val icon = if (isPublic) Icons.Default.Public else Icons.Default.PublicOff
+            Icon(
+                icon,
+                contentDescription = null,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            )
+        }
+        Surface(
             shape = CircleShape,
             color = Color.White.copy(alpha = 0.5f),
             shadowElevation = 8.dp,
@@ -167,9 +207,7 @@ fun UiLayer(
                 .padding(bottom = 26.dp)
                 .size(80.dp)
                 .border(4.dp, Color.White, CircleShape)
-                .clickable {
-//                    findNavController().navigate(R.id.addDialogFragment)
-                }
+                .clickable { onAddPostClicked() }
         ) {}
     }
 }

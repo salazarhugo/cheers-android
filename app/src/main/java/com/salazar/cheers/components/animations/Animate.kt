@@ -1,4 +1,4 @@
-package com.salazar.cheers.components
+package com.salazar.cheers.components.animations
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -106,7 +106,9 @@ fun AnimatedLogo() {
         Image(
             painter = rememberImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
             contentDescription = null,
-            modifier = Modifier.size(80.dp).alpha(alpha = value)
+            modifier = Modifier
+                .size(80.dp)
+                .alpha(alpha = value)
         )
     }
 }
@@ -131,7 +133,10 @@ fun AnimateHeart(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun AnimateVisibilityFade(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun AnimateVisibilityFade(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
     val state = remember {
         MutableTransitionState(false).apply {
             targetState = true

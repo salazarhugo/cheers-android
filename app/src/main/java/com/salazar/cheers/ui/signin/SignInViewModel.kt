@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,7 +64,10 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    private fun validateInput(email: String, password: String): Boolean {
+    private fun validateInput(
+        email: String,
+        password: String
+    ): Boolean {
         if (email.isBlank() || password.isBlank())
             return false
         return true
@@ -77,7 +81,9 @@ class SignInViewModel @Inject constructor(
             }
             // Get new FCM registration token
             val token = task.result
-            MyFirebaseMessagingService.addTokenToFirestore(token)
+            viewModelScope.launch {
+                MyFirebaseMessagingService.addTokenToNeo4j(token)
+            }
         }
     }
 
@@ -112,7 +118,8 @@ class SignInViewModel @Inject constructor(
                 }
                 if (task.isSuccessful) {
                     signInSuccessful(acct)
-                } else {}
+                } else {
+                }
             }
     }
 

@@ -3,10 +3,8 @@ package com.salazar.cheers.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.Neo4jRepository.Companion.NETWORK_PAGE_SIZE
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.data.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.EventUi
-import com.salazar.cheers.internal.Post
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
@@ -32,11 +30,11 @@ class EventsPagingSource(
         }
     }
 
-   override fun getRefreshKey(state: PagingState<Int, EventUi>): Int? {
-       return state.anchorPosition?.let { anchorPosition ->
-           state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
-               ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
-       }
+    override fun getRefreshKey(state: PagingState<Int, EventUi>): Int? {
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
     }
 
     private fun prettyDate(str: String): String {

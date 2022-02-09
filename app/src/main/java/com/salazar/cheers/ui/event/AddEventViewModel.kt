@@ -1,9 +1,7 @@
 package com.salazar.cheers.ui.event
 
 import android.app.Application
-import android.media.ThumbnailUtils
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
@@ -18,8 +16,8 @@ import androidx.work.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.add.Privacy
 import com.salazar.cheers.workers.UploadEventWorker
-import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import java.util.*
@@ -39,14 +37,19 @@ data class AddEventUiState(
     val description: String = "",
     val allDay: Boolean = false,
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val selectedPrivacy: PrivacyItem = PrivacyItem("Privacy", "Choose a privacy", Icons.Filled.Lock, "NONE"),
+    val selectedPrivacy: PrivacyItem = PrivacyItem(
+        "Privacy",
+        "Choose a privacy",
+        Icons.Filled.Lock,
+        Privacy.NONE
+    ),
 )
 
 data class PrivacyItem(
     val title: String,
     val subtitle: String,
     val icon: ImageVector,
-    val type: String,
+    val type: Privacy,
 )
 
 @HiltViewModel
@@ -102,6 +105,7 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
             it.copy(endTime = endTime)
         }
     }
+
     fun onEndDateChange(endDate: String) {
         viewModelState.update {
             it.copy(endDate = endDate)

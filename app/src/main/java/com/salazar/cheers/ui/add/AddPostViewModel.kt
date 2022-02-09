@@ -22,24 +22,33 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 
+enum class Privacy {
+    NONE, PRIVATE, FRIENDS, PUBLIC, GROUP
+}
+
 data class AddPostUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
-    val caption : String ="",
-    val beverage : String ="",
-    val postType : String = PostType.TEXT,
-    val mediaUri : Uri? = null,
-    val locationPoint : Point? = null,
-    val location : String = "Current Location",
-    val locationResults : List<SearchResult> = emptyList(),
-    val selectedLocation : SearchResult? = null,
-    val selectedTagUsers : List<User> = emptyList(),
+    val caption: String = "",
+    val beverage: String = "",
+    val postType: String = PostType.TEXT,
+    val mediaUri: Uri? = null,
+    val locationPoint: Point? = null,
+    val location: String = "Current Location",
+    val locationResults: List<SearchResult> = emptyList(),
+    val selectedLocation: SearchResult? = null,
+    val selectedTagUsers: List<User> = emptyList(),
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val privacy: PrivacyItem = PrivacyItem("Privacy", "Choose a privacy", Icons.Filled.Lock, "NONE"),
-    val showOnMap : Boolean = true,
-    val isChooseOnMapOpen : Boolean = false,
-    val isChooseBeverageOpen : Boolean = false,
+    val privacy: PrivacyItem = PrivacyItem(
+        "Privacy",
+        "Choose a privacy",
+        Icons.Filled.Lock,
+        Privacy.NONE
+    ),
+    val showOnMap: Boolean = true,
+    val isChooseOnMapOpen: Boolean = false,
+    val isChooseBeverageOpen: Boolean = false,
 )
 
 @HiltViewModel
@@ -162,7 +171,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
                         "LOCATION_LATITUDE" to uiState.selectedLocation?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.selectedLocation?.coordinate?.longitude(),
                         "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),
-                        "SHOW_ON_MAP" to uiState.showOnMap,
+                        "PRIVACY" to uiState.privacy.type.name,
                     )
                 )
             }

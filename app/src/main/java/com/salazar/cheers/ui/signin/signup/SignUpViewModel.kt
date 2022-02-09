@@ -146,7 +146,10 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun isUsernameAvailable(username: String, onResponse: (Result<Boolean>) -> Unit)  {
+    private fun isUsernameAvailable(
+        username: String,
+        onResponse: (Result<Boolean>) -> Unit
+    ) {
         viewModelScope.launch {
             val result = Neo4jUtil.isUsernameAvailable(username)
             onResponse(result)
@@ -161,11 +164,16 @@ class SignUpViewModel @Inject constructor(
             }
             // Get new FCM registration token
             val token = task.result
-            MyFirebaseMessagingService.addTokenToFirestore(token)
+            viewModelScope.launch {
+                MyFirebaseMessagingService.addTokenToNeo4j(token)
+            }
         }
     }
 
-    private fun signInSuccessful(email: String, username: String) {
+    private fun signInSuccessful(
+        email: String,
+        username: String
+    ) {
         FirestoreUtil.checkIfUserExists { exists ->
             if (exists) {
                 updateIsSignedIn(true)
@@ -196,7 +204,7 @@ class SignUpViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     Firebase.auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener() { task ->
+                        .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 signInSuccessful(email = email, username = username)
                             } else {

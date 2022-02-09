@@ -10,6 +10,9 @@ interface UserDao {
     @Query("SELECT * FROM users")
     fun pagingSource(): PagingSource<Int, User>
 
+    @Query("SELECT * FROM users WHERE users.id = :userId")
+    suspend fun getUser(userId: String): User
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User)
 

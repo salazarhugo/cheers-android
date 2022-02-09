@@ -12,7 +12,6 @@ import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 object FirestoreUtil {
@@ -104,7 +103,10 @@ object FirestoreUtil {
 
     }
 
-    fun updateName(firstName: String, lastName: String) {
+    fun updateName(
+        firstName: String,
+        lastName: String
+    ) {
         if (firstName.isBlank() && lastName.isBlank())
             return
 

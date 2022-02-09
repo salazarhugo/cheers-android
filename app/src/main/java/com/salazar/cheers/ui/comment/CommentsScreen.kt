@@ -1,10 +1,8 @@
 package com.salazar.cheers.ui.comment
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoAlbum
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.fragment.findNavController
 import com.salazar.cheers.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
@@ -23,7 +20,7 @@ fun CommentsScreen(
     uiState: CommentsUiState,
     modifier: Modifier = Modifier,
 ) {
-    Column() {
+    Column {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
@@ -53,6 +50,7 @@ fun Toolbar() {
         )
     }
 }
+
 @Composable
 fun CommentsFooter(
 ) {

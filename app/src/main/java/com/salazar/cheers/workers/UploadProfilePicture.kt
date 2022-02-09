@@ -50,7 +50,10 @@ class UploadProfilePicture @AssistedInject constructor(
 
     @OptIn(ExperimentalMaterial3Api::class)
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat.Builder(applicationContext, applicationContext.getString(R.string.default_notification_channel_id))
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            applicationContext.getString(R.string.default_notification_channel_id)
+        )
             .setContentIntent(
                 PendingIntent.getActivity(
                     applicationContext,

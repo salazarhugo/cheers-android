@@ -18,6 +18,7 @@ fun ProfileRoute(
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
+
     ProfileScreen(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::refresh,

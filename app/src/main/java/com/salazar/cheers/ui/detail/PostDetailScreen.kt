@@ -1,10 +1,10 @@
 package com.salazar.cheers.ui.detail
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Share
@@ -12,12 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -41,10 +36,10 @@ import com.mapbox.geojson.Point
 import com.salazar.cheers.R
 import com.salazar.cheers.components.LikeButton
 import com.salazar.cheers.components.PrettyImage
-import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
 
 @Composable
 fun PostDetailScreen(
@@ -54,24 +49,42 @@ fun PostDetailScreen(
     onHeaderClicked: (username: String) -> Unit,
     onDelete: () -> Unit,
 ) {
+    val post = uiState.postFeed.post
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed) }
     ) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
-            if (uiState.post.locationName.isNotBlank())
+            if (post.locationName.isNotBlank())
                 StaticMap(
-                    longitude = uiState.post.locationLongitude,
-                    latitude = uiState.post.locationLatitude
+                    longitude = post.locationLongitude,
+                    latitude = post.locationLatitude
                 )
             Post(
-                post = uiState.post,
+                postFeed = uiState.postFeed,
                 onHeaderClicked = onHeaderClicked,
                 onDelete = onDelete,
-                isAuthor = uiState.post.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                isAuthor = post.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
             )
+            PrivacyText(post.privacy)
         }
+    }
+}
+
+@Composable
+fun PrivacyText(
+    privacy: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = privacy,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
@@ -102,20 +115,29 @@ fun StaticMap(
 
     val url = remember { staticImage.url().toString() }
     PrettyImage(
-        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f),
         data = url,
     )
 }
 
 @Composable
 fun Post(
-    post: Post,
+    postFeed: PostFeed,
     onHeaderClicked: (username: String) -> Unit,
     onDelete: () -> Unit,
     isAuthor: Boolean,
 ) {
+    val post = postFeed.post
+    val author = postFeed.author
     Column {
-        PostHeader(post = post, onHeaderClicked = onHeaderClicked)
+        PostHeader(
+            username = author.username,
+            verified = author.verified,
+            locationName = post.locationName,
+            onHeaderClicked = onHeaderClicked,
+        )
         PostBody(post = post)
         PostFooter(post = post, onDelete = onDelete, isAuthor = isAuthor)
     }
@@ -176,63 +198,6 @@ fun Toolbar(
     }
 }
 
-@Composable
-fun PostHeader(
-    post: Post,
-    onHeaderClicked: (username: String) -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(14.dp, 11.dp)
-            .clickable { },//onHeaderClicked(post.creator.username) },
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            val brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFD41668),
-                    Color(0xFFF9B85D),
-                )
-            )
-
-            Image(
-                painter = rememberImagePainter(
-                    data = null,//post.creator.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .border(1.2.dp, brush, CircleShape)
-                    .size(33.dp)
-                    .padding(3.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-            Spacer(Modifier.width(8.dp))
-            Column {
-                Username(
-                    username = "username",//post.creator.username,
-                    verified = true,//post.creator.verified,
-                    textStyle = Typography.bodyMedium
-                )
-                if (post.locationName.isNotBlank())
-                    Text(text = post.locationName, style = Typography.labelSmall)
-            }
-        }
-        Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
-        })
-    }
-}
 
 @Composable
 fun PostBody(

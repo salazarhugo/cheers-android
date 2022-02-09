@@ -1,9 +1,7 @@
 package com.salazar.cheers
 
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
 import com.google.accompanist.pager.PagerState
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,9 +54,16 @@ class PhoneAuthViewModel @Inject constructor(
         }
     }
 
-    fun onCodeSent(verificationId: String, resendingToken: PhoneAuthProvider.ForceResendingToken) {
+    fun onCodeSent(
+        verificationId: String,
+        resendingToken: PhoneAuthProvider.ForceResendingToken
+    ) {
         viewModelState.update {
-            it.copy(isLoading = true, verificationId = verificationId, resendingToken = resendingToken)
+            it.copy(
+                isLoading = true,
+                verificationId = verificationId,
+                resendingToken = resendingToken
+            )
         }
 
         viewModelScope.launch {

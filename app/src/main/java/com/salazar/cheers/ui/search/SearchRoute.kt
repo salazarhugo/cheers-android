@@ -19,7 +19,7 @@ fun SearchRoute(
     SearchScreen(
         uiState = uiState,
         onSearchInputChanged = { searchViewModel.onSearchInputChanged(it) },
-        onDeleteRecentUser = { searchViewModel.deleteRecentUser(it)},
+        onDeleteRecentUser = { searchViewModel.deleteRecentUser(it) },
         onUserClicked = {
             searchViewModel.insertRecentUser(it)
             navActions.navigateToOtherProfile(it.username)

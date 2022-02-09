@@ -3,7 +3,7 @@ package com.salazar.cheers.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.Neo4jRepository.Companion.NETWORK_PAGE_SIZE
+import com.salazar.cheers.data.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Post
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -34,11 +34,11 @@ class PostsPagingSource(
         }
     }
 
-   override fun getRefreshKey(state: PagingState<Int, Post>): Int? {
-       return state.anchorPosition?.let { anchorPosition ->
-           state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
-               ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
-       }
+    override fun getRefreshKey(state: PagingState<Int, Post>): Int? {
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
     }
 
     private fun prettyDate(str: String): String {
@@ -51,7 +51,7 @@ class PostsPagingSource(
         else if (diff < 60 * 60)
             "${diff / 60}m ago"
         else if (diff < 60 * 60 * 24)
-            "${diff / 60 / 60} ${if ((diff / 60 / 60) > 1) "hours" else "hour" } ago"
+            "${diff / 60 / 60} ${if ((diff / 60 / 60) > 1) "hours" else "hour"} ago"
         else if (diff < 60 * 60 * 24 * 7)
             "${diff / 60 / 60 / 24} ${if ((diff / 60 / 60 / 24) > 1) "days" else "day"} ago"
         else if (diff < 60 * 60 * 24 * 30)

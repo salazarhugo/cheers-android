@@ -44,7 +44,7 @@ abstract class CheersDatabase : RoomDatabase() {
 
 class Converters {
     @TypeConverter
-    fun fromList(value : List<String>) = Json.encodeToString(value)
+    fun fromList(value: List<String>) = Json.encodeToString(value)
 
     @TypeConverter
     fun toList(value: String) = Json.decodeFromString<List<String>>(value)

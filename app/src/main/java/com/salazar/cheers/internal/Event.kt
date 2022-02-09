@@ -1,11 +1,6 @@
 package com.salazar.cheers.internal
 
-object EventType {
-    const val PRIVATE = "PRIVATE"
-    const val PUBLIC = "PUBLIC"
-    const val FRIENDS = "FRIENDS"
-    const val GROUP = "GROUP"
-}
+import com.salazar.cheers.ui.add.Privacy
 
 data class Event(
     val id: String = "",
@@ -21,7 +16,7 @@ data class Event(
     val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val type: String = EventType.PUBLIC,
+    val type: String = Privacy.PUBLIC.name,
 )
 
 data class EventUi(

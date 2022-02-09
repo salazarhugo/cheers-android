@@ -15,12 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.SignInActivity
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.data.entities.RecentUser
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 
 @Composable
@@ -81,7 +77,9 @@ fun DeleteAccountButton() {
     OutlinedButton(
         onClick = {},
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         enabled = false,
     ) {
         Text("Delete account")
@@ -93,7 +91,9 @@ fun SignOutButton(onSignOut: () -> Unit) {
     OutlinedButton(
         onClick = onSignOut,
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
     ) {
         Text("Logout")
     }

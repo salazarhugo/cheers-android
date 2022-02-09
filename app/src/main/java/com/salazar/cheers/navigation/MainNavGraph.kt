@@ -119,6 +119,7 @@ fun NavGraphBuilder.mainNavGraph(
             val mapViewModel = hiltViewModel<MapViewModel>()
             MapRoute(
                 mapViewModel = mapViewModel,
+                navActions = navActions
             )
         }
 

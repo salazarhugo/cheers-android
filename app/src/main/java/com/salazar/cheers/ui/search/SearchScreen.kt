@@ -89,7 +89,10 @@ private fun SearchBody(
 }
 
 @Composable
-fun UserList(users: List<User>, onUserClicked: (User) -> Unit) {
+fun UserList(
+    users: List<User>,
+    onUserClicked: (User) -> Unit
+) {
     LazyColumn {
         item {
             Text("Result")
@@ -172,7 +175,10 @@ fun RecentUserCard(
 }
 
 @Composable
-fun UserCard(user: User, onUserClicked: (User) -> Unit) {
+fun UserCard(
+    user: User,
+    onUserClicked: (User) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -215,7 +221,10 @@ fun UserCard(user: User, onUserClicked: (User) -> Unit) {
 }
 
 @Composable
-fun SearchBar(uiState: SearchUiState, onSearchInputChanged: (String) -> Unit) {
+fun SearchBar(
+    uiState: SearchUiState,
+    onSearchInputChanged: (String) -> Unit
+) {
     Box(
         modifier = Modifier.padding(15.dp),
         contentAlignment = Alignment.Center,

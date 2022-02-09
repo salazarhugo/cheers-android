@@ -27,7 +27,10 @@ import com.salazar.cheers.R
 private const val TAG = "WorkerUtils"
 private const val CHANNEL_ID = "CHANNEL_ID"
 
-fun makeStatusNotification(message: String, context: Context) {
+fun makeStatusNotification(
+    message: String,
+    context: Context
+) {
 
     // Make a channel if necessary
     val name = "name"

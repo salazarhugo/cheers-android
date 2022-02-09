@@ -46,7 +46,6 @@ fun AddPostRoute(
             onSelectLocation = addPostViewModel::selectLocation,
             onUploadPost = addPostViewModel::uploadPost,
             onDismiss = navActions.navigateBack,
-            onShowOnMapChanged = addPostViewModel::onShowOnMapChanged,
             interactWithChooseOnMap = addPostViewModel::interactedWithChooseOnMap,
             interactWithChooseBeverage = addPostViewModel::interactedWithChooseBeverage,
             navigateToTagUser = {},
@@ -55,7 +54,7 @@ fun AddPostRoute(
             updateLocationName = addPostViewModel::updateLocation,
             updateLocationResults = addPostViewModel::updateLocationResults,
             onSelectMedia = addPostViewModel::setPostImage,
-            onMediaSelectorClicked = { launcher.launch("image/* video/*") },
+            onMediaSelectorClicked = { launcher.launch("image/*") },
             onSelectPrivacy = addPostViewModel::selectPrivacy,
         )
 }

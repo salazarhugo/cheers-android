@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.result.ActivityResultLauncher
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -12,14 +14,6 @@ import com.salazar.cheers.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import android.provider.MediaStore
-
-import android.graphics.Bitmap
-import android.net.Uri
-import com.google.android.gms.ads.*
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdOptions
-import java.io.ByteArrayOutputStream
 
 
 object Utils {
@@ -52,7 +46,11 @@ object Utils {
             .build()
     }
 
-    fun createFile(baseFolder: File, format: String, extension: String) =
+    fun createFile(
+        baseFolder: File,
+        format: String,
+        extension: String
+    ) =
         File(
             baseFolder, SimpleDateFormat(format, Locale.US)
                 .format(System.currentTimeMillis()) + extension

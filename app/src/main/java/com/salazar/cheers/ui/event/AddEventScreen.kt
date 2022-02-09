@@ -60,7 +60,6 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.internal.EventType
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
@@ -265,25 +264,25 @@ fun PrivacyBottomSheet(
                         icon = Icons.Filled.Lock,
                         title = "Private",
                         subtitle = "Only people who are invited",
-                        type = EventType.PRIVATE
+                        type = com.salazar.cheers.ui.add.Privacy.PRIVATE
                     ),
                     PrivacyItem(
                         icon = Icons.Filled.Public,
                         title = "Public",
                         subtitle = "Anyone on Cheers",
-                        type = EventType.PUBLIC
+                        type = com.salazar.cheers.ui.add.Privacy.PUBLIC
                     ),
                     PrivacyItem(
                         icon = Icons.Filled.People,
                         title = "Friends",
                         subtitle = "Your friends on Cheers",
-                        type = EventType.FRIENDS
+                        type = com.salazar.cheers.ui.add.Privacy.FRIENDS
                     ),
                     PrivacyItem(
                         icon = Icons.Filled.Groups,
                         title = "Group",
                         subtitle = "Members of a group that you're in",
-                        type = EventType.GROUP
+                        type = com.salazar.cheers.ui.add.Privacy.GROUP
                     ),
                 )
                 items.forEach {
@@ -406,7 +405,7 @@ fun StartDateInput(
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Icon(Icons.Default.Schedule, null, modifier = Modifier.offset(y = 12.dp))
-            Column() {
+            Column {
                 SwitchPreference(
                     value = uiState.allDay,
                     text = "All-day"
@@ -686,7 +685,7 @@ fun TagSection(
 ) {
     Row(modifier = Modifier.padding(16.dp)) {
         Icon(Icons.Outlined.People, null)
-        Column() {
+        Column {
             Row(
                 modifier = Modifier
                     .clickable { navigateToTagUsers() }

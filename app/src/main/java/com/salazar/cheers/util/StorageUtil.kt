@@ -14,6 +14,7 @@ object StorageUtil {
 
     // 5 MB
     private const val IMAGE_SIZE_LIMIT = 5000000
+
     // 4 GB
     private const val VIDEO_SIZE_LIMIT = 4000000000
 

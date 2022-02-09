@@ -2,64 +2,54 @@ package com.salazar.cheers.ui.detail
 
 import android.app.Activity
 import android.util.Log
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Neo4jRepository
-import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
+import com.salazar.cheers.data.PostRepository
+import com.salazar.cheers.data.db.PostFeed
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 sealed interface PostDetailUiState {
 
     val isLoading: Boolean
     val errorMessages: List<String>
 
-    data class NoPosts(
+    data class NoPost(
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : PostDetailUiState
 
     data class HasPost(
-        val post: Post,
+        val postFeed: PostFeed,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : PostDetailUiState
 }
 
 private data class PostDetailViewModelState(
-    val post: Post? = null,
+    val postFeed: PostFeed? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
     fun toUiState(): PostDetailUiState =
-        if (post == null) {
-            PostDetailUiState.NoPosts(
+        if (postFeed == null) {
+            PostDetailUiState.NoPost(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
         } else {
             PostDetailUiState.HasPost(
-                post = post,
+                postFeed = postFeed,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
@@ -67,9 +57,9 @@ private data class PostDetailViewModelState(
 }
 
 class PostDetailViewModel @AssistedInject constructor(
-//    private val repository: Neo4jRepository,
+    private val repository: PostRepository,
     @Assisted private val postId: String
-): ViewModel() {
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PostDetailViewModelState(isLoading = true))
 
@@ -85,14 +75,11 @@ class PostDetailViewModel @AssistedInject constructor(
         refreshPost()
     }
 
-    fun refreshPost() {
+    private fun refreshPost() {
         viewModelScope.launch {
-            val result = Neo4jUtil.getPost(postId = postId)
+            val post = repository.getPost(postId = postId)
             viewModelState.update {
-                when (result) {
-                    is Result.Success -> it.copy(post = result.data)
-                    is Result.Error -> it.copy(errorMessages = listOf(result.exception.toString()))
-                }
+                it.copy(postFeed = post)
             }
         }
     }

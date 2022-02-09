@@ -9,7 +9,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.R
-import com.salazar.cheers.util.FirestoreUtil
+import com.salazar.cheers.backend.Neo4jUtil
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -17,8 +19,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(newRegistrationToken: String) {
         super.onNewToken(newRegistrationToken)
 
-        if (FirebaseAuth.getInstance().currentUser != null)
-            addTokenToFirestore(newRegistrationToken)
+        if (FirebaseAuth.getInstance().currentUser == null)
+            return
+
+        GlobalScope.launch {
+            addTokenToNeo4j(newRegistrationToken)
+        }
     }
 
 
@@ -46,16 +52,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
-        fun addTokenToFirestore(newRegistrationToken: String?) {
-            if (newRegistrationToken == null) throw NullPointerException("FCM token is null.")
+        suspend fun addTokenToNeo4j(newRegistrationToken: String?) {
+            if (newRegistrationToken == null)
+                throw NullPointerException("FCM token is null.")
 
-            FirestoreUtil.getFCMRegistrationTokens { tokens ->
-                if (tokens.contains(newRegistrationToken))
-                    return@getFCMRegistrationTokens
-
-                tokens.add(newRegistrationToken)
-                FirestoreUtil.setFCMRegistrationTokens(tokens)
-            }
+            Neo4jUtil.addRegistrationToken(newRegistrationToken)
         }
     }
 }

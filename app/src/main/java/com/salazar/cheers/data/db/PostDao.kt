@@ -12,11 +12,20 @@ interface PostDao {
     @Query("SELECT * FROM posts INNER JOIN users ON posts.authorId = users.id ORDER BY posts.createdTime DESC")
     fun pagingSourceFeed(): PagingSource<Int, PostFeed>
 
+    @Query("SELECT * FROM posts INNER JOIN users ON posts.authorId = users.id WHERE users.id = :authorId ORDER BY posts.createdTime DESC")
+    fun getPostsWithAuthorId(authorId: String): List<PostFeed>
+
+    @Query("SELECT * FROM posts INNER JOIN users ON posts.authorId = users.id WHERE posts.postId = :postId")
+    fun getPost(postId: String): PostFeed
+
     @Query("SELECT * FROM posts ORDER BY createdTime DESC")
     fun pagingSource(): PagingSource<Int, Post>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(user: User, post: Post)
+    suspend fun insert(
+        user: User,
+        post: Post
+    )
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(posts: List<Post>)

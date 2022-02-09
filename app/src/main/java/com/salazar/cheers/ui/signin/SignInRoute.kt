@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -23,6 +24,7 @@ fun SignInRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by signInViewModel.uiState.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
             try {
@@ -34,7 +36,10 @@ fun SignInRoute(
         }
     SignInScreen(
         uiState = uiState,
-        signInWithEmailPassword = signInViewModel::signInWithEmailPassword,
+        signInWithEmailPassword = {
+            signInViewModel.signInWithEmailPassword()
+            keyboardController?.hide()
+        },
         navigateToPhone = { navActions.navigateToPhone() },
         navigateToSignUp = { navActions.navigateToSignUp() },
         onPasswordChanged = signInViewModel::onPasswordChange,

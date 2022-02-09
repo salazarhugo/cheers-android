@@ -38,7 +38,6 @@ import androidx.fragment.app.viewModels
 import coil.compose.rememberImagePainter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.salazar.cheers.R
-import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.add.AddPostViewModel
@@ -66,7 +65,8 @@ class TagUser : BottomSheetDialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
@@ -125,7 +125,10 @@ class TagUser : BottomSheetDialogFragment() {
     }
 
     @Composable
-    fun Users(users: List<User>, selectedUsers: List<User>) {
+    fun Users(
+        users: List<User>,
+        selectedUsers: List<User>
+    ) {
         LazyColumn {
             items(users) { user ->
                 UserCard(user, selectedUsers.contains(user))
@@ -134,7 +137,10 @@ class TagUser : BottomSheetDialogFragment() {
     }
 
     @Composable
-    fun UserCard(user: User, selected: Boolean) {
+    fun UserCard(
+        user: User,
+        selected: Boolean
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

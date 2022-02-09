@@ -1,28 +1,17 @@
 package com.salazar.cheers.ui.event.detail
 
 import android.util.Log
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.internal.Event
-import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Neo4jRepository
+import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.EventUi
-import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 sealed interface EventDetailUiState {
 
@@ -64,7 +53,7 @@ private data class EventDetailViewModelState(
 class EventDetailViewModel @AssistedInject constructor(
 //    private val repository: Neo4jRepository,
     @Assisted private val eventId: String
-): ViewModel() {
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EventDetailViewModelState(isLoading = true))
 

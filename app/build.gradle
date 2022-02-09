@@ -70,7 +70,7 @@ android {
                         "-Xuse-experimental=com.google.accompanist.pager.ExperimentalPagerApi",
                         "-Xuse-experimental=com.google.accompanist.permissions.ExperimentalPermissionsApi",
                         "-Xuse-experimental=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
-                        "-Xuse-experimental=androidx.paging:paging-common.ExperimentalPagingApi",
+                        "-Xuse-experimental=androidx.paging.ExperimentalPagingApi",
                         "-Xjvm-default=enable"
                 ]
             }

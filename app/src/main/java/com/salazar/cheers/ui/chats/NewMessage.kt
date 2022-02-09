@@ -66,7 +66,8 @@ class NewMessageFragment : DialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
@@ -109,7 +110,10 @@ class NewMessageFragment : DialogFragment() {
     }
 
     @Composable
-    fun Users(users: List<User>, selectedUsers: List<User>) {
+    fun Users(
+        users: List<User>,
+        selectedUsers: List<User>
+    ) {
         LazyColumn {
             items(users) { user ->
                 UserCard(user, selectedUsers.contains(user))
@@ -118,7 +122,10 @@ class NewMessageFragment : DialogFragment() {
     }
 
     @Composable
-    fun UserCard(user: User, selected: Boolean) {
+    fun UserCard(
+        user: User,
+        selected: Boolean
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

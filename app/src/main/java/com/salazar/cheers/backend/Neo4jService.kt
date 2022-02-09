@@ -28,8 +28,36 @@ class Neo4jService {
         const val database: String = Environment.DEFAULT_DATABASE
     }
 
+    suspend fun getUser(userId: String): Result<User> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = userId
+                params["currentUserId"] = FirebaseAuth.getInstance().currentUser?.uid!!
+
+                val records = query(
+                    "MATCH (u:User) WHERE u.id = \$userId\n" +
+                            "OPTIONAL MATCH (u)-[r:POSTED]->(:Post)\n" +
+                            "OPTIONAL MATCH (u)-[f:FOLLOWS]->(:User)\n" +
+                            "OPTIONAL MATCH (:User)-[f2:FOLLOWS]->(u)\n" +
+                            "RETURN u {.*, posts: count(DISTINCT r), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
+                    params
+                )
+
+                val user = Gson().fromJson(records[0].values()[0].toString(), User::class.java)
+
+                return@withContext Result.Success(user)
+            } catch (e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
     // page index zero
-    suspend fun events(page: Int, pageSize: Int): Result<List<EventUi>> {
+    suspend fun events(
+        page: Int,
+        pageSize: Int
+    ): Result<List<EventUi>> {
         return withContext(Dispatchers.IO) {
             try {
                 val params: MutableMap<String, Any> = mutableMapOf()
@@ -80,7 +108,10 @@ class Neo4jService {
     }
 
     // page index zero
-    suspend fun posts(page: Int, pageSize: Int): Result<List<Pair<User, Post>>> {
+    suspend fun posts(
+        page: Int,
+        pageSize: Int
+    ): Result<List<Pair<User, Post>>> {
         Log.d("MONEY", "Page: $page")
         Log.d("MONEY", "PageSize: $pageSize").toString()
         return withContext(Dispatchers.IO) {
@@ -101,7 +132,7 @@ class Neo4jService {
                     params
                 )
 
-                val posts = mutableListOf<Pair<User,Post>>()
+                val posts = mutableListOf<Pair<User, Post>>()
 
                 records.forEach { record ->
                     val gson = Gson()
@@ -127,7 +158,10 @@ class Neo4jService {
         }
     }
 
-    private fun query(query: String, params: MutableMap<String, Any>): List<Record> {
+    private fun query(
+        query: String,
+        params: MutableMap<String, Any>
+    ): List<Record> {
         getSession().use { session ->
             return session.readTransaction { tx ->
                 tx.run(query, params).list()

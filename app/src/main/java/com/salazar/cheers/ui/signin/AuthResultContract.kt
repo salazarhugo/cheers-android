@@ -17,7 +17,10 @@ class AuthResultContract : ActivityResultContract<Int, Task<GoogleSignInAccount>
         return getGoogleSignInClient(context).signInIntent.putExtra("input", input)
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): Task<GoogleSignInAccount>? {
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?
+    ): Task<GoogleSignInAccount>? {
         return when (resultCode) {
             Activity.RESULT_OK -> GoogleSignIn.getSignedInAccountFromIntent(intent)
             else -> null

@@ -60,8 +60,8 @@ class UploadPostWorker @AssistedInject constructor(
         val longitude =
             inputData.getDouble("LOCATION_LONGITUDE", 0.0)
 
-        val showOnMap =
-            inputData.getBoolean("SHOW_ON_MAP", true)
+        val privacy =
+            inputData.getString("PRIVACY") ?: return Result.failure()
 
         val tagUserIds =
             inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
@@ -100,7 +100,7 @@ class UploadPostWorker @AssistedInject constructor(
                                     locationName = locationName,
                                     locationLatitude = latitude,
                                     locationLongitude = longitude,
-                                    showOnMap = showOnMap,
+                                    privacy = privacy,
                                 )
                                 Neo4jUtil.addPost(post, tagUserIds.toList())
                                 makeStatusNotification("Successfully uploaded", appContext)
@@ -114,7 +114,7 @@ class UploadPostWorker @AssistedInject constructor(
                                 locationName = locationName,
                                 locationLatitude = latitude,
                                 locationLongitude = longitude,
-                                showOnMap = showOnMap,
+                                privacy = privacy,
                             )
                             Neo4jUtil.addPost(post, tagUserIds.toList())
                             makeStatusNotification("Successfully uploaded", appContext)
@@ -132,7 +132,7 @@ class UploadPostWorker @AssistedInject constructor(
                             locationName = locationName,
                             locationLatitude = latitude,
                             locationLongitude = longitude,
-                            showOnMap = showOnMap,
+                            privacy = privacy,
                         )
                         Neo4jUtil.addPost(post, tagUserIds.toList())
                         makeStatusNotification("Successfully uploaded", appContext)
@@ -145,7 +145,7 @@ class UploadPostWorker @AssistedInject constructor(
                         locationName = locationName,
                         locationLatitude = latitude,
                         locationLongitude = longitude,
-                        showOnMap = showOnMap,
+                        privacy = privacy,
                     )
                     Neo4jUtil.addPost(post, tagUserIds.toList())
                     makeStatusNotification("Successfully uploaded", appContext)

@@ -129,7 +129,7 @@ object Neo4jUtil {
             liked = post.liked,
             comments = post.comments,
             shares = post.shares,
-            showOnMap = post.showOnMap,
+            privacy = post.privacy,
             photoUrl = post.photoUrl,
             videoUrl = post.videoUrl,
             videoThumbnailUrl = post.videoThumbnailUrl,
@@ -146,6 +146,22 @@ object Neo4jUtil {
             params = params
         )
         sendPostNotification(post2.id)
+    }
+
+    private fun sendLikeNotification(postId: String): Task<String> {
+
+        // Create the arguments to the callable function.
+        val data = hashMapOf(
+            "postId" to postId,
+        )
+
+        return FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("likePost")
+            .call(data)
+            .continueWith { task ->
+                val result = task.result?.data as String
+                result
+            }
     }
 
     private fun sendPostNotification(postId: String): Task<String> {
@@ -473,6 +489,7 @@ object Neo4jUtil {
                 "MATCH (p:Post), (u:User) WHERE p.id = \$postId AND u.id = \$userId MERGE (u)-[:LIKED]->(p)",
                 params = params
             )
+            sendLikeNotification(postId = postId)
         }
     }
 
@@ -644,17 +661,29 @@ object Neo4jUtil {
         }
     }
 
-    suspend fun getMapPosts(): Result<List<Post>> {
+    /*
+        isPublic: weather to get all public posts or only the user friends post.
+     */
+    suspend fun getMapPosts(isPublic: Boolean): Result<List<Post>> {
         return withContext(Dispatchers.IO) {
             try {
                 val params: MutableMap<String, Any> = mutableMapOf()
                 params["userId"] = FirebaseAuth.getInstance().uid!!
 
-                val records = query(
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p: Post) WHERE p.showOnMap = true \n" +
+                val queryPublic =
+                    "MATCH (f:User)-[:POSTED]->(p: Post) WHERE p.privacy = 'PUBLIC' \n" +
+                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p: Post) \n" +
+                            "RETURN p {.*, likes: count(DISTINCT r), createdTime: toString(p.createdTime)}," +
+                            " properties(f) ORDER BY datetime(p.createdTime) DESC"
+
+                val queryFriends =
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f:User)-[:POSTED]->(p: Post) WHERE (f)-[:FOLLOWS]->(u) \n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]-(p: Post) \n" +
                             "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: toString(p.createdTime)}," +
-                            " properties(f) ORDER BY datetime(p.createdTime) DESC",
+                            " properties(f) ORDER BY datetime(p.createdTime) DESC"
+
+                val records = query(
+                    if (isPublic) queryPublic else queryFriends,
                     params
                 )
 
@@ -715,6 +744,25 @@ object Neo4jUtil {
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
                 return@withContext Result.Error(e)
+            }
+        }
+    }
+
+    suspend fun addRegistrationToken(registrationToken: String) {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = FirebaseAuth.getInstance().uid!!
+                params["registrationToken"] = registrationToken
+
+                write(
+                    "MATCH (u:User {id: \$userId}) " +
+                            "WHERE NOT \$registrationToken IN u.registrationTokens " +
+                            "SET u.registrationTokens = u.registrationTokens + \$registrationToken",
+                    params,
+                )
+            } catch (e: Exception) {
+                Log.e("Neo4j", e.message.toString())
             }
         }
     }

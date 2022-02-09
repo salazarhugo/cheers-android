@@ -35,9 +35,10 @@ fun CheersApp() {
             }
 
             val mainViewModel = hiltViewModel<MainViewModel>()
+            val user = mainViewModel.user.value
 
             CheersNavGraph(
-                user = mainViewModel.user2.value ?: User(),
+                user = user ?: User(),
                 navActions = navigationActions
             )
         }

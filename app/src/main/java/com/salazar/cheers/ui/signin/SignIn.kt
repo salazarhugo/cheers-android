@@ -55,7 +55,11 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.PhoneAuthActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.components.*
+import com.salazar.cheers.components.CircularProgressIndicatorM3
+import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.FacebookButton
+import com.salazar.cheers.components.GoogleButton
+import com.salazar.cheers.components.animations.AnimatedLogo
 import com.salazar.cheers.ui.theme.Typography
 import com.salazar.cheers.util.FirestoreUtil
 import org.jetbrains.anko.clearTask

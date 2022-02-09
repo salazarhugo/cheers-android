@@ -33,7 +33,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.components.*
+import com.salazar.cheers.components.CircularProgressIndicatorM3
+import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.FacebookButton
+import com.salazar.cheers.components.GoogleButton
+import com.salazar.cheers.components.animations.AnimatedLogo
 import com.salazar.cheers.ui.theme.Typography
 
 @Composable

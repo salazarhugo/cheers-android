@@ -1,9 +1,11 @@
 package com.salazar.cheers.navigation
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ fun CheersNavGraph(
 
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     navController.navigatorProvider += bottomSheetNavigator
+
     val navActions = remember(navController) {
         CheersNavigationActions(navController)
     }
@@ -46,12 +49,17 @@ fun CheersNavGraph(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
-    val authDestinations = listOf(AuthDestinations.SIGN_IN_ROUTE, AuthDestinations.SIGN_UP_ROUTE, AuthDestinations.CHOOSE_USERNAME, AuthDestinations.PHONE_ROUTE)
+    val authDestinations = listOf(
+        AuthDestinations.SIGN_IN_ROUTE,
+        AuthDestinations.SIGN_UP_ROUTE,
+        AuthDestinations.CHOOSE_USERNAME,
+        AuthDestinations.PHONE_ROUTE
+    )
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-        sheetBackgroundColor = GreySheet,
+        sheetBackgroundColor = if (isSystemInDarkTheme()) GreySheet else MaterialTheme.colorScheme.background,
         sheetElevation = 0.dp,
         modifier = Modifier
             .fillMaxSize()

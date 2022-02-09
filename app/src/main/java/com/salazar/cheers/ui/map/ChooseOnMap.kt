@@ -105,7 +105,10 @@ private fun setupGesturesListener(
     mapView.gestures.addOnMoveListener(onMoveListener(mapView, onIndicatorPositionChangedListener))
 }
 
-private fun onMoveListener(mapView: MapView, onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener) = object : OnMoveListener {
+private fun onMoveListener(
+    mapView: MapView,
+    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
+) = object : OnMoveListener {
     override fun onMoveBegin(detector: MoveGestureDetector) {
         onCameraTrackingDismissed(mapView, this, onIndicatorPositionChangedListener)
     }

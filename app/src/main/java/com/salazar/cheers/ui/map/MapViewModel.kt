@@ -4,10 +4,10 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.backend.Neo4jUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,7 +37,7 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
         viewModelScope.launch {
             viewModelState.update {
-                val result = Neo4jUtil.getMapPosts()
+                val result = Neo4jUtil.getMapPosts(it.isPublic)
                 when (result) {
                     is Result.Success -> it.copy(posts = result.data, isLoading = false)
                     is Result.Error -> it.copy(
@@ -60,6 +60,13 @@ class MapViewModel @Inject constructor() : ViewModel() {
             it.copy(selectedPost = post)
         }
     }
+
+    fun onTogglePublic() {
+        viewModelState.update {
+            it.copy(isPublic = !it.isPublic)
+        }
+        refreshPosts()
+    }
 }
 
 data class MapUiState(
@@ -68,6 +75,7 @@ data class MapUiState(
     val city: String = "",
     val selectedPost: Post? = null,
     val isLoading: Boolean = false,
+    val isPublic: Boolean = false,
     val postSheetState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",

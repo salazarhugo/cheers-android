@@ -30,7 +30,7 @@ fun ChatRoute(
                 chatViewModel.sendImageMessage(listOf(it))
         }
 
-    when(uiState) {
+    when (uiState) {
         is ChatUiState.HasChannel -> {
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,

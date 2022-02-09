@@ -10,7 +10,7 @@ data class PostNeo4j(
     var liked: Boolean = false,
     val comments: Int = 0,
     val shares: Int = 0,
-    val showOnMap: Boolean = false,
+    val privacy: String = "",
     val photoUrl: String = "",
     val videoUrl: String = "",
     val videoThumbnailUrl: String = "",

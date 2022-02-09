@@ -8,7 +8,7 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.Neo4jRepository.Companion.NETWORK_PAGE_SIZE
+import com.salazar.cheers.data.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.entities.RemoteKey

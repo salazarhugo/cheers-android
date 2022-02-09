@@ -12,7 +12,8 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Neo4jRepository
+import com.salazar.cheers.data.EventRepository
+import com.salazar.cheers.data.PostRepository
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.EventUi
@@ -101,8 +102,9 @@ private data class HomeViewModelState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: Neo4jRepository
-): ViewModel() {
+    private val repository: PostRepository,
+    private val eventRepository: EventRepository,
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
 
@@ -136,7 +138,7 @@ class HomeViewModel @Inject constructor(
     fun refreshEventsFlow() {
         viewModelState.update { it.copy(isLoading = true) }
         viewModelState.update {
-            it.copy(eventsFlow = repository.getEvents(), isLoading = false)
+            it.copy(eventsFlow = eventRepository.getEvents(), isLoading = false)
         }
     }
 
@@ -152,7 +154,7 @@ class HomeViewModel @Inject constructor(
         viewModelState.update {
             it.copy(
                 postsFlow = repository.getPosts(),
-                eventsFlow = repository.getEvents(),
+                eventsFlow = eventRepository.getEvents(),
                 isLoading = false
             )
         }
