@@ -2,6 +2,7 @@ package com.salazar.cheers.service
 
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -10,6 +11,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.ui.theme.Purple200
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -40,8 +42,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun makeNotification(remoteNotification: RemoteMessage.Notification) {
         val builder =
             NotificationCompat.Builder(this, getString(R.string.default_notification_channel_id))
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_cheers_logo)
                 .setContentTitle(remoteNotification.title)
+                .setColor(Purple200.toArgb())
                 .setContentText(remoteNotification.body)
                 .setChannelId(getString(R.string.default_notification_channel_id))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

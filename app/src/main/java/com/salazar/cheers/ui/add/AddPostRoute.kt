@@ -28,33 +28,46 @@ fun AddPostRoute(
             addPostViewModel.setPostVideo(it)
     }
 
-    if (uiState.isChooseOnMapOpen)
-        ChooseOnMapScreen(
-            onSelectLocation = { addPostViewModel.updateLocationPoint(it); addPostViewModel.interactedWithAddPost() },
-            onBackPressed = addPostViewModel::interactedWithAddPost,
-        )
-    else if (uiState.isChooseBeverageOpen)
-        BeverageScreen(
-            onBackPressed = addPostViewModel::interactedWithAddPost,
-            onSelectBeverage = {}
-        )
-    else
-        AddPostScreen(
-            uiState = uiState,
-            profilePictureUrl = profilePictureUrl,
-            onCaptionChanged = addPostViewModel::onCaptionChanged,
-            onSelectLocation = addPostViewModel::selectLocation,
-            onUploadPost = addPostViewModel::uploadPost,
-            onDismiss = navActions.navigateBack,
-            interactWithChooseOnMap = addPostViewModel::interactedWithChooseOnMap,
-            interactWithChooseBeverage = addPostViewModel::interactedWithChooseBeverage,
-            navigateToTagUser = {},
-            navigateToCamera = { navActions.navigateToCamera() },
-            unselectLocation = addPostViewModel::unselectLocation,
-            updateLocationName = addPostViewModel::updateLocation,
-            updateLocationResults = addPostViewModel::updateLocationResults,
-            onSelectMedia = addPostViewModel::setPostImage,
-            onMediaSelectorClicked = { launcher.launch("image/*") },
-            onSelectPrivacy = addPostViewModel::selectPrivacy,
-        )
+    when (uiState.page) {
+        AddPostPage.AddPost ->
+            AddPostScreen(
+                uiState = uiState,
+                profilePictureUrl = profilePictureUrl,
+                onCaptionChanged = addPostViewModel::onCaptionChanged,
+                onSelectLocation = addPostViewModel::selectLocation,
+                onUploadPost = addPostViewModel::uploadPost,
+                onDismiss = navActions.navigateBack,
+                interactWithChooseOnMap = { addPostViewModel.updatePage(AddPostPage.ChooseOnMap) },
+                interactWithChooseBeverage = { addPostViewModel.updatePage(AddPostPage.ChooseBeverage) },
+                navigateToTagUser = { addPostViewModel.updatePage(AddPostPage.AddPeople) },
+                navigateToCamera = { navActions.navigateToCamera() },
+                unselectLocation = addPostViewModel::unselectLocation,
+                updateLocationName = addPostViewModel::updateLocation,
+                updateLocationResults = addPostViewModel::updateLocationResults,
+                onSelectMedia = addPostViewModel::setPostImage,
+                onMediaSelectorClicked = { launcher.launch("image/*") },
+                onSelectPrivacy = addPostViewModel::selectPrivacy,
+                onNameChanged = addPostViewModel::onNameChanged,
+            )
+        AddPostPage.ChooseOnMap ->
+            ChooseOnMapScreen(
+                onSelectLocation = {
+                    addPostViewModel.updateLocationPoint(it); addPostViewModel.updatePage(
+                    AddPostPage.AddPost
+                )
+                },
+                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+            )
+        AddPostPage.ChooseBeverage ->
+            BeverageScreen(
+                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onSelectBeverage = {}
+            )
+        AddPostPage.AddPeople ->
+            AddPeopleScreen(
+                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onSelectUser = addPostViewModel::selectTagUser,
+                selectedUsers = uiState.selectedTagUsers,
+            )
+    }
 }

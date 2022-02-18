@@ -31,7 +31,7 @@ object StorageUtil {
     ) {
         if (imageBytes.size > IMAGE_SIZE_LIMIT)
             return
-        val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
+        val ref = currentUserRef.child("profilePictures/${FirebaseAuth.getInstance().currentUser?.uid!!}")
         ref.putBytes(imageBytes)
             .addOnSuccessListener {
                 ref.downloadUrl.addOnSuccessListener { downloadUri ->

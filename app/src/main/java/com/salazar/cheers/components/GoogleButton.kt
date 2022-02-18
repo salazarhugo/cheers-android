@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
@@ -31,13 +32,11 @@ fun GoogleButton(
     var clicked by remember { mutableStateOf(false) }
 
     Surface(
-        onClick = {
-            clicked = !clicked
-            onClicked()
-        },
-//        shape = shape,
-//        border = BorderStroke(width = 1.dp, color = borderColor),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable {
+                clicked = !clicked
+                onClicked()
+            },
         color = Color.White,//Color(0xFF4285F4),
         shadowElevation = 2.dp,
         shape = RoundedCornerShape(2.dp)

@@ -67,19 +67,30 @@ class CheersApplication : Application(), Configuration.Provider {
     }
 
     private fun createNotificationChannel() {
-        val name = getString(R.string.default_notification_channel_name)
-        val descriptionText = getString(R.string.default_notification_channel_description)
-        val importance = NotificationManager.IMPORTANCE_HIGH
-        val channel = NotificationChannel(
-            getString(R.string.default_notification_channel_id),
-            name,
-            importance
-        ).apply {
-            description = descriptionText
-        }
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+
+
+        val importance = NotificationManager.IMPORTANCE_HIGH
+
+        val defaultChannel = NotificationChannel(
+            getString(R.string.default_notification_channel_id),
+            getString(R.string.default_notification_channel_name),
+            importance
+        ).apply {
+            description = getString(R.string.default_notification_channel_description)
+        }
+
+        val uploadChannel = NotificationChannel(
+            getString(R.string.upload_notification_channel_id),
+            getString(R.string.upload_notification_channel_name),
+            importance
+        ).apply {
+            description = getString(R.string.upload_notification_channel_description)
+        }
+
+        notificationManager.createNotificationChannel(defaultChannel)
+        notificationManager.createNotificationChannel(uploadChannel)
     }
 
     override fun getWorkManagerConfiguration() =

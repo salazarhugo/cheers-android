@@ -1,6 +1,5 @@
 package com.salazar.cheers.backend
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -40,7 +39,7 @@ class Neo4jService {
                             "OPTIONAL MATCH (u)-[r:POSTED]->(:Post)\n" +
                             "OPTIONAL MATCH (u)-[f:FOLLOWS]->(:User)\n" +
                             "OPTIONAL MATCH (:User)-[f2:FOLLOWS]->(u)\n" +
-                            "RETURN u {.*, posts: count(DISTINCT r), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
+                            "RETURN u {.*, postCount: count(DISTINCT r), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
                     params
                 )
 
@@ -111,9 +110,7 @@ class Neo4jService {
     suspend fun posts(
         page: Int,
         pageSize: Int
-    ): Result<List<Pair<User, Post>>> {
-        Log.d("MONEY", "Page: $page")
-        Log.d("MONEY", "PageSize: $pageSize").toString()
+    ): Result<List<Pair<Post, List<User>>>> {
         return withContext(Dispatchers.IO) {
             try {
                 val params: MutableMap<String, Any> = mutableMapOf()
@@ -132,24 +129,26 @@ class Neo4jService {
                     params
                 )
 
-                val posts = mutableListOf<Pair<User, Post>>()
+                val posts = mutableListOf<Pair<Post, List<User>>>()
 
                 records.forEach { record ->
                     val gson = Gson()
 
                     val post =
                         gson.fromJson(record.values()[0].toString(), Post::class.java)
+
                     val author =
                         gson.fromJson(record.values()[1].toString(), User::class.java)
 
-                    val userListType: Type =
-                        object : TypeToken<ArrayList<User>>() {}.type
+                    val userListType: Type = object : TypeToken<ArrayList<User>>() {}.type
 
                     val s = record.values()[2].toString()
-                    val tagUsers =
-                        gson.fromJson<ArrayList<User>>(s, userListType)
 
-                    posts.add(Pair(author, post))
+                    val users =
+                        gson.fromJson<ArrayList<User>>(s, userListType)
+                    users.add(author)
+
+                    posts.add(Pair(post, users))
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {

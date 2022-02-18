@@ -24,7 +24,8 @@ class MainViewModel @Inject constructor(
 
     private fun refreshUser() {
         viewModelScope.launch {
-            user.value = userRepository.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+            if (FirebaseAuth.getInstance().currentUser?.uid != null)
+                user.value = userRepository.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
         }
     }
 

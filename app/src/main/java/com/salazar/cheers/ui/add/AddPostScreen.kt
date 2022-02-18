@@ -80,6 +80,7 @@ fun AddPostScreen(
     onSelectLocation: (SearchResult) -> Unit,
     onSelectMedia: (Uri) -> Unit,
     onCaptionChanged: (String) -> Unit,
+    onNameChanged: (String) -> Unit,
     unselectLocation: () -> Unit,
     updateLocationName: (String) -> Unit,
     updateLocationResults: (List<SearchResult>) -> Unit,
@@ -122,7 +123,11 @@ fun AddPostScreen(
                     onSelectMedia = onSelectMedia,
                     onMediaSelectorClicked = onMediaSelectorClicked,
                 )
-//                    DividerM3()
+//                NameSection(
+//                    name = uiState.name,
+//                    onNameChanged = onNameChanged,
+//                )
+//                DividerM3()
                 CaptionSection(
                     profilePictureUrl = profilePictureUrl,
                     caption = uiState.caption,
@@ -200,6 +205,35 @@ fun Privacy(
 }
 
 @Composable
+fun NameSection(
+    name: String,
+    onNameChanged: (String) -> Unit,
+) {
+    TextField(
+        value = name,
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = 4.dp),
+        onValueChange = { onNameChanged(it) },
+        singleLine = false,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+        placeholder = {
+            Text(text = "Name", fontSize = 13.sp)
+        },
+        trailingIcon = { }
+    )
+}
+
+@Composable
 fun BeverageSection(
     beverage: String,
     interactWithChooseBeverage: () -> Unit,
@@ -234,7 +268,7 @@ fun TopAppBar(
     onDismiss: () -> Unit
 ) {
     SmallTopAppBar(
-        title = { Text("New post", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
+        title = { Text("Add post", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
         navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, "")

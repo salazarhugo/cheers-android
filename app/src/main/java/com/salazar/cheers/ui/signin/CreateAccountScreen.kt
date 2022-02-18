@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.components.share.ErrorMessage
 import com.salazar.cheers.ui.signin.signup.SignUpUiState
 
 @Composable
@@ -31,7 +32,6 @@ fun CreateAccountScreen(
     onEmailChanged: (String) -> Unit,
     onSignUp: () -> Unit,
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(32.dp),
@@ -54,6 +54,7 @@ fun CreateAccountScreen(
             uiState = uiState,
             onSignUp = onSignUp,
         )
+        ErrorMessage(errorMessage = uiState.errorMessage)
     }
 }
 

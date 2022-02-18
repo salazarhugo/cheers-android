@@ -75,7 +75,7 @@ fun Tabs(
     uiState: MessagesUiState,
     onChannelClicked: (String, String, String, String) -> Unit,
 ) {
-    val tabs = listOf("Primary", "General", "Requests")
+    val tabs = listOf("Direct", "Groups")
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
 

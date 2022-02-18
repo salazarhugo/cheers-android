@@ -1,15 +1,13 @@
 package com.salazar.cheers.ui.signin.signup
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.salazar.cheers.components.share.AppBar
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.signin.CreateAccountScreen
 import com.salazar.cheers.ui.signin.username.ChooseUsernameScreen
-import kotlinx.coroutines.launch
 
 /**
  * Stateful composable that displays the Navigation route for the SignUp screen.
@@ -27,37 +25,38 @@ fun SignUpRoute(
         navActions.navigateToMain()
     }
 
-    val pagerState = rememberPagerState()
-    val scope = rememberCoroutineScope()
-
-    if (uiState.isUsernameAvailable)
-        LaunchedEffect(Unit) {
-            scope.launch {
-                pagerState.animateScrollToPage(1)
-            }
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = "Sign up",
+                center = true,
+                backNavigation = true,
+                onNavigateBack = { if (uiState.page > 0) signUpViewModel.prevPage() else navActions.navigateBack() })
         }
-
-    HorizontalPager(
-        count = 2,
-        state = pagerState,
-    ) { page ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            when (page) {
-                0 -> ChooseUsernameScreen(
-                    uiState = uiState,
-                    onClearUsername = signUpViewModel::onClearUsername,
-                    onUsernameChanged = signUpViewModel::onUsernameChanged,
-                    onNextClicked = signUpViewModel::checkUsername,
-                )
-                1 -> CreateAccountScreen(
-                    uiState = uiState,
-                    onPasswordChanged = signUpViewModel::onPasswordChange,
-                    onEmailChanged = signUpViewModel::onEmailChange,
-                    onSignUp = signUpViewModel::createAccount,
-                )
-            }
+    ) {
+        when (uiState.page) {
+            0 -> ChooseUsernameScreen(
+                uiState = uiState,
+                onClearUsername = signUpViewModel::onClearUsername,
+                onUsernameChanged = signUpViewModel::onUsernameChanged,
+                onNextClicked = signUpViewModel::checkUsername,
+            )
+            1 -> EmailScreen(
+                email = uiState.email,
+                onEmailChanged = signUpViewModel::onEmailChange,
+                onNextClicked = signUpViewModel::verifyEmail,
+            )
+            2 -> PasswordScreen(
+                password = uiState.password,
+                onPasswordChanged = signUpViewModel::onPasswordChange,
+                onNextClicked = signUpViewModel::verifyPassword,
+            )
+            3 -> CreateAccountScreen(
+                uiState = uiState,
+                onPasswordChanged = signUpViewModel::onPasswordChange,
+                onEmailChanged = signUpViewModel::onEmailChange,
+                onSignUp = signUpViewModel::createAccount,
+            )
         }
     }
 }

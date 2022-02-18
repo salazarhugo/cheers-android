@@ -14,7 +14,6 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
@@ -23,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -62,9 +60,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.components.animations.AnimateVisibilityFade
+import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.add.Privacy
 import com.salazar.cheers.ui.theme.Typography
 import org.jetbrains.anko.collections.forEachWithIndex
 import org.jetbrains.anko.image
@@ -75,10 +75,10 @@ import kotlin.math.absoluteValue
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    modifier: Modifier = Modifier,
     onRefreshPosts: () -> Unit,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
+    onEventClicked: (String) -> Unit,
     onPostMoreClicked: (postId: String, isAuthor: Boolean) -> Unit,
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
@@ -161,7 +161,8 @@ fun HomeScreen(
                                 onUserClicked = onUserClicked,
                                 onPostMoreClicked = onPostMoreClicked,
                                 onLike = onLike,
-                                navigateToComments = navigateToComments
+                                navigateToComments = navigateToComments,
+                                onEventClicked = onEventClicked,
                             )
                     }
                 }
@@ -434,6 +435,7 @@ fun PostList(
     uiState: HomeUiState.HasPosts,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
+    onEventClicked: (String) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onLike: (post: Post) -> Unit,
@@ -445,7 +447,10 @@ fun PostList(
     LazyColumn(state = uiState.listState) {
         if (uiState.selectedTab == 1)
             items(events) { event ->
-                Event(event!!)
+                Event(
+                    event!!,
+                    onEventClicked = onEventClicked,
+                )
             }
         else {
             itemsIndexed(posts) { i, post ->
@@ -542,119 +547,35 @@ fun Post(
     onLike: (post: Post) -> Unit,
     navigateToComments: (String) -> Unit,
 ) {
+    val author = postFeed.author
+    val post = postFeed.post
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        PostHeader(postFeed, onUserClicked, onPostMoreClicked)
-//            if (post.type != PostType.TEXT)
-//                DividerM3()
-        PostBody(postFeed.post, isPostVisible, onPostClicked = onPostClicked, onLike = onLike)
+        PostHeader(
+            username = author.username,
+            verified = author.verified,
+            public = post.privacy == Privacy.PUBLIC.name,
+            profilePictureUrl = author.profilePictureUrl,
+            locationName = post.locationName,
+            onHeaderClicked = onUserClicked,
+            onMoreClicked = {
+                onPostMoreClicked(
+                    post.id,
+                    author.id == FirebaseAuth.getInstance().currentUser?.uid
+                )
+            },
+        )
+        PostBody(postFeed.post, onPostClicked = onPostClicked, onLike = onLike)
         PostFooter(postFeed, navActions, onLike = onLike, navigateToComments = navigateToComments)
     }
 }
 
-@Composable
-fun PostHeader(
-    postFeed: PostFeed,
-    onUserClicked: (username: String) -> Unit,
-    onPostMoreClicked: (postId: String, Boolean) -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-    val post = postFeed.post
-    val author = postFeed.author
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-            .clickable { onUserClicked(author.username) },
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            val brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFD41668),
-                    Color(0xFFF9B85D),
-                )
-            )
-
-            Image(
-                painter = rememberImagePainter(
-                    data = author.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .border(1.2.dp, brush, CircleShape)
-                    .size(36.dp)
-                    .padding(3.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-            Spacer(Modifier.width(8.dp))
-            Column {
-                Username(
-                    username = author.username,
-                    verified = author.verified,
-                    textStyle = Typography.bodyMedium
-                )
-                if (post.locationName.isBlank())
-                    Text(
-                        post.relativeTime,
-                        style = Typography.labelMedium
-                    )
-                else
-                    Text(text = post.locationName, style = Typography.labelSmall)
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-//                Box(
-//                    modifier = Modifier
-//                        .padding(end = 4.dp)
-//                        .size(4.dp)
-//                        .clip(CircleShape)
-//                        .background(MaterialTheme.colorScheme.onBackground)
-//                )
-            if (post.locationName.isNotBlank())
-                Text(
-                    post.relativeTime,
-                    style = Typography.labelMedium
-                )
-            Spacer(Modifier.width(8.dp))
-            IconButton(
-                onClick = {
-                    onPostMoreClicked(
-                        post.id,
-                        author.id == FirebaseAuth.getInstance().currentUser?.uid
-                    )
-                }
-            ) {
-                Icon(
-                    Icons.Default.MoreHoriz, null,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(4.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun PostBody(
     post: Post,
-    isPostVisible: Boolean,
     onPostClicked: (postId: String) -> Unit,
     onLike: (post: Post) -> Unit,
 ) {
@@ -674,7 +595,7 @@ fun PostBody(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .aspectRatio(1f)// or 4/5f
-                    .padding(16.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom=16.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .fillMaxWidth()
                     .pointerInput(Unit) {
@@ -762,11 +683,13 @@ fun PostFooter(
             .fillMaxWidth()
             .padding(16.dp),
     ) {
+//        Text(postFeed.post.tagUsersId.toString())
+//        Text(postFeed.tagUsers.toString())
         PostFooterButtons(postFeed.post, onLike = onLike, navigateToComments = navigateToComments)
         if (postFeed.post.type != PostType.TEXT) {
             LikedBy(post = postFeed.post, navActions)
-//            if (post.tagUsers.isNotEmpty())
-//                TagUsers(post.tagUsers)
+            if (postFeed.tagUsers.isNotEmpty())
+                TagUsers(postFeed.tagUsers)
             if (postFeed.post.caption.isNotBlank())
                 Caption(
                     username = postFeed.author.username,
@@ -955,10 +878,13 @@ fun VideoPlayer(
 }
 
 @Composable
-fun Event(post: EventUi) {
-    val event = post.event
+fun Event(
+    event: EventUi,
+    onEventClicked: (String) -> Unit,
+) {
+    val event = event.event
     Column(
-        modifier = Modifier.clickable { }
+        modifier = Modifier.clickable { onEventClicked(event.id) }
     ) {
         Image(
             painter = rememberImagePainter(
@@ -976,31 +902,6 @@ fun Event(post: EventUi) {
         Column(
             modifier = Modifier.padding(16.dp),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Image(
-                    painter = rememberImagePainter(
-                        data = post.host.profilePictureUrl,
-                        builder = {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        },
-                    ),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                )
-                Spacer(Modifier.width(16.dp))
-                Username(
-                    username = post.host.username,
-                    verified = post.host.verified,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
             val d = remember { ZonedDateTime.parse(event.startDate) }
             Text(
                 d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")),
@@ -1008,6 +909,7 @@ fun Event(post: EventUi) {
             )
             if (event.name.isNotBlank())
                 Text(event.name, style = MaterialTheme.typography.titleLarge)
+
             if (event.description.isNotBlank())
                 Text(
                     event.description,

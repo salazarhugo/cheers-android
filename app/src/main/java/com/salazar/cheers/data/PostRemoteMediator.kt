@@ -1,7 +1,5 @@
 package com.salazar.cheers.data
 
-import android.util.Log
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
@@ -18,7 +16,6 @@ import java.time.temporal.ChronoUnit
 
 private const val POST_STARTING_PAGE_INDEX = 0
 
-@OptIn(ExperimentalPagingApi::class)
 class PostRemoteMediator(
     private val database: CheersDatabase,
     private val networkService: Neo4jService,
@@ -32,8 +29,6 @@ class PostRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, PostFeed>
     ): MediatorResult {
-
-        Log.d("MONEY", loadType.toString())
 
         return try {
             val page = when (loadType) {
@@ -52,8 +47,6 @@ class PostRemoteMediator(
             }
             val response = networkService.posts(page, NETWORK_PAGE_SIZE)
 
-            Log.d("MONEY", "Page: $page")
-
             when (response) {
                 is Result.Success -> {
                     val result = response.data
@@ -68,14 +61,14 @@ class PostRemoteMediator(
                         val prevKey = if (page == initialPage) null else page - 1
                         val nextKey = if (endOfPaginationReached) null else page + 1
                         val keys = result.map {
-                            RemoteKey(postId = it.second.id, prevKey = prevKey, nextKey = nextKey)
+                            RemoteKey(postId = it.first.id, prevKey = prevKey, nextKey = nextKey)
                         }
 
                         remoteKeyDao.insertAll(keys)
                         result.forEach {
                             postDao.insert(
-                                it.first,
-                                it.second.copy(relativeTime = prettyDate(it.second.createdTime))
+                                it.first.copy(relativeTime = prettyDate(it.first.createdTime)),
+                                it.second,
                             )
                         }
                     }

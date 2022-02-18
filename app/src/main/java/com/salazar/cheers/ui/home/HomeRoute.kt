@@ -37,5 +37,6 @@ fun HomeRoute(
         onLike = homeViewModel::toggleLike,
         navigateToComments = { navActions.navigateToPostComments(it) },
         navigateToSearch = { navActions.navigateToSearch() },
+        onEventClicked = { navActions.navigateToEventDetail(it) }
     )
 }

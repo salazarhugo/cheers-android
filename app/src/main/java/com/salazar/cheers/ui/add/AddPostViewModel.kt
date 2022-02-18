@@ -26,10 +26,15 @@ enum class Privacy {
     NONE, PRIVATE, FRIENDS, PUBLIC, GROUP
 }
 
+enum class AddPostPage {
+    AddPost, ChooseOnMap, ChooseBeverage, AddPeople
+}
+
 data class AddPostUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
+    val name: String = "",
     val caption: String = "",
     val beverage: String = "",
     val postType: String = PostType.TEXT,
@@ -47,8 +52,7 @@ data class AddPostUiState(
         Privacy.NONE
     ),
     val showOnMap: Boolean = true,
-    val isChooseOnMapOpen: Boolean = false,
-    val isChooseBeverageOpen: Boolean = false,
+    val page: AddPostPage = AddPostPage.AddPost,
 )
 
 @HiltViewModel
@@ -67,30 +71,6 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
     }
 
     private val workManager = WorkManager.getInstance(application)
-
-    fun onShowOnMapChanged(showOnMap: Boolean) {
-        viewModelState.update {
-            it.copy(showOnMap = showOnMap)
-        }
-    }
-
-    fun interactedWithChooseOnMap() {
-        viewModelState.update {
-            it.copy(isChooseOnMapOpen = true)
-        }
-    }
-
-    fun interactedWithChooseBeverage() {
-        viewModelState.update {
-            it.copy(isChooseBeverageOpen = true)
-        }
-    }
-
-    fun interactedWithAddPost() {
-        viewModelState.update {
-            it.copy(isChooseOnMapOpen = false, isChooseBeverageOpen = false)
-        }
-    }
 
     fun selectPrivacy(privacy: PrivacyItem) {
         viewModelState.update {
@@ -115,6 +95,18 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
     fun selectLocation(location: SearchResult) {
         viewModelState.update {
             it.copy(selectedLocation = location)
+        }
+    }
+
+    fun updatePage(page: AddPostPage) {
+        viewModelState.update {
+            it.copy(page = page)
+        }
+    }
+
+    fun onNameChanged(name: String) {
+        viewModelState.update {
+            it.copy(name = name)
         }
     }
 
@@ -167,6 +159,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
                         "MEDIA_URI" to uiState.mediaUri.toString(),
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
+                        "NAME" to uiState.name,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,
                         "LOCATION_LATITUDE" to uiState.selectedLocation?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.selectedLocation?.coordinate?.longitude(),

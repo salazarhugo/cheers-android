@@ -227,13 +227,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun setNativeAd(nativeAd: NativeAd) {
+    private fun setNativeAd(nativeAd: NativeAd) {
         viewModelState.update {
             it.copy(nativeAd = nativeAd)
         }
     }
 
     fun initNativeAdd(context: Context) {
+//        return
         val configuration = RequestConfiguration.Builder()
             .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
         MobileAds.setRequestConfiguration(configuration)

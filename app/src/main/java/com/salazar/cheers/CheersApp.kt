@@ -9,7 +9,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.CheersTheme
@@ -37,10 +36,11 @@ fun CheersApp() {
             val mainViewModel = hiltViewModel<MainViewModel>()
             val user = mainViewModel.user.value
 
-            CheersNavGraph(
-                user = user ?: User(),
-                navActions = navigationActions
-            )
+            if (user != null)
+                CheersNavGraph(
+                    user = user,
+                    navActions = navigationActions
+                )
         }
     }
 }

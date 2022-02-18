@@ -18,7 +18,6 @@ fun PostDetailRoute(
 ) {
     val uiState by postDetailViewModel.uiState.collectAsState()
 
-
     if (uiState is PostDetailUiState.HasPost)
         PostDetailScreen(
             uiState = uiState as PostDetailUiState.HasPost,
@@ -28,6 +27,12 @@ fun PostDetailRoute(
                 postDetailViewModel.deletePost()
                 navActions.navigateBack()
             },
+            onLeave = {
+                postDetailViewModel.leavePost()
+                navActions.navigateBack()
+            },
+            onMapClick = { navActions.navigateToMap() },
+            onToggleLike = postDetailViewModel::toggleLike,
         )
     else
         LoadingScreen()

@@ -1,4 +1,4 @@
-package com.salazar.cheers.components
+package com.salazar.cheers.components.chat
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition

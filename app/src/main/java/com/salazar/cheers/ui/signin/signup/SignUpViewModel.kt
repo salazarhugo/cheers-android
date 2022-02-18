@@ -11,6 +11,7 @@ import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.util.FirestoreUtil
+import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +29,7 @@ data class SignUpUiState(
     val email: String = "",
     val password: String = "",
     val isSignedIn: Boolean = false,
+    val page: Int = 0,
 )
 
 @HiltViewModel
@@ -117,21 +119,56 @@ class SignUpViewModel @Inject constructor(
         return isLowerCase(username) && hasValidChars(username) && username.matches(regex)
     }
 
+    fun prevPage() {
+        viewModelState.update {
+            if (it.page < 1) return
+            it.copy(page = it.page - 1)
+        }
+    }
+
+    fun nextPage() {
+        viewModelState.update {
+            it.copy(page = it.page + 1)
+        }
+    }
+
+    fun verifyEmail() {
+        if (uiState.value.email.isEmailValid())
+            nextPage()
+    }
+
+    fun verifyPassword() {
+        val state = uiState.value
+        if (state.password.isNotBlank())
+            nextPage()
+    }
+
     fun checkUsername() {
-        updateErrorMessage("")
         val username = uiState.value.username
-        // Ui state is refreshing
-        viewModelState.update { it.copy(isLoading = true) }
+        updateIsLoading(true)
+
+        if (!validateUsername(username = username)) {
+            updateErrorMessage("Invalid username")
+            updateIsLoading(false)
+            return
+        }
+
         isUsernameAvailable(username) { result ->
-            if (result is Result.Success && !result.data)
+
+            if (result is Result.Success && !result.data) {
                 updateErrorMessage("This username is taken")
+                updateIsLoading(false)
+                return@isUsernameAvailable
+            }
+
             viewModelState.update {
                 when (result) {
                     is Result.Success -> {
                         it.copy(
-                            isUsernameAvailable = result.data && validateUsername(username = username),
+                            isUsernameAvailable = result.data,
                             username = username,
-                            isLoading = false
+                            isLoading = false,
+                            page = it.page + 1,
                         )
                     }
                     is Result.Error -> {
@@ -209,6 +246,7 @@ class SignUpViewModel @Inject constructor(
                                 signInSuccessful(email = email, username = username)
                             } else {
                                 // If sign in fails, display a message to the user.
+                                updateErrorMessage(task.exception?.message)
                             }
                             updateIsLoading(false)
                         }

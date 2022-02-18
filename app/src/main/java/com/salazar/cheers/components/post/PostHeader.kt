@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,15 +29,18 @@ import com.salazar.cheers.components.Username
 fun PostHeader(
     username: String,
     verified: Boolean,
+    public: Boolean,
     locationName: String,
+    profilePictureUrl: String,
     onHeaderClicked: (username: String) -> Unit,
+    onMoreClicked: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(14.dp, 11.dp)
-            .clickable { onHeaderClicked(username) },
+            .clickable { onHeaderClicked(username) }
+            .padding(14.dp, 11.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -53,7 +57,7 @@ fun PostHeader(
 
             Image(
                 painter = rememberImagePainter(
-                    data = null,//post.creator.profilePictureUrl,
+                    data = profilePictureUrl,
                     builder = {
                         transformations(CircleCropTransformation())
                         error(R.drawable.default_profile_picture)
@@ -74,11 +78,38 @@ fun PostHeader(
                     verified = verified,
                     textStyle = MaterialTheme.typography.bodyMedium,
                 )
-                if (locationName.isNotBlank())
-                    Text(text = locationName, style = MaterialTheme.typography.labelSmall)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (locationName.isNotBlank())
+                        Text(text = locationName, style = MaterialTheme.typography.labelSmall)
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(horizontal = 8.dp)
+//                            .size(4.dp)
+//                            .clip(CircleShape)
+//                            .background(MaterialTheme.colorScheme.onBackground)
+//                    )
+                }
             }
         }
-        Icon(Icons.Default.MoreVert, "", modifier = Modifier.clickable {
-        })
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (public)
+                Icon(
+                    Icons.Default.Public,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 8.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { onMoreClicked() }
+            )
+        }
     }
 }

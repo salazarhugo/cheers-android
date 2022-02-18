@@ -9,24 +9,15 @@ import android.os.StrictMode
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.UserMessagingPlatform
 import com.salazar.cheers.ui.chat.ChatViewModel
 import com.salazar.cheers.ui.comment.CommentsViewModel
 import com.salazar.cheers.ui.detail.PostDetailViewModel
+import com.salazar.cheers.ui.event.detail.EventDetailViewModel
 import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -41,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     @InstallIn(ActivityComponent::class)
     interface ViewModelFactoryProvider {
         fun postDetailViewModelFactory(): PostDetailViewModel.PostDetailViewModelFactory
+        fun eventDetailViewModelFactory(): EventDetailViewModel.EventDetailViewModelFactory
         fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
         fun chatViewModelFactory(): ChatViewModel.ChatViewModelFactory
         fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
@@ -58,37 +50,37 @@ class MainActivity : AppCompatActivity() {
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
+        userConsentPolicy()
     }
 
-    @Composable
-    fun ChangeProfileBottomSheet(bottomSheetState: ModalBottomSheetState) {
-        ModalBottomSheetLayout(
-            sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            sheetContent = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .background(MaterialTheme.colorScheme.background)
-                )
-                {
-                    Column {
-                        Text("Add photo")
-                        Text("Take photo")
-                        Text("Add photo")
-                        Text("Take photo")
-                        Text("Add photo")
-                        Text("Take photo")
-                        Text("Add photo")
-                        Text("Take photo")
-                        Text("Add photo")
-                        Text("Take photo")
-                        Text("Add photo")
-                        Text("Take photo")
+    private fun userConsentPolicy() {
+        // Set tag for underage of consent. false means users are not underage.
+        val params = ConsentRequestParameters.Builder()
+            .setTagForUnderAgeOfConsent(false)
+            .build()
+
+        val consentInformation = UserMessagingPlatform.getConsentInformation(this)
+        consentInformation.requestConsentInfoUpdate(this, params, {
+                if (consentInformation.isConsentFormAvailable)
+                    loadForm(consentInformation = consentInformation)
+            },
+            {
+            })
+    }
+
+    private fun loadForm(consentInformation: ConsentInformation) {
+        UserMessagingPlatform.loadConsentForm(
+            this,
+            { consentForm ->
+                val consentForm = consentForm
+                if (consentInformation.getConsentStatus() === ConsentInformation.ConsentStatus.REQUIRED) {
+                    consentForm.show(
+                        this@MainActivity
+                    ) { // Handle dismissal by reloading form.
+                        loadForm(consentInformation)
                     }
                 }
-            },
-            sheetState = bottomSheetState
+            }
         ) {
         }
     }

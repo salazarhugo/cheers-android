@@ -25,6 +25,8 @@ import com.salazar.cheers.ui.detail.PostDetailRoute
 import com.salazar.cheers.ui.detail.postDetailViewModel
 import com.salazar.cheers.ui.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.editprofile.EditProfileViewModel
+import com.salazar.cheers.ui.event.detail.EventDetailRoute
+import com.salazar.cheers.ui.event.detail.eventDetailViewModel
 import com.salazar.cheers.ui.home.HomeRoute
 import com.salazar.cheers.ui.home.HomeViewModel
 import com.salazar.cheers.ui.map.MapRoute
@@ -147,7 +149,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        bottomSheet(
+        composable(
             route = "${MainDestinations.POST_COMMENTS}/{postId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
         ) {
@@ -169,6 +171,17 @@ fun NavGraphBuilder.mainNavGraph(
             val otherProfileViewModel = otherProfileViewModel(username = username)
             OtherProfileRoute(
                 otherProfileViewModel = otherProfileViewModel,
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
+        ) {
+            val eventId = it.arguments?.getString("eventId")!!
+            val eventDetailViewModel = eventDetailViewModel(eventId = eventId)
+            EventDetailRoute(
+                eventDetailViewModel = eventDetailViewModel,
                 navActions = navActions,
             )
         }

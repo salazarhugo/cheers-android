@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.ui.add.Privacy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -34,7 +35,20 @@ class PostRepository @Inject constructor(
     fun getPostsWithAuthorId(authorId: String): List<PostFeed> =
         postDao.getPostsWithAuthorId(authorId = authorId)
 
-    fun getPost(postId: String): PostFeed = postDao.getPost(postId = postId)
+    suspend fun getMapPosts(privacy: Privacy): List<PostFeed> {
+        return postDao.getMapPosts(privacy = privacy).map {
+            it.copy(
+                tagUsers =
+                postDao.getPostUsers(it.post.tagUsersId)
+            )
+        }
+    }
+
+    suspend fun getPost(postId: String): PostFeed {
+        val post = postDao.getPost(postId = postId)
+        return post.copy(tagUsers = postDao.getPostUsers(post.post.tagUsersId))
+    }
+
 
     fun observeLikes(): Flow<Set<String>> = likes
 

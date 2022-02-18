@@ -1,6 +1,8 @@
 package com.salazar.cheers.ui.comment
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoAlbum
 import androidx.compose.material3.*
@@ -8,12 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.components.FunctionalityNotAvailablePanel
-import com.salazar.cheers.ui.theme.GreySheet
-import com.salazar.cheers.ui.theme.Roboto
+import com.google.accompanist.insets.imePadding
+import com.salazar.cheers.components.UserInput
+import com.salazar.cheers.components.comment.Comment
 
 @Composable
 fun CommentsScreen(
@@ -22,31 +23,54 @@ fun CommentsScreen(
 ) {
     Column {
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize(),
-            containerColor = GreySheet,
-            topBar = { Toolbar() },
-            bottomBar = { }
+            modifier = Modifier,
+            topBar = { Toolbar(18, {}) },
+            bottomBar = {
+                UserInput(
+                    onMessageSent = { },
+                    resetScroll = { },
+                    modifier = Modifier.imePadding(),
+                    onImageSelectorClick = {},
+                )
+            }
         ) {
-            FunctionalityNotAvailablePanel()
+            Comments(listOf("wf", "fw", "fw"))
         }
     }
 }
 
 @Composable
-fun Toolbar() {
-    Column {
-        SmallTopAppBar(
-            title = {
-                Text(
-                    "Comments",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
-                )
-            },
-            colors = TopAppBarDefaults.smallTopAppBarColors(
-                containerColor = GreySheet,
+fun Comments(comments: List<String>) {
+    LazyColumn() {
+        items(comments) { comment ->
+            Comment(
+                profilePictureUrl = "",
+                username = "cheers",
+                verified = true,
+                text = "J'arrive les boys",
+                onLike = {},
+                onReply = {},
+                onCommentClicked = {},
             )
+        }
+    }
+}
+
+@Composable
+fun Toolbar(
+    commentCount: Int,
+    onCloseClicked: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "$commentCount comments",
+            style = MaterialTheme.typography.titleSmall,
         )
     }
 }

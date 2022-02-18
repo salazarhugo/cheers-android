@@ -115,37 +115,25 @@ object Neo4jUtil {
 
     fun addPost(
         post: Post,
-        tagUsers: List<String> = emptyList()
     ) {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = FirebaseAuth.getInstance().currentUser?.uid!!
-        val post2 = PostNeo4j(
+
+        val finalPost = post.copy(
             id = randomUUID().toString(),
             authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
-            type = post.type,
-            caption = post.caption,
-            createdTime = post.createdTime,
-            likes = post.likes,
-            liked = post.liked,
-            comments = post.comments,
-            shares = post.shares,
-            privacy = post.privacy,
-            photoUrl = post.photoUrl,
-            videoUrl = post.videoUrl,
-            videoThumbnailUrl = post.videoThumbnailUrl,
-            locationLatitude = post.locationLatitude,
-            locationLongitude = post.locationLongitude,
-            locationName = post.locationName,
         )
-        params["post"] = toMap(post2)
-        params["tagUsersId"] = tagUsers
+
+        params["post"] = toMap(finalPost)
+        params["tagUsersId"] = finalPost.tagUsersId
+
         write(
             "MATCH (u:User) WHERE u.id = \$userId CREATE (p: Post \$post)" +
                     " SET p += { createdTime: datetime() } CREATE (u)-[:POSTED]->(p)" +
                     " WITH p UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
             params = params
         )
-        sendPostNotification(post2.id)
+        sendPostNotification(finalPost.id)
     }
 
     private fun sendLikeNotification(postId: String): Task<String> {
@@ -176,6 +164,19 @@ object Neo4jUtil {
                 val result = task.result?.data as String
                 result
             }
+    }
+
+    suspend fun leavePost(postId: String) {
+        return withContext(Dispatchers.IO) {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["userId"] = FirebaseAuth.getInstance().uid!!
+            params["postId"] = postId
+            write(
+                "MATCH (p:Post { id: \$postId }) " +
+                        "SET p.tagUsersId = [x IN p.tagUsersId WHERE x <> \$userId]",
+                params = params
+            )
+        }
     }
 
     suspend fun deletePost(postId: String) {

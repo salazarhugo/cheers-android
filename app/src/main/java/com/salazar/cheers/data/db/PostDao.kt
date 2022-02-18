@@ -4,27 +4,37 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.add.Privacy
 
 @Dao
 interface PostDao {
 
     @Transaction
-    @Query("SELECT * FROM posts INNER JOIN users ON posts.authorId = users.id ORDER BY posts.createdTime DESC")
+    @Query("SELECT * FROM posts ORDER BY posts.createdTime DESC")
     fun pagingSourceFeed(): PagingSource<Int, PostFeed>
 
-    @Query("SELECT * FROM posts INNER JOIN users ON posts.authorId = users.id WHERE users.id = :authorId ORDER BY posts.createdTime DESC")
+    @Transaction
+    @Query("SELECT * FROM posts WHERE authorId = :authorId ORDER BY posts.createdTime DESC")
     fun getPostsWithAuthorId(authorId: String): List<PostFeed>
 
-    @Query("SELECT * FROM posts INNER JOIN users ON posts.authorId = users.id WHERE posts.postId = :postId")
-    fun getPost(postId: String): PostFeed
+    @Transaction
+    @Query("SELECT * FROM posts WHERE posts.postId = :postId")
+    suspend fun getPost(postId: String): PostFeed
+
+    @Transaction
+    @Query("SELECT * FROM posts WHERE privacy = :privacy")
+    suspend fun getMapPosts(privacy: Privacy): List<PostFeed>
+
+    @Query("SELECT * FROM users WHERE id IN (:tagUsersId)")
+    suspend fun getPostUsers(tagUsersId: List<String>): List<User>
 
     @Query("SELECT * FROM posts ORDER BY createdTime DESC")
     fun pagingSource(): PagingSource<Int, Post>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(
-        user: User,
-        post: Post
+        post: Post,
+        users: List<User>,
     )
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -46,6 +56,13 @@ interface PostDao {
 data class PostFeed(
     @Embedded
     val post: Post,
-    @Embedded
+
+    @Relation(parentColumn = "authorId", entityColumn = "id")
     val author: User,
+
+    @Relation(
+        parentColumn = "tagUsersId",
+        entityColumn = "id",
+    )
+    val tagUsers: List<User> = ArrayList()
 )

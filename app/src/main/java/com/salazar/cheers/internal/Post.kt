@@ -16,6 +16,7 @@ data class Post(
     @ColumnInfo(name = "postId")
     val id: String = "",
     val authorId: String = "",
+    val name: String = "",
     val caption: String = "",
     val createdTime: String = "",
     val relativeTime: String = "",
@@ -30,6 +31,6 @@ data class Post(
     val locationLatitude: Double = 0.0,
     val locationLongitude: Double = 0.0,
     val locationName: String = "",
-//    val tagUsers: List<User> = emptyList(),
+    val tagUsersId: List<String> = emptyList(),
     val type: String = PostType.TEXT,
 )

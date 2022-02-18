@@ -12,9 +12,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -33,7 +37,10 @@ fun ChooseUsernameScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(32.dp),
     ) {
-        Text("Choose username", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = "Choose username",
+            style = MaterialTheme.typography.titleLarge
+        )
         Spacer(Modifier.height(8.dp))
         Text("You can't change it later")
         Spacer(Modifier.height(36.dp))
@@ -86,6 +93,12 @@ fun UsernameTextField(
     onUsernameChanged: (String) -> Unit,
     onClearUsername: () -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     TextField(
         value = username,
         colors = TextFieldDefaults.textFieldColors(
@@ -95,7 +108,8 @@ fun UsernameTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(8.dp))
+            .focusRequester(focusRequester = focusRequester),
         onValueChange = { onUsernameChanged(it) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(

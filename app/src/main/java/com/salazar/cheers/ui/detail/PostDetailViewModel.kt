@@ -12,6 +12,7 @@ import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.PostRepository
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.internal.Post
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -84,6 +85,17 @@ class PostDetailViewModel @AssistedInject constructor(
         }
     }
 
+    fun toggleLike(post: Post) {
+        val likes = if (post.liked) post.likes - 1 else post.likes + 1
+        viewModelScope.launch {
+            repository.postDao.update(post.copy(liked = !post.liked, likes = likes))
+        }
+        if (post.liked)
+            unlikePost(post.id)
+        else
+            likePost(post.id)
+    }
+
     private fun unlikePost(postId: String) {
         viewModelScope.launch {
             try {
@@ -94,20 +106,24 @@ class PostDetailViewModel @AssistedInject constructor(
         }
     }
 
+    fun leavePost() {
+        viewModelScope.launch {
+            try {
+                Neo4jUtil.leavePost(postId = postId)
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", e.toString())
+            }
+        }
+    }
+
     private fun likePost(postId: String) {
         viewModelScope.launch {
             try {
                 Neo4jUtil.likePost(postId = postId)
             } catch (e: Exception) {
-                Log.e("PostDetailViewModel", e.toString())
+                Log.e("HomeViewModel", e.toString())
             }
         }
-    }
-
-    fun selectPost(postId: String) {
-//        viewModelState.update {
-//            it.copy(selectedPostId = postId)
-//        }
     }
 
     fun deletePost() {
@@ -117,12 +133,6 @@ class PostDetailViewModel @AssistedInject constructor(
             } catch (e: Exception) {
                 Log.e("PostDetailViewModel", e.toString())
             }
-        }
-    }
-
-    fun deleteErrorMessage() {
-        viewModelState.update {
-            it.copy(errorMessages = emptyList())
         }
     }
 

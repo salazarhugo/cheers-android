@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TagUserViewModel @Inject constructor() : ViewModel() {
+class AddPeopleViewModel @Inject constructor() : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(TagUserViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(AddPeopleViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -68,49 +68,29 @@ class TagUserViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-sealed interface TagUserUiState {
 
-    val isLoading: Boolean
-    val errorMessages: List<String>
+data class AddPeopleUiState(
+    val isLoading: Boolean,
+    val users: List<User>?,
+    val selectedUsers: List<User>,
+    val errorMessages: List<String>,
     val searchInput: String
+)
 
-    data class NoChannels(
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : TagUserUiState
-
-    data class HasChannels(
-        val users: List<User>,
-        val selectedUsers: List<User>,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : TagUserUiState
-}
-
-private data class TagUserViewModelState(
+private data class AddPeopleViewModelState(
     val users: List<User>? = null,
     val selectedUsers: List<User> = mutableListOf(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 ) {
-    fun toUiState(): TagUserUiState =
-        if (users == null) {
-            TagUserUiState.NoChannels(
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                searchInput = searchInput
-            )
-        } else {
-            TagUserUiState.HasChannels(
-                users = users,
-                selectedUsers = selectedUsers,
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                searchInput = searchInput
-            )
-        }
+    fun toUiState(): AddPeopleUiState =
+        AddPeopleUiState(
+            users = users,
+            selectedUsers = selectedUsers,
+            isLoading = isLoading,
+            errorMessages = errorMessages,
+            searchInput = searchInput
+        )
 }
 

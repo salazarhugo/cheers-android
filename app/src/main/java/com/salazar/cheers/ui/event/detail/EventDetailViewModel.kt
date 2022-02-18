@@ -1,15 +1,21 @@
 package com.salazar.cheers.ui.event.detail
 
+import android.app.Activity
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.EventUi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -139,4 +145,14 @@ class EventDetailViewModel @AssistedInject constructor(
             }
         }
     }
+}
+
+@Composable
+fun eventDetailViewModel(eventId: String): EventDetailViewModel {
+    val factory = EntryPointAccessors.fromActivity(
+        LocalContext.current as Activity,
+        MainActivity.ViewModelFactoryProvider::class.java
+    ).eventDetailViewModelFactory()
+
+    return viewModel(factory = EventDetailViewModel.provideFactory(factory, eventId = eventId))
 }

@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.util.Size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -47,6 +46,9 @@ class UploadPostWorker @AssistedInject constructor(
 
         val postType =
             inputData.getString("POST_TYPE") ?: return Result.failure()
+
+        val name =
+            inputData.getString("NAME") ?: ""
 
         val photoCaption =
             inputData.getString("PHOTO_CAPTION") ?: ""
@@ -92,6 +94,7 @@ class UploadPostWorker @AssistedInject constructor(
 
                             StorageUtil.uploadPostImage(thumbnailBytes) { thumbnailUrl ->
                                 val post = Post(
+                                    name = name,
                                     type = postType,
                                     authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
                                     caption = photoCaption,
@@ -101,12 +104,14 @@ class UploadPostWorker @AssistedInject constructor(
                                     locationLatitude = latitude,
                                     locationLongitude = longitude,
                                     privacy = privacy,
+                                    tagUsersId = tagUserIds.toList(),
                                 )
-                                Neo4jUtil.addPost(post, tagUserIds.toList())
+                                Neo4jUtil.addPost(post)
                                 makeStatusNotification("Successfully uploaded", appContext)
                             }
                         } else {
                             val post = Post(
+                                name = name,
                                 type = postType,
                                 authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
                                 caption = photoCaption,
@@ -115,8 +120,9 @@ class UploadPostWorker @AssistedInject constructor(
                                 locationLatitude = latitude,
                                 locationLongitude = longitude,
                                 privacy = privacy,
+                                tagUsersId = tagUserIds.toList()
                             )
-                            Neo4jUtil.addPost(post, tagUserIds.toList())
+                            Neo4jUtil.addPost(post)
                             makeStatusNotification("Successfully uploaded", appContext)
                         }
                     }
@@ -126,6 +132,7 @@ class UploadPostWorker @AssistedInject constructor(
                     val photoBytes = extractImage(Uri.parse(mediaUri))
                     StorageUtil.uploadPostImage(photoBytes) { downloadUrl ->
                         val post = Post(
+                            name = name,
                             type = postType,
                             caption = photoCaption,
                             photoUrl = downloadUrl,
@@ -133,21 +140,24 @@ class UploadPostWorker @AssistedInject constructor(
                             locationLatitude = latitude,
                             locationLongitude = longitude,
                             privacy = privacy,
+                            tagUsersId = tagUserIds.toList()
                         )
-                        Neo4jUtil.addPost(post, tagUserIds.toList())
+                        Neo4jUtil.addPost(post)
                         makeStatusNotification("Successfully uploaded", appContext)
                     }
                 }
                 PostType.TEXT -> {
                     val post = Post(
+                        name = name,
                         type = postType,
                         caption = photoCaption,
                         locationName = locationName,
                         locationLatitude = latitude,
                         locationLongitude = longitude,
                         privacy = privacy,
+                        tagUsersId = tagUserIds.toList()
                     )
-                    Neo4jUtil.addPost(post, tagUserIds.toList())
+                    Neo4jUtil.addPost(post)
                     makeStatusNotification("Successfully uploaded", appContext)
                 }
             }
@@ -164,13 +174,15 @@ class UploadPostWorker @AssistedInject constructor(
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat.Builder(applicationContext, "CHANNEL_ID")
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            applicationContext.getString(R.string.upload_notification_channel_id)
+        )
             .setContentIntent(
                 PendingIntent.getActivity(
                     applicationContext,
-                    0,
+                    2,
                     Intent(applicationContext, MainActivity::class.java),
                     PendingIntent.FLAG_IMMUTABLE
                 )
@@ -184,7 +196,8 @@ class UploadPostWorker @AssistedInject constructor(
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setContentText("Updating widget")
             .build()
-        return ForegroundInfo(1337, notification)
+
+        return ForegroundInfo(42, notification)
     }
 
     private fun extractImage(path: Uri): ByteArray {

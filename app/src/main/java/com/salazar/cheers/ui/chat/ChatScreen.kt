@@ -32,10 +32,10 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.imePadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.components.JumpToBottom
 import com.salazar.cheers.components.UserInput
 import com.salazar.cheers.components.animations.AnimateHeart
 import com.salazar.cheers.components.chat.DirectChatBar
+import com.salazar.cheers.components.chat.JumpToBottom
 import com.salazar.cheers.internal.ImageMessage
 import com.salazar.cheers.internal.Message
 import com.salazar.cheers.internal.MessageType

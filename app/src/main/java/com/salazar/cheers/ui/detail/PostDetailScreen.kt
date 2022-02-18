@@ -2,9 +2,11 @@ package com.salazar.cheers.ui.detail
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Share
@@ -14,7 +16,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -36,10 +38,13 @@ import com.mapbox.geojson.Point
 import com.salazar.cheers.R
 import com.salazar.cheers.components.LikeButton
 import com.salazar.cheers.components.PrettyImage
-import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.ui.home.PostBody
 import com.salazar.cheers.ui.theme.Roboto
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun PostDetailScreen(
@@ -48,24 +53,28 @@ fun PostDetailScreen(
     onBackPressed: () -> Unit,
     onHeaderClicked: (username: String) -> Unit,
     onDelete: () -> Unit,
+    onLeave: () -> Unit,
+    onMapClick: () -> Unit,
+    onToggleLike: (Post) -> Unit,
 ) {
     val post = uiState.postFeed.post
     Scaffold(
-        topBar = { Toolbar(onBackPressed = onBackPressed) }
+        topBar = {
+            Toolbar(
+                onBackPressed = onBackPressed,
+                name = post.locationName,
+            )
+        }
     ) {
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            if (post.locationName.isNotBlank())
-                StaticMap(
-                    longitude = post.locationLongitude,
-                    latitude = post.locationLatitude
-                )
+        Column {
             Post(
                 postFeed = uiState.postFeed,
                 onHeaderClicked = onHeaderClicked,
                 onDelete = onDelete,
                 isAuthor = post.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                onMapClick = onMapClick,
+                onToggleLike = onToggleLike,
+                onLeave = onLeave,
             )
             PrivacyText(post.privacy)
         }
@@ -92,6 +101,7 @@ fun PrivacyText(
 fun StaticMap(
     longitude: Double,
     latitude: Double,
+    onMapClick: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val token = stringResource(R.string.mapbox_access_token)
@@ -117,29 +127,157 @@ fun StaticMap(
     PrettyImage(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f),
+            .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .aspectRatio(1f)
+            .clickable { onMapClick() },
         data = url,
     )
+}
+
+@Composable
+fun PostDetails(
+    postFeed: PostFeed
+) {
+    val d = remember { ZonedDateTime.parse(postFeed.post.createdTime) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Column {
+            Text("Date:")
+            Text(
+                d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
 }
 
 @Composable
 fun Post(
     postFeed: PostFeed,
     onHeaderClicked: (username: String) -> Unit,
+    onLeave: () -> Unit,
     onDelete: () -> Unit,
+    onMapClick: () -> Unit,
+    onToggleLike: (Post) -> Unit,
     isAuthor: Boolean,
 ) {
     val post = postFeed.post
     val author = postFeed.author
+    val postUsers = postFeed.tagUsers
+
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val joined = post.tagUsersId.contains(uid) || author.id == uid
+
     Column {
-        PostHeader(
-            username = author.username,
-            verified = author.verified,
-            locationName = post.locationName,
-            onHeaderClicked = onHeaderClicked,
-        )
-        PostBody(post = post)
-        PostFooter(post = post, onDelete = onDelete, isAuthor = isAuthor)
+        LazyColumn(
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+
+            item { PostDetails(postFeed) }
+
+            item {
+                Buttons(
+                    joined = joined,
+                    onLeave = onLeave,
+                )
+            }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom,
+                ) {
+                    Text(
+                        text = "Hangout event",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Column() {
+//                        Text(
+//                            text = String.format("%.2f", post.locationLongitude),
+//                            style = MaterialTheme.typography.titleMedium
+//                        )
+//                        Text(
+//                            text = String.format("%.2f", post.locationLatitude),
+//                            style = MaterialTheme.typography.titleMedium
+//                        )
+                    }
+                }
+                StaticMap(
+                    longitude = post.locationLongitude,
+                    latitude = post.locationLatitude,
+                    onMapClick = onMapClick,
+                )
+            }
+            item {
+                PostBody(post = post, {}, {})
+                PostFooter(
+                    post = post,
+                    onDelete = onDelete,
+                    isAuthor = isAuthor,
+                    onToggleLike = onToggleLike,
+                )
+            }
+            item {
+                Text(
+                    text = "With",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 8.dp),
+                )
+                UserItem(user = author, isAuthor = true)
+            }
+            if (postUsers.isNotEmpty())
+                items(postUsers) { user -> UserItem(user = user) }
+
+        }
+    }
+}
+
+@Composable
+fun Buttons(
+    joined: Boolean,
+    onLeave: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (joined)
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = onLeave,
+            ) {
+                Text("Leave")
+            }
+        else
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {},
+            ) {
+                Text("Join")
+            }
+        Spacer(modifier = Modifier.width(16.dp))
+        OutlinedButton(
+            modifier = Modifier.weight(1f),
+            onClick = {},
+        ) {
+            Text("Message")
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                Icons.Default.MoreHoriz,
+                contentDescription = null
+            )
+        }
     }
 }
 
@@ -148,6 +286,7 @@ fun PostFooter(
     post: Post,
     isAuthor: Boolean,
     onDelete: () -> Unit,
+    onToggleLike: (Post) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -162,7 +301,7 @@ fun PostFooter(
             LikeButton(
                 like = post.liked,
                 likes = post.likes,
-                onToggle = {})
+                onToggle = { onToggleLike(post) })
             Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
             Icon(Icons.Outlined.Share, null)
         }
@@ -178,13 +317,14 @@ fun PostFooter(
 
 @Composable
 fun Toolbar(
+    name: String,
     onBackPressed: () -> Unit,
 ) {
     Column {
-        SmallTopAppBar(
+        CenterAlignedTopAppBar(
             title = {
                 Text(
-                    "Detail",
+                    text = name,
                     fontWeight = FontWeight.Bold,
                     fontFamily = Roboto,
                 )
@@ -198,33 +338,6 @@ fun Toolbar(
     }
 }
 
-
-@Composable
-fun PostBody(
-    post: Post,
-) {
-    when {
-        post.videoUrl.isNotBlank() -> VideoPlayer(
-            uri = post.videoUrl,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4 / 5f)
-        )
-        post.photoUrl.isNotBlank() -> PrettyImage(
-            data = post.photoUrl,
-            contentDescription = "avatar",
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .aspectRatio(1f)// or 4/5f
-                .fillMaxWidth()
-        )
-        else -> Text(
-            text = post.caption,
-            modifier = Modifier.padding(14.dp)
-        )
-    }
-}
 
 @Composable
 fun VideoPlayer(
