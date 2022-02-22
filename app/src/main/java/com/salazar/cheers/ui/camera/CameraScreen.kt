@@ -284,23 +284,10 @@ private fun CameraPermission(
     PermissionRequired(
         permissionState = cameraPermissionState,
         permissionNotGrantedContent = {
-            if (doNotShowRationale.value) {
+            if (doNotShowRationale.value)
                 Text("Feature not available")
-            } else {
-                Column {
-                    Text("The camera is important for this app. Please grant the permission.")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row {
-                        Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                            Text("Ok")
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Button(onClick = { doNotShowRationale.value = true }) {
-                            Text("No")
-                        }
-                    }
-                }
-            }
+            else
+                LaunchedEffect(Unit) { cameraPermissionState.launchPermissionRequest() }
         },
         permissionNotAvailableContent = {
             Column {

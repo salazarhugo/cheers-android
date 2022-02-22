@@ -44,13 +44,7 @@ fun OtherProfileRoute(
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onMessageClicked = {
             FirestoreChat.getOrCreateChatChannel(uiState.user) { channelId ->
-                navActions.navigateToChat(
-                    channelId,
-                    uiState.user.username,
-                    uiState.user.verified,
-                    uiState.user.fullName,
-                    uiState.user.profilePictureUrl,
-                )
+                navActions.navigateToChat(channelId)
             }
         },
         onFollowClicked = { otherProfileViewModel.followUser() },

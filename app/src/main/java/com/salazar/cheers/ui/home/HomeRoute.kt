@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.util.FirestoreChat
 
 /**
  * Stateful composable that displays the Navigation route for the Interests screen.
@@ -35,7 +36,11 @@ fun HomeRoute(
         navigateToAddPost = { navActions.navigateToAddPostSheet() },
         onSelectTab = homeViewModel::selectTab,
         onLike = homeViewModel::toggleLike,
-        navigateToComments = { navActions.navigateToPostComments(it) },
+        navigateToComments = {
+            FirestoreChat.getOrCreatePostChatGroup(it) { channelId ->
+                navActions.navigateToChat(channelId)
+            }
+        },
         navigateToSearch = { navActions.navigateToSearch() },
         onEventClicked = { navActions.navigateToEventDetail(it) }
     )

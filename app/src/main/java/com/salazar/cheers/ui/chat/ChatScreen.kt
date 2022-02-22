@@ -35,11 +35,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.UserInput
 import com.salazar.cheers.components.animations.AnimateHeart
 import com.salazar.cheers.components.chat.DirectChatBar
+import com.salazar.cheers.components.chat.GroupChatBar
 import com.salazar.cheers.components.chat.JumpToBottom
-import com.salazar.cheers.internal.ImageMessage
-import com.salazar.cheers.internal.Message
-import com.salazar.cheers.internal.MessageType
-import com.salazar.cheers.internal.TextMessage
+import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -68,6 +66,7 @@ fun ChatScreen(
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
     val selectedMessage = remember { mutableStateOf<Message?>(null) }
+    val channel = uiState.channel
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -101,16 +100,25 @@ fun ChatScreen(
                     onImageSelectorClick = onImageSelectorClick,
                 )
             }
-            DirectChatBar(
-                name = name,
-                username = username,
-                verified = verified,
-                profilePictureUrl = profilePicturePath,
-                onNavIconPressed = { onPoBackStack() },
-                onTitleClick = onTitleClick,
-                scrollBehavior = scrollBehavior,
-//                modifier = Modifier.statusBarsPadding(),
-            )
+            if (channel.type == ChatChannelType.DIRECT)
+                DirectChatBar(
+                    name = name,
+                    username = username,
+                    verified = verified,
+                    profilePictureUrl = profilePicturePath,
+                    onNavIconPressed = { onPoBackStack() },
+                    onTitleClick = onTitleClick,
+                    scrollBehavior = scrollBehavior,
+                )
+            else if (channel.type == ChatChannelType.GROUP)
+                GroupChatBar(
+                    name = channel.name,
+                    members = channel.members.size,
+                    profilePictureUrl = profilePicturePath,
+                    onNavIconPressed = { onPoBackStack() },
+                    onTitleClick = {},
+                    scrollBehavior = scrollBehavior,
+                )
         }
     }
 

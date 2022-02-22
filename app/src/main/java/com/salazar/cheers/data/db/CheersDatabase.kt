@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.*
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.data.entities.RemoteKey
+import com.salazar.cheers.data.entities.UserPreference
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import kotlinx.serialization.decodeFromString
@@ -12,7 +13,7 @@ import kotlinx.serialization.json.Json
 
 @TypeConverters(Converters::class)
 @Database(
-    entities = [RecentUser::class, Post::class, User::class, RemoteKey::class],
+    entities = [RecentUser::class, Post::class, User::class, RemoteKey::class, UserPreference::class],
     version = 1,
     exportSchema = false
 )
@@ -21,6 +22,7 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun cheersDao(): CheersDao
     abstract fun postDao(): PostDao
     abstract fun userDao(): UserDao
+    abstract fun userPreferenceDao(): UserPreferenceDao
     abstract fun remoteKeyDao(): RemoteKeyDao
 
     companion object {

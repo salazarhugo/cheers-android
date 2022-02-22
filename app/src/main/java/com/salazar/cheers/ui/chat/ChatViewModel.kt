@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.chat
 import android.app.Activity
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
@@ -14,8 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.UserRepository
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.workers.UploadImageMessage
@@ -68,6 +66,7 @@ private data class ChatViewModelState(
 
 class ChatViewModel @AssistedInject constructor(
     application: Application,
+    private val userRepository: UserRepository,
     @Assisted private val channelId: String
 ) : ViewModel() {
 
@@ -84,6 +83,7 @@ class ChatViewModel @AssistedInject constructor(
 
     init {
         refreshCurrentUser()
+        refreshChannel()
         seenLastMessage()
 
         viewModelScope.launch {
@@ -91,22 +91,37 @@ class ChatViewModel @AssistedInject constructor(
                 viewModelState.update { it.copy(messages = messages) }
             }
         }
+    }
 
+    private val user2 = mutableStateOf<User?>(null)
+
+    private fun refreshChannel() {
         viewModelScope.launch {
             FirestoreChat.getChatChannel(channelId).collect { channel ->
+                if (channel.type == ChatChannelType.DIRECT) {
+                    val otherUserId =
+                        channel.members.lastOrNull { it != FirebaseAuth.getInstance().currentUser?.uid }
+                            ?: channel.createdBy
+                    refreshOtherUser(otherUserId = otherUserId)
+                }
                 viewModelState.update { it.copy(channel = channel) }
             }
         }
     }
 
-    private val user2 = mutableStateOf<User?>(null)
+    private fun refreshOtherUser(otherUserId: String) {
+        viewModelScope.launch {
+            viewModelState.update {
+                val otherUser = userRepository.getUser(otherUserId)
+                it.copy(channel = it.channel?.copy(otherUser = otherUser))
+            }
+        }
+    }
 
     private fun refreshCurrentUser() {
         viewModelScope.launch {
-            when (val result = Neo4jUtil.getCurrentUser()) {
-                is Result.Success -> user2.value = result.data
-                is Result.Error -> Log.e("NEO4J", result.exception.toString())
-            }
+            val user = userRepository.getCurrentUser()
+            user2.value = user
         }
     }
 

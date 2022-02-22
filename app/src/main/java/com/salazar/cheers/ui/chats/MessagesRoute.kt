@@ -25,8 +25,8 @@ fun MessagesRoute(
         onBackPressed = {},
         onActivityIconClicked = {
         },
-        onChannelClicked = { a, b, c, d ->
-            navActions.navigateToChat(a, b, verified, c, d)
+        onChannelClicked = { channelId,->
+            navActions.navigateToChat(channelId)
         },
         onNewMessageClicked = {
 //                              navActions.navigateToChat()

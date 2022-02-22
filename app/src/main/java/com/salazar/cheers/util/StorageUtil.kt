@@ -2,6 +2,7 @@ package com.salazar.cheers.util
 
 import android.net.Uri
 import androidx.core.net.toFile
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -57,9 +58,9 @@ object StorageUtil {
 
     fun uploadPostImage2(
         imageBytes: ByteArray,
-    ): UploadTask {
+    ): Task<Uri> {
         val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
-        return ref.putBytes(imageBytes)
+        return ref.putBytes(imageBytes).continueWithTask { ref.downloadUrl }
     }
 
     fun uploadPostImage(

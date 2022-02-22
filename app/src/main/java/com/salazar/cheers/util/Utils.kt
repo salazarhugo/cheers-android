@@ -20,8 +20,36 @@ import java.util.*
 
 object Utils {
 
+    fun Bitmap.getCircularBitmapWithWhiteBorder(borderWidth: Int): Bitmap? {
+        if (this.isRecycled) return null
+
+        val size = 2000
+        val width = size + borderWidth
+        val height = size + borderWidth
+        val canvasBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val shader = BitmapShader(this, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        val paint = Paint()
+        paint.isAntiAlias = true
+        paint.shader = shader
+        val canvas = Canvas(canvasBitmap)
+        val radius = if (width > height) height.toFloat() / 2f else width.toFloat() / 2f
+        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, paint)
+        paint.shader = null
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.WHITE
+        paint.strokeWidth = borderWidth.toFloat()
+        canvas.drawCircle(
+            (width / 2).toFloat(),
+            (height / 2).toFloat(),
+            radius - borderWidth / 2,
+            paint
+        )
+        return canvasBitmap
+    }
+
     fun String.isEmailValid(): Boolean {
-        return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+        return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this)
+            .matches()
     }
 
     fun Context.isDarkModeOn(): Boolean {

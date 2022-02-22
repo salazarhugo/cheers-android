@@ -79,6 +79,12 @@
             android:theme="@style/Theme.Cheers.NoActionBar">
 
             <intent-filter>
+                <action android:name="MainActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
                 <data android:scheme="https" android:host="cheers-a275e.web.app" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT"/>

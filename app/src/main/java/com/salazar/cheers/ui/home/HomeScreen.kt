@@ -4,7 +4,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -12,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Star
@@ -24,7 +22,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,10 +39,7 @@ import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerScope
-import com.google.accompanist.pager.calculateCurrentOffsetForPage
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.exoplayer2.C
@@ -59,7 +53,6 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
-import com.salazar.cheers.components.animations.AnimateVisibilityFade
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
@@ -83,7 +76,7 @@ fun HomeScreen(
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
-    navigateToComments: (String) -> Unit,
+    navigateToComments: (PostFeed) -> Unit,
     navigateToSearch: () -> Unit,
     onSelectTab: (Int) -> Unit,
     onLike: (post: Post) -> Unit,
@@ -377,7 +370,11 @@ fun Suggestion(
                 ) {
                     repeat(3) {
                         Image(
-                            painter = rememberImagePainter(suggestedUser.posts.getOrNull(it)?.photoUrl),
+                            painter = rememberImagePainter(
+                                suggestedUser.posts.getOrNull(it)?.photos?.get(
+                                    0
+                                )
+                            ),
                             contentDescription = "Profile image",
                             modifier = Modifier
                                 .weight(1f)
@@ -439,7 +436,7 @@ fun PostList(
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (String) -> Unit,
+    navigateToComments: (PostFeed) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
     val events = uiState.eventsFlow.collectAsLazyPagingItems()
@@ -545,10 +542,11 @@ fun Post(
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (String) -> Unit,
+    navigateToComments: (PostFeed) -> Unit,
 ) {
     val author = postFeed.author
     val post = postFeed.post
+    val pagerState = rememberPagerState()
 
     Column(
         modifier = modifier.fillMaxWidth()
@@ -567,8 +565,19 @@ fun Post(
                 )
             },
         )
-        PostBody(postFeed.post, onPostClicked = onPostClicked, onLike = onLike)
-        PostFooter(postFeed, navActions, onLike = onLike, navigateToComments = navigateToComments)
+        PostBody(
+            postFeed.post,
+            onPostClicked = onPostClicked,
+            onLike = onLike,
+            pagerState = pagerState
+        )
+        PostFooter(
+            postFeed,
+            navActions,
+            onLike = onLike,
+            navigateToComments = navigateToComments,
+            pagerState = pagerState
+        )
     }
 }
 
@@ -578,7 +587,9 @@ fun PostBody(
     post: Post,
     onPostClicked: (postId: String) -> Unit,
     onLike: (post: Post) -> Unit,
+    pagerState: PagerState = rememberPagerState(),
 ) {
+
     Box {
         if (post.videoUrl.isNotBlank())
             VideoPlayer(
@@ -587,24 +598,11 @@ fun PostBody(
                     .fillMaxWidth()
                     .aspectRatio(4 / 5f)
             )
-        else if (post.photoUrl.isNotBlank())
-            PrettyImage(
-                data = post.photoUrl,
-                contentDescription = "avatar",
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .aspectRatio(1f)// or 4/5f
-                    .padding(start = 16.dp, end = 16.dp, bottom=16.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .fillMaxWidth()
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onDoubleTap = { onLike(post) },
-                        )
-                    }
-                    .clickable { onPostClicked(post.id) }
-            )
+        else if (post.photos.isNotEmpty())
+            PhotoCarousel(
+                photos = post.photos,
+                pagerState = pagerState,
+            ) { onPostClicked(post.id) }
         else
             SelectionContainer {
                 Text(
@@ -619,23 +617,28 @@ fun PostBody(
 }
 
 @Composable
-fun InThisPhotoAnnotation(modifier: Modifier) {
-    AnimateVisibilityFade(modifier = modifier) {
-        Surface(
+fun PhotoCarousel(
+    photos: List<String>,
+    pagerState: PagerState,
+    onPostClick: () -> Unit,
+) {
+
+    HorizontalPager(
+        count = photos.size,
+        state = pagerState,
+    ) { page ->
+        PrettyImage(
+            data = photos[page],
+            contentDescription = "avatar",
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .padding(32.dp)
-                .clickable {},
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)
-        ) {
-            Icon(
-                Icons.Filled.AccountCircle,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .size(15.dp),
-                contentDescription = null
-            )
-        }
+                .aspectRatio(1f)// or 4/5f
+                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .fillMaxWidth()
+                .clickable { onPostClick() }
+        )
     }
 }
 
@@ -644,6 +647,7 @@ fun PostFooterButtons(
     post: Post,
     onLike: (post: Post) -> Unit,
     navigateToComments: (String) -> Unit,
+    pagerState: PagerState,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -676,16 +680,30 @@ fun PostFooter(
     postFeed: PostFeed,
     navActions: CheersNavigationActions,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (String) -> Unit,
+    navigateToComments: (PostFeed) -> Unit,
+    pagerState: PagerState,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
     ) {
+
+        if (postFeed.post.photos.size > 1)
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
+                activeColor = MaterialTheme.colorScheme.primary,
+            )
 //        Text(postFeed.post.tagUsersId.toString())
 //        Text(postFeed.tagUsers.toString())
-        PostFooterButtons(postFeed.post, onLike = onLike, navigateToComments = navigateToComments)
+        PostFooterButtons(
+            postFeed.post,
+            onLike = onLike,
+            navigateToComments = { navigateToComments(postFeed) },
+            pagerState = pagerState,
+        )
         if (postFeed.post.type != PostType.TEXT) {
             LikedBy(post = postFeed.post, navActions)
             if (postFeed.tagUsers.isNotEmpty())

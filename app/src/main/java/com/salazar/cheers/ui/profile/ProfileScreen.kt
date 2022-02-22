@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -30,8 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,12 +41,13 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
+import com.salazar.cheers.components.profile.ProfileHeader
+import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.internal.Counter
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -101,9 +99,9 @@ fun Profile(
             Column(
                 modifier = Modifier.padding(15.dp)
             ) {
-                Section1(user = uiState.user, onStatClicked = onStatClicked)
-                Section2(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
-                Spacer(Modifier.height(4.dp))
+                ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
+                ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
+                Spacer(Modifier.height(8.dp))
                 Row {
                     OutlinedButton(
                         onClick = onEditProfileClicked,
@@ -277,11 +275,12 @@ fun PostItem(
     post: Post,
     onPostClicked: (postId: String) -> Unit,
 ) {
+    if (post.photos.isEmpty()) return
     Box(
         modifier = Modifier.padding(1.dp),
         contentAlignment = Alignment.TopEnd
     ) {
-        val url = if (post.type == PostType.VIDEO) post.videoThumbnailUrl else post.photoUrl
+        val url = if (post.type == PostType.VIDEO) post.videoThumbnailUrl else post.photos[0]
         PrettyImage(
             data = url,
             contentDescription = "avatar",
@@ -307,44 +306,6 @@ fun PlayIcon() {
         null,
         modifier = Modifier.padding(8.dp)
     )
-}
-
-@Composable
-fun Section2(
-    user: User,
-    onWebsiteClicked: (String) -> Unit,
-) {
-    Column {
-        Row {
-            Text(
-                text = user.fullName,
-                style = Typography.bodyMedium
-            )
-            if (user.verified) {
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "VIP",
-                    style = Typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            user.bio,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
-        )
-        ClickableText(
-            text = AnnotatedString(user.website),
-            style = TextStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Normal
-            ),
-            onClick = { offset ->
-                onWebsiteClicked(user.website)
-            },
-        )
-    }
 }
 
 @Composable
@@ -376,37 +337,6 @@ fun Toolbar(
             },
         )
         DividerM3()
-    }
-}
-
-@Composable
-fun Section1(
-    user: User,
-    onStatClicked: (statName: String, username: String) -> Unit,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .padding(bottom = 15.dp)
-            .fillMaxWidth()
-    ) {
-
-        Image(
-            painter = rememberImagePainter(
-                data = user.profilePictureUrl,
-                builder = {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                },
-            ),
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape),
-            contentDescription = null,
-        )
-        ProfileStats(user, onStatClicked)
-        Spacer(Modifier.height(18.dp))
     }
 }
 

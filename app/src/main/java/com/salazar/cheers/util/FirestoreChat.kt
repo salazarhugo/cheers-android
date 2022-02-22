@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -29,6 +30,52 @@ object FirestoreChat {
         )
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
 
+    fun getOrCreatePostChatGroup(
+        postFeed: PostFeed,
+        onComplete: (channelId: String) -> Unit
+    ) {
+        currentUserDocRef.collection("engagedChatChannels")
+            .document(postFeed.post.id).get().addOnSuccessListener {
+                if (it.exists()) {
+                    onComplete(it["channelId"] as String)
+                    return@addOnSuccessListener
+                }
+                val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+                val post = postFeed.post
+
+                val members = listOf(post.authorId) + postFeed.post.tagUsersId
+
+                chatChannelsCollectionRef.document(post.id).set(
+                    ChatChannel(
+                        id = post.id,
+                        name = post.locationName,
+                        members = members,
+                        otherUser = User(),
+                        createdAt = Timestamp.now(),
+                        createdBy = currentUserId,
+                        recentMessage = TextMessage(),
+                        recentMessageTime = Timestamp.now(),
+                        type = ChatChannelType.GROUP
+                    )
+                )
+
+                members.forEach { memberId ->
+                    firestoreInstance.document(
+                        "users/${
+                            FirebaseAuth.getInstance().uid ?: throw NullPointerException(
+                                "UID is null."
+                            )
+                        }"
+                    )
+                        .collection("engagedChatChannels")
+                        .document(memberId)
+                        .set(mapOf("channelId" to post.id))
+                }
+
+                onComplete(post.id)
+            }
+    }
+
     fun getOrCreateChatChannel(
         otherUser: User,
         onComplete: (channelId: String) -> Unit
@@ -44,14 +91,15 @@ object FirestoreChat {
                 val newChannel = chatChannelsCollectionRef.document()
                 newChannel.set(
                     ChatChannel(
-                        newChannel.id,
-                        "Channel 1",
-                        listOf(currentUserId, otherUser.id),
-                        User(),
-                        Timestamp.now(),
-                        "",
-                        TextMessage(),
-                        ChatChannelType.DIRECT
+                        id = newChannel.id,
+                        name = "Channel 1",
+                        members = listOf(currentUserId, otherUser.id),
+                        otherUser = User(),
+                        createdAt = Timestamp.now(),
+                        recentMessageTime = Timestamp.now(),
+                        createdBy = currentUserId,
+                        recentMessage = TextMessage(),
+                        type = ChatChannelType.DIRECT
                     )
                 )
 

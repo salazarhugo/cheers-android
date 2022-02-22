@@ -1,14 +1,10 @@
 package com.salazar.cheers.ui.otherprofile
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -22,28 +18,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.R
 import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
-import com.salazar.cheers.internal.Counter
+import com.salazar.cheers.components.profile.ProfileHeader
+import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,7 +52,7 @@ fun OtherProfileScreen(
         topBar = { Toolbar(uiState.user, onBackPressed = onBackPressed, onCopyUrl) }
     ) {
         Column {
-            ProfileHeader(
+            Profile(
                 uiState,
                 onFollowClicked = onFollowClicked,
                 onUnfollowClicked = onUnfollowClicked,
@@ -76,7 +65,7 @@ fun OtherProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(
+fun Profile(
     uiState: OtherProfileUiState,
     onFollowClicked: () -> Unit,
     onUnfollowClicked: () -> Unit,
@@ -93,8 +82,9 @@ fun ProfileHeader(
                     .height(1.dp),
                 color = MaterialTheme.colorScheme.onBackground,
             )
-        Section1(uiState, onStatClicked)
-        Section2(uiState.user)
+        ProfileHeader(uiState.user, onStatClicked)
+        ProfileText(user = uiState.user, onWebsiteClicked = {})
+        Spacer(Modifier.height(8.dp))
         HeaderButtons(
             uiState,
             onFollowClicked = onFollowClicked,
@@ -173,7 +163,7 @@ fun PostItem(post: Post) {
         modifier = Modifier.padding(1.dp)
     ) {
         PrettyImage(
-            data = post.photoUrl,
+            data = post.photos[0],
             contentDescription = "avatar",
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop,
@@ -274,102 +264,6 @@ fun MoreDialog(
         confirmButton = {
         },
     )
-}
-
-
-@Composable
-fun Section2(otherUser: User) {
-    Column(
-        modifier = Modifier.padding(vertical = 16.dp)
-    ) {
-        Row {
-            Text(
-                text = otherUser.fullName,
-                style = Typography.bodyMedium
-            )
-            if (otherUser.verified) {
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "VIP",
-                    style = Typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            otherUser.bio,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
-        )
-        ClickableText(
-            text = AnnotatedString(otherUser.website),
-            style = TextStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Normal
-            ),
-            onClick = { offset ->
-            },
-        )
-    }
-}
-
-@Composable
-fun Section1(
-    uiState: OtherProfileUiState,
-    onStatClicked: (statName: String, username: String) -> Unit,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Image(
-            painter = rememberImagePainter(
-                data = uiState.user.profilePictureUrl,
-                builder = {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                },
-            ),
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape),
-            contentDescription = null,
-        )
-        Counters(uiState, onStatClicked)
-    }
-}
-
-@Composable
-fun Counters(
-    uiState: OtherProfileUiState,
-    onStatClicked: (statName: String, username: String) -> Unit,
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(26.dp)
-    ) {
-        val otherUser = uiState.user
-        val items = listOf(
-            Counter("Posts", otherUser.postCount),
-            Counter("Followers", otherUser.followers),
-            Counter("Following", otherUser.following),
-        )
-
-        items.forEach { item ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable { onStatClicked(item.name, otherUser.username) }
-            ) {
-                Text(
-                    text = item.value.toString(),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto
-                )
-                Text(text = item.name, fontSize = 14.sp, fontFamily = Roboto)
-            }
-        }
-    }
 }
 
 @Composable

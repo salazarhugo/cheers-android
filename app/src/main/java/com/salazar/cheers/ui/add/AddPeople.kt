@@ -43,6 +43,7 @@ fun AddPeopleScreen(
     onSelectUser: (User) -> Unit,
     selectedUsers: List<User>,
     onBackPressed: () -> Unit,
+    onDone: () -> Unit,
 ) {
     val viewModel = hiltViewModel<AddPeopleViewModel>()
     val uiState by viewModel.uiState.collectAsState()
@@ -51,7 +52,10 @@ fun AddPeopleScreen(
         LoadingScreen()
 
     Scaffold(
-        topBar = { AddPeopleTopBar(onDismiss = onBackPressed) },
+        topBar = { AddPeopleTopBar(
+            onDismiss = onBackPressed,
+            onDone = onDone
+        ) },
     ) {
         Column(
             modifier = Modifier
@@ -75,7 +79,8 @@ fun AddPeopleScreen(
 
 @Composable
 fun AddPeopleTopBar(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onDone: () -> Unit
 ) {
     SmallTopAppBar(
         title = { Text("Add people", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
@@ -84,6 +89,11 @@ fun AddPeopleTopBar(
                 Icon(Icons.Default.Close, contentDescription = null)
             }
         },
+        actions = {
+            TextButton(onClick = onDone) {
+                Text("DONE")
+            }
+        }
     )
 }
 

@@ -35,6 +35,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.flyTo
@@ -54,7 +55,7 @@ import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
-import com.salazar.cheers.util.Utils.getCircledBitmap
+import com.salazar.cheers.util.Utils.getCircularBitmapWithWhiteBorder
 import com.salazar.cheers.util.Utils.isDarkModeOn
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -115,7 +116,7 @@ fun MapScreen(
 }
 
 @Composable
-private fun LocationPermission(
+fun LocationPermission(
     navigateToSettingsScreen: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -228,7 +229,7 @@ fun UiLayer(
         Surface(
             shape = CircleShape,
             color = Color.White.copy(alpha = 0.5f),
-            shadowElevation = 8.dp,
+            shadowElevation = 0.dp,
             modifier = Modifier
                 .padding(bottom = 26.dp)
                 .size(80.dp)
@@ -288,8 +289,9 @@ private fun addPostToMap(
     onSelectPost: (PostFeed) -> Unit,
     scope: CoroutineScope,
 ) {
+    if (postFeed.post.photos.isEmpty()) return
     scope.launch {
-        val bitmap = getBitmapFromUrl(postFeed.post.photoUrl) ?: return@launch
+        val bitmap = getBitmapFromUrl(postFeed.post.photos[0]) ?: return@launch
         val annotationApi = mapView.annotations
         val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
         val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
@@ -319,7 +321,7 @@ private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) 
 
     return@withContext try {
         BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
-            .getCircledBitmap()
+            .getCircularBitmapWithWhiteBorder(180)
     } catch (e: IOException) {
         null
     }
@@ -465,9 +467,11 @@ private fun onMapReady(
     val style = if (context.isDarkModeOn())
         "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0"
     else
-        "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
+        "mapbox://styles/salazarbrock/ckzsmluho004114lmeb8rl2zi"
 
-    mapView.getMapboxMap().loadStyleUri(style) {
+    mapView.getMapboxMap().loadStyle(
+        style(styleUri = style) { }
+    ) {
         val positionChangedListener = onIndicatorPositionChangedListener(mapView)
         initLocationComponent(mapView, context, positionChangedListener)
         setupGesturesListener(mapView, positionChangedListener)

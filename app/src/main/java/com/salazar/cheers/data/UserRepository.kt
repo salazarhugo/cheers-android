@@ -1,5 +1,6 @@
 package com.salazar.cheers.data
 
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.internal.User
@@ -13,6 +14,12 @@ class UserRepository @Inject constructor(
     private val service: Neo4jService,
     private val userDao: UserDao
 ) {
+
+    suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid!!
+        refreshUser(userId = currentUserId)
+        return@withContext userDao.getUser(userId = currentUserId)
+    }
 
     suspend fun getUser(userId: String): User = withContext(Dispatchers.IO) {
         refreshUser(userId = userId)

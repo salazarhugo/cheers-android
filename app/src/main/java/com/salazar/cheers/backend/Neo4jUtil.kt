@@ -113,9 +113,7 @@ object Neo4jUtil {
         }
     }
 
-    fun addPost(
-        post: Post,
-    ) {
+    suspend fun addPost(post: Post) = withContext(Dispatchers.IO) {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = FirebaseAuth.getInstance().currentUser?.uid!!
 
@@ -129,7 +127,7 @@ object Neo4jUtil {
 
         write(
             "MATCH (u:User) WHERE u.id = \$userId CREATE (p: Post \$post)" +
-                    " SET p += { createdTime: datetime() } CREATE (u)-[:POSTED]->(p)" +
+                    " SET p += { createdTime: datetime(), duration: duration({ hours: 2 }) } CREATE (u)-[:POSTED]->(p)" +
                     " WITH p UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
             params = params
         )
@@ -419,7 +417,7 @@ object Neo4jUtil {
 
             val records = query(
                 "MATCH (u:User)-[:FOLLOWS]->(u2:User) " +
-                        "WHERE u.id = \$userId AND u2.username CONTAINS \$query " +
+                        "WHERE u.id = \$userId AND u2.username CONTAINS \$query AND u2.id <> \$userId " +
                         "RETURN properties(u2) LIMIT 20",
                 params
             )

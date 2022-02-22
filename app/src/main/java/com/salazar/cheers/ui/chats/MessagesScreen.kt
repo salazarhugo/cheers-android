@@ -49,7 +49,7 @@ fun MessagesScreen(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onNewMessageClicked: () -> Unit,
-    onChannelClicked: (String, String, String, String) -> Unit,
+    onChannelClicked: (channelId: String) -> Unit,
     onActivityIconClicked: () -> Unit,
 ) {
     Scaffold(
@@ -73,7 +73,7 @@ fun MessagesScreen(
 @Composable
 fun Tabs(
     uiState: MessagesUiState,
-    onChannelClicked: (String, String, String, String) -> Unit,
+    onChannelClicked: (String) -> Unit,
 ) {
     val tabs = listOf("Direct", "Groups")
     val pagerState = rememberPagerState()
@@ -114,13 +114,19 @@ fun Tabs(
         ) {
             when (page) {
                 0 -> {
-                    val channels = uiState.channels
+                    val directChats = uiState.channels?.filter { it.type == ChatChannelType.DIRECT }
                     if (uiState.isLoading)
                         LoadingScreen()
-                    if (channels != null)
-                        ConversationList(channels, onChannelClicked)
+                    if (directChats != null)
+                        ConversationList(directChats, onChannelClicked)
                 }
-                1 -> {}
+                1 -> {
+                    val groupChats = uiState.channels?.filter { it.type == ChatChannelType.GROUP }
+                    if (uiState.isLoading)
+                        LoadingScreen()
+                    if (groupChats != null)
+                        ConversationList(groupChats, onChannelClicked)
+                }
             }
         }
     }
@@ -129,7 +135,7 @@ fun Tabs(
 @Composable
 fun ConversationList(
     channels: List<ChatChannel>,
-    onChannelClicked: (String, String, String, String) -> Unit
+    onChannelClicked: (String) -> Unit,
 ) {
     if (channels.isEmpty()) {
         Text("No chat channels")
@@ -156,19 +162,12 @@ fun LinkContactsItem() {
 @Composable
 fun DirectConversation(
     channel: ChatChannel,
-    onChannelClicked: (String, String, String, String) -> Unit
+    onChannelClicked: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onChannelClicked(
-                    channel.id,
-                    channel.otherUser.fullName,
-                    channel.otherUser.username,
-                    channel.otherUser.profilePictureUrl,
-                )
-            }
+            .clickable { onChannelClicked(channel.id) }
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -244,19 +243,12 @@ fun DirectConversation(
 @Composable
 fun GroupConversation(
     channel: ChatChannel,
-    onChannelClicked: (String, String, String, String) -> Unit
+    onChannelClicked: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onChannelClicked(
-                    channel.id,
-                    channel.otherUser.fullName,
-                    channel.otherUser.username,
-                    channel.otherUser.profilePictureUrl,
-                )
-            }
+            .clickable { onChannelClicked(channel.id) }
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -267,7 +259,13 @@ fun GroupConversation(
             val image = channel.recentMessage.senderProfilePictureUrl
 
             Image(
-                painter = rememberImagePainter(data = image),
+                painter = rememberImagePainter(
+                    data = image,
+                    builder = {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_group_picture)
+                    },
+                ),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(50.dp)

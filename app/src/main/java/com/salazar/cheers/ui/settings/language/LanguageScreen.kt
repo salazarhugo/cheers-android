@@ -1,0 +1,72 @@
+package com.salazar.cheers.ui.settings.language
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import com.salazar.cheers.components.items.SettingTitle
+import com.salazar.cheers.components.share.Toolbar
+import com.salazar.cheers.internal.Language
+
+@Composable
+fun LanguageScreen(
+    language: Language,
+    onLanguageChange: (Language) -> Unit,
+    onBackPressed: () -> Unit,
+) {
+    Scaffold(
+        topBar = { Toolbar(onBackPressed = onBackPressed, title = "Language") },
+    ) {
+        Column {
+            LanguagesSection(
+                language = language,
+                onLanguageChange = onLanguageChange
+            )
+        }
+    }
+}
+
+@Composable
+fun LanguagesSection(
+    language: Language,
+    onLanguageChange: (Language) -> Unit,
+) {
+    SettingTitle(title = "Language")
+    val radioOptions = Language.values()
+
+    Column(Modifier.selectableGroup()) {
+        radioOptions.forEach {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .selectable(
+                        selected = (it == language),
+                        onClick = { onLanguageChange(it) },
+                        role = Role.RadioButton
+                    )
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(
+                    selected = (it == language),
+                    onClick = null
+                )
+                Text(
+                    text = it.name,
+//                            style = MaterialTheme.typography.bodyMedium.merge(),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+        }
+    }
+}
+
+

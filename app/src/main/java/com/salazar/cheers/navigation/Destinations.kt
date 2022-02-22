@@ -1,8 +1,6 @@
 package com.salazar.cheers.navigation
 
 import androidx.navigation.NavHostController
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 /**
  * Destinations used in the [CheersApp].
@@ -11,6 +9,7 @@ object CheersDestinations {
     const val ROOT_ROUTE = "root"
     const val AUTH_ROUTE = "auth"
     const val MAIN_ROUTE = "main"
+    const val SETTING_ROUTE = "setting"
 }
 
 /**
@@ -30,7 +29,6 @@ object MainDestinations {
     const val ACTIVITY_ROUTE = "activity"
     const val LIKES_ROUTE = "likes"
     const val CHAT_ROUTE = "chat"
-    const val SETTINGS_ROUTE = "settings"
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val ADD_POST_SHEET = "addPostSheet"
@@ -50,12 +48,47 @@ object AuthDestinations {
 }
 
 /**
+ * Destinations used in [Settings].
+ */
+object SettingDestinations {
+    const val SETTINGS_ROUTE = "settings"
+    const val THEME_ROUTE = "theme"
+    const val NOTIFICATIONS_ROUTE = "notifications"
+    const val LANGUAGE_ROUTE = "language"
+    const val CHAT_SETTINGS_ROUTE = "chatSettings"
+}
+
+/**
  * Models the navigation actions in the app.
  */
 class CheersNavigationActions(navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToChatSettings: () -> Unit = {
+        navController.navigate(SettingDestinations.CHAT_SETTINGS_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToLanguage: () -> Unit = {
+        navController.navigate(SettingDestinations.LANGUAGE_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToNotifications: () -> Unit = {
+        navController.navigate(SettingDestinations.NOTIFICATIONS_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToTheme: () -> Unit = {
+        navController.navigate(SettingDestinations.THEME_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToSignUp: () -> Unit = {
@@ -204,8 +237,9 @@ class CheersNavigationActions(navController: NavHostController) {
             restoreState = true
         }
     }
+
     val navigateToSettings: () -> Unit = {
-        navController.navigate(MainDestinations.SETTINGS_ROUTE) {
+        navController.navigate(CheersDestinations.SETTING_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
@@ -213,13 +247,9 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateToChat: (
         channelId: String,
-        username: String,
-        verified: Boolean,
-        name: String,
-        profilePictureUrl: String,
-    ) -> Unit = { channelId, username, verified, name, profilePictureUrl ->
-        val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
-        navController.navigate("${MainDestinations.CHAT_ROUTE}/$channelId/$username/${verified}/$name/$encodedUrl") {
+    ) -> Unit = { channelId ->
+//        val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
+        navController.navigate("${MainDestinations.CHAT_ROUTE}/$channelId") {
             launchSingleTop = true
             restoreState = true
         }

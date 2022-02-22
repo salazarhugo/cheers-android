@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.util.FirestoreChat
 
 /**
  * Stateful composable that displays the Navigation route for the Post detail screen.
@@ -33,6 +34,11 @@ fun PostDetailRoute(
             },
             onMapClick = { navActions.navigateToMap() },
             onToggleLike = postDetailViewModel::toggleLike,
+            onMessageClicked = {
+                FirestoreChat.getOrCreatePostChatGroup((uiState as PostDetailUiState.HasPost).postFeed) {
+                    navActions.navigateToChat(it)
+                }
+            }
         )
     else
         LoadingScreen()

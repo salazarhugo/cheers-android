@@ -65,29 +65,34 @@ class MessagesViewModel @Inject constructor() : ViewModel() {
 
         viewModelScope.launch {
             FirestoreChat.getChatChannels().collect { channels ->
-                a(channels.filter { it.type == ChatChannelType.DIRECT })
+                addDirect(channels)
             }
         }
     }
 
-    private fun a(directChannels: List<ChatChannel>) {
+
+    private fun addDirect(directChannels: List<ChatChannel>) {
         viewModelScope.launch {
             val channels = mutableListOf<ChatChannel>()
 
             directChannels.forEach {
-                val otherUserId =
-                    it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! }
-                        ?: return@forEach
-                when (val result = Neo4jUtil.getUser(otherUserId)) {
-                    is Result.Success -> channels.add(it.copy(otherUser = result.data))
-                    is Result.Error -> channels.add(
-                        it.copy(
-                            otherUser = User().copy(
-                                username = "User not found",
-                                fullName = "User not found"
+                if (it.type == ChatChannelType.GROUP) {
+                    channels.add(it)
+                } else {
+                    val otherUserId =
+                        it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! }
+                            ?: return@forEach
+                    when (val result = Neo4jUtil.getUser(otherUserId)) {
+                        is Result.Success -> channels.add(it.copy(otherUser = result.data))
+                        is Result.Error -> channels.add(
+                            it.copy(
+                                otherUser = User().copy(
+                                    username = "User not found",
+                                    fullName = "User not found"
+                                )
                             )
                         )
-                    )
+                    }
                 }
             }
 

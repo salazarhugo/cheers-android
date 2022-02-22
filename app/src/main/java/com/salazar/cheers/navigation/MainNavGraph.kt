@@ -1,7 +1,10 @@
 package com.salazar.cheers.navigation
 
 import android.net.Uri
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
@@ -9,6 +12,7 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
+import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.components.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.add.AddPostRoute
@@ -36,37 +40,33 @@ import com.salazar.cheers.ui.otherprofile.otherProfileViewModel
 import com.salazar.cheers.ui.profile.*
 import com.salazar.cheers.ui.search.SearchRoute
 import com.salazar.cheers.ui.search.SearchViewModel
-import com.salazar.cheers.ui.settings.SettingsRoute
-import com.salazar.cheers.ui.settings.SettingsViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     user: User,
+    mainViewModel: MainViewModel,
     navActions: CheersNavigationActions,
 ) {
     val uri = "https://cheers-a275e.web.app"
+
+    mainViewModel.refreshUser()
 
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
 
-        bottomSheet(
-            route = "${MainDestinations.CHAT_ROUTE}/{channelId}/{username}/{verified}/{name}/{profilePictureUrl}",
+        settingNavGraph(navActions = navActions)
+
+        composable(
+            route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/chat/{channelId}" })
         ) {
             val channelId = it.arguments?.getString("channelId")!!
-            val username = it.arguments?.getString("username")!!
-            val verified = it.arguments?.getBoolean("verified")!!
-            val name = it.arguments?.getString("name")!!
-            val profilePictureUrl2 = it.arguments?.getString("profilePictureUrl")!!
-
             val chatViewModel = chatViewModel(channelId = channelId)
+
             ChatRoute(
                 chatViewModel = chatViewModel,
                 navActions = navActions,
-                username = username,
-                verified = verified,
-                name = name,
-                profilePictureUrl = profilePictureUrl2,
             )
         }
 
@@ -106,7 +106,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
             val photoUri = it.arguments?.getString("photoUri")
             if (photoUri != null)
-                viewModel.setPostImage(Uri.parse(photoUri))
+                viewModel.addPhoto(Uri.parse(photoUri))
         }
 
         composable(MainDestinations.HOME_ROUTE) {
@@ -137,14 +137,6 @@ fun NavGraphBuilder.mainNavGraph(
             val searchViewModel = hiltViewModel<SearchViewModel>()
             SearchRoute(
                 searchViewModel = searchViewModel,
-                navActions = navActions,
-            )
-        }
-
-        dialog(MainDestinations.SETTINGS_ROUTE) {
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
-            SettingsRoute(
-                settingsViewModel = settingsViewModel,
                 navActions = navActions,
             )
         }
@@ -188,6 +180,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/post/{postId}" })
         ) {
             val postId = it.arguments?.getString("postId")!!
             val postDetailViewModel = postDetailViewModel(postId = postId)
@@ -207,7 +200,11 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(MainDestinations.MESSAGES_ROUTE) {
+        composable(
+            MainDestinations.MESSAGES_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
+        ) {
             val messagesViewModel = hiltViewModel<MessagesViewModel>()
             MessagesRoute(
                 messagesViewModel = messagesViewModel,
@@ -225,7 +222,17 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(MainDestinations.PROFILE_ROUTE) {
+        composable(
+            MainDestinations.PROFILE_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = {
+                if (targetState.destination.hierarchy.any { it.route == CheersDestinations.SETTING_ROUTE })
+                    slideOutHorizontally(targetOffsetX = { -1000 })
+                else
+                    slideOutHorizontally(targetOffsetX = { 1000 })
+            }
+
+        ) {
             val profileViewModel = hiltViewModel<ProfileViewModel>()
             ProfileRoute(
                 profileViewModel = profileViewModel,

@@ -26,20 +26,6 @@ class AddPeopleViewModel @Inject constructor() : ViewModel() {
         refreshNewMessages()
     }
 
-    fun selectUser(user: User) {
-        viewModelState.update {
-            val selectedUsers = mutableListOf<User>()
-            selectedUsers.addAll(it.selectedUsers)
-
-            if (selectedUsers.contains(user))
-                selectedUsers.remove(user)
-            else
-                selectedUsers.add(user)
-
-            return@update it.copy(selectedUsers = selectedUsers)
-        }
-    }
-
     fun onSearchInputChanged(query: String) {
         viewModelState.update {
             it.copy(searchInput = query)
@@ -57,14 +43,6 @@ class AddPeopleViewModel @Inject constructor() : ViewModel() {
                 it.copy(users = result, isLoading = false)
             }
         }
-    }
-
-    fun send() {
-        if (viewModelState.value.selectedUsers.isEmpty())
-            return
-        if (viewModelState.value.selectedUsers.size == 1)
-            if (viewModelState.value.selectedUsers.size > 1)
-                return
     }
 }
 

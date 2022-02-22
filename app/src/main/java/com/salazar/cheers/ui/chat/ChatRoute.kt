@@ -17,10 +17,6 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 fun ChatRoute(
     chatViewModel: ChatViewModel,
     navActions: CheersNavigationActions,
-    username: String,
-    verified: Boolean,
-    name: String,
-    profilePictureUrl: String,
 ) {
     val uiState by chatViewModel.uiState.collectAsState()
 
@@ -32,6 +28,7 @@ fun ChatRoute(
 
     when (uiState) {
         is ChatUiState.HasChannel -> {
+            val otherUser = (uiState as ChatUiState.HasChannel).channel.otherUser
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,
                 onTitleClick = { navActions.navigateToOtherProfile(it) },
@@ -42,10 +39,10 @@ fun ChatRoute(
                 onMessageSent = chatViewModel::sendTextMessage,
                 onImageSelectorClick = { launcher.launch("image/*") },
                 onCopyText = {},
-                username = username,
-                verified = verified,
-                name = name,
-                profilePicturePath = profilePictureUrl,
+                username = otherUser.username,
+                verified = otherUser.verified,
+                name = otherUser.fullName,
+                profilePicturePath = otherUser.profilePictureUrl,
             )
         }
         is ChatUiState.NoChannel -> {

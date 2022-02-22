@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.navigation.CheersNavigationActions
 
@@ -18,7 +17,6 @@ fun SettingsRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by settingsViewModel.uiState.collectAsState()
-    val context = LocalContext.current
 
     SettingsScreen(
         uiState = uiState,
@@ -26,8 +24,10 @@ fun SettingsRoute(
         onSignOut = {
             FirebaseAuth.getInstance().signOut()
             navActions.navigateToSignIn()
-//            context.startActivity(Intent(context, SignInActivity::class.java).newTask().clearTask())
-        }
+        },
+        navigateToTheme = { navActions.navigateToTheme() },
+        navigateToNotifications = { navActions.navigateToNotifications() },
+        navigateToLanguage = { navActions.navigateToLanguage() },
     )
 }
 

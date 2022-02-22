@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Cheers</string>
-    <string name="mapbox_access_token">pk.eyJ1Ijoic2FsYXphcmJyb2NrIiwiYSI6ImNqd3hxaDBleTFobGQ0Y2sxc3lpdnNwYXMifQ.TgYFgyclmL6pGXXANhnlsw</string>
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoic2FsYXphcmJyb2NrIiwiYSI6ImNqd3hxaDBleTFobGQ0Y2sxc3lpdnNwYXMifQ.TgYFgyclmL6pGXXANhnlsw</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Composer</string>
@@ -9,21 +9,21 @@
     <string name="action_settings">Settings</string>
 
     <!-- Notifications -->
-    <string name="default_notification_channel_id">DEFAULT_CHANNEL</string>
-    <string name="default_notification_channel_name">Messages</string>
-    <string name="default_notification_channel_description">Channel for chat messages</string>
+    <string name="default_notification_channel_id" translatable="false">DEFAULT_CHANNEL</string>
+    <string name="default_notification_channel_name" translatable="false">Messages</string>
+    <string name="default_notification_channel_description" translatable="false">Channel for chat messages</string>
 
-    <string name="upload_notification_channel_id">UPLOAD_CHANNEL</string>
-    <string name="upload_notification_channel_name">Upload</string>
-    <string name="upload_notification_channel_description">Channel for uploads</string>
+    <string name="upload_notification_channel_id" translatable="false">UPLOAD_CHANNEL</string>
+    <string name="upload_notification_channel_name" translatable="false">Upload</string>
+    <string name="upload_notification_channel_description" translatable="false">Channel for uploads</string>
 
-    <string name="post_notification_channel_id">POST_CHANNEL</string>
-    <string name="post_notification_channel_name">Post</string>
-    <string name="post_notification_channel_description">Channel for posts</string>
+    <string name="post_notification_channel_id" translatable="false">POST_CHANNEL</string>
+    <string name="post_notification_channel_name" translatable="false">Post</string>
+    <string name="post_notification_channel_description" translatable="false">Channel for posts</string>
 
-    <string name="cheers_direct_notification_channel_id">CHEERS_DIRECT</string>
-    <string name="cheers_direct_notification_channel_name">Cheers direct</string>
-    <string name="cheers_direct_notification_description">Cheers direct messages</string>
+    <string name="cheers_direct_notification_channel_id" translatable="false">CHEERS_DIRECT</string>
+    <string name="cheers_direct_notification_channel_name" translatable="false">Cheers direct</string>
+    <string name="cheers_direct_notification_description" translatable="false">Cheers direct messages</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -74,8 +74,8 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string name="snap_oauth_client_id">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
-    <string name="snap_oauth_client_id_staging">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
+    <string name="snap_oauth_client_id" translatable="false">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
+    <string name="snap_oauth_client_id_staging" translatable="false">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
 
-    <string name="snap_redirect_url">cheers://snap-kit/oauth2</string>
+    <string name="snap_redirect_url" translatable="false">cheers://snap-kit/oauth2</string>
 </resources>

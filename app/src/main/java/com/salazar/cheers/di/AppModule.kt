@@ -3,10 +3,7 @@ package com.salazar.cheers.di
 import android.content.Context
 import androidx.room.Room
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.db.CheersDao
-import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.PostDao
-import com.salazar.cheers.data.db.UserDao
+import com.salazar.cheers.data.db.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,6 +28,12 @@ object AppModule {
     @Provides
     fun provideUserDao(@ApplicationContext appContext: Context): UserDao {
         return CheersDatabase.invoke(appContext).userDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserPreferenceDao(@ApplicationContext appContext: Context): UserPreferenceDao {
+        return CheersDatabase.invoke(appContext).userPreferenceDao()
     }
 
     @Singleton

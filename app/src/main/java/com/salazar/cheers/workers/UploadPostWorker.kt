@@ -7,16 +7,14 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import android.util.Size
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import androidx.work.workDataOf
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
@@ -25,9 +23,10 @@ import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
-import java.util.*
 
 @HiltWorker
 class UploadPostWorker @AssistedInject constructor(
@@ -41,8 +40,8 @@ class UploadPostWorker @AssistedInject constructor(
 
         makeStatusNotification("Uploading", appContext)
 
-        val mediaUri =
-            inputData.getString("MEDIA_URI") ?: ""
+        val photos =
+            inputData.getStringArray("PHOTOS") ?: emptyArray()
 
         val postType =
             inputData.getString("POST_TYPE") ?: return Result.failure()
@@ -68,83 +67,111 @@ class UploadPostWorker @AssistedInject constructor(
         val tagUserIds =
             inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
 
+        val allowJoin =
+            inputData.getBoolean("ALLOW_JOIN", true)
 
         try {
             when (postType) {
                 PostType.VIDEO -> {
-                    val videoUri = Uri.parse(mediaUri) ?: return Result.failure()
-
-                    val ref = StorageUtil.currentUserRef.child("posts/${UUID.randomUUID()}")
-                    val uploadTask = ref.putFile(videoUri)
-
-                    uploadTask.addOnProgressListener {
-                        val progress = (100.0 * it.bytesTransferred) / it.totalByteCount
-                        setProgressAsync(workDataOf("Progress" to progress))
-                    }.continueWithTask {
-                        ref.downloadUrl
-                    }.addOnSuccessListener { downloadUri ->
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                            val videoThumbnail: Bitmap = ThumbnailUtils.createVideoThumbnail(File(videoUri.path), Size(120, 120), null)
-                            val videoThumbnail: Bitmap = appContext.contentResolver.loadThumbnail(
-                                videoUri,
-                                Size(1080, 1080),
-                                null
-                            )
-                            val thumbnailBytes = extractBitmap(videoThumbnail)
-
-                            StorageUtil.uploadPostImage(thumbnailBytes) { thumbnailUrl ->
-                                val post = Post(
-                                    name = name,
-                                    type = postType,
-                                    authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
-                                    caption = photoCaption,
-                                    videoUrl = downloadUri.toString(),
-                                    videoThumbnailUrl = thumbnailUrl,
-                                    locationName = locationName,
-                                    locationLatitude = latitude,
-                                    locationLongitude = longitude,
-                                    privacy = privacy,
-                                    tagUsersId = tagUserIds.toList(),
-                                )
-                                Neo4jUtil.addPost(post)
-                                makeStatusNotification("Successfully uploaded", appContext)
-                            }
-                        } else {
-                            val post = Post(
-                                name = name,
-                                type = postType,
-                                authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
-                                caption = photoCaption,
-                                videoUrl = downloadUri.toString(),
-                                locationName = locationName,
-                                locationLatitude = latitude,
-                                locationLongitude = longitude,
-                                privacy = privacy,
-                                tagUsersId = tagUserIds.toList()
-                            )
-                            Neo4jUtil.addPost(post)
-                            makeStatusNotification("Successfully uploaded", appContext)
-                        }
-                    }
-
+//                    val videoUri = Uri.parse(mediaUri) ?: return Result.failure()
+//
+//                    val ref = StorageUtil.currentUserRef.child("posts/${UUID.randomUUID()}")
+//                    val uploadTask = ref.putFile(videoUri)
+//
+//                    uploadTask.addOnProgressListener {
+//                        val progress = (100.0 * it.bytesTransferred) / it.totalByteCount
+//                        setProgressAsync(workDataOf("Progress" to progress))
+//                    }.continueWithTask {
+//                        ref.downloadUrl
+//                    }.addOnSuccessListener { downloadUri ->
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+////                            val videoThumbnail: Bitmap = ThumbnailUtils.createVideoThumbnail(File(videoUri.path), Size(120, 120), null)
+//                            val videoThumbnail: Bitmap = appContext.contentResolver.loadThumbnail(
+//                                videoUri,
+//                                Size(1080, 1080),
+//                                null
+//                            )
+//                            val thumbnailBytes = extractBitmap(videoThumbnail)
+//
+//                            StorageUtil.uploadPostImage(thumbnailBytes) { thumbnailUrl ->
+//                                val post = Post(
+//                                    name = name,
+//                                    type = postType,
+//                                    authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
+//                                    caption = photoCaption,
+//                                    videoUrl = downloadUri.toString(),
+//                                    videoThumbnailUrl = thumbnailUrl,
+//                                    locationName = locationName,
+//                                    locationLatitude = latitude,
+//                                    locationLongitude = longitude,
+//                                    privacy = privacy,
+//                                    allowJoin = allowJoin,
+//                                    tagUsersId = tagUserIds.toList(),
+//                                )
+//                                GlobalScope.launch {
+//                                    Neo4jUtil.addPost(post)
+//                                }
+//                                makeStatusNotification("Successfully uploaded", appContext)
+//                            }
+//                        } else {
+//                            val post = Post(
+//                                name = name,
+//                                type = postType,
+//                                authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
+//                                caption = photoCaption,
+//                                videoUrl = downloadUri.toString(),
+//                                locationName = locationName,
+//                                locationLatitude = latitude,
+//                                locationLongitude = longitude,
+//                                privacy = privacy,
+//                                allowJoin = allowJoin,
+//                                tagUsersId = tagUserIds.toList()
+//                            )
+//                            GlobalScope.launch {
+//                                Neo4jUtil.addPost(post)
+//                            }
+//                            makeStatusNotification("Successfully uploaded", appContext)
+//                        }
+//                    }
+//
                 }
                 PostType.IMAGE -> {
-                    val photoBytes = extractImage(Uri.parse(mediaUri))
-                    StorageUtil.uploadPostImage(photoBytes) { downloadUrl ->
+
+                    val tasks: MutableList<Task<*>> = mutableListOf()
+
+                    photos.toList().forEach { photoUri ->
+                        val photoBytes = extractImage(Uri.parse(photoUri))
+                        tasks.add(StorageUtil.uploadPostImage2(photoBytes))
+                    }
+
+                    Tasks.whenAllComplete(tasks).addOnSuccessListener {
+                        val downloadUrls = mutableListOf<String>()
+
+                        it.forEach { task ->
+                            task.addOnSuccessListener { downloadUrl ->
+                                downloadUrls.add(downloadUrl.toString())
+                            }
+                        }
+
                         val post = Post(
                             name = name,
                             type = postType,
                             caption = photoCaption,
-                            photoUrl = downloadUrl,
+                            photos = downloadUrls,
                             locationName = locationName,
                             locationLatitude = latitude,
                             locationLongitude = longitude,
                             privacy = privacy,
+                            allowJoin = allowJoin,
                             tagUsersId = tagUserIds.toList()
                         )
-                        Neo4jUtil.addPost(post)
+
+                        GlobalScope.launch {
+                            Neo4jUtil.addPost(post)
+                        }
                         makeStatusNotification("Successfully uploaded", appContext)
                     }
+
                 }
                 PostType.TEXT -> {
                     val post = Post(
@@ -155,6 +182,7 @@ class UploadPostWorker @AssistedInject constructor(
                         locationLatitude = latitude,
                         locationLongitude = longitude,
                         privacy = privacy,
+                        allowJoin = allowJoin,
                         tagUsersId = tagUserIds.toList()
                     )
                     Neo4jUtil.addPost(post)

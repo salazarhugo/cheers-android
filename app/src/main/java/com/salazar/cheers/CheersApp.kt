@@ -9,16 +9,27 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.CheersTheme
 
 @Composable
 fun CheersApp() {
-    CheersTheme {
+
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    val preference = mainViewModel.userPreference//.collectAsState(UserPreference("fw", Theme.SYSTEM))
+
+    val darkTheme = when (preference.theme) {
+        Theme.LIGHT -> false
+        Theme.DARK -> true
+        Theme.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    CheersTheme(darkTheme = darkTheme) {
         ProvideWindowInsets {
             val systemUiController = rememberSystemUiController()
-            val darkIcons = !isSystemInDarkTheme()
+            val darkIcons = !darkTheme
 
             SideEffect {
                 systemUiController.setSystemBarsColor(
@@ -33,14 +44,10 @@ fun CheersApp() {
                 CheersNavigationActions(navController)
             }
 
-            val mainViewModel = hiltViewModel<MainViewModel>()
-            val user = mainViewModel.user.value
-
-            if (user != null)
-                CheersNavGraph(
-                    user = user,
-                    navActions = navigationActions
-                )
+            CheersNavGraph(
+                navActions = navigationActions,
+                darkTheme = darkTheme,
+            )
         }
     }
 }

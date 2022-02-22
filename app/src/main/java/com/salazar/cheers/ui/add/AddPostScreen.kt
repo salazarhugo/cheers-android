@@ -58,7 +58,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.components.post.MultipleAnnotation
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.event.Item
 import com.salazar.cheers.ui.event.PrivacyItem
@@ -66,6 +66,7 @@ import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils
 import kotlinx.coroutines.launch
+import java.util.*
 
 @Composable
 fun AddPostScreen(
@@ -81,6 +82,7 @@ fun AddPostScreen(
     onSelectMedia: (Uri) -> Unit,
     onCaptionChanged: (String) -> Unit,
     onNameChanged: (String) -> Unit,
+    onAllowJoinChange: (Boolean) -> Unit,
     unselectLocation: () -> Unit,
     updateLocationName: (String) -> Unit,
     updateLocationResults: (List<SearchResult>) -> Unit,
@@ -118,7 +120,7 @@ fun AddPostScreen(
                     .fillMaxSize()
             ) {
                 AddPhotoOrVideo(
-                    mediaUri = uiState.mediaUri,
+                    photos = uiState.photos,
                     navigateToCamera = navigateToCamera,
                     onSelectMedia = onSelectMedia,
                     onMediaSelectorClicked = onMediaSelectorClicked,
@@ -132,7 +134,7 @@ fun AddPostScreen(
                     profilePictureUrl = profilePictureUrl,
                     caption = uiState.caption,
                     onCaptionChanged = onCaptionChanged,
-                    mediaUri = uiState.mediaUri,
+                    photos = uiState.photos,
                     postType = uiState.postType,
                 )
                 DividerM3()
@@ -167,12 +169,47 @@ fun AddPostScreen(
                     privacy = uiState.privacy,
                 )
                 DividerM3()
+                EndDateSection(
+                    endDate = Date(),
+                    onEndDateChange = {},
+                )
+                DividerM3()
                 SwitchPreference(
-                    text = "Allow repost",
-                    showOnMap = uiState.showOnMap,
-                ) {}
+                    text = "Allow people to join",
+                    checked = uiState.allowJoin,
+                    onCheckedChange = onAllowJoinChange
+                )
                 ShareButton(onDismiss, onUploadPost = onUploadPost)
             }
+        }
+    }
+}
+
+@Composable
+fun EndDateSection(
+    endDate: Date,
+    onEndDateChange: (Date) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clickable { }
+            .padding(15.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Duration",
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = "2 hours",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+            )
         }
     }
 }
@@ -304,7 +341,7 @@ fun ShareButton(
 
 @Composable
 fun SwitchPreference(
-    showOnMap: Boolean,
+    checked: Boolean,
     text: String,
     onCheckedChange: (Boolean) -> Unit = {},
 ) {
@@ -317,7 +354,7 @@ fun SwitchPreference(
     ) {
         Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
         SwitchM3(
-            checked = showOnMap,
+            checked = checked,
             onCheckedChange = onCheckedChange
         )
     }
@@ -325,7 +362,7 @@ fun SwitchPreference(
 
 @Composable
 fun AddPhotoOrVideo(
-    mediaUri: Uri?,
+    photos: List<Uri>,
     navigateToCamera: () -> Unit,
     onSelectMedia: (Uri) -> Unit,
     onMediaSelectorClicked: () -> Unit,
@@ -339,7 +376,7 @@ fun AddPhotoOrVideo(
                     onSelectMedia(uri)
             }
         }
-    if (mediaUri != null)
+    if (photos.isNotEmpty())
         return
     Row(
         modifier = Modifier
@@ -482,7 +519,7 @@ fun TagSection(
 @Composable
 fun CaptionSection(
     profilePictureUrl: String,
-    mediaUri: Uri?,
+    photos: List<Uri>,
     postType: String,
     caption: String,
     onCaptionChanged: (String) -> Unit,
@@ -493,19 +530,19 @@ fun CaptionSection(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val videoUri = mediaUri
+        val videoUri = photos
 
-        if (videoUri != null && postType == PostType.VIDEO)
-            VideoPlayer(
-                uri = videoUri,
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .height(120.dp)
-                    .aspectRatio(9f / 16f)
-            )
-        else
-            ProfilePicture(profilePictureUrl = profilePictureUrl)
+//        if (videoUri.isNotEmpty() && postType == PostType.VIDEO)
+//            VideoPlayer(
+//                uri = videoUri,
+//                modifier = Modifier
+//                    .padding(bottom = 8.dp)
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .height(120.dp)
+//                    .aspectRatio(9f / 16f)
+//            )
+//        else
+        ProfilePicture(profilePictureUrl = profilePictureUrl)
 
         TextField(
             value = caption,
@@ -528,17 +565,20 @@ fun CaptionSection(
                 Text(text = "Write a caption...", fontSize = 13.sp)
             },
             trailingIcon = {
-                val photoUri = mediaUri
-                if (photoUri != null) {
+                if (photos.isEmpty()) return@TextField
+                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                     Image(
                         modifier = Modifier
                             .clickable(onClick = { openPhotoVideoChooser() })
-                            .padding(horizontal = 16.dp)
                             .size(50.dp),
-                        painter = rememberImagePainter(data = mediaUri),
+                        painter = rememberImagePainter(data = photos[0]),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )
+                    if (photos.size > 1)
+                        MultipleAnnotation(
+                            modifier = Modifier.align(Alignment.TopEnd).padding(0.dp)
+                        )
                 }
             }
         )

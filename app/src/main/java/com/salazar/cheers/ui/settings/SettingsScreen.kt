@@ -1,122 +1,127 @@
 package com.salazar.cheers.ui.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.SwitchM3
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.BuildConfig
+import com.salazar.cheers.components.items.SettingItem
+import com.salazar.cheers.components.items.SettingTitle
+import com.salazar.cheers.components.share.Toolbar
 
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
-    modifier: Modifier = Modifier,
     onSignOut: () -> Unit,
-    onBackPressed: () -> Unit
-) {
-    val settings = listOf("Theme", "Notifications", "About")
-
-    Scaffold(
-        topBar = { Toolbar(onBackPressed = onBackPressed) },
-    ) {
-        Column {
-            Settings(settings = settings)
-            SignOutButton(onSignOut = onSignOut)
-            DeleteAccountButton()
-        }
-    }
-
-}
-
-@Composable
-fun Settings(settings: List<String>) {
-    LazyColumn {
-        items(settings) { setting ->
-            Setting(setting)
-            DividerM3()
-        }
-    }
-}
-
-@Composable
-fun Toolbar(
+    navigateToTheme: () -> Unit,
+    navigateToLanguage: () -> Unit,
+    navigateToNotifications: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
-    SmallTopAppBar(
-        title = {
-            Text(
-                "Settings",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto
-                )
+
+    Scaffold(
+        topBar = { Toolbar(onBackPressed = onBackPressed, title = "Settings") },
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            SettingsSection(
+                navigateToTheme = navigateToTheme,
+                navigateToNotifications = navigateToNotifications,
+                navigateToLanguage = navigateToLanguage,
             )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(Icons.Default.ArrowBack, "")
-            }
-        },
+            Spacer(modifier = Modifier.height(16.dp))
+            HelpSection()
+            Spacer(modifier = Modifier.height(16.dp))
+            LoginsSection(onSignOut = onSignOut)
+            Spacer(modifier = Modifier.height(16.dp))
+            VersionSection()
+        }
+    }
+
+}
+
+@Composable
+fun VersionSection() {
+    Text(
+        text = "Cheers v.${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        textAlign = TextAlign.Center,
     )
 }
 
 @Composable
+fun LoginsSection(
+    onSignOut: () -> Unit,
+) {
+    Column() {
+        SettingTitle(title = "Logins")
+        SignOutButton(onSignOut = onSignOut)
+        DeleteAccountButton()
+    }
+}
+
+@Composable
+fun HelpSection() {
+    Column() {
+        SettingTitle(title = "Help")
+        SettingItem("Ask a Question", Icons.Outlined.QuestionAnswer, {})
+        SettingItem("Privacy Policy", Icons.Outlined.Policy, {})
+    }
+}
+
+@Composable
+fun SettingsSection(
+    navigateToTheme: () -> Unit,
+    navigateToNotifications: () -> Unit,
+    navigateToLanguage: () -> Unit,
+) {
+    Column() {
+        SettingTitle(title = "Settings")
+        SettingItem("Notifications and Sounds", Icons.Outlined.Notifications, navigateToNotifications)
+        SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline, {})
+        SettingItem("Devices", Icons.Outlined.Computer, {})
+        SettingItem("Language", Icons.Outlined.Language, navigateToLanguage)
+        SettingItem("Theme", Icons.Outlined.Palette, navigateToTheme)
+        SettingItem("About", Icons.Outlined.Info, {})
+    }
+}
+
+@Composable
 fun DeleteAccountButton() {
-    OutlinedButton(
+    TextButton(
         onClick = {},
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        enabled = false,
     ) {
-        Text("Delete account")
+        Text(
+            text = "Delete account",
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            color = MaterialTheme.colorScheme.error,
+            textAlign = TextAlign.Start,
+        )
     }
 }
 
 @Composable
 fun SignOutButton(onSignOut: () -> Unit) {
-    OutlinedButton(
+    TextButton(
         onClick = onSignOut,
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
     ) {
-        Text("Logout")
-    }
-}
-
-@Composable
-fun Setting(setting: String) {
-    val checkedState = remember { mutableStateOf(true) }
-    Row(
-        modifier = Modifier
-            .clickable { checkedState.value = !checkedState.value }
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column {
-            Text(text = setting)
-//                Text(text = "Subtitle", style = MaterialTheme.typography.labelMedium)
-        }
-        SwitchM3(
-            checked = checkedState.value,
-            onCheckedChange = { checkedState.value = it }
+        Text(
+            text = "Log Out",
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            color = MaterialTheme.colorScheme.error,
+            textAlign = TextAlign.Start,
         )
     }
 }

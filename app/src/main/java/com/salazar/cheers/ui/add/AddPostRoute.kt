@@ -20,12 +20,8 @@ fun AddPostRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by addPostViewModel.uiState.collectAsState()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-        if (it == null) return@rememberLauncherForActivityResult
-        if (it.toString().contains("image"))
-            addPostViewModel.setPostImage(it)
-        if (it.toString().contains("video"))
-            addPostViewModel.setPostVideo(it)
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
+        addPostViewModel.setPhotos(it)
     }
 
     when (uiState.page) {
@@ -44,10 +40,11 @@ fun AddPostRoute(
                 unselectLocation = addPostViewModel::unselectLocation,
                 updateLocationName = addPostViewModel::updateLocation,
                 updateLocationResults = addPostViewModel::updateLocationResults,
-                onSelectMedia = addPostViewModel::setPostImage,
+                onSelectMedia = addPostViewModel::addPhoto,
                 onMediaSelectorClicked = { launcher.launch("image/*") },
                 onSelectPrivacy = addPostViewModel::selectPrivacy,
                 onNameChanged = addPostViewModel::onNameChanged,
+                onAllowJoinChange = addPostViewModel::toggleAllowJoin
             )
         AddPostPage.ChooseOnMap ->
             ChooseOnMapScreen(
@@ -68,6 +65,7 @@ fun AddPostRoute(
                 onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
                 onSelectUser = addPostViewModel::selectTagUser,
                 selectedUsers = uiState.selectedTagUsers,
+                onDone = { addPostViewModel.updatePage(AddPostPage.AddPost) },
             )
     }
 }

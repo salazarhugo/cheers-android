@@ -33,6 +33,7 @@ import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListen
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.util.Utils.isDarkModeOn
 
 @Composable
 fun ChooseOnMapScreen(
@@ -57,16 +58,18 @@ fun ChooseOnMapScreen(
             }
         }
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            AndroidView(factory = { mapView }, Modifier.fillMaxSize()) {
-                onMapReady(it, context)
+        LocationPermission({}) {
+            Box(contentAlignment = Alignment.Center) {
+                AndroidView(factory = { mapView }, Modifier.fillMaxSize()) {
+                    onMapReady(it, context)
+                }
+                Icon(
+                    Icons.Default.Place,
+                    "",
+                    modifier = Modifier.size(52.dp),
+                    tint = MaterialTheme.colorScheme.error,
+                )
             }
-            Icon(
-                Icons.Default.Place,
-                "",
-                modifier = Modifier.size(52.dp),
-                tint = MaterialTheme.colorScheme.error,
-            )
         }
     }
 }
@@ -86,10 +89,10 @@ private fun onMapReady(
             .build()
     )
 
-    val style = if (false)
+    val style = if (context.isDarkModeOn())
         "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0"
     else
-        "mapbox://styles/salazarbrock/cjx6b2vma1gm71cuwxugjhm1k"
+        "mapbox://styles/salazarbrock/ckzsmluho004114lmeb8rl2zi"
 
     mapView.getMapboxMap().loadStyleUri(style) {
         val positionChangedListener = onIndicatorPositionChangedListener(mapView)
@@ -204,7 +207,7 @@ fun ChooseOnMapAppBar(
                 val center = mapView.getMapboxMap().cameraState.center
                 onSelectLocation(center)
             }) {
-                Text("OK")
+                Text("DONE")
             }
         },
     )

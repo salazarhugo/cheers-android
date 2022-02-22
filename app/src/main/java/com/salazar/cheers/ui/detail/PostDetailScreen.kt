@@ -1,12 +1,13 @@
 package com.salazar.cheers.ui.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Share
@@ -17,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -24,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberImagePainter
+import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -43,30 +47,38 @@ import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.home.PostBody
 import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.util.Utils.isDarkModeOn
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun PostDetailScreen(
     uiState: PostDetailUiState.HasPost,
-    modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onHeaderClicked: (username: String) -> Unit,
     onDelete: () -> Unit,
     onLeave: () -> Unit,
+    onMessageClicked: () -> Unit,
     onMapClick: () -> Unit,
     onToggleLike: (Post) -> Unit,
 ) {
     val post = uiState.postFeed.post
+    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
+
     Scaffold(
         topBar = {
             Toolbar(
                 onBackPressed = onBackPressed,
                 name = post.locationName,
+                scrollBehavior = scrollBehavior,
+                createdTime = post.createdTime
             )
         }
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+        ) {
             Post(
                 postFeed = uiState.postFeed,
                 onHeaderClicked = onHeaderClicked,
@@ -75,6 +87,7 @@ fun PostDetailScreen(
                 onMapClick = onMapClick,
                 onToggleLike = onToggleLike,
                 onLeave = onLeave,
+                onMessageClicked = onMessageClicked,
             )
             PrivacyText(post.privacy)
         }
@@ -103,12 +116,16 @@ fun StaticMap(
     latitude: Double,
     onMapClick: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val style =
+        if (context.isDarkModeOn()) StaticMapCriteria.DARK_STYLE else StaticMapCriteria.LIGHT_STYLE
+
     val configuration = LocalConfiguration.current
     val token = stringResource(R.string.mapbox_access_token)
     val staticImage = remember {
         MapboxStaticMap.builder()
             .accessToken(token)
-            .styleId(StaticMapCriteria.LIGHT_STYLE)
+            .styleId(style)
             .cameraPoint(Point.fromLngLat(longitude, latitude)) // Image's center point on map
             .staticMarkerAnnotations(
                 listOf(
@@ -139,18 +156,17 @@ fun StaticMap(
 fun PostDetails(
     postFeed: PostFeed
 ) {
-    val d = remember { ZonedDateTime.parse(postFeed.post.createdTime) }
+//    val d = remember { ZonedDateTime.parse(postFeed.post.createdTime) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Column {
-            Text("Date:")
-            Text(
-                d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")),
-                style = MaterialTheme.typography.bodyMedium
-            )
+//            Text(
+//                d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM HH:mm a")),
+//                style = MaterialTheme.typography.bodyMedium
+//            )
         }
     }
 }
@@ -162,6 +178,7 @@ fun Post(
     onLeave: () -> Unit,
     onDelete: () -> Unit,
     onMapClick: () -> Unit,
+    onMessageClicked: () -> Unit,
     onToggleLike: (Post) -> Unit,
     isAuthor: Boolean,
 ) {
@@ -173,16 +190,16 @@ fun Post(
     val joined = post.tagUsersId.contains(uid) || author.id == uid
 
     Column {
-        LazyColumn(
-            modifier = Modifier.padding(vertical = 8.dp)
-        ) {
+        LazyColumn() {
 
             item { PostDetails(postFeed) }
 
             item {
                 Buttons(
                     joined = joined,
+                    allowJoin = post.allowJoin,
                     onLeave = onLeave,
+                    onMessageClicked = onMessageClicked
                 )
             }
 
@@ -216,7 +233,7 @@ fun Post(
                 )
             }
             item {
-                PostBody(post = post, {}, {})
+                PostBody(post = post, {}, {}, pagerState = rememberPagerState())
                 PostFooter(
                     post = post,
                     onDelete = onDelete,
@@ -242,7 +259,9 @@ fun Post(
 @Composable
 fun Buttons(
     joined: Boolean,
+    allowJoin: Boolean,
     onLeave: () -> Unit,
+    onMessageClicked: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -257,7 +276,7 @@ fun Buttons(
             ) {
                 Text("Leave")
             }
-        else
+        else if (allowJoin)
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = {},
@@ -267,16 +286,9 @@ fun Buttons(
         Spacer(modifier = Modifier.width(16.dp))
         OutlinedButton(
             modifier = Modifier.weight(1f),
-            onClick = {},
+            onClick = onMessageClicked,
         ) {
             Text("Message")
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                Icons.Default.MoreHoriz,
-                contentDescription = null
-            )
         }
     }
 }
@@ -318,22 +330,51 @@ fun PostFooter(
 @Composable
 fun Toolbar(
     name: String,
+    createdTime: String,
     onBackPressed: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    Column {
+    val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+    val backgroundColor = backgroundColors.containerColor(
+        scrollFraction = scrollBehavior?.scrollFraction ?: 0f
+    ).value
+
+    val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        containerColor = Color.Transparent,
+        scrolledContainerColor = Color.Transparent
+    )
+
+    Box(modifier = Modifier.background(backgroundColor)) {
         CenterAlignedTopAppBar(
+            scrollBehavior = scrollBehavior,
+            colors = foregroundColors,
             title = {
-                Text(
-                    text = name,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
-                )
+                val d = remember { ZonedDateTime.parse(createdTime) }
+                Column {
+                    Text(
+                        text = name,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Roboto,
+                    )
+                    Text(
+                        d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM HH:mm a")),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             },
             navigationIcon = {
                 IconButton(onClick = onBackPressed) {
                     Icon(Icons.Outlined.ArrowBack, "")
                 }
             },
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = null
+                    )
+                }
+            }
         )
     }
 }

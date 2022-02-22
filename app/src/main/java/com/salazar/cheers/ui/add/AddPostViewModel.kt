@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.add
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
@@ -37,8 +38,8 @@ data class AddPostUiState(
     val name: String = "",
     val caption: String = "",
     val beverage: String = "",
-    val postType: String = PostType.TEXT,
-    val mediaUri: Uri? = null,
+    val postType: String = PostType.IMAGE,
+    val photos: List<Uri> = emptyList(),
     val locationPoint: Point? = null,
     val location: String = "Current Location",
     val locationResults: List<SearchResult> = emptyList(),
@@ -49,9 +50,9 @@ data class AddPostUiState(
         "Privacy",
         "Choose a privacy",
         Icons.Filled.Lock,
-        Privacy.NONE
+        Privacy.FRIENDS,
     ),
-    val showOnMap: Boolean = true,
+    val allowJoin: Boolean = true,
     val page: AddPostPage = AddPostPage.AddPost,
 )
 
@@ -98,6 +99,12 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
         }
     }
 
+    fun toggleAllowJoin(allowJoin: Boolean) {
+        viewModelState.update {
+            it.copy(allowJoin = allowJoin)
+        }
+    }
+
     fun updatePage(page: AddPostPage) {
         viewModelState.update {
             it.copy(page = page)
@@ -134,15 +141,15 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
         }
     }
 
-    fun setPostImage(image: Uri) {
+    fun addPhoto(photo: Uri) {
         viewModelState.update {
-            it.copy(mediaUri = image, postType = PostType.IMAGE)
+            it.copy(photos = it.photos + photo, postType = PostType.IMAGE)
         }
     }
 
-    fun setPostVideo(video: Uri) {
+    fun setPhotos(photos: List<Uri>) {
         viewModelState.update {
-            it.copy(mediaUri = video, postType = PostType.VIDEO)
+            it.copy(photos = photos, postType = PostType.IMAGE)
         }
     }
 
@@ -151,12 +158,13 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
 
     fun uploadPost() {
         val uiState = viewModelState.value
+        Log.d("HAHA", uiState.photos.toString())
         val uploadWorkRequest: WorkRequest =
             OneTimeWorkRequestBuilder<UploadPostWorker>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(
                     workDataOf(
-                        "MEDIA_URI" to uiState.mediaUri.toString(),
+                        "PHOTOS" to uiState.photos.map { it.toString() }.toTypedArray(),
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
                         "NAME" to uiState.name,
@@ -165,6 +173,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
                         "LOCATION_LONGITUDE" to uiState.selectedLocation?.coordinate?.longitude(),
                         "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),
                         "PRIVACY" to uiState.privacy.type.name,
+                        "ALLOW_JOIN" to uiState.allowJoin,
                     )
                 )
             }
