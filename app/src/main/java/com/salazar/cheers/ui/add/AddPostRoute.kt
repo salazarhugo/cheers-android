@@ -21,7 +21,10 @@ fun AddPostRoute(
 ) {
     val uiState by addPostViewModel.uiState.collectAsState()
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
-        addPostViewModel.setPhotos(it)
+        if (it.size <= 5)
+            addPostViewModel.setPhotos(it)
+        else
+            addPostViewModel.updateErrorMessage("Maximum 5 photos.")
     }
 
     when (uiState.page) {

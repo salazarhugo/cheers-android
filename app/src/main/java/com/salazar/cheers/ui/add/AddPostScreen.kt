@@ -59,6 +59,7 @@ import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.components.post.MultipleAnnotation
+import com.salazar.cheers.components.share.ErrorMessage
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.event.Item
 import com.salazar.cheers.ui.event.PrivacyItem
@@ -125,11 +126,10 @@ fun AddPostScreen(
                     onSelectMedia = onSelectMedia,
                     onMediaSelectorClicked = onMediaSelectorClicked,
                 )
-//                NameSection(
-//                    name = uiState.name,
-//                    onNameChanged = onNameChanged,
-//                )
-//                DividerM3()
+                ErrorMessage(
+                    errorMessage = uiState.errorMessage,
+                    paddingValues = PaddingValues(16.dp),
+                )
                 CaptionSection(
                     profilePictureUrl = profilePictureUrl,
                     caption = uiState.caption,
@@ -577,7 +577,9 @@ fun CaptionSection(
                     )
                     if (photos.size > 1)
                         MultipleAnnotation(
-                            modifier = Modifier.align(Alignment.TopEnd).padding(0.dp)
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(0.dp)
                         )
                 }
             }

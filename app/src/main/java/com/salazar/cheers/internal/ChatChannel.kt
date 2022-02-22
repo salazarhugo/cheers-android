@@ -15,7 +15,7 @@ data class ChatChannel(
     val createdAt: Timestamp,
     val createdBy: String,
     val recentMessage: TextMessage,
-    val recentMessageTime: Timestamp,
+    val recentMessageTime: Timestamp?,
     val type: String,
 ) {
     constructor() : this(

@@ -61,7 +61,6 @@ fun CheersNavGraph(
         AuthDestinations.CHOOSE_USERNAME,
         AuthDestinations.PHONE_ROUTE,
         MainDestinations.CHAT_ROUTE,
-        "chat",
         SettingDestinations.SETTINGS_ROUTE,
         SettingDestinations.THEME_ROUTE,
         SettingDestinations.LANGUAGE_ROUTE,
@@ -79,7 +78,7 @@ fun CheersNavGraph(
     ) {
         Scaffold(
             bottomBar = {
-                if (!authDestinations.contains(currentRoute))
+                if (!authDestinations.contains(currentRoute) && !currentRoute.contains(MainDestinations.CHAT_ROUTE))
                     Column {
                         DividerM3()
                         CheersNavigationBar(

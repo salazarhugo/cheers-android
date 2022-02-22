@@ -23,8 +23,7 @@ import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
@@ -42,6 +41,8 @@ class UploadPostWorker @AssistedInject constructor(
 
         val photos =
             inputData.getStringArray("PHOTOS") ?: emptyArray()
+
+        if (photos.size > 5) return Result.failure()
 
         val postType =
             inputData.getString("POST_TYPE") ?: return Result.failure()
@@ -137,14 +138,19 @@ class UploadPostWorker @AssistedInject constructor(
                 }
                 PostType.IMAGE -> {
 
-                    val tasks: MutableList<Task<*>> = mutableListOf()
+                    val tasks: MutableList<Deferred<Task<*>>> = mutableListOf()
 
-                    photos.toList().forEach { photoUri ->
-                        val photoBytes = extractImage(Uri.parse(photoUri))
-                        tasks.add(StorageUtil.uploadPostImage2(photoBytes))
+                    coroutineScope {
+                        photos.toList().forEach { photoUri ->
+                            val photoBytes = extractImage(Uri.parse(photoUri))
+                            val task = async {
+                                StorageUtil.uploadPostImage2(photoBytes)
+                            }
+                            tasks.add(task)
+                        }
                     }
 
-                    Tasks.whenAllComplete(tasks).addOnSuccessListener {
+                    Tasks.whenAllComplete(tasks.awaitAll()).addOnSuccessListener {
                         val downloadUrls = mutableListOf<String>()
 
                         it.forEach { task ->

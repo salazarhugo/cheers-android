@@ -46,7 +46,7 @@ sealed interface HomeUiState {
 
     data class HasPosts(
         val postsFlow: Flow<PagingData<PostFeed>>,
-        val eventsFlow: Flow<PagingData<EventUi>>,
+        val eventsFlow: Flow<PagingData<EventUi>>?,
         val listState: LazyListState = LazyListState(),
         val likes: Set<String>,
         override val postSheetState: ModalBottomSheetState,
@@ -73,7 +73,7 @@ private data class HomeViewModelState(
     val selectedTab: Int = 0,
 ) {
     fun toUiState(): HomeUiState =
-        if (postsFlow == null || eventsFlow == null) {
+        if (postsFlow == null) {
             HomeUiState.NoPosts(
                 nativeAd = nativeAd,
                 postSheetState = sheetState,

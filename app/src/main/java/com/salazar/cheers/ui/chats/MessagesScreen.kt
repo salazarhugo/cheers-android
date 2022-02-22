@@ -13,6 +13,7 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
@@ -34,7 +36,6 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.ui.theme.Roboto
@@ -133,13 +134,43 @@ fun Tabs(
 }
 
 @Composable
+fun NoMessages() {
+    Column(
+        modifier = Modifier.padding(bottom = 32.dp).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(
+            Icons.Outlined.Inbox,
+            contentDescription = null,
+            modifier = Modifier.size(100.dp)
+        )
+        Text(
+            text = "No messages yet",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(6.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+        )
+        Text(
+            text = "Looks like you haven't initiated a conversation with any party buddies",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+@Composable
 fun ConversationList(
     channels: List<ChatChannel>,
     onChannelClicked: (String) -> Unit,
 ) {
-    if (channels.isEmpty()) {
-        Text("No chat channels")
-    }
+    if (channels.isEmpty())
+        NoMessages()
     LazyColumn {
         items(channels) { channel ->
             when (channel.type) {
@@ -303,14 +334,21 @@ fun MyAppBar(
 ) {
     SmallTopAppBar(
         title = {
-            Username(
-                username = username,
-                verified = verified,
-                textStyle = MaterialTheme.typography.titleLarge.copy(
+            Text(
+                text = "Chats",
+                style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontFamily = Roboto
                 ),
             )
+//            Username(
+//                username = username,
+//                verified = verified,
+//                textStyle = MaterialTheme.typography.titleLarge.copy(
+//                    fontWeight = FontWeight.Bold,
+//                    fontFamily = Roboto
+//                ),
+//            )
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {

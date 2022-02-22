@@ -144,19 +144,16 @@ fun HomeScreen(
                     )
                 when (uiState) {
                     is HomeUiState.HasPosts -> {
-                        if (uiState.postsFlow.collectAsLazyPagingItems().itemSnapshotList.size == 0)
-                            NoPosts(uiState = uiState)
-                        else
-                            PostList(
-                                uiState = uiState,
-                                navActions = navActions,
-                                onPostClicked = onPostClicked,
-                                onUserClicked = onUserClicked,
-                                onPostMoreClicked = onPostMoreClicked,
-                                onLike = onLike,
-                                navigateToComments = navigateToComments,
-                                onEventClicked = onEventClicked,
-                            )
+                        PostList(
+                            uiState = uiState,
+                            navActions = navActions,
+                            onPostClicked = onPostClicked,
+                            onUserClicked = onUserClicked,
+                            onPostMoreClicked = onPostMoreClicked,
+                            onLike = onLike,
+                            navigateToComments = navigateToComments,
+                            onEventClicked = onEventClicked,
+                        )
                     }
                 }
             }
@@ -263,14 +260,11 @@ fun TopTabs(
 }
 
 @Composable
-fun NoPosts(uiState: HomeUiState) {
+fun NoPosts() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(22.dp),
     ) {
-        val suggestions = uiState.suggestions
-//            if (suggestions != null)
-//                Suggestions(suggestions = suggestions)
         Text(
             "Welcome to Cheers",
             textAlign = TextAlign.Center,
@@ -283,8 +277,6 @@ fun NoPosts(uiState: HomeUiState) {
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
         )
-//            Spacer(Modifier.height(24.dp))
-//            ConnectContacts()
     }
 }
 
@@ -439,10 +431,10 @@ fun PostList(
     navigateToComments: (PostFeed) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
-    val events = uiState.eventsFlow.collectAsLazyPagingItems()
+    val events = uiState.eventsFlow?.collectAsLazyPagingItems()
 
     LazyColumn(state = uiState.listState) {
-        if (uiState.selectedTab == 1)
+        if (uiState.selectedTab == 1 && events != null)
             items(events) { event ->
                 Event(
                     event!!,
@@ -499,11 +491,14 @@ fun PostList(
 
         posts.apply {
             when {
+                loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && itemCount < 1 -> {
+                    item { NoPosts() }
+                }
                 loadState.refresh is LoadState.Loading -> {
                     item {
                         CircularProgressIndicatorM3(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxSize()
                                 .wrapContentSize(Alignment.Center)
                         )
                     }

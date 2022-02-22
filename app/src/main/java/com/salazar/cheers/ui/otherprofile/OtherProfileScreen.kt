@@ -159,6 +159,8 @@ fun GridViewPosts(posts: List<Post>) {
 
 @Composable
 fun PostItem(post: Post) {
+    if (post.photos.isEmpty()) return
+
     Box(
         modifier = Modifier.padding(1.dp)
     ) {

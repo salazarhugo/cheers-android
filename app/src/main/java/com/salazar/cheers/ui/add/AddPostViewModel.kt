@@ -105,6 +105,12 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
         }
     }
 
+    fun updateErrorMessage(errorMessage: String) {
+        viewModelState.update {
+            it.copy(errorMessage = errorMessage)
+        }
+    }
+
     fun updatePage(page: AddPostPage) {
         viewModelState.update {
             it.copy(page = page)

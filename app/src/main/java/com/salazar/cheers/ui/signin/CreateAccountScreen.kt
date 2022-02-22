@@ -54,7 +54,7 @@ fun CreateAccountScreen(
             uiState = uiState,
             onSignUp = onSignUp,
         )
-        ErrorMessage(errorMessage = uiState.errorMessage)
+        ErrorMessage(errorMessage = uiState.errorMessage, paddingValues = PaddingValues(vertical = 8.dp))
     }
 }
 
