@@ -39,6 +39,9 @@
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
 
         <meta-data android:name="com.snapchat.kit.sdk.clientId" android:value="@string/snap_oauth_client_id_staging" />
         <meta-data android:name="com.snapchat.kit.sdk.redirectUrl" android:value="@string/snap_redirect_url" />

@@ -1,7 +1,6 @@
 package com.salazar.cheers.components.comment
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -21,6 +20,8 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Preview
 @Composable
@@ -30,6 +31,7 @@ fun CommentPreview() {
         username = "cheers",
         verified = true,
         text = "J'arrive les boys",
+        created = Date(),
         onLike = {},
         onReply = {},
         onCommentClicked = {},
@@ -41,6 +43,7 @@ fun Comment(
     profilePictureUrl: String,
     username: String,
     verified: Boolean,
+    created: Date,
     onLike: () -> Unit,
     onReply: () -> Unit,
     onCommentClicked: () -> Unit,
@@ -49,7 +52,7 @@ fun Comment(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+//            .background(MaterialTheme.colorScheme.surface)
             .clickable { onCommentClicked() }
             .padding(14.dp, 11.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -72,17 +75,24 @@ fun Comment(
             )
             Spacer(Modifier.width(8.dp))
             Column {
-                Username(
-                    username = username,
-                    verified = verified,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                )
-                Text(text)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Username(
+                        username = username,
+                        verified = verified,
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(text)
+                }
+                Spacer(Modifier.height(4.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val dateFormatter = SimpleDateFormat("HH:mm")
                     Text(
-                        text = "1d",
+                        text = dateFormatter.format(created),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(Modifier.width(8.dp))

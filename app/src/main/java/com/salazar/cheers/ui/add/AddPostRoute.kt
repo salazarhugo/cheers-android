@@ -44,7 +44,7 @@ fun AddPostRoute(
                 updateLocationName = addPostViewModel::updateLocation,
                 updateLocationResults = addPostViewModel::updateLocationResults,
                 onSelectMedia = addPostViewModel::addPhoto,
-                onMediaSelectorClicked = { launcher.launch("image/*") },
+                onMediaSelectorClicked = { launcher.launch("image/* video/*") },
                 onSelectPrivacy = addPostViewModel::selectPrivacy,
                 onNameChanged = addPostViewModel::onNameChanged,
                 onAllowJoinChange = addPostViewModel::toggleAllowJoin

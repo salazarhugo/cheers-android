@@ -33,6 +33,7 @@ fun CheersNavGraph(
     navController: NavHostController = rememberAnimatedNavController(),
     navActions: CheersNavigationActions,
     darkTheme: Boolean,
+    presentPaymentSheet: (String) -> Unit,
 ) {
 
     val mainViewModel = hiltViewModel<MainViewModel>()
@@ -101,7 +102,12 @@ fun CheersNavGraph(
                 modifier = Modifier.padding(innerPadding)
             ) {
                 authNavGraph(navActions = navActions)
-                mainNavGraph(user = user ?: User(), navActions = navActions, mainViewModel = mainViewModel)
+                mainNavGraph(
+                    user = user ?: User(),
+                    navActions = navActions,
+                    mainViewModel = mainViewModel,
+                    presentPaymentSheet = presentPaymentSheet
+                )
             }
         }
     }

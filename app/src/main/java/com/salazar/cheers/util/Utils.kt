@@ -1,6 +1,7 @@
 package com.salazar.cheers.util
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
@@ -10,6 +11,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.text.TextUtils
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import com.salazar.cheers.R
@@ -19,6 +21,12 @@ import java.util.*
 
 
 object Utils {
+
+    fun Context.getActivity(): AppCompatActivity? = when (this) {
+        is AppCompatActivity -> this
+        is ContextWrapper -> baseContext.getActivity()
+        else -> null
+    }
 
     fun Bitmap.getCircularBitmapWithWhiteBorder(borderWidth: Int): Bitmap? {
         if (this.isRecycled) return null

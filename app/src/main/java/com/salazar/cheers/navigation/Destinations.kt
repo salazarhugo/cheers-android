@@ -20,6 +20,7 @@ object MainDestinations {
     const val SEARCH_ROUTE = "search"
     const val MAP_ROUTE = "map"
     const val MESSAGES_ROUTE = "messages"
+    const val MESSAGES_MORE_SHEET = "messagesMoreSheet"
     const val PROFILE_ROUTE = "profile"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
@@ -56,6 +57,9 @@ object SettingDestinations {
     const val NOTIFICATIONS_ROUTE = "notifications"
     const val LANGUAGE_ROUTE = "language"
     const val CHAT_SETTINGS_ROUTE = "chatSettings"
+    const val ADD_PAYMENT_METHOD_ROUTE = "addPaymentMethod"
+    const val RECHARGE_ROUTE = "recharge"
+    const val PAYMENT_HISTORY_ROUTE = "paymentHistory"
 }
 
 /**
@@ -65,6 +69,24 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToPaymentHistory: () -> Unit = {
+        navController.navigate(SettingDestinations.PAYMENT_HISTORY_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToRecharge: () -> Unit = {
+        navController.navigate(SettingDestinations.RECHARGE_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToAddPaymentMethod: () -> Unit = {
+        navController.navigate(SettingDestinations.ADD_PAYMENT_METHOD_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToChatSettings: () -> Unit = {
@@ -127,16 +149,23 @@ class CheersNavigationActions(navController: NavHostController) {
     }
 
     val navigateToAddEvent: () -> Unit = {
-        navController.navigate(MainDestinations.ADD_EVENT_SHEET) {
-            launchSingleTop = true
-            restoreState = true
-        }
+//        navController.navigate(MainDestinations.ADD_EVENT_SHEET) {
+//            launchSingleTop = true
+//            restoreState = true
+//        }
     }
 
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
         navController.navigate("${MainDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
             popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
+        }
+    }
+
+    val navigateToChatsMoreSheet: (name: String) -> Unit = { name ->
+        navController.navigate("${MainDestinations.MESSAGES_MORE_SHEET}/$name") {
+            launchSingleTop = true
+            restoreState = true
         }
     }
 

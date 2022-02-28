@@ -3,8 +3,8 @@ package com.salazar.cheers.data.db
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.add.Privacy
 
 @Dao
 interface PostDao {
@@ -14,8 +14,8 @@ interface PostDao {
     fun pagingSourceFeed(): PagingSource<Int, PostFeed>
 
     @Transaction
-    @Query("SELECT * FROM posts WHERE authorId = :authorId ORDER BY posts.createdTime DESC")
-    fun getPostsWithAuthorId(authorId: String): List<PostFeed>
+    @Query("SELECT * FROM posts WHERE (authorId = :authorId OR tagUsersId LIKE '%' || :authorId || '%') AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
+    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed>
 
     @Transaction
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
@@ -24,6 +24,10 @@ interface PostDao {
     @Transaction
     @Query("SELECT * FROM posts WHERE privacy = :privacy")
     suspend fun getMapPosts(privacy: Privacy): List<PostFeed>
+
+//    @Transaction
+//    @Query("SELECT * FROM posts WHERE tagUsersId")
+//    suspend fun getUserPosts(userId:): List<PostFeed>
 
     @Query("SELECT * FROM users WHERE id IN (:tagUsersId)")
     suspend fun getPostUsers(tagUsersId: List<String>): List<User>

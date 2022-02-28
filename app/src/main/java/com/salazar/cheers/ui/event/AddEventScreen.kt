@@ -16,7 +16,9 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.People
@@ -61,6 +63,7 @@ import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
@@ -182,7 +185,7 @@ fun FirstScreen(
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         AddPhotoOrVideo(uiState = uiState)
 //        NameTextField(uiState = uiState)
-        DividerM3()
+//        DividerM3()
 //        StartDateInput(uiState = uiState)
         DividerM3()
 //        TagSection()
@@ -259,35 +262,6 @@ fun PrivacyBottomSheet(
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 12.dp)
                 )
-                val items = listOf(
-                    PrivacyItem(
-                        icon = Icons.Filled.Lock,
-                        title = "Private",
-                        subtitle = "Only people who are invited",
-                        type = com.salazar.cheers.ui.add.Privacy.PRIVATE
-                    ),
-                    PrivacyItem(
-                        icon = Icons.Filled.Public,
-                        title = "Public",
-                        subtitle = "Anyone on Cheers",
-                        type = com.salazar.cheers.ui.add.Privacy.PUBLIC
-                    ),
-                    PrivacyItem(
-                        icon = Icons.Filled.People,
-                        title = "Friends",
-                        subtitle = "Your friends on Cheers",
-                        type = com.salazar.cheers.ui.add.Privacy.FRIENDS
-                    ),
-                    PrivacyItem(
-                        icon = Icons.Filled.Groups,
-                        title = "Group",
-                        subtitle = "Members of a group that you're in",
-                        type = com.salazar.cheers.ui.add.Privacy.GROUP
-                    ),
-                )
-                items.forEach {
-                    Item(it, it == uiState.selectedPrivacy, {})
-                }
 
                 val scope = rememberCoroutineScope()
                 Button(
@@ -311,9 +285,9 @@ fun PrivacyBottomSheet(
 
 @Composable
 fun Item(
-    item: PrivacyItem,
+    item: Privacy,
     selected: Boolean,
-    onSelectPrivacy: (PrivacyItem) -> Unit,
+    onSelectPrivacy: (Privacy) -> Unit,
 ) {
     Row(
         modifier = Modifier

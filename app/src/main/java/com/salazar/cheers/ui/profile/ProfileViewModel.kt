@@ -7,8 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.PostRepository
 import com.salazar.cheers.data.UserRepository
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalMaterialApi::class)
 sealed interface ProfileUiState {
 
     val isLoading: Boolean
@@ -31,7 +31,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val posts: List<Post>,
+        val posts: List<PostFeed>,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -40,7 +40,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val user: User? = null,
-    val posts: List<Post> = emptyList(),
+    val posts: List<PostFeed> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
@@ -62,10 +62,10 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
             )
 }
 
-@ExperimentalMaterialApi
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val postRepository: PostRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = false))
@@ -93,17 +93,17 @@ class ProfileViewModel @Inject constructor(
     fun toggleLike(post: Post) {
         val posts = viewModelState.value.posts
         val mPosts = posts.toMutableList()
-        val post = mPosts.find { it.id == post.id } ?: return
-
-        val updatedPost = if (post.liked)
-            post.copy(likes = post.likes - 1, liked = false)
-        else
-            post.copy(likes = post.likes + 1, liked = true)
-
-        mPosts[mPosts.indexOf(post)] = updatedPost
-
-        toggleLike(postId = post.id, like = updatedPost.liked)
-        updatePosts(mPosts)
+//        val post = mPosts.find { it.id == post.id } ?: return
+//
+//        val updatedPost = if (post.liked)
+//            post.copy(likes = post.likes - 1, liked = false)
+//        else
+//            post.copy(likes = post.likes + 1, liked = true)
+//
+//        mPosts[mPosts.indexOf(post)] = updatedPost
+//
+//        toggleLike(postId = post.id, like = updatedPost.liked)
+//        updatePosts(mPosts)
     }
 
     private fun toggleLike(
@@ -115,12 +115,6 @@ class ProfileViewModel @Inject constructor(
                 Neo4jUtil.likePost(postId = postId)
             else
                 Neo4jUtil.unlikePost(postId = postId)
-        }
-    }
-
-    private fun updatePosts(posts: List<Post>) {
-        viewModelState.update {
-            it.copy(posts = posts)
         }
     }
 
@@ -137,14 +131,9 @@ class ProfileViewModel @Inject constructor(
 
     private fun refreshUserPosts() {
         viewModelScope.launch {
+            val posts = postRepository.getPostsWithAuthorId(FirebaseAuth.getInstance().currentUser?.uid!!)
             viewModelState.update {
-                when (val result = Neo4jUtil.getCurrentUserPosts()) {
-                    is Result.Success -> it.copy(posts = result.data)
-                    is Result.Error -> it.copy(
-                        errorMessages = listOf(result.exception.toString()),
-                        isLoading = false
-                    )
-                }
+                it.copy(posts = posts, isLoading = false)
             }
         }
     }

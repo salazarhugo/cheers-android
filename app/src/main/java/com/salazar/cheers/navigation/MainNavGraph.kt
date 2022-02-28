@@ -21,6 +21,7 @@ import com.salazar.cheers.ui.camera.CameraRoute
 import com.salazar.cheers.ui.camera.CameraViewModel
 import com.salazar.cheers.ui.chat.ChatRoute
 import com.salazar.cheers.ui.chat.chatViewModel
+import com.salazar.cheers.ui.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.ui.chats.MessagesRoute
 import com.salazar.cheers.ui.chats.MessagesViewModel
 import com.salazar.cheers.ui.comment.CommentsRoute
@@ -45,6 +46,7 @@ fun NavGraphBuilder.mainNavGraph(
     user: User,
     mainViewModel: MainViewModel,
     navActions: CheersNavigationActions,
+    presentPaymentSheet: (String) -> Unit,
 ) {
     val uri = "https://cheers-a275e.web.app"
 
@@ -55,7 +57,10 @@ fun NavGraphBuilder.mainNavGraph(
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
 
-        settingNavGraph(navActions = navActions)
+        settingNavGraph(
+            navActions = navActions,
+            presentPaymentSheet = presentPaymentSheet
+        )
 
         composable(
             route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
@@ -84,6 +89,16 @@ fun NavGraphBuilder.mainNavGraph(
                 onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
                 onShare = {},
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.MESSAGES_MORE_SHEET}/{name}",
+        ) {
+            val name = it.arguments?.getString("name")!!
+            ChatsMoreBottomSheet(
+                name = name,
+                onSettingsClick = { },
             )
         }
 
@@ -141,7 +156,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
+        bottomSheet(
             route = "${MainDestinations.POST_COMMENTS}/{postId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
         ) {

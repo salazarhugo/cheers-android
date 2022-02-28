@@ -35,7 +35,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.FacebookButton
 import com.salazar.cheers.components.GoogleButton
 import com.salazar.cheers.components.animations.AnimatedLogo
 import com.salazar.cheers.ui.theme.Typography
@@ -94,9 +93,7 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 GoogleButton { signInWithGoogle() }
                 Spacer(modifier = Modifier.height(16.dp))
-                FacebookButton { }
-                Spacer(modifier = Modifier.height(16.dp))
-                PhoneButton(navigateToPhone = navigateToPhone)
+//                PhoneButton(navigateToPhone = navigateToPhone)
             }
             Footer(
                 navigateToSignUp = navigateToSignUp,

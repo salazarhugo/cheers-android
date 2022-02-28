@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.internal.Post
+import com.salazar.cheers.data.UserRepository
+import com.salazar.cheers.internal.CommentWithAuthor
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.assisted.Assisted
@@ -37,7 +37,7 @@ sealed interface CommentsUiState {
     ) : CommentsUiState
 
     data class HasPosts(
-        val posts: List<Post>,
+        val comments: List<CommentWithAuthor>,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val isFollowing: Boolean,
@@ -48,14 +48,23 @@ sealed interface CommentsUiState {
 
 private data class CommentsViewModelState(
     val user: User? = null,
-    val posts: List<Post>? = null,
+    val comments: List<CommentWithAuthor>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
 ) {
     fun toUiState(): CommentsUiState =
-        if (posts == null || posts.isEmpty()) {
+        if (comments != null)
+            CommentsUiState.HasPosts(
+                isLoading = isLoading,
+                errorMessages = errorMessages,
+                isFollowing = isFollowing,
+                comments = comments,
+                user = user ?: User(),
+                shortLink = shortLink,
+            )
+        else
             CommentsUiState.NoPosts(
                 user = user ?: User(),
                 isLoading = isLoading,
@@ -63,19 +72,10 @@ private data class CommentsViewModelState(
                 isFollowing = isFollowing,
                 shortLink = shortLink,
             )
-        } else {
-            CommentsUiState.HasPosts(
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                isFollowing = isFollowing,
-                posts = posts,
-                user = user ?: User(),
-                shortLink = shortLink,
-            )
-        }
 }
 
 class CommentsViewModel @AssistedInject constructor(
+    private val userRepository: UserRepository,
     @Assisted private val postId: String
 ) : ViewModel() {
 
@@ -90,12 +90,14 @@ class CommentsViewModel @AssistedInject constructor(
         )
 
     init {
-        refresh()
-    }
-
-    fun refresh() {
-        refreshUser(postId = postId)
-        refreshUserPosts(postId = postId)
+        viewModelScope.launch {
+            FirestoreUtil.getComments(postId).collect { comments ->
+                val commentWithAuthor = comments.map {
+                    CommentWithAuthor(comment = it, author = userRepository.getUser(it.authorId))
+                }
+                viewModelState.update { it.copy(comments = commentWithAuthor) }
+            }
+        }
     }
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
@@ -111,34 +113,16 @@ class CommentsViewModel @AssistedInject constructor(
         }
     }
 
-    private fun refreshUser(postId: String) {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            viewModelState.update {
-                when (val result = Neo4jUtil.getUserWithUsername(postId)) {
-                    is Result.Success -> it.copy(user = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
-            }
-        }
+    fun onComment(text: String) {
+        val comment = com.salazar.cheers.internal.Comment(
+            postId = postId,
+            authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
+            text = text,
+        )
+        FirestoreUtil.addComment(comment = comment)
     }
 
-    private fun refreshUserPosts(postId: String) {
-        viewModelScope.launch {
-//            viewModelState.update {
-//                when (val result = Neo4jUtil.getUserPosts(postId = postId)) {
-//                    is Result.Success -> it.copy(posts = result.data, isLoading = false)
-//                    is Result.Error -> it.copy(
-//                        errorMessages = listOf(result.exception.toString()),
-//                        isLoading = false
-//                    )
-//                }
-//            }
-        }
+    private fun refreshComments(postId: String) {
     }
 
     @AssistedFactory

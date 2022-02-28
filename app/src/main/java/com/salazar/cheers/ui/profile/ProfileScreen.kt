@@ -18,8 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Celebration
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Repeat
+import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -131,7 +131,7 @@ fun ProfilePostsAndTags(
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
 ) {
-    val tabs = listOf(Icons.Default.GridView, Icons.Outlined.Email, Icons.Outlined.Celebration)
+    val tabs = listOf(Icons.Default.GridView, Icons.Outlined.ViewList, Icons.Outlined.Celebration)
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
 
@@ -169,19 +169,20 @@ fun ProfilePostsAndTags(
             modifier = Modifier.fillMaxSize(),
         ) {
             val posts = uiState.posts
-            val tweets = posts.filter { it.type == PostType.TEXT }
-            val postsWithoutTweets =
-                posts.filter { it.type == PostType.IMAGE || it.type == PostType.VIDEO }
             when (page) {
                 0 -> GridViewPosts(
-                    posts = postsWithoutTweets,
+                    posts = posts.map { it.post },
                     onPostClicked = onPostClicked,
                 )
-                1 -> Tweets(
-                    tweets = tweets,
+                1 -> ListViewPosts(
+                    posts = posts.map { it.post },
+                    onPostClicked = onPostClicked,
+                )
+                2 -> Tweets(
+                    tweets = posts.map { it.post },
                     onLikeClicked = onLikeClicked,
                 )
-                2 -> FunctionalityNotAvailablePanel()
+//                2 -> FunctionalityNotAvailablePanel()
             }
         }
     }
@@ -251,6 +252,21 @@ fun Tweet(
                 )
                 Icon(Icons.Outlined.Repeat, null, modifier = size)
             }
+        }
+    }
+}
+
+@Composable
+fun ListViewPosts(
+    posts: List<Post>,
+    onPostClicked: (postId: String) -> Unit,
+) {
+    LazyVerticalGrid(
+        cells = GridCells.Fixed(count = 3),
+        modifier = Modifier.height(800.dp)
+    ) {
+        items(posts) { post ->
+            PostItem(post, onPostClicked)
         }
     }
 }

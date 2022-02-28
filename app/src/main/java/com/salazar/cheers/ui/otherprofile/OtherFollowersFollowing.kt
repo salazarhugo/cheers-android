@@ -211,9 +211,8 @@ class OtherFollowersFollowing : Fragment() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
-                }
-                .padding(16.dp),
+                .clickable { }
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -247,10 +246,9 @@ class OtherFollowersFollowing : Fragment() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
-                }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .clickable { }
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {

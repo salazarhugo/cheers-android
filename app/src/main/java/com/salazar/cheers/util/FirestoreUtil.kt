@@ -8,9 +8,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.internal.Comment
+import com.salazar.cheers.internal.Payment
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
 
@@ -48,12 +54,13 @@ object FirestoreUtil {
 
             val id = FirebaseAuth.getInstance().currentUser!!.uid
             val fullName = if (acct != null) "${acct.givenName} ${acct.familyName}" else ""
+            val profilePicturePath = if (acct?.photoUrl != null) acct.photoUrl.toString() else ""
 
             val newUser = User().copy(
                 id = id,
                 fullName = fullName,
                 username = username,
-                profilePictureUrl = acct?.photoUrl.toString(),
+                profilePictureUrl = profilePicturePath,
                 email = FirebaseAuth.getInstance().currentUser?.email ?: email,
             )
             currentUserDocRef.set(newUser)
@@ -66,6 +73,61 @@ object FirestoreUtil {
         }
     }
 
+    fun getPaymentHistory(
+        onSuccess: (List<Payment>) -> Unit
+    ) {
+        firestoreInstance.collection("stripe_customers")
+            .document(FirebaseAuth.getInstance().currentUser?.uid!!)
+            .collection("payments")
+            .orderBy("created", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, firebaseFirestoreException ->
+                if (firebaseFirestoreException != null) {
+                    Log.e("FIRESTORE", "Users listener error.", firebaseFirestoreException)
+                    return@addSnapshotListener
+                }
+
+                if (value == null) return@addSnapshotListener
+
+                val payments = mutableListOf<Payment>()
+
+                value.documents.forEach {
+                    val payment = it.toObject(Payment::class.java)!!
+                    payments.add(payment)
+                }
+                onSuccess(payments)
+            }
+    }
+
+    fun getComments(postId: String): Flow<List<Comment>> = callbackFlow {
+
+        val commentsDocument = firestoreInstance
+            .collection("comments")
+            .whereEqualTo("postId", postId)
+            .orderBy("created", Query.Direction.DESCENDING)
+
+        val subscription = commentsDocument.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e(FirestoreChat.TAG, "Users listener error.", e)
+                return@addSnapshotListener
+            }
+            val items = mutableListOf<Comment>()
+            snapshot!!.forEach {
+                items.add(it.toObject(Comment::class.java))
+                return@forEach
+            }
+            this.trySend(items).isSuccess
+        }
+
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
+    fun addComment(comment: Comment) {
+        val commentDoc = firestoreInstance.collection("comments")
+            .document()
+        commentDoc.set(comment.copy(id = commentDoc.id))
+    }
 
     fun getCurrentUserDocumentLiveData(): LiveData<User> {
         val currentUser: MutableLiveData<User> = MutableLiveData()

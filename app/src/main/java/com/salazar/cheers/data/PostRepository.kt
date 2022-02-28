@@ -3,12 +3,14 @@ package com.salazar.cheers.data
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.map
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PostFeed
-import com.salazar.cheers.ui.add.Privacy
+import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,18 +31,21 @@ class PostRepository @Inject constructor(
             remoteMediator = PostRemoteMediator(database = database, networkService = service),
         ) {
             postDao.pagingSourceFeed()
-        }.flow
+        }.flow.map { it.map {
+            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+        } }
     }
 
-    fun getPostsWithAuthorId(authorId: String): List<PostFeed> =
-        postDao.getPostsWithAuthorId(authorId = authorId)
+    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed> {
+        return postDao.getPostsWithAuthorId(authorId = authorId).map {
+            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+        }
+    }
+
 
     suspend fun getMapPosts(privacy: Privacy): List<PostFeed> {
         return postDao.getMapPosts(privacy = privacy).map {
-            it.copy(
-                tagUsers =
-                postDao.getPostUsers(it.post.tagUsersId)
-            )
+            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
         }
     }
 

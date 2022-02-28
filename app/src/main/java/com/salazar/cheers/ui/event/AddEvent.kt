@@ -64,6 +64,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.ui.theme.Roboto
@@ -278,33 +279,6 @@ class AddEventFragment : DialogFragment() {
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(vertical = 12.dp)
                     )
-                    val items = listOf(
-                        PrivacyItem(
-                            icon = Icons.Filled.Lock,
-                            title = "Private",
-                            subtitle = "Only people who are invited",
-                            type = com.salazar.cheers.ui.add.Privacy.PRIVATE
-                        ),
-                        PrivacyItem(
-                            icon = Icons.Filled.Public,
-                            title = "Public",
-                            subtitle = "Anyone on Cheers",
-                            type = com.salazar.cheers.ui.add.Privacy.PUBLIC
-                        ),
-                        PrivacyItem(
-                            icon = Icons.Filled.People,
-                            title = "Friends",
-                            subtitle = "Your friends on Cheers",
-                            type = com.salazar.cheers.ui.add.Privacy.FRIENDS
-                        ),
-                        PrivacyItem(
-                            icon = Icons.Filled.Groups,
-                            title = "Group",
-                            subtitle = "Members of a group that you're in",
-                            type = com.salazar.cheers.ui.add.Privacy.GROUP
-                        ),
-                    )
-                    items.forEach { Item(it, it == uiState.selectedPrivacy) }
 
                     val scope = rememberCoroutineScope()
                     Button(
@@ -328,7 +302,7 @@ class AddEventFragment : DialogFragment() {
 
     @Composable
     fun Item(
-        item: PrivacyItem,
+        item: Privacy,
         selected: Boolean,
     ) {
         Row(

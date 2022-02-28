@@ -14,7 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
@@ -60,9 +61,9 @@ import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.components.post.MultipleAnnotation
 import com.salazar.cheers.components.share.ErrorMessage
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.event.Item
-import com.salazar.cheers.ui.event.PrivacyItem
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils
@@ -88,7 +89,7 @@ fun AddPostScreen(
     updateLocationName: (String) -> Unit,
     updateLocationResults: (List<SearchResult>) -> Unit,
     onMediaSelectorClicked: () -> Unit,
-    onSelectPrivacy: (PrivacyItem) -> Unit,
+    onSelectPrivacy: (Privacy) -> Unit,
 ) {
     val searchCallback = object : SearchCallback {
         override fun onResults(
@@ -217,7 +218,7 @@ fun EndDateSection(
 @Composable
 fun Privacy(
     privacyState: ModalBottomSheetState,
-    privacy: PrivacyItem,
+    privacy: Privacy,
 ) {
     val scope = rememberCoroutineScope()
     Row(
@@ -672,7 +673,7 @@ fun ProfilePicture(profilePictureUrl: String) {
 @Composable
 fun PrivacyBottomSheet(
     uiState: AddPostUiState,
-    onSelectPrivacy: (PrivacyItem) -> Unit,
+    onSelectPrivacy: (Privacy) -> Unit,
     content: @Composable () -> Unit
 ) {
     val state = uiState.privacyState
@@ -709,34 +710,7 @@ fun PrivacyBottomSheet(
                 )
             }
 
-            val items = listOf(
-                PrivacyItem(
-                    icon = Icons.Filled.Lock,
-                    title = "Private",
-                    subtitle = "Only people who are invited",
-                    type = Privacy.PRIVATE
-                ),
-                PrivacyItem(
-                    icon = Icons.Filled.Public,
-                    title = "Public",
-                    subtitle = "Anyone on Cheers",
-                    type = Privacy.PUBLIC
-                ),
-                PrivacyItem(
-                    icon = Icons.Filled.People,
-                    title = "Friends",
-                    subtitle = "Your friends on Cheers",
-                    type = Privacy.FRIENDS
-                ),
-                PrivacyItem(
-                    icon = Icons.Filled.Groups,
-                    title = "Group",
-                    subtitle = "Members of a group that you're in",
-                    type = Privacy.GROUP
-                ),
-            )
-
-            items.forEach {
+            Privacy.values().forEach {
                 Item(it, it == uiState.privacy, onSelectPrivacy = {
                     onSelectPrivacy(it)
                     scope.launch {

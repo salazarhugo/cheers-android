@@ -175,7 +175,7 @@ fun FollowerCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onUserClicked(user.username) }
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -224,8 +224,8 @@ fun FollowingCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onUserClicked(user.username) }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

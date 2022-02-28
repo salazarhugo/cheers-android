@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import androidx.compose.runtime.mutableStateOf
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.google.firebase.FirebaseApp
@@ -13,6 +12,7 @@ import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.search.MapboxSearchSdk
 import com.salazar.cheers.internal.Environment
+import com.stripe.android.PaymentConfiguration
 import dagger.hilt.android.HiltAndroidApp
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Config
@@ -24,28 +24,33 @@ import javax.inject.Inject
 @HiltAndroidApp
 class CheersApplication : Application(), Configuration.Provider {
 
-    val isDark = mutableStateOf(false)
-
-    fun toggleLightTheme() {
-        isDark.value = !isDark.value
-    }
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
 
         initFirebase()
         initDatabase()
+        initStripe()
+        initMapBox()
         createNotificationChannel()
+    }
 
+    private fun initMapBox() {
         MapboxSearchSdk.initialize(
             application = this,
-            accessToken = getString(com.salazar.cheers.R.string.mapbox_access_token),
+            accessToken = getString(R.string.mapbox_access_token),
             locationEngine = LocationEngineProvider.getBestLocationEngine(this)
         )
     }
 
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+    private fun initStripe() {
+        PaymentConfiguration.init(
+            applicationContext,
+            "pk_test_51KWqPTAga4Q2CELOu5oK8GHRPlQwVPvcISBMuoWU5yxP8VrtmBhRGm0TBKaKeKm1tz2EY7gmmvvYuFWMJEzWvFhC00qOX6gQb1"
+        )
+    }
 
     private fun initFirebase() {
         FirebaseApp.initializeApp(this)

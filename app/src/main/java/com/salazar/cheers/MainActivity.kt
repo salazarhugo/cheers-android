@@ -8,6 +8,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.ump.ConsentInformation
@@ -18,6 +20,9 @@ import com.salazar.cheers.ui.comment.CommentsViewModel
 import com.salazar.cheers.ui.detail.PostDetailViewModel
 import com.salazar.cheers.ui.event.detail.EventDetailViewModel
 import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
+import com.stripe.android.PaymentConfiguration
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,18 +43,70 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val mainViewModel: MainViewModel by viewModels()
+    lateinit var paymentSheet: PaymentSheet
+    private lateinit var flowController: PaymentSheet.FlowController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            CheersApp()
+            if (mainViewModel.completed.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        mainViewModel.completed.value = false
+                    },
+                    confirmButton = {},
+                    title = { Text("Payment succeeded") },
+                    text = {Text("It may take a few minutes before coins are credited to your account")}
+                )
+            }
+            CheersApp(
+                presentPaymentSheet = ::presentPaymentSheet,
+            )
         }
+
+        PaymentConfiguration.init(
+            this,
+            "pk_test_51KWqPTAga4Q2CELOu5oK8GHRPlQwVPvcISBMuoWU5yxP8VrtmBhRGm0TBKaKeKm1tz2EY7gmmvvYuFWMJEzWvFhC00qOX6gQb1"
+        )
+        paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
 //
 //        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
 //        StrictMode.setThreadPolicy(policy)
 //        userConsentPolicy()
+    }
+
+    private fun presentPaymentSheet(clientSecret: String) {
+        val googlePayConfiguration = PaymentSheet.GooglePayConfiguration(
+            environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
+            countryCode = "US",
+            currencyCode = "USD" // Required for Setup Intents, optional for Payment Intents
+        )
+        paymentSheet.presentWithPaymentIntent(
+            clientSecret,
+            PaymentSheet.Configuration(
+                merchantDisplayName = "My merchant name",
+                allowsDelayedPaymentMethods = true,
+                googlePay = googlePayConfiguration
+            )
+        )
+    }
+
+    fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
+        when (paymentSheetResult) {
+            is PaymentSheetResult.Canceled -> {
+                print("Canceled")
+            }
+            is PaymentSheetResult.Failed -> {
+                print("Error: ${paymentSheetResult.error}")
+            }
+            is PaymentSheetResult.Completed -> {
+                // Display for example, an order confirmation screen
+                mainViewModel.completed.value = true
+                print("Completed")
+            }
+        }
     }
 
     private fun userConsentPolicy() {
@@ -60,9 +117,9 @@ class MainActivity : AppCompatActivity() {
 
         val consentInformation = UserMessagingPlatform.getConsentInformation(this)
         consentInformation.requestConsentInfoUpdate(this, params, {
-                if (consentInformation.isConsentFormAvailable)
-                    loadForm(consentInformation = consentInformation)
-            },
+            if (consentInformation.isConsentFormAvailable)
+                loadForm(consentInformation = consentInformation)
+        },
             {
             })
     }

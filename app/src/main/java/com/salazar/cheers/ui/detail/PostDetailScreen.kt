@@ -45,6 +45,7 @@ import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.home.PostBody
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
@@ -154,19 +155,21 @@ fun StaticMap(
 
 @Composable
 fun PostDetails(
-    postFeed: PostFeed
+    privacy: Privacy,
 ) {
-//    val d = remember { ZonedDateTime.parse(postFeed.post.createdTime) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Column {
-//            Text(
-//                d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM HH:mm a")),
-//                style = MaterialTheme.typography.bodyMedium
-//            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(privacy.icon, null)
+                Column(modifier = Modifier.padding(start = 16.dp)) {
+                    Text(privacy.title)
+                    Text(privacy.subtitle)
+                }
+            }
         }
     }
 }
@@ -192,7 +195,7 @@ fun Post(
     Column {
         LazyColumn() {
 
-            item { PostDetails(postFeed) }
+            item { PostDetails(Privacy.valueOf(postFeed.post.privacy)) }
 
             item {
                 Buttons(

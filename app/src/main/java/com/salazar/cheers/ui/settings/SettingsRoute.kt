@@ -28,6 +28,8 @@ fun SettingsRoute(
         navigateToTheme = { navActions.navigateToTheme() },
         navigateToNotifications = { navActions.navigateToNotifications() },
         navigateToLanguage = { navActions.navigateToLanguage() },
+        navigateToAddPaymentMethod = { navActions.navigateToRecharge() },
+        navigateToPaymentHistory = { navActions.navigateToPaymentHistory() },
     )
 }
 

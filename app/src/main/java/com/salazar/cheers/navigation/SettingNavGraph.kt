@@ -10,15 +10,53 @@ import com.salazar.cheers.ui.settings.SettingsRoute
 import com.salazar.cheers.ui.settings.SettingsViewModel
 import com.salazar.cheers.ui.settings.language.LanguageRoute
 import com.salazar.cheers.ui.settings.notifications.NotificationsRoute
+import com.salazar.cheers.ui.settings.payments.*
 import com.salazar.cheers.ui.settings.theme.ThemeRoute
 
 fun NavGraphBuilder.settingNavGraph(
     navActions: CheersNavigationActions,
+    presentPaymentSheet: (String) -> Unit,
 ) {
     navigation(
         route = CheersDestinations.SETTING_ROUTE,
         startDestination = SettingDestinations.SETTINGS_ROUTE,
     ) {
+
+        composable(
+            SettingDestinations.PAYMENT_HISTORY_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
+            val paymentHistoryViewModel = hiltViewModel<PaymentHistoryViewModel>()
+
+            PaymentHistoryRoute(
+                paymentHistoryViewModel = paymentHistoryViewModel,
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            SettingDestinations.RECHARGE_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
+            val rechargeViewModel = hiltViewModel<RechargeViewModel>()
+
+            RechargeRoute(
+                rechargeViewModel = rechargeViewModel,
+                navActions = navActions,
+                presentPaymentSheet = presentPaymentSheet,
+            )
+        }
+
+        composable(
+            SettingDestinations.ADD_PAYMENT_METHOD_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
+            AddPaymentMethodScreenScreen(
+            )
+        }
 
         composable(
             SettingDestinations.LANGUAGE_ROUTE,

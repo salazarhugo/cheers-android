@@ -15,6 +15,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.add.Privacy
 import com.salazar.cheers.workers.UploadEventWorker
@@ -37,20 +38,9 @@ data class AddEventUiState(
     val description: String = "",
     val allDay: Boolean = false,
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val selectedPrivacy: PrivacyItem = PrivacyItem(
-        "Privacy",
-        "Choose a privacy",
-        Icons.Filled.Lock,
-        Privacy.NONE
-    ),
+    val selectedPrivacy: Privacy = Privacy.FRIENDS
 )
 
-data class PrivacyItem(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val type: Privacy,
-)
 
 @HiltViewModel
 class AddEventViewModel @Inject constructor(application: Application) : ViewModel() {
@@ -78,7 +68,7 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
     val selectedTagUsers = mutableStateListOf<User>()
     val showOnMap = mutableStateOf(true)
 
-    fun selectPrivacy(privacy: PrivacyItem) {
+    fun selectPrivacy(privacy: Privacy) {
         viewModelState.update {
             it.copy(selectedPrivacy = privacy)
         }
@@ -177,7 +167,7 @@ class AddEventViewModel @Inject constructor(application: Application) : ViewMode
                         "LOCATION_LONGITUDE" to selectedLocation.value?.coordinate?.longitude(),
                         "PARTICIPANTS" to state.participants.toTypedArray(),
                         "SHOW_ON_MAP" to showOnMap.value,
-                        "EVENT_TYPE" to state.selectedPrivacy.type,
+                        "EVENT_TYPE" to state.selectedPrivacy.name,
                         "IMAGE_URI" to state.imageUri.toString(),
                         "START_DATETIME" to "${state.startDate}T${state.startTime}",
                         "END_DATETIME" to "${state.endDate}T${state.endTime}",

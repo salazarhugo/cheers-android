@@ -15,7 +15,9 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.CheersTheme
 
 @Composable
-fun CheersApp() {
+fun CheersApp(
+    presentPaymentSheet: (String) -> Unit,
+) {
 
     val mainViewModel = hiltViewModel<MainViewModel>()
     val preference = mainViewModel.userPreference//.collectAsState(UserPreference("fw", Theme.SYSTEM))
@@ -47,6 +49,7 @@ fun CheersApp() {
             CheersNavGraph(
                 navActions = navigationActions,
                 darkTheme = darkTheme,
+                presentPaymentSheet = presentPaymentSheet
             )
         }
     }

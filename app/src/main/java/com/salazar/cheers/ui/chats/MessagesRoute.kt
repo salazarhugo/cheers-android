@@ -28,8 +28,8 @@ fun MessagesRoute(
         onChannelClicked = { channelId,->
             navActions.navigateToChat(channelId)
         },
+        onLongPress = { navActions.navigateToChatsMoreSheet(it) },
         onNewMessageClicked = {
-//                              navActions.navigateToChat()
         },
     )
 }

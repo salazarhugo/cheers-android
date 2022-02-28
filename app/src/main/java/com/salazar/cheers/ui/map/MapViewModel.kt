@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.PostRepository
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.add.Privacy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

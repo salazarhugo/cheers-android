@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.chats
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -47,10 +48,10 @@ fun MessagesScreen(
     uiState: MessagesUiState,
     username: String,
     verified: Boolean,
-    modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onNewMessageClicked: () -> Unit,
     onChannelClicked: (channelId: String) -> Unit,
+    onLongPress: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
 ) {
     Scaffold(
@@ -66,7 +67,11 @@ fun MessagesScreen(
         }
     ) {
         Column {
-            Tabs(uiState, onChannelClicked)
+            Tabs(
+                uiState = uiState,
+                onChannelClicked = onChannelClicked,
+                onLongPress = onLongPress,
+            )
         }
     }
 }
@@ -75,6 +80,7 @@ fun MessagesScreen(
 fun Tabs(
     uiState: MessagesUiState,
     onChannelClicked: (String) -> Unit,
+    onLongPress: (String) -> Unit,
 ) {
     val tabs = listOf("Direct", "Groups")
     val pagerState = rememberPagerState()
@@ -119,14 +125,14 @@ fun Tabs(
                     if (uiState.isLoading)
                         LoadingScreen()
                     if (directChats != null)
-                        ConversationList(directChats, onChannelClicked)
+                        ConversationList(directChats, onChannelClicked, onLongPress)
                 }
                 1 -> {
                     val groupChats = uiState.channels?.filter { it.type == ChatChannelType.GROUP }
                     if (uiState.isLoading)
                         LoadingScreen()
                     if (groupChats != null)
-                        ConversationList(groupChats, onChannelClicked)
+                        ConversationList(groupChats, onChannelClicked, onLongPress)
                 }
             }
         }
@@ -136,7 +142,9 @@ fun Tabs(
 @Composable
 fun NoMessages() {
     Column(
-        modifier = Modifier.padding(bottom = 32.dp).fillMaxSize(),
+        modifier = Modifier
+            .padding(bottom = 32.dp)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -168,13 +176,18 @@ fun NoMessages() {
 fun ConversationList(
     channels: List<ChatChannel>,
     onChannelClicked: (String) -> Unit,
+    onLongPress: (String) -> Unit,
 ) {
     if (channels.isEmpty())
         NoMessages()
     LazyColumn {
         items(channels) { channel ->
             when (channel.type) {
-                ChatChannelType.DIRECT -> DirectConversation(channel = channel, onChannelClicked)
+                ChatChannelType.DIRECT -> DirectConversation(
+                    channel = channel,
+                    onChannelClicked,
+                    onLongPress
+                )
                 ChatChannelType.GROUP -> GroupConversation(channel = channel, onChannelClicked)
             }
         }
@@ -193,12 +206,15 @@ fun LinkContactsItem() {
 @Composable
 fun DirectConversation(
     channel: ChatChannel,
-    onChannelClicked: (String) -> Unit
+    onChannelClicked: (String) -> Unit,
+    onLongPress: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onChannelClicked(channel.id) }
+            .combinedClickable(
+                onClick = { onChannelClicked(channel.id) },
+                onLongClick = { onLongPress(channel.otherUser.fullName) })
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,

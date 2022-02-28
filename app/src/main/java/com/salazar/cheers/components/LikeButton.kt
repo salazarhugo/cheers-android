@@ -2,7 +2,7 @@ package com.salazar.cheers.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.animation.animateColor
+import androidx.compose.animation.*
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -42,6 +42,7 @@ fun LikeButton(
         val transition = updateTransition(
             targetState = like, label = ""
         )
+
         val color by transition.animateColor(label = "Color") { state ->
             when (state) {
                 true -> Color(0xFFF28E1C)
@@ -63,11 +64,26 @@ fun LikeButton(
         )
         if (likes > 0) {
             Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = likes.toString(),
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = color
-            )
+            AnimatedContent(
+                targetState = likes,
+                transitionSpec = {
+                    if (targetState > initialState) {
+                        slideInVertically { height -> height } + fadeIn() with
+                                slideOutVertically { height -> -height } + fadeOut()
+                    } else {
+                        slideInVertically { height -> -height } + fadeIn() with
+                                slideOutVertically { height -> height } + fadeOut()
+                    }.using(
+                        SizeTransform(clip = false)
+                    )
+                }
+            ) { targetCount ->
+                Text(
+                    text = targetCount.toString(),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    color = color
+                )
+            }
         }
     }
 }

@@ -26,6 +26,8 @@ fun SettingsScreen(
     navigateToTheme: () -> Unit,
     navigateToLanguage: () -> Unit,
     navigateToNotifications: () -> Unit,
+    navigateToAddPaymentMethod: () -> Unit,
+    navigateToPaymentHistory: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
 
@@ -37,6 +39,8 @@ fun SettingsScreen(
                 navigateToTheme = navigateToTheme,
                 navigateToNotifications = navigateToNotifications,
                 navigateToLanguage = navigateToLanguage,
+                navigateToAddPaymentMethod = navigateToAddPaymentMethod,
+                navigateToPaymentHistory = navigateToPaymentHistory,
             )
             Spacer(modifier = Modifier.height(16.dp))
             HelpSection()
@@ -83,13 +87,17 @@ fun HelpSection() {
 fun SettingsSection(
     navigateToTheme: () -> Unit,
     navigateToNotifications: () -> Unit,
+    navigateToAddPaymentMethod: () -> Unit,
     navigateToLanguage: () -> Unit,
+    navigateToPaymentHistory: () -> Unit,
 ) {
     Column() {
         SettingTitle(title = "Settings")
         SettingItem("Notifications and Sounds", Icons.Outlined.Notifications, navigateToNotifications)
         SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline, {})
         SettingItem("Devices", Icons.Outlined.Computer, {})
+        SettingItem("Payment Methods", Icons.Outlined.CreditCard, navigateToAddPaymentMethod)
+        SettingItem("Payment History", Icons.Outlined.CreditCard, navigateToPaymentHistory)
         SettingItem("Language", Icons.Outlined.Language, navigateToLanguage)
         SettingItem("Theme", Icons.Outlined.Palette, navigateToTheme)
         SettingItem("About", Icons.Outlined.Info, {})

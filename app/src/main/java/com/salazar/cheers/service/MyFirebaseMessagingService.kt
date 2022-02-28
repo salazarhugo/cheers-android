@@ -60,7 +60,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 .setChannelId(getString(R.string.default_notification_channel_id))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        if (profilePictureUrl != null) {
+        if (profilePictureUrl != null && profilePictureUrl.isNotBlank()) {
             val url = URL(profilePictureUrl)
             val image = BitmapFactory.decodeStream(url.openConnection().getInputStream()).getCircledBitmap()
             builder.setLargeIcon(image)

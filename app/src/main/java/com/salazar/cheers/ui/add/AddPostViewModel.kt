@@ -5,8 +5,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -15,17 +13,13 @@ import androidx.work.*
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.internal.PostType
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.event.PrivacyItem
 import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
-
-enum class Privacy {
-    NONE, PRIVATE, FRIENDS, PUBLIC, GROUP
-}
 
 enum class AddPostPage {
     AddPost, ChooseOnMap, ChooseBeverage, AddPeople
@@ -38,7 +32,7 @@ data class AddPostUiState(
     val name: String = "",
     val caption: String = "",
     val beverage: String = "",
-    val postType: String = PostType.IMAGE,
+    val postType: String = PostType.TEXT,
     val photos: List<Uri> = emptyList(),
     val locationPoint: Point? = null,
     val location: String = "Current Location",
@@ -46,12 +40,7 @@ data class AddPostUiState(
     val selectedLocation: SearchResult? = null,
     val selectedTagUsers: List<User> = emptyList(),
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val privacy: PrivacyItem = PrivacyItem(
-        "Privacy",
-        "Choose a privacy",
-        Icons.Filled.Lock,
-        Privacy.FRIENDS,
-    ),
+    val privacy: Privacy = Privacy.FRIENDS,
     val allowJoin: Boolean = true,
     val page: AddPostPage = AddPostPage.AddPost,
 )
@@ -73,7 +62,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
 
     private val workManager = WorkManager.getInstance(application)
 
-    fun selectPrivacy(privacy: PrivacyItem) {
+    fun selectPrivacy(privacy: Privacy) {
         viewModelState.update {
             it.copy(privacy = privacy)
         }
@@ -178,7 +167,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
                         "LOCATION_LATITUDE" to uiState.selectedLocation?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.selectedLocation?.coordinate?.longitude(),
                         "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),
-                        "PRIVACY" to uiState.privacy.type.name,
+                        "PRIVACY" to uiState.privacy.name,
                         "ALLOW_JOIN" to uiState.allowJoin,
                     )
                 )

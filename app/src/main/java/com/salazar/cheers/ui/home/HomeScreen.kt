@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -57,7 +58,8 @@ import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.add.Privacy
+import com.salazar.cheers.ui.chat.SymbolAnnotationType
+import com.salazar.cheers.ui.chat.messageFormatter
 import com.salazar.cheers.ui.theme.Typography
 import org.jetbrains.anko.collections.forEachWithIndex
 import org.jetbrains.anko.image
@@ -452,8 +454,6 @@ fun PostList(
                         modifier = Modifier.animateItemPlacement(),
                         postFeed = post,
                         navigateToComments = navigateToComments,
-                        likes = uiState.likes,
-                        isPostVisible = true,
                         navActions = navActions,
                         onPostClicked = onPostClicked,
                         onUserClicked = onUserClicked,
@@ -464,8 +464,6 @@ fun PostList(
                         modifier = Modifier.animateItemPlacement(),
                         postFeed = post,
                         navigateToComments = navigateToComments,
-                        likes = uiState.likes,
-                        isPostVisible = true,
                         navActions = navActions,
                         onPostClicked = onPostClicked,
                         onUserClicked = onUserClicked,
@@ -476,8 +474,6 @@ fun PostList(
                         modifier = Modifier.animateItemPlacement(),
                         postFeed = post,
                         navigateToComments = navigateToComments,
-                        likes = uiState.likes,
-                        isPostVisible = true,
                         navActions = navActions,
                         onPostClicked = onPostClicked,
                         onUserClicked = onUserClicked,
@@ -529,9 +525,7 @@ fun PostList(
 @Composable
 fun Post(
     postFeed: PostFeed,
-    likes: Set<String>,
     modifier: Modifier = Modifier,
-    isPostVisible: Boolean,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onPostMoreClicked: (postId: String, Boolean) -> Unit,
@@ -560,6 +554,10 @@ fun Post(
                 )
             },
         )
+        PostText(
+            caption = post.caption,
+            onUserClicked = onUserClicked,
+        )
         PostBody(
             postFeed.post,
             onPostClicked = onPostClicked,
@@ -576,6 +574,37 @@ fun Post(
     }
 }
 
+@Composable
+fun PostText(
+    caption: String,
+    onUserClicked: (username: String) -> Unit,
+) {
+    if (caption.isBlank()) return
+
+    val styledCaption = messageFormatter(
+        text = caption,
+        primary = false,
+    )
+    val uriHandler = LocalUriHandler.current
+
+    ClickableText(
+        text = styledCaption,
+        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
+        modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
+        onClick = {
+            styledCaption
+                .getStringAnnotations(start = it, end = it)
+                .firstOrNull()
+                ?.let { annotation ->
+                    when (annotation.tag) {
+                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                        SymbolAnnotationType.PERSON.name -> onUserClicked(annotation.item)
+                        else -> Unit
+                    }
+                }
+        }
+    )
+}
 
 @Composable
 fun PostBody(
@@ -598,14 +627,6 @@ fun PostBody(
                 photos = post.photos,
                 pagerState = pagerState,
             ) { onPostClicked(post.id) }
-        else
-            SelectionContainer {
-                Text(
-                    text = post.caption,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
 //        if (post.tagUsers.isNotEmpty())
 //            InThisPhotoAnnotation(modifier = Modifier.align(Alignment.BottomStart))
     }
@@ -703,11 +724,6 @@ fun PostFooter(
             LikedBy(post = postFeed.post, navActions)
             if (postFeed.tagUsers.isNotEmpty())
                 TagUsers(postFeed.tagUsers)
-            if (postFeed.post.caption.isNotBlank())
-                Caption(
-                    username = postFeed.author.username,
-                    caption = postFeed.post.caption,
-                )
         }
     }
     if (postFeed.post.type != PostType.TEXT)
@@ -757,22 +773,24 @@ fun TagUsers(tagUsers: List<User>) {
                     data = u.profilePictureUrl,
                     builder = {
                         transformations(CircleCropTransformation())
-                        crossfade(true)
-                        placeholder(R.drawable.default_profile_picture)
-                    }
+                        error(R.drawable.default_profile_picture)
+                    },
                 ),
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(24.dp)
                     .offset(x = -(8 * i).dp)
-                    .border(2.dp, MaterialTheme.colorScheme.background, CircleShape),
-                contentDescription = null,
+                    .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
+                    .clip(CircleShape),
+            contentDescription = null,
             )
         }
         Text(
             buildAnnotatedString {
-                append("With ")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(tagUsers.joinToString(", ") { it.username })
+                    if (tagUsers.size > 2)
+                        append(tagUsers[0].username + ", " + tagUsers[1].username + " and others")
+                    else
+                        append(tagUsers.joinToString(", ") { it.username })
                 }
             },
             style = Typography.bodyMedium

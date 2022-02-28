@@ -26,6 +26,7 @@ class MainViewModel @Inject constructor(
 
     val userPreference = UserPreference(id = "fwf", theme = Theme.SYSTEM) //userPreferenceDao.getUserPreference(FirebaseAuth.getInstance().currentUser?.uid!!)
 
+    val completed = mutableStateOf(false)
     init {
         refreshUser()
     }
@@ -40,3 +41,4 @@ class MainViewModel @Inject constructor(
     fun onNewMessage() {
     }
 }
+
