@@ -26,7 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.signin.username.NextButton
+import com.salazar.cheers.components.share.ButtonWithLoading
 
 @Composable
 fun PasswordScreen(
@@ -43,7 +43,12 @@ fun PasswordScreen(
             style = MaterialTheme.typography.titleMedium,
         )
         PasswordTextField(password = password, onPasswordChanged = onPasswordChanged)
-        NextButton(onNextClicked = onNextClicked, isLoading = false)
+        ButtonWithLoading(
+            text = "Next",
+            isLoading = false,
+            onClick = onNextClicked,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

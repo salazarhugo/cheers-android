@@ -4,13 +4,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.components.share.ButtonWithLoading
 import com.salazar.cheers.ui.signin.signup.SignUpUiState
 
 @Composable
@@ -35,7 +38,7 @@ fun ChooseUsernameScreen(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(32.dp),
+        modifier = Modifier.padding(16.dp),
     ) {
         Text(
             text = "Choose username",
@@ -52,36 +55,12 @@ fun ChooseUsernameScreen(
             onUsernameChanged = onUsernameChanged,
         )
         Spacer(Modifier.height(8.dp))
-        NextButton(
+        ButtonWithLoading(
+            text = "Next",
             isLoading = uiState.isLoading,
-            onNextClicked = onNextClicked,
+            onClick = onNextClicked,
+            modifier = Modifier.fillMaxWidth()
         )
-    }
-}
-
-@Composable
-fun NextButton(
-    isLoading: Boolean,
-    onNextClicked: () -> Unit,
-) {
-    Button(
-        shape = RoundedCornerShape(8.dp),
-        onClick = onNextClicked,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        enabled = !isLoading,
-    ) {
-        if (isLoading)
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(30.dp)
-                    .align(Alignment.CenterVertically),
-                color = MaterialTheme.colorScheme.onSurface,
-                strokeWidth = 1.dp
-            )
-        else
-            Text(text = "Next")
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.animations.AnimatedTextCounter
 import com.salazar.cheers.components.share.Toolbar
 
 data class Recharge(
@@ -23,6 +24,7 @@ data class Recharge(
 
 @Composable
 fun RechargeScreen(
+    coins: Int,
     onRecharge: (Recharge) -> Unit,
     recharges: List<Recharge>,
     onBackPressed: () -> Unit,
@@ -41,8 +43,8 @@ fun RechargeScreen(
                     text = "Coins Balance",
                     style = MaterialTheme.typography.titleLarge,
                 )
-                Text(
-                    text = "0",
+                AnimatedTextCounter(
+                    targetState = coins,
                     style = MaterialTheme.typography.headlineLarge,
                 )
             }
@@ -83,7 +85,7 @@ fun RechargeItem(
         Button(
             onClick = { onRecharge(recharge) },
             shape = RoundedCornerShape(8.dp),
-            modifier= Modifier.width(100.dp)
+            modifier = Modifier.width(100.dp)
         ) {
             Text(text = "$${recharge.price}")
         }

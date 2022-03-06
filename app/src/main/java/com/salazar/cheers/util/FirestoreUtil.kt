@@ -12,6 +12,7 @@ import com.google.firebase.firestore.Query
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Payment
+import com.salazar.cheers.internal.Source
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
@@ -23,6 +24,13 @@ import kotlinx.coroutines.launch
 object FirestoreUtil {
 
     private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val stripeCustomerDocRef: DocumentReference
+        get() = firestoreInstance.document(
+            "stripe_customers/${
+                FirebaseAuth.getInstance().uid
+                    ?: throw NullPointerException("UID is null.")
+            }"
+        )
     private val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document(
             "users/${
@@ -129,6 +137,48 @@ object FirestoreUtil {
         commentDoc.set(comment.copy(id = commentDoc.id))
     }
 
+    fun listenSources() = callbackFlow<List<Source>> {
+
+        val sourcesRef = stripeCustomerDocRef
+            .collection("sources")
+
+        val subscription = sourcesRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e(FirestoreChat.TAG, "Users listener error.", e)
+                return@addSnapshotListener
+            }
+
+            val sources = mutableListOf<Source>()
+            snapshot!!.forEach {
+                sources.add(it.toObject(Source::class.java))
+            }
+
+            this.trySend(sources).isSuccess
+        }
+
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
+    fun getUserCoins() = callbackFlow<Int> {
+
+        val subscription = currentUserDocRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e(FirestoreChat.TAG, "Users listener error.", e)
+                return@addSnapshotListener
+            }
+
+            val coins = snapshot?.data?.get("coins") ?: return@addSnapshotListener
+
+            this.trySend((coins as Long).toInt()).isSuccess
+        }
+
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
     fun getCurrentUserDocumentLiveData(): LiveData<User> {
         val currentUser: MutableLiveData<User> = MutableLiveData()
         currentUserDocRef.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -203,6 +253,6 @@ object FirestoreUtil {
     fun setFCMRegistrationTokens(registrationTokens: MutableList<String>) {
         currentUserDocRef.update(mapOf("registrationTokens" to registrationTokens))
     }
-    //endregion FCM
+//endregion FCM
 
 }

@@ -2,7 +2,7 @@ package com.salazar.cheers.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.animation.*
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.salazar.cheers.R
+import com.salazar.cheers.components.animations.AnimatedTextCounter
 
 @Composable
 fun LikeButton(
@@ -64,26 +64,11 @@ fun LikeButton(
         )
         if (likes > 0) {
             Spacer(modifier = Modifier.width(6.dp))
-            AnimatedContent(
+            AnimatedTextCounter(
                 targetState = likes,
-                transitionSpec = {
-                    if (targetState > initialState) {
-                        slideInVertically { height -> height } + fadeIn() with
-                                slideOutVertically { height -> -height } + fadeOut()
-                    } else {
-                        slideInVertically { height -> -height } + fadeIn() with
-                                slideOutVertically { height -> height } + fadeOut()
-                    }.using(
-                        SizeTransform(clip = false)
-                    )
-                }
-            ) { targetCount ->
-                Text(
-                    text = targetCount.toString(),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = color
-                )
-            }
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                color = color
+            )
         }
     }
 }

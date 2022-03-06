@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.PhotoAlbum
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.FlipCameraAndroid
@@ -115,16 +115,27 @@ fun CameraFooter(
 fun CameraFooterSendTo(
     onPostClicked: () -> Unit,
 ) {
-    FilledTonalButton(
-        modifier = Modifier,
-        onClick = onPostClicked,
+    Row(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        FilledTonalButton(
+            modifier = Modifier.weight(1f),
+            onClick = { },
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Filled.AccountCircle, null, tint = MaterialTheme.colorScheme.primary)
+                Spacer(Modifier.width(4.dp))
+                Text("Your Story")
+            }
+        }
+        Spacer(Modifier.width(8.dp))
+        FilledTonalButton(
+            modifier = Modifier.weight(1f),
+            onClick = onPostClicked,
         ) {
             Text("Post")
-            Spacer(Modifier.width(4.dp))
-            Icon(Icons.Filled.ChevronRight, null)
         }
     }
 }

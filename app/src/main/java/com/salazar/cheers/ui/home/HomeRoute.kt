@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -19,6 +20,8 @@ fun HomeRoute(
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    focusManager.clearFocus()
 
     LaunchedEffect(Unit) {
         homeViewModel.initNativeAdd(context = context)

@@ -180,6 +180,24 @@ fun EditProfileBody(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
+                    "Email",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                textColor = MaterialTheme.colorScheme.onBackground,
+            ),
+            value = user.email,
+            onValueChange = {},
+            enabled = false,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text(
                     "Website",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

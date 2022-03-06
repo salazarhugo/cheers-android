@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                     },
                     confirmButton = {},
                     title = { Text("Payment succeeded") },
-                    text = {Text("It may take a few minutes before coins are credited to your account")}
+                    text = { Text("It may take a few minutes before coins are credited to your account") }
                 )
             }
             CheersApp(
@@ -75,91 +75,95 @@ class MainActivity : AppCompatActivity() {
 //        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
 //        StrictMode.setThreadPolicy(policy)
 //        userConsentPolicy()
-    }
 
-    private fun presentPaymentSheet(clientSecret: String) {
-        val googlePayConfiguration = PaymentSheet.GooglePayConfiguration(
-            environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
-            countryCode = "US",
-            currencyCode = "USD" // Required for Setup Intents, optional for Payment Intents
-        )
-        paymentSheet.presentWithPaymentIntent(
-            clientSecret,
-            PaymentSheet.Configuration(
-                merchantDisplayName = "My merchant name",
-                allowsDelayedPaymentMethods = true,
-                googlePay = googlePayConfiguration
-            )
-        )
-    }
+        val apiKey =
+            "sk_test_51KWqPTAga4Q2CELO44kZENZkAEi8gpc0H5Y5MeFRcAj5nlSQyndRg2gxIlr95zfWY1ZIneWTeyhwSTn5iRERO9RO0029fjMWvc"
 
-    fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
-        when (paymentSheetResult) {
-            is PaymentSheetResult.Canceled -> {
-                print("Canceled")
-            }
-            is PaymentSheetResult.Failed -> {
-                print("Error: ${paymentSheetResult.error}")
-            }
-            is PaymentSheetResult.Completed -> {
-                // Display for example, an order confirmation screen
-                mainViewModel.completed.value = true
-                print("Completed")
-            }
+}
+
+private fun presentPaymentSheet(clientSecret: String) {
+    val googlePayConfiguration = PaymentSheet.GooglePayConfiguration(
+        environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
+        countryCode = "US",
+        currencyCode = "USD" // Required for Setup Intents, optional for Payment Intents
+    )
+    paymentSheet.presentWithPaymentIntent(
+        clientSecret,
+        PaymentSheet.Configuration(
+            merchantDisplayName = "Cheers",
+            allowsDelayedPaymentMethods = true,
+            googlePay = googlePayConfiguration
+        )
+    )
+}
+
+fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
+    when (paymentSheetResult) {
+        is PaymentSheetResult.Canceled -> {
+            print("Canceled")
+        }
+        is PaymentSheetResult.Failed -> {
+            print("Error: ${paymentSheetResult.error}")
+        }
+        is PaymentSheetResult.Completed -> {
+            // Display for example, an order confirmation screen
+            mainViewModel.completed.value = true
+            print("Completed")
         }
     }
+}
 
-    private fun userConsentPolicy() {
-        // Set tag for underage of consent. false means users are not underage.
-        val params = ConsentRequestParameters.Builder()
-            .setTagForUnderAgeOfConsent(false)
-            .build()
+private fun userConsentPolicy() {
+    // Set tag for underage of consent. false means users are not underage.
+    val params = ConsentRequestParameters.Builder()
+        .setTagForUnderAgeOfConsent(false)
+        .build()
 
-        val consentInformation = UserMessagingPlatform.getConsentInformation(this)
-        consentInformation.requestConsentInfoUpdate(this, params, {
-            if (consentInformation.isConsentFormAvailable)
-                loadForm(consentInformation = consentInformation)
-        },
-            {
-            })
-    }
+    val consentInformation = UserMessagingPlatform.getConsentInformation(this)
+    consentInformation.requestConsentInfoUpdate(this, params, {
+        if (consentInformation.isConsentFormAvailable)
+            loadForm(consentInformation = consentInformation)
+    },
+        {
+        })
+}
 
-    private fun loadForm(consentInformation: ConsentInformation) {
-        UserMessagingPlatform.loadConsentForm(
-            this,
-            { consentForm ->
-                val consentForm = consentForm
-                if (consentInformation.getConsentStatus() === ConsentInformation.ConsentStatus.REQUIRED) {
-                    consentForm.show(
-                        this@MainActivity
-                    ) { // Handle dismissal by reloading form.
-                        loadForm(consentInformation)
-                    }
+private fun loadForm(consentInformation: ConsentInformation) {
+    UserMessagingPlatform.loadConsentForm(
+        this,
+        { consentForm ->
+            val consentForm = consentForm
+            if (consentInformation.getConsentStatus() === ConsentInformation.ConsentStatus.REQUIRED) {
+                consentForm.show(
+                    this@MainActivity
+                ) { // Handle dismissal by reloading form.
+                    loadForm(consentInformation)
                 }
             }
-        ) {
         }
+    ) {
     }
+}
 
-    override fun onStart() {
-        super.onStart()
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            (mMessageReceiver),
-            IntentFilter("NewMessage")
-        )
-    }
+override fun onStart() {
+    super.onStart()
+    LocalBroadcastManager.getInstance(this).registerReceiver(
+        (mMessageReceiver),
+        IntentFilter("NewMessage")
+    )
+}
 
-    override fun onStop() {
-        super.onStop()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-    }
+override fun onStop() {
+    super.onStop()
+    LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+}
 
-    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(
-            context: Context?,
-            intent: Intent
-        ) {
-            mainViewModel.onNewMessage()
-        }
+private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(
+        context: Context?,
+        intent: Intent
+    ) {
+        mainViewModel.onNewMessage()
     }
+}
 }

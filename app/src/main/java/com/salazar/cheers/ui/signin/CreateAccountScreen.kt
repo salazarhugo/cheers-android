@@ -34,7 +34,7 @@ fun CreateAccountScreen(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(32.dp),
+        modifier = Modifier.padding(16.dp),
     ) {
         Text("Enter Phone or Email", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp))

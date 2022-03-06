@@ -58,7 +58,8 @@ fun RechargeRoute(
                 callCreatePaymentIntent((it.price * 100).toInt())
             },
             recharges = recharges,
-            onBackPressed = { navActions.navigateBack() }
+            onBackPressed = { navActions.navigateBack() },
+            coins = uiState.coins
         )
 }
 

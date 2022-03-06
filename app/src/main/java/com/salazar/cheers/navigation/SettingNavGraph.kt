@@ -54,7 +54,12 @@ fun NavGraphBuilder.settingNavGraph(
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            AddPaymentMethodScreenScreen(
+            val addPaymentViewModel = hiltViewModel<AddPaymentViewModel>()
+
+            AddPaymentMethod(
+                addPaymentViewModel = addPaymentViewModel,
+                navActions = navActions,
+                onAddCard = {}
             )
         }
 
@@ -99,6 +104,7 @@ fun NavGraphBuilder.settingNavGraph(
             SettingsRoute(
                 settingsViewModel = settingsViewModel,
                 navActions = navActions,
+                presentPaymentSheet = presentPaymentSheet,
             )
         }
 

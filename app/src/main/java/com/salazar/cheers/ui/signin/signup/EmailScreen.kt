@@ -27,7 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.signin.username.NextButton
+import com.salazar.cheers.components.share.ButtonWithLoading
 import com.salazar.cheers.util.Utils.isEmailValid
 
 @Composable
@@ -45,7 +45,12 @@ fun EmailScreen(
             style = MaterialTheme.typography.titleMedium,
         )
         EmailTextField(email = email, onEmailChanged = onEmailChanged)
-        NextButton(onNextClicked = onNextClicked, isLoading = false)
+        ButtonWithLoading(
+            text = "Next",
+            isLoading = false,
+            onClick = onNextClicked,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

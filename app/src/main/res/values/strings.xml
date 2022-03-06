@@ -8,6 +8,9 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Stripe -->
+    <string name="stripe_pk" translatable="false"></string>
+
     <!-- Notifications -->
     <string name="default_notification_channel_id" translatable="false">DEFAULT_CHANNEL</string>
     <string name="default_notification_channel_name" translatable="false">Messages</string>

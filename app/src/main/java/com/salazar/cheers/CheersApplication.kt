@@ -56,8 +56,7 @@ class CheersApplication : Application(), Configuration.Provider {
         FirebaseApp.initializeApp(this)
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
-//            DebugAppCheckProviderFactory.getInstance() // For debug
-            SafetyNetAppCheckProviderFactory.getInstance() // For Prod
+            SafetyNetAppCheckProviderFactory.getInstance()
         )
     }
 

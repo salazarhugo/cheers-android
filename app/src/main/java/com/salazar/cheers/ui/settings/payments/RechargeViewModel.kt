@@ -2,16 +2,21 @@ package com.salazar.cheers.ui.settings.payments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.UserRepository
+import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
-class RechargeViewModel @Inject constructor() : ViewModel() {
+class RechargeViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RechargeUiState(isLoading = false))
 
@@ -22,7 +27,15 @@ class RechargeViewModel @Inject constructor() : ViewModel() {
             viewModelState.value
         )
 
-    init {}
+    init {
+        viewModelScope.launch {
+            FirestoreUtil.getUserCoins().collect { coins ->
+                viewModelState.update {
+                    it.copy(coins = coins)
+                }
+            }
+        }
+    }
 
     fun updateIsLoading(isLoading: Boolean) {
         viewModelState.update {
@@ -35,5 +48,6 @@ class RechargeViewModel @Inject constructor() : ViewModel() {
 data class RechargeUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
+    val coins: Int = 0,
 )
 

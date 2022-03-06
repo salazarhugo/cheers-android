@@ -28,6 +28,8 @@ fun SettingsScreen(
     navigateToNotifications: () -> Unit,
     navigateToAddPaymentMethod: () -> Unit,
     navigateToPaymentHistory: () -> Unit,
+    navigateToBecomeVip: () -> Unit,
+    navigateToRecharge: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
 
@@ -35,12 +37,17 @@ fun SettingsScreen(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Settings") },
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AccountSection(
+                navigateToBecomeVip = navigateToBecomeVip,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             SettingsSection(
                 navigateToTheme = navigateToTheme,
                 navigateToNotifications = navigateToNotifications,
                 navigateToLanguage = navigateToLanguage,
                 navigateToAddPaymentMethod = navigateToAddPaymentMethod,
                 navigateToPaymentHistory = navigateToPaymentHistory,
+                navigateToRecharge = navigateToRecharge,
             )
             Spacer(modifier = Modifier.height(16.dp))
             HelpSection()
@@ -84,12 +91,22 @@ fun HelpSection() {
 }
 
 @Composable
+fun AccountSection(
+    navigateToBecomeVip: () -> Unit,
+) {
+    Column() {
+        SettingTitle(title = "Account")
+        SettingItem("Become VIP", Icons.Outlined.WorkspacePremium, navigateToBecomeVip)
+    }
+}
+@Composable
 fun SettingsSection(
     navigateToTheme: () -> Unit,
     navigateToNotifications: () -> Unit,
     navigateToAddPaymentMethod: () -> Unit,
     navigateToLanguage: () -> Unit,
     navigateToPaymentHistory: () -> Unit,
+    navigateToRecharge: () -> Unit,
 ) {
     Column() {
         SettingTitle(title = "Settings")
@@ -97,6 +114,7 @@ fun SettingsSection(
         SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline, {})
         SettingItem("Devices", Icons.Outlined.Computer, {})
         SettingItem("Payment Methods", Icons.Outlined.CreditCard, navigateToAddPaymentMethod)
+        SettingItem("Recharge coins", Icons.Outlined.CreditCard, navigateToRecharge)
         SettingItem("Payment History", Icons.Outlined.CreditCard, navigateToPaymentHistory)
         SettingItem("Language", Icons.Outlined.Language, navigateToLanguage)
         SettingItem("Theme", Icons.Outlined.Palette, navigateToTheme)

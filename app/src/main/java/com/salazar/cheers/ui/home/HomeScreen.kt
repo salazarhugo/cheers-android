@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -144,6 +145,10 @@ fun HomeScreen(
                             .height(1.dp),
                         color = MaterialTheme.colorScheme.onBackground,
                     )
+//                Column {
+//                    Stories(profilePictureUrl = "")
+//                    DividerM3()
+//                }
                 when (uiState) {
                     is HomeUiState.HasPosts -> {
                         PostList(
@@ -170,6 +175,39 @@ fun HomeScreen(
     }
 }
 
+@Composable
+fun Stories(
+    profilePictureUrl: String,
+) {
+    LazyRow(
+        modifier = Modifier.padding(start=16.dp, bottom = 16.dp)
+    ) {
+        item {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = rememberImagePainter(
+                        data = profilePictureUrl,
+                        builder = {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        },
+                    ),
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape),
+                    contentDescription = null,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Your story",
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun NativeAdPost(ad: NativeAd) {
@@ -436,6 +474,12 @@ fun PostList(
     val events = uiState.eventsFlow?.collectAsLazyPagingItems()
 
     LazyColumn(state = uiState.listState) {
+//        item {
+//            Stories(
+//                profilePictureUrl = ""
+//            )
+//            DividerM3()
+//        }
         if (uiState.selectedTab == 1 && events != null)
             items(events) { event ->
                 Event(
@@ -781,7 +825,7 @@ fun TagUsers(tagUsers: List<User>) {
                     .offset(x = -(8 * i).dp)
                     .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
                     .clip(CircleShape),
-            contentDescription = null,
+                contentDescription = null,
             )
         }
         Text(
