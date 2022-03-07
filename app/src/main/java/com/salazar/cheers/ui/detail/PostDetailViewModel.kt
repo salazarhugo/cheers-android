@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.PostRepository
+import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import dagger.assisted.Assisted

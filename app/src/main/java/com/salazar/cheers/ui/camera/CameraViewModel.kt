@@ -1,9 +1,12 @@
 package com.salazar.cheers.ui.camera
 
+import android.app.Application
 import android.net.Uri
 import androidx.camera.core.CameraSelector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.*
+import com.salazar.cheers.workers.UploadStoryWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,8 +22,11 @@ data class CameraUiState(
 )
 
 @HiltViewModel
-class CameraViewModel @Inject constructor() : ViewModel() {
+class CameraViewModel @Inject constructor(
+    application: Application
+) : ViewModel() {
 
+    private val workManager = WorkManager.getInstance(application)
     private val viewModelState = MutableStateFlow(CameraUiState(isLoading = true))
 
     val uiState = viewModelState
@@ -31,6 +37,25 @@ class CameraViewModel @Inject constructor() : ViewModel() {
         )
 
     init {
+    }
+
+    fun uploadStory() {
+        val imageUri = viewModelState.value.imageUri ?: return
+
+        val uploadWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<UploadStoryWorker>().apply {
+                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                setInputData(
+                    workDataOf(
+                        "PHOTOS" to arrayOf(imageUri.toString()),
+                        "STORY_TYPE" to "IMAGE",
+                        "PRIVACY" to "FRIENDS",
+                    )
+                )
+            }
+                .build()
+
+        workManager.enqueue(uploadWorkRequest)
     }
 
     fun setImageUri(imageUri: Uri) {

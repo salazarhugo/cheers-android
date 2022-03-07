@@ -179,6 +179,26 @@ object FirestoreUtil {
         }
     }
 
+
+    suspend fun listenUser(): Flow<User> = callbackFlow {
+        val subscription = currentUserDocRef.addSnapshotListener { doc, e ->
+            if (e != null) {
+                Log.e(TAG, "Listen failed", e)
+                return@addSnapshotListener
+            }
+
+            if (doc == null || !doc.exists())
+                return@addSnapshotListener
+
+            val pro = doc.toObject(User::class.java)!!
+            trySend(pro).isSuccess
+        }
+
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
     fun getCurrentUserDocumentLiveData(): LiveData<User> {
         val currentUser: MutableLiveData<User> = MutableLiveData()
         currentUserDocRef.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->

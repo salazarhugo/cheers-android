@@ -36,6 +36,7 @@ object MainDestinations {
     const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
+    const val STORY_ROUTE = "story"
 }
 
 /**
@@ -69,6 +70,18 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToStoryWithUserId: (userId: String) -> Unit = { userId ->
+        navController.navigate(route = "${MainDestinations.STORY_ROUTE}?userId=$userId") {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToStory: () -> Unit = {
+        navController.navigate(route = MainDestinations.STORY_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToPaymentHistory: () -> Unit = {

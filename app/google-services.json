@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "988221557023-gj4dih5ac8svt23nndur7a04ono6tto9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salazar.cheers",
+            "certificate_hash": "2a49c636a6941e169d037d1bb98db70c013e3a6f"
+          }
+        },
+        {
           "client_id": "988221557023-tesorgnkjtn6k87fapu859qedstt4jci.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -40,7 +48,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-7182026441345500~5053837395"
     }
   ],
   "configuration_version": "1"

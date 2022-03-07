@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,11 +16,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.ui.chat.ChatViewModel
 import com.salazar.cheers.ui.comment.CommentsViewModel
 import com.salazar.cheers.ui.detail.PostDetailViewModel
 import com.salazar.cheers.ui.event.detail.EventDetailViewModel
-import com.salazar.cheers.ui.otherprofile.OtherProfileViewModel
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
@@ -30,7 +32,7 @@ import dagger.hilt.android.components.ActivityComponent
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     @EntryPoint
     @InstallIn(ActivityComponent::class)
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
     }
 
-    private val mainViewModel: MainViewModel by viewModels()
+    private val cheersViewModel: CheersViewModel by viewModels()
     lateinit var paymentSheet: PaymentSheet
     private lateinit var flowController: PaymentSheet.FlowController
 
@@ -51,10 +53,10 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            if (mainViewModel.completed.value) {
+            if (cheersViewModel.completed.value) {
                 AlertDialog(
                     onDismissRequest = {
-                        mainViewModel.completed.value = false
+                        cheersViewModel.completed.value = false
                     },
                     confirmButton = {},
                     title = { Text("Payment succeeded") },
@@ -75,95 +77,98 @@ class MainActivity : AppCompatActivity() {
 //        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
 //        StrictMode.setThreadPolicy(policy)
 //        userConsentPolicy()
-
-        val apiKey =
-            "sk_test_51KWqPTAga4Q2CELO44kZENZkAEi8gpc0H5Y5MeFRcAj5nlSQyndRg2gxIlr95zfWY1ZIneWTeyhwSTn5iRERO9RO0029fjMWvc"
-
-}
-
-private fun presentPaymentSheet(clientSecret: String) {
-    val googlePayConfiguration = PaymentSheet.GooglePayConfiguration(
-        environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
-        countryCode = "US",
-        currencyCode = "USD" // Required for Setup Intents, optional for Payment Intents
-    )
-    paymentSheet.presentWithPaymentIntent(
-        clientSecret,
-        PaymentSheet.Configuration(
-            merchantDisplayName = "Cheers",
-            allowsDelayedPaymentMethods = true,
-            googlePay = googlePayConfiguration
-        )
-    )
-}
-
-fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
-    when (paymentSheetResult) {
-        is PaymentSheetResult.Canceled -> {
-            print("Canceled")
-        }
-        is PaymentSheetResult.Failed -> {
-            print("Error: ${paymentSheetResult.error}")
-        }
-        is PaymentSheetResult.Completed -> {
-            // Display for example, an order confirmation screen
-            mainViewModel.completed.value = true
-            print("Completed")
-        }
     }
-}
 
-private fun userConsentPolicy() {
-    // Set tag for underage of consent. false means users are not underage.
-    val params = ConsentRequestParameters.Builder()
-        .setTagForUnderAgeOfConsent(false)
-        .build()
+    private fun presentPaymentSheet(clientSecret: String) {
+        val googlePayConfiguration = PaymentSheet.GooglePayConfiguration(
+            environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
+            countryCode = "US",
+            currencyCode = "USD" // Required for Setup Intents, optional for Payment Intents
+        )
+        paymentSheet.presentWithPaymentIntent(
+            clientSecret,
+            PaymentSheet.Configuration(
+                merchantDisplayName = "Cheers",
+                allowsDelayedPaymentMethods = true,
+                googlePay = googlePayConfiguration
+            )
+        )
+    }
 
-    val consentInformation = UserMessagingPlatform.getConsentInformation(this)
-    consentInformation.requestConsentInfoUpdate(this, params, {
-        if (consentInformation.isConsentFormAvailable)
-            loadForm(consentInformation = consentInformation)
-    },
-        {
-        })
-}
-
-private fun loadForm(consentInformation: ConsentInformation) {
-    UserMessagingPlatform.loadConsentForm(
-        this,
-        { consentForm ->
-            val consentForm = consentForm
-            if (consentInformation.getConsentStatus() === ConsentInformation.ConsentStatus.REQUIRED) {
-                consentForm.show(
-                    this@MainActivity
-                ) { // Handle dismissal by reloading form.
-                    loadForm(consentInformation)
-                }
+    fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
+        when (paymentSheetResult) {
+            is PaymentSheetResult.Canceled -> {
+                print("Canceled")
+            }
+            is PaymentSheetResult.Failed -> {
+                print("Error: ${paymentSheetResult.error}")
+            }
+            is PaymentSheetResult.Completed -> {
+                // Display for example, an order confirmation screen
+                cheersViewModel.completed.value = true
+                print("Completed")
             }
         }
-    ) {
     }
-}
 
-override fun onStart() {
-    super.onStart()
-    LocalBroadcastManager.getInstance(this).registerReceiver(
-        (mMessageReceiver),
-        IntentFilter("NewMessage")
-    )
-}
+    private fun userConsentPolicy() {
+        // Set tag for underage of consent. false means users are not underage.
+        val params = ConsentRequestParameters.Builder()
+            .setTagForUnderAgeOfConsent(false)
+            .build()
 
-override fun onStop() {
-    super.onStop()
-    LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-}
-
-private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-    override fun onReceive(
-        context: Context?,
-        intent: Intent
-    ) {
-        mainViewModel.onNewMessage()
+        val consentInformation = UserMessagingPlatform.getConsentInformation(this)
+        consentInformation.requestConsentInfoUpdate(this, params, {
+            if (consentInformation.isConsentFormAvailable)
+                loadForm(consentInformation = consentInformation)
+        },
+            {
+            })
     }
-}
+
+    private fun loadForm(consentInformation: ConsentInformation) {
+        UserMessagingPlatform.loadConsentForm(
+            this,
+            { consentForm ->
+                val consentForm = consentForm
+                if (consentInformation.getConsentStatus() === ConsentInformation.ConsentStatus.REQUIRED) {
+                    consentForm.show(
+                        this@MainActivity
+                    ) { // Handle dismissal by reloading form.
+                        loadForm(consentInformation)
+                    }
+                }
+            }
+        ) {
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            (mMessageReceiver),
+            IntentFilter("NewMessage")
+        )
+        FirebaseAuth.getInstance().addAuthStateListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        FirebaseAuth.getInstance().removeAuthStateListener(this)
+    }
+
+    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(
+            context: Context?,
+            intent: Intent
+        ) {
+            cheersViewModel.onNewMessage()
+        }
+    }
+
+    override fun onAuthStateChanged(p0: FirebaseAuth) {
+        Log.i("AUTH", p0.currentUser?.uid.toString())
+        cheersViewModel.onAuthChange(p0)
+    }
 }

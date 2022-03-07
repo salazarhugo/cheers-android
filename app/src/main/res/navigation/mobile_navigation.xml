@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.salazar.cheers.ui.home.HomeFragment"
+        android:name="com.salazar.cheers.ui.main.home.HomeFragment"
         android:label="HomeFragment" >
         <action
             android:id="@+id/action_homeFragment_to_mapFragment"
@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.salazar.cheers.ui.profile.ProfileFragment"
+        android:name="com.salazar.cheers.ui.main.profile.ProfileFragment"
         android:label="ProfileFragment" >
         <action
             android:id="@+id/action_profileFragment_to_settingsFragment"
@@ -58,11 +58,11 @@
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
-        android:name="com.salazar.cheers.ui.map.MapFragment"
+        android:name="com.salazar.cheers.ui.main.map.MapFragment"
         android:label="MapFragment" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.salazar.cheers.ui.search.SearchFragment"
+        android:name="com.salazar.cheers.ui.main.search.SearchFragment"
         android:label="SearchFragment" >
         <action
             android:id="@+id/action_searchFragment_to_otherProfileFragment"
@@ -92,7 +92,7 @@
     </fragment>
     <fragment
         android:id="@+id/otherProfileFragment"
-        android:name="com.salazar.cheers.ui.otherprofile.OtherProfileFragment"
+        android:name="com.salazar.cheers.ui.main.otherprofile.OtherProfileFragment"
         android:label="OtherProfileFragment">
         <action
             android:id="@+id/action_otherProfileFragment_to_chatActivity"
@@ -109,7 +109,7 @@
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.salazar.cheers.ui.profile.EditProfileFragment"
+        android:name="com.salazar.cheers.ui.main.profile.EditProfileFragment"
         android:label="EditProfileFragment" />
     <activity
         android:id="@+id/chatActivity"
@@ -135,7 +135,7 @@
         android:label="SettingsFragment" />
     <fragment
         android:id="@+id/followersFollowingFragment"
-        android:name="com.salazar.cheers.ui.profile.FollowersFollowingFragment"
+        android:name="com.salazar.cheers.ui.main.profile.FollowersFollowingFragment"
         android:label="FollowersFollowingFragment" >
         <action
             android:id="@+id/action_followersFollowingFragment_to_otherProfileFragment"
@@ -146,7 +146,7 @@
     </fragment>
     <fragment
         android:id="@+id/activityFragment"
-        android:name="com.salazar.cheers.ui.activity.ActivityFragment"
+        android:name="com.salazar.cheers.ui.main.activity.ActivityFragment"
         android:label="ActivityFragment" />
     <dialog
         android:id="@+id/newMessageFragment"
@@ -179,7 +179,7 @@
         android:label="MoreOtherProfileBottomSheet" />
     <fragment
         android:id="@+id/otherFollowersFollowing"
-        android:name="com.salazar.cheers.ui.otherprofile.OtherFollowersFollowing"
+        android:name="com.salazar.cheers.ui.main.otherprofile.OtherFollowersFollowing"
         android:label="OtherFollowersFollowing" >
         <argument
             android:name="username"
@@ -192,7 +192,7 @@
     </fragment>
     <fragment
         android:id="@+id/likesFragment"
-        android:name="com.salazar.cheers.ui.home.likes.LikesFragment"
+        android:name="com.salazar.cheers.ui.main.home.likes.LikesFragment"
         android:label="LikesFragment" >
         <argument
             android:name="postId"

@@ -2,7 +2,7 @@ package com.salazar.cheers.ui.settings.payments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.UserRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

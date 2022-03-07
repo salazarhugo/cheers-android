@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.entities.StoryResponse
 import com.salazar.cheers.internal.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -107,6 +108,64 @@ class Neo4jService {
     }
 
     // page index zero
+    suspend fun stories(
+        page: Int,
+        pageSize: Int
+    ): Result<List<Pair<StoryResponse, List<User>>>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = FirebaseAuth.getInstance().uid!!
+                params["pageSize"] = pageSize
+                params["skip"] = page * pageSize
+
+                val records = query(
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(author:User)-[:POSTED]->(s:Story)\n" +
+                            "OPTIONAL MATCH (viewers:User)-[:SEEN]->(s) \n" +
+                            "OPTIONAL MATCH (s)-[:WITH]->(w:User) \n" +
+                            "RETURN s {.*, created: s.created.epochMillis}," +
+                            " properties(author), collect(DISTINCT properties(w)), collect(DISTINCT viewers.id) " +
+                            "ORDER BY s.created DESC " +
+                            "SKIP \$skip LIMIT \$pageSize",
+                    params
+                )
+
+                val stories = mutableListOf<Pair<StoryResponse, List<User>>>()
+
+                records.forEach { record ->
+                    val userListType: Type = object : TypeToken<ArrayList<User>>() {}.type
+                    val stringArrayType: Type = object : TypeToken<ArrayList<String>>() {}.type
+
+                    val gson = Gson()
+
+                    val story =
+                        gson.fromJson(record.values()[0].toString(), StoryResponse::class.java)
+
+                    val author =
+                        gson.fromJson(record.values()[1].toString(), User::class.java)
+
+                    val withUsers = record.values()[2].toString()
+
+                    val seenUsers = record.values()[3].toString()
+
+                    val users =
+                        gson.fromJson<ArrayList<User>>(withUsers, userListType)
+
+                    val seenUsersIds =
+                        gson.fromJson<ArrayList<String>>(seenUsers, stringArrayType)
+
+                    users.add(author)
+
+                    stories.add(Pair(story.copy(seenBy = seenUsersIds), users))
+                }
+                return@withContext Result.Success(stories.toList())
+            } catch (e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
+    // page index zero
     suspend fun posts(
         page: Int,
         pageSize: Int
@@ -157,6 +216,19 @@ class Neo4jService {
         }
     }
 
+    suspend fun seenStory(storyId: String) {
+        return withContext(Dispatchers.IO) {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["storyId"] = storyId
+            params["userId"] = FirebaseAuth.getInstance().uid!!
+            write(
+                "MATCH (s:Story), (u:User) WHERE s.id = \$storyId AND u.id = \$userId MERGE (u)-[:SEEN]->(s) " +
+                        "SET s.seenBy = s.seenBy + \$userId",
+                params = params
+            )
+        }
+    }
+
     private fun query(
         query: String,
         params: MutableMap<String, Any>
@@ -165,6 +237,15 @@ class Neo4jService {
             return session.readTransaction { tx ->
                 tx.run(query, params).list()
             }
+        }
+    }
+
+    private fun write(
+        query: String,
+        params: MutableMap<String, Any>
+    ) {
+        getSession().writeTransaction { tx ->
+            tx.run(query, params)
         }
     }
 

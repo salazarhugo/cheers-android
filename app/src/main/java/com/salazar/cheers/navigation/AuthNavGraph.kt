@@ -4,10 +4,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
-import com.salazar.cheers.ui.signin.SignInRoute
-import com.salazar.cheers.ui.signin.SignInViewModel
-import com.salazar.cheers.ui.signin.signup.SignUpRoute
-import com.salazar.cheers.ui.signin.signup.SignUpViewModel
+import com.salazar.cheers.ui.auth.signin.SignInRoute
+import com.salazar.cheers.ui.auth.signin.SignInViewModel
+import com.salazar.cheers.ui.auth.signin.signup.SignUpRoute
+import com.salazar.cheers.ui.auth.signin.signup.SignUpViewModel
 
 fun NavGraphBuilder.authNavGraph(
     navActions: CheersNavigationActions,

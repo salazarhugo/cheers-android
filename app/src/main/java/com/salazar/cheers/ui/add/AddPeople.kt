@@ -34,7 +34,7 @@ import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.taguser.AddPeopleViewModel
+import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 

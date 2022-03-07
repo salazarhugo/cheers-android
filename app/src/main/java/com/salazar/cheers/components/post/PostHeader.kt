@@ -1,7 +1,6 @@
 package com.salazar.cheers.components.post
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,9 +37,9 @@ fun PostHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+//            .background(MaterialTheme.colorScheme.surface)
             .clickable { onHeaderClicked(username) }
-            .padding(14.dp, 11.dp),
+            .padding(16.dp, 11.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

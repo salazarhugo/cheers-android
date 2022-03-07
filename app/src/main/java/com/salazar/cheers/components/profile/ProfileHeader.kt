@@ -12,7 +12,7 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.profile.ProfileStats
+import com.salazar.cheers.ui.main.profile.ProfileStats
 
 @Composable
 fun ProfileHeader(

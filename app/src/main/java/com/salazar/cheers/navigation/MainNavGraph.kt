@@ -1,6 +1,9 @@
 package com.salazar.cheers.navigation
 
 import android.net.Uri
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -12,7 +15,6 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
-import com.salazar.cheers.MainViewModel
 import com.salazar.cheers.components.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.add.AddPostRoute
@@ -28,39 +30,38 @@ import com.salazar.cheers.ui.comment.CommentsRoute
 import com.salazar.cheers.ui.comment.commentsViewModel
 import com.salazar.cheers.ui.detail.PostDetailRoute
 import com.salazar.cheers.ui.detail.postDetailViewModel
-import com.salazar.cheers.ui.editprofile.EditProfileRoute
-import com.salazar.cheers.ui.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.event.detail.EventDetailRoute
 import com.salazar.cheers.ui.event.detail.eventDetailViewModel
-import com.salazar.cheers.ui.home.HomeRoute
-import com.salazar.cheers.ui.home.HomeViewModel
-import com.salazar.cheers.ui.map.MapRoute
-import com.salazar.cheers.ui.map.MapViewModel
-import com.salazar.cheers.ui.otherprofile.OtherProfileRoute
-import com.salazar.cheers.ui.otherprofile.otherProfileViewModel
-import com.salazar.cheers.ui.profile.*
-import com.salazar.cheers.ui.search.SearchRoute
-import com.salazar.cheers.ui.search.SearchViewModel
+import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
+import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
+import com.salazar.cheers.ui.main.home.HomeRoute
+import com.salazar.cheers.ui.main.home.HomeViewModel
+import com.salazar.cheers.ui.main.map.MapRoute
+import com.salazar.cheers.ui.main.map.MapViewModel
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
+import com.salazar.cheers.ui.main.otherprofile.otherProfileViewModel
+import com.salazar.cheers.ui.main.profile.*
+import com.salazar.cheers.ui.main.search.SearchRoute
+import com.salazar.cheers.ui.main.search.SearchViewModel
+import com.salazar.cheers.ui.main.story.StoryRoute
+import com.salazar.cheers.ui.main.story.StoryViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     user: User,
-    mainViewModel: MainViewModel,
     navActions: CheersNavigationActions,
     presentPaymentSheet: (String) -> Unit,
 ) {
     val uri = "https://cheers-a275e.web.app"
-
-    mainViewModel.refreshUser()
 
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
 
-        settingNavGraph(
-            navActions = navActions,
-            presentPaymentSheet = presentPaymentSheet
-        )
+//        settingNavGraph(
+//            navActions = navActions,
+//            presentPaymentSheet = presentPaymentSheet
+//        )
 
         composable(
             route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
@@ -102,6 +103,23 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
+        composable(
+            route = "${MainDestinations.STORY_ROUTE}?userId={userId}",
+            arguments = listOf(navArgument("userId") { nullable = true }),
+            enterTransition = { scaleIn(animationSpec = tween(500)) },
+            exitTransition = { scaleOut(animationSpec = tween(500)) },
+        ) {
+            val storyViewModel = hiltViewModel<StoryViewModel>()
+            val userId = it.arguments?.getString("userId")
+//            if (userId != null)
+//                storyViewModel.
+
+            StoryRoute(
+                storyViewModel = storyViewModel,
+                navActions = navActions,
+            )
+        }
+
         bottomSheet(route = MainDestinations.PROFILE_MORE_SHEET) {
             ProfileMoreBottomSheet(
                 onSettingsClick = { navActions.navigateToSettings() },
@@ -124,7 +142,10 @@ fun NavGraphBuilder.mainNavGraph(
                 viewModel.addPhoto(Uri.parse(photoUri))
         }
 
-        composable(MainDestinations.HOME_ROUTE) {
+        composable(
+            route = MainDestinations.HOME_ROUTE,
+//            exitTransition = {},
+        ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
             HomeRoute(
                 homeViewModel = homeViewModel,

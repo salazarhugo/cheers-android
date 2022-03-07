@@ -6,7 +6,7 @@
     app:startDestination="@id/signInFragment">
     <fragment
         android:id="@+id/emailPasswordFragment"
-        android:name="com.salazar.cheers.ui.signin.EmailPasswordFragment"
+        android:name="com.salazar.cheers.ui.auth.signin.EmailPasswordFragment"
         android:label="EmailPasswordFragment" >
         <action
             android:id="@+id/action_emailPasswordFragment_to_chooseUsernameFragment"
@@ -14,7 +14,7 @@
     </fragment>
     <fragment
         android:id="@+id/signInFragment"
-        android:name="com.salazar.cheers.ui.signin.SignInFragment"
+        android:name="com.salazar.cheers.ui.auth.signin.SignInFragment"
         android:label="SignInFragment" >
         <action
             android:id="@+id/action_signInFragment_to_emailPasswordFragment"
@@ -30,7 +30,7 @@
     </fragment>
     <fragment
         android:id="@+id/chooseUsernameFragment"
-        android:name="com.salazar.cheers.ui.signin.ChooseUsernameFragment"
+        android:name="com.salazar.cheers.ui.auth.signin.ChooseUsernameFragment"
         android:label="ChooseUsernameFragment" >
         <action
             android:id="@+id/action_chooseUsernameFragment_to_createPasswordFragment"
@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/createPasswordFragment"
-        android:name="com.salazar.cheers.ui.signin.CreatePasswordFragment"
+        android:name="com.salazar.cheers.ui.auth.signin.CreatePasswordFragment"
         android:label="CreatePasswordFragment" >
         <argument
             android:name="username"

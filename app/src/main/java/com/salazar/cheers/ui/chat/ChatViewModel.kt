@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.data.UserRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.workers.UploadImageMessage

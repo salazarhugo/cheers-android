@@ -26,6 +26,12 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideStoryDao(@ApplicationContext appContext: Context): StoryDao {
+        return CheersDatabase.invoke(appContext).storyDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideUserDao(@ApplicationContext appContext: Context): UserDao {
         return CheersDatabase.invoke(appContext).userDao()
     }

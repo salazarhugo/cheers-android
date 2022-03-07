@@ -46,7 +46,7 @@ import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.ui.home.PostBody
+import com.salazar.cheers.ui.main.home.PostBody
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
 import java.time.ZonedDateTime

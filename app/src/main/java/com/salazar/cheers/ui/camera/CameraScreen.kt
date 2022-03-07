@@ -66,6 +66,7 @@ fun CameraScreen(
     modifier: Modifier = Modifier,
     onCameraUIAction: (CameraUIAction) -> Unit,
     onPostClicked: () -> Unit,
+    onStoryClick: () -> Unit,
 ) {
 
     Scaffold(
@@ -77,6 +78,7 @@ fun CameraScreen(
                 imageTaken = uiState.imageUri != null,
                 cameraUIAction = onCameraUIAction,
                 onPostClicked = onPostClicked,
+                onStoryClick = onStoryClick,
             )
         }
     ) {
@@ -96,6 +98,7 @@ fun CameraFooter(
     imageTaken: Boolean,
     cameraUIAction: (CameraUIAction) -> Unit,
     onPostClicked: () -> Unit,
+    onStoryClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -105,7 +108,10 @@ fun CameraFooter(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (imageTaken)
-            CameraFooterSendTo(onPostClicked = onPostClicked)
+            CameraFooterSendTo(
+                onPostClicked = onPostClicked,
+                onStoryClick = onStoryClick,
+            )
         else
             CameraFooterIdle(cameraUIAction)
     }
@@ -114,13 +120,14 @@ fun CameraFooter(
 @Composable
 fun CameraFooterSendTo(
     onPostClicked: () -> Unit,
+    onStoryClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
         FilledTonalButton(
             modifier = Modifier.weight(1f),
-            onClick = { },
+            onClick = onStoryClick,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

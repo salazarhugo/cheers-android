@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.map.ChooseOnMapScreen
+import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
 
 /**
  * Stateful composable that displays the Navigation route for the Add post screen.

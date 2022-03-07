@@ -28,6 +28,7 @@ fun CameraRoute(
     CameraScreen(
         uiState = uiState,
         imageCapture = imageCapture,
+        onStoryClick = cameraViewModel::uploadStory,
         onPostClicked = {
             if (uiState.imageUri != null)
                 navActions.navigateToAddPostSheetWithPhotoUri(uiState.imageUri.toString())

@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.entities.StoryResponse
 import com.salazar.cheers.internal.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -111,6 +112,27 @@ object Neo4jUtil {
         } catch (e: Exception) {
             Log.e("HAHA", e.toString())
         }
+    }
+
+    suspend fun addStory(story: StoryResponse) = withContext(Dispatchers.IO) {
+        val params: MutableMap<String, Any> = mutableMapOf()
+        params["userId"] = FirebaseAuth.getInstance().currentUser?.uid!!
+
+        val finalStory = story.copy(
+            id = randomUUID().toString(),
+            authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
+        )
+
+        params["story"] = toMap(finalStory)
+        params["tagUsersId"] = finalStory.tagUsersId
+
+        write(
+            "MATCH (u:User) WHERE u.id = \$userId CREATE (s: Story \$story)" +
+                    " SET s += { created: datetime() } CREATE (u)-[:POSTED]->(s)" +
+                    " WITH s UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (s)-[:WITH]->(u2)",
+            params = params
+        )
+        sendPostNotification(finalStory.id)
     }
 
     suspend fun addPost(post: Post) = withContext(Dispatchers.IO) {
@@ -261,10 +283,10 @@ object Neo4jUtil {
                     )
                 }
 
-                Log.d("FWA", users.toString())
+                Log.d("Get suggestions: ", users.toString())
                 return@withContext Result.Success(users.toList())
             } catch (e: Exception) {
-                Log.e("FWA", e.toString())
+                Log.e("Get suggestions: ", e.toString())
                 return@withContext Result.Error(e)
             }
         }
@@ -297,10 +319,8 @@ object Neo4jUtil {
                     users.add(user)
                 }
 
-                Log.d("FWA", users.toString())
                 return@withContext Result.Success(users.toList())
             } catch (e: Exception) {
-                Log.e("FWA", e.toString())
                 return@withContext Result.Error(e)
             }
         }

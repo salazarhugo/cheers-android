@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.data.UserRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.CommentWithAuthor
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
