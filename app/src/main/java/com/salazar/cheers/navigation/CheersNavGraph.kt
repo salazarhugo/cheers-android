@@ -1,8 +1,5 @@
 package com.salazar.cheers.navigation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,6 +33,7 @@ fun CheersNavGraph(
     navController: NavHostController = rememberAnimatedNavController(),
     darkTheme: Boolean,
     presentPaymentSheet: (String) -> Unit,
+    showInterstitialAd: () -> Unit,
     user: User?
 ) {
     val startDestination =
@@ -54,6 +53,18 @@ fun CheersNavGraph(
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
 
+    val a =
+        navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE }
+
+    LaunchedEffect(user) {
+        when {
+            user != null -> {
+                if (a == true) navActions.navigateToMain()
+            }
+            else -> navActions.navigateToSignIn()
+        }
+    }
+
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -68,13 +79,16 @@ fun CheersNavGraph(
             bottomBar = {
                 val visible =
                     navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.MAIN_ROUTE } == true &&
-                            currentRoute != MainDestinations.STORY_ROUTE && !currentRoute.contains(MainDestinations.CHAT_ROUTE)
+                            !currentRoute.contains(MainDestinations.STORY_ROUTE) && !currentRoute.contains(
+                        MainDestinations.CHAT_ROUTE
+                    )
                 val density = LocalDensity.current
-                AnimatedVisibility(
-                    visible = visible,
-                    enter = slideInVertically { with(density) { 52.dp.roundToPx() } },
-                    exit = slideOutVertically { with(density) { 52.dp.roundToPx() } }
-                ) {
+//                AnimatedVisibility(
+//                    visible = visible,
+//                    enter = slideInVertically { with(density) { 52.dp.roundToPx() } },
+//                    exit = slideOutVertically { with(density) { 52.dp.roundToPx() } }
+//                ) {
+                if (visible)
                     Column {
                         DividerM3()
                         CheersNavigationBar(
@@ -88,7 +102,7 @@ fun CheersNavGraph(
                             navigateToProfile = navActions.navigateToProfile,
                         )
                     }
-                }
+//                }
             },
         ) { innerPadding ->
             AnimatedNavHost(
@@ -105,7 +119,9 @@ fun CheersNavGraph(
                 mainNavGraph(
                     user = user ?: User(),
                     navActions = navActions,
-                    presentPaymentSheet = presentPaymentSheet
+                    presentPaymentSheet = presentPaymentSheet,
+                    bottomSheetNavigator = bottomSheetNavigator,
+                    showInterstitialAd = showInterstitialAd,
                 )
             }
         }

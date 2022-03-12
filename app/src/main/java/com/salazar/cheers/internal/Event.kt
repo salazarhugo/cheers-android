@@ -1,7 +1,5 @@
 package com.salazar.cheers.internal
 
-import com.salazar.cheers.ui.add.Privacy
-
 data class Event(
     val id: String = "",
     val name: String = "",

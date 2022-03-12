@@ -62,8 +62,8 @@ import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.chat.SymbolAnnotationType
-import com.salazar.cheers.ui.chat.messageFormatter
+import com.salazar.cheers.ui.main.chat.SymbolAnnotationType
+import com.salazar.cheers.ui.main.chat.messageFormatter
 import com.salazar.cheers.ui.theme.Typography
 import org.jetbrains.anko.collections.forEachWithIndex
 import org.jetbrains.anko.image
@@ -78,7 +78,7 @@ fun HomeScreen(
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onEventClicked: (String) -> Unit,
-    onPostMoreClicked: (postId: String, isAuthor: Boolean) -> Unit,
+    onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
@@ -86,6 +86,7 @@ fun HomeScreen(
     navigateToSearch: () -> Unit,
     onSelectTab: (Int) -> Unit,
     onStoryClick: () -> Unit,
+    onAddStoryClick: () -> Unit,
     onLike: (post: Post) -> Unit,
 ) {
     SwipeRefresh(
@@ -161,6 +162,7 @@ fun HomeScreen(
                             navigateToComments = navigateToComments,
                             onEventClicked = onEventClicked,
                             onStoryClick = onStoryClick,
+                            onAddStoryClick = onAddStoryClick,
                         )
                     }
                 }
@@ -180,14 +182,16 @@ fun HomeScreen(
 fun Stories(
     uiState: HomeUiState.HasPosts,
     onStoryClick: () -> Unit,
+    onAddStoryClick: () -> Unit,
 ) {
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
+    val profilePictureUrl = uiState.user?.profilePictureUrl
 
     LazyRow(
         modifier = Modifier.padding(bottom = 8.dp),
     ) {
         item {
-            YourStory(profilePictureUrl = "", {})
+            YourStory(profilePictureUrl = profilePictureUrl, onAddStoryClick)
         }
         items(items = stories, key = { it.story.id }) { story ->
             if (story != null)
@@ -228,7 +232,7 @@ fun NativeAdPost(ad: NativeAd) {
                 color = MaterialTheme.colorScheme.tertiaryContainer,
             ) {
                 Text(
-                    text = "Sponsored",
+                    text = "Ad",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                 )
@@ -460,10 +464,11 @@ fun PostList(
     onPostClicked: (postId: String) -> Unit,
     onEventClicked: (String) -> Unit,
     onUserClicked: (username: String) -> Unit,
-    onPostMoreClicked: (postId: String, Boolean) -> Unit,
+    onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onLike: (post: Post) -> Unit,
     navigateToComments: (PostFeed) -> Unit,
     onStoryClick: () -> Unit,
+    onAddStoryClick: () -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
     val events = uiState.eventsFlow?.collectAsLazyPagingItems()
@@ -473,6 +478,7 @@ fun PostList(
             Stories(
                 uiState = uiState,
                 onStoryClick = onStoryClick,
+                onAddStoryClick = onAddStoryClick,
             )
             DividerM3()
         }
@@ -485,7 +491,7 @@ fun PostList(
             }
         else {
             itemsIndexed(posts) { i, post ->
-                if (i != 0 && i % 4 == 0 && uiState.nativeAd != null) {
+                if ((i-1)%3 == 0 && uiState.nativeAd != null) {
                     DividerM3()
                     NativeAdPost(ad = uiState.nativeAd)
                 }
@@ -568,7 +574,7 @@ fun Post(
     modifier: Modifier = Modifier,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
-    onPostMoreClicked: (postId: String, Boolean) -> Unit,
+    onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onLike: (post: Post) -> Unit,
     navigateToComments: (PostFeed) -> Unit,
@@ -584,14 +590,12 @@ fun Post(
             username = author.username,
             verified = author.verified,
             public = post.privacy == Privacy.PUBLIC.name,
+            created = post.createdTime,
             profilePictureUrl = author.profilePictureUrl,
             locationName = post.locationName,
             onHeaderClicked = onUserClicked,
             onMoreClicked = {
-                onPostMoreClicked(
-                    post.id,
-                    author.id == FirebaseAuth.getInstance().currentUser?.uid
-                )
+                onPostMoreClicked(post.id, author.id)
             },
         )
         PostText(
@@ -804,7 +808,9 @@ fun Caption(
 
 @Composable
 fun TagUsers(tagUsers: List<User>) {
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         val n = Math.min(tagUsers.size, 3)
         repeat(n) { i ->
             val u = tagUsers[i]

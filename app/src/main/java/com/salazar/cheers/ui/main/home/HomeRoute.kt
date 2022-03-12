@@ -32,7 +32,7 @@ fun HomeRoute(
         onRefreshPosts = { homeViewModel.refresh() },
         navActions = navActions,
         onPostClicked = { navActions.navigateToPostDetail(it) },
-        onPostMoreClicked = { a, b -> navActions.navigateToPostMoreSheet(a, b) },
+        onPostMoreClicked = { postId, authorId -> navActions.navigateToPostMoreSheet(postId, authorId) },
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         navigateToAddEvent = { navActions.navigateToAddEvent() },
         navigateToAddPost = { navActions.navigateToAddPostSheet() },
@@ -42,5 +42,6 @@ fun HomeRoute(
         navigateToSearch = { navActions.navigateToSearch() },
         onEventClicked = { navActions.navigateToEventDetail(it) },
         onStoryClick = { navActions.navigateToStory() },
+        onAddStoryClick = { navActions.navigateToCamera() },
     )
 }

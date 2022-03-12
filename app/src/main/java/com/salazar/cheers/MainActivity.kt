@@ -8,20 +8,28 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.ui.chat.ChatViewModel
-import com.salazar.cheers.ui.comment.CommentsViewModel
-import com.salazar.cheers.ui.detail.PostDetailViewModel
-import com.salazar.cheers.ui.event.detail.EventDetailViewModel
+import com.salazar.cheers.ui.main.chat.ChatViewModel
+import com.salazar.cheers.ui.main.comment.CommentsViewModel
+import com.salazar.cheers.ui.main.detail.PostDetailViewModel
+import com.salazar.cheers.ui.main.event.detail.EventDetailViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
+import com.salazar.cheers.ui.sheets.SendGiftViewModel
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
@@ -42,11 +50,12 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
         fun chatViewModelFactory(): ChatViewModel.ChatViewModelFactory
         fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
+        fun sendGiftViewModelFactory(): SendGiftViewModel.SendGiftViewModelFactory
     }
 
     private val cheersViewModel: CheersViewModel by viewModels()
     lateinit var paymentSheet: PaymentSheet
-    private lateinit var flowController: PaymentSheet.FlowController
+    private var mInterstitialAd: InterstitialAd? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,18 +74,20 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             }
             CheersApp(
                 presentPaymentSheet = ::presentPaymentSheet,
+                showInterstitialAd = ::showInterstitialAd,
             )
         }
 
         PaymentConfiguration.init(
             this,
-            "pk_test_51KWqPTAga4Q2CELOu5oK8GHRPlQwVPvcISBMuoWU5yxP8VrtmBhRGm0TBKaKeKm1tz2EY7gmmvvYuFWMJEzWvFhC00qOX6gQb1"
+            "pk_live_51KWqPTAga4Q2CELO2K93NrScmrQOQf0Pbvn0XpDXSqW4gzgXFWpMx1lnSjTfR8251B3TI4zHmQ0MqFDCYdpKD2D200KhtML5F7"
         )
         paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
 //
 //        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
 //        StrictMode.setThreadPolicy(policy)
-//        userConsentPolicy()
+        userConsentPolicy()
+        initInterstitialAd()
     }
 
     private fun presentPaymentSheet(clientSecret: String) {
@@ -123,6 +134,32 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                 loadForm(consentInformation = consentInformation)
         },
             {
+            })
+    }
+
+    fun showInterstitialAd() {
+        mInterstitialAd?.show(this)
+    }
+
+    fun initInterstitialAd() {
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
+        MobileAds.setRequestConfiguration(configuration)
+
+        val adRequest: AdRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(
+            this,
+            "ca-app-pub-7182026441345500/2922347081",
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(@NonNull interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                }
+
+                override fun onAdFailedToLoad(@NonNull loadAdError: LoadAdError) {
+                    mInterstitialAd = null
+                }
             })
     }
 

@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.functions.FirebaseFunctions
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Payment
@@ -38,6 +40,22 @@ object FirestoreUtil {
                     ?: throw NullPointerException("UID is null.")
             }"
         )
+
+    fun sendGift(receiverId: String): Task<HashMap<*, *>> {
+        // Create the arguments to the callable function.
+        val data = hashMapOf(
+            "receiverId" to receiverId,
+        )
+
+        return FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("sendGift")
+            .call(data)
+            .continueWith { task ->
+                val result = task.result?.data as HashMap<*, *>
+                result
+            }
+    }
+
 
     fun checkIfUserExists(
         onComplete: (exists: Boolean) -> Unit,

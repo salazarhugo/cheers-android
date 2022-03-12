@@ -47,6 +47,10 @@ interface PostDao {
     @Delete
     suspend fun delete(post: Post)
 
+    @Transaction
+    @Query("DELETE FROM posts WHERE posts.authorId = :authorId")
+    suspend fun deleteWithAuthorId(authorId: String)
+
     @Query("DELETE FROM posts WHERE posts.postId = :postId")
     suspend fun deleteWithId(postId: String)
 

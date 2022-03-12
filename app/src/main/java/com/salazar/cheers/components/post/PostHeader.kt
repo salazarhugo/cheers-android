@@ -23,12 +23,14 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.internal.relativeTimeFormatter
 
 @Composable
 fun PostHeader(
     username: String,
     verified: Boolean,
     public: Boolean,
+    created: String = "",
     locationName: String,
     profilePictureUrl: String,
     onHeaderClicked: (username: String) -> Unit,
@@ -95,6 +97,11 @@ fun PostHeader(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            Text(
+                text = relativeTimeFormatter(value = created),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(end = 8.dp),
+            )
             if (public)
                 Icon(
                     Icons.Default.Public,

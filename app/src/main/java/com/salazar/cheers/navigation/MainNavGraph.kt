@@ -6,6 +6,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
@@ -14,26 +15,28 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
+import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.bottomSheet
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.add.AddPostRoute
-import com.salazar.cheers.ui.add.AddPostViewModel
-import com.salazar.cheers.ui.camera.CameraRoute
-import com.salazar.cheers.ui.camera.CameraViewModel
-import com.salazar.cheers.ui.chat.ChatRoute
-import com.salazar.cheers.ui.chat.chatViewModel
-import com.salazar.cheers.ui.chats.ChatsMoreBottomSheet
-import com.salazar.cheers.ui.chats.MessagesRoute
-import com.salazar.cheers.ui.chats.MessagesViewModel
-import com.salazar.cheers.ui.comment.CommentsRoute
-import com.salazar.cheers.ui.comment.commentsViewModel
-import com.salazar.cheers.ui.detail.PostDetailRoute
-import com.salazar.cheers.ui.detail.postDetailViewModel
-import com.salazar.cheers.ui.event.detail.EventDetailRoute
-import com.salazar.cheers.ui.event.detail.eventDetailViewModel
+import com.salazar.cheers.ui.main.add.AddPostRoute
+import com.salazar.cheers.ui.main.add.AddPostViewModel
+import com.salazar.cheers.ui.main.camera.CameraRoute
+import com.salazar.cheers.ui.main.camera.CameraViewModel
+import com.salazar.cheers.ui.main.chat.ChatRoute
+import com.salazar.cheers.ui.main.chat.chatViewModel
+import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
+import com.salazar.cheers.ui.main.chats.MessagesRoute
+import com.salazar.cheers.ui.main.chats.MessagesViewModel
+import com.salazar.cheers.ui.main.comment.CommentsRoute
+import com.salazar.cheers.ui.main.comment.commentsViewModel
+import com.salazar.cheers.ui.main.detail.PostDetailRoute
+import com.salazar.cheers.ui.main.detail.postDetailViewModel
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
+import com.salazar.cheers.ui.main.event.detail.EventDetailRoute
+import com.salazar.cheers.ui.main.event.detail.eventDetailViewModel
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapRoute
@@ -45,11 +48,18 @@ import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.search.SearchViewModel
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.StoryViewModel
+import com.salazar.cheers.ui.sheets.SendGiftRoute
+import com.salazar.cheers.ui.sheets.sendGiftViewModel
+import com.salazar.cheers.ui.theme.CheersTheme
+import com.salazar.cheers.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.util.Utils.copyToClipboard
 
 fun NavGraphBuilder.mainNavGraph(
     user: User,
     navActions: CheersNavigationActions,
     presentPaymentSheet: (String) -> Unit,
+    showInterstitialAd: () -> Unit,
+    bottomSheetNavigator: BottomSheetNavigator,
 ) {
     val uri = "https://cheers-a275e.web.app"
 
@@ -77,12 +87,18 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         bottomSheet(
-            route = "${MainDestinations.POST_MORE_SHEET}/{postId}/{isAuthor}",
-            arguments = listOf(navArgument("isAuthor") { defaultValue = false })
+            route = "${MainDestinations.POST_MORE_SHEET}/{postId}/{authorId}",
+            arguments = listOf(
+                navArgument("authorId") { nullable = false },
+                navArgument("postId") { nullable = false },
+            )
         ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
             val postId = it.arguments?.getString("postId")!!
-            val isAuthor = it.arguments?.getBoolean("isAuthor")!!
+            val authorId = it.arguments?.getString("authorId")!!
+            val isAuthor = authorId == FirebaseAuth.getInstance().currentUser?.uid!!
+            val context = LocalContext.current
+
             PostMoreBottomSheet(
                 isAuthor = isAuthor,
                 onDetails = { navActions.navigateToPostDetail(postId) },
@@ -90,6 +106,30 @@ fun NavGraphBuilder.mainNavGraph(
                 onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
                 onShare = {},
+                onBlock = {
+                    homeViewModel.blockUser(authorId)
+                    navActions.navigateBack()
+                },
+                onLinkClick = {
+                    FirebaseDynamicLinksUtil.createShortLink("p/$postId")
+                        .addOnSuccessListener { shortLink ->
+                            context.copyToClipboard(shortLink.shortLink.toString())
+                        }
+                    navActions.navigateBack()
+                }
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.SEND_GIFT_SHEET}/{receiverId}",
+        ) {
+            val receiverId = it.arguments?.getString("receiverId")!!
+            val sendGiftViewModel = sendGiftViewModel(receiverId = receiverId)
+
+            SendGiftRoute(
+                sendGiftViewModel = sendGiftViewModel,
+                navActions = navActions,
+                bottomSheetNavigator = bottomSheetNavigator,
             )
         }
 
@@ -114,10 +154,13 @@ fun NavGraphBuilder.mainNavGraph(
 //            if (userId != null)
 //                storyViewModel.
 
-            StoryRoute(
-                storyViewModel = storyViewModel,
-                navActions = navActions,
-            )
+            CheersTheme(darkTheme = true) {
+                StoryRoute(
+                    storyViewModel = storyViewModel,
+                    navActions = navActions,
+                    showInterstitialAd = showInterstitialAd,
+                )
+            }
         }
 
         bottomSheet(route = MainDestinations.PROFILE_MORE_SHEET) {
@@ -147,6 +190,7 @@ fun NavGraphBuilder.mainNavGraph(
 //            exitTransition = {},
         ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
+
             HomeRoute(
                 homeViewModel = homeViewModel,
                 navActions = navActions,
@@ -187,6 +231,8 @@ fun NavGraphBuilder.mainNavGraph(
             CommentsRoute(
                 commentsViewModel = commentsViewModel,
                 navActions = navActions,
+                bottomSheetNavigator = bottomSheetNavigator,
+                profilePictureUrl = user.profilePictureUrl,
             )
         }
 
@@ -197,6 +243,7 @@ fun NavGraphBuilder.mainNavGraph(
 
             val username = it.arguments?.getString("username")!!
             val otherProfileViewModel = otherProfileViewModel(username = username)
+
             OtherProfileRoute(
                 otherProfileViewModel = otherProfileViewModel,
                 navActions = navActions,
@@ -205,6 +252,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/e/{eventId}" })
         ) {
             val eventId = it.arguments?.getString("eventId")!!
             val eventDetailViewModel = eventDetailViewModel(eventId = eventId)
@@ -216,7 +264,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/post/{postId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
         ) {
             val postId = it.arguments?.getString("postId")!!
             val postDetailViewModel = postDetailViewModel(postId = postId)
@@ -245,8 +293,6 @@ fun NavGraphBuilder.mainNavGraph(
             MessagesRoute(
                 messagesViewModel = messagesViewModel,
                 navActions = navActions,
-                username = user.username,
-                verified = user.verified,
             )
         }
 

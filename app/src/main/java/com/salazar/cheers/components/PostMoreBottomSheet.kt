@@ -22,7 +22,9 @@ fun PostMoreBottomSheet(
     onDetails: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
+    onBlock: () -> Unit,
     onShare: () -> Unit,
+    onLinkClick: () -> Unit,
     onUnfollow: () -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -35,11 +37,12 @@ fun PostMoreBottomSheet(
                 .background(MaterialTheme.colorScheme.outline)
         )
         Item(text = "Details", icon = Icons.Outlined.OpenInNew, onDetails)
-        Item(text = "Link", icon = Icons.Outlined.Link)
+        Item(text = "Link", icon = Icons.Outlined.Link, onLinkClick)
         if (isAuthor)
             Item(text = "Delete", icon = Icons.Outlined.Delete, onDelete)
         Item(text = "Share", icon = Icons.Outlined.Share, onShare)
         Item(text = "Report", icon = Icons.Outlined.Report, onReport)
+        Item(text = "Block", icon = Icons.Outlined.Block, onBlock)
         if (!isAuthor)
             Item(text = "Unfollow", icon = Icons.Outlined.UnfoldLess, onUnfollow)
     }

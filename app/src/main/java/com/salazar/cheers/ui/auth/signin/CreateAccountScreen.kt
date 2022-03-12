@@ -16,14 +16,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.share.ErrorMessage
-import com.salazar.cheers.ui.auth.signin.signup.SignUpUiState
+import com.salazar.cheers.ui.auth.signup.SignUpUiState
 
 @Composable
 fun CreateAccountScreen(
@@ -33,28 +37,45 @@ fun CreateAccountScreen(
     onSignUp: () -> Unit,
 ) {
     Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text("Enter Phone or Email", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(8.dp))
-        Text("You can't change it later")
-        Spacer(Modifier.height(16.dp))
-        EmailTextField(
-            email = uiState.email,
-            onEmailChanged = onEmailChanged,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(Modifier.height(8.dp))
+            Text("Sign up as ${uiState.username}?", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(8.dp))
+            Text("You can't change it later")
+            Spacer(Modifier.height(32.dp))
+            SignUpButton(
+                uiState = uiState,
+                onSignUp = onSignUp,
+            )
+            ErrorMessage(
+                errorMessage = uiState.errorMessage,
+                paddingValues = PaddingValues(vertical = 8.dp)
+            )
+        }
+
+        val text = buildAnnotatedString {
+            append("By clicking Next, you agree to our ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("Terms. ")
+            }
+            append("Learn how we collect, use and share your data in our ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("Data Policy.")
+            }
+        }
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
         )
-        Spacer(Modifier.height(8.dp))
-        PasswordTextField(
-            password = uiState.password,
-            onPasswordChanged = onPasswordChanged
-        )
-        Spacer(Modifier.height(16.dp))
-        SignUpButton(
-            uiState = uiState,
-            onSignUp = onSignUp,
-        )
-        ErrorMessage(errorMessage = uiState.errorMessage, paddingValues = PaddingValues(vertical = 8.dp))
     }
 }
 

@@ -84,7 +84,7 @@
     </dialog>
     <fragment
         android:id="@+id/messagesFragment"
-        android:name="com.salazar.cheers.ui.chats.MessagesFragment"
+        android:name="com.salazar.cheers.ui.main.chats.MessagesFragment"
         android:label="MessagesFragment" >
         <action
             android:id="@+id/action_messagesFragment_to_chatActivity"
@@ -113,7 +113,7 @@
         android:label="EditProfileFragment" />
     <activity
         android:id="@+id/chatActivity"
-        android:name="com.salazar.cheers.ui.chat.ChatActivity"
+        android:name="com.salazar.cheers.ui.main.chat.ChatActivity"
         android:label="activity_chat"
         tools:layout="@layout/activity_chat" >
         <argument
@@ -203,7 +203,7 @@
     </fragment>
     <fragment
         android:id="@+id/postDetailFragment"
-        android:name="com.salazar.cheers.ui.detail.PostDetailFragment"
+        android:name="com.salazar.cheers.ui.main.detail.PostDetailFragment"
         android:label="PostDetailFragment" >
         <argument
             android:name="postId"
@@ -218,7 +218,7 @@
         android:label="AddEventFragment" />
     <fragment
         android:id="@+id/eventDetailFragment"
-        android:name="com.salazar.cheers.ui.event.detail.EventDetailFragment"
+        android:name="com.salazar.cheers.ui.main.event.detail.EventDetailFragment"
         android:label="EventDetailFragment" >
         <argument
             android:name="eventId"
@@ -226,6 +226,6 @@
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="com.salazar.cheers.ui.camera.CameraFragment"
+        android:name="com.salazar.cheers.ui.main.camera.CameraFragment"
         android:label="CameraFragment" />
 </navigation>

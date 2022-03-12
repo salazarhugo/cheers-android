@@ -31,12 +31,12 @@ fun AppBar(
                         Icon(Icons.Default.ChevronLeft, contentDescription = null)
                     }
             },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            )
+//            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+//                containerColor = MaterialTheme.colorScheme.primary,
+//                titleContentColor = MaterialTheme.colorScheme.onPrimary,
+//                actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+//                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+//            )
         )
     } else {
         SmallTopAppBar(

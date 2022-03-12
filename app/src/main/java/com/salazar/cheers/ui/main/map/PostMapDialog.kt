@@ -14,7 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.data.db.PostFeed
-import com.salazar.cheers.ui.detail.PostFooter
+import com.salazar.cheers.ui.main.detail.PostFooter
 import com.salazar.cheers.ui.main.home.PostBody
 
 

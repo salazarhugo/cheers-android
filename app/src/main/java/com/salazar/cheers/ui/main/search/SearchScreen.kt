@@ -46,11 +46,6 @@ fun SearchScreen(
 ) {
     Scaffold(
         topBar = { SearchBar(uiState, onSearchInputChanged) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { }) {
-                Icon(Icons.Default.Search, "w")
-            }
-        }
     ) {
         SearchBody(
             uiState = uiState,
@@ -68,9 +63,7 @@ private fun SearchBody(
     onDeleteRecentUser: (RecentUser) -> Unit,
     onRecentUserClicked: (String) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.padding(15.dp)
-    ) {
+    Column {
         val users = uiState.users
         val recommendation = uiState.userRecommendations
         if (users.isNullOrEmpty() && uiState.searchInput.isNotBlank()) {
@@ -95,10 +88,19 @@ fun UserList(
 ) {
     LazyColumn {
         item {
-            Text("Result")
+            Text(
+                text = "Result",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(16.dp),
+            )
+//            Spacer(Modifier.height(8.dp))
         }
         items(users) { user ->
-            UserCard(user, onUserClicked = onUserClicked)
+            UserCard(
+                modifier = Modifier.animateItemPlacement(),
+                user = user,
+                onUserClicked = onUserClicked,
+            )
         }
     }
 }
@@ -113,7 +115,11 @@ fun RecentUserList(
 ) {
     LazyColumn {
         item {
-            Text("Recent")
+            Text(
+                text = "Recent",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(16.dp),
+            )
         }
         items(recent) { user ->
             RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
@@ -123,7 +129,11 @@ fun RecentUserList(
                 Text("Suggestions")
         }
         items(recommendations) { user ->
-            UserCard(user, onUserClicked = onUserClicked)
+            UserCard(
+                modifier = Modifier.animateItemPlacement(),
+                user = user,
+                onUserClicked = onUserClicked,
+            )
         }
     }
 }
@@ -138,7 +148,7 @@ fun RecentUserCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onRecentUserClicked(user.username) }
-            .padding(6.dp),
+            .padding(vertical = 6.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -176,14 +186,15 @@ fun RecentUserCard(
 
 @Composable
 fun UserCard(
+    modifier: Modifier = Modifier,
     user: User,
     onUserClicked: (User) -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onUserClicked(user) }
-            .padding(6.dp),
+            .padding(vertical = 6.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

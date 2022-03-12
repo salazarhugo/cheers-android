@@ -22,14 +22,9 @@ import com.salazar.cheers.components.share.Toolbar
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
+    onSettingsUIAction: (SettingsUIAction) -> Unit,
     onSignOut: () -> Unit,
-    navigateToTheme: () -> Unit,
-    navigateToLanguage: () -> Unit,
-    navigateToNotifications: () -> Unit,
-    navigateToAddPaymentMethod: () -> Unit,
-    navigateToPaymentHistory: () -> Unit,
     navigateToBecomeVip: () -> Unit,
-    navigateToRecharge: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
 
@@ -37,20 +32,11 @@ fun SettingsScreen(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Settings") },
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            AccountSection(
-                navigateToBecomeVip = navigateToBecomeVip,
-            )
+            AccountSection(navigateToBecomeVip = navigateToBecomeVip)
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsSection(
-                navigateToTheme = navigateToTheme,
-                navigateToNotifications = navigateToNotifications,
-                navigateToLanguage = navigateToLanguage,
-                navigateToAddPaymentMethod = navigateToAddPaymentMethod,
-                navigateToPaymentHistory = navigateToPaymentHistory,
-                navigateToRecharge = navigateToRecharge,
-            )
+            SettingsSection(onSettingsUIAction = onSettingsUIAction)
             Spacer(modifier = Modifier.height(16.dp))
-            HelpSection()
+            HelpSection(onSettingsUIAction = onSettingsUIAction)
             Spacer(modifier = Modifier.height(16.dp))
             LoginsSection(onSignOut = onSignOut)
             Spacer(modifier = Modifier.height(16.dp))
@@ -65,7 +51,9 @@ fun VersionSection() {
     Text(
         text = "Cheers v.${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         textAlign = TextAlign.Center,
     )
 }
@@ -82,11 +70,15 @@ fun LoginsSection(
 }
 
 @Composable
-fun HelpSection() {
+fun HelpSection(
+    onSettingsUIAction: (SettingsUIAction) -> Unit,
+) {
     Column() {
         SettingTitle(title = "Help")
         SettingItem("Ask a Question", Icons.Outlined.QuestionAnswer, {})
-        SettingItem("Privacy Policy", Icons.Outlined.Policy, {})
+        SettingItem("Privacy Policy", Icons.Outlined.Policy) {
+            onSettingsUIAction(SettingsUIAction.OnPrivacyPolicyClick)
+        }
     }
 }
 
@@ -99,25 +91,37 @@ fun AccountSection(
         SettingItem("Become VIP", Icons.Outlined.WorkspacePremium, navigateToBecomeVip)
     }
 }
+
 @Composable
 fun SettingsSection(
-    navigateToTheme: () -> Unit,
-    navigateToNotifications: () -> Unit,
-    navigateToAddPaymentMethod: () -> Unit,
-    navigateToLanguage: () -> Unit,
-    navigateToPaymentHistory: () -> Unit,
-    navigateToRecharge: () -> Unit,
+    onSettingsUIAction: (SettingsUIAction) -> Unit,
 ) {
     Column() {
         SettingTitle(title = "Settings")
-        SettingItem("Notifications and Sounds", Icons.Outlined.Notifications, navigateToNotifications)
-        SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline, {})
+        SettingItem("Notifications and Sounds", Icons.Outlined.Notifications) {
+            onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
+        }
+        SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline) {
+            onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
+        }
         SettingItem("Devices", Icons.Outlined.Computer, {})
-        SettingItem("Payment Methods", Icons.Outlined.CreditCard, navigateToAddPaymentMethod)
-        SettingItem("Recharge coins", Icons.Outlined.CreditCard, navigateToRecharge)
-        SettingItem("Payment History", Icons.Outlined.CreditCard, navigateToPaymentHistory)
-        SettingItem("Language", Icons.Outlined.Language, navigateToLanguage)
-        SettingItem("Theme", Icons.Outlined.Palette, navigateToTheme)
+        SettingItem("Payment Methods", Icons.Outlined.CreditCard) {
+            onSettingsUIAction(SettingsUIAction.OnAddPaymentClick)
+        }
+        SettingItem("Recharge coins", Icons.Outlined.CreditCard) {
+            onSettingsUIAction(SettingsUIAction.OnRechargeClick)
+
+        }
+        SettingItem("Payment History", Icons.Outlined.CreditCard) {
+            onSettingsUIAction(SettingsUIAction.OnPaymentHistoryClick)
+
+        }
+        SettingItem("Language", Icons.Outlined.Language) {
+            onSettingsUIAction(SettingsUIAction.OnLanguageClick)
+        }
+        SettingItem("Theme", Icons.Outlined.Palette) {
+            onSettingsUIAction(SettingsUIAction.OnThemeClick)
+        }
         SettingItem("About", Icons.Outlined.Info, {})
     }
 }
@@ -130,7 +134,9 @@ fun DeleteAccountButton() {
     ) {
         Text(
             text = "Delete account",
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp),
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Start,
         )
@@ -145,7 +151,9 @@ fun SignOutButton(onSignOut: () -> Unit) {
     ) {
         Text(
             text = "Log Out",
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp),
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Start,
         )

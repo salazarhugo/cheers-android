@@ -16,6 +16,7 @@ import com.salazar.cheers.ui.theme.CheersTheme
 @Composable
 fun CheersApp(
     presentPaymentSheet: (String) -> Unit,
+    showInterstitialAd: () -> Unit,
 ) {
 
     val cheersViewModel = hiltViewModel<CheersViewModel>()
@@ -36,6 +37,7 @@ fun CheersApp(
                 darkTheme = darkTheme,
                 presentPaymentSheet = presentPaymentSheet,
                 user = uiState.user,
+                showInterstitialAd = showInterstitialAd,
             )
         }
     }

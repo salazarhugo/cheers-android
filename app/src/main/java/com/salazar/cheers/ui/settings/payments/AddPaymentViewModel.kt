@@ -63,7 +63,7 @@ class AddPaymentViewModel @Inject constructor() : ViewModel() {
         updateIsLoading(true)
         Stripe(
             context = context,
-            publishableKey = ""
+            publishableKey = "pk_live_51KWqPTAga4Q2CELO2K93NrScmrQOQf0Pbvn0XpDXSqW4gzgXFWpMx1lnSjTfR8251B3TI4zHmQ0MqFDCYdpKD2D200KhtML5F7"
         ).createCardToken(cardParams = cardParams, callback = object : ApiResultCallback<Token> {
             override fun onSuccess(result: Token) {
                 val tokenDoc = Firebase.firestore.collection("stripe_customers")

@@ -7,11 +7,11 @@
 
     <fragment
         android:id="@+id/chatFragment2"
-        android:name="com.salazar.cheers.ui.chat.ChatFragment"
+        android:name="com.salazar.cheers.ui.main.chat.ChatFragment"
         android:label="ChatFragment" />
     <activity
         android:id="@+id/chatActivity2"
-        android:name="com.salazar.cheers.ui.chat.ChatActivity"
+        android:name="com.salazar.cheers.ui.main.chat.ChatActivity"
         android:label="activity_chat"
         tools:layout="@layout/activity_chat" />
     <dialog

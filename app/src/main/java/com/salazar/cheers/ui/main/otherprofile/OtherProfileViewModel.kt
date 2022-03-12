@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
@@ -76,6 +77,7 @@ private data class OtherProfileViewModelState(
 }
 
 class OtherProfileViewModel @AssistedInject constructor(
+    private val userRepository: UserRepository,
     @Assisted private val username: String
 ) : ViewModel() {
 
@@ -107,14 +109,14 @@ class OtherProfileViewModel @AssistedInject constructor(
 
     fun followUser() {
         viewModelScope.launch {
-            Neo4jUtil.followUser(username = username)
+            userRepository.followUser(username = username)
         }
         toggleIsFollowed()
     }
 
     fun unfollowUser() {
         viewModelScope.launch {
-            Neo4jUtil.unfollowUser(username = username)
+            userRepository.unfollowUser(username = username)
         }
         toggleIsFollowed()
     }

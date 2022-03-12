@@ -37,6 +37,7 @@ object MainDestinations {
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
     const val STORY_ROUTE = "story"
+    const val SEND_GIFT_SHEET = "giftSheet"
 }
 
 /**
@@ -70,6 +71,12 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToSendGift: (String) -> Unit = { receiverId ->
+        navController.navigate(route = "${MainDestinations.SEND_GIFT_SHEET}/$receiverId") {
+            launchSingleTop = true
+        }
     }
 
     val navigateToStoryWithUserId: (userId: String) -> Unit = { userId ->
@@ -182,8 +189,8 @@ class CheersNavigationActions(navController: NavHostController) {
         }
     }
 
-    val navigateToPostMoreSheet: (postId: String, isAuthor: Boolean) -> Unit = { postId, isAuthor ->
-        navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postId/$isAuthor") {
+    val navigateToPostMoreSheet: (postId: String, authorId: String) -> Unit = { postId, authorId ->
+        navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postId/$authorId") {
             launchSingleTop = true
             restoreState = true
         }

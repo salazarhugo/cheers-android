@@ -77,43 +77,54 @@ object FirestoreChat {
     }
 
     fun getOrCreateChatChannel(
-        otherUser: User,
+        otherUserId: String,
         onComplete: (channelId: String) -> Unit
     ) {
-        currentUserDocRef.collection("engagedChatChannels")
-            .document(otherUser.id).get().addOnSuccessListener {
-                if (it.exists()) {
-                    onComplete(it["channelId"] as String)
-                    return@addOnSuccessListener
-                }
-                val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+        val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
 
-                val newChannel = chatChannelsCollectionRef.document()
-                newChannel.set(
-                    ChatChannel(
-                        id = newChannel.id,
-                        name = "Channel 1",
-                        members = listOf(currentUserId, otherUser.id),
-                        otherUser = User(),
-                        createdAt = Timestamp.now(),
-                        recentMessageTime = Timestamp.now(),
-                        createdBy = currentUserId,
-                        recentMessage = TextMessage(),
-                        type = ChatChannelType.DIRECT
-                    )
+        val snapshot = chatChannelsCollectionRef
+            .whereArrayContains("members", currentUserId)
+            .whereEqualTo("type", ChatChannelType.DIRECT)
+            .get()
+
+        snapshot.addOnSuccessListener {
+            val doc = it.documents.find { (it["members"] as List<*>).contains(otherUserId) }
+            if (doc != null) {
+                onComplete(doc.id)
+                return@addOnSuccessListener
+            }
+
+            val newChannel = chatChannelsCollectionRef.document()
+            newChannel.set(
+                ChatChannel(
+                    id = newChannel.id,
+                    name = "Channel 1",
+                    members = listOf(currentUserId, otherUserId),
+                    otherUser = User(),
+                    createdAt = Timestamp.now(),
+                    recentMessageTime = Timestamp.now(),
+                    createdBy = currentUserId,
+                    recentMessage = TextMessage(),
+                    type = ChatChannelType.DIRECT
                 )
+            )
 
-                currentUserDocRef.collection("engagedChatChannels")
-                    .document(otherUser.id)
-                    .set(mapOf("channelId" to newChannel.id))
+            onComplete(newChannel.id)
+        }
+    }
 
-                firestoreInstance.collection("users") //ADDS channelId for the otherUser
-                    .document(otherUser.id)
-                    .collection("engagedChatChannels")
-                    .document(currentUserId)
-                    .set(mapOf("channelId" to newChannel.id))
+    suspend fun getChatChannel(
+        channelId: String,
+        onSuccess: (ChatChannel) -> Unit
+    ) {
+        chatChannelsCollectionRef
+            .document(channelId).get()
+            .addOnSuccessListener { doc ->
+                if (doc == null || !doc.exists())
+                    return@addOnSuccessListener
 
-                onComplete(newChannel.id)
+                val channel = doc.toObject(ChatChannel::class.java)!!
+                onSuccess(channel)
             }
     }
 
@@ -195,6 +206,20 @@ object FirestoreChat {
         chatChannelsCollectionRef.document(channelId).update(
             mapOf("recentMessage.seenBy" to FieldValue.arrayUnion(currentUserId)),
         )
+    }
+
+    fun sendMessageTo(
+        message: Message,
+        authorId: String
+    ) {
+        val snapshot = chatChannelsCollectionRef
+            .whereIn("members", listOf(authorId, FirebaseAuth.getInstance().currentUser?.uid))
+            .whereEqualTo("type", ChatChannelType.DIRECT)
+            .get()
+
+        snapshot.addOnSuccessListener {
+
+        }
     }
 
     fun sendMessage(

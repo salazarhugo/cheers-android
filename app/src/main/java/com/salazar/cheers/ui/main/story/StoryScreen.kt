@@ -7,6 +7,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +29,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.insets.imePadding
+import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -45,6 +51,13 @@ fun StoryScreen(
     onStoryClick: () -> Unit,
     onStoryOpen: (String) -> Unit,
     onNavigateBack: () -> Unit,
+    onUserClick: (String) -> Unit,
+    value: String,
+    pause: Boolean,
+    onFocusChange: (Boolean) -> Unit,
+    onInputChange: (String) -> Unit,
+    onSendReaction: (Story, String) -> Unit,
+    showInterstitialAd: () -> Unit,
 ) {
     val pagerState = rememberPagerState()
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
@@ -64,6 +77,13 @@ fun StoryScreen(
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
             },
+            onUserClick = onUserClick,
+            value = value,
+            onInputChange = onInputChange,
+            onSendReaction = onSendReaction,
+            pause = pause,
+            onFocusChange = onFocusChange,
+            showInterstitialAd = showInterstitialAd,
         )
     }
 }
@@ -71,23 +91,45 @@ fun StoryScreen(
 @Composable
 fun StoryCarousel(
     stories: List<Story>,
+    showInterstitialAd: () -> Unit,
     pagerState: PagerState,
     onStoryClick: () -> Unit,
     onStoryFinish: () -> Unit,
     onStoryOpen: (String) -> Unit,
+    onUserClick: (String) -> Unit,
+    value: String,
+    pause: Boolean,
+    onFocusChange: (Boolean) -> Unit,
+    onInputChange: (String) -> Unit,
+    onSendReaction: (Story, String) -> Unit,
 ) {
     HorizontalPager(
         count = stories.size,
         state = pagerState,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
     ) { page ->
+
+        val story = stories[page]
+
         LaunchedEffect(currentPage) {
-            if (page == currentPage && !stories[page].story.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid))
-                onStoryOpen(stories[page].story.id)
+            if (page == currentPage && !story.story.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid))
+                onStoryOpen(story.story.id)
         }
-        Column {
-            Box(
-                Modifier
+
+        if ((page - 1) % 3 == 0)
+            showInterstitialAd()
+        else
+            Scaffold(
+                bottomBar = {
+                    StoryFooter(
+                        value = value,
+                        onInputChange = onInputChange,
+                        onSendReaction = { onSendReaction(story, it) },
+                        onFocusChange = onFocusChange,
+                    )
+                },
+                backgroundColor = Color.Black,
+                modifier = Modifier
                     .graphicsLayer {
                         val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
                         lerp(
@@ -121,10 +163,10 @@ fun StoryCarousel(
                     page = page,
                     user = stories[page].author,
                     onStoryFinish = onStoryFinish,
+                    onUserClick = onUserClick,
+                    pause = pause
                 )
             }
-            StoryFooter()
-        }
     }
 }
 
@@ -133,13 +175,15 @@ fun StoryHeader(
     currentPage: Int,
     page: Int,
     user: User,
-    onStoryFinish: () -> Unit
+    onStoryFinish: () -> Unit,
+    onUserClick: (String) -> Unit,
+    pause: Boolean,
 ) {
     Column() {
         StoryProgressBar(
             steps = 1,
             currentStep = 1,
-            paused = currentPage != page,
+            paused = currentPage != page || pause,
             onFinished = onStoryFinish,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
@@ -149,22 +193,30 @@ fun StoryHeader(
             public = false,
             locationName = "",
             profilePictureUrl = user.profilePictureUrl,
-            onHeaderClicked = {},
+            onHeaderClicked = onUserClick,
             onMoreClicked = {}
         )
     }
 }
 
 @Composable
-fun StoryFooter() {
+fun StoryFooter(
+    value: String,
+    onInputChange: (String) -> Unit,
+    onSendReaction: (String) -> Unit,
+    onFocusChange: (Boolean) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .imePadding()
             .padding(16.dp)
     ) {
         StoryInputField(
-            value = "",
-            onInputChange = {},
+            value = value,
+            onInputChange = onInputChange,
+            onSendReaction = onSendReaction,
+            onFocusChange = onFocusChange
         )
     }
 }
@@ -173,6 +225,8 @@ fun StoryFooter() {
 fun StoryInputField(
     value: String,
     onInputChange: (String) -> Unit,
+    onSendReaction: (String) -> Unit,
+    onFocusChange: (Boolean) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     TextField(
@@ -184,17 +238,32 @@ fun StoryInputField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(8.dp))
+            .onFocusChanged {
+                onFocusChange(it.hasFocus)
+            },
         onValueChange = { onInputChange(it) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Send
         ),
         textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-        keyboardActions = KeyboardActions(onDone = {
+        keyboardActions = KeyboardActions(onSend = {
+            onSendReaction(value)
             focusManager.clearFocus()
         }),
+        trailingIcon = {
+            if (value.isNotBlank())
+                Icon(
+                    Icons.Default.Send,
+                    modifier = Modifier.clickable {
+                        onSendReaction(value)
+                        focusManager.clearFocus()
+                    },
+                    contentDescription = null,
+                )
+        },
         placeholder = { Text("Send message") },
     )
 }

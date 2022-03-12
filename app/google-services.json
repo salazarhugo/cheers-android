@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "988221557023-gj4dih5ac8svt23nndur7a04ono6tto9.apps.googleusercontent.com",
+          "client_id": "988221557023-68gsd84f6ebj2k0h3c9gen1a3cqlkmhj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.salazar.cheers",
-            "certificate_hash": "2a49c636a6941e169d037d1bb98db70c013e3a6f"
+            "certificate_hash": "e7a5e74067fedd10ac41b9a2e0f47dd71e703e6e"
           }
         },
         {

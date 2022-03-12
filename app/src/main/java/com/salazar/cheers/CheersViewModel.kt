@@ -5,11 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.data.entities.UserPreference
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,11 +50,8 @@ class CheersViewModel @Inject constructor(
 
         viewModelScope.launch {
             viewModelState.update {
-                val result = Neo4jUtil.getCurrentUser()
-                when (result) {
-                    is Result.Success -> it.copy(user = result.data)
-                    is Result.Error -> it
-                }
+                val user = userRepository.getCurrentUser()
+                it.copy(user = user)
             }
         }
     }

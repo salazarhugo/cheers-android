@@ -34,7 +34,6 @@ class SearchViewModel @Inject constructor(
 
     init {
         refreshUserRecommendations()
-        cheersDao.getRecentUsers()
         updateRecentUser()
     }
 

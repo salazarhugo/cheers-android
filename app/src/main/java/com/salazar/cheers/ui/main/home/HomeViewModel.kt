@@ -18,9 +18,11 @@ import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.StoryRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.EventUi
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
+import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -50,8 +52,10 @@ sealed interface HomeUiState {
         val postsFlow: Flow<PagingData<PostFeed>>,
         val eventsFlow: Flow<PagingData<EventUi>>?,
         val storiesFlow: Flow<PagingData<Story>>?,
+        val stories: PagingData<Story>?,
         val listState: LazyListState = LazyListState(),
         val likes: Set<String>,
+        val user: User? = null,
         override val postSheetState: ModalBottomSheetState,
         override val suggestions: List<SuggestionUser>?,
         override val isLoading: Boolean,
@@ -63,9 +67,11 @@ sealed interface HomeUiState {
 }
 
 private data class HomeViewModelState(
+    val user: User? = null,
     val postsFlow: Flow<PagingData<PostFeed>>? = null,
     val eventsFlow: Flow<PagingData<EventUi>>? = null,
     val storiesFlow: Flow<PagingData<Story>>? = null,
+    val stories: PagingData<Story>? = null,
     val listState: LazyListState = LazyListState(),
     val suggestions: List<SuggestionUser>? = null,
     val likes: Set<String> = emptySet(),
@@ -89,6 +95,7 @@ private data class HomeViewModelState(
             )
         } else {
             HomeUiState.HasPosts(
+                user = user,
                 nativeAd = nativeAd,
                 postsFlow = postsFlow,
                 eventsFlow = eventsFlow,
@@ -101,6 +108,7 @@ private data class HomeViewModelState(
                 searchInput = searchInput,
                 suggestions = suggestions,
                 selectedTab = selectedTab,
+                stories = stories,
             )
         }
 }
@@ -110,6 +118,7 @@ class HomeViewModel @Inject constructor(
     private val repository: PostRepository,
     private val eventRepository: EventRepository,
     private val storyRepository: StoryRepository,
+    val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
@@ -132,6 +141,11 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             repository.observeLikes().collect { likes ->
                 viewModelState.update { it.copy(likes = likes) }
+            }
+        }
+        viewModelScope.launch {
+            viewModelState.update {
+                it.copy(user = userRepository.getCurrentUser())
             }
         }
     }
@@ -165,13 +179,17 @@ class HomeViewModel @Inject constructor(
 
     fun refresh() {
         viewModelState.update { it.copy(isLoading = true) }
-        viewModelState.update {
-            it.copy(
-                postsFlow = repository.getPosts(),
-                eventsFlow = eventRepository.getEvents(),
-                storiesFlow = storyRepository.getStories(),
-                isLoading = false
-            )
+
+        viewModelScope.launch {
+            viewModelState.update {
+                it.copy(
+                    postsFlow = repository.getPosts(),
+                    eventsFlow = eventRepository.getEvents(),
+                    storiesFlow = storyRepository.getStories(),
+                    user = userRepository.getCurrentUser(),
+                    isLoading = false
+                )
+            }
         }
         refreshSuggestions()
     }
@@ -206,6 +224,12 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }
+        }
+    }
+
+    fun blockUser(userId: String) {
+        viewModelScope.launch {
+            userRepository.blockUser(userId = userId)
         }
     }
 

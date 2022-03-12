@@ -69,6 +69,18 @@ object Neo4jUtil {
         )
     }
 
+    suspend fun blockUser(otherUserId: String) = withContext(Dispatchers.IO) {
+        val params: MutableMap<String, Any> = mutableMapOf()
+        params["userId"] = FirebaseAuth.getInstance().uid!!
+        params["otherUserId"] = otherUserId
+
+        write(
+            "MATCH (u:User)-[r:FOLLOWS]-(u2:User)" +
+                    " WHERE u.id = \$userId AND u2.id = \$otherUserId" +
+                    " DELETE r MERGE (u)-[:BLOCKED]->(u2)", params
+        )
+    }
+
     suspend fun addUser(user: User) {
         return withContext(Dispatchers.IO) {
             val params: MutableMap<String, Any> = mutableMapOf()
@@ -132,7 +144,6 @@ object Neo4jUtil {
                     " WITH s UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (s)-[:WITH]->(u2)",
             params = params
         )
-        sendPostNotification(finalStory.id)
     }
 
     suspend fun addPost(post: Post) = withContext(Dispatchers.IO) {

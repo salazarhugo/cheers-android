@@ -48,9 +48,6 @@ fun SignInRoute(
         onEmailChanged = signInViewModel::onEmailChange,
         signInWithGoogle = { authResultLauncher.launch(1) },
     )
-    if (uiState.isSignedIn) {
-        navActions.navigateToMain()
-    }
 }
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {

@@ -12,3 +12,6 @@ val GreenGoogle = Color(0xFF0F9D58)
 val GreyYoutube = Color(0xFFF9F9F9)
 
 val GreySheet = Color(0xFF262626)
+
+val GreenSurface = Color(0xFFD7F7C2)
+val Green = Color(0xFF228402)

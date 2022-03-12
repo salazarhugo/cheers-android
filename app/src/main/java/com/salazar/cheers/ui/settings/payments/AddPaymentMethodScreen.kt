@@ -37,7 +37,8 @@ fun AddPaymentMethodScreenScreen(
                 title = "Wallet",
             )
         },
-        ) {
+        backgroundColor = MaterialTheme.colorScheme.background,
+    ) {
         Column() {
             LazyColumn() {
                 items(uiState.sources) { source ->

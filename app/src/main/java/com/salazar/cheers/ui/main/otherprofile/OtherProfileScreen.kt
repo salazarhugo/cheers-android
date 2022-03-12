@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AssignmentInd
+import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,6 +48,7 @@ fun OtherProfileScreen(
     onMessageClicked: () -> Unit,
     onBackPressed: () -> Unit,
     onCopyUrl: () -> Unit,
+    onGiftClick: () -> Unit,
 ) {
     Scaffold(
         topBar = { Toolbar(uiState.user, onBackPressed = onBackPressed, onCopyUrl) }
@@ -58,6 +60,7 @@ fun OtherProfileScreen(
                 onUnfollowClicked = onUnfollowClicked,
                 onMessageClicked = onMessageClicked,
                 onStatClicked = onStatClicked,
+                onGiftClick = onGiftClick,
             )
             Tabs(uiState)
         }
@@ -71,6 +74,7 @@ fun Profile(
     onUnfollowClicked: () -> Unit,
     onMessageClicked: () -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
+    onGiftClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(15.dp)
@@ -90,6 +94,7 @@ fun Profile(
             onFollowClicked = onFollowClicked,
             onUnfollowClicked = onUnfollowClicked,
             onMessageClicked = onMessageClicked,
+            onGiftClick = onGiftClick,
         )
     }
 }
@@ -274,6 +279,7 @@ fun HeaderButtons(
     onFollowClicked: () -> Unit,
     onUnfollowClicked: () -> Unit,
     onMessageClicked: () -> Unit,
+    onGiftClick: () -> Unit,
 ) {
     Row {
         if (uiState.user.isFollowed)
@@ -296,6 +302,14 @@ fun HeaderButtons(
             onClick = onMessageClicked,
         ) {
             Text("Message")
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        IconButton(onClick = onGiftClick) {
+            Icon(
+                Icons.Outlined.CardGiftcard,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
