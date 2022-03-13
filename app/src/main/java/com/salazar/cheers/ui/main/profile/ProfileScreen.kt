@@ -3,9 +3,10 @@ package com.salazar.cheers.ui.main.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -262,8 +263,10 @@ fun ListViewPosts(
     onPostClicked: (postId: String) -> Unit,
 ) {
     LazyVerticalGrid(
-        cells = GridCells.Fixed(count = 3),
-        modifier = Modifier.height(800.dp)
+        columns = GridCells.Fixed(count = 3),
+        // We check if there is an *URL* annotation attached to the text
+        // at the clicked position
+        modifier = Modifier.height(800.dp),
     ) {
         items(posts) { post ->
             PostItem(post, onPostClicked)
@@ -277,8 +280,8 @@ fun GridViewPosts(
     onPostClicked: (postId: String) -> Unit,
 ) {
     LazyVerticalGrid(
-        cells = GridCells.Fixed(count = 3),
-        modifier = Modifier.height(800.dp)
+        columns = GridCells.Fixed(count = 3),
+        modifier = Modifier.height(800.dp),
     ) {
         items(posts) { post ->
             PostItem(post, onPostClicked)

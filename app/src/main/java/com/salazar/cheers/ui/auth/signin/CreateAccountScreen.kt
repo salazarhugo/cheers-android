@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.auth.signin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -36,6 +38,9 @@ fun CreateAccountScreen(
     onEmailChanged: (String) -> Unit,
     onSignUp: () -> Unit,
 ) {
+
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,20 +66,63 @@ fun CreateAccountScreen(
             )
         }
 
-        val text = buildAnnotatedString {
-            append("By clicking Next, you agree to our ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+        val annotatedText = buildAnnotatedString {
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                append("By clicking Sign Up, you agree to our ")
+            }
+
+            pushStringAnnotation(
+                tag = "Terms",
+                annotation = "https://cheers-a275e.web.app/terms-of-use"
+            )
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 append("Terms. ")
             }
-            append("Learn how we collect, use and share your data in our ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            pop()
+
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                append("Learn how we collect, use and share your data in our ")
+            }
+
+            pushStringAnnotation(
+                tag = "Data Policy",
+                annotation = "https://cheers-a275e.web.app/privacy-policy"
+            )
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 append("Data Policy.")
             }
+            pop()
         }
 
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium,
+        ClickableText(
+            text = annotatedText,
+            onClick = { offset ->
+                annotatedText.getStringAnnotations(
+                    tag = "Data Policy", start = offset,
+                    end = offset
+                )
+                    .firstOrNull()?.let { annotation ->
+                        uriHandler.openUri(annotation.item)
+                    }
+                annotatedText.getStringAnnotations(
+                    tag = "Terms", start = offset,
+                    end = offset
+                )
+                    .firstOrNull()?.let { annotation ->
+                        uriHandler.openUri(annotation.item)
+                    }
+            },
+//            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

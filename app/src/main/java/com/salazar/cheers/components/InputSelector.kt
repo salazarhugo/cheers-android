@@ -4,9 +4,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -504,8 +504,9 @@ fun ExtendedSelectorInnerButton(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageGrid(images: List<String>) {
+
     LazyVerticalGrid(
-        cells = GridCells.Adaptive(minSize = 100.dp),
+        columns = GridCells.Adaptive(minSize = 100.dp),
     ) {
         items(images) { uri ->
             Text(uri.toString())

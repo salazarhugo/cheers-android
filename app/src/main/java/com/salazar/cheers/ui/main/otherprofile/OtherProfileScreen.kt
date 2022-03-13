@@ -2,9 +2,9 @@ package com.salazar.cheers.ui.main.otherprofile
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells.Fixed
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -152,7 +152,7 @@ fun Tabs(uiState: OtherProfileUiState) {
 @Composable
 fun GridViewPosts(posts: List<Post>) {
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3),
+        columns = Fixed(3),
         modifier = Modifier,
     ) {
         val imagePosts = posts.filter { it.type == PostType.IMAGE }
