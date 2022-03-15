@@ -27,11 +27,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.share.ButtonWithLoading
-import com.salazar.cheers.ui.auth.signup.SignUpUiState
 
 @Composable
 fun ChooseUsernameScreen(
-    uiState: SignUpUiState,
+    username: String,
+    isUsernameAvailable: Boolean,
+    isLoading: Boolean,
+    errorMessage: String?,
     onClearUsername: () -> Unit,
     onUsernameChanged: (String) -> Unit,
     onNextClicked: () -> Unit,
@@ -48,16 +50,16 @@ fun ChooseUsernameScreen(
         Text("You can't change it later")
         Spacer(Modifier.height(36.dp))
         UsernameTextField(
-            username = uiState.username,
-            isUsernameAvailable = uiState.isUsernameAvailable,
-            errorMessage = uiState.errorMessage,
+            username = username,
+            isUsernameAvailable = isUsernameAvailable,
+            errorMessage = errorMessage,
             onClearUsername = onClearUsername,
             onUsernameChanged = onUsernameChanged,
         )
         Spacer(Modifier.height(8.dp))
         ButtonWithLoading(
             text = "Next",
-            isLoading = uiState.isLoading,
+            isLoading = isLoading,
             onClick = onNextClicked,
             modifier = Modifier.fillMaxWidth()
         )

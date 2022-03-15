@@ -28,7 +28,9 @@ data class SignUpUiState(
     val isUsernameAvailable: Boolean = false,
     val email: String = "",
     val password: String = "",
+    val withGoogle: Boolean = false,
     val isSignedIn: Boolean = false,
+    val acceptTerms: Boolean = false,
     val page: Int = 0,
 )
 
@@ -51,6 +53,12 @@ class SignUpViewModel @Inject constructor(
     fun onClearUsername() {
         viewModelState.update {
             it.copy(username = "")
+        }
+    }
+
+    fun updateWithGoogle(withGoogle: Boolean) {
+        viewModelState.update {
+            it.copy(withGoogle = withGoogle)
         }
     }
 
@@ -90,13 +98,23 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun validateInput(
+    fun onAcceptTermsChange(acceptTerms: Boolean) {
+        viewModelState.update {
+            it.copy(acceptTerms = acceptTerms)
+        }
+    }
+
+
+    private fun validateEmail(
         email: String,
+    ): Boolean {
+        return email.isNotBlank()
+    }
+
+    private fun validatePassword(
         password: String
     ): Boolean {
-        if (email.isBlank() || password.isBlank())
-            return false
-        return true
+        return password.isNotBlank()
     }
 
     private fun isLowerCase(username: String): Boolean {
@@ -164,11 +182,12 @@ class SignUpViewModel @Inject constructor(
             viewModelState.update {
                 when (result) {
                     is Result.Success -> {
+                        val page = if (it.email.isNotBlank()) it.page + 3 else it.page + 1
                         it.copy(
                             isUsernameAvailable = result.data,
                             username = username,
                             isLoading = false,
-                            page = it.page + 1,
+                            page = page,
                         )
                     }
                     is Result.Error -> {
@@ -232,24 +251,32 @@ class SignUpViewModel @Inject constructor(
 
         updateIsLoading(true)
 
-        if (!validateInput(email, password)) {
-            updateErrorMessage("Fields can't be empty")
+        if (!validateEmail(email)) {
+            updateErrorMessage("Email can't be empty")
+            return
+        }
+
+        if (!state.withGoogle && !validatePassword(password)) {
+            updateErrorMessage("Password can't be empty")
             return
         }
 
         isUsernameAvailable(username) { result ->
             when (result) {
                 is Result.Success -> {
-                    Firebase.auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                signInSuccessful(email = email, username = username)
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                updateErrorMessage(task.exception?.message)
+                    if (state.withGoogle)
+                        signInSuccessful(email = email, username = username)
+                    else
+                        Firebase.auth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    signInSuccessful(email = email, username = username)
+                                } else {
+                                    // If sign in fails, display a message to the user.
+                                    updateErrorMessage(task.exception?.message)
+                                }
+                                updateIsLoading(false)
                             }
-                            updateIsLoading(false)
-                        }
                 }
                 else -> {
                     updateErrorMessage("Username not available")

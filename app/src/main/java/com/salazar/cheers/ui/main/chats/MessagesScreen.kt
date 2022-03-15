@@ -238,7 +238,7 @@ fun DirectConversation(
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(54.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )

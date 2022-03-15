@@ -67,7 +67,7 @@ object SettingDestinations {
 /**
  * Models the navigation actions in the app.
  */
-class CheersNavigationActions(navController: NavHostController) {
+class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
@@ -135,6 +135,12 @@ class CheersNavigationActions(navController: NavHostController) {
 
     val navigateToSignUp: () -> Unit = {
         navController.navigate(AuthDestinations.SIGN_UP_ROUTE) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToSignUpWithEmail: (email: String) -> Unit = { email ->
+        navController.navigate("${AuthDestinations.SIGN_UP_ROUTE}?email=$email") {
             launchSingleTop = true
         }
     }

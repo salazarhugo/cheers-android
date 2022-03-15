@@ -24,6 +24,7 @@ import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.ui.main.chat.ChatViewModel
 import com.salazar.cheers.ui.main.comment.CommentsViewModel
 import com.salazar.cheers.ui.main.detail.PostDetailViewModel
@@ -37,6 +38,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.components.ActivityComponent
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -56,6 +58,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     private val cheersViewModel: CheersViewModel by viewModels()
     lateinit var paymentSheet: PaymentSheet
     private var mInterstitialAd: InterstitialAd? = null
+
+    @Inject
+    lateinit var billingRepository: BillingRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -180,6 +185,12 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        cheersViewModel.queryPurchases()
+    }
+
     override fun onStart() {
         super.onStart()
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -208,4 +219,5 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         Log.i("AUTH", p0.currentUser?.uid.toString())
         cheersViewModel.onAuthChange(p0)
     }
+
 }

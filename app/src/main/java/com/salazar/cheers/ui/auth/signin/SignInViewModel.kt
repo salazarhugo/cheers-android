@@ -52,15 +52,15 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    private fun updateIsLoading(isLoading: Boolean) {
-        viewModelState.update {
-            it.copy(isLoading = isLoading)
-        }
-    }
-
     private fun updateIsSignedIn(isSignedIn: Boolean) {
         viewModelState.update {
             it.copy(isSignedIn = isSignedIn)
+        }
+    }
+
+    private fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
         }
     }
 
@@ -73,7 +73,7 @@ class SignInViewModel @Inject constructor(
         return true
     }
 
-    fun getAndSaveRegistrationToken() {
+    private fun getAndSaveRegistrationToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("FCM", "Fetching FCM registration token failed", task.exception)
@@ -98,13 +98,13 @@ class SignInViewModel @Inject constructor(
 
         updateIsLoading(true)
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            .addOnFailureListener {
+                updateErrorMessage("Authentication failed: ${it.message}")
+            }
+            .addOnSuccessListener {
+                getAndSaveRegistrationToken()
+            }
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    signInSuccessful()
-                } else {
-                    updateErrorMessage("Authentication failed")
-                }
-
                 updateIsLoading(false)
             }
     }
@@ -125,26 +125,25 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun signInSuccessful(acct: GoogleSignInAccount? = null) {
+        if (acct == null) return
         FirestoreUtil.checkIfUserExists { exists ->
             if (exists) {
                 updateIsSignedIn(true)
                 getAndSaveRegistrationToken()
             } else {
-                FirestoreUtil.initCurrentUserIfFirstTime(acct = acct, username = "username") {
-                    updateIsSignedIn(true)
-                    getAndSaveRegistrationToken()
+                viewModelState.update {
+                    it.copy(firstTime = true, email = acct.email!!)
                 }
             }
         }
     }
-
-
 }
 
 data class SignInUiState(
+    val isSignedIn: Boolean = false,
+    val firstTime: Boolean = false,
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val email: String = "",
     val password: String = "",
-    val isSignedIn: Boolean = false,
 )

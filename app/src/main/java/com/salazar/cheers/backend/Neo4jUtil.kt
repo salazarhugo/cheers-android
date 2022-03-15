@@ -85,7 +85,7 @@ object Neo4jUtil {
         return withContext(Dispatchers.IO) {
             val params: MutableMap<String, Any> = mutableMapOf()
             params["user"] = toMap(user)
-            write("CREATE (u:User \$user)", params)
+            write("CREATE (u:User \$user) SET u.created = datetime().epochMillis", params)
         }
     }
 

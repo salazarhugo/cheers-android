@@ -15,14 +15,10 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 14
-        versionName "0.9.6"
+        versionCode 15
+        versionName "0.9.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-//            generatedDensities []
-        }
     }
 
     aaptOptions {
@@ -244,7 +240,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:2.7.1"
 
     // Snapchat
-    implementation ([
+    implementation([
             'com.snapchat.kit.sdk:bitmoji:1.13.0',
             'com.snapchat.kit.sdk:login:1.13.0',
             'com.snapchat.kit.sdk:core:1.13.0',

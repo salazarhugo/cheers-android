@@ -1,8 +1,10 @@
 package com.salazar.cheers.ui.settings.payments
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.UserRepository
+import com.android.billingclient.api.SkuDetails
+import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RechargeViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val billingRepository: BillingRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RechargeUiState(isLoading = false))
@@ -35,6 +37,26 @@ class RechargeViewModel @Inject constructor(
                 }
             }
         }
+        billingRepository.startConnection()
+        refreshSkuDetails()
+    }
+
+    fun refreshSkuDetails() {
+        viewModelScope.launch {
+            val skuDetails = billingRepository.querySkuDetails().skuDetailsList
+            if (skuDetails != null) {
+                viewModelState.update {
+                    it.copy(skuDetails = skuDetails.sortedBy { it.priceAmountMicros })
+                }
+            }
+        }
+    }
+
+    fun onSkuClick(
+        skuDetails: SkuDetails,
+        activity: Activity
+    ) {
+        billingRepository.launchBillingFlow(skuDetails = skuDetails, activity = activity)
     }
 
     fun updateIsLoading(isLoading: Boolean) {
@@ -49,5 +71,6 @@ data class RechargeUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
     val coins: Int = 0,
+    val skuDetails: List<SkuDetails>? = null,
 )
 

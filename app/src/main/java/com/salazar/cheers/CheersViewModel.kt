@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.data.entities.UserPreference
+import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,7 @@ data class CheersUiState(
 @HiltViewModel
 class CheersViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val billingRepository: BillingRepository,
 ) : ViewModel() {
 
     val completed = mutableStateOf(false)
@@ -41,13 +43,23 @@ class CheersViewModel @Inject constructor(
             viewModelState.value
         )
 
-    init {
+    init {}
+
+    fun queryPurchases() {
+        viewModelScope.launch {
+            billingRepository.queryPurchases()
+        }
     }
 
     fun onAuthChange(auth: FirebaseAuth) {
         Log.i("AUTH1", auth.currentUser?.uid.toString())
-        if (auth.currentUser == null) return
 
+        if (auth.currentUser == null) {
+            viewModelState.update {
+                it.copy(user = null)
+            }
+            return
+        }
         viewModelScope.launch {
             viewModelState.update {
                 val user = userRepository.getCurrentUser()

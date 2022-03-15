@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,17 +37,27 @@ fun SignInRoute(
                 Log.e("SIGN IN", e.toString())
             }
         }
+
+//    if (uiState.isSignedIn) {
+//        navActions.navigateToMain()
+//    }
+
+    if (uiState.firstTime)
+        SideEffect {
+            navActions.navigateToSignUpWithEmail(uiState.email)
+        }
+
     SignInScreen(
         uiState = uiState,
         signInWithEmailPassword = {
             signInViewModel.signInWithEmailPassword()
             keyboardController?.hide()
         },
+        signInWithGoogle = { authResultLauncher.launch(1) },
         navigateToPhone = { navActions.navigateToPhone() },
         navigateToSignUp = { navActions.navigateToSignUp() },
         onPasswordChanged = signInViewModel::onPasswordChange,
         onEmailChanged = signInViewModel::onEmailChange,
-        signInWithGoogle = { authResultLauncher.launch(1) },
     )
 }
 

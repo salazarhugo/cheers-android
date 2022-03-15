@@ -1,32 +1,29 @@
 package com.salazar.cheers.ui.settings.payments
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
+import com.android.billingclient.api.SkuDetails
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.animations.AnimatedTextCounter
 import com.salazar.cheers.components.share.Toolbar
 
-data class Recharge(
-    val coins: Int,
-    val price: Float
-) {
-
-}
-
 @Composable
 fun RechargeScreen(
     coins: Int,
-    onRecharge: (Recharge) -> Unit,
-    recharges: List<Recharge>,
+    onRecharge: (SkuDetails) -> Unit,
+    recharges: List<SkuDetails>,
     onBackPressed: () -> Unit,
 ) {
     Scaffold(
@@ -60,8 +57,8 @@ fun RechargeScreen(
 
 @Composable
 fun RechargeItem(
-    recharge: Recharge,
-    onRecharge: (Recharge) -> Unit,
+    recharge: SkuDetails,
+    onRecharge: (SkuDetails) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -71,14 +68,13 @@ fun RechargeItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Default.MonetizationOn,
+            Image(
+                painter = rememberImagePainter(data = recharge.iconUrl),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.width(16.dp))
             Text(
-                text = "${recharge.coins} coins",
+                text = recharge.description,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -87,7 +83,7 @@ fun RechargeItem(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.width(100.dp)
         ) {
-            Text(text = "$${recharge.price}")
+            Text(text = recharge.price)
         }
     }
 }

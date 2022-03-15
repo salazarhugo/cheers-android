@@ -26,6 +26,7 @@ data class User(
     val darkMode: Boolean,
     val registrationTokens: List<String>,
     val isFollowed: Boolean,
+    val created: Long,
 ) : Serializable {
 
     constructor() : this(
@@ -48,5 +49,6 @@ data class User(
         false,
         listOf(),
         false,
+        0,
     )
 }

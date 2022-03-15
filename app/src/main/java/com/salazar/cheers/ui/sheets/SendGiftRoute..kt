@@ -8,10 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +18,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
+import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Green
@@ -40,44 +39,138 @@ fun SendGiftRoute(
     val uiState by sendGiftViewModel.uiState.collectAsState()
 
     val success = uiState.success
+    val username = uiState.receiver?.username
 
-    when (success) {
-        true -> {
-            val y = bottomSheetNavigator.navigatorSheetState.offset.value
-            SuccessSplashView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = -LocalDensity.current.run { y.toDp() } / 2),
-                onFinish = {
-                    navActions.navigateBack()
-                }
-            )
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .width(36.dp)
+                .height(4.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.outline)
+        )
+        when (success) {
+            true -> {
+                val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                SuccessSplashView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = -LocalDensity.current.run { y.toDp() } / 2),
+                    onFinish = {
+                        navActions.navigateBack()
+                    }
+                )
+            }
+            false -> {
+                val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                FailureSplashView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = -LocalDensity.current.run { y.toDp() } / 2),
+                    onFinish = {
+                        navActions.navigateBack()
+                    },
+                    errorMessage = uiState.errorMessage.toString(),
+                )
+            }
+            else -> {
+                if (uiState.isLoading) {
+                    val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                    LoadingScreen(
+                        modifier = Modifier.offset(y = -LocalDensity.current.run { y.toDp() } / 2),
+                    )
+                } else if (uiState.isConfirmationScreen) {
+                    val selectedSticker = uiState.selectedSticker
+                    if (selectedSticker != null)
+                        ConfirmTransactionScreen(
+                            coins = selectedSticker.price,
+                            username = username ?: ""
+                        ) {
+                            sendGiftViewModel.sendGift()
+                        }
+                } else
+                    SendGiftSheet(
+                        name = uiState.receiver?.username ?: "",
+                        onStickerClick = sendGiftViewModel::selectSticker,
+                        bottomSheetNavigator = bottomSheetNavigator,
+                    )
+            }
+
         }
-        false -> {
+    }
+}
+
+@Composable
+fun ConfirmTransactionScreen(
+    coins: Int,
+    username: String,
+    onConfirm: () -> Unit,
+) {
+
+    Text(
+        text = "Send $coins ${if (coins > 1) "coins" else "coin"} to $username",
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(16.dp),
+        color = MaterialTheme.colorScheme.onBackground,
+    )
+    DividerM3()
+    Button(
+        onClick = onConfirm,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = RoundedCornerShape(8.dp),
+    ) {
+        Text(
+//                text = "Send $coins ${if (coins > 1) "coins" else "coin"} to $username"
+            text = "Confirm",
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationGraphicsApi::class)
+@Composable
+fun FailureSplashView(
+    errorMessage: String,
+    modifier: Modifier = Modifier,
+    onFinish: () -> Unit,
+) {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        val image = AnimatedImageVector.animatedVectorResource(R.drawable.avd_fail)
+        var atEnd by remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            atEnd = !atEnd
+        }
+
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier,
+        ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("FAILURE")
+                Icon(
+                    painter = rememberAnimatedVectorPainter(image, atEnd),
+                    contentDescription = "Your content description",
+                    modifier = Modifier
+                        .size(64.dp)
+//                    .clip(CircleShape)
+//                    .background(GreenSurface)
+                        .clickable {
+                            atEnd = !atEnd
+                        }
+                        .padding(8.dp),
+                    tint = MaterialTheme.colorScheme.error,
+                )
                 Text(
-                    text = uiState.errorMessage.toString(),
+                    text = errorMessage,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
             }
         }
-        else -> {
-            if (uiState.isLoading) {
-                val y = bottomSheetNavigator.navigatorSheetState.offset.value
-                LoadingScreen(
-                    modifier = Modifier.offset(y = -LocalDensity.current.run { y.toDp() } / 2),
-                )
-            } else
-                SendGiftSheet(
-                    name = uiState.receiver?.username ?: "",
-                    onStickerClick = { sendGiftViewModel.sendGift() },
-                    bottomSheetNavigator = bottomSheetNavigator,
-                )
-        }
-
     }
 }
 

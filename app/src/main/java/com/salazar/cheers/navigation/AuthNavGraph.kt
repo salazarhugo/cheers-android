@@ -2,6 +2,7 @@ package com.salazar.cheers.navigation
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.salazar.cheers.ui.auth.signin.SignInRoute
@@ -16,8 +17,16 @@ fun NavGraphBuilder.authNavGraph(
         route = CheersDestinations.AUTH_ROUTE,
         startDestination = AuthDestinations.SIGN_IN_ROUTE,
     ) {
-        composable(AuthDestinations.SIGN_UP_ROUTE) {
+        composable(
+            route = "${AuthDestinations.SIGN_UP_ROUTE}?email={email}",
+            arguments = listOf(navArgument("email") { nullable = true }),
+        ) {
             val signUpViewModel = hiltViewModel<SignUpViewModel>()
+            val email = it.arguments?.getString("email")
+            if (email != null) {
+                signUpViewModel.onEmailChange(email = email)
+                signUpViewModel.updateWithGoogle(withGoogle = true)
+            }
 
             SignUpRoute(
                 signUpViewModel = signUpViewModel,

@@ -47,7 +47,7 @@ fun SettingsRoute(
         onBackPressed = { navActions.navigateToProfile() },
         onSignOut = {
             FirebaseAuth.getInstance().signOut()
-            navActions.navigateToSignIn()
+//            navActions.navigateToSignIn()
         },
         onSettingsUIAction = { action ->
             when (action) {
@@ -58,6 +58,7 @@ fun SettingsRoute(
                 is SettingsUIAction.OnPaymentHistoryClick -> navActions.navigateToPaymentHistory()
                 is SettingsUIAction.OnNotificationsClick -> navActions.navigateToNotifications()
                 is SettingsUIAction.OnPrivacyPolicyClick -> uriHandler.openUri("https://cheers-a275e.web.app/privacy-policy")
+                is SettingsUIAction.OnTermsOfUseClick -> uriHandler.openUri("https://cheers-a275e.web.app/terms-of-use")
             }
         },
         navigateToBecomeVip = { callCreatePaymentIntent(49999) },
@@ -72,4 +73,5 @@ sealed class SettingsUIAction {
     object OnPaymentHistoryClick : SettingsUIAction()
     object OnRechargeClick : SettingsUIAction()
     object OnPrivacyPolicyClick : SettingsUIAction()
+    object OnTermsOfUseClick : SettingsUIAction()
 }

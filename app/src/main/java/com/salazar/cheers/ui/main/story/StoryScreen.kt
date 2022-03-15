@@ -116,57 +116,58 @@ fun StoryCarousel(
                 onStoryOpen(story.story.id)
         }
 
-        if ((page - 1) % 3 == 0)
+        if ((page - 1) % 3 == 0) {
             showInterstitialAd()
-        else
-            Scaffold(
-                bottomBar = {
-                    StoryFooter(
-                        value = value,
-                        onInputChange = onInputChange,
-                        onSendReaction = { onSendReaction(story, it) },
-                        onFocusChange = onFocusChange,
-                    )
-                },
-                backgroundColor = Color.Black,
-                modifier = Modifier
-                    .graphicsLayer {
-                        val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
-                        lerp(
-                            start = 0.85f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        ).also { scale ->
-                            scaleX = scale
-                            scaleY = scale
-                        }
-                        alpha = lerp(
-                            start = 0.5f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
+//            onFocusChange(true)
+        }
+        Scaffold(
+            bottomBar = {
+                StoryFooter(
+                    value = value,
+                    onInputChange = onInputChange,
+                    onSendReaction = { onSendReaction(story, it) },
+                    onFocusChange = onFocusChange,
+                )
+            },
+            backgroundColor = Color.Black,
+            modifier = Modifier
+                .graphicsLayer {
+                    val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+                    lerp(
+                        start = 0.85f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    ).also { scale ->
+                        scaleX = scale
+                        scaleY = scale
                     }
-            ) {
-                PrettyImage(
-                    data = stories[page].story.photos[0],
-                    contentDescription = null,
-                    alignment = Alignment.Center,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .aspectRatio(9 / 16f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .fillMaxWidth()
-                        .clickable { onStoryClick() }
-                )
-                StoryHeader(
-                    currentPage = currentPage,
-                    page = page,
-                    user = stories[page].author,
-                    onStoryFinish = onStoryFinish,
-                    onUserClick = onUserClick,
-                    pause = pause
-                )
-            }
+                    alpha = lerp(
+                        start = 0.5f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    )
+                }
+        ) {
+            PrettyImage(
+                data = stories[page].story.photos[0],
+                contentDescription = null,
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .aspectRatio(9 / 16f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .fillMaxWidth()
+                    .clickable { onStoryClick() }
+            )
+            StoryHeader(
+                currentPage = currentPage,
+                page = page,
+                user = stories[page].author,
+                onStoryFinish = onStoryFinish,
+                onUserClick = onUserClick,
+                pause = pause
+            )
+        }
     }
 }
 

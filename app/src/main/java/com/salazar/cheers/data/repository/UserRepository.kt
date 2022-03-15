@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.backend.Neo4jUtil
@@ -47,7 +48,9 @@ class UserRepository @Inject constructor(
         val result = service.getUser(userId = userId)
         when (result) {
             is Result.Success -> userDao.insert(result.data)
-            is Result.Error -> Result.Error(result.exception)
+            is Result.Error ->  {
+                Log.e("User Service", result.exception.message.toString())
+            }
         }
     }
 }

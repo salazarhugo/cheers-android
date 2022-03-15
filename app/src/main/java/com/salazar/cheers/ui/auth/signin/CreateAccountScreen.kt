@@ -36,6 +36,7 @@ fun CreateAccountScreen(
     uiState: SignUpUiState,
     onPasswordChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
+    onAcceptTermsChange: (Boolean) -> Unit,
     onSignUp: () -> Unit,
 ) {
 
@@ -56,6 +57,13 @@ fun CreateAccountScreen(
             Spacer(Modifier.height(8.dp))
             Text("You can't change it later")
             Spacer(Modifier.height(32.dp))
+            AcceptTerms(
+                onAcceptTermsChange = onAcceptTermsChange,
+                acceptTerms = uiState.acceptTerms,
+                onOpenLink = {
+                    uriHandler.openUri(it)
+                })
+            Spacer(Modifier.height(32.dp))
             SignUpButton(
                 uiState = uiState,
                 onSignUp = onSignUp,
@@ -66,44 +74,55 @@ fun CreateAccountScreen(
             )
         }
 
-        val annotatedText = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-                append("By clicking Sign Up, you agree to our ")
-            }
+    }
+}
 
-            pushStringAnnotation(
-                tag = "Terms",
-                annotation = "https://cheers-a275e.web.app/terms-of-use"
-            )
-            withStyle(
-                style = SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                append("Terms. ")
-            }
-            pop()
-
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-                append("Learn how we collect, use and share your data in our ")
-            }
-
-            pushStringAnnotation(
-                tag = "Data Policy",
-                annotation = "https://cheers-a275e.web.app/privacy-policy"
-            )
-            withStyle(
-                style = SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                append("Data Policy.")
-            }
-            pop()
+@Composable
+fun AcceptTerms(
+    onAcceptTermsChange: (Boolean) -> Unit,
+    acceptTerms: Boolean,
+    onOpenLink: (String) -> Unit,
+) {
+    val annotatedText = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+            append("By clicking Sign Up, you agree to our ")
         }
 
+        pushStringAnnotation(
+            tag = "Terms",
+            annotation = "https://cheers-a275e.web.app/terms-of-use"
+        )
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            append("Terms. ")
+        }
+        pop()
+
+        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+            append("Learn how we collect, use and share your data in our ")
+        }
+
+        pushStringAnnotation(
+            tag = "Data Policy",
+            annotation = "https://cheers-a275e.web.app/privacy-policy"
+        )
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            append("Data Policy.")
+        }
+        pop()
+    }
+
+    Row() {
+        Checkbox(checked = acceptTerms, onCheckedChange = onAcceptTermsChange)
         ClickableText(
             text = annotatedText,
             onClick = { offset ->
@@ -112,17 +131,16 @@ fun CreateAccountScreen(
                     end = offset
                 )
                     .firstOrNull()?.let { annotation ->
-                        uriHandler.openUri(annotation.item)
+                        onOpenLink(annotation.item)
                     }
                 annotatedText.getStringAnnotations(
                     tag = "Terms", start = offset,
                     end = offset
                 )
                     .firstOrNull()?.let { annotation ->
-                        uriHandler.openUri(annotation.item)
+                        onOpenLink(annotation.item)
                     }
             },
-//            style = MaterialTheme.typography.labelMedium,
         )
     }
 }
@@ -138,7 +156,7 @@ fun SignUpButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = !uiState.isLoading,
+        enabled = !uiState.isLoading && uiState.acceptTerms,
     ) {
         if (uiState.isLoading)
             CircularProgressIndicator(
@@ -149,7 +167,7 @@ fun SignUpButton(
                 strokeWidth = 1.dp
             )
         else
-            Text(text = "Sign up")
+            Text(text = "Sign Up")
     }
 }
 

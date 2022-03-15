@@ -36,7 +36,10 @@ fun SignUpRoute(
     ) {
         when (uiState.page) {
             0 -> ChooseUsernameScreen(
-                uiState = uiState,
+                username = uiState.username,
+                errorMessage = uiState.errorMessage,
+                isLoading = uiState.isLoading,
+                isUsernameAvailable = uiState.isUsernameAvailable,
                 onClearUsername = signUpViewModel::onClearUsername,
                 onUsernameChanged = signUpViewModel::onUsernameChanged,
                 onNextClicked = signUpViewModel::checkUsername,
@@ -56,6 +59,7 @@ fun SignUpRoute(
                 onPasswordChanged = signUpViewModel::onPasswordChange,
                 onEmailChanged = signUpViewModel::onEmailChange,
                 onSignUp = signUpViewModel::createAccount,
+                onAcceptTermsChange = signUpViewModel::onAcceptTermsChange,
             )
         }
     }

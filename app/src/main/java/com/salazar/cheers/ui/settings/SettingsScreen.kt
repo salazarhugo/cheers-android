@@ -79,6 +79,9 @@ fun HelpSection(
         SettingItem("Privacy Policy", Icons.Outlined.Policy) {
             onSettingsUIAction(SettingsUIAction.OnPrivacyPolicyClick)
         }
+        SettingItem("Terms of Use", Icons.Outlined.Policy) {
+            onSettingsUIAction(SettingsUIAction.OnTermsOfUseClick)
+        }
     }
 }
 

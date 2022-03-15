@@ -25,9 +25,11 @@ import kotlinx.coroutines.launch
 
 data class SendGiftUiState(
     val isLoading: Boolean,
+    val isConfirmationScreen: Boolean = false,
     val errorMessage: String? = null,
     val success: Boolean? = null,
     val receiver: User? = null,
+    val selectedSticker: Sticker? = null,
 )
 
 class SendGiftViewModel @AssistedInject constructor(
@@ -51,6 +53,19 @@ class SendGiftViewModel @AssistedInject constructor(
             viewModelState.update {
                 it.copy(receiver = receiver)
             }
+        }
+    }
+
+    fun selectSticker(sticker: Sticker) {
+        viewModelState.update {
+            it.copy(selectedSticker =  sticker)
+        }
+        updateConfirmation(true)
+    }
+
+    fun updateConfirmation(isConfirmationScreen: Boolean) {
+        viewModelState.update {
+            it.copy(isConfirmationScreen = isConfirmationScreen)
         }
     }
 
