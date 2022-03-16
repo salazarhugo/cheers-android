@@ -8,8 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -49,14 +48,14 @@ sealed interface OtherProfileUiState {
 
 private data class OtherProfileViewModelState(
     val user: User? = null,
-    val posts: List<Post>? = null,
+    val posts: List<Post> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
 ) {
     fun toUiState(): OtherProfileUiState =
-        if (posts == null || posts.isEmpty()) {
+        if (posts.isEmpty()) {
             OtherProfileUiState.NoPosts(
                 user = user ?: User(),
                 isLoading = isLoading,
@@ -78,6 +77,7 @@ private data class OtherProfileViewModelState(
 
 class OtherProfileViewModel @AssistedInject constructor(
     private val userRepository: UserRepository,
+    private val postRepository: PostRepository,
     @Assisted private val username: String
 ) : ViewModel() {
 
@@ -96,7 +96,10 @@ class OtherProfileViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        refreshUser(username = username)
+        getUser(username = username)
+        viewModelScope.launch {
+            userRepository.refreshUser(userIdOrUsername = username)
+        }
         refreshUserPosts(username = username)
     }
 
@@ -133,32 +136,22 @@ class OtherProfileViewModel @AssistedInject constructor(
         }
     }
 
-    private fun refreshUser(username: String) {
+    private fun getUser(username: String) {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            val user = userRepository.getUserWithUsername(username = username)
             viewModelState.update {
-                when (val result = Neo4jUtil.getUserWithUsername(username)) {
-                    is Result.Success -> it.copy(user = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
+                it.copy(user = user, isLoading = false)
             }
         }
     }
 
     private fun refreshUserPosts(username: String) {
         viewModelScope.launch {
+            val posts = postRepository.getPostsWithUsername(username = username)
             viewModelState.update {
-                when (val result = Neo4jUtil.getUserPosts(username = username)) {
-                    is Result.Success -> it.copy(posts = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        errorMessages = listOf(result.exception.toString()),
-                        isLoading = false
-                    )
-                }
+                it.copy(posts = posts, isLoading = false)
             }
         }
     }

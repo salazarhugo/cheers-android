@@ -1,15 +1,11 @@
 package com.salazar.cheers.ui.main.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Tab
@@ -19,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Celebration
-import androidx.compose.material.icons.outlined.Repeat
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
@@ -27,14 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
@@ -44,10 +36,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.*
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
-import com.salazar.cheers.internal.Counter
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -118,8 +107,7 @@ fun Profile(
                 }
             }
             ProfilePostsAndTags(
-                uiState = uiState,
-                onLikeClicked = onLikeClicked,
+                posts = uiState.posts,
                 onPostClicked = onPostClicked,
             )
         }
@@ -128,8 +116,7 @@ fun Profile(
 
 @Composable
 fun ProfilePostsAndTags(
-    uiState: ProfileUiState.HasUser,
-    onLikeClicked: (Post) -> Unit,
+    posts: List<Post>,
     onPostClicked: (postId: String) -> Unit,
 ) {
     val tabs = listOf(Icons.Default.GridView, Icons.Outlined.ViewList, Icons.Outlined.Celebration)
@@ -169,93 +156,21 @@ fun ProfilePostsAndTags(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            val posts = uiState.posts
             when (page) {
                 0 -> GridViewPosts(
-                    posts = posts.map { it.post },
+                    posts = posts,
                     onPostClicked = onPostClicked,
                 )
                 1 -> ListViewPosts(
-                    posts = posts.map { it.post },
+                    posts = posts,
                     onPostClicked = onPostClicked,
                 )
-                2 -> Tweets(
-                    tweets = posts.map { it.post },
-                    onLikeClicked = onLikeClicked,
-                )
-//                2 -> FunctionalityNotAvailablePanel()
+                2 -> FunctionalityNotAvailablePanel()
             }
         }
     }
 }
 
-@Composable
-fun Tweets(
-    tweets: List<Post>,
-    onLikeClicked: (Post) -> Unit
-) {
-    LazyColumn(Modifier.height(800.dp)) {
-        items(tweets) { tweet ->
-            Tweet(tweet, onLikeClicked = onLikeClicked)
-            DividerM3()
-        }
-    }
-}
-
-@Composable
-fun Tweet(
-    post: Post,
-    onLikeClicked: (Post) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Image(
-            painter = rememberImagePainter(
-                data = null,//post.creator.profilePictureUrl,
-                builder = {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                },
-            ),
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape),
-            contentDescription = null,
-        )
-        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-//            Username(
-//                username = post.creator.username,
-//                verified = post.creator.verified,
-//                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
-//            )
-            Text(
-                text = post.caption,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp),
-            ) {
-                val size = Modifier.size(22.dp)
-                LikeButton(
-                    like = post.liked,
-                    likes = post.likes,
-                    onToggle = { onLikeClicked(post) }
-                )
-                Icon(
-                    painter = rememberImagePainter(R.drawable.ic_bubble_icon),
-                    null,
-                    modifier = size
-                )
-                Icon(Icons.Outlined.Repeat, null, modifier = size)
-            }
-        }
-    }
-}
 
 @Composable
 fun ListViewPosts(
@@ -383,7 +298,7 @@ fun ProfileStats(
                 }
             ) {
                 Text(
-                    text = item.value.toString(),
+                    text = numberFormatter(value = item.value),
                     fontWeight = FontWeight.Bold,
                     fontFamily = Roboto
                 )
@@ -392,3 +307,71 @@ fun ProfileStats(
         }
     }
 }
+
+//@Composable
+//fun Tweets(
+//    tweets: List<Post>,
+//    onLikeClicked: (Post) -> Unit
+//) {
+//    LazyColumn(Modifier.height(800.dp)) {
+//        items(tweets) { tweet ->
+//            Tweet(tweet, onLikeClicked = onLikeClicked)
+//            DividerM3()
+//        }
+//    }
+//}
+//
+//@Composable
+//fun Tweet(
+//    post: Post,
+//    onLikeClicked: (Post) -> Unit,
+//) {
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp)
+//    ) {
+//        Image(
+//            painter = rememberImagePainter(
+//                data = null,//post.creator.profilePictureUrl,
+//                builder = {
+//                    transformations(CircleCropTransformation())
+//                    error(R.drawable.default_profile_picture)
+//                },
+//            ),
+//            modifier = Modifier
+//                .size(40.dp)
+//                .clip(CircleShape),
+//            contentDescription = null,
+//        )
+//        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+////            Username(
+////                username = post.creator.username,
+////                verified = post.creator.verified,
+////                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
+////            )
+//            Text(
+//                text = post.caption,
+//                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
+//            )
+//            Row(
+//                horizontalArrangement = Arrangement.spacedBy(12.dp),
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier.padding(vertical = 8.dp),
+//            ) {
+//                val size = Modifier.size(22.dp)
+//                LikeButton(
+//                    like = post.liked,
+//                    likes = post.likes,
+//                    onToggle = { onLikeClicked(post) }
+//                )
+//                Icon(
+//                    painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+//                    null,
+//                    modifier = size
+//                )
+//                Icon(Icons.Outlined.Repeat, null, modifier = size)
+//            }
+//        }
+//    }
+//}

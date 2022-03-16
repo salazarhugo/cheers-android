@@ -45,13 +45,13 @@ fun SendGiftSheet(
         ),
         Sticker(
             name = "Shot",
-            icon = 0,
+            icon = com.salazar.cheers.R.drawable.ic_tequila_shot,
             onClick = onStickerClick,
             price = 5,
         ),
         Sticker(
             name = "Pint",
-            icon = 0,
+            icon = com.salazar.cheers.R.drawable.ic_beer,
             onClick = onStickerClick,
             price = 10,
         ),
@@ -107,6 +107,7 @@ fun SendGiftSheet(
 fun Item(
     text: String,
     price: Int = 50,
+    @DrawableRes icon: Int = com.salazar.cheers.R.drawable.ic_beer,
     onClick: () -> Unit = {}
 ) {
     Column(
@@ -117,7 +118,7 @@ fun Item(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = rememberImagePainter(data = com.salazar.cheers.R.drawable.ic_beer),
+            painter = rememberImagePainter(data = icon),
             contentDescription = null,
             modifier = Modifier.size(44.dp)
         )

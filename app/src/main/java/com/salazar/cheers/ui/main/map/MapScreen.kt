@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MyLocation
@@ -57,7 +56,9 @@ import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
 import com.salazar.cheers.util.Utils.getCircularBitmapWithWhiteBorder
 import com.salazar.cheers.util.Utils.isDarkModeOn
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
 
@@ -89,16 +90,25 @@ fun MapScreen(
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {}) {
-                    Icon(Icons.Default.MyLocation, "w")
+                    Icon(Icons.Default.MyLocation, null)
                 }
             }
         ) {
             LocationPermission(navigateToSettingsScreen) {
                 Box(contentAlignment = Alignment.BottomCenter) {
-                    AndroidView(factory = {
-                        onMapReady(mapView, context)
-                        mapView
-                    }, Modifier.fillMaxSize()) {
+                    AndroidView(
+                        modifier = Modifier.fillMaxSize(),
+                        factory = {
+                            onMapReady(mapView, context)
+                            mapView
+                        },
+                    ) { mapView ->
+                        addPostsAnnotations(
+                            context = context,
+                            posts = uiState.posts,
+                            mapView = mapView,
+                            onSelectPost = onSelectPost,
+                        )
                     }
                     UiLayer(
                         this,
@@ -111,6 +121,44 @@ fun MapScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+private fun addPostsAnnotations(
+    context: Context,
+    posts: List<PostFeed>?,
+    mapView: MapView,
+    onSelectPost: (PostFeed) -> Unit,
+) {
+    val annotationApi = mapView.annotations
+    posts?.forEach {
+        if (it.post.type == PostType.IMAGE) {
+            val pointAnnotationManager =
+                annotationApi.createPointAnnotationManager(mapView)
+            val pointAnnotationOptions: PointAnnotationOptions =
+                PointAnnotationOptions()
+                    .withPoint(
+                        Point.fromLngLat(
+                            it.post.locationLongitude,
+                            it.post.locationLatitude
+                        )
+                    )
+                    .withIconImage(
+                        bitmapFromDrawableRes(
+                            context,
+                            resourceId = com.salazar.cheers.R.drawable.ic_beer
+                        )!!
+                    )
+                    .withIconSize(1.0)
+            pointAnnotationManager.create(pointAnnotationOptions)
+            pointAnnotationManager.addClickListener(
+                onPostAnnotationClick(
+                    it,
+                    onSelectPost = onSelectPost,
+                    mapView = mapView,
+                )
+            )
         }
     }
 }
@@ -164,23 +212,18 @@ fun UiLayer(
     val scope2 = rememberCoroutineScope()
 
     scope.apply {
-
-        LaunchedEffect(uiState.isPublic, uiState.posts) {
-            GlobalScope.launch {
-                mapView.annotations.cleanup()
-                uiState.posts?.forEach {
-                    if (it.post.type == PostType.IMAGE) {
-                        addPostToMap(
-                            it,
-                            postSheetState = uiState.postSheetState,
-                            mapView,
-                            context,
-                            onSelectPost = onSelectPost,
-                            scope = scope2
-                        )
-                    }
-                }
-            }
+        Surface(
+            shape = RoundedCornerShape(22.dp),
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(8.dp)
+                .clickable { scope2.launch { uiState.postSheetState.hide() } },
+        ) {
+            Text(
+                text = uiState.posts?.size.toString(),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            )
         }
 
         if (uiState.postSheetState.isVisible)
@@ -281,41 +324,6 @@ private fun initLocationComponent(
     )
 }
 
-private fun addPostToMap(
-    postFeed: PostFeed,
-    postSheetState: ModalBottomSheetState,
-    mapView: MapView,
-    context: Context,
-    onSelectPost: (PostFeed) -> Unit,
-    scope: CoroutineScope,
-) {
-    if (postFeed.post.photos.isEmpty()) return
-    scope.launch {
-        val bitmap = getBitmapFromUrl(postFeed.post.photos[0]) ?: return@launch
-        val annotationApi = mapView.annotations
-        val pointAnnotationManager = annotationApi.createPointAnnotationManager(mapView)
-        val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
-            .withPoint(
-                Point.fromLngLat(
-                    postFeed.post.locationLongitude,
-                    postFeed.post.locationLatitude
-                )
-            )
-            .withIconImage(bitmap)
-            .withIconSize(0.05)
-        pointAnnotationManager.create(pointAnnotationOptions)
-        pointAnnotationManager.addClickListener(
-            onPostAnnotationClick(
-                postFeed,
-                postSheetState,
-                scope,
-                onSelectPost = onSelectPost,
-                mapView
-            )
-        )
-    }
-}
-
 private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) {
     val urlObj = URL(url)
 
@@ -329,16 +337,11 @@ private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) 
 
 private fun onPostAnnotationClick(
     post: PostFeed,
-    postSheetState: ModalBottomSheetState,
-    scope: CoroutineScope,
     onSelectPost: (PostFeed) -> Unit,
     mapView: MapView,
 ): OnPointAnnotationClickListener {
     return OnPointAnnotationClickListener {
         onSelectPost(post)
-        scope.launch {
-            postSheetState.show()
-        }
         mapView.getMapboxMap().flyTo(
             cameraOptions = CameraOptions.Builder()
                 .center(

@@ -8,6 +8,7 @@ import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.paging.PostRemoteMediator
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,10 +38,12 @@ class PostRepository @Inject constructor(
         } }
     }
 
-    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed> {
-        return postDao.getPostsWithAuthorId(authorId = authorId).map {
-            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
-        }
+    suspend fun getPostsWithUsername(username: String): List<Post> {
+        return postDao.getPostsWithUsername(username = username)
+    }
+
+    suspend fun getPostsWithAuthorId(authorId: String): List<Post> {
+        return postDao.getPostsWithAuthorId(authorId = authorId)
     }
 
 

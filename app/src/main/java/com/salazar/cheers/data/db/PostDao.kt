@@ -13,9 +13,27 @@ interface PostDao {
     @Query("SELECT * FROM posts ORDER BY posts.createdTime DESC")
     fun pagingSourceFeed(): PagingSource<Int, PostFeed>
 
+//    /**
+//     ** Get User posts and posts where they are tagged in. Only IMAGE, VIDEO posts.
+//     **/
+//    @Transaction
+//    @Query("SELECT * FROM posts WHERE (authorId = :authorId OR tagUsersId LIKE '%' || :authorId || '%') AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
+//    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed>
+
+    /**
+     ** Get User posts. Only IMAGE, VIDEO posts.
+     **/
     @Transaction
-    @Query("SELECT * FROM posts WHERE (authorId = :authorId OR tagUsersId LIKE '%' || :authorId || '%') AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
-    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed>
+    @Query("SELECT * FROM posts WHERE authorId = :authorId AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
+    suspend fun getPostsWithAuthorId(authorId: String): List<Post>
+
+    @Transaction
+    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE username = :username AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
+    suspend fun getPostsWithUsername(username: String): List<Post>
+
+//    @Transaction
+//    @Query("SELECT users.id FROM users WHERE username = :username")
+//    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed>
 
     @Transaction
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")

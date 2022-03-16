@@ -28,19 +28,19 @@ class Neo4jService {
         const val database: String = Environment.DEFAULT_DATABASE
     }
 
-    suspend fun getUser(userId: String): Result<User> {
+    suspend fun getUser(userIdOrUsername: String): Result<User> {
         return withContext(Dispatchers.IO) {
             try {
                 val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = userId
+                params["userIdOrUsername"] = userIdOrUsername
                 params["currentUserId"] = FirebaseAuth.getInstance().currentUser?.uid!!
 
                 val records = query(
-                    "MATCH (u:User) WHERE u.id = \$userId\n" +
+                    "MATCH (u:User) WHERE u.id = \$userIdOrUsername OR u.username = \$userIdOrUsername\n" +
                             "OPTIONAL MATCH (u)-[r:POSTED]->(:Post)\n" +
                             "OPTIONAL MATCH (u)-[f:FOLLOWS]->(:User)\n" +
                             "OPTIONAL MATCH (:User)-[f2:FOLLOWS]->(u)\n" +
-                            "RETURN u {.*, postCount: count(DISTINCT r), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
+                            "RETURN u {.*, postCount: count(DISTINCT r), isFollowed: exists( (:User{id:\$currentUserId})-[:FOLLOWS]->(u) ), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
                     params
                 )
 
@@ -66,10 +66,14 @@ class Neo4jService {
                 params["skip"] = page * pageSize
 
                 val records = query(
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f:User)-[:POSTED]->(e:Event)\n" +
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(author:User)-[:POSTED]->(e:Event)\n" +
+                            "OPTIONAL MATCH (author)-[authorPosts:POSTED]->(:Post)\n" +
+                            "OPTIONAL MATCH (author)-[authorFollowing:FOLLOWS]->(:User)\n" +
+                            "OPTIONAL MATCH (:User)-[authorFollowers:FOLLOWS]->(author)\n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(e) \n" +
                             "OPTIONAL MATCH (e)-[:WITH]->(e:Event) \n" +
-                            "RETURN DISTINCT e { .*, createdTime: toString(e.createdTime), startDate: toString(e.startDate), endDate: toString(e.endDate)}, properties(f) " +
+                            "RETURN DISTINCT e { .*, createdTime: toString(e.createdTime), startDate: toString(e.startDate), endDate: toString(e.endDate)},\n" +
+                            "       author {.*, postCount: count(DISTINCT authorPosts), isFollowed: exists( (u)-[:FOLLOWS]->(author) ), following: count(DISTINCT authorFollowing), followers: count(DISTINCT authorFollowers)},\n" +
                             "ORDER BY datetime(e.createdTime) DESC " +
                             "SKIP \$skip LIMIT \$pageSize",
                     params
@@ -121,10 +125,14 @@ class Neo4jService {
 
                 val records = query(
                     "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(author:User)-[:POSTED]->(s:Story)\n" +
+                            "OPTIONAL MATCH (author)-[authorPosts:POSTED]->(:Post)\n" +
+                            "OPTIONAL MATCH (author)-[authorFollowing:FOLLOWS]->(:User)\n" +
+                            "OPTIONAL MATCH (:User)-[authorFollowers:FOLLOWS]->(author)\n" +
                             "OPTIONAL MATCH (viewers:User)-[:SEEN]->(s) \n" +
                             "OPTIONAL MATCH (s)-[:WITH]->(w:User) \n" +
                             "RETURN s {.*, created: s.created.epochMillis}," +
-                            " properties(author), collect(DISTINCT properties(w)), collect(DISTINCT viewers.id) " +
+                            "       author {.*, postCount: count(DISTINCT authorPosts), isFollowed: exists( (u)-[:FOLLOWS]->(author) ), following: count(DISTINCT authorFollowing), followers: count(DISTINCT authorFollowers)}, " +
+                            "       collect(DISTINCT properties(w)), collect(DISTINCT viewers.id) " +
                             "ORDER BY s.created DESC " +
                             "SKIP \$skip LIMIT \$pageSize",
                     params
@@ -178,11 +186,14 @@ class Neo4jService {
                 params["skip"] = page * pageSize
 
                 val records = query(
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f:User)-[:POSTED]->(p:Post)\n" +
+                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(author:User)-[authorPosts:POSTED]->(p:Post)\n" +
+                            "OPTIONAL MATCH (author)-[authorFollowing:FOLLOWS]->(:User)\n" +
+                            "OPTIONAL MATCH (:User)-[authorFollowers:FOLLOWS]->(author)\n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
                             "OPTIONAL MATCH (p)-[:WITH]->(w:User) \n" +
                             "RETURN p {.*, likes: count(DISTINCT r), liked: exists((u)-[:LIKED]->(p)), createdTime: toString(p.createdTime)}," +
-                            " properties(f), collect(DISTINCT properties(w)) " +
+                            "       author {.*, postCount: count(DISTINCT authorPosts), isFollowed: exists( (u)-[:FOLLOWS]->(author) ), following: count(DISTINCT authorFollowing), followers: count(DISTINCT authorFollowers)}, " +
+                            "       collect(DISTINCT properties(w)) " +
                             "ORDER BY datetime(p.createdTime) DESC " +
                             "SKIP \$skip LIMIT \$pageSize",
                     params

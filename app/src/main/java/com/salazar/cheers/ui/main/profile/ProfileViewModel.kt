@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +30,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val posts: List<PostFeed>,
+        val posts: List<Post>,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -40,7 +39,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val user: User? = null,
-    val posts: List<PostFeed> = emptyList(),
+    val posts: List<Post> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
@@ -131,7 +130,7 @@ class ProfileViewModel @Inject constructor(
 
     private fun refreshUserPosts() {
         viewModelScope.launch {
-            val posts = postRepository.getPostsWithAuthorId(FirebaseAuth.getInstance().currentUser?.uid!!)
+            val posts = postRepository.getPostsWithAuthorId(authorId = FirebaseAuth.getInstance().currentUser?.uid!!)
             viewModelState.update {
                 it.copy(posts = posts, isLoading = false)
             }

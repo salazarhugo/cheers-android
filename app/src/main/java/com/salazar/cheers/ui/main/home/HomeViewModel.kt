@@ -19,10 +19,7 @@ import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.EventUi
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.SuggestionUser
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.internal.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -157,9 +154,9 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun refreshEventsFlow() {
-        viewModelState.update { it.copy(isLoading = true) }
+//        viewModelState.update { it.copy(isLoading = true) }
         viewModelState.update {
-            it.copy(eventsFlow = eventRepository.getEvents(), isLoading = false)
+            it.copy(eventsFlow = flow { emptyList<Event>()  })
         }
     }
 

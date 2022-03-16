@@ -33,9 +33,12 @@ fun PostHeader(
     created: String = "",
     locationName: String,
     profilePictureUrl: String,
+    darkMode: Boolean = false,
     onHeaderClicked: (username: String) -> Unit,
     onMoreClicked: () -> Unit,
 ) {
+    val color = if (darkMode) Color.White else MaterialTheme.colorScheme.onBackground
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,6 +81,7 @@ fun PostHeader(
                     username = username,
                     verified = verified,
                     textStyle = MaterialTheme.typography.bodyMedium,
+                    color = color,
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -114,7 +118,8 @@ fun PostHeader(
                 contentDescription = null,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .clickable { onMoreClicked() }
+                    .clickable { onMoreClicked() },
+                tint = color
             )
         }
     }

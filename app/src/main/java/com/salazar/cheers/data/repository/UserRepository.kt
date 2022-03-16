@@ -22,7 +22,7 @@ class UserRepository @Inject constructor(
 
     suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid!!
-        refreshUser(userId = currentUserId)
+        refreshUser(userIdOrUsername = currentUserId)
         return@withContext userDao.getUser(userId = currentUserId)
     }
 
@@ -39,13 +39,17 @@ class UserRepository @Inject constructor(
         Neo4jUtil.unfollowUser(username = username)
     }
 
+    suspend fun getUserWithUsername(username: String): User = withContext(Dispatchers.IO) {
+        return@withContext userDao.getUserWithUsername(username = username)
+    }
+
     suspend fun getUser(userId: String): User = withContext(Dispatchers.IO) {
-        refreshUser(userId = userId)
+        refreshUser(userIdOrUsername = userId)
         return@withContext userDao.getUser(userId = userId)
     }
 
-    private suspend fun refreshUser(userId: String) {
-        val result = service.getUser(userId = userId)
+    suspend fun refreshUser(userIdOrUsername: String) {
+        val result = service.getUser(userIdOrUsername = userIdOrUsername)
         when (result) {
             is Result.Success -> userDao.insert(result.data)
             is Result.Error ->  {

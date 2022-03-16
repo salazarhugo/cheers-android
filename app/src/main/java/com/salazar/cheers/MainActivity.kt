@@ -10,8 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.ads.AdRequest
@@ -68,14 +66,14 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
         setContent {
             if (cheersViewModel.completed.value) {
-                AlertDialog(
-                    onDismissRequest = {
-                        cheersViewModel.completed.value = false
-                    },
-                    confirmButton = {},
-                    title = { Text("Payment succeeded") },
-                    text = { Text("It may take a few minutes before coins are credited to your account") }
-                )
+//                AlertDialog(
+//                    onDismissRequest = {
+//                        cheersViewModel.completed.value = false
+//                    },
+//                    confirmButton = {},
+//                    title = { Text("Payment succeeded") },
+//                    text = { Text("It may take a few minutes before coins are credited to your account") }
+//                )
             }
             CheersApp(
                 presentPaymentSheet = ::presentPaymentSheet,

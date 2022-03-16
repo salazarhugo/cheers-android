@@ -1,7 +1,10 @@
 package com.salazar.cheers.ui.main.story
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,9 +15,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,7 +64,9 @@ fun StoryScreen(
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
     val scope = rememberCoroutineScope()
 
-    Column() {
+    Column(
+        modifier = Modifier.background(Color.Black)
+    ) {
         StoryCarousel(
             stories = stories.itemSnapshotList.items,
             pagerState = pagerState,
@@ -110,6 +113,7 @@ fun StoryCarousel(
     ) { page ->
 
         val story = stories[page]
+        var isPaused by remember { mutableStateOf(false) }
 
         LaunchedEffect(currentPage) {
             if (page == currentPage && !story.story.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid))
@@ -126,7 +130,7 @@ fun StoryCarousel(
                     value = value,
                     onInputChange = onInputChange,
                     onSendReaction = { onSendReaction(story, it) },
-                    onFocusChange = onFocusChange,
+                    onFocusChange = { isPaused = it },
                 )
             },
             backgroundColor = Color.Black,
@@ -163,9 +167,12 @@ fun StoryCarousel(
                 currentPage = currentPage,
                 page = page,
                 user = stories[page].author,
-                onStoryFinish = onStoryFinish,
+                onStoryFinish = {
+                    isPaused = false
+                    onStoryFinish()
+                },
                 onUserClick = onUserClick,
-                pause = pause
+                pause = isPaused
             )
         }
     }
@@ -191,6 +198,7 @@ fun StoryHeader(
         PostHeader(
             username = user.username,
             verified = user.verified,
+            darkMode = true,
             public = false,
             locationName = "",
             profilePictureUrl = user.profilePictureUrl,
@@ -233,13 +241,15 @@ fun StoryInputField(
     TextField(
         value = value,
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            backgroundColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = Color.White,
         ),
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, Color.White, CircleShape)
             .onFocusChanged {
                 onFocusChange(it.hasFocus)
             },
@@ -263,8 +273,14 @@ fun StoryInputField(
                         focusManager.clearFocus()
                     },
                     contentDescription = null,
+                    tint = Color.White,
                 )
         },
-        placeholder = { Text("Send message") },
+        placeholder = {
+            Text(
+                text = "Send message",
+                color = Color.White
+            )
+        },
     )
 }

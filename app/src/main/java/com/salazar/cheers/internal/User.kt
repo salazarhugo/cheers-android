@@ -1,17 +1,21 @@
 package com.salazar.cheers.internal
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-@Entity(tableName = "users")
+@Entity(
+    tableName = "users",
+    indices = [Index(value = ["username"], unique = true)],
+)
 data class User(
     @PrimaryKey
     val id: String,
+    val username: String,
     val firstName: String,
     val lastName: String,
-    var fullName: String,
-    var username: String,
+    val fullName: String,
     val postCount: Int,
     val followers: Int,
     val following: Int,
@@ -19,7 +23,7 @@ data class User(
     val phoneNumber: String,
     val verified: Boolean,
     val email: String,
-    var bio: String,
+    val bio: String,
     val profilePictureUrl: String,
     val website: String,
     val online: Boolean,

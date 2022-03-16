@@ -4,11 +4,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +37,9 @@ private data class MessagesViewModelState(
 }
 
 @HiltViewModel
-class MessagesViewModel @Inject constructor() : ViewModel() {
+class MessagesViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
 
@@ -82,17 +82,9 @@ class MessagesViewModel @Inject constructor() : ViewModel() {
                     val otherUserId =
                         it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! }
                             ?: return@forEach
-                    when (val result = Neo4jUtil.getUser(otherUserId)) {
-                        is Result.Success -> channels.add(it.copy(otherUser = result.data))
-                        is Result.Error -> channels.add(
-                            it.copy(
-                                otherUser = User().copy(
-                                    username = "User not found",
-                                    fullName = "User not found"
-                                )
-                            )
-                        )
-                    }
+
+                    val user = userRepository.getUser(userId = otherUserId)
+                    channels.add(it.copy(otherUser = user))
                 }
             }
 

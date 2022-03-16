@@ -31,11 +31,12 @@ fun StoryProgressBar(
             percent.animateTo(
                 targetValue = 1f,
                 animationSpec = tween(
-                    durationMillis = (5000 * (1f - percent.value)).toInt(),
+                    durationMillis = (10000 * (1f - percent.value)).toInt(),
                     easing = LinearEasing
                 )
             )
             onFinished()
+            percent.animateTo(targetValue = 0f)
         }
     }
     Row(

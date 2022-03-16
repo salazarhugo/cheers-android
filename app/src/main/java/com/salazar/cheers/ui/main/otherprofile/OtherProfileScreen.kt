@@ -1,40 +1,29 @@
 package com.salazar.cheers.ui.main.otherprofile
 
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells.Fixed
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.AssignmentInd
 import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.components.PrettyImage
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.main.profile.ProfilePostsAndTags
 import com.salazar.cheers.ui.theme.Roboto
-import kotlinx.coroutines.launch
 
 @Composable
 fun OtherProfileScreen(
@@ -50,19 +39,23 @@ fun OtherProfileScreen(
     onCopyUrl: () -> Unit,
     onGiftClick: () -> Unit,
 ) {
-    Scaffold(
-        topBar = { Toolbar(uiState.user, onBackPressed = onBackPressed, onCopyUrl) }
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = false),
+        onRefresh = onSwipeRefresh,
     ) {
-        Column {
-            Profile(
-                uiState,
-                onFollowClicked = onFollowClicked,
-                onUnfollowClicked = onUnfollowClicked,
-                onMessageClicked = onMessageClicked,
-                onStatClicked = onStatClicked,
-                onGiftClick = onGiftClick,
-            )
-            Tabs(uiState)
+        Scaffold(
+            topBar = { Toolbar(uiState.user, onBackPressed = onBackPressed, onCopyUrl) }
+        ) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Profile(
+                    uiState,
+                    onFollowClicked = onFollowClicked,
+                    onUnfollowClicked = onUnfollowClicked,
+                    onMessageClicked = onMessageClicked,
+                    onStatClicked = onStatClicked,
+                    onGiftClick = onGiftClick,
+                )
+            }
         }
     }
 }
@@ -97,91 +90,11 @@ fun Profile(
             onGiftClick = onGiftClick,
         )
     }
-}
-
-@Composable
-fun Tabs(uiState: OtherProfileUiState) {
-    val tabs = listOf(Icons.Default.GridView, Icons.Outlined.AssignmentInd)
-    val pagerState = rememberPagerState()
-    val scope = rememberCoroutineScope()
-
-    TabRow(
-        // Our selected tab is our current page
-        selectedTabIndex = pagerState.currentPage,
-        // Override the indicator, using the provided pagerTabIndicatorOffset modifier
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-            )
-        },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-    ) {
-        // Add tabs for all of our pages
-        tabs.forEachIndexed { index, icon ->
-            Tab(
-                icon = { Icon(icon, null) },
-                selected = pagerState.currentPage == index,
-                onClick = {
-                    scope.launch {
-                        pagerState.scrollToPage(index)
-                    }
-//                        viewModel.toggle()
-                },
-            )
-        }
-    }
-    HorizontalPager(
-        count = tabs.size,
-        state = pagerState,
-    ) { page ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            when (page) {
-                0 -> {
-                    if (uiState is OtherProfileUiState.HasPosts)
-                        GridViewPosts(posts = uiState.posts)
-                }
-                1 -> {}
-            }
-        }
-    }
-}
-
-@Composable
-fun GridViewPosts(posts: List<Post>) {
-    LazyVerticalGrid(
-        columns = Fixed(3),
-        modifier = Modifier,
-    ) {
-        val imagePosts = posts.filter { it.type == PostType.IMAGE }
-        items(imagePosts) { post ->
-            PostItem(post)
-        }
-    }
-}
-
-@Composable
-fun PostItem(post: Post) {
-    if (post.photos.isEmpty()) return
-
-    Box(
-        modifier = Modifier.padding(1.dp)
-    ) {
-        PrettyImage(
-            data = post.photos[0],
-            contentDescription = "avatar",
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .aspectRatio(1f)// or 4/5f
-                .fillMaxWidth()
-                .pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { })
-                }
+    if (uiState is OtherProfileUiState.HasPosts)
+        ProfilePostsAndTags(
+            posts = uiState.posts,
+            onPostClicked = {},
         )
-    }
 }
 
 @Composable

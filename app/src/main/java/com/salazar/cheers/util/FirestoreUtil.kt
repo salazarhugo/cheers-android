@@ -227,8 +227,7 @@ object FirestoreUtil {
             if (documentSnapshot != null) {
                 val user = documentSnapshot.toObject(User::class.java)
                 if (user != null) {
-                    user.fullName = "${user.firstName} ${user.lastName}"
-                    currentUser.value = user
+                    currentUser.value = user.copy(fullName = "${user.firstName} ${user.lastName}")
                 }
             }
         }
