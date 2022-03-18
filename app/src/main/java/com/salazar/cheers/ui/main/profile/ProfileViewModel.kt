@@ -5,8 +5,10 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
@@ -30,7 +32,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val posts: List<Post>,
+        val postFlow: Flow<PagingData<PostFeed>>,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -39,7 +41,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val user: User? = null,
-    val posts: List<Post> = emptyList(),
+    val posts: Flow<PagingData<PostFeed>> = emptyFlow(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
@@ -47,7 +49,7 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     fun toUiState(): ProfileUiState =
         if (user != null)
             ProfileUiState.HasUser(
-                posts = posts,
+                postFlow = posts,
                 user = user,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
@@ -90,19 +92,6 @@ class ProfileViewModel @Inject constructor(
      * Toggle like of a post
      */
     fun toggleLike(post: Post) {
-        val posts = viewModelState.value.posts
-        val mPosts = posts.toMutableList()
-//        val post = mPosts.find { it.id == post.id } ?: return
-//
-//        val updatedPost = if (post.liked)
-//            post.copy(likes = post.likes - 1, liked = false)
-//        else
-//            post.copy(likes = post.likes + 1, liked = true)
-//
-//        mPosts[mPosts.indexOf(post)] = updatedPost
-//
-//        toggleLike(postId = post.id, like = updatedPost.liked)
-//        updatePosts(mPosts)
     }
 
     private fun toggleLike(
@@ -129,8 +118,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun refreshUserPosts() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid!!
         viewModelScope.launch {
-            val posts = postRepository.getPostsWithAuthorId(authorId = FirebaseAuth.getInstance().currentUser?.uid!!)
+            val posts = postRepository.profilePostFeed(userIdOrUsername = userId)
             viewModelState.update {
                 it.copy(posts = posts, isLoading = false)
             }

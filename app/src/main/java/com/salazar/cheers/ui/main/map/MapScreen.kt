@@ -65,12 +65,12 @@ import java.net.URL
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    modifier: Modifier = Modifier,
     onCityChanged: (String) -> Unit,
     onSelectPost: (PostFeed) -> Unit,
     onTogglePublic: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     onAddPostClicked: () -> Unit,
+    onUserClick: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val mapView = remember {
@@ -81,7 +81,12 @@ fun MapScreen(
 
     ModalBottomSheetLayout(
         sheetState = uiState.postSheetState,
-        sheetContent = { PostMapScreen(uiState = uiState) },
+        sheetContent = {
+            PostMapScreen(
+                uiState = uiState,
+                onUserClick = onUserClick,
+            )
+        },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
         sheetElevation = 0.dp,
@@ -241,19 +246,19 @@ fun UiLayer(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }
-        Surface(
-            shape = RoundedCornerShape(22.dp),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(8.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                text = uiState.city,
-                style = MaterialTheme.typography.titleMedium,
-            )
-        }
+//        Surface(
+//            shape = RoundedCornerShape(22.dp),
+//            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+//            modifier = Modifier
+//                .align(Alignment.TopCenter)
+//                .padding(8.dp),
+//        ) {
+//            Text(
+//                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+//                text = uiState.city,
+//                style = MaterialTheme.typography.titleMedium,
+//            )
+//        }
         Surface(
             shape = RoundedCornerShape(22.dp),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),

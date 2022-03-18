@@ -72,6 +72,7 @@ fun SendGiftRoute(
                         navActions.navigateBack()
                     },
                     errorMessage = uiState.errorMessage.toString(),
+                    onRechargeClick = { navActions.navigateToRecharge() },
                 )
             }
             else -> {
@@ -135,6 +136,7 @@ fun FailureSplashView(
     errorMessage: String,
     modifier: Modifier = Modifier,
     onFinish: () -> Unit,
+    onRechargeClick: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         val image = AnimatedImageVector.animatedVectorResource(R.drawable.avd_fail)
@@ -168,7 +170,14 @@ fun FailureSplashView(
                 Text(
                     text = errorMessage,
                     color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(8.dp),
                 )
+                Button(
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = onRechargeClick,
+                ) {
+                    Text("Recharge")
+                }
             }
         }
     }

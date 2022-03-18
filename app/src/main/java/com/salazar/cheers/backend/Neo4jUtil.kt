@@ -5,22 +5,21 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.gson.Gson
-import com.google.gson.JsonParser
-import com.google.gson.reflect.TypeToken
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.entities.StoryResponse
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.Environment
+import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.neo4j.driver.*
-import java.lang.reflect.Type
 import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit
 
 
 object Neo4jUtil {
 
-    //    companion object {
     private val driver: Driver by lazy {
         GraphDatabase.driver(
             Environment.DEFAULT_URL,
@@ -31,7 +30,6 @@ object Neo4jUtil {
         )
     }
     const val database: String = Environment.DEFAULT_DATABASE
-//    }
 
     private fun toMap(obj: Any): Map<String, Any> {
         val map: MutableMap<String, Any> = HashMap()
@@ -221,14 +219,6 @@ object Neo4jUtil {
         }
     }
 
-    suspend fun getCurrentUser(): Result<User> {
-        return try {
-            getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
-        } catch (e: Exception) {
-            return Result.Error(e)
-        }
-    }
-
     suspend fun getPostLikes(postId: String): Result<List<User>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -255,191 +245,6 @@ object Neo4jUtil {
         }
     }
 
-    suspend fun getSuggestions(): Result<List<SuggestionUser>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = FirebaseAuth.getInstance().uid!!
-
-                val records = query(
-                    "MATCH (u:User { id: \$userId})-[:FOLLOWS]->(f:User)-[:FOLLOWS]->(r:User) " +
-//                            " MATCH (r:User) " +
-                            "WHERE r.id <> \$userId " +
-                            "AND NOT (u)-[:FOLLOWS]->(r) " +
-                            "OPTIONAL MATCH (r)-[:POSTED]->(p:Post) " +
-                            "RETURN DISTINCT properties(r), collect(properties(p { photoUrl: p.photoUrl })) LIMIT 10",
-                    params
-                )
-
-                val users = mutableListOf<SuggestionUser>()
-
-                records.forEach { record ->
-                    val gson = Gson()
-                    val parser = JsonParser()
-                    val user = gson.fromJson(
-                        parser.parse(record.values().get(0).toString()),
-                        User::class.java
-                    )
-                    val postListType: Type =
-                        object : TypeToken<ArrayList<Post>>() {}.type
-                    val s = record.values()[1].toString()
-                    val userPosts =
-                        gson.fromJson<ArrayList<Post>>(s, postListType)
-
-                    users.add(
-                        SuggestionUser(
-                            user = user,
-                            posts = userPosts.toList(),
-                        )
-                    )
-                }
-
-                Log.d("Get suggestions: ", users.toString())
-                return@withContext Result.Success(users.toList())
-            } catch (e: Exception) {
-                Log.e("Get suggestions: ", e.toString())
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun getUserRecommendations(): Result<List<User>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = FirebaseAuth.getInstance().uid!!
-
-                val records = query(
-                    "MATCH (u:User { id: \$userId})-[:FOLLOWS]->(f:User)-[:FOLLOWS]->(r:User) " +
-                            "WHERE r.id <> \$userId " +
-                            "AND NOT (u)-[:FOLLOWS]->(r) " +
-                            "RETURN DISTINCT properties(r)",
-                    params
-                )
-
-                val users = mutableListOf<User>()
-
-                records.forEach { record ->
-                    val gson = Gson()
-                    val parser = JsonParser()
-                    val user =
-                        gson.fromJson(
-                            parser.parse(record.values().get(0).toString()),
-                            User::class.java
-                        )
-                    users.add(user)
-                }
-
-                return@withContext Result.Success(users.toList())
-            } catch (e: Exception) {
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun getUserWithUsername(username: String): Result<User> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["username"] = username
-                params["currentUserId"] = FirebaseAuth.getInstance().currentUser?.uid!!
-
-                val records = query(
-                    "MATCH (u:User { username: \$username}) \n" +
-                            "MATCH (me:User { id: \$currentUserId }) \n" +
-                            "OPTIONAL MATCH (u)-[r:POSTED]->(:Post)\n" +
-                            "OPTIONAL MATCH (u)-[f:FOLLOWS]->(:User)\n" +
-                            "OPTIONAL MATCH (:User)-[f2:FOLLOWS]->(u)\n" +
-                            "RETURN u {.*, posts: count(DISTINCT r), isFollowed: exists((me)-[:FOLLOWS]->(u)), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
-                    params
-                )
-
-                val gson = Gson()
-                val parser = JsonParser()
-                val user =
-                    gson.fromJson(parser.parse(records[0].values()[0].toString()), User::class.java)
-                Log.d("HAHA", user.toString())
-                return@withContext Result.Success(user)
-            } catch (e: Exception) {
-                Log.e("HAHA", e.toString())
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun getUser(userId: String): Result<User> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = userId
-
-                val records = query(
-                    "MATCH (u:User) WHERE u.id = \$userId\n" +
-                            "OPTIONAL MATCH (u)-[r:POSTED]->(:Post)\n" +
-                            "OPTIONAL MATCH (u)-[f:FOLLOWS]->(:User)\n" +
-                            "OPTIONAL MATCH (:User)-[f2:FOLLOWS]->(u)\n" +
-                            "RETURN u {.*, posts: count(DISTINCT r), following: count(DISTINCT f), followers: count(DISTINCT f2)}",
-                    params
-                )
-
-                val gson = Gson()
-                val parser = JsonParser()
-                val user =
-                    gson.fromJson(parser.parse(records[0].values()[0].toString()), User::class.java)
-                Log.d("HAHA", user.toString())
-                return@withContext Result.Success(user)
-            } catch (e: Exception) {
-                Log.e("HAHA", e.toString())
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun getEvent(eventId: String): Result<EventUi> {
-        return withContext(Dispatchers.IO) {
-            val params: MutableMap<String, Any> = mutableMapOf()
-            params["eventId"] = eventId
-
-            val records = query(
-                "MATCH (u:User)-[:POSTED]->(e:Event { id: \$eventId }) " +
-                        "RETURN properties(e { .*, createdTime: toString(e.createdTime), startDate: toString(e.startDate), endDate: toString(e.endDate) })" +
-                        ", properties(u)",
-                params
-            )
-
-            val gson = Gson()
-            val event = gson.fromJson(records[0].values()[0].toString(), Event::class.java)
-            val host = gson.fromJson(records[0].values()[1].toString(), User::class.java)
-
-            val eventUi = EventUi(
-                event = event,
-                host = host,
-                participants = emptyList()
-            )
-
-            return@withContext Result.Success(eventUi)
-        }
-    }
-
-    suspend fun getPost(postId: String): Result<Post> {
-        return withContext(Dispatchers.IO) {
-            val params: MutableMap<String, Any> = mutableMapOf()
-            params["postId"] = postId
-
-            val records = query(
-                "MATCH (u:User)-[:POSTED]->(p:Post { id: \$postId }) " +
-                        "RETURN properties(apoc.map.removeKey(p,\"createdTime\")), properties(u)",
-                params
-            )
-
-            val gson = Gson()
-            val post = gson.fromJson(records[0].values()[0].toString(), Post::class.java)
-            val creator = gson.fromJson(records[0].values()[1].toString(), User::class.java)
-
-            return@withContext Result.Success(post)
-        }
-    }
-
     suspend fun queryFriends(query: String): List<User> {
         return withContext(Dispatchers.IO) {
             val params: MutableMap<String, Any> = mutableMapOf()
@@ -457,40 +262,8 @@ object Neo4jUtil {
 
             records.forEach { record ->
                 val gson = Gson()
-                val parser = JsonParser()
                 val user =
-                    gson.fromJson(parser.parse(record.values().get(0).toString()), User::class.java)
-                users.add(user)
-            }
-
-            return@withContext users.toList()
-        }
-    }
-
-    suspend fun queryUsers(query: String): List<User> {
-        return withContext(Dispatchers.IO) {
-            if (query.isBlank())
-                return@withContext emptyList()
-
-            val params: MutableMap<String, Any> = mutableMapOf()
-            params["query"] = query
-            params["userId"] = FirebaseAuth.getInstance().uid!!
-
-            val records = query(
-                "MATCH (u:User) " +
-                        "WHERE u.username CONTAINS \$query " +
-                        "AND u.id <> \$userId " +
-                        "RETURN properties(u) LIMIT 10",
-                params
-            )
-
-            val users = mutableListOf<User>()
-
-            records.forEach { record ->
-                val gson = Gson()
-                val parser = JsonParser()
-                val user =
-                    gson.fromJson(parser.parse(record.values().get(0).toString()), User::class.java)
+                    gson.fromJson(record.values()[0].toString(), User::class.java)
                 users.add(user)
             }
 
@@ -567,9 +340,8 @@ object Neo4jUtil {
                 records.forEach { record ->
                     Log.d("HAHA", record.values().size.toString())
                     val gson = Gson()
-                    val parser = JsonParser()
                     val user =
-                        gson.fromJson(parser.parse(record.values()[0].toString()), User::class.java)
+                        gson.fromJson(record.values()[0].toString(), User::class.java)
                     following.add(user)
                 }
 
@@ -606,172 +378,12 @@ object Neo4jUtil {
                 records.forEach { record ->
                     Log.d("HAHA", record.values().size.toString())
                     val gson = Gson()
-                    val parser = JsonParser()
                     val user =
-                        gson.fromJson(parser.parse(record.values()[0].toString()), User::class.java)
+                        gson.fromJson(record.values()[0].toString(), User::class.java)
                     followers.add(user)
                 }
 
                 return@withContext Result.Success(followers.toList())
-            } catch (e: Exception) {
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun getUserPosts(username: String): Result<List<Post>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["username"] = username
-
-                val records = query(
-                    "MATCH (u:User {username: \$username})-[:POSTED]->(p:Post) \n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: toString(p.createdTime) }," +
-                            " properties(u) ORDER BY datetime(p.createdTime) DESC",
-                    params
-                )
-
-                val posts = mutableListOf<Post>()
-
-                records.forEach { record ->
-                    val gson = Gson()
-                    val parser = JsonParser()
-
-                    val post =
-                        gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
-                    val user =
-                        gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-
-                    posts.add(post)
-                }
-                return@withContext Result.Success(posts.toList())
-            } catch (e: Exception) {
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun getCurrentUserPosts(): Result<List<Post>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = FirebaseAuth.getInstance().uid!!
-
-                val records = query(
-                    "MATCH (u:User {id: \$userId})-[:POSTED]->(p:Post) \n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: toString(p.createdTime)}," +
-                            " properties(u) ORDER BY datetime(p.createdTime) DESC",
-                    params
-                )
-
-                val posts = mutableListOf<Post>()
-
-                records.forEach { record ->
-                    val gson = Gson()
-                    val parser = JsonParser()
-
-                    val post =
-                        gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
-                    val user =
-                        gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-//                    post.username = user.username
-//                    post.verified = user.verified
-//                    post.userPhotoUrl = user.profilePicturePath
-//                    post.userId = user.id
-
-                    posts.add(post)
-                }
-                return@withContext Result.Success(posts.toList())
-            } catch (e: Exception) {
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    /*
-        isPublic: weather to get all public posts or only the user friends post.
-     */
-    suspend fun getMapPosts(isPublic: Boolean): Result<List<Post>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = FirebaseAuth.getInstance().uid!!
-
-                val queryPublic =
-                    "MATCH (f:User)-[:POSTED]->(p: Post) WHERE p.privacy = 'PUBLIC' \n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p: Post) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), createdTime: toString(p.createdTime)}," +
-                            " properties(f) ORDER BY datetime(p.createdTime) DESC"
-
-                val queryFriends =
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f:User)-[:POSTED]->(p: Post) WHERE (f)-[:FOLLOWS]->(u) \n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p: Post) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists( (u)-[:LIKED]->(p) ), createdTime: toString(p.createdTime)}," +
-                            " properties(f) ORDER BY datetime(p.createdTime) DESC"
-
-                val records = query(
-                    if (isPublic) queryPublic else queryFriends,
-                    params
-                )
-
-                val posts = mutableListOf<Post>()
-
-                records.forEach { record ->
-                    val gson = Gson()
-                    val parser = JsonParser()
-
-                    val post =
-                        gson.fromJson(parser.parse(record.values()[0].toString()), Post::class.java)
-                    val user =
-                        gson.fromJson(parser.parse(record.values()[1].toString()), User::class.java)
-                    posts.add(post)
-                }
-                return@withContext Result.Success(posts.toList())
-            } catch (e: Exception) {
-                return@withContext Result.Error(e)
-            }
-        }
-    }
-
-    suspend fun posts(): Result<List<Post>> {
-        return withContext(Dispatchers.IO)
-        {
-            try {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                params["userId"] = FirebaseAuth.getInstance().uid!!
-
-                val records = query(
-                    "MATCH (u:User {id: \$userId})-[:FOLLOWS*0..1]->(f)-[:POSTED]->(p)\n" +
-                            "OPTIONAL MATCH (:User)-[r:LIKED]-(p) \n" +
-                            "OPTIONAL MATCH (p)-[:WITH]-(w:User) \n" +
-                            "RETURN p {.*, likes: count(DISTINCT r), liked: exists((u)-[:LIKED]->(p)), createdTime: toString(p.createdTime)}," +
-                            " properties(f), collect(properties(w)) ORDER BY datetime(p.createdTime) DESC",
-                    params
-                )
-
-                val posts = mutableListOf<Post>()
-
-                records.forEach { record ->
-                    val gson = Gson()
-
-                    val post =
-                        gson.fromJson(record.values()[0].toString(), Post::class.java)
-                    val user =
-                        gson.fromJson(record.values()[1].toString(), User::class.java)
-
-                    val userListType: Type =
-                        object : TypeToken<ArrayList<User>>() {}.type
-
-                    val s = record.values()[2].toString()
-//                    val tagUsers =
-//                        gson.fromJson<ArrayList<User>>(s, userListType)
-
-                    posts.add(post)
-                }
-                return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
                 return@withContext Result.Error(e)
             }
@@ -810,23 +422,6 @@ object Neo4jUtil {
 
     private fun getSession(): Session {
         return driver.session(SessionConfig.forDatabase(Environment.DEFAULT_DATABASE))
-    }
-
-    private fun convert(value: Value): Any? {
-        when (value.type().name()) {
-            "PATH" -> return value.asList(Neo4jUtil::convert)
-            "NODE", "RELATIONSHIP" -> return value.asMap()
-        }
-        return value.asObject()
-    }
-
-    private fun read(
-        query: String,
-        params: Value
-    ) {
-        getSession().writeTransaction { tx ->
-            tx.run(query, params)
-        }
     }
 
     private fun write(

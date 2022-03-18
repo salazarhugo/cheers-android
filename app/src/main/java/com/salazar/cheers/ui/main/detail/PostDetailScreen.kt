@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +32,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
 import com.mapbox.api.staticmap.v1.StaticMapCriteria
@@ -62,6 +61,7 @@ fun PostDetailScreen(
     onMessageClicked: () -> Unit,
     onMapClick: () -> Unit,
     onToggleLike: (Post) -> Unit,
+    onUserClick: (String) -> Unit,
 ) {
     val post = uiState.postFeed.post
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
@@ -89,6 +89,7 @@ fun PostDetailScreen(
                 onToggleLike = onToggleLike,
                 onLeave = onLeave,
                 onMessageClicked = onMessageClicked,
+                onUserClick = onUserClick,
             )
             PrivacyText(post.privacy)
         }
@@ -121,7 +122,6 @@ fun StaticMap(
     val style =
         if (context.isDarkModeOn()) StaticMapCriteria.DARK_STYLE else StaticMapCriteria.LIGHT_STYLE
 
-    val configuration = LocalConfiguration.current
     val token = stringResource(R.string.mapbox_access_token)
     val staticImage = remember {
         MapboxStaticMap.builder()
@@ -180,6 +180,7 @@ fun Post(
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
     onDelete: () -> Unit,
+    onUserClick: (String) -> Unit,
     onMapClick: () -> Unit,
     onMessageClicked: () -> Unit,
     onToggleLike: (Post) -> Unit,
@@ -250,10 +251,12 @@ fun Post(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 8.dp),
                 )
-                UserItem(user = author, isAuthor = true)
+                UserItem(user = author, isAuthor = true, onUserClick = onUserClick)
             }
             if (postUsers.isNotEmpty())
-                items(postUsers) { user -> UserItem(user = user) }
+                items(postUsers) { user ->
+                    UserItem(user = user, onUserClick = onUserClick)
+                }
 
         }
     }
@@ -408,7 +411,7 @@ fun VideoPlayer(
     DisposableEffect(
         AndroidView(
             factory = {
-                PlayerView(context).apply {
+                StyledPlayerView(context).apply {
                     this.player = player
                 }
             },

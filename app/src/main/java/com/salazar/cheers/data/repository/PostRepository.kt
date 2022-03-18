@@ -38,6 +38,20 @@ class PostRepository @Inject constructor(
         } }
     }
 
+    fun profilePostFeed(userIdOrUsername: String): Flow<PagingData<PostFeed>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = NETWORK_PAGE_SIZE,
+                enablePlaceholders = true,
+            ),
+            remoteMediator = PostRemoteMediator(database = database, networkService = service),
+        ) {
+            postDao.profilePostFeed(userIdOrUsername = userIdOrUsername)
+        }.flow.map { it.map {
+            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+        } }
+    }
+
     suspend fun getPostsWithUsername(username: String): List<Post> {
         return postDao.getPostsWithUsername(username = username)
     }
@@ -45,7 +59,6 @@ class PostRepository @Inject constructor(
     suspend fun getPostsWithAuthorId(authorId: String): List<Post> {
         return postDao.getPostsWithAuthorId(authorId = authorId)
     }
-
 
     suspend fun getMapPosts(privacy: Privacy): List<PostFeed> {
         return postDao.getMapPosts(privacy = privacy).map {

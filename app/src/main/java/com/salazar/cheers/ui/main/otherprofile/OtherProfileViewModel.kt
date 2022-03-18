@@ -7,10 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.PagingData
 import com.salazar.cheers.MainActivity
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.assisted.Assisted
@@ -25,51 +26,48 @@ sealed interface OtherProfileUiState {
     val isLoading: Boolean
     val errorMessages: List<String>
     val isFollowing: Boolean
-    val user: User
     val shortLink: String?
 
-    data class NoPosts(
+    data class NoUser(
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val isFollowing: Boolean,
-        override val user: User,
         override val shortLink: String?,
     ) : OtherProfileUiState
 
-    data class HasPosts(
-        val posts: List<Post>,
+    data class HasUser(
+        val postFlow: Flow<PagingData<PostFeed>> = emptyFlow(),
+        val user: User,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
         override val isFollowing: Boolean,
-        override val user: User,
         override val shortLink: String?,
     ) : OtherProfileUiState
 }
 
 private data class OtherProfileViewModelState(
     val user: User? = null,
-    val posts: List<Post> = emptyList(),
+    val postFlow: Flow<PagingData<PostFeed>> = emptyFlow(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
 ) {
     fun toUiState(): OtherProfileUiState =
-        if (posts.isEmpty()) {
-            OtherProfileUiState.NoPosts(
-                user = user ?: User(),
+        if (user != null) {
+            OtherProfileUiState.HasUser(
+                user = user,
+                postFlow = postFlow,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 isFollowing = isFollowing,
                 shortLink = shortLink,
             )
         } else {
-            OtherProfileUiState.HasPosts(
+            OtherProfileUiState.NoUser(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 isFollowing = isFollowing,
-                posts = posts,
-                user = user ?: User(),
                 shortLink = shortLink,
             )
         }
@@ -97,9 +95,6 @@ class OtherProfileViewModel @AssistedInject constructor(
 
     fun refresh() {
         getUser(username = username)
-        viewModelScope.launch {
-            userRepository.refreshUser(userIdOrUsername = username)
-        }
         refreshUserPosts(username = username)
     }
 
@@ -140,7 +135,7 @@ class OtherProfileViewModel @AssistedInject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val user = userRepository.getUserWithUsername(username = username)
+            val user = userRepository.getUser(userIdOrUsername = username)
             viewModelState.update {
                 it.copy(user = user, isLoading = false)
             }
@@ -149,9 +144,9 @@ class OtherProfileViewModel @AssistedInject constructor(
 
     private fun refreshUserPosts(username: String) {
         viewModelScope.launch {
-            val posts = postRepository.getPostsWithUsername(username = username)
+            val posts = postRepository.profilePostFeed(userIdOrUsername = username)
             viewModelState.update {
-                it.copy(posts = posts, isLoading = false)
+                it.copy(postFlow = posts, isLoading = false)
             }
         }
     }

@@ -21,6 +21,7 @@ import com.salazar.cheers.ui.main.home.PostBody
 @Composable
 fun PostMapScreen(
     uiState: MapUiState,
+    onUserClick: (String) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -35,14 +36,18 @@ fun PostMapScreen(
         Column() {
             if (uiState.selectedPost != null)
                 Post(
-                    postFeed = uiState.selectedPost
+                    postFeed = uiState.selectedPost,
+                    onUserClick = onUserClick,
                 )
         }
     }
 }
 
 @Composable
-fun Post(postFeed: PostFeed) {
+fun Post(
+    postFeed: PostFeed,
+    onUserClick: (String) -> Unit,
+) {
     val post = postFeed.post
     val author = postFeed.author
     val postUsers = postFeed.tagUsers
@@ -52,7 +57,11 @@ fun Post(postFeed: PostFeed) {
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 8.dp),
     )
-    UserItem(user = author, isAuthor = true)
+    UserItem(
+        user = author,
+        isAuthor = true,
+        onUserClick = onUserClick,
+    )
     if (postUsers.isNotEmpty()) {
         Text(
             text = if (postUsers.size > 1) "Guests" else "Guest",
@@ -62,7 +71,9 @@ fun Post(postFeed: PostFeed) {
         LazyColumn(
             modifier = Modifier.padding(vertical = 8.dp)
         ) {
-            items(postUsers) { user -> UserItem(user = user) }
+            items(postUsers) { user ->
+                UserItem(user = user, onUserClick = onUserClick)
+            }
         }
     }
 

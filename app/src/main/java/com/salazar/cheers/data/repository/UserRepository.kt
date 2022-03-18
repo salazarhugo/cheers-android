@@ -20,15 +20,13 @@ class UserRepository @Inject constructor(
     private val postDao: PostDao,
 ) {
 
-    suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid!!
-        refreshUser(userIdOrUsername = currentUserId)
-        return@withContext userDao.getUser(userId = currentUserId)
-    }
-
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {
         postDao.deleteWithAuthorId(authorId = userId)
         Neo4jUtil.blockUser(otherUserId = userId)
+    }
+
+    suspend fun queryUsers(query: String) = withContext(Dispatchers.IO) {
+        service.queryUsers(query = query)
     }
 
     suspend fun followUser(username: String) = withContext(Dispatchers.IO) {
@@ -39,16 +37,17 @@ class UserRepository @Inject constructor(
         Neo4jUtil.unfollowUser(username = username)
     }
 
-    suspend fun getUserWithUsername(username: String): User = withContext(Dispatchers.IO) {
-        return@withContext userDao.getUserWithUsername(username = username)
+    suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid !!
+        return@withContext getUser(userIdOrUsername = currentUserId)
     }
 
-    suspend fun getUser(userId: String): User = withContext(Dispatchers.IO) {
-        refreshUser(userIdOrUsername = userId)
-        return@withContext userDao.getUser(userId = userId)
+    suspend fun getUser(userIdOrUsername: String): User = withContext(Dispatchers.IO) {
+        refreshUser(userIdOrUsername = userIdOrUsername)
+        return@withContext userDao.getUserWithUsername(userIdOrUsername = userIdOrUsername)
     }
 
-    suspend fun refreshUser(userIdOrUsername: String) {
+    private suspend fun refreshUser(userIdOrUsername: String) {
         val result = service.getUser(userIdOrUsername = userIdOrUsername)
         when (result) {
             is Result.Success -> userDao.insert(result.data)

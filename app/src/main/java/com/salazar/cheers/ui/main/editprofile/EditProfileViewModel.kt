@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadProfilePicture
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,6 +55,7 @@ private data class EditProfileViewModelState(
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
+    val userRepository: UserRepository,
     application: Application,
 ) : ViewModel() {
 
@@ -74,20 +75,14 @@ class EditProfileViewModel @Inject constructor(
     }
 
     val currentUser = mutableStateOf(User())
-    val photoUri = mutableStateOf<Uri?>(null)
 
     private fun refreshUser() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            val user = userRepository.getCurrentUser()
             viewModelState.update {
-                when (val result = Neo4jUtil.getCurrentUser()) {
-                    is Result.Success -> it.copy(user = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        errorMessages = listOf(result.exception.toString()),
-                        isLoading = false
-                    )
-                }
+                it.copy(user = user, isLoading = false)
             }
         }
     }

@@ -38,7 +38,6 @@ import com.salazar.cheers.ui.theme.Typography
 @Composable
 fun SearchScreen(
     uiState: SearchUiState,
-    modifier: Modifier = Modifier,
     onSearchInputChanged: (String) -> Unit,
     onUserClicked: (User) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
@@ -114,20 +113,25 @@ fun RecentUserList(
     onRecentUserClicked: (String) -> Unit,
 ) {
     LazyColumn {
-        item {
-            Text(
-                text = "Recent",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(16.dp),
-            )
-        }
+        if (recent.isNotEmpty())
+            item {
+                Text(
+                    text = "Recent",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         items(recent) { user ->
             RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
         }
-        item {
-            if (recommendations.isNotEmpty())
-                Text("Suggestions")
-        }
+        if (recommendations.isNotEmpty())
+            item {
+                Text(
+                    text = "Suggestions",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         items(recommendations) { user ->
             UserCard(
                 modifier = Modifier.animateItemPlacement(),

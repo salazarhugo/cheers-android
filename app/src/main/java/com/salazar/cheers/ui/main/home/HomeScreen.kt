@@ -50,7 +50,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
@@ -165,6 +165,7 @@ fun HomeScreen(
                             onAddStoryClick = onAddStoryClick,
                         )
                     }
+                    else -> {}
                 }
             }
             val alpha = if (toState == MultiFabState.EXPANDED) 0.9f else 0f
@@ -206,7 +207,6 @@ fun Stories(
     }
 }
 
-
 @Composable
 fun NativeAdPost(ad: NativeAd) {
     Column {
@@ -224,8 +224,9 @@ fun NativeAdPost(ad: NativeAd) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            if (ad.headline != null)
-                Text(ad.headline, style = MaterialTheme.typography.bodyMedium)
+            val headline = ad.headline
+            if (headline != null)
+                Text(text = headline, style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.width(12.dp))
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -491,43 +492,21 @@ fun PostList(
             }
         else {
             itemsIndexed(posts) { i, post ->
-                if ((i-1)%3 == 0 && uiState.nativeAd != null) {
+                if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
                     DividerM3()
                     NativeAdPost(ad = uiState.nativeAd)
                 }
-                when (post?.post?.type) {
-                    PostType.TEXT -> Post(
+                if (post != null) {
+                    Post(
                         modifier = Modifier.animateItemPlacement(),
                         postFeed = post,
                         navigateToComments = navigateToComments,
-                        navActions = navActions,
-                        onPostClicked = onPostClicked,
-                        onUserClicked = onUserClicked,
-                        onPostMoreClicked = onPostMoreClicked,
-                        onLike = onLike,
-                    )
-                    PostType.IMAGE -> Post(
-                        modifier = Modifier.animateItemPlacement(),
-                        postFeed = post,
-                        navigateToComments = navigateToComments,
-                        navActions = navActions,
-                        onPostClicked = onPostClicked,
-                        onUserClicked = onUserClicked,
-                        onPostMoreClicked = onPostMoreClicked,
-                        onLike = onLike,
-                    )
-                    PostType.VIDEO -> Post(
-                        modifier = Modifier.animateItemPlacement(),
-                        postFeed = post,
-                        navigateToComments = navigateToComments,
-                        navActions = navActions,
                         onPostClicked = onPostClicked,
                         onUserClicked = onUserClicked,
                         onPostMoreClicked = onPostMoreClicked,
                         onLike = onLike,
                     )
                 }
-
             }
         }
 
@@ -572,7 +551,6 @@ fun PostList(
 fun Post(
     postFeed: PostFeed,
     modifier: Modifier = Modifier,
-    navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
@@ -610,7 +588,6 @@ fun Post(
         )
         PostFooter(
             postFeed,
-            navActions,
             onLike = onLike,
             navigateToComments = navigateToComments,
             pagerState = pagerState
@@ -707,7 +684,6 @@ fun PostFooterButtons(
     post: Post,
     onLike: (post: Post) -> Unit,
     navigateToComments: (String) -> Unit,
-    pagerState: PagerState,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -738,7 +714,6 @@ fun PostFooterButtons(
 @Composable
 fun PostFooter(
     postFeed: PostFeed,
-    navActions: CheersNavigationActions,
     onLike: (post: Post) -> Unit,
     navigateToComments: (PostFeed) -> Unit,
     pagerState: PagerState,
@@ -762,31 +737,15 @@ fun PostFooter(
             postFeed.post,
             onLike = onLike,
             navigateToComments = { navigateToComments(postFeed) },
-            pagerState = pagerState,
         )
         if (postFeed.post.type != PostType.TEXT) {
-            LikedBy(post = postFeed.post, navActions)
+//            LikedBy(post = postFeed.post)
             if (postFeed.tagUsers.isNotEmpty())
                 TagUsers(postFeed.tagUsers)
         }
     }
     if (postFeed.post.type != PostType.TEXT)
         Spacer(Modifier.height(12.dp))
-}
-
-@Composable
-fun LikedBy(
-    post: Post,
-    navActions: CheersNavigationActions
-) {
-//    Text(
-//        "${post.likes} ${if (post.likes > 1) "likes" else "like"}",
-//        style = MaterialTheme.typography.bodyMedium,
-//        fontWeight = FontWeight.Bold,
-//        modifier = Modifier.clickable {
-//            navActions.navigateToLikes(post.id)
-//        }
-//    )
 }
 
 @Composable
@@ -932,7 +891,7 @@ fun VideoPlayer(
     DisposableEffect(
         AndroidView(
             factory = {
-                PlayerView(context).apply {
+                StyledPlayerView(context).apply {
                     this.player = player
                 }
             },

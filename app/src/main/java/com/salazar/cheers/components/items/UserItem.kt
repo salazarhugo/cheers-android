@@ -19,11 +19,12 @@ import com.salazar.cheers.internal.User
 fun UserItem(
     user: User,
     isAuthor: Boolean = false,
+    onUserClick: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable { onUserClick(user.username) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

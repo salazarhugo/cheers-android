@@ -13,6 +13,10 @@ interface PostDao {
     @Query("SELECT * FROM posts ORDER BY posts.createdTime DESC")
     fun pagingSourceFeed(): PagingSource<Int, PostFeed>
 
+    @Transaction
+    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE (authorId = :userIdOrUsername OR users.username = :userIdOrUsername) ORDER BY posts.createdTime DESC")
+    fun profilePostFeed(userIdOrUsername: String): PagingSource<Int, PostFeed>
+
 //    /**
 //     ** Get User posts and posts where they are tagged in. Only IMAGE, VIDEO posts.
 //     **/

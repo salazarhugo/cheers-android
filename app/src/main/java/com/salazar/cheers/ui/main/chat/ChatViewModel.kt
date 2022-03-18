@@ -112,7 +112,7 @@ class ChatViewModel @AssistedInject constructor(
     private fun refreshOtherUser(otherUserId: String) {
         viewModelScope.launch {
             viewModelState.update {
-                val otherUser = userRepository.getUser(otherUserId)
+                val otherUser = userRepository.getUser(userIdOrUsername = otherUserId)
                 it.copy(channel = it.channel?.copy(otherUser = otherUser))
             }
         }

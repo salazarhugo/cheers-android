@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.sheets
 
 import android.app.Activity
-import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +32,6 @@ data class SendGiftUiState(
 )
 
 class SendGiftViewModel @AssistedInject constructor(
-    application: Application,
     userRepository: UserRepository,
     @Assisted private val receiverId: String
 ) : ViewModel() {
@@ -49,7 +47,7 @@ class SendGiftViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            val receiver = userRepository.getUser(userId = receiverId)
+            val receiver = userRepository.getUser(userIdOrUsername = receiverId)
             viewModelState.update {
                 it.copy(receiver = receiver)
             }
@@ -77,7 +75,7 @@ class SendGiftViewModel @AssistedInject constructor(
 
     fun sendGift() {
         updateIsLoading(true)
-        FirestoreUtil.sendGift(receiverId = receiverId).addOnSuccessListener { result ->
+        FirestoreUtil.sendGift(receiverId = receiverId, price = uiState.value.selectedSticker?.price ?: 50).addOnSuccessListener { result ->
             Log.e("SendGift", result.toString())
 
             val success = result["success"] as Boolean

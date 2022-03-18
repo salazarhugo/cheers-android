@@ -68,7 +68,7 @@ class PostRemoteMediator(
                         remoteKeyDao.insertAll(keys)
                         result.forEach {
                             postDao.insert(
-                                it.first.copy(relativeTime = prettyDate(it.first.createdTime)),
+                                it.first,//.copy(relativeTime = prettyDate(it.first.createdTime)),
                                 it.second,
                             )
                         }

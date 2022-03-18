@@ -83,7 +83,7 @@ class MessagesViewModel @Inject constructor(
                         it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! }
                             ?: return@forEach
 
-                    val user = userRepository.getUser(userId = otherUserId)
+                    val user = userRepository.getUser(userIdOrUsername = otherUserId)
                     channels.add(it.copy(otherUser = user))
                 }
             }

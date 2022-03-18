@@ -2,12 +2,11 @@ package com.salazar.cheers.ui.main.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
@@ -27,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
@@ -34,16 +34,20 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
+import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
+import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
+import com.salazar.cheers.ui.main.home.PostBody
+import com.salazar.cheers.ui.main.home.PostFooter
+import com.salazar.cheers.ui.main.home.PostText
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
     uiState: ProfileUiState,
-    modifier: Modifier = Modifier,
     onSwipeRefresh: () -> Unit,
     onSettingsClicked: () -> Unit,
     onEditProfileClicked: () -> Unit,
@@ -85,108 +89,120 @@ fun Profile(
     Scaffold(
         topBar = { Toolbar(uiState = uiState, navigateToProfileMoreSheet) }
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Column(
-                modifier = Modifier.padding(15.dp)
-            ) {
-                ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
-                ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
-                Spacer(Modifier.height(8.dp))
-                Row {
-                    OutlinedButton(
-                        onClick = onEditProfileClicked,
-                        shape = RoundedCornerShape(4.dp),
-                        modifier = Modifier.fillMaxWidth(),
-//                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
-                    ) {
-                        Text("Edit Profile", color = MaterialTheme.colorScheme.onBackground)
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.BookmarkBorder, "")
+        val posts = uiState.postFlow.collectAsLazyPagingItems()
+        val pagerState = rememberPagerState()
+        val tabs = listOf(
+            Icons.Outlined.ViewList,
+            Icons.Default.GridView,
+            Icons.Outlined.Celebration
+        )
+
+        LazyColumn {
+            item {
+                Column(
+                    modifier = Modifier.padding(15.dp)
+                ) {
+                    ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
+                    ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
+                    Spacer(Modifier.height(8.dp))
+                    Row {
+                        OutlinedButton(
+                            onClick = onEditProfileClicked,
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text("Edit Profile", color = MaterialTheme.colorScheme.onBackground)
+                        }
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(Icons.Outlined.BookmarkBorder, "")
+                        }
                     }
                 }
             }
-            ProfilePostsAndTags(
-                posts = uiState.posts,
-                onPostClicked = onPostClicked,
-            )
-        }
-    }
-}
-
-@Composable
-fun ProfilePostsAndTags(
-    posts: List<Post>,
-    onPostClicked: (postId: String) -> Unit,
-) {
-    val tabs = listOf(Icons.Default.GridView, Icons.Outlined.ViewList, Icons.Outlined.Celebration)
-    val pagerState = rememberPagerState()
-    val scope = rememberCoroutineScope()
-
-    TabRow(
-        // Our selected tab is our current page
-        selectedTabIndex = pagerState.currentPage,
-        // Override the indicator, using the provided pagerTabIndicatorOffset modifier
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-            )
-        },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-    ) {
-        // Add tabs for all of our pages
-        tabs.forEachIndexed { index, icon ->
-            Tab(
-                icon = { Icon(icon, null) },
-                selected = pagerState.currentPage == index,
-                onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(index)
+            stickyHeader {
+                val scope = rememberCoroutineScope()
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                        )
+                    },
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                ) {
+                    tabs.forEachIndexed { index, icon ->
+                        Tab(
+                            icon = { Icon(icon, contentDescription = null) },
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                        )
                     }
-//                        viewModel.toggle()
-                },
-            )
-        }
-    }
-    HorizontalPager(
-        count = tabs.size,
-        state = pagerState,
-    ) { page ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            when (page) {
-                0 -> GridViewPosts(
-                    posts = posts,
-                    onPostClicked = onPostClicked,
-                )
-                1 -> ListViewPosts(
-                    posts = posts,
-                    onPostClicked = onPostClicked,
-                )
-                2 -> FunctionalityNotAvailablePanel()
+                }
+            }
+
+            item {
+                HorizontalPager(
+                    count = tabs.size,
+                    state = pagerState,
+                ) { page ->
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        when (page) {
+                            0 -> posts.itemSnapshotList.forEach { postFeed ->
+                                if (postFeed != null)
+                                    Post(postFeed, onPostClicked)
+                            }
+                            1 -> FunctionalityNotAvailablePanel()
+                            2 -> FunctionalityNotAvailablePanel()
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-
 @Composable
-fun ListViewPosts(
-    posts: List<Post>,
+fun Post(
+    postFeed: PostFeed,
     onPostClicked: (postId: String) -> Unit,
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(count = 3),
-        // We check if there is an *URL* annotation attached to the text
-        // at the clicked position
-        modifier = Modifier.height(800.dp),
-    ) {
-        items(posts) { post ->
-            PostItem(post, onPostClicked)
-        }
-    }
+    val pagerState = rememberPagerState()
+    val post = postFeed.post
+    val author = postFeed.author
+
+    PostHeader(
+        username = author.username,
+        verified = author.verified,
+        public = post.privacy == Privacy.PUBLIC.name,
+        created = post.createdTime,
+        profilePictureUrl = author.profilePictureUrl,
+        locationName = post.locationName,
+        onHeaderClicked = {},
+        onMoreClicked = {},
+    )
+    PostText(
+        caption = post.caption,
+        onUserClicked = {},
+    )
+    PostBody(
+        post = post,
+        onPostClicked = onPostClicked,
+        onLike = {},
+        pagerState = pagerState,
+    )
+    PostFooter(
+        postFeed,
+        onLike = {},
+        navigateToComments = {},
+        pagerState = pagerState,
+    )
 }
 
 @Composable

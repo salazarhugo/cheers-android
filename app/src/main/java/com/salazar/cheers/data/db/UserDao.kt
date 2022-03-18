@@ -13,8 +13,11 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE users.id = :userId")
     suspend fun getUser(userId: String): User
 
-    @Query("SELECT * FROM users WHERE users.username = :username")
-    suspend fun getUserWithUsername(username: String): User
+    @Query("SELECT * FROM users WHERE id = :userIdOrUsername OR username = :userIdOrUsername")
+    suspend fun getUserWithUsername(userIdOrUsername: String): User
+
+    @Query("SELECT users.id FROM users WHERE users.username = :username")
+    suspend fun getUserIdWithUsername(username: String): String
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User)

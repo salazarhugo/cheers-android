@@ -33,5 +33,6 @@ fun MapRoute(
         navigateToSettingsScreen = { },
         onTogglePublic = mapViewModel::onTogglePublic,
         onAddPostClicked = { navActions.navigateToAddPostSheet() },
+        onUserClick = { navActions.navigateToOtherProfile(it) }
     )
 }

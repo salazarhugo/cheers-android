@@ -15,8 +15,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 16
-        versionName "0.9.8"
+        versionCode 17
+        versionName "0.9.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -161,7 +161,7 @@ dependencies {
     implementation("androidx.datastore:datastore:1.0.0")
 
     // ExoPlayer 2
-    implementation 'com.google.android.exoplayer:exoplayer:2.17.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
 
     // Firebase BOM
     implementation platform('com.google.firebase:firebase-bom:29.0.0')
@@ -230,7 +230,7 @@ dependencies {
 //    implementation "com.mapbox.search:mapbox-search-android-ui:1.0.0-beta.23"
 
     // Paging
-    implementation("androidx.paging:paging-runtime-ktx:3.1.0")
+    implementation("androidx.paging:paging-runtime-ktx:3.1.1")
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
     // Google's Fused Location Provider

@@ -1,12 +1,10 @@
 package com.salazar.cheers.ui.main.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+    private val userRepository: UserRepository,
     private var cheersDao: CheersDao,
 ) : ViewModel() {
 
@@ -56,13 +55,9 @@ class SearchViewModel @Inject constructor(
 
     fun refreshUsers(searchInput: String) {
         viewModelScope.launch {
+            val users = userRepository.queryUsers(searchInput)
             viewModelState.update {
-                try {
-                    it.copy(users = Neo4jUtil.queryUsers(searchInput))
-                } catch (e: Exception) {
-                    Log.e("HomeViewModel", e.toString())
-                    it.copy(errorMessage = e.toString())
-                }
+                it.copy(users = users)
             }
         }
     }
@@ -88,15 +83,15 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun refreshUserRecommendations() {
-        viewModelScope.launch {
-            viewModelState.update {
-                val result = Neo4jUtil.getUserRecommendations()
-                when (result) {
-                    is Result.Success -> it.copy(userRecommendations = result.data)
-                    is Result.Error -> it.copy(errorMessage = result.exception.toString())
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            viewModelState.update {
+//                val result = Neo4jUtil.getUserRecommendations()
+//                when (result) {
+//                    is Result.Success -> it.copy(userRecommendations = result.data)
+//                    is Result.Error -> it.copy(errorMessage = result.exception.toString())
+//                }
+//            }
+//        }
     }
 }
 

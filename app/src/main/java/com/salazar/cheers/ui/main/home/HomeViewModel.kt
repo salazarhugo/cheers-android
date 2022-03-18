@@ -12,7 +12,6 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.data.repository.EventRepository
@@ -192,15 +191,15 @@ class HomeViewModel @Inject constructor(
     }
 
     fun refreshSuggestions() {
-        viewModelScope.launch {
-            val result = Neo4jUtil.getSuggestions()
-            viewModelState.update {
-                when (result) {
-                    is Result.Success -> it.copy(suggestions = result.data)
-                    is Result.Error -> it.copy(errorMessages = listOf(result.exception.toString()))
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            val result = Neo4jUtil.getSuggestions()
+//            viewModelState.update {
+//                when (result) {
+//                    is Result.Success -> it.copy(suggestions = result.data)
+//                    is Result.Error -> it.copy(errorMessages = listOf(result.exception.toString()))
+//                }
+//            }
+//        }
     }
 
     fun toggleLike(post: Post) {

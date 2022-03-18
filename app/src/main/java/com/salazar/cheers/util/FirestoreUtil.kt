@@ -41,10 +41,11 @@ object FirestoreUtil {
             }"
         )
 
-    fun sendGift(receiverId: String): Task<HashMap<*, *>> {
+    fun sendGift(receiverId: String, price: Int = 50): Task<HashMap<*, *>> {
         // Create the arguments to the callable function.
         val data = hashMapOf(
             "receiverId" to receiverId,
+            "price" to price,
         )
 
         return FirebaseFunctions.getInstance("europe-west2")

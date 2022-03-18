@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.paging
 
+import android.util.Log
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
@@ -48,6 +49,7 @@ class StoryRemoteMediator(
                 is Result.Success -> {
                     val result = response.data
                     val endOfPaginationReached = result.size < state.config.pageSize
+                    Log.d("HAHA", result.toString())
 
                     database.withTransaction {
                         if (loadType == LoadType.REFRESH) {

@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.EventUi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -57,7 +55,6 @@ private data class EventDetailViewModelState(
 }
 
 class EventDetailViewModel @AssistedInject constructor(
-//    private val repository: Neo4jRepository,
     @Assisted private val eventId: String
 ) : ViewModel() {
 
@@ -76,47 +73,12 @@ class EventDetailViewModel @AssistedInject constructor(
     }
 
     private fun refreshEvent() {
-        viewModelScope.launch {
-            val result = Neo4jUtil.getEvent(eventId = eventId)
-            viewModelState.update {
-                when (result) {
-                    is Result.Success -> it.copy(eventUi = result.data)
-                    is Result.Error -> it.copy(errorMessages = listOf(result.exception.toString()))
-                }
-            }
-        }
-    }
-
-//    private fun unlikeEvent(eventId: String) {
-//        viewModelScope.launch {
-//            try {
-//                Neo4jUtil.unlikeEvent(eventId = eventId)
-//            } catch (e: Exception) {
-//                Log.e("EventDetailViewModel", e.toString())
-//            }
-//        }
-//    }
-
-//    private fun likeEvent(eventId: String) {
-//        viewModelScope.launch {
-//            try {
-//                Neo4jUtil.likeEvent(eventId = eventId)
-//            } catch (e: Exception) {
-//                Log.e("EventDetailViewModel", e.toString())
-//            }
-//        }
-//    }
-
-    fun selectEvent(eventId: String) {
-//        viewModelState.update {
-//            it.copy(selectedEventId = eventId)
-//        }
+        viewModelScope.launch { }
     }
 
     fun deleteEvent() {
         viewModelScope.launch {
             try {
-//                Neo4jUtil.deleteEvent(eventId = eventId)
             } catch (e: Exception) {
                 Log.e("EventDetailViewModel", e.toString())
             }

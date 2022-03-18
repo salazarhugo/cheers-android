@@ -1,11 +1,12 @@
 package com.salazar.cheers.ui.main.detail
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.util.FirestoreChat
 
 /**
  * Stateful composable that displays the Navigation route for the Post detail screen.
@@ -18,6 +19,7 @@ fun PostDetailRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by postDetailViewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     if (uiState is PostDetailUiState.HasPost)
         PostDetailScreen(
@@ -35,10 +37,12 @@ fun PostDetailRoute(
             onMapClick = { navActions.navigateToMap() },
             onToggleLike = postDetailViewModel::toggleLike,
             onMessageClicked = {
-                FirestoreChat.getOrCreatePostChatGroup((uiState as PostDetailUiState.HasPost).postFeed) {
-                    navActions.navigateToChat(it)
-                }
-            }
+                Toast.makeText(context, "Group chat coming soon", Toast.LENGTH_SHORT).show()
+//                FirestoreChat.getOrCreatePostChatGroup((uiState as PostDetailUiState.HasPost).postFeed) {
+//                    navActions.navigateToChat(it)
+//                }
+            },
+            onUserClick = { navActions.navigateToOtherProfile(it) },
         )
     else
         LoadingScreen()
