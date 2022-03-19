@@ -129,7 +129,7 @@ class Neo4jService {
                             "WITH s, author, count(DISTINCT authorPosts) as postCount, count(DISTINCT authorFollowing) as following,\n" +
                             "count(DISTINCT authorFollowers) as followers, collect(DISTINCT properties(w)) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed,\n" +
                             "collect(DISTINCT viewers.id) as viewers\n" +
-                            "RETURN s,\n" +
+                            "RETURN properties(s),\n" +
                             "       author {.*, postCount: postCount, isFollowed: isFollowed, following: following, followers: followers}, " +
                             "       tags, viewers\n" +
                             "ORDER BY s.created DESC",
