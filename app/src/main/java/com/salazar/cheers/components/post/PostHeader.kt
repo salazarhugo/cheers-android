@@ -30,7 +30,7 @@ fun PostHeader(
     username: String,
     verified: Boolean,
     public: Boolean,
-    created: String = "",
+    created: Long,
     locationName: String,
     profilePictureUrl: String,
     darkMode: Boolean = false,
@@ -102,7 +102,7 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = relativeTimeFormatter(value = created),
+                text = relativeTimeFormatter(timestamp = created),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
             )

@@ -115,7 +115,7 @@ object Neo4jUtil {
             params["event"] = toMap(event)
             write(
                 "MATCH (u:User { id: \$userId}) CREATE (e: Event \$event)" +
-                        " SET e += { createdTime: datetime(), startDate: datetime(e.startDate), endDate: datetime(e.endDate)} CREATE (u)-[:POSTED]->(e)" +
+                        " SET e += { created: datetime().epochMillis, startDate: datetime(e.startDate), endDate: datetime(e.endDate)} CREATE (u)-[:POSTED]->(e)" +
                         " WITH e UNWIND e.participants as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
                 params = params
             )
@@ -138,7 +138,7 @@ object Neo4jUtil {
 
         write(
             "MATCH (u:User) WHERE u.id = \$userId CREATE (s: Story \$story)" +
-                    " SET s += { created: datetime() } CREATE (u)-[:POSTED]->(s)" +
+                    " SET s += { created: datetime().epochMillis } CREATE (u)-[:POSTED]->(s)" +
                     " WITH s UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (s)-[:WITH]->(u2)",
             params = params
         )
@@ -158,7 +158,7 @@ object Neo4jUtil {
 
         write(
             "MATCH (u:User) WHERE u.id = \$userId CREATE (p: Post \$post)" +
-                    " SET p += { createdTime: datetime(), duration: duration({ hours: 2 }) } CREATE (u)-[:POSTED]->(p)" +
+                    " SET p += { created: datetime().epochMillis, duration: duration({ hours: 2 }) } CREATE (u)-[:POSTED]->(p)" +
                     " WITH p UNWIND \$tagUsersId as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
             params = params
         )

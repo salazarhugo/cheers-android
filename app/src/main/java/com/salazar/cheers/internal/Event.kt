@@ -6,7 +6,7 @@ data class Event(
     val description: String = "",
     val startDate: String = "",
     val endDate: String = "",
-    val createdTime: String = "",
+    val created: Long = 0L,
     val host: String = "",
     val participants: List<String> = emptyList(),
     val showOnMap: Boolean = false,

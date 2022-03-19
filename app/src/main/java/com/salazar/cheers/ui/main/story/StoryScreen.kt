@@ -172,7 +172,8 @@ fun StoryCarousel(
                     onStoryFinish()
                 },
                 onUserClick = onUserClick,
-                pause = isPaused
+                pause = isPaused,
+                created = story.story.created,
             )
         }
     }
@@ -182,6 +183,7 @@ fun StoryCarousel(
 fun StoryHeader(
     currentPage: Int,
     page: Int,
+    created: Long,
     user: User,
     onStoryFinish: () -> Unit,
     onUserClick: (String) -> Unit,
@@ -198,12 +200,13 @@ fun StoryHeader(
         PostHeader(
             username = user.username,
             verified = user.verified,
+            created = created,
             darkMode = true,
             public = false,
             locationName = "",
             profilePictureUrl = user.profilePictureUrl,
             onHeaderClicked = onUserClick,
-            onMoreClicked = {}
+            onMoreClicked = {},
         )
     }
 }

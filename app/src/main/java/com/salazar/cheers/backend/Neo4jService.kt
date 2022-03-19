@@ -74,9 +74,9 @@ class Neo4jService {
                             "OPTIONAL MATCH (:User)-[authorFollowers:FOLLOWS]->(author)\n" +
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(e) \n" +
                             "OPTIONAL MATCH (e)-[:WITH]->(e:Event) \n" +
-                            "RETURN DISTINCT e { .*, createdTime: toString(e.createdTime), startDate: toString(e.startDate), endDate: toString(e.endDate)},\n" +
+                            "RETURN DISTINCT e { .*, startDate: toString(e.startDate), endDate: toString(e.endDate)},\n" +
                             "       author {.*, postCount: count(DISTINCT authorPosts), isFollowed: exists( (u)-[:FOLLOWS]->(author) ), following: count(DISTINCT authorFollowing), followers: count(DISTINCT authorFollowers)},\n" +
-                            "ORDER BY datetime(e.createdTime) DESC " +
+                            "ORDER BY e.created DESC " +
                             "SKIP \$skip LIMIT \$pageSize",
                     params
                 )
@@ -129,7 +129,7 @@ class Neo4jService {
                             "WITH s, author, count(DISTINCT authorPosts) as postCount, count(DISTINCT authorFollowing) as following,\n" +
                             "count(DISTINCT authorFollowers) as followers, collect(DISTINCT properties(w)) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed,\n" +
                             "collect(DISTINCT viewers.id) as viewers\n" +
-                            "RETURN s {.*, created: s.created.epochMillis}," +
+                            "RETURN s,\n" +
                             "       author {.*, postCount: postCount, isFollowed: isFollowed, following: following, followers: followers}, " +
                             "       tags, viewers\n" +
                             "ORDER BY s.created DESC",
@@ -193,10 +193,10 @@ class Neo4jService {
                             "OPTIONAL MATCH (p)-[:WITH]->(w:User) \n" +
                             "WITH p, author, count(DISTINCT authorPosts) as postCount, exists((u)-[:LIKED]->(p)) as liked, count(DISTINCT authorFollowing) as following,\n" +
                             "count(DISTINCT authorFollowers) as followers, count(DISTINCT r) as likes, collect(DISTINCT properties(w)) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed\n" +
-                            "RETURN p {.*, likes: likes, liked: liked, createdTime: toString(p.createdTime)}," +
+                            "RETURN p {.*, likes: likes, liked: liked}," +
                             "       author {.*, postCount: postCount, isFollowed: isFollowed, following: following, followers: followers}, " +
                             "       tags\n" +
-                            "ORDER BY datetime(p.createdTime) DESC",
+                            "ORDER BY p.created DESC",
                     params
                 )
 
@@ -222,6 +222,43 @@ class Neo4jService {
                     posts.add(Pair(post, users))
                 }
                 return@withContext Result.Success(posts.toList())
+            } catch (e: Exception) {
+                return@withContext Result.Error(e)
+            }
+        }
+    }
+
+    suspend fun getSuggestions(): Result<List<User>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = FirebaseAuth.getInstance().uid!!
+                params["pageSize"] = 10
+                params["skip"] = 0 * 10
+
+                val records = query(
+                    "MATCH (u:User { id: \$userId})-[:FOLLOWS]->(f:User)-[:FOLLOWS]->(suggestion:User) " +
+                            "WHERE suggestion.id <> \$userId " +
+                            "AND NOT (u)-[:FOLLOWS]->(suggestion) " +
+                            "WITH suggestion SKIP \$skip LIMIT \$pageSize\n" +
+                            "OPTIONAL MATCH (suggestion)-[posts:POSTED]->(:Post)\n" +
+                            "OPTIONAL MATCH (suggestion)-[following:FOLLOWS]->(:User)\n" +
+                            "OPTIONAL MATCH (:User)-[followers:FOLLOWS]->(suggestion)\n" +
+                            "WITH suggestion, count(DISTINCT posts) as posts, count(DISTINCT followers) as followers, count(DISTINCT following) as following\n" +
+                            "RETURN suggestion {.*,  postCount: posts, followers: followers, following: following, isFollowed: false }",
+                    params
+                )
+
+                val users = mutableListOf<User>()
+
+                records.forEach { record ->
+                    val gson = Gson()
+                    val user =
+                        gson.fromJson(record.values()[0].toString(), User::class.java)
+                    users.add(user)
+                }
+
+                return@withContext Result.Success(users.toList())
             } catch (e: Exception) {
                 return@withContext Result.Error(e)
             }

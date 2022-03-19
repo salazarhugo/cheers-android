@@ -42,14 +42,13 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.LikeButton
 import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.items.UserItem
+import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.ui.main.home.PostBody
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Composable
 fun PostDetailScreen(
@@ -72,7 +71,7 @@ fun PostDetailScreen(
                 onBackPressed = onBackPressed,
                 name = post.locationName,
                 scrollBehavior = scrollBehavior,
-                createdTime = post.createdTime
+                created = post.created
             )
         }
     ) {
@@ -156,13 +155,15 @@ fun StaticMap(
 @Composable
 fun PostDetails(
     privacy: Privacy,
+    created: Long,
+    drunkenness: Int,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(privacy.icon, null)
                 Column(modifier = Modifier.padding(start = 16.dp)) {
@@ -170,6 +171,14 @@ fun PostDetails(
                     Text(privacy.subtitle)
                 }
             }
+            Text(
+                text = Date(created).toString(),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Drunkenness level $drunkenness",
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }
@@ -196,7 +205,13 @@ fun Post(
     Column {
         LazyColumn() {
 
-            item { PostDetails(Privacy.valueOf(postFeed.post.privacy)) }
+            item {
+                PostDetails(
+                    privacy = Privacy.valueOf(postFeed.post.privacy),
+                    created = post.created,
+                    drunkenness = post.drunkenness,
+                )
+            }
 
             item {
                 Buttons(
@@ -336,7 +351,7 @@ fun PostFooter(
 @Composable
 fun Toolbar(
     name: String,
-    createdTime: String,
+    created: Long,
     onBackPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
@@ -355,17 +370,16 @@ fun Toolbar(
             scrollBehavior = scrollBehavior,
             colors = foregroundColors,
             title = {
-                val d = remember { ZonedDateTime.parse(createdTime) }
                 Column {
                     Text(
                         text = name,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Roboto,
                     )
-                    Text(
-                        d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM HH:mm a")),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+//                    Text(
+//                        d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM HH:mm a")),
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
                 }
             },
             navigationIcon = {

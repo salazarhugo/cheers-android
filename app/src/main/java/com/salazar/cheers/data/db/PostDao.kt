@@ -5,16 +5,17 @@ import androidx.room.*
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
+import java.util.*
 
 @Dao
 interface PostDao {
 
     @Transaction
-    @Query("SELECT * FROM posts ORDER BY posts.createdTime DESC")
+    @Query("SELECT * FROM posts ORDER BY posts.created DESC")
     fun pagingSourceFeed(): PagingSource<Int, PostFeed>
 
     @Transaction
-    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE (authorId = :userIdOrUsername OR users.username = :userIdOrUsername) ORDER BY posts.createdTime DESC")
+    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE (authorId = :userIdOrUsername OR users.username = :userIdOrUsername) ORDER BY posts.created DESC")
     fun profilePostFeed(userIdOrUsername: String): PagingSource<Int, PostFeed>
 
 //    /**
@@ -28,11 +29,11 @@ interface PostDao {
      ** Get User posts. Only IMAGE, VIDEO posts.
      **/
     @Transaction
-    @Query("SELECT * FROM posts WHERE authorId = :authorId AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
+    @Query("SELECT * FROM posts WHERE authorId = :authorId AND type <> 'TEXT' ORDER BY posts.created DESC")
     suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
-    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE username = :username AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
+    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE username = :username AND type <> 'TEXT' ORDER BY posts.created DESC")
     suspend fun getPostsWithUsername(username: String): List<Post>
 
 //    @Transaction
@@ -44,8 +45,8 @@ interface PostDao {
     suspend fun getPost(postId: String): PostFeed
 
     @Transaction
-    @Query("SELECT * FROM posts WHERE privacy = :privacy")
-    suspend fun getMapPosts(privacy: Privacy): List<PostFeed>
+    @Query("SELECT * FROM posts WHERE privacy = :privacy AND created > :yesterday")
+    suspend fun getMapPosts(privacy: Privacy, yesterday: Long = Date().time - 24 * 60 * 60 * 1000): List<PostFeed>
 
 //    @Transaction
 //    @Query("SELECT * FROM posts WHERE tagUsersId")
@@ -54,7 +55,7 @@ interface PostDao {
     @Query("SELECT * FROM users WHERE id IN (:tagUsersId)")
     suspend fun getPostUsers(tagUsersId: List<String>): List<User>
 
-    @Query("SELECT * FROM posts ORDER BY createdTime DESC")
+    @Query("SELECT * FROM posts ORDER BY created DESC")
     fun pagingSource(): PagingSource<Int, Post>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

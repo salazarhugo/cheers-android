@@ -18,7 +18,7 @@ data class Post(
     val authorId: String = "",
     val name: String = "",
     val caption: String = "",
-    val createdTime: String = "",
+    val created: Long = 0,
     val relativeTime: String = "",
     var likes: Int = 0,
     var liked: Boolean = false,
