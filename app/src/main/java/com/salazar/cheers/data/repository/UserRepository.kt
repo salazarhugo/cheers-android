@@ -48,11 +48,25 @@ class UserRepository @Inject constructor(
     }
 
     private suspend fun refreshUser(userIdOrUsername: String) {
-        val result = service.getUser(userIdOrUsername = userIdOrUsername)
-        when (result) {
+        when (val result = service.getUser(userIdOrUsername = userIdOrUsername)) {
             is Result.Success -> userDao.insert(result.data)
             is Result.Error ->  {
                 Log.e("User Service", result.exception.message.toString())
+            }
+        }
+    }
+
+    suspend fun getSuggestions(): List<User> = withContext(Dispatchers.IO) {
+        when (val result = service.getSuggestions()) {
+            is Result.Success -> {
+                val suggestions = result.data
+                userDao.insertAll(suggestions)
+                val ids = suggestions.map { it.id }
+                return@withContext userDao.getSuggestions(ids)
+            }
+            is Result.Error ->  {
+                Log.e("User Service", result.exception.message.toString())
+                return@withContext emptyList()
             }
         }
     }

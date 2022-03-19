@@ -17,8 +17,7 @@ import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +35,17 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
+import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.UserProfilePicture
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
-import java.time.ZoneId
 
 @Composable
 fun MessagesScreen(
@@ -51,6 +53,7 @@ fun MessagesScreen(
     onNewMessageClicked: () -> Unit,
     onChannelClicked: (channelId: String) -> Unit,
     onLongPress: (String) -> Unit,
+    onFollowClick: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
 ) {
     Scaffold(
@@ -70,6 +73,7 @@ fun MessagesScreen(
                 uiState = uiState,
                 onChannelClicked = onChannelClicked,
                 onLongPress = onLongPress,
+                onFollowClick = onFollowClick,
             )
         }
     }
@@ -80,10 +84,12 @@ fun Tabs(
     uiState: MessagesUiState,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
+    onFollowClick: (String) -> Unit,
 ) {
     val tabs = listOf("Direct", "Groups")
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
+    val suggestions = uiState.suggestions
 
     TabRow(
         // Our selected tab is our current page
@@ -124,14 +130,26 @@ fun Tabs(
                     if (uiState.isLoading)
                         LoadingScreen()
                     if (directChats != null)
-                        ConversationList(directChats, onChannelClicked, onLongPress)
+                        ConversationList(
+                            channels = directChats,
+                            onChannelClicked = onChannelClicked,
+                            onLongPress = onLongPress,
+                            suggestions = suggestions,
+                            onFollowClick = onFollowClick,
+                        )
                 }
                 1 -> {
                     val groupChats = uiState.channels?.filter { it.type == ChatChannelType.GROUP }
                     if (uiState.isLoading)
                         LoadingScreen()
                     if (groupChats != null)
-                        ConversationList(groupChats, onChannelClicked, onLongPress)
+                        ConversationList(
+                            channels = groupChats,
+                            onChannelClicked = onChannelClicked,
+                            onLongPress = onLongPress,
+                            suggestions = suggestions,
+                            onFollowClick = onFollowClick,
+                        )
                 }
             }
         }
@@ -139,43 +157,12 @@ fun Tabs(
 }
 
 @Composable
-fun NoMessages() {
-    Column(
-        modifier = Modifier
-            .padding(bottom = 32.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            Icons.Outlined.Inbox,
-            contentDescription = null,
-            modifier = Modifier.size(100.dp)
-        )
-        Text(
-            text = "No messages yet",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(6.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-        )
-        Text(
-            text = "Looks like you haven't initiated a conversation with any party buddies",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium,
-        )
-    }
-}
-
-@Composable
 fun ConversationList(
     channels: List<ChatChannel>,
+    suggestions: List<User>?,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
+    onFollowClick: (String) -> Unit,
 ) {
     if (channels.isEmpty())
         NoMessages()
@@ -190,14 +177,70 @@ fun ConversationList(
                 ChatChannelType.GROUP -> GroupConversation(channel = channel, onChannelClicked)
             }
         }
+        item {
+            Text(
+                text = "Find friends to follow and message",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+        if (suggestions != null)
+            items(suggestions) { user ->
+                UserItem(
+                    user = user,
+                    onUserClick = {},
+                    onFollowClick = onFollowClick,
+                )
+            }
     }
 }
 
 @Composable
+fun UserItem(
+    user: User,
+    isAuthor: Boolean = false,
+    onUserClick: (String) -> Unit,
+    onFollowClick: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onUserClick(user.username) }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            UserProfilePicture(profilePictureUrl = user.profilePictureUrl)
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                if (user.fullName.isNotBlank())
+                    Text(text = user.fullName, style = MaterialTheme.typography.bodyMedium)
+                Username(
+                    username = user.username,
+                    verified = user.verified,
+                    textStyle = MaterialTheme.typography.bodyMedium
+                )
+//                    Text(text = user.username, style = Typography.bodyMedium)
+            }
+        }
+        if (isAuthor)
+            Image(
+                rememberImagePainter(R.drawable.ic_crown),
+                modifier = Modifier.padding(end = 8.dp).size(16.dp),
+                contentDescription = null,
+            )
+        var isFollowed by remember { mutableStateOf(false) }
+        FollowButton(isFollowing = isFollowed, onClick = {
+            onFollowClick(user.username)
+            isFollowed = !isFollowed
+        })
+    }
+}
+@Composable
 fun LinkContactsItem() {
     Row {
         Button(onClick = { /*TODO*/ }) {
-
         }
     }
 }
@@ -258,8 +301,7 @@ fun DirectConversation(
                     append("  •  ")
                     append(
                         relativeTimeFormatter(
-                            value = channel.recentMessageTime?.toDate()?.toInstant()
-                                ?.atZone(ZoneId.systemDefault())!!.toString()
+                            timestamp = channel.recentMessageTime?.toDate()?.time ?: 0
                         )
                     )
 //                    append("  •  ")
@@ -399,3 +441,37 @@ fun MyAppBar(
         },
     )
 }
+
+@Composable
+fun NoMessages() {
+    Column(
+        modifier = Modifier
+            .padding(bottom = 32.dp)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(
+            Icons.Outlined.Inbox,
+            contentDescription = null,
+            modifier = Modifier.size(100.dp)
+        )
+        Text(
+            text = "No messages yet",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(6.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+        )
+        Text(
+            text = "Looks like you haven't initiated a conversation with any party buddies",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+

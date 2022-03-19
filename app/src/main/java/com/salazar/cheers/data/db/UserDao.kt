@@ -19,6 +19,9 @@ interface UserDao {
     @Query("SELECT users.id FROM users WHERE users.username = :username")
     suspend fun getUserIdWithUsername(username: String): String
 
+    @Query("SELECT * FROM users WHERE users.id IN (:ids)")
+    suspend fun getSuggestions(ids: List<String>): List<User>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User)
 

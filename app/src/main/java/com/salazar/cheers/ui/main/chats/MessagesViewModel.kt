@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelType
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,10 +20,12 @@ data class MessagesUiState(
     val errorMessages: List<String>,
     val searchInput: String,
     val channels: List<ChatChannel>?,
+    val suggestions: List<User>?,
 )
 
 private data class MessagesViewModelState(
     val channels: List<ChatChannel>? = null,
+    val suggestions: List<User>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
@@ -32,7 +35,8 @@ private data class MessagesViewModelState(
             channels = channels,
             isLoading = isLoading,
             errorMessages = errorMessages,
-            searchInput = searchInput
+            searchInput = searchInput,
+            suggestions = suggestions,
         )
 }
 
@@ -42,7 +46,6 @@ class MessagesViewModel @Inject constructor(
 ) : ViewModel() {
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
-
     val name = mutableStateOf("")
 
     private val viewModelState =
@@ -58,6 +61,24 @@ class MessagesViewModel @Inject constructor(
 
     init {
         refreshMessages()
+        refreshSuggestions()
+    }
+
+    private fun refreshSuggestions() {
+        viewModelState.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            val suggestions = userRepository.getSuggestions()
+            viewModelState.update {
+                it.copy(suggestions = suggestions, isLoading = false)
+            }
+        }
+    }
+
+    fun onFollowClick(username: String) {
+        viewModelScope.launch {
+            userRepository.followUser(username = username)
+        }
     }
 
     private fun refreshMessages() {

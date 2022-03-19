@@ -26,5 +26,6 @@ fun MessagesRoute(
         onLongPress = { navActions.navigateToChatsMoreSheet(it) },
         onNewMessageClicked = {
         },
+        onFollowClick = messagesViewModel::onFollowClick,
     )
 }
