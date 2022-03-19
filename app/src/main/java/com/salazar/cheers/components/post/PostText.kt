@@ -1,0 +1,43 @@
+package com.salazar.cheers.components.post
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
+import com.salazar.cheers.ui.main.chat.SymbolAnnotationType
+import com.salazar.cheers.ui.main.chat.messageFormatter
+
+@Composable
+fun PostText(
+    caption: String,
+    onUserClicked: (username: String) -> Unit,
+) {
+    if (caption.isBlank()) return
+
+    val styledCaption = messageFormatter(
+        text = caption,
+        primary = false,
+    )
+    val uriHandler = LocalUriHandler.current
+
+    ClickableText(
+        text = styledCaption,
+        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
+        modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
+        onClick = {
+            styledCaption
+                .getStringAnnotations(start = it, end = it)
+                .firstOrNull()
+                ?.let { annotation ->
+                    when (annotation.tag) {
+                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                        SymbolAnnotationType.PERSON.name -> onUserClicked(annotation.item)
+                        else -> Unit
+                    }
+                }
+        }
+    )
+}

@@ -10,11 +10,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ContactPage
+import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.PostAdd
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,14 +56,15 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
+import com.salazar.cheers.components.post.PostBody
+import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.main.chat.SymbolAnnotationType
-import com.salazar.cheers.ui.main.chat.messageFormatter
 import com.salazar.cheers.ui.theme.Typography
 import org.jetbrains.anko.collections.forEachWithIndex
 import org.jetbrains.anko.image
@@ -568,7 +569,7 @@ fun Post(
             username = author.username,
             verified = author.verified,
             public = post.privacy == Privacy.PUBLIC.name,
-            created = post.createdTime,
+            created = post.created,
             profilePictureUrl = author.profilePictureUrl,
             locationName = post.locationName,
             onHeaderClicked = onUserClicked,
@@ -596,64 +597,6 @@ fun Post(
 }
 
 @Composable
-fun PostText(
-    caption: String,
-    onUserClicked: (username: String) -> Unit,
-) {
-    if (caption.isBlank()) return
-
-    val styledCaption = messageFormatter(
-        text = caption,
-        primary = false,
-    )
-    val uriHandler = LocalUriHandler.current
-
-    ClickableText(
-        text = styledCaption,
-        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
-        modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
-        onClick = {
-            styledCaption
-                .getStringAnnotations(start = it, end = it)
-                .firstOrNull()
-                ?.let { annotation ->
-                    when (annotation.tag) {
-                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-                        SymbolAnnotationType.PERSON.name -> onUserClicked(annotation.item)
-                        else -> Unit
-                    }
-                }
-        }
-    )
-}
-
-@Composable
-fun PostBody(
-    post: Post,
-    onPostClicked: (postId: String) -> Unit,
-    onLike: (post: Post) -> Unit,
-    pagerState: PagerState = rememberPagerState(),
-) {
-
-    Box {
-        if (post.videoUrl.isNotBlank())
-            VideoPlayer(
-                uri = post.videoUrl,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(4 / 5f)
-            )
-        else if (post.photos.isNotEmpty())
-            PhotoCarousel(
-                photos = post.photos,
-                pagerState = pagerState,
-            ) { onPostClicked(post.id) }
-//        if (post.tagUsers.isNotEmpty())
-//            InThisPhotoAnnotation(modifier = Modifier.align(Alignment.BottomStart))
-    }
-}
-
-@Composable
 fun PhotoCarousel(
     photos: List<String>,
     pagerState: PagerState,
@@ -677,75 +620,6 @@ fun PhotoCarousel(
                 .clickable { onPostClick() }
         )
     }
-}
-
-@Composable
-fun PostFooterButtons(
-    post: Post,
-    onLike: (post: Post) -> Unit,
-    navigateToComments: (String) -> Unit,
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            LikeButton(
-                like = post.liked,
-                likes = post.likes,
-                onToggle = { onLike(post) },
-            )
-            Icon(
-                modifier = Modifier.clickable { navigateToComments(post.id) },
-                painter = rememberImagePainter(R.drawable.ic_bubble_icon),
-                contentDescription = null
-            )
-            Icon(Icons.Outlined.Share, null)
-        }
-        Icon(Icons.Outlined.BookmarkBorder, null)
-    }
-}
-
-@Composable
-fun PostFooter(
-    postFeed: PostFeed,
-    onLike: (post: Post) -> Unit,
-    navigateToComments: (PostFeed) -> Unit,
-    pagerState: PagerState,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-    ) {
-
-        if (postFeed.post.photos.size > 1)
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-                activeColor = MaterialTheme.colorScheme.primary,
-            )
-//        Text(postFeed.post.tagUsersId.toString())
-//        Text(postFeed.tagUsers.toString())
-        PostFooterButtons(
-            postFeed.post,
-            onLike = onLike,
-            navigateToComments = { navigateToComments(postFeed) },
-        )
-        if (postFeed.post.type != PostType.TEXT) {
-//            LikedBy(post = postFeed.post)
-            if (postFeed.tagUsers.isNotEmpty())
-                TagUsers(postFeed.tagUsers)
-        }
-    }
-    if (postFeed.post.type != PostType.TEXT)
-        Spacer(Modifier.height(12.dp))
 }
 
 @Composable

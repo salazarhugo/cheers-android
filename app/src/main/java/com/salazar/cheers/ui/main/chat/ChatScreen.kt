@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.chat
 
 import OnMessageLongClickDialog
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -228,7 +229,7 @@ fun Message(
     val spaceBetweenAuthors = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
     val horizontalAlignment = if (isUserMe) Arrangement.End else Arrangement.Start
     Row(
-        modifier = spaceBetweenAuthors.fillMaxWidth(),
+        modifier = spaceBetweenAuthors.fillMaxWidth().animateContentSize(),
         horizontalArrangement = horizontalAlignment
     ) {
         if (isLastMessageByAuthor && !isUserMe) {

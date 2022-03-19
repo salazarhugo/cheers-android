@@ -8,6 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -282,7 +283,10 @@ fun UiLayer(
                 .padding(bottom = 26.dp)
                 .size(80.dp)
                 .border(4.dp, Color.White, CircleShape)
-                .clickable { onAddPostClicked() }
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { onAddPostClicked() }
         ) {}
     }
 }

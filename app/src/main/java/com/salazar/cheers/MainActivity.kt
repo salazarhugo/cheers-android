@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.StrictMode
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -87,8 +88,8 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         )
         paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
 //
-//        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-//        StrictMode.setThreadPolicy(policy)
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
         initInterstitialAd()
     }
@@ -200,6 +201,12 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     override fun onStop() {
         super.onStop()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        FirebaseAuth.getInstance().removeAuthStateListener(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         FirebaseAuth.getInstance().removeAuthStateListener(this)
     }

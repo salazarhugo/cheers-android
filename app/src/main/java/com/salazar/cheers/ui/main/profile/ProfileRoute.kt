@@ -31,7 +31,6 @@ fun ProfileRoute(
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onLikeClicked = profileViewModel::toggleLike,
         onEditProfileClicked = { navActions.navigateToEditProfile() },
-        onSettingsClicked = navActions.navigateToSettings,
         navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
         onWebsiteClicked = { website ->
             var url = website

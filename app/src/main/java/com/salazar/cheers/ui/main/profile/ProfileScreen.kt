@@ -34,14 +34,14 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.*
+import com.salazar.cheers.components.post.PostBody
+import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.ui.main.home.PostBody
-import com.salazar.cheers.ui.main.home.PostFooter
-import com.salazar.cheers.ui.main.home.PostText
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -49,7 +49,6 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     uiState: ProfileUiState,
     onSwipeRefresh: () -> Unit,
-    onSettingsClicked: () -> Unit,
     onEditProfileClicked: () -> Unit,
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
@@ -106,12 +105,12 @@ fun Profile(
                     ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
                     Spacer(Modifier.height(8.dp))
                     Row {
-                        OutlinedButton(
+                        FilledTonalButton(
                             onClick = onEditProfileClicked,
-                            shape = RoundedCornerShape(4.dp),
+                            shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Text("Edit Profile", color = MaterialTheme.colorScheme.onBackground)
+                            Text("Edit Profile")
                         }
                         IconButton(onClick = { /*TODO*/ }) {
                             Icon(Icons.Outlined.BookmarkBorder, "")
@@ -181,7 +180,7 @@ fun Post(
         username = author.username,
         verified = author.verified,
         public = post.privacy == Privacy.PUBLIC.name,
-        created = post.createdTime,
+        created = post.created,
         profilePictureUrl = author.profilePictureUrl,
         locationName = post.locationName,
         onHeaderClicked = {},
