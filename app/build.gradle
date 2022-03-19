@@ -264,7 +264,7 @@ dependencies {
     implementation 'com.google.mlkit:object-detection:17.0.0'
 
 
-    // Debugging
+    // <!------ Debugging ------!>
 
     // LeakCanary
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'

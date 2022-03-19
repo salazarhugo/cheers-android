@@ -1,28 +1,28 @@
 <resources>
-    <style name="Theme.Cheers" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="android:dialogTheme">@style/Theme.DialogFullScreen</item>
-    </style>
+<!--    <style name="Theme.Cheers" parent="Theme.MaterialComponents.DayNight.DarkActionBar">-->
+<!--        <item name="android:dialogTheme">@style/Theme.DialogFullScreen</item>-->
+<!--    </style>-->
 
-    <style name="Theme.Cheers.SignIn">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
+<!--    <style name="Theme.Cheers.SignIn">-->
+<!--        <item name="windowActionBar">false</item>-->
+<!--        <item name="windowNoTitle">true</item>-->
+<!--    </style>-->
 
-    <style name="Theme.DialogFullScreen" parent="Theme.MaterialComponents.DayNight.Dialog">
-<!--        <item name="android:windowBackground">@android:color/white</item>-->
-        <item name="android:windowMinWidthMajor">100%</item>
-        <item name="android:windowMinWidthMinor">100%</item>
-    </style>
+<!--    <style name="Theme.DialogFullScreen" parent="Theme.MaterialComponents.DayNight.Dialog">-->
+<!--&lt;!&ndash;        <item name="android:windowBackground">@android:color/white</item>&ndash;&gt;-->
+<!--        <item name="android:windowMinWidthMajor">100%</item>-->
+<!--        <item name="android:windowMinWidthMinor">100%</item>-->
+<!--    </style>-->
 
-    <style name="Theme.Cheers.Slide">
-        <item name="android:windowEnterAnimation">@anim/slide_up</item>
-        <item name="android:windowExitAnimation">@anim/slide_down</item>
-    </style>
+<!--    <style name="Theme.Cheers.Slide">-->
+<!--        <item name="android:windowEnterAnimation">@anim/slide_up</item>-->
+<!--        <item name="android:windowExitAnimation">@anim/slide_down</item>-->
+<!--    </style>-->
 
-    <style name="Theme.Cheers.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/black</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_artboard_1cheers_logo_svg</item>
-        <item name="windowSplashScreenAnimationDuration">20</item>
-        <item name="postSplashScreenTheme">@style/Theme.Cheers</item>
-    </style>
+<!--    <style name="Theme.Cheers.Starting" parent="Theme.SplashScreen">-->
+<!--        <item name="windowSplashScreenBackground">@color/black</item>-->
+<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_artboard_1cheers_logo_svg</item>-->
+<!--        <item name="windowSplashScreenAnimationDuration">20</item>-->
+<!--        <item name="postSplashScreenTheme">@style/Theme.Cheers</item>-->
+<!--    </style>-->
 </resources>
