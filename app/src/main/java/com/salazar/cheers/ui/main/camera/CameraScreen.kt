@@ -54,6 +54,7 @@ sealed class CameraUIAction {
     object OnCloseClick : CameraUIAction()
     object OnBackClick : CameraUIAction()
     object OnCameraClick : CameraUIAction()
+    object OnFlashClick : CameraUIAction()
     object OnGalleryViewClick : CameraUIAction()
     object OnSwitchCameraClick : CameraUIAction()
 }
@@ -216,20 +217,26 @@ fun ImageControls(
         }
     }
 }
+
 @Composable
 fun Controls(
     cameraUIAction: (CameraUIAction) -> Unit,
     hasImage: Boolean,
+    flashMode: Int,
 ) {
-    when(hasImage) {
+    when (hasImage) {
         true -> ImageControls(cameraUIAction = cameraUIAction)
-        false -> CameraControls(cameraUIAction = cameraUIAction)
+        false -> CameraControls(
+            cameraUIAction = cameraUIAction,
+            flashMode = flashMode,
+        )
     }
 }
 
 @Composable
 fun CameraControls(
     cameraUIAction: (CameraUIAction) -> Unit,
+    flashMode: Int,
 ) {
     Box(
         modifier = Modifier
@@ -242,6 +249,23 @@ fun CameraControls(
         ) {
             Icon(
                 Icons.Outlined.Settings,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = Color.White
+            )
+        }
+        IconButton(
+            onClick = { cameraUIAction(CameraUIAction.OnFlashClick) },
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            val icon = when (flashMode) {
+                ImageCapture.FLASH_MODE_AUTO -> Icons.Outlined.FlashAuto
+                ImageCapture.FLASH_MODE_ON -> Icons.Outlined.FlashOn
+                else -> Icons.Outlined.FlashOff
+            }
+
+            Icon(
+                icon,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = Color.White
@@ -294,7 +318,7 @@ fun CameraPreview(
 
     val previewView = remember { PreviewView(context) }
 
-    LaunchedEffect(lensFacing, uiState.imageUri) {
+    LaunchedEffect(lensFacing, uiState.imageUri, uiState.flashMode) {
         val cameraProvider = context.getCameraProvider()
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(
@@ -330,6 +354,7 @@ fun CameraPreview(
         Controls(
             cameraUIAction = onCameraUIAction,
             hasImage = uiState.imageUri != null,
+            flashMode = uiState.flashMode,
         )
     }
 }
@@ -371,6 +396,7 @@ private fun CameraPermission(
 fun ImageCapture.takePicture(
     context: Context,
     lensFacing: Int,
+    flashMode: Int = ImageCapture.FLASH_MODE_AUTO,
     onImageCaptured: (Uri, Boolean) -> Unit,
     onError: (ImageCaptureException) -> Unit
 ) {
@@ -382,6 +408,8 @@ fun ImageCapture.takePicture(
 
     val photoFile = createFile(outputDirectory, FILENAME, PHOTO_EXTENSION)
     val outputFileOptions = getOutputFileOptions(lensFacing, photoFile)
+
+    setFlashMode(flashMode)
 
     this.takePicture(
         outputFileOptions,

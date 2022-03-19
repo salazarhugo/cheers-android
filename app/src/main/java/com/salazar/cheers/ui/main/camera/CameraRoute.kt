@@ -43,7 +43,7 @@ fun CameraRoute(
                 is CameraUIAction.OnSwitchCameraClick ->
                     cameraViewModel.onSwitchCameraClicked()
                 is CameraUIAction.OnCameraClick -> {
-                    imageCapture.takePicture(context, uiState.lensFacing, { uri, fromGallery ->
+                    imageCapture.takePicture(context, uiState.lensFacing, uiState.flashMode, { uri, fromGallery ->
                         cameraViewModel.setImageUri(uri)
                     }, {})
                 }
@@ -51,6 +51,9 @@ fun CameraRoute(
                 is CameraUIAction.OnCloseClick -> navActions.navigateBack()
                 is CameraUIAction.OnBackClick -> {
                     cameraViewModel.setImageUri(null)
+                }
+                is CameraUIAction.OnFlashClick -> {
+                    cameraViewModel.onSwitchFlash()
                 }
             }
         },

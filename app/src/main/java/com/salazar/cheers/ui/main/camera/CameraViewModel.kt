@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.camera
 import android.app.Application
 import android.net.Uri
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 data class CameraUiState(
     val isLoading: Boolean,
+    val flashMode: Int = ImageCapture.FLASH_MODE_AUTO,
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
     val lensFacing: Int = CameraSelector.LENS_FACING_BACK,
@@ -61,6 +63,18 @@ class CameraViewModel @Inject constructor(
     fun setImageUri(imageUri: Uri?) {
         viewModelState.update {
             it.copy(imageUri = imageUri)
+        }
+    }
+
+    fun onSwitchFlash() {
+        val nextFlashMode = when (viewModelState.value.flashMode) {
+            ImageCapture.FLASH_MODE_AUTO -> ImageCapture.FLASH_MODE_ON
+            ImageCapture.FLASH_MODE_ON -> ImageCapture.FLASH_MODE_OFF
+            else -> ImageCapture.FLASH_MODE_AUTO
+        }
+
+        viewModelState.update {
+            it.copy(flashMode = nextFlashMode)
         }
     }
 
