@@ -50,6 +50,9 @@ class UploadPostWorker @AssistedInject constructor(
         val name =
             inputData.getString("NAME") ?: ""
 
+        val drunkenness =
+            inputData.getInt("DRUNKENNESS", 0)
+
         val photoCaption =
             inputData.getString("PHOTO_CAPTION") ?: ""
 
@@ -164,6 +167,7 @@ class UploadPostWorker @AssistedInject constructor(
                             type = postType,
                             caption = photoCaption,
                             photos = downloadUrls,
+                            drunkenness = drunkenness,
                             locationName = locationName,
                             locationLatitude = latitude,
                             locationLongitude = longitude,
@@ -184,6 +188,7 @@ class UploadPostWorker @AssistedInject constructor(
                         name = name,
                         type = postType,
                         caption = photoCaption,
+                        drunkenness = drunkenness,
                         locationName = locationName,
                         locationLatitude = latitude,
                         locationLongitude = longitude,

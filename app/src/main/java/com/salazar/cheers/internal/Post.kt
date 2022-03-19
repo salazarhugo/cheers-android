@@ -29,6 +29,7 @@ data class Post(
     val photos: List<String> = emptyList(),
     val videoUrl: String = "",
     val videoThumbnailUrl: String = "",
+    val drunkenness: Int = 0,
     val locationLatitude: Double = 0.0,
     val locationLongitude: Double = 0.0,
     val locationName: String = "",

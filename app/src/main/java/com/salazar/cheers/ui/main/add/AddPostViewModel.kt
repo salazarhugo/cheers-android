@@ -22,7 +22,7 @@ import java.util.*
 import javax.inject.Inject
 
 enum class AddPostPage {
-    AddPost, ChooseOnMap, ChooseBeverage, AddPeople
+    AddPost, ChooseOnMap, ChooseBeverage, AddPeople, DrunkennessLevel
 }
 
 data class AddPostUiState(
@@ -30,6 +30,7 @@ data class AddPostUiState(
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
     val name: String = "",
+    val drunkenness: Int = 0,
     val caption: String = "",
     val beverage: String = "",
     val postType: String = PostType.TEXT,
@@ -79,6 +80,12 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
     fun unselectLocation() {
         viewModelState.update {
             it.copy(selectedLocation = null)
+        }
+    }
+
+    fun onDrunkennessChange(drunkenness: Int) {
+        viewModelState.update {
+            it.copy(drunkenness = drunkenness)
         }
     }
 
@@ -163,6 +170,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
                         "NAME" to uiState.name,
+                        "DRUNKENNESS" to uiState.drunkenness,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,
                         "LOCATION_LATITUDE" to uiState.selectedLocation?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.selectedLocation?.coordinate?.longitude(),

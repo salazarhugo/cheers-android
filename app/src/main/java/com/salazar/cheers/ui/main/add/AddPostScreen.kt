@@ -78,6 +78,7 @@ fun AddPostScreen(
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
     interactWithChooseBeverage: () -> Unit,
+    interactWithDrunkennessLevel: () -> Unit,
     navigateToCamera: () -> Unit,
     navigateToTagUser: () -> Unit,
     onSelectLocation: (SearchResult) -> Unit,
@@ -155,14 +156,19 @@ fun AddPostScreen(
                         location = uiState.location,
                         navigateToChooseOnMap = interactWithChooseOnMap
                     )
-                DividerM3()
                 LocationResultsSection(
                     results = uiState.locationResults,
                     onSelectLocation = onSelectLocation,
                 )
+                DividerM3()
                 BeverageSection(
                     beverage = uiState.beverage,
                     interactWithChooseBeverage = interactWithChooseBeverage
+                )
+                DividerM3()
+                DrunkennessLevelSection(
+                    drunkenness = uiState.drunkenness,
+                    interactWithChooseBeverage = interactWithDrunkennessLevel
                 )
                 DividerM3()
                 Privacy(
@@ -269,6 +275,36 @@ fun NameSection(
         },
         trailingIcon = { }
     )
+}
+
+@Composable
+fun DrunkennessLevelSection(
+    drunkenness: Int,
+    interactWithChooseBeverage: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clickable { interactWithChooseBeverage() }
+            .padding(15.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Drunkenness Level",
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(Icons.Outlined.Bloodtype, null)
+            Text(
+                text = drunkenness.toString(),
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+            )
+        }
+    }
 }
 
 @Composable

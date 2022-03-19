@@ -20,12 +20,13 @@ fun AddPostRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by addPostViewModel.uiState.collectAsState()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
-        if (it.size <= 5)
-            addPostViewModel.setPhotos(it)
-        else
-            addPostViewModel.updateErrorMessage("Maximum 5 photos.")
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
+            if (it.size <= 5)
+                addPostViewModel.setPhotos(it)
+            else
+                addPostViewModel.updateErrorMessage("Maximum 5 photos.")
+        }
 
     when (uiState.page) {
         AddPostPage.AddPost ->
@@ -38,6 +39,7 @@ fun AddPostRoute(
                 onDismiss = navActions.navigateBack,
                 interactWithChooseOnMap = { addPostViewModel.updatePage(AddPostPage.ChooseOnMap) },
                 interactWithChooseBeverage = { addPostViewModel.updatePage(AddPostPage.ChooseBeverage) },
+                interactWithDrunkennessLevel = { addPostViewModel.updatePage(AddPostPage.DrunkennessLevel) },
                 navigateToTagUser = { addPostViewModel.updatePage(AddPostPage.AddPeople) },
                 navigateToCamera = { navActions.navigateToCamera() },
                 unselectLocation = addPostViewModel::unselectLocation,
@@ -69,6 +71,13 @@ fun AddPostRoute(
                 onSelectUser = addPostViewModel::selectTagUser,
                 selectedUsers = uiState.selectedTagUsers,
                 onDone = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+            )
+        AddPostPage.DrunkennessLevel ->
+            DrunkennessLevelScreen(
+                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onDone = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onSelectDrunkenness = addPostViewModel::onDrunkennessChange,
+                drunkenness = uiState.drunkenness,
             )
     }
 }
