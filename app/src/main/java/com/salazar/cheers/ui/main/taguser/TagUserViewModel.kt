@@ -2,7 +2,7 @@ package com.salazar.cheers.ui.main.taguser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -10,7 +10,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddPeopleViewModel @Inject constructor() : ViewModel() {
+class AddPeopleViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPeopleViewModelState(isLoading = true))
 
@@ -37,10 +39,9 @@ class AddPeopleViewModel @Inject constructor() : ViewModel() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            val users = userRepository.queryUsers(query = query)
             viewModelState.update {
-                val result = Neo4jUtil.queryFriends(query)
-//                when(result)
-                it.copy(users = result, isLoading = false)
+                it.copy(users = users, isLoading = false)
             }
         }
     }

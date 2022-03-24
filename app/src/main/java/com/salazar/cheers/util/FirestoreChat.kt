@@ -45,19 +45,19 @@ object FirestoreChat {
 
                 val members = listOf(post.authorId) + postFeed.post.tagUsersId
 
-                chatChannelsCollectionRef.document(post.id).set(
-                    ChatChannel(
-                        id = post.id,
-                        name = post.locationName,
-                        members = members,
-                        otherUser = User(),
-                        createdAt = Timestamp.now(),
-                        createdBy = currentUserId,
-                        recentMessage = TextMessage(),
-                        recentMessageTime = Timestamp.now(),
-                        type = ChatChannelType.GROUP
-                    )
-                )
+//                chatChannelsCollectionRef.document(post.id).set(
+//                    ChatChannel(
+//                        id = post.id,
+//                        name = post.locationName,
+//                        members = members,
+////                        otherUser = User(),
+//                        createdAt = Timestamp.now(),
+//                        createdBy = currentUserId,
+////                        recentMessage = TextMessage(),
+//                        recentMessageTime = Timestamp.now(),
+//                        type = ChatChannelType.GROUP,
+//                    )
+//                )
 
                 members.forEach { memberId ->
                     firestoreInstance.document(
@@ -100,12 +100,14 @@ object FirestoreChat {
                     id = newChannel.id,
                     name = "Channel 1",
                     members = listOf(currentUserId, otherUserId),
-                    otherUser = User(),
+//                    otherUser = User(),
                     createdAt = Timestamp.now(),
                     recentMessageTime = Timestamp.now(),
                     createdBy = currentUserId,
-                    recentMessage = TextMessage(),
-                    type = ChatChannelType.DIRECT
+//                    recentMessage = TextMessage(),
+                    type = ChatChannelType.DIRECT,
+                    otherUserId = "",
+                    recentMessageId = ""
                 )
             )
 
@@ -150,25 +152,17 @@ object FirestoreChat {
         }
     }
 
-    suspend fun getChatChannels(): Flow<List<ChatChannel>> = callbackFlow {
+    suspend fun getChatChannels(onSuccess: (List<ChatChannel>) -> Unit) {
         val channelCol = chatChannelsCollectionRef
             .whereArrayContains("members", FirebaseAuth.getInstance().currentUser!!.uid)
             .orderBy("recentMessageTime", Query.Direction.DESCENDING)
 
-        val subscription = channelCol.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.e(TAG, "Users listener error.", e)
-                return@addSnapshotListener
-            }
+        channelCol.get().addOnSuccessListener { snapshot ->
             val chatChannels = ArrayList<ChatChannel>()
             snapshot!!.forEach {
                 chatChannels.add(it.toObject(ChatChannel::class.java))
             }
-            this.trySend(chatChannels).isSuccess
-        }
-
-        awaitClose {
-            subscription.remove()
+            onSuccess(chatChannels)
         }
     }
 

@@ -13,8 +13,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
+import com.salazar.cheers.data.db.DirectChannel
+import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.Message
+import com.salazar.cheers.internal.MessageType
+import com.salazar.cheers.internal.TextMessage
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.workers.UploadImageMessage
 import dagger.assisted.Assisted
@@ -35,7 +40,7 @@ sealed interface ChatUiState {
     ) : ChatUiState
 
     data class HasChannel(
-        val channel: ChatChannel,
+        val channel: DirectChannel,
         val messages: List<Message>,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -43,7 +48,7 @@ sealed interface ChatUiState {
 }
 
 private data class ChatViewModelState(
-    val channel: ChatChannel? = null,
+    val channel: DirectChannel? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val messages: List<Message> = emptyList(),
@@ -67,6 +72,7 @@ private data class ChatViewModelState(
 class ChatViewModel @AssistedInject constructor(
     application: Application,
     private val userRepository: UserRepository,
+    private val chatRepository: ChatRepository,
     @Assisted private val channelId: String
 ) : ViewModel() {
 
@@ -97,24 +103,8 @@ class ChatViewModel @AssistedInject constructor(
 
     private fun refreshChannel() {
         viewModelScope.launch {
-            FirestoreChat.getChatChannel(channelId) { channel ->
-                if (channel.type == ChatChannelType.DIRECT) {
-                    val otherUserId =
-                        channel.members.lastOrNull { it != FirebaseAuth.getInstance().currentUser?.uid }
-                            ?: channel.createdBy
-                    refreshOtherUser(otherUserId = otherUserId)
-                }
-                viewModelState.update { it.copy(channel = channel) }
-            }
-        }
-    }
-
-    private fun refreshOtherUser(otherUserId: String) {
-        viewModelScope.launch {
-            viewModelState.update {
-                val otherUser = userRepository.getUser(userIdOrUsername = otherUserId)
-                it.copy(channel = it.channel?.copy(otherUser = otherUser))
-            }
+            val channel = chatRepository.getChannel(channelId = channelId)
+            viewModelState.update { it.copy(channel = channel, isLoading = false) }
         }
     }
 

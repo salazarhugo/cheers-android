@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.add
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,6 +34,7 @@ import coil.compose.rememberImagePainter
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
 import com.salazar.cheers.ui.theme.Roboto
@@ -59,7 +61,7 @@ fun AddPeopleScreen(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize().animateContentSize()
         ) {
             DividerM3()
             ChipInput(
@@ -120,7 +122,7 @@ fun UserCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onSelectUser(user) }
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -129,7 +131,7 @@ fun UserCard(
                 painter = rememberImagePainter(data = user.profilePictureUrl),
                 contentDescription = "Profile image",
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(54.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
             )
@@ -137,7 +139,11 @@ fun UserCard(
             Column {
                 if (user.fullName.isNotBlank())
                     Text(text = user.fullName, style = Typography.bodyMedium)
-                Text(text = user.username, style = Typography.bodyMedium)
+                Username(
+                    username = user.username,
+                    verified = user.verified,
+                    textStyle = Typography.bodyMedium
+                )
             }
         }
         Checkbox(

@@ -23,6 +23,7 @@ data class Post(
     var likes: Int = 0,
     var liked: Boolean = false,
     val duration: String = "",
+    val beverage: String = "",
     val comments: Int = 0,
     val shares: Int = 0,
     val privacy: String = "",

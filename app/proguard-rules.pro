@@ -18,6 +18,20 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
--keep class com.salazar.cheers.backend.*
--keep class com.salazar.cheers.internal.Environment
+-renamesourcefileattribute SourceFile
+
+#-keep class com.salazar.cheers.backend.*
+#-keep class com.salazar.cheers.internal.*
+#-keep class com.salazar.cheers.data.entities.*
+
+# ServiceLoader support
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+
+-keep class kotlinx.coroutines.android.AndroidExceptionPreHandler
+-keep class kotlinx.coroutines.android.AndroidDispatcherFactory
+
+# Most of volatile fields are updated with AFU and should not be mangled
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}

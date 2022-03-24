@@ -23,12 +23,14 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.relativeTimeFormatter
 
 @Composable
 fun PostHeader(
     username: String,
     verified: Boolean,
+    beverage: Beverage,
     public: Boolean,
     created: Long,
     locationName: String,
@@ -77,12 +79,26 @@ fun PostHeader(
             )
             Spacer(Modifier.width(8.dp))
             Column {
-                Username(
-                    username = username,
-                    verified = verified,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    color = color,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Username(
+                        username = username,
+                        verified = verified,
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        color = color,
+                    )
+                    if (beverage != Beverage.NONE) {
+                        Text(
+                            text = " is drinking ${beverage.displayName.lowercase()}",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+//                        Text(
+//                            text = beverage.displayName.lowercase(Locale.getDefault()),
+//                            style = MaterialTheme.typography.bodyMedium,
+//                        )
+                    }
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

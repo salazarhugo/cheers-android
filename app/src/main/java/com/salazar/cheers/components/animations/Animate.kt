@@ -45,11 +45,7 @@ fun AnimateMessage(content: @Composable () -> Unit) {
     val density = LocalDensity.current
     AnimatedVisibility(
         visibleState = state,
-        enter = slideInVertically(
-            initialOffsetY = { with(density) { 200.dp.roundToPx() } }
-        ) + fadeIn(
-            initialAlpha = 0.3f
-        ),
+        enter = slideInVertically() + fadeIn(),
         exit = slideOutVertically() + fadeOut(),
     ) {
         content()

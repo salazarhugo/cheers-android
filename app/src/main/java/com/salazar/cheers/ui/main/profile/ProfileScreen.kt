@@ -12,8 +12,8 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Celebration
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
@@ -50,6 +50,7 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     onSwipeRefresh: () -> Unit,
     onEditProfileClicked: () -> Unit,
+    onDrinkingStatsClick: () -> Unit,
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
@@ -70,6 +71,7 @@ fun ProfileScreen(
                 onStatClicked = onStatClicked,
                 navigateToProfileMoreSheet = navigateToProfileMoreSheet,
                 onWebsiteClicked = onWebsiteClicked,
+                onDrinkingStatsClick = onDrinkingStatsClick,
             )
         }
     }
@@ -79,6 +81,7 @@ fun ProfileScreen(
 fun Profile(
     uiState: ProfileUiState.HasUser,
     onEditProfileClicked: () -> Unit,
+    onDrinkingStatsClick: () -> Unit,
     onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
@@ -104,18 +107,10 @@ fun Profile(
                     ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
                     ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
                     Spacer(Modifier.height(8.dp))
-                    Row {
-                        FilledTonalButton(
-                            onClick = onEditProfileClicked,
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text("Edit Profile")
-                        }
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(Icons.Outlined.BookmarkBorder, "")
-                        }
-                    }
+                    ProfileButtons(
+                        onEditProfileClicked = onEditProfileClicked,
+                        onDrinkingStatsClick = onDrinkingStatsClick,
+                    )
                 }
             }
             stickyHeader {
@@ -168,6 +163,27 @@ fun Profile(
 }
 
 @Composable
+fun ProfileButtons(
+    onEditProfileClicked: () -> Unit,
+    onDrinkingStatsClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        FilledTonalButton(
+            onClick = onEditProfileClicked,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.weight(0.9f)
+        ) {
+            Text("Edit Profile")
+        }
+        IconButton(onClick = onDrinkingStatsClick) {
+            Icon(Icons.Outlined.QueryStats, null)
+        }
+    }
+}
+
+@Composable
 fun Post(
     postFeed: PostFeed,
     onPostClicked: (postId: String) -> Unit,
@@ -179,6 +195,7 @@ fun Post(
     PostHeader(
         username = author.username,
         verified = author.verified,
+        beverage = Beverage.fromName(post.beverage),
         public = post.privacy == Privacy.PUBLIC.name,
         created = post.created,
         profilePictureUrl = author.profilePictureUrl,

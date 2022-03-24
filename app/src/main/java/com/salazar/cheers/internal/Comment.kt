@@ -7,8 +7,7 @@ import java.util.*
 data class CommentWithAuthor(
     val author: User = User(),
     val comment: Comment = Comment(),
-) {
-}
+)
 
 data class Comment(
     val id: String = "",
@@ -17,5 +16,4 @@ data class Comment(
     val text: String = "",
     @ServerTimestamp
     val created: Date = Date(),
-) {
-}
+)

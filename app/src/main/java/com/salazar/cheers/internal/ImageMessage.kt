@@ -13,7 +13,7 @@ data class ImageMessage(
     override val senderName: String,
     override val senderProfilePictureUrl: String,
     override val senderUsername: String,
-    override val likedBy: ArrayList<String>,
+    override val likedBy: List<String>,
     override val seenBy: List<String>,
     override val type: String = MessageType.IMAGE
 ) : Message {

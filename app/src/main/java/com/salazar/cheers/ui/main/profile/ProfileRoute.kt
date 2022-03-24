@@ -15,6 +15,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 fun ProfileRoute(
     profileViewModel: ProfileViewModel,
     navActions: CheersNavigationActions,
+    username: String,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
@@ -31,6 +32,7 @@ fun ProfileRoute(
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onLikeClicked = profileViewModel::toggleLike,
         onEditProfileClicked = { navActions.navigateToEditProfile() },
+        onDrinkingStatsClick = { navActions.navigateToDrinkingStats(username) },
         navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
         onWebsiteClicked = { website ->
             var url = website

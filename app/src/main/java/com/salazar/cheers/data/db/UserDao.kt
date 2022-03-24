@@ -7,11 +7,15 @@ import com.salazar.cheers.internal.User
 @Dao
 interface UserDao {
 
+    @Transaction
     @Query("SELECT * FROM users")
     fun pagingSource(): PagingSource<Int, User>
 
     @Query("SELECT * FROM users WHERE users.id = :userId")
     suspend fun getUser(userId: String): User
+
+    @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' ")
+    suspend fun queryUsers(query: String): List<User>
 
     @Query("SELECT * FROM users WHERE id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUserWithUsername(userIdOrUsername: String): User
@@ -20,7 +24,7 @@ interface UserDao {
     suspend fun getUserIdWithUsername(username: String): String
 
     @Query("SELECT * FROM users WHERE users.id IN (:ids)")
-    suspend fun getSuggestions(ids: List<String>): List<User>
+    suspend fun getUsersWithListOfIds(ids: List<String>): List<User>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User)

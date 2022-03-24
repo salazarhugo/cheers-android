@@ -16,6 +16,7 @@ import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.main.detail.PostFooter
 
@@ -59,6 +60,7 @@ fun Post(
             PostHeader(
                 username = author.username,
                 verified = author.verified,
+                beverage = Beverage.fromName(post.beverage),
                 public = post.privacy == Privacy.PUBLIC.name,
                 locationName = post.locationName,
                 profilePictureUrl = author.profilePictureUrl,

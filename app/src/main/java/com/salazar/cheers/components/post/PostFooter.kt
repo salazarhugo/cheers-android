@@ -2,6 +2,7 @@ package com.salazar.cheers.components.post
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Share
@@ -100,7 +101,10 @@ fun DrunkennessLevelIndicator(
     var show by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .clickable { show = !show }
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { show = !show }
             .animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,

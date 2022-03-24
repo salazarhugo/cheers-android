@@ -50,6 +50,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 sealed class CameraUIAction {
+    object OnAddContent : CameraUIAction()
     object OnSettingsClick : CameraUIAction()
     object OnCloseClick : CameraUIAction()
     object OnBackClick : CameraUIAction()
@@ -205,11 +206,11 @@ fun ImageControls(
             )
         }
         IconButton(
-            onClick = {},
+            onClick = { cameraUIAction(CameraUIAction.OnAddContent) },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Icon(
-                Icons.Outlined.TextFields,
+                Icons.Outlined.StickyNote2,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = Color.White

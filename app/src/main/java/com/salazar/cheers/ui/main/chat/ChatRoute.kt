@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -28,7 +29,9 @@ fun ChatRoute(
 
     when (uiState) {
         is ChatUiState.HasChannel -> {
-            val otherUser = (uiState as ChatUiState.HasChannel).channel.otherUser
+            val ui = (uiState as ChatUiState.HasChannel)
+            val otherUser = if (ui.channel.members.size > 1) ui.channel.members[0] else User()
+
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,
                 onTitleClick = { navActions.navigateToOtherProfile(it) },

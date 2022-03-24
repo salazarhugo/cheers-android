@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
@@ -32,7 +33,7 @@ data class AddPostUiState(
     val name: String = "",
     val drunkenness: Int = 0,
     val caption: String = "",
-    val beverage: String = "",
+    val beverage: Beverage = Beverage.NONE,
     val postType: String = PostType.TEXT,
     val photos: List<Uri> = emptyList(),
     val locationPoint: Point? = null,
@@ -86,6 +87,12 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
     fun onDrunkennessChange(drunkenness: Int) {
         viewModelState.update {
             it.copy(drunkenness = drunkenness)
+        }
+    }
+
+    fun onSelectBeverage(beverage: Beverage) {
+        viewModelState.update {
+            it.copy(beverage = beverage)
         }
     }
 
@@ -171,6 +178,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
                         "PHOTO_CAPTION" to uiState.caption,
                         "NAME" to uiState.name,
                         "DRUNKENNESS" to uiState.drunkenness,
+                        "BEVERAGE" to uiState.beverage.name,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,
                         "LOCATION_LATITUDE" to uiState.selectedLocation?.coordinate?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.selectedLocation?.coordinate?.longitude(),

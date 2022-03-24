@@ -41,6 +41,7 @@ import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.story.StoryProgressBar
 import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -201,6 +202,7 @@ fun StoryHeader(
             username = user.username,
             verified = user.verified,
             created = created,
+            beverage = Beverage.NONE,
             darkMode = true,
             public = false,
             locationName = "",

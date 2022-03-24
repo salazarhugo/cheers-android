@@ -3,12 +3,10 @@ package com.salazar.cheers.ui.main.chats
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.db.DirectChannel
+import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -19,12 +17,12 @@ data class MessagesUiState(
     val isLoading: Boolean,
     val errorMessages: List<String>,
     val searchInput: String,
-    val channels: List<ChatChannel>?,
+    val channels: List<DirectChannel>?,
     val suggestions: List<User>?,
 )
 
 private data class MessagesViewModelState(
-    val channels: List<ChatChannel>? = null,
+    val channels: List<DirectChannel>? = null,
     val suggestions: List<User>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
@@ -43,6 +41,7 @@ private data class MessagesViewModelState(
 @HiltViewModel
 class MessagesViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
@@ -60,7 +59,7 @@ class MessagesViewModel @Inject constructor(
         )
 
     init {
-        refreshMessages()
+        refreshChannels()
         refreshSuggestions()
     }
 
@@ -81,38 +80,14 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
-    private fun refreshMessages() {
+    private fun refreshChannels() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            FirestoreChat.getChatChannels().collect { channels ->
-                addDirect(channels)
-            }
-        }
-    }
-
-
-    private fun addDirect(directChannels: List<ChatChannel>) {
-        viewModelScope.launch {
-            val channels = mutableListOf<ChatChannel>()
-
-            directChannels.forEach {
-                if (it.type == ChatChannelType.GROUP) {
-                    channels.add(it)
-                } else {
-                    val otherUserId =
-                        it.members.find { it != FirebaseAuth.getInstance().currentUser?.uid!! }
-                            ?: return@forEach
-
-                    val user = userRepository.getUser(userIdOrUsername = otherUserId)
-                    channels.add(it.copy(otherUser = user))
-                }
-            }
-
+            val channels = chatRepository.getChannels()
             viewModelState.update {
                 it.copy(channels = channels, isLoading = false)
             }
         }
     }
-
 }

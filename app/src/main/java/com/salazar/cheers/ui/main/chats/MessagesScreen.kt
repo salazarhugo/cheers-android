@@ -39,8 +39,8 @@ import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.UserProfilePicture
+import com.salazar.cheers.data.db.DirectChannel
 import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.ChatChannelType
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.theme.Roboto
@@ -126,7 +126,8 @@ fun Tabs(
         ) {
             when (page) {
                 0 -> {
-                    val directChats = uiState.channels?.filter { it.type == ChatChannelType.DIRECT }
+                    val directChats =
+                        uiState.channels//?.filter { it.type == ChatChannelType.DIRECT }
                     if (uiState.isLoading)
                         LoadingScreen()
                     if (directChats != null)
@@ -139,17 +140,17 @@ fun Tabs(
                         )
                 }
                 1 -> {
-                    val groupChats = uiState.channels?.filter { it.type == ChatChannelType.GROUP }
-                    if (uiState.isLoading)
-                        LoadingScreen()
-                    if (groupChats != null)
-                        ConversationList(
-                            channels = groupChats,
-                            onChannelClicked = onChannelClicked,
-                            onLongPress = onLongPress,
-                            suggestions = suggestions,
-                            onFollowClick = onFollowClick,
-                        )
+//                    val groupChats = uiState.channels?.filter { it.type == ChatChannelType.GROUP }
+//                    if (uiState.isLoading)
+//                        LoadingScreen()
+//                    if (groupChats != null)
+//                        ConversationList(
+//                            channels = groupChats,
+//                            onChannelClicked = onChannelClicked,
+//                            onLongPress = onLongPress,
+//                            suggestions = suggestions,
+//                            onFollowClick = onFollowClick,
+//                        )
                 }
             }
         }
@@ -158,7 +159,7 @@ fun Tabs(
 
 @Composable
 fun ConversationList(
-    channels: List<ChatChannel>,
+    channels: List<DirectChannel>,
     suggestions: List<User>?,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
@@ -168,14 +169,11 @@ fun ConversationList(
         NoMessages()
     LazyColumn {
         items(channels) { channel ->
-            when (channel.type) {
-                ChatChannelType.DIRECT -> DirectConversation(
-                    channel = channel,
-                    onChannelClicked,
-                    onLongPress
-                )
-                ChatChannelType.GROUP -> GroupConversation(channel = channel, onChannelClicked)
-            }
+            DirectConversation(
+                channel = channel,
+                onChannelClicked,
+                onLongPress
+            )
         }
         item {
             Text(
@@ -227,7 +225,9 @@ fun UserItem(
         if (isAuthor)
             Image(
                 rememberImagePainter(R.drawable.ic_crown),
-                modifier = Modifier.padding(end = 8.dp).size(16.dp),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(16.dp),
                 contentDescription = null,
             )
         var isFollowed by remember { mutableStateOf(false) }
@@ -237,35 +237,38 @@ fun UserItem(
         })
     }
 }
+
 @Composable
 fun LinkContactsItem() {
     Row {
-        Button(onClick = { /*TODO*/ }) {
-        }
+        Button(onClick = { /*TODO*/ }) { }
     }
 }
 
 @Composable
 fun DirectConversation(
-    channel: ChatChannel,
+    channel: DirectChannel,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
 ) {
+    val otherUser =
+        channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid } ?: User()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onChannelClicked(channel.id) },
-                onLongClick = { onLongPress(channel.otherUser.fullName) })
+                onClick = { onChannelClicked(channel.channel.id) },
+                onLongClick = { onLongPress(otherUser.fullName) })
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        val image = channel.otherUser.profilePictureUrl
-        val seen =
-            channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
-        val isLastMessageMe =
-            channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
+        val image = otherUser.profilePictureUrl
+        val seen = true
+//            channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
+        val isLastMessageMe = true
+//            channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -287,33 +290,21 @@ fun DirectConversation(
             )
             Spacer(modifier = Modifier.width(14.dp))
             Column {
-                val title = channel.otherUser.fullName
-                val seenByOthers = channel.recentMessage.seenBy.size > 1
+                val title = otherUser.fullName
+                val seenByOthers = true//channel.recentMessage.seenBy.size > 1
                 val lastMessageStatus = if (isLastMessageMe && seenByOthers) "Opened"
                 else if (isLastMessageMe && !seenByOthers) "Delivered"
                 else if (!isLastMessageMe) "Received"
                 else "New chat"
 
-//                val subtitle = if (isLastMessageMe) channel.recentMessage.text else
-//                    "$lastMessageStatus ${channel.recentMessage.senderUsername}: ${channel.recentMessage.text}"
                 val subtitle = buildAnnotatedString {
                     append(lastMessageStatus)
                     append("  •  ")
                     append(
                         relativeTimeFormatter(
-                            timestamp = channel.recentMessageTime?.toDate()?.time ?: 0
+                            timestamp = channel.channel.recentMessageTime.toDate().time
                         )
                     )
-//                    append("  •  ")
-//                    withStyle(
-//                        style = SpanStyle(
-//                            color = MaterialTheme.colorScheme.onBackground,
-//                            fontWeight = FontWeight.Bold,
-//                            fontSize = 14.sp,
-//                        )
-//                    ) {
-//                        append("189\uD83E\uDE85")
-//                    }
                 }
 
                 val fontWeight = if (seen) FontWeight.Normal else FontWeight.Bold
@@ -370,33 +361,33 @@ fun GroupConversation(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val image = channel.recentMessage.senderProfilePictureUrl
+//            val image = channel.recentMessage.senderProfilePictureUrl
 
-            Image(
-                painter = rememberImagePainter(
-                    data = image,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_group_picture)
-                    },
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(Modifier.width(8.dp))
-            Column {
-                val title = channel.name
-                val subtitle =
-                    "${channel.recentMessage.senderUsername}: ${channel.recentMessage.text}"
-                Text(text = title, style = Typography.bodyMedium)
-                Text(
-                    text = subtitle,
-                    style = Typography.bodySmall
-                )
-            }
+//            Image(
+//                painter = rememberImagePainter(
+//                    data = image,
+//                    builder = {
+//                        transformations(CircleCropTransformation())
+//                        error(R.drawable.default_group_picture)
+//                    },
+//                ),
+//                contentDescription = "Profile image",
+//                modifier = Modifier
+//                    .size(50.dp)
+//                    .clip(CircleShape),
+//                contentScale = ContentScale.Crop
+//            )
+//            Spacer(Modifier.width(8.dp))
+//            Column {
+//                val title = channel.name
+//                val subtitle =
+//                    "${channel.recentMessage.senderUsername}: ${channel.recentMessage.text}"
+//                Text(text = title, style = Typography.bodyMedium)
+//                Text(
+//                    text = subtitle,
+//                    style = Typography.bodySmall
+//                )
+//            }
         }
         IconButton(onClick = {}) {
             Icon(

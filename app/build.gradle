@@ -15,17 +15,16 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 17
-        versionName "0.9.9"
-
+        versionCode 19
+        versionName "0.92.201"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-//    aaptOptions {
-//        additionalParameters "--no-version-vectors"
-//    }
-
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
             shrinkResources false
@@ -48,11 +47,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.2.0-alpha01"
     }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
-    }
+//    packagingOptions {
+//        resources {
+//            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+//        }
+//    }
     allprojects {
         tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
             kotlinOptions {

@@ -52,12 +52,6 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    private fun updateIsSignedIn(isSignedIn: Boolean) {
-        viewModelState.update {
-            it.copy(isSignedIn = isSignedIn)
-        }
-    }
-
     private fun updateIsLoading(isLoading: Boolean) {
         viewModelState.update {
             it.copy(isLoading = isLoading)
@@ -112,15 +106,15 @@ class SignInViewModel @Inject constructor(
     fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         FirebaseAuth.getInstance().signInWithCredential(credential)
+            .addOnFailureListener {
+                updateErrorMessage("Authentication failed: ${it.message}")
+            }
+            .addOnSuccessListener {
+                getAndSaveRegistrationToken()
+                signInSuccessful(acct)
+            }
             .addOnCompleteListener { task ->
-                task.addOnFailureListener {
-                    Log.e("GOOGLE", it.toString())
-                }
-                if (task.isSuccessful) {
-                    signInSuccessful(acct)
-                    Log.e("GOOGLE", "SUCCESSFUL")
-                } else {
-                }
+                updateIsLoading(false)
             }
     }
 
@@ -128,7 +122,6 @@ class SignInViewModel @Inject constructor(
         if (acct == null) return
         FirestoreUtil.checkIfUserExists { exists ->
             if (exists) {
-                updateIsSignedIn(true)
                 getAndSaveRegistrationToken()
             } else {
                 viewModelState.update {

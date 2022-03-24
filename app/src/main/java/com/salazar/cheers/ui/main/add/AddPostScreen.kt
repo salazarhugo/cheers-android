@@ -162,7 +162,7 @@ fun AddPostScreen(
                 )
                 DividerM3()
                 BeverageSection(
-                    beverage = uiState.beverage,
+                    beverage = uiState.beverage.displayName,
                     interactWithChooseBeverage = interactWithChooseBeverage
                 )
                 DividerM3()
@@ -206,7 +206,7 @@ fun EndDateSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Duration",
+            text = "Map timeout",
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
         )
         Row(
@@ -214,7 +214,7 @@ fun EndDateSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "2 hours",
+                text = "24 hours",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
             )
         }
@@ -342,7 +342,7 @@ fun TopAppBar(
     onDismiss: () -> Unit
 ) {
     SmallTopAppBar(
-        title = { Text("Add post", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
+        title = { Text("Add hangout", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
         navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, "")
@@ -392,7 +392,8 @@ fun SwitchPreference(
         Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
         SwitchM3(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            enabled = false,
         )
     }
 }

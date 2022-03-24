@@ -1,5 +1,7 @@
 package com.salazar.cheers.internal
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.firebase.Timestamp
 
 object ChatChannelType {
@@ -7,26 +9,18 @@ object ChatChannelType {
     const val GROUP = "GROUP"
 }
 
+@Entity(tableName = "channel")
 data class ChatChannel(
-    val id: String,
-    val name: String,
-    var members: List<String>,
-    val otherUser: User,
-    val createdAt: Timestamp,
-    val createdBy: String,
-    val recentMessage: TextMessage,
-    val recentMessageTime: Timestamp?,
-    val type: String,
-) {
-    constructor() : this(
-        "",
-        "",
-        listOf(),
-        User(),
-        Timestamp.now(),
-        "",
-        TextMessage(),
-        Timestamp.now(),
-        ChatChannelType.DIRECT
-    )
-}
+    @PrimaryKey
+    val id: String = "",
+    val name: String = "",
+    var members: List<String> = emptyList(),
+    val otherUserId: String = "",
+//    val otherUser: User = User(),
+    val createdAt: Timestamp = Timestamp.now(),
+    val createdBy: String = "",
+    val recentMessageId: String = "",
+//    val recentMessage: TextMessage,
+    val recentMessageTime: Timestamp = Timestamp.now(),
+    val type: String = "",
+)

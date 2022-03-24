@@ -155,7 +155,6 @@ fun HomeScreen(
                     is HomeUiState.HasPosts -> {
                         PostList(
                             uiState = uiState,
-                            navActions = navActions,
                             onPostClicked = onPostClicked,
                             onUserClicked = onUserClicked,
                             onPostMoreClicked = onPostMoreClicked,
@@ -169,7 +168,7 @@ fun HomeScreen(
                     else -> {}
                 }
             }
-            val alpha = if (toState == MultiFabState.EXPANDED) 0.9f else 0f
+            val alpha = if (toState == MultiFabState.EXPANDED) 0.92f else 0f
             Box(
                 modifier = Modifier
                     .alpha(animateFloatAsState(alpha).value)
@@ -462,7 +461,6 @@ fun ConnectContacts() {
 @Composable
 fun PostList(
     uiState: HomeUiState.HasPosts,
-    navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onEventClicked: (String) -> Unit,
     onUserClicked: (username: String) -> Unit,
@@ -473,7 +471,7 @@ fun PostList(
     onAddStoryClick: () -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
-    val events = uiState.eventsFlow?.collectAsLazyPagingItems()
+//    val events = uiState.eventsFlow?.collectAsLazyPagingItems()
 
     LazyColumn(state = uiState.listState) {
         item {
@@ -484,14 +482,14 @@ fun PostList(
             )
             DividerM3()
         }
-        if (uiState.selectedTab == 1 && events != null)
-            items(events) { event ->
-                Event(
-                    event!!,
-                    onEventClicked = onEventClicked,
-                )
-            }
-        else {
+//        if (uiState.selectedTab == 1 && events != null)
+//            items(events) { event ->
+//                Event(
+//                    event!!,
+//                    onEventClicked = onEventClicked,
+//                )
+//            }
+//        else {
             itemsIndexed(posts) { i, post ->
                 if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
                     DividerM3()
@@ -509,7 +507,7 @@ fun PostList(
                     )
                 }
             }
-        }
+//        }
 
         posts.apply {
             when {
@@ -568,6 +566,7 @@ fun Post(
         PostHeader(
             username = author.username,
             verified = author.verified,
+            beverage = Beverage.fromName(post.beverage),
             public = post.privacy == Privacy.PUBLIC.name,
             created = post.created,
             profilePictureUrl = author.profilePictureUrl,
@@ -620,23 +619,6 @@ fun PhotoCarousel(
                 .clickable { onPostClick() }
         )
     }
-}
-
-@Composable
-fun Caption(
-    username: String,
-    caption: String,
-) {
-    Text(
-        buildAnnotatedString {
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(username)
-            }
-            append(" ")
-            append(caption)
-        },
-        style = Typography.bodyMedium
-    )
 }
 
 @Composable

@@ -26,6 +26,12 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideUserStatsDao(@ApplicationContext appContext: Context): UserStatsDao {
+        return CheersDatabase.invoke(appContext).userStatsDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideStoryDao(@ApplicationContext appContext: Context): StoryDao {
         return CheersDatabase.invoke(appContext).storyDao()
     }
@@ -34,6 +40,12 @@ object AppModule {
     @Provides
     fun provideUserDao(@ApplicationContext appContext: Context): UserDao {
         return CheersDatabase.invoke(appContext).userDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideChatDao(@ApplicationContext appContext: Context): ChatDao {
+        return CheersDatabase.invoke(appContext).chatDao()
     }
 
     @Singleton

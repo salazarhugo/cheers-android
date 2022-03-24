@@ -8,6 +8,7 @@ import com.salazar.cheers.internal.User
 @Dao
 interface StoryDao {
 
+    @Transaction
     @Query("SELECT * FROM story GROUP BY story.authorId ORDER BY story.seenBy DESC")
     fun pagingSource(): PagingSource<Int, Story>
 

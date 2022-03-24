@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.material.BottomSheetNavigator
@@ -138,7 +139,7 @@ fun FailureSplashView(
     onFinish: () -> Unit,
     onRechargeClick: () -> Unit,
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.Transparent) {
         val image = AnimatedImageVector.animatedVectorResource(R.drawable.avd_fail)
         var atEnd by remember { mutableStateOf(false) }
 
@@ -189,7 +190,7 @@ fun SuccessSplashView(
     modifier: Modifier = Modifier,
     onFinish: () -> Unit,
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.Transparent) {
         val image = AnimatedImageVector.animatedVectorResource(R.drawable.avd_done)
         var atEnd by remember { mutableStateOf(false) }
 

@@ -1,57 +1,111 @@
 package com.salazar.cheers.ui.main.add
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mapbox.geojson.Point
-import com.mapbox.maps.MapView
+import coil.compose.rememberImagePainter
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.ui.theme.Roboto
 
 @Composable
 fun BeverageScreen(
     onBackPressed: () -> Unit,
-    onSelectBeverage: (Point) -> Unit,
+    onSelectBeverage: (Beverage) -> Unit,
 ) {
-    val context = LocalContext.current
-    val mapView = remember { MapView(context = context) }
+    val drinks = Beverage.values().toList().sortedBy { it.displayName }
+    val grouped = drinks.groupBy { it.displayName[0] }
 
     Scaffold(
         topBar = {
             ChooseOnMapAppBar(
                 onBackPressed = onBackPressed,
-                onSelectBeverage = onSelectBeverage,
-                mapView = mapView,
             )
         },
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                Icons.Default.Place,
-                "",
-                modifier = Modifier.size(52.dp),
-                tint = MaterialTheme.colorScheme.error,
+        Column {
+            Drinks(grouped = grouped, onBeverageClick = onSelectBeverage)
+        }
+    }
+}
+
+@Composable
+fun Drinks(
+    grouped: Map<Char, List<Beverage>>,
+    onBeverageClick: (Beverage) -> Unit,
+) {
+    LazyColumn() {
+        grouped.forEach { (initial, drinks) ->
+            stickyHeader {
+                CharacterHeader(initial)
+            }
+            items(drinks) { drink ->
+                Drink(drink = drink, onBeverageClick = onBeverageClick)
+            }
+        }
+        item {
+            Text(
+                text = "More coming soon",
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
             )
         }
     }
 }
 
 @Composable
+fun CharacterHeader(initial: Char) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = initial.toString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+fun Drink(
+    drink: Beverage,
+    onBeverageClick: (Beverage) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onBeverageClick(drink) }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            painter = rememberImagePainter(drink.icon),
+            contentDescription = null,
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = drink.displayName,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
 fun ChooseOnMapAppBar(
-    mapView: MapView,
     onBackPressed: () -> Unit,
-    onSelectBeverage: (Point) -> Unit,
 ) {
     SmallTopAppBar(
         navigationIcon = {
@@ -75,8 +129,7 @@ fun ChooseOnMapAppBar(
         },
         actions = {
             TextButton(onClick = {
-                val center = mapView.getMapboxMap().cameraState.center
-                onSelectBeverage(center)
+                onBackPressed()
             }) {
                 Text("OK")
             }

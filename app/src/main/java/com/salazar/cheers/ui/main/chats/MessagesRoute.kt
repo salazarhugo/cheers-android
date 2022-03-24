@@ -16,6 +16,7 @@ fun MessagesRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by messagesViewModel.uiState.collectAsState()
+
     MessagesScreen(
         uiState = uiState,
         onActivityIconClicked = {

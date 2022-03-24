@@ -7,6 +7,7 @@ import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.PostDao
 import com.salazar.cheers.data.db.UserDao
+import com.salazar.cheers.data.db.UserStatsDao
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,6 +18,7 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val service: Neo4jService,
     private val userDao: UserDao,
+    private val userStatsDao: UserStatsDao,
     private val postDao: PostDao,
 ) {
 
@@ -25,8 +27,19 @@ class UserRepository @Inject constructor(
         Neo4jUtil.blockUser(otherUserId = userId)
     }
 
+//    suspend fun queryFriends(query: String) = withContext(Dispatchers.IO) {
+//        service.queryFriends(query = query)
+//    }
+
+    suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {
+        val userStats = service.getUserStats(username = username)
+        userStatsDao.insert(userStats = userStats)
+        return@withContext userStatsDao.getUserStats(username)
+    }
+
     suspend fun queryUsers(query: String) = withContext(Dispatchers.IO) {
         service.queryUsers(query = query)
+        return@withContext userDao.queryUsers(query = query)
     }
 
     suspend fun followUser(username: String) = withContext(Dispatchers.IO) {
@@ -62,7 +75,7 @@ class UserRepository @Inject constructor(
                 val suggestions = result.data
                 userDao.insertAll(suggestions)
                 val ids = suggestions.map { it.id }
-                return@withContext userDao.getSuggestions(ids)
+                return@withContext userDao.getUsersWithListOfIds(ids)
             }
             is Result.Error ->  {
                 Log.e("User Service", result.exception.message.toString())

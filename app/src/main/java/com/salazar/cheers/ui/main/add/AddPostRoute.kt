@@ -63,7 +63,10 @@ fun AddPostRoute(
         AddPostPage.ChooseBeverage ->
             BeverageScreen(
                 onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
-                onSelectBeverage = {}
+                onSelectBeverage = {
+                    addPostViewModel.onSelectBeverage(it)
+                    addPostViewModel.updatePage(AddPostPage.AddPost)
+                },
             )
         AddPostPage.AddPeople ->
             AddPeopleScreen(

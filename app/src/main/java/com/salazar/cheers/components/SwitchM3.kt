@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SwitchM3(
     checked: Boolean,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -23,6 +24,7 @@ fun SwitchM3(
             checkedThumbColor = MaterialTheme.colorScheme.secondary,
             uncheckedThumbColor = MaterialTheme.colorScheme.surfaceVariant,
             uncheckedTrackColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        ),
+        enabled = enabled,
     )
 }

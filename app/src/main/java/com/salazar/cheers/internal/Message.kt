@@ -17,6 +17,6 @@ interface Message {
     val senderProfilePictureUrl: String
     val senderUsername: String
     val type: String
-    val likedBy: ArrayList<String>
+    val likedBy: List<String>
     val seenBy: List<String>
 }

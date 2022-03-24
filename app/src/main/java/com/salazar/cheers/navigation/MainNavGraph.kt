@@ -46,6 +46,8 @@ import com.salazar.cheers.ui.main.otherprofile.otherProfileViewModel
 import com.salazar.cheers.ui.main.profile.*
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.search.SearchViewModel
+import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
+import com.salazar.cheers.ui.main.stats.drinkingStatsViewModel
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.StoryViewModel
 import com.salazar.cheers.ui.sheets.SendGiftRoute
@@ -164,9 +166,16 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         bottomSheet(route = MainDestinations.PROFILE_MORE_SHEET) {
+            val context = LocalContext.current
             ProfileMoreBottomSheet(
                 onSettingsClick = { navActions.navigateToSettings() },
-                onCopyProfileUrlClick = {}
+                onCopyProfileUrlClick = {
+                    FirebaseDynamicLinksUtil.createShortLink(user.id)
+                        .addOnSuccessListener { shortLink ->
+                            context.copyToClipboard(shortLink.shortLink.toString())
+                        }
+                    navActions.navigateBack()
+                }
             )
         }
 
@@ -234,6 +243,21 @@ fun NavGraphBuilder.mainNavGraph(
                 bottomSheetNavigator = bottomSheetNavigator,
                 profilePictureUrl = user.profilePictureUrl,
             )
+        }
+
+        composable(
+            route = "${MainDestinations.DRINKING_STATS}/{username}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/stats/{username}" })
+        ) {
+
+            val username = it.arguments?.getString("username")!!
+            val drinkingStatsViewModel = drinkingStatsViewModel(username = username)
+
+            DrinkingStatsRoute(
+                navActions = navActions,
+                drinkingStatsViewModel = drinkingStatsViewModel,
+            )
+
         }
 
         composable(
@@ -316,9 +340,11 @@ fun NavGraphBuilder.mainNavGraph(
 
         ) {
             val profileViewModel = hiltViewModel<ProfileViewModel>()
+
             ProfileRoute(
                 profileViewModel = profileViewModel,
                 navActions = navActions,
+                username = user.username,
             )
         }
 

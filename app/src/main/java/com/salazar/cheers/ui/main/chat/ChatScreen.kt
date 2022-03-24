@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.main.chat
 
 import OnMessageLongClickDialog
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -36,9 +35,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.UserInput
 import com.salazar.cheers.components.animations.AnimateHeart
 import com.salazar.cheers.components.chat.DirectChatBar
-import com.salazar.cheers.components.chat.GroupChatBar
 import com.salazar.cheers.components.chat.JumpToBottom
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.ImageMessage
+import com.salazar.cheers.internal.Message
+import com.salazar.cheers.internal.MessageType
+import com.salazar.cheers.internal.TextMessage
 import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -101,7 +102,7 @@ fun ChatScreen(
                     onImageSelectorClick = onImageSelectorClick,
                 )
             }
-            if (channel.type == ChatChannelType.DIRECT)
+//            if (channel.type == ChatChannelType.DIRECT)
                 DirectChatBar(
                     name = name,
                     username = username,
@@ -111,15 +112,15 @@ fun ChatScreen(
                     onTitleClick = onTitleClick,
                     scrollBehavior = scrollBehavior,
                 )
-            else if (channel.type == ChatChannelType.GROUP)
-                GroupChatBar(
-                    name = channel.name,
-                    members = channel.members.size,
-                    profilePictureUrl = profilePicturePath,
-                    onNavIconPressed = { onPoBackStack() },
-                    onTitleClick = {},
-                    scrollBehavior = scrollBehavior,
-                )
+//            else if (channel.type == ChatChannelType.GROUP)
+//                GroupChatBar(
+//                    name = channel.name,
+//                    members = channel.members.size,
+//                    profilePictureUrl = profilePicturePath,
+//                    onNavIconPressed = { onPoBackStack() },
+//                    onTitleClick = {},
+//                    scrollBehavior = scrollBehavior,
+//                )
         }
     }
 
@@ -173,9 +174,9 @@ fun Messages(
                 }
 
                 item {
-//                    AnimateMessage {
                     Message(
                         uiState = uiState,
+                        modifier = Modifier.animateItemPlacement(),
                         onAuthorClick = { name -> navigateToProfile(name) },
                         onLongClickMessage = onLongClickMessage,
                         onDoubleTapMessage = onDoubleTapMessage,
@@ -184,7 +185,6 @@ fun Messages(
                         isFirstMessageByAuthor = isFirstMessageByAuthor,
                         isLastMessageByAuthor = isLastMessageByAuthor,
                     )
-//                    }
                 }
             }
         }
@@ -218,6 +218,7 @@ fun Messages(
 @Composable
 fun Message(
     uiState: ChatUiState.HasChannel,
+    modifier: Modifier = Modifier,
     onAuthorClick: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
@@ -226,10 +227,10 @@ fun Message(
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean
 ) {
-    val spaceBetweenAuthors = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
+    val spaceBetweenAuthors = if (isLastMessageByAuthor) modifier.padding(top = 8.dp) else modifier
     val horizontalAlignment = if (isUserMe) Arrangement.End else Arrangement.Start
     Row(
-        modifier = spaceBetweenAuthors.fillMaxWidth().animateContentSize(),
+        modifier = spaceBetweenAuthors.fillMaxWidth(),
         horizontalArrangement = horizontalAlignment
     ) {
         if (isLastMessageByAuthor && !isUserMe) {
@@ -427,11 +428,11 @@ fun ChatItemBubble(
             )
         }
 
-        if (isUserMe && message.id == uiState.channel.recentMessage.id &&
-            uiState.channel.recentMessage.seenBy.containsAll(uiState.channel.members)
-        ) {
-            Text("Seen", color = MaterialTheme.colorScheme.onBackground)
-        }
+//        if (isUserMe && message.id == uiState.channel.recentMessage.id &&
+//            uiState.channel.recentMessage.seenBy.containsAll(uiState.channel.members)
+//        ) {
+//            Text("Seen", color = MaterialTheme.colorScheme.onBackground)
+//        }
         if (message.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)) {
             AnimateHeart {
                 Surface(

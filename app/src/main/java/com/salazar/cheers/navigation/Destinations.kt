@@ -38,6 +38,7 @@ object MainDestinations {
     const val POST_MORE_SHEET = "postMoreSheet"
     const val STORY_ROUTE = "story"
     const val SEND_GIFT_SHEET = "giftSheet"
+    const val DRINKING_STATS= "drinkingStats"
 }
 
 /**
@@ -260,6 +261,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateToPostComments: (postId: String) -> Unit = { postId ->
         navController.navigate("${MainDestinations.POST_COMMENTS}/$postId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToDrinkingStats: (username: String) -> Unit = { username ->
+        navController.navigate("${MainDestinations.DRINKING_STATS}/$username") {
             launchSingleTop = true
             restoreState = true
         }
