@@ -77,6 +77,7 @@ class SignInViewModel @Inject constructor(
             val token = task.result
             viewModelScope.launch {
                 MyFirebaseMessagingService.addTokenToNeo4j(token)
+                FirestoreUtil.addFCMRegistrationToken(token = token)
             }
         }
     }
@@ -125,7 +126,7 @@ class SignInViewModel @Inject constructor(
                 getAndSaveRegistrationToken()
             } else {
                 viewModelState.update {
-                    it.copy(firstTime = true, email = acct.email!!)
+                    it.copy(acct = acct)
                 }
             }
         }
@@ -134,9 +135,9 @@ class SignInViewModel @Inject constructor(
 
 data class SignInUiState(
     val isSignedIn: Boolean = false,
-    val firstTime: Boolean = false,
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val email: String = "",
+    val acct: GoogleSignInAccount? = null,
     val password: String = "",
 )

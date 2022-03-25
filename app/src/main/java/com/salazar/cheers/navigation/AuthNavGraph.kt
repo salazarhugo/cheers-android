@@ -17,12 +17,21 @@ fun NavGraphBuilder.authNavGraph(
         route = CheersDestinations.AUTH_ROUTE,
         startDestination = AuthDestinations.SIGN_IN_ROUTE,
     ) {
+
         composable(
-            route = "${AuthDestinations.SIGN_UP_ROUTE}?email={email}",
-            arguments = listOf(navArgument("email") { nullable = true }),
+            route = "${AuthDestinations.SIGN_UP_ROUTE}?email={email}&displayName={displayName}",
+            arguments = listOf(
+                navArgument("email") { nullable = true },
+                navArgument("displayName") { nullable = true },
+            ),
         ) {
             val signUpViewModel = hiltViewModel<SignUpViewModel>()
             val email = it.arguments?.getString("email")
+            val displayName = it.arguments?.getString("displayName")
+
+            if (displayName != null)
+                signUpViewModel.onNameChange(name = displayName)
+
             if (email != null) {
                 signUpViewModel.onEmailChange(email = email)
                 signUpViewModel.updateWithGoogle(withGoogle = true)
@@ -33,6 +42,7 @@ fun NavGraphBuilder.authNavGraph(
                 navActions = navActions,
             )
         }
+
         composable(AuthDestinations.SIGN_IN_ROUTE) {
             val signInViewModel = hiltViewModel<SignInViewModel>()
 
@@ -41,5 +51,6 @@ fun NavGraphBuilder.authNavGraph(
                 navActions = navActions,
             )
         }
+
     }
 }

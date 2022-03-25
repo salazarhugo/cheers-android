@@ -30,9 +30,13 @@ class ChatRepository @Inject constructor(
         return@withContext a
     }
 
-    suspend fun getChannel(channelId: String): DirectChannel = withContext(Dispatchers.IO) {
-        val channel = chatDao.getChannel(channelId = channelId)
-        return@withContext channel.copy(members = userDao.getUsersWithListOfIds(channel.channel.members))
+    suspend fun getChannel(channelId: String): DirectChannel? = withContext(Dispatchers.IO) {
+        try {
+            val channel = chatDao.getChannel(channelId = channelId)
+            return@withContext channel.copy(members = userDao.getUsersWithListOfIds(channel.channel.members))
+        } catch (e: Exception) {
+            return@withContext null
+        }
     }
 
     private suspend fun refreshChannels() {

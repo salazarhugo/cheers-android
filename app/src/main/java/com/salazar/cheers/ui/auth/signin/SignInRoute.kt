@@ -38,13 +38,10 @@ fun SignInRoute(
             }
         }
 
-//    if (uiState.isSignedIn) {
-//        navActions.navigateToMain()
-//    }
-
-    if (uiState.firstTime)
+    val acct = uiState.acct
+    if (acct != null)
         SideEffect {
-            navActions.navigateToSignUpWithEmail(uiState.email)
+            navActions.navigateToSignUpWithGoogle(acct.email!!, acct.displayName ?: "")
         }
 
     SignInScreen(

@@ -27,6 +27,7 @@ data class SignUpUiState(
     val username: String = "",
     val isUsernameAvailable: Boolean = false,
     val email: String = "",
+    val name: String = "",
     val password: String = "",
     val withGoogle: Boolean = false,
     val isSignedIn: Boolean = false,
@@ -59,6 +60,12 @@ class SignUpViewModel @Inject constructor(
     fun updateWithGoogle(withGoogle: Boolean) {
         viewModelState.update {
             it.copy(withGoogle = withGoogle)
+        }
+    }
+
+    fun onNameChange(name: String) {
+        viewModelState.update {
+            it.copy(name = name)
         }
     }
 
@@ -228,14 +235,15 @@ class SignUpViewModel @Inject constructor(
 
     private fun signInSuccessful(
         email: String,
-        username: String
+        username: String,
+        name: String = "",
     ) {
         FirestoreUtil.checkIfUserExists { exists ->
             if (exists) {
                 updateIsSignedIn(true)
                 getAndSaveRegistrationToken()
             } else {
-                FirestoreUtil.initCurrentUserIfFirstTime(email = email, username = username) {
+                FirestoreUtil.initCurrentUserIfFirstTime(email = email, username = username, name = name) {
                     updateIsSignedIn(true)
                     getAndSaveRegistrationToken()
                 }
@@ -247,6 +255,7 @@ class SignUpViewModel @Inject constructor(
         val state = uiState.value
         val username = state.username
         val email = state.email
+        val name = state.name
         val password = state.password
 
         updateIsLoading(true)
@@ -265,12 +274,12 @@ class SignUpViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     if (state.withGoogle)
-                        signInSuccessful(email = email, username = username)
+                        signInSuccessful(email = email, username = username, name = name)
                     else
                         Firebase.auth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    signInSuccessful(email = email, username = username)
+                                    signInSuccessful(email = email, username = username, name = name)
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     updateErrorMessage(task.exception?.message)

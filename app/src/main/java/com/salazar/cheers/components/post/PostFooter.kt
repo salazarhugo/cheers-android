@@ -112,7 +112,7 @@ fun DrunkennessLevelIndicator(
         if (show)
             Text(
                 modifier = Modifier.padding(vertical = 8.dp),
-                text = "Drunkenness level out of 5",
+                text = "Drunkenness out of 100",
                 style = MaterialTheme.typography.bodyMedium,
             )
         else {
@@ -126,7 +126,7 @@ fun DrunkennessLevelIndicator(
 //                contentDescription = null,
 //            )
             Text(
-                text = ((drunkenness * 5).toFloat() / 100f).toString(),
+                text = drunkenness.toString(),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

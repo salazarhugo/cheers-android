@@ -8,6 +8,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
@@ -41,7 +42,10 @@ object FirestoreUtil {
             }"
         )
 
-    fun sendGift(receiverId: String, price: Int = 50): Task<HashMap<*, *>> {
+    fun sendGift(
+        receiverId: String,
+        price: Int = 50
+    ): Task<HashMap<*, *>> {
         // Create the arguments to the callable function.
         val data = hashMapOf(
             "receiverId" to receiverId,
@@ -71,6 +75,7 @@ object FirestoreUtil {
         acct: GoogleSignInAccount? = null,
         email: String = "",
         username: String,
+        name: String = "",
         onComplete: (exists: Boolean) -> Unit,
     ) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
@@ -80,12 +85,12 @@ object FirestoreUtil {
             }
 
             val id = FirebaseAuth.getInstance().currentUser!!.uid
-            val fullName = if (acct != null) "${acct.givenName} ${acct.familyName}" else ""
+//            val fullName = if (acct != null) "${acct.givenName} ${acct.familyName}" else ""
             val profilePicturePath = if (acct?.photoUrl != null) acct.photoUrl.toString() else ""
 
             val newUser = User().copy(
                 id = id,
-                fullName = fullName,
+                fullName = name,
                 username = username,
                 profilePictureUrl = profilePicturePath,
                 email = FirebaseAuth.getInstance().currentUser?.email ?: email,
@@ -288,8 +293,8 @@ object FirestoreUtil {
         }
     }
 
-    fun setFCMRegistrationTokens(registrationTokens: MutableList<String>) {
-        currentUserDocRef.update(mapOf("registrationTokens" to registrationTokens))
+    fun addFCMRegistrationToken(token: String) {
+        currentUserDocRef.update("registrationTokens", FieldValue.arrayUnion(token))
     }
 //endregion FCM
 

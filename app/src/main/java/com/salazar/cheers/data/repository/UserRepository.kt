@@ -32,8 +32,10 @@ class UserRepository @Inject constructor(
 //    }
 
     suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {
-        val userStats = service.getUserStats(username = username)
-        userStatsDao.insert(userStats = userStats)
+        when (val result = service.getUserStats(username = username)) {
+            is Result.Success -> userStatsDao.insert(userStats = result.data)
+            is Result.Error -> {}
+        }
         return@withContext userStatsDao.getUserStats(username)
     }
 
@@ -51,7 +53,7 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid !!
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid!!
         return@withContext getUser(userIdOrUsername = currentUserId)
     }
 
@@ -63,7 +65,7 @@ class UserRepository @Inject constructor(
     private suspend fun refreshUser(userIdOrUsername: String) {
         when (val result = service.getUser(userIdOrUsername = userIdOrUsername)) {
             is Result.Success -> userDao.insert(result.data)
-            is Result.Error ->  {
+            is Result.Error -> {
                 Log.e("User Service", result.exception.message.toString())
             }
         }
@@ -77,7 +79,7 @@ class UserRepository @Inject constructor(
                 val ids = suggestions.map { it.id }
                 return@withContext userDao.getUsersWithListOfIds(ids)
             }
-            is Result.Error ->  {
+            is Result.Error -> {
                 Log.e("User Service", result.exception.message.toString())
                 return@withContext emptyList()
             }

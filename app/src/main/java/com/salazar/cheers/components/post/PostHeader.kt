@@ -121,6 +121,7 @@ fun PostHeader(
                 text = relativeTimeFormatter(timestamp = created),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
+                color = color,
             )
             if (public)
                 Icon(

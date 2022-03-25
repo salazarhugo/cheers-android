@@ -54,6 +54,7 @@ fun MessagesScreen(
     onChannelClicked: (channelId: String) -> Unit,
     onLongPress: (String) -> Unit,
     onFollowClick: (String) -> Unit,
+    onUserClick: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
 ) {
     Scaffold(
@@ -74,6 +75,7 @@ fun MessagesScreen(
                 onChannelClicked = onChannelClicked,
                 onLongPress = onLongPress,
                 onFollowClick = onFollowClick,
+                onUserClick = onUserClick,
             )
         }
     }
@@ -85,6 +87,7 @@ fun Tabs(
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
     onFollowClick: (String) -> Unit,
+    onUserClick: (String) -> Unit,
 ) {
     val tabs = listOf("Direct", "Groups")
     val pagerState = rememberPagerState()
@@ -137,6 +140,7 @@ fun Tabs(
                             onLongPress = onLongPress,
                             suggestions = suggestions,
                             onFollowClick = onFollowClick,
+                            onUserClick = onUserClick,
                         )
                 }
                 1 -> {
@@ -164,6 +168,7 @@ fun ConversationList(
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
     onFollowClick: (String) -> Unit,
+    onUserClick: (String) -> Unit,
 ) {
     if (channels.isEmpty())
         NoMessages()
@@ -175,18 +180,19 @@ fun ConversationList(
                 onLongPress
             )
         }
-        item {
-            Text(
-                text = "Find friends to follow and message",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp),
-            )
-        }
+        if (suggestions != null && suggestions.isNotEmpty())
+            item {
+                Text(
+                    text = "Find friends to follow and message",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         if (suggestions != null)
             items(suggestions) { user ->
                 UserItem(
                     user = user,
-                    onUserClick = {},
+                    onUserClick = onUserClick,
                     onFollowClick = onFollowClick,
                 )
             }
@@ -252,7 +258,8 @@ fun DirectConversation(
     onLongPress: (String) -> Unit,
 ) {
     val otherUser =
-        channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid } ?: User()
+        channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid }
+            ?: User()
 
     Row(
         modifier = Modifier
@@ -298,8 +305,8 @@ fun DirectConversation(
                 else "New chat"
 
                 val subtitle = buildAnnotatedString {
-                    append(lastMessageStatus)
-                    append("  •  ")
+//                    append(lastMessageStatus)
+//                    append("  •  ")
                     append(
                         relativeTimeFormatter(
                             timestamp = channel.channel.recentMessageTime.toDate().time

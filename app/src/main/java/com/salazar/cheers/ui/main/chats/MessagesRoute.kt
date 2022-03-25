@@ -28,5 +28,6 @@ fun MessagesRoute(
         onNewMessageClicked = {
         },
         onFollowClick = messagesViewModel::onFollowClick,
+        onUserClick = { navActions.navigateToOtherProfile(it) },
     )
 }

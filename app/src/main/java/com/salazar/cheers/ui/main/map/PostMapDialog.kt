@@ -89,13 +89,14 @@ fun Post(
                 onUserClick = onUserClick,
             )
         }
-        item {
-            Text(
-                text = if (postUsers.size > 1) "Guests" else "Guest",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-            )
-        }
+        if (postUsers.isNotEmpty())
+            item {
+                Text(
+                    text = "With",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                )
+            }
         items(postUsers) { user ->
             UserItem(user = user, onUserClick = onUserClick)
         }

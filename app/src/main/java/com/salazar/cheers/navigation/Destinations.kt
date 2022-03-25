@@ -140,8 +140,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToSignUpWithEmail: (email: String) -> Unit = { email ->
-        navController.navigate("${AuthDestinations.SIGN_UP_ROUTE}?email=$email") {
+    val navigateToSignUpWithGoogle: (email: String, displayName: String) -> Unit = { email, displayName ->
+        navController.navigate("${AuthDestinations.SIGN_UP_ROUTE}?email=$email&displayName=$displayName") {
             launchSingleTop = true
         }
     }
