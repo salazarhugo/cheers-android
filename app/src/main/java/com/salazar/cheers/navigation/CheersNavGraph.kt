@@ -117,6 +117,7 @@ fun CheersNavGraph(
                 )
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
+                    navController = navController,
                     user = user ?: User(),
                     navActions = navActions,
                     presentPaymentSheet = presentPaymentSheet,

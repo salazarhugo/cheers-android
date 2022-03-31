@@ -108,17 +108,15 @@ fun SettingsSection(
             onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
         }
         SettingItem("Devices", Icons.Outlined.Computer, {})
-        SettingItem("Payment Methods", Icons.Outlined.CreditCard) {
-            onSettingsUIAction(SettingsUIAction.OnAddPaymentClick)
-        }
+//        SettingItem("Payment Methods", Icons.Outlined.CreditCard) {
+//            onSettingsUIAction(SettingsUIAction.OnAddPaymentClick)
+//        }
         SettingItem("Recharge coins", Icons.Outlined.CreditCard) {
             onSettingsUIAction(SettingsUIAction.OnRechargeClick)
-
         }
-        SettingItem("Payment History", Icons.Outlined.CreditCard) {
-            onSettingsUIAction(SettingsUIAction.OnPaymentHistoryClick)
-
-        }
+//        SettingItem("Payment History", Icons.Outlined.CreditCard) {
+//            onSettingsUIAction(SettingsUIAction.OnPaymentHistoryClick)
+//        }
         SettingItem("Language", Icons.Outlined.Language) {
             onSettingsUIAction(SettingsUIAction.OnLanguageClick)
         }

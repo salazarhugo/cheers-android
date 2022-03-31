@@ -341,6 +341,32 @@ class Neo4jService {
         }
     }
 
+    suspend fun unlikePost(postId: String) {
+        return withContext(Dispatchers.IO) {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["postId"] = postId
+            params["userId"] = FirebaseAuth.getInstance().uid!!
+            write(
+                "MATCH (u:User)-[l:LIKED]->(p:Post) WHERE p.id = \$postId AND u.id = \$userId DELETE l",
+                params = params
+            )
+        }
+    }
+
+    suspend fun likePost(postId: String) {
+        return withContext(Dispatchers.IO) {
+            val params: MutableMap<String, Any> = mutableMapOf()
+            params["postId"] = postId
+            params["userId"] = FirebaseAuth.getInstance().uid!!
+            write(
+                "MATCH (p:Post), (u:User) WHERE p.id = \$postId AND u.id = \$userId MERGE (u)-[:LIKED]->(p)",
+                params = params
+            )
+//            sendLikeNotification(postId = postId)
+        }
+    }
+
+
     private fun query(
         query: String,
         params: MutableMap<String, Any>

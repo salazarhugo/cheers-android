@@ -25,6 +25,7 @@ import com.salazar.cheers.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.profile.Post
 import com.salazar.cheers.ui.theme.Roboto
@@ -35,6 +36,7 @@ fun OtherProfileScreen(
     uiState: OtherProfileUiState.HasUser,
     onSwipeRefresh: () -> Unit,
     onPostClicked: (postId: String) -> Unit,
+    onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
     onFollowClicked: () -> Unit,
     onUnfollowClicked: () -> Unit,
@@ -113,7 +115,11 @@ fun OtherProfileScreen(
                             when (page) {
                                 0 -> posts.itemSnapshotList.forEach { postFeed ->
                                     if (postFeed != null)
-                                        Post(postFeed, onPostClicked)
+                                        Post(
+                                            postFeed,
+                                            onPostClicked,
+                                            onPostLike = onPostLike,
+                                        )
                                 }
                                 1 -> FunctionalityNotAvailablePanel()
                                 2 -> FunctionalityNotAvailablePanel()

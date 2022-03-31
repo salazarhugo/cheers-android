@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.add
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -299,10 +298,11 @@ fun DrunkennessLevelSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(Icons.Outlined.Bloodtype, null)
-            Text(
-                text = drunkenness.toString(),
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-            )
+            if (drunkenness > 0)
+                Text(
+                    text = drunkenness.toString(),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+                )
         }
     }
 }
@@ -329,10 +329,11 @@ fun BeverageSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(Icons.Outlined.LocalBar, null)
-            Text(
-                text = beverage,
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-            )
+            if (beverage.isNotBlank())
+                Text(
+                    text = beverage,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+                )
         }
     }
 }
@@ -433,7 +434,10 @@ fun AddPhotoOrVideo(
         }
         Spacer(Modifier.width(8.dp))
         FilledTonalButton(
-            onClick = { takePictureLauncher.launch() },
+            onClick = {
+                navigateToCamera()
+//                takePictureLauncher.launch()
+            },
             modifier = Modifier.weight(1f)
         ) {
             Icon(Icons.Outlined.PhotoCamera, "")
@@ -457,7 +461,7 @@ fun LocationSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Location",
+            text = "Add location",
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
         )
         Row(
@@ -465,10 +469,11 @@ fun LocationSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(Icons.Outlined.MyLocation, null)
-            Text(
-                text = location,
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-            )
+            if (location.isNotBlank())
+                Text(
+                    text = location,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+                )
         }
     }
 }

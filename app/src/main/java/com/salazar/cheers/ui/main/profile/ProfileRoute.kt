@@ -30,7 +30,7 @@ fun ProfileRoute(
             )
         },
         onPostClicked = { navActions.navigateToPostDetail(it) },
-        onLikeClicked = profileViewModel::toggleLike,
+        onPostLike = profileViewModel::toggleLike,
         onEditProfileClicked = { navActions.navigateToEditProfile() },
         onDrinkingStatsClick = { navActions.navigateToDrinkingStats(username) },
         navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,

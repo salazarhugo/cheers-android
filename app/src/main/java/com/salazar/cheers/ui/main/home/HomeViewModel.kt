@@ -173,7 +173,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun refresh() {
+    fun onSwipeRefresh() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -203,23 +203,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun toggleLike(post: Post) {
-        val likes = if (post.liked) post.likes - 1 else post.likes + 1
         viewModelScope.launch {
-            repository.postDao.update(post.copy(liked = !post.liked, likes = likes))
-        }
-        if (post.liked)
-            unlikePost(post.id)
-        else
-            likePost(post.id)
-    }
-
-    private fun unlikePost(postId: String) {
-        viewModelScope.launch {
-            try {
-                Neo4jUtil.unlikePost(postId = postId)
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", e.toString())
-            }
+            repository.toggleLike(post = post)
         }
     }
 
@@ -232,16 +217,6 @@ class HomeViewModel @Inject constructor(
     fun unfollowUser(username: String) {
         viewModelScope.launch {
             Neo4jUtil.unfollowUser(username = username)
-        }
-    }
-
-    private fun likePost(postId: String) {
-        viewModelScope.launch {
-            try {
-                Neo4jUtil.likePost(postId = postId)
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", e.toString())
-            }
         }
     }
 

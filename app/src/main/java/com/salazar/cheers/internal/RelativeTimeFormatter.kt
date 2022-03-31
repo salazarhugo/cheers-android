@@ -6,6 +6,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/*
+ *  timestamp in seconds
+ */
 @Composable
 fun relativeTimeFormatter(
     timestamp: Long,
@@ -24,8 +27,8 @@ fun relativeTimeFormatter(
             days > 0 -> TimeUnit.MILLISECONDS.toDays(diff).toString() + 'd'
             hours > 0 -> TimeUnit.MILLISECONDS.toHours(diff).toString() + 'h'
             minutes > 0 ->  TimeUnit.MILLISECONDS.toMinutes(diff).toString() + 'm'
-            seconds > 0 ->  TimeUnit.MILLISECONDS.toSeconds(diff).toString() +  's'
-            else -> ""
+            seconds > 2 ->  TimeUnit.MILLISECONDS.toSeconds(diff).toString() +  's'
+            else -> "now"
         }
 
         append(res)

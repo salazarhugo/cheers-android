@@ -22,6 +22,7 @@ import com.salazar.cheers.components.DividerM3
 fun ChatsMoreBottomSheet(
     name: String,
     onSettingsClick: () -> Unit,
+    onDeleteClick: () -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -42,7 +43,7 @@ fun ChatsMoreBottomSheet(
         Item(
             text = "Delete",
             icon = Icons.Outlined.Delete,
-            onClick = onSettingsClick
+            onClick = onDeleteClick,
         )
         Item(text = "Mute messages", icon = Icons.Outlined.NotificationsOff)
         Item(text = "Mute call notifications", icon = Icons.Outlined.NotificationsOff)

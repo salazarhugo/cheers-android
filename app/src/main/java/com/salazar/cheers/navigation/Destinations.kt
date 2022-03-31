@@ -38,7 +38,7 @@ object MainDestinations {
     const val POST_MORE_SHEET = "postMoreSheet"
     const val STORY_ROUTE = "story"
     const val SEND_GIFT_SHEET = "giftSheet"
-    const val DRINKING_STATS= "drinkingStats"
+    const val DRINKING_STATS = "drinkingStats"
 }
 
 /**
@@ -140,11 +140,12 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToSignUpWithGoogle: (email: String, displayName: String) -> Unit = { email, displayName ->
-        navController.navigate("${AuthDestinations.SIGN_UP_ROUTE}?email=$email&displayName=$displayName") {
-            launchSingleTop = true
+    val navigateToSignUpWithGoogle: (email: String, displayName: String) -> Unit =
+        { email, displayName ->
+            navController.navigate("${AuthDestinations.SIGN_UP_ROUTE}?email=$email&displayName=$displayName") {
+                launchSingleTop = true
+            }
         }
-    }
 
     val navigateToMain: () -> Unit = {
         navController.navigate(CheersDestinations.MAIN_ROUTE) {
@@ -189,8 +190,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToChatsMoreSheet: (name: String) -> Unit = { name ->
-        navController.navigate("${MainDestinations.MESSAGES_MORE_SHEET}/$name") {
+    val navigateToChatsMoreSheet: (name: String, channelId: String) -> Unit = { name, channelId ->
+        navController.navigate("${MainDestinations.MESSAGES_MORE_SHEET}/$name/$channelId") {
             launchSingleTop = true
             restoreState = true
         }

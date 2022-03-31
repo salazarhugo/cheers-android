@@ -12,6 +12,7 @@ import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.assisted.Assisted
@@ -103,6 +104,12 @@ class OtherProfileViewModel @AssistedInject constructor(
     private fun toggleIsFollowed() {
         val isFollowed = viewModelState.value.user?.isFollowed ?: return
         updateIsFollowed(isFollowed = !isFollowed)
+    }
+
+    fun toggleLike(post: Post) {
+        viewModelScope.launch {
+            postRepository.toggleLike(post = post)
+        }
     }
 
     fun followUser() {

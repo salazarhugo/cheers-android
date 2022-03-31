@@ -10,8 +10,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -58,7 +58,7 @@ private data class PostDetailViewModelState(
 }
 
 class PostDetailViewModel @AssistedInject constructor(
-    private val repository: PostRepository,
+    private val postRepository: PostRepository,
     @Assisted private val postId: String
 ) : ViewModel() {
 
@@ -78,7 +78,7 @@ class PostDetailViewModel @AssistedInject constructor(
 
     private fun refreshPost() {
         viewModelScope.launch {
-            val post = repository.getPost(postId = postId)
+            val post = postRepository.getPost(postId = postId)
             viewModelState.update {
                 it.copy(postFeed = post)
             }
@@ -86,23 +86,8 @@ class PostDetailViewModel @AssistedInject constructor(
     }
 
     fun toggleLike(post: Post) {
-        val likes = if (post.liked) post.likes - 1 else post.likes + 1
         viewModelScope.launch {
-            repository.postDao.update(post.copy(liked = !post.liked, likes = likes))
-        }
-        if (post.liked)
-            unlikePost(post.id)
-        else
-            likePost(post.id)
-    }
-
-    private fun unlikePost(postId: String) {
-        viewModelScope.launch {
-            try {
-                Neo4jUtil.unlikePost(postId = postId)
-            } catch (e: Exception) {
-                Log.e("PostDetailViewModel", e.toString())
-            }
+            postRepository.toggleLike(post = post)
         }
     }
 
@@ -110,16 +95,6 @@ class PostDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             try {
                 Neo4jUtil.leavePost(postId = postId)
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", e.toString())
-            }
-        }
-    }
-
-    private fun likePost(postId: String) {
-        viewModelScope.launch {
-            try {
-                Neo4jUtil.likePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }

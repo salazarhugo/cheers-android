@@ -22,10 +22,10 @@ fun AddPostRoute(
     val uiState by addPostViewModel.uiState.collectAsState()
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
-            if (it.size <= 5)
+            if (it.size <= 8)
                 addPostViewModel.setPhotos(it)
             else
-                addPostViewModel.updateErrorMessage("Maximum 5 photos.")
+                addPostViewModel.updateErrorMessage("Maximum 8 photos.")
         }
 
     when (uiState.page) {
@@ -54,9 +54,8 @@ fun AddPostRoute(
         AddPostPage.ChooseOnMap ->
             ChooseOnMapScreen(
                 onSelectLocation = {
-                    addPostViewModel.updateLocationPoint(it); addPostViewModel.updatePage(
-                    AddPostPage.AddPost
-                )
+                    addPostViewModel.updateLocationPoint(it)
+                    addPostViewModel.updatePage(AddPostPage.AddPost)
                 },
                 onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
             )

@@ -30,16 +30,19 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.R
-import com.salazar.cheers.components.*
+import com.salazar.cheers.components.FunctionalityNotAvailablePanel
+import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.PrettyImage
+import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
+import com.salazar.cheers.components.share.SwipeToRefresh
+import com.salazar.cheers.components.share.rememberSwipeRefreshState
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.theme.Roboto
@@ -51,29 +54,25 @@ fun ProfileScreen(
     onSwipeRefresh: () -> Unit,
     onEditProfileClicked: () -> Unit,
     onDrinkingStatsClick: () -> Unit,
-    onLikeClicked: (Post) -> Unit,
     onPostClicked: (postId: String) -> Unit,
+    onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
     navigateToProfileMoreSheet: () -> Unit,
     onWebsiteClicked: (String) -> Unit,
 ) {
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = false),
-        onRefresh = onSwipeRefresh,
-    ) {
-        when (uiState) {
-            is ProfileUiState.Loading -> LoadingScreen()
-            is ProfileUiState.HasUser -> Profile(
-                uiState = uiState,
-                onEditProfileClicked = onEditProfileClicked,
-                onLikeClicked = onLikeClicked,
-                onPostClicked = onPostClicked,
-                onStatClicked = onStatClicked,
-                navigateToProfileMoreSheet = navigateToProfileMoreSheet,
-                onWebsiteClicked = onWebsiteClicked,
-                onDrinkingStatsClick = onDrinkingStatsClick,
-            )
-        }
+    when (uiState) {
+        is ProfileUiState.Loading -> LoadingScreen()
+        is ProfileUiState.HasUser -> Profile(
+            uiState = uiState,
+            onEditProfileClicked = onEditProfileClicked,
+            onPostClicked = onPostClicked,
+            onStatClicked = onStatClicked,
+            navigateToProfileMoreSheet = navigateToProfileMoreSheet,
+            onWebsiteClicked = onWebsiteClicked,
+            onDrinkingStatsClick = onDrinkingStatsClick,
+            onSwipeRefresh = onSwipeRefresh,
+            onPostLike = onPostLike,
+        )
     }
 }
 
@@ -82,8 +81,9 @@ fun Profile(
     uiState: ProfileUiState.HasUser,
     onEditProfileClicked: () -> Unit,
     onDrinkingStatsClick: () -> Unit,
-    onLikeClicked: (Post) -> Unit,
+    onSwipeRefresh: () -> Unit,
     onPostClicked: (postId: String) -> Unit,
+    onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
     navigateToProfileMoreSheet: () -> Unit,
     onWebsiteClicked: (String) -> Unit,
@@ -99,61 +99,70 @@ fun Profile(
             Icons.Outlined.Celebration
         )
 
-        LazyColumn {
-            item {
-                Column(
-                    modifier = Modifier.padding(15.dp)
-                ) {
-                    ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
-                    ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
-                    Spacer(Modifier.height(8.dp))
-                    ProfileButtons(
-                        onEditProfileClicked = onEditProfileClicked,
-                        onDrinkingStatsClick = onDrinkingStatsClick,
-                    )
-                }
-            }
-            stickyHeader {
-                val scope = rememberCoroutineScope()
-                TabRow(
-                    selectedTabIndex = pagerState.currentPage,
-                    indicator = { tabPositions ->
-                        TabRowDefaults.Indicator(
-                            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-                        )
-                    },
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                ) {
-                    tabs.forEachIndexed { index, icon ->
-                        Tab(
-                            icon = { Icon(icon, contentDescription = null) },
-                            selected = pagerState.currentPage == index,
-                            onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(index)
-                                }
-                            },
+        SwipeToRefresh(
+            state = rememberSwipeRefreshState(isRefreshing = false),
+            onRefresh = onSwipeRefresh,
+        ) {
+            LazyColumn {
+                item {
+                    Column(
+                        modifier = Modifier.padding(15.dp)
+                    ) {
+                        ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
+                        ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
+                        Spacer(Modifier.height(8.dp))
+                        ProfileButtons(
+                            onEditProfileClicked = onEditProfileClicked,
+                            onDrinkingStatsClick = onDrinkingStatsClick,
                         )
                     }
                 }
-            }
-
-            item {
-                HorizontalPager(
-                    count = tabs.size,
-                    state = pagerState,
-                ) { page ->
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
+                stickyHeader {
+                    val scope = rememberCoroutineScope()
+                    TabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        indicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                            )
+                        },
+                        backgroundColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground,
                     ) {
-                        when (page) {
-                            0 -> posts.itemSnapshotList.forEach { postFeed ->
-                                if (postFeed != null)
-                                    Post(postFeed, onPostClicked)
+                        tabs.forEachIndexed { index, icon ->
+                            Tab(
+                                icon = { Icon(icon, contentDescription = null) },
+                                selected = pagerState.currentPage == index,
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                },
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    HorizontalPager(
+                        count = tabs.size,
+                        state = pagerState,
+                    ) { page ->
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            when (page) {
+                                0 -> posts.itemSnapshotList.forEach { postFeed ->
+                                    if (postFeed != null)
+                                        Post(
+                                            postFeed,
+                                            onPostClicked,
+                                            onPostLike = onPostLike,
+                                        )
+                                }
+                                1 -> FunctionalityNotAvailablePanel()
+                                2 -> FunctionalityNotAvailablePanel()
                             }
-                            1 -> FunctionalityNotAvailablePanel()
-                            2 -> FunctionalityNotAvailablePanel()
                         }
                     }
                 }
@@ -187,6 +196,7 @@ fun ProfileButtons(
 fun Post(
     postFeed: PostFeed,
     onPostClicked: (postId: String) -> Unit,
+    onPostLike: (post: Post) -> Unit,
 ) {
     val pagerState = rememberPagerState()
     val post = postFeed.post
@@ -215,7 +225,7 @@ fun Post(
     )
     PostFooter(
         postFeed,
-        onLike = {},
+        onLike = onPostLike,
         navigateToComments = {},
         pagerState = pagerState,
     )
@@ -281,29 +291,26 @@ fun Toolbar(
 ) {
     val otherUser = uiState.user
 
-    Column {
-        SmallTopAppBar(
-            title = {
-                Username(
-                    username = otherUser.username,
-                    verified = otherUser.verified,
-                    textStyle = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Roboto
-                    ),
-                )
-            },
-            actions = {
-                IconButton(onClick = {}) {
-                    Icon(painter = painterResource(id = R.drawable.ic_add_box_white), "")
-                }
-                IconButton(onClick = navigateToProfileMoreSheet) {
-                    Icon(painter = painterResource(id = R.drawable.ic_more_vert_icon), "")
-                }
-            },
-        )
-        DividerM3()
-    }
+    SmallTopAppBar(
+        title = {
+            Username(
+                username = otherUser.username,
+                verified = otherUser.verified,
+                textStyle = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto
+                ),
+            )
+        },
+        actions = {
+            IconButton(onClick = {}) {
+                Icon(painter = painterResource(id = R.drawable.ic_add_box_white), "")
+            }
+            IconButton(onClick = navigateToProfileMoreSheet) {
+                Icon(painter = painterResource(id = R.drawable.ic_more_vert_icon), "")
+            }
+        },
+    )
 }
 
 @Composable

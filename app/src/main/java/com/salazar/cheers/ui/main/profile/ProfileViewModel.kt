@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -91,18 +90,11 @@ class ProfileViewModel @Inject constructor(
     /**
      * Toggle like of a post
      */
-    fun toggleLike(post: Post) {
-    }
-
-    private fun toggleLike(
-        postId: String,
-        like: Boolean
+    fun toggleLike(
+        post: Post,
     ) {
         viewModelScope.launch {
-            if (like)
-                Neo4jUtil.likePost(postId = postId)
-            else
-                Neo4jUtil.unlikePost(postId = postId)
+            postRepository.toggleLike(post = post)
         }
     }
 

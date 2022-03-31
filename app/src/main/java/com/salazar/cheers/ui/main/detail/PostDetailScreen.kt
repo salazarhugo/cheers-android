@@ -164,6 +164,10 @@ fun PostDetails(
             .padding(16.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = "Sharing with",
+                style = MaterialTheme.typography.titleMedium,
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(privacy.icon, null)
                 Column(modifier = Modifier.padding(start = 16.dp)) {
@@ -171,6 +175,7 @@ fun PostDetails(
                     Text(privacy.subtitle)
                 }
             }
+            Spacer(Modifier.height(32.dp))
             Text(
                 text = Date(created).toString(),
                 style = MaterialTheme.typography.titleMedium
@@ -200,7 +205,7 @@ fun Post(
     val postUsers = postFeed.tagUsers
 
     val uid = FirebaseAuth.getInstance().currentUser?.uid
-    val joined = post.tagUsersId.contains(uid) || author.id == uid
+    val joined = post.tagUsersId.contains(uid)
 
     Column {
         LazyColumn() {
@@ -216,7 +221,6 @@ fun Post(
             item {
                 Buttons(
                     joined = joined,
-                    allowJoin = post.allowJoin,
                     onLeave = onLeave,
                     onMessageClicked = onMessageClicked
                 )
@@ -280,7 +284,6 @@ fun Post(
 @Composable
 fun Buttons(
     joined: Boolean,
-    allowJoin: Boolean,
     onLeave: () -> Unit,
     onMessageClicked: () -> Unit,
 ) {
@@ -290,21 +293,15 @@ fun Buttons(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (joined)
+        if (joined) {
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onLeave,
             ) {
                 Text("Leave")
             }
-        else if (allowJoin)
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {},
-            ) {
-                Text("Join")
-            }
-        Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+        }
         OutlinedButton(
             modifier = Modifier.weight(1f),
             onClick = onMessageClicked,

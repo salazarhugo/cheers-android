@@ -36,6 +36,7 @@ fun OtherProfileRoute(
             onBackPressed = { navActions.navigateBack() },
             onSwipeRefresh = { otherProfileViewModel.refresh() },
             onPostClicked = { navActions.navigateToPostDetail(it) },
+            onPostLike = otherProfileViewModel::toggleLike,
             onFollowClicked = { otherProfileViewModel.followUser() },
             onUnfollowClicked = { otherProfileViewModel.unfollowUser() },
             onGiftClick = {
@@ -70,4 +71,3 @@ fun OtherProfileRoute(
         )
     }
 }
-

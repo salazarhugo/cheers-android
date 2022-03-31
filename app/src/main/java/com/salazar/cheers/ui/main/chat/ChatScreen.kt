@@ -176,7 +176,7 @@ fun Messages(
                 item {
                     Message(
                         uiState = uiState,
-                        modifier = Modifier.animateItemPlacement(),
+//                        modifier = Modifier.animateItemPlacement(),
                         onAuthorClick = { name -> navigateToProfile(name) },
                         onLongClickMessage = onLongClickMessage,
                         onDoubleTapMessage = onDoubleTapMessage,

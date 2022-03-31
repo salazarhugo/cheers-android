@@ -6,8 +6,10 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
@@ -29,6 +31,7 @@ import com.salazar.cheers.ui.main.chat.chatViewModel
 import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.ui.main.chats.MessagesRoute
 import com.salazar.cheers.ui.main.chats.MessagesViewModel
+import com.salazar.cheers.ui.main.chats.chatsSheetViewModel
 import com.salazar.cheers.ui.main.comment.CommentsRoute
 import com.salazar.cheers.ui.main.comment.commentsViewModel
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
@@ -57,6 +60,7 @@ import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.copyToClipboard
 
 fun NavGraphBuilder.mainNavGraph(
+    navController: NavController,
     user: User,
     navActions: CheersNavigationActions,
     presentPaymentSheet: (String) -> Unit,
@@ -136,12 +140,16 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         bottomSheet(
-            route = "${MainDestinations.MESSAGES_MORE_SHEET}/{name}",
+            route = "${MainDestinations.MESSAGES_MORE_SHEET}/{name}/{channelId}",
         ) {
             val name = it.arguments?.getString("name")!!
+            val channelId = it.arguments?.getString("channelId")!!
+            val chatsSheetViewModel = chatsSheetViewModel(channelId = channelId)
+
             ChatsMoreBottomSheet(
                 name = name,
                 onSettingsClick = { },
+                onDeleteClick = chatsSheetViewModel::deleteChannel,
             )
         }
 
@@ -190,8 +198,11 @@ fun NavGraphBuilder.mainNavGraph(
                 profilePictureUrl = user.profilePictureUrl,
             )
             val photoUri = it.arguments?.getString("photoUri")
-            if (photoUri != null)
-                viewModel.addPhoto(Uri.parse(photoUri))
+            if (photoUri != null) {
+                LaunchedEffect(photoUri) {
+                    viewModel.addPhoto(Uri.parse(photoUri))
+                }
+            }
         }
 
         composable(
@@ -314,6 +325,7 @@ fun NavGraphBuilder.mainNavGraph(
             exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
         ) {
             val messagesViewModel = hiltViewModel<MessagesViewModel>()
+
             MessagesRoute(
                 messagesViewModel = messagesViewModel,
                 navActions = navActions,

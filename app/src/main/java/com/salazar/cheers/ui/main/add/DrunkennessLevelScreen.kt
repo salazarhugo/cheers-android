@@ -61,7 +61,7 @@ fun DrunkennessLevelScreen(
             Slider(
                 value = drunkenness.toFloat(),
                 onValueChange = { onSelectDrunkenness(it.toInt()) },
-                valueRange = 0f..101f,
+                valueRange = 0f..100f,
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.secondary,
                     activeTrackColor = MaterialTheme.colorScheme.secondary

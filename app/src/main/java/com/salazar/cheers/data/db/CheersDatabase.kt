@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.*
 import com.google.firebase.Timestamp
 import com.salazar.cheers.data.entities.*
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.Beverage
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.User
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -20,8 +22,8 @@ import java.util.*
         UserPreference::class,
         StoryRemoteKey::class,
         StoryResponse::class,
-        ChatChannel::class,
-        TextMessage::class,
+//        ChatChannel::class,
+//        TextMessage::class,
         UserStats::class,
     ],
     version = 1,
@@ -69,7 +71,7 @@ class Converters {
     fun toBeverage(name: String) = Beverage.fromName(name)
 
     @TypeConverter
-    fun fromTimestamp(value: Timestamp) = value.seconds
+    fun fromTimestamp(value: Timestamp?) = value?.seconds ?: Timestamp.now().seconds
 
     @TypeConverter
     fun toTimestamp(value: Long) = Timestamp(value, 0)

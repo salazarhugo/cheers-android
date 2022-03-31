@@ -38,8 +38,9 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.UserProfilePicture
-import com.salazar.cheers.data.db.DirectChannel
+import com.salazar.cheers.components.share.rememberSwipeRefreshState
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.internal.relativeTimeFormatter
@@ -52,10 +53,11 @@ fun MessagesScreen(
     uiState: MessagesUiState,
     onNewMessageClicked: () -> Unit,
     onChannelClicked: (channelId: String) -> Unit,
-    onLongPress: (String) -> Unit,
+    onLongPress: (String, String) -> Unit,
     onFollowClick: (String) -> Unit,
     onUserClick: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
+    onSwipeRefresh: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -69,14 +71,19 @@ fun MessagesScreen(
             }
         }
     ) {
-        Column {
-            Tabs(
-                uiState = uiState,
-                onChannelClicked = onChannelClicked,
-                onLongPress = onLongPress,
-                onFollowClick = onFollowClick,
-                onUserClick = onUserClick,
-            )
+        SwipeToRefresh(
+            state = rememberSwipeRefreshState(isRefreshing = false),
+            onRefresh = onSwipeRefresh,
+        ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Tabs(
+                    uiState = uiState,
+                    onChannelClicked = onChannelClicked,
+                    onLongPress = onLongPress,
+                    onFollowClick = onFollowClick,
+                    onUserClick = onUserClick,
+                )
+            }
         }
     }
 }
@@ -85,7 +92,7 @@ fun MessagesScreen(
 fun Tabs(
     uiState: MessagesUiState,
     onChannelClicked: (String) -> Unit,
-    onLongPress: (String) -> Unit,
+    onLongPress: (String, String) -> Unit,
     onFollowClick: (String) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
@@ -163,16 +170,16 @@ fun Tabs(
 
 @Composable
 fun ConversationList(
-    channels: List<DirectChannel>,
+    channels: List<ChatChannel>,
     suggestions: List<User>?,
     onChannelClicked: (String) -> Unit,
-    onLongPress: (String) -> Unit,
+    onLongPress: (String, String) -> Unit,
     onFollowClick: (String) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     if (channels.isEmpty())
         NoMessages()
-    LazyColumn {
+    LazyColumn(modifier = Modifier.fillMaxHeight()) {
         items(channels) { channel ->
             DirectConversation(
                 channel = channel,
@@ -253,29 +260,38 @@ fun LinkContactsItem() {
 
 @Composable
 fun DirectConversation(
-    channel: DirectChannel,
+    channel: ChatChannel,
     onChannelClicked: (String) -> Unit,
-    onLongPress: (String) -> Unit,
+    onLongPress: (String, String) -> Unit,
 ) {
     val otherUser =
-        channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid }
+        channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid!! }
             ?: User()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onChannelClicked(channel.channel.id) },
-                onLongClick = { onLongPress(otherUser.fullName) })
+                onClick = { onChannelClicked(channel.id) },
+                onLongClick = {
+                    onLongPress(
+                        otherUser.username,
+                        channel.id
+                    )
+                })
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
+
         val image = otherUser.profilePictureUrl
-        val seen = true
-//            channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
-        val isLastMessageMe = true
-//            channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
+        val seen = if (channel.recentMessage != null)
+            channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
+        else true
+
+        val isLastMessageMe = if (channel.recentMessage != null)
+            channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
+        else true
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -298,18 +314,23 @@ fun DirectConversation(
             Spacer(modifier = Modifier.width(14.dp))
             Column {
                 val title = otherUser.fullName
-                val seenByOthers = true//channel.recentMessage.seenBy.size > 1
+                val seenByOthers =
+                    if (channel.recentMessage != null) channel.recentMessage.seenBy.size > 1 else true
                 val lastMessageStatus = if (isLastMessageMe && seenByOthers) "Opened"
                 else if (isLastMessageMe && !seenByOthers) "Delivered"
                 else if (!isLastMessageMe) "Received"
                 else "New chat"
 
                 val subtitle = buildAnnotatedString {
-//                    append(lastMessageStatus)
-//                    append("  •  ")
+                    if (channel.recentMessage != null) {
+                        append(channel.recentMessage.text)
+                        append("  •  ")
+                    }
+                    append(lastMessageStatus)
+                    append("  •  ")
                     append(
                         relativeTimeFormatter(
-                            timestamp = channel.channel.recentMessageTime.toDate().time
+                            timestamp = channel.recentMessageTime.time
                         )
                     )
                 }
@@ -421,14 +442,6 @@ fun MyAppBar(
                 ),
             )
         },
-//        navigationIcon = {
-//            IconButton(onClick = onBackPressed) {
-//                Icon(
-//                    imageVector = Icons.Outlined.ArrowBack,
-//                    contentDescription = null,
-//                )
-//            }
-//        },
         actions = {
             IconButton(onClick = onActivityIconClicked) {
                 Icon(

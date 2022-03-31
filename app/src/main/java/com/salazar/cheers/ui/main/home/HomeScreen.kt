@@ -43,8 +43,6 @@ import androidx.paging.compose.itemsIndexed
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.*
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -60,6 +58,7 @@ import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
+import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.data.db.PostFeed
@@ -75,7 +74,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    onRefreshPosts: () -> Unit,
+    onSwipeRefresh: () -> Unit,
     navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
     onEventClicked: (String) -> Unit,
@@ -90,55 +89,55 @@ fun HomeScreen(
     onAddStoryClick: () -> Unit,
     onLike: (post: Post) -> Unit,
 ) {
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = false),
-        onRefresh = onRefreshPosts,
-    ) {
-        val showDivider =
-            if (uiState is HomeUiState.HasPosts)
-                uiState.listState.firstVisibleItemIndex > 0
-            else
-                false
+    val showDivider =
+        if (uiState is HomeUiState.HasPosts)
+            uiState.listState.firstVisibleItemIndex > 0
+        else
+            false
 
-        var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
-        Scaffold(
-            topBar = {
-                Column {
-                    MyAppBar(
-                        navigateToSearch = navigateToSearch,
-                        onSelectTab = onSelectTab,
-                        tab = uiState.selectedTab,
-                    )
-                    if (showDivider)
-                        DividerM3()
-                }
-            },
-            floatingActionButton = {
-                MultiFloatingActionButton(
-                    Icons.Default.Add,
-                    listOf(
-                        MultiFabItem(
-                            "event",
-                            Icons.Outlined.Event,
-                            "Party",
-                        ),
-                        MultiFabItem(
-                            "post",
-                            Icons.Outlined.PostAdd,
-                            "Hangout",
-                        )
-                    ), toState, true, { state ->
-                        toState = state
-                    },
-                    onFabItemClicked = {
-                        toState = MultiFabState.COLLAPSED
-                        if (it.identifier == "event")
-                            navigateToAddEvent()
-                        else
-                            navigateToAddPost()
-                    }
+    var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
+    Scaffold(
+        topBar = {
+            Column {
+                MyAppBar(
+                    navigateToSearch = navigateToSearch,
+                    onSelectTab = onSelectTab,
+                    tab = uiState.selectedTab,
                 )
+                if (showDivider)
+                    DividerM3()
             }
+        },
+        floatingActionButton = {
+            MultiFloatingActionButton(
+                Icons.Default.Add,
+                listOf(
+                    MultiFabItem(
+                        "event",
+                        Icons.Outlined.Event,
+                        "Party",
+                    ),
+                    MultiFabItem(
+                        "post",
+                        Icons.Outlined.PostAdd,
+                        "Hangout",
+                    )
+                ), toState, true, { state ->
+                    toState = state
+                },
+                onFabItemClicked = {
+                    toState = MultiFabState.COLLAPSED
+                    if (it.identifier == "event")
+                        navigateToAddEvent()
+                    else
+                        navigateToAddPost()
+                }
+            )
+        }
+    ) {
+        SwipeToRefresh(
+            state = com.salazar.cheers.components.share.rememberSwipeRefreshState(isRefreshing = false),
+            onRefresh = onSwipeRefresh,
         ) {
             Column(
                 modifier = Modifier
@@ -490,23 +489,23 @@ fun PostList(
 //                )
 //            }
 //        else {
-            itemsIndexed(posts) { i, post ->
-                if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
-                    DividerM3()
-                    NativeAdPost(ad = uiState.nativeAd)
-                }
-                if (post != null) {
-                    Post(
-                        modifier = Modifier.animateItemPlacement(),
-                        postFeed = post,
-                        navigateToComments = navigateToComments,
-                        onPostClicked = onPostClicked,
-                        onUserClicked = onUserClicked,
-                        onPostMoreClicked = onPostMoreClicked,
-                        onLike = onLike,
-                    )
-                }
+        itemsIndexed(posts) { i, post ->
+            if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
+                DividerM3()
+                NativeAdPost(ad = uiState.nativeAd)
             }
+            if (post != null) {
+                Post(
+                    modifier = Modifier.animateItemPlacement(),
+                    postFeed = post,
+                    navigateToComments = navigateToComments,
+                    onPostClicked = onPostClicked,
+                    onUserClicked = onUserClicked,
+                    onPostMoreClicked = onPostMoreClicked,
+                    onLike = onLike,
+                )
+            }
+        }
 //        }
 
         posts.apply {

@@ -7,6 +7,7 @@ import com.salazar.cheers.data.db.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -71,4 +72,10 @@ object AppModule {
     fun provideNeo4jService(): Neo4jService {
         return Neo4jService()
     }
+}
+
+@Module
+@InstallIn(ViewComponent::class)
+object ChatModule {
+
 }

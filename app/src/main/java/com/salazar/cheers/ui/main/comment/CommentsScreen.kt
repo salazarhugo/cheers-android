@@ -191,8 +191,7 @@ fun CommentBottomBar(
                         imeAction = ImeAction.Send
                     ),
                     keyboardActions = KeyboardActions(
-                        onSend = {
-                        }
+                        onSend = { onComment() },
                     ),
                     maxLines = 1,
                     cursorBrush = SolidColor(LocalContentColor.current),

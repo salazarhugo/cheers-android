@@ -29,10 +29,15 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        onRefreshPosts = { homeViewModel.refresh() },
         navActions = navActions,
+        onSwipeRefresh = homeViewModel::onSwipeRefresh,
         onPostClicked = { navActions.navigateToPostDetail(it) },
-        onPostMoreClicked = { postId, authorId -> navActions.navigateToPostMoreSheet(postId, authorId) },
+        onPostMoreClicked = { postId, authorId ->
+            navActions.navigateToPostMoreSheet(
+                postId,
+                authorId
+            )
+        },
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         navigateToAddEvent = { navActions.navigateToAddEvent() },
         navigateToAddPost = { navActions.navigateToAddPostSheet() },

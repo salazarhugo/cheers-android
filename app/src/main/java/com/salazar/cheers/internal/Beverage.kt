@@ -9,7 +9,7 @@ enum class Beverage(
     @DrawableRes val icon: Int,
 ) {
     NONE(
-        displayName = "None",
+        displayName = "",
         alcohol = 0f,
         icon = R.drawable.ic_cocktail,
     ),

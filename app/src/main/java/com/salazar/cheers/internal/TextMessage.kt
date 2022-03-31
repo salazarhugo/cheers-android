@@ -10,23 +10,17 @@ import java.util.*
 
 
 @Entity(
-    tableName = "message", foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["id"],
-            childColumns = ["senderId"],
-            onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.CASCADE
-        ),
+    tableName = "message",
+    foreignKeys = [
         ForeignKey(
             entity = ChatChannel::class,
             parentColumns = ["id"],
             childColumns = ["chatChannelId"],
             onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.CASCADE
+            onUpdate = ForeignKey.NO_ACTION
         )
     ], indices = [
-        Index("senderId"),
+//        Index("senderId"),
         Index("chatChannelId")
     ]
 )
@@ -36,7 +30,7 @@ data class TextMessage(
     override var chatChannelId: String,
     var text: String,
     @ServerTimestamp
-    override val time: Date? = null,
+    override val time: Date? = Date(),
     override val senderId: String,
     override val senderName: String,
     override val senderUsername: String,
@@ -50,12 +44,12 @@ data class TextMessage(
         "",
         "",
         "",
-        null,
+        Date(),
         "",
         "",
         "",
         "",
-        arrayListOf(),
+        listOf(),
         listOf(),
     )
 }

@@ -19,12 +19,15 @@ fun MessagesRoute(
 
     MessagesScreen(
         uiState = uiState,
+        onSwipeRefresh = messagesViewModel::onSwipeRefresh,
         onActivityIconClicked = {
         },
-        onChannelClicked = { channelId,->
+        onChannelClicked = { channelId ->
             navActions.navigateToChat(channelId)
         },
-        onLongPress = { navActions.navigateToChatsMoreSheet(it) },
+        onLongPress = { name, channelId ->
+            navActions.navigateToChatsMoreSheet(name, channelId)
+        },
         onNewMessageClicked = {
         },
         onFollowClick = messagesViewModel::onFollowClick,

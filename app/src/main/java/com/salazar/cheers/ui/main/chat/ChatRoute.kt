@@ -30,7 +30,7 @@ fun ChatRoute(
     when (uiState) {
         is ChatUiState.HasChannel -> {
             val ui = (uiState as ChatUiState.HasChannel)
-            val otherUser = if (ui.channel.members.size > 1) ui.channel.members[0] else User()
+            val otherUser = if (ui.channel.members.isNotEmpty()) ui.channel.members[0] else User()
 
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,

@@ -3,16 +3,14 @@ package com.salazar.cheers.util
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.util.*
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -96,18 +94,15 @@ object FirestoreChat {
 
             val newChannel = chatChannelsCollectionRef.document()
             newChannel.set(
-                ChatChannel(
+                ChatChannelResponse(
                     id = newChannel.id,
                     name = "Channel 1",
                     members = listOf(currentUserId, otherUserId),
-//                    otherUser = User(),
                     createdAt = Timestamp.now(),
-                    recentMessageTime = Timestamp.now(),
+                    recentMessageTime = Date(),
                     createdBy = currentUserId,
-//                    recentMessage = TextMessage(),
                     type = ChatChannelType.DIRECT,
                     otherUserId = "",
-                    recentMessageId = ""
                 )
             )
 
@@ -130,7 +125,7 @@ object FirestoreChat {
             }
     }
 
-    suspend fun getChatChannel(channelId: String): Flow<ChatChannel> = callbackFlow {
+    suspend fun getChatChannel(channelId: String): Flow<ChatChannelResponse> = callbackFlow {
         val channelCol = chatChannelsCollectionRef
             .document(channelId)
 
@@ -143,8 +138,44 @@ object FirestoreChat {
             if (doc == null || !doc.exists())
                 return@addSnapshotListener
 
-            val channel = doc.toObject(ChatChannel::class.java)!!
+            val behavior = DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+            val recentMessageTime: Date = doc.getDate("recentMessageTime", behavior)!!
+            val channel = doc.toObject(ChatChannelResponse::class.java)!!
+                .copy(recentMessageTime = recentMessageTime)
             trySend(channel).isSuccess
+        }
+
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
+    suspend fun getChatChannelsFlow(): Flow<List<ChatChannelResponse>> = callbackFlow {
+        val channelCol = chatChannelsCollectionRef
+            .whereArrayContains("members", FirebaseAuth.getInstance().currentUser!!.uid)
+            .orderBy("recentMessageTime", Query.Direction.DESCENDING)
+
+        val subscription = channelCol.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e(TAG, "Users listener e.", e)
+                return@addSnapshotListener
+            }
+
+            if (snapshot == null)
+                return@addSnapshotListener
+
+
+            val chatChannels = ArrayList<ChatChannelResponse>()
+
+            for (dc in snapshot.documentChanges) {
+                val behavior = DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+                val recentMessageTime: Date = dc.document.getDate("recentMessageTime", behavior)!!
+                chatChannels.add(
+                    dc.document.toObject(ChatChannelResponse::class.java)
+                        .copy(recentMessageTime = recentMessageTime)
+                )
+            }
+            trySend(chatChannels).isSuccess
         }
 
         awaitClose {
@@ -194,12 +225,16 @@ object FirestoreChat {
         }
     }
 
-    fun seenLastMessage(channelId: String) {
+    fun seenLastMessage(
+        channelId: String,
+        messageId: String
+    ) {
         val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
 
-        chatChannelsCollectionRef.document(channelId).update(
-            mapOf("recentMessage.seenBy" to FieldValue.arrayUnion(currentUserId)),
-        )
+        chatChannelsCollectionRef.document(channelId)
+            .collection("messages")
+            .document(messageId)
+            .update("seenBy", FieldValue.arrayUnion(currentUserId))
     }
 
     fun sendMessageTo(

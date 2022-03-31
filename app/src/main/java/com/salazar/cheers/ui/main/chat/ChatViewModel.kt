@@ -13,13 +13,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.data.db.DirectChannel
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.Message
-import com.salazar.cheers.internal.MessageType
-import com.salazar.cheers.internal.TextMessage
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.internal.*
 import com.salazar.cheers.util.FirestoreChat
 import com.salazar.cheers.workers.UploadImageMessage
 import dagger.assisted.Assisted
@@ -40,7 +36,7 @@ sealed interface ChatUiState {
     ) : ChatUiState
 
     data class HasChannel(
-        val channel: DirectChannel,
+        val channel: ChatChannel,
         val messages: List<Message>,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -48,7 +44,7 @@ sealed interface ChatUiState {
 }
 
 private data class ChatViewModelState(
-    val channel: DirectChannel? = null,
+    val channel: ChatChannel? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val messages: List<Message> = emptyList(),
@@ -90,11 +86,11 @@ class ChatViewModel @AssistedInject constructor(
     init {
         refreshCurrentUser()
         refreshChannel()
-        seenLastMessage()
 
         viewModelScope.launch {
-            FirestoreChat.getChatMessages(channelId).collect { messages ->
-                viewModelState.update { it.copy(messages = messages) }
+            chatRepository.getMessages(channelId = channelId).collect { messages ->
+                viewModelState.update { it.copy(messages = messages, isLoading = false) }
+                seenLastMessage()
             }
         }
     }
@@ -103,8 +99,9 @@ class ChatViewModel @AssistedInject constructor(
 
     private fun refreshChannel() {
         viewModelScope.launch {
-            val channel = chatRepository.getChannel(channelId = channelId)
-            viewModelState.update { it.copy(channel = channel, isLoading = false) }
+            chatRepository.getChannel(channelId = channelId).collect { channel ->
+                viewModelState.update { it.copy(channel = channel, isLoading = false) }
+            }
         }
     }
 
@@ -116,8 +113,16 @@ class ChatViewModel @AssistedInject constructor(
     }
 
     private fun seenLastMessage() {
+        val state = uiState.value
+        if (state is ChatUiState.NoChannel) return
+
+        val stateWithChannel = (state as ChatUiState.HasChannel)
+        if (stateWithChannel.messages.isEmpty()) return
+
+        val lastMessageId = stateWithChannel.messages.last().id
+
         viewModelScope.launch {
-            FirestoreChat.seenLastMessage(channelId)
+            FirestoreChat.seenLastMessage(channelId = channelId, messageId = lastMessageId)
         }
     }
 
@@ -146,6 +151,7 @@ class ChatViewModel @AssistedInject constructor(
     fun sendTextMessage(text: String) {
         val user = user2.value ?: return
         viewModelScope.launch {
+//            chatRepository.insertMessage(TextMessage().copy(id = text, text = text, chatChannelId = channelId))
             val textMessage =
                 TextMessage().copy(
                     senderId = FirebaseAuth.getInstance().currentUser?.uid!!,

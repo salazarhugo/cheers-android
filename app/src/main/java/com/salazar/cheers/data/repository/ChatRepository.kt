@@ -3,13 +3,13 @@ package com.salazar.cheers.data.repository
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.DirectChannel
 import com.salazar.cheers.data.db.UserDao
+import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.internal.ChatChannelResponse
+import com.salazar.cheers.internal.Message
 import com.salazar.cheers.util.FirestoreChat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,29 +21,29 @@ class ChatRepository @Inject constructor(
     private val chatDao: ChatDao,
 ) {
 
-    suspend fun getChannels(): List<DirectChannel> = withContext(Dispatchers.IO) {
-        refreshChannels()
-        val a = chatDao.getChannels().map {
-            val members = userDao.getUsersWithListOfIds(it.channel.members)
-            it.copy(members = members)
-        }
-        return@withContext a
-    }
+    suspend fun getMessages(channelId: String): Flow<List<Message>> =
+        FirestoreChat.getChatMessages(channelId)
 
-    suspend fun getChannel(channelId: String): DirectChannel? = withContext(Dispatchers.IO) {
-        try {
-            val channel = chatDao.getChannel(channelId = channelId)
-            return@withContext channel.copy(members = userDao.getUsersWithListOfIds(channel.channel.members))
-        } catch (e: Exception) {
-            return@withContext null
-        }
-    }
+    suspend fun getChannels(): Flow<List<ChatChannel>> =
+        FirestoreChat.getChatChannelsFlow().map { it.map { it.toChatChannel() } }
 
-    private suspend fun refreshChannels() {
-        FirestoreChat.getChatChannels {
-            GlobalScope.launch {
-                chatDao.insertAll(it)
-            }
+    suspend fun getChannel(channelId: String): Flow<ChatChannel> =
+        FirestoreChat.getChatChannel(channelId = channelId).map {
+            it.toChatChannel()
         }
+
+    private suspend fun ChatChannelResponse.toChatChannel(): ChatChannel {
+        return ChatChannel().copy(
+            id = id,
+            name = name,
+            members = userDao.getUsersWithListOfIds(ids = members),
+            otherUserId = "",
+            createdAt = createdAt,
+            createdBy = createdBy,
+            recentMessageTime = recentMessageTime,
+            recentMessage = recentMessage,
+            type = type
+        )
     }
 }
+

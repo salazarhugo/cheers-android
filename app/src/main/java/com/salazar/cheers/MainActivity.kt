@@ -25,6 +25,7 @@ import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.ui.main.chat.ChatViewModel
+import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
 import com.salazar.cheers.ui.main.comment.CommentsViewModel
 import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.event.detail.EventDetailViewModel
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
         fun drinkingStatsViewModelFactory(): DrinkingStatsViewModel.DrinkingStatsViewModelFactory
         fun chatViewModelFactory(): ChatViewModel.ChatViewModelFactory
+        fun chatsSheetViewModelFactory(): ChatsSheetViewModel.ChatsSheetViewModelFactory
         fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
         fun sendGiftViewModelFactory(): SendGiftViewModel.SendGiftViewModelFactory
     }
@@ -68,16 +70,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            if (cheersViewModel.completed.value) {
-//                AlertDialog(
-//                    onDismissRequest = {
-//                        cheersViewModel.completed.value = false
-//                    },
-//                    confirmButton = {},
-//                    title = { Text("Payment succeeded") },
-//                    text = { Text("It may take a few minutes before coins are credited to your account") }
-//                )
-            }
+//            Text(text = "YES")
             CheersApp(
                 presentPaymentSheet = ::presentPaymentSheet,
                 showInterstitialAd = ::showInterstitialAd,

@@ -33,9 +33,11 @@ class PostRepository @Inject constructor(
             remoteMediator = PostRemoteMediator(database = database, networkService = service),
         ) {
             postDao.pagingSourceFeed()
-        }.flow.map { it.map {
-            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
-        } }
+        }.flow.map {
+            it.map {
+                it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+            }
+        }
     }
 
     fun profilePostFeed(userIdOrUsername: String): Flow<PagingData<PostFeed>> {
@@ -47,9 +49,11 @@ class PostRepository @Inject constructor(
             remoteMediator = PostRemoteMediator(database = database, networkService = service),
         ) {
             postDao.profilePostFeed(userIdOrUsername = userIdOrUsername)
-        }.flow.map { it.map {
-            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
-        } }
+        }.flow.map {
+            it.map {
+                it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+            }
+        }
     }
 
     suspend fun getPostsWithUsername(username: String): List<Post> {
@@ -69,6 +73,17 @@ class PostRepository @Inject constructor(
     suspend fun getPost(postId: String): PostFeed {
         val post = postDao.getPost(postId = postId)
         return post.copy(tagUsers = postDao.getPostUsers(post.post.tagUsersId))
+    }
+
+    suspend fun toggleLike(post: Post) {
+        val likes = if (post.liked) post.likes - 1 else post.likes + 1
+
+        postDao.update(post.copy(liked = !post.liked, likes = likes))
+
+        if (post.liked)
+            service.unlikePost(post.id)
+        else
+            service.likePost(post.id)
     }
 
 
