@@ -25,6 +25,7 @@ fun BeverageScreen(
     onSelectBeverage: (Beverage) -> Unit,
 ) {
     val drinks = Beverage.values().toList().sortedBy { it.displayName }
+        .filter { it.displayName.isNotBlank() }
     val grouped = drinks.groupBy { it.displayName[0] }
 
     Scaffold(
@@ -57,7 +58,9 @@ fun Drinks(
         item {
             Text(
                 text = "More coming soon",
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             )
         }
     }
@@ -66,7 +69,8 @@ fun Drinks(
 @Composable
 fun CharacterHeader(initial: Char) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
