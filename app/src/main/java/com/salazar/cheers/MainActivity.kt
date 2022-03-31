@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-//            Text(text = "YES")
             CheersApp(
                 presentPaymentSheet = ::presentPaymentSheet,
                 showInterstitialAd = ::showInterstitialAd,

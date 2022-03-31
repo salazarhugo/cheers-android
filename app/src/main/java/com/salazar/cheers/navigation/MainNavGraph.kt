@@ -44,6 +44,8 @@ import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapRoute
 import com.salazar.cheers.ui.main.map.MapViewModel
+import com.salazar.cheers.ui.main.nfc.NfcRoute
+import com.salazar.cheers.ui.main.nfc.NfcViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.otherProfileViewModel
 import com.salazar.cheers.ui.main.profile.*
@@ -78,6 +80,17 @@ fun NavGraphBuilder.mainNavGraph(
 //            navActions = navActions,
 //            presentPaymentSheet = presentPaymentSheet
 //        )
+
+        composable(
+            route = MainDestinations.NFC_ROUTE,
+        ) {
+            val nfcViewModel = hiltViewModel<NfcViewModel>()
+
+            NfcRoute(
+                nfcViewModel = nfcViewModel,
+                navActions = navActions
+            )
+        }
 
         composable(
             route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
@@ -176,14 +189,19 @@ fun NavGraphBuilder.mainNavGraph(
         bottomSheet(route = MainDestinations.PROFILE_MORE_SHEET) {
             val context = LocalContext.current
             ProfileMoreBottomSheet(
-                onSettingsClick = { navActions.navigateToSettings() },
-                onCopyProfileUrlClick = {
-                    FirebaseDynamicLinksUtil.createShortLink(user.id)
-                        .addOnSuccessListener { shortLink ->
-                            context.copyToClipboard(shortLink.shortLink.toString())
+                onProfileSheetUIAction = { action ->
+                    when (action) {
+                        is ProfileSheetUIAction.OnNfcClick -> navActions.navigateToNfc()
+                        is ProfileSheetUIAction.OnSettingsClick -> navActions.navigateToSettings()
+                        is ProfileSheetUIAction.OnCopyProfileClick -> {
+                            FirebaseDynamicLinksUtil.createShortLink(user.id)
+                                .addOnSuccessListener { shortLink ->
+                                    context.copyToClipboard(shortLink.shortLink.toString())
+                                }
+                            navActions.navigateBack()
                         }
-                    navActions.navigateBack()
-                }
+                    }
+                },
             )
         }
 

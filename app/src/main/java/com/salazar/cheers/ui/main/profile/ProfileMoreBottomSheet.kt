@@ -16,10 +16,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
+
+sealed class ProfileSheetUIAction {
+    object OnNfcClick : ProfileSheetUIAction()
+    object OnCopyProfileClick : ProfileSheetUIAction()
+    object OnSettingsClick : ProfileSheetUIAction()
+}
+
 @Composable
 fun ProfileMoreBottomSheet(
-    onSettingsClick: () -> Unit,
-    onCopyProfileUrlClick: () -> Unit,
+    onProfileSheetUIAction: (ProfileSheetUIAction) -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -33,15 +39,20 @@ fun ProfileMoreBottomSheet(
         Item(
             text = "Settings",
             icon = Icons.Outlined.Settings,
-            onClick = onSettingsClick
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnSettingsClick) }
         )
         Item(text = "Archive", icon = Icons.Outlined.Archive)
+        Item(
+            text = "Nfc",
+            icon = Icons.Outlined.Contactless,
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnNfcClick) }
+        )
         Item(text = "QR code", icon = Icons.Outlined.QrCode)
         Item(text = "Saved", icon = Icons.Outlined.BookmarkBorder)
         Item(
             text = "Copy Profile URL",
             icon = Icons.Outlined.ContentCopy,
-            onClick = onCopyProfileUrlClick
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnCopyProfileClick) }
         )
     }
 }

@@ -39,6 +39,7 @@ object MainDestinations {
     const val STORY_ROUTE = "story"
     const val SEND_GIFT_SHEET = "giftSheet"
     const val DRINKING_STATS = "drinkingStats"
+    const val NFC_ROUTE = "nfc"
 }
 
 /**
@@ -72,6 +73,12 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToNfc: () -> Unit = {
+        navController.navigate(route = MainDestinations.NFC_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToSendGift: (String) -> Unit = { receiverId ->
