@@ -86,9 +86,6 @@ class PostRepository @Inject constructor(
             service.likePost(post.id)
     }
 
-
-    fun observeLikes(): Flow<Set<String>> = likes
-
     companion object {
         const val NETWORK_PAGE_SIZE = 10
     }

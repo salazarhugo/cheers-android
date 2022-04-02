@@ -27,10 +27,6 @@ class UserRepository @Inject constructor(
         Neo4jUtil.blockUser(otherUserId = userId)
     }
 
-//    suspend fun queryFriends(query: String) = withContext(Dispatchers.IO) {
-//        service.queryFriends(query = query)
-//    }
-
     suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {
         when (val result = service.getUserStats(username = username)) {
             is Result.Success -> userStatsDao.insert(userStats = result.data)
@@ -40,21 +36,29 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun queryUsers(query: String) = withContext(Dispatchers.IO) {
-        service.queryUsers(query = query)
+        userDao.insertAll(service.queryUsers(query = query))
         return@withContext userDao.queryUsers(query = query)
     }
 
-    suspend fun followUser(username: String) = withContext(Dispatchers.IO) {
-        Neo4jUtil.followUser(username = username)
-    }
+    suspend fun toggleFollow(user: User) {
+        userDao.update(user.copy(isFollowed = !user.isFollowed))
 
-    suspend fun unfollowUser(username: String) = withContext(Dispatchers.IO) {
-        Neo4jUtil.unfollowUser(username = username)
+        if (user.isFollowed)
+            service.unfollowUser(user.username)
+        else
+            service.followUser(user.username)
     }
 
     suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid!!
         return@withContext getUser(userIdOrUsername = currentUserId)
+    }
+
+    suspend fun getUsersWithListOfIds(ids: List<String>): List<User> = withContext(Dispatchers.IO) {
+        ids.forEach { id ->
+            refreshUser(userIdOrUsername = id)
+        }
+        return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 
     suspend fun getUser(userIdOrUsername: String): User = withContext(Dispatchers.IO) {

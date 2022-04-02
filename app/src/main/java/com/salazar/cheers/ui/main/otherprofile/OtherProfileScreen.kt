@@ -19,8 +19,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.salazar.cheers.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.profile.ProfileHeader
@@ -34,97 +32,84 @@ import kotlinx.coroutines.launch
 @Composable
 fun OtherProfileScreen(
     uiState: OtherProfileUiState.HasUser,
-    onSwipeRefresh: () -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String) -> Unit,
-    onFollowClicked: () -> Unit,
-    onUnfollowClicked: () -> Unit,
+    onFollowToggle: (User) -> Unit,
     onMessageClicked: () -> Unit,
     onWebsiteClick: (String) -> Unit,
-    onBackPressed: () -> Unit,
-    onCopyUrl: () -> Unit,
     onGiftClick: () -> Unit,
 ) {
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = false),
-        onRefresh = onSwipeRefresh,
-    ) {
-        Scaffold(
-            topBar = { Toolbar(uiState.user, onBackPressed = onBackPressed, onCopyUrl) }
-        ) {
-            val posts = uiState.postFlow.collectAsLazyPagingItems()
-            val pagerState = rememberPagerState()
-            val tabs = listOf(
-                Icons.Outlined.ViewList,
-                Icons.Default.GridView,
-                Icons.Outlined.Celebration
-            )
+    val posts = uiState.postFlow.collectAsLazyPagingItems()
+    val pagerState = rememberPagerState()
+    val tabs = listOf(
+        Icons.Outlined.ViewList,
+        Icons.Default.GridView,
+        Icons.Outlined.Celebration
+    )
 
-            LazyColumn {
-                item {
-                    Column(
-                        modifier = Modifier.padding(15.dp)
-                    ) {
-                        ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
-                        ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
-                        Spacer(Modifier.height(8.dp))
-                        HeaderButtons(
-                            uiState,
-                            onFollowClicked = onFollowClicked,
-                            onUnfollowClicked = onUnfollowClicked,
-                            onMessageClicked = onMessageClicked,
-                            onGiftClick = onGiftClick,
-                        )
-                    }
-                }
-                stickyHeader {
-                    val scope = rememberCoroutineScope()
-                    androidx.compose.material.TabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
-                                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-                            )
-                        },
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.onBackground,
-                    ) {
-                        tabs.forEachIndexed { index, icon ->
-                            androidx.compose.material.Tab(
-                                icon = { Icon(icon, contentDescription = null) },
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    scope.launch {
-                                        pagerState.animateScrollToPage(index)
-                                    }
-                                },
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    HorizontalPager(
-                        count = tabs.size,
-                        state = pagerState,
-                    ) { page ->
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                        ) {
-                            when (page) {
-                                0 -> posts.itemSnapshotList.forEach { postFeed ->
-                                    if (postFeed != null)
-                                        Post(
-                                            postFeed,
-                                            onPostClicked,
-                                            onPostLike = onPostLike,
-                                        )
-                                }
-                                1 -> FunctionalityNotAvailablePanel()
-                                2 -> FunctionalityNotAvailablePanel()
+    LazyColumn {
+        item {
+            Column(
+                modifier = Modifier.padding(15.dp)
+            ) {
+                ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
+                ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
+                Spacer(Modifier.height(8.dp))
+                val isFollowed = uiState.user.isFollowed
+                HeaderButtons(
+                    isFollowed = isFollowed,
+                    onFollowToggle = { onFollowToggle(uiState.user)},
+                    onMessageClicked = onMessageClicked,
+                    onGiftClick = onGiftClick,
+                )
+            }
+        }
+        stickyHeader {
+            val scope = rememberCoroutineScope()
+            androidx.compose.material.TabRow(
+                selectedTabIndex = pagerState.currentPage,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                    )
+                },
+                backgroundColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground,
+            ) {
+                tabs.forEachIndexed { index, icon ->
+                    androidx.compose.material.Tab(
+                        icon = { Icon(icon, contentDescription = null) },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(index)
                             }
+                        },
+                    )
+                }
+            }
+        }
+
+        item {
+            HorizontalPager(
+                count = tabs.size,
+                state = pagerState,
+            ) { page ->
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    when (page) {
+                        0 -> posts.itemSnapshotList.forEach { postFeed ->
+                            if (postFeed != null)
+                                Post(
+                                    postFeed,
+                                    onPostClicked,
+                                    onPostLike = onPostLike,
+                                )
                         }
+                        1 -> FunctionalityNotAvailablePanel()
+                        2 -> FunctionalityNotAvailablePanel()
                     }
                 }
             }
@@ -134,7 +119,8 @@ fun OtherProfileScreen(
 
 @Composable
 fun Toolbar(
-    otherUser: User,
+    username: String,
+    verified: Boolean,
     onBackPressed: () -> Unit,
     onCopyUrl: () -> Unit,
 ) {
@@ -142,8 +128,8 @@ fun Toolbar(
     SmallTopAppBar(
         title = {
             Username(
-                username = otherUser.username,
-                verified = otherUser.verified,
+                username = username,
+                verified = verified,
                 textStyle = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontFamily = Roboto
@@ -223,24 +209,23 @@ fun MoreDialog(
 
 @Composable
 fun HeaderButtons(
-    uiState: OtherProfileUiState.HasUser,
-    onFollowClicked: () -> Unit,
-    onUnfollowClicked: () -> Unit,
+    isFollowed: Boolean,
+    onFollowToggle: () -> Unit,
     onMessageClicked: () -> Unit,
     onGiftClick: () -> Unit,
 ) {
     Row {
-        if (uiState.user.isFollowed)
+        if (isFollowed)
             OutlinedButton(
                 modifier = Modifier.weight(1f),
-                onClick = onUnfollowClicked,
+                onClick = onFollowToggle,
             ) {
                 Text(text = "Following")
             }
         else
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = onFollowClicked
+                onClick = onFollowToggle,
             ) {
                 Text("Follow")
             }

@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.profile
+package com.salazar.cheers.ui.main.otherprofile
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -8,21 +8,21 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 /**
  * Stateful composable that displays the Navigation route for the Profile stats screen.
  *
- * @param profileStatsViewModel ViewModel that handles the business logic of this screen
+ * @param otherProfileStatsViewModel ViewModel that handles the business logic of this screen
  */
 @Composable
-fun ProfileStatsRoute(
-    profileStatsViewModel: ProfileStatsViewModel,
+fun OtherProfileStatsRoute(
+    otherProfileStatsViewModel: OtherProfileStatsViewModel,
     navActions: CheersNavigationActions,
     username: String,
     verified: Boolean,
 ) {
-    val uiState by profileStatsViewModel.uiState.collectAsState()
-    ProfileStatsScreen(
+    val uiState by otherProfileStatsViewModel.uiState.collectAsState()
+    OtherProfileStatsScreen(
         uiState = uiState,
         username = username,
         verified = verified,
-        onFollowToggle = profileStatsViewModel::toggleFollow,
+        onFollowToggle = otherProfileStatsViewModel::toggleFollow,
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         onBackPressed = navActions.navigateBack,
     )

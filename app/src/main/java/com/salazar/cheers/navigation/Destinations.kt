@@ -24,6 +24,7 @@ object MainDestinations {
     const val PROFILE_ROUTE = "profile"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
+    const val OTHER_PROFILE_STATS_ROUTE = "otherProfileStats"
     const val POST_COMMENTS = "comments"
     const val CAMERA_ROUTE = "camera"
     const val OTHER_PROFILE_ROUTE = "otherProfile"
@@ -321,6 +322,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
     ) -> Unit = { channelId ->
 //        val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
         navController.navigate("${MainDestinations.CHAT_ROUTE}/$channelId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToOtherProfileStats: (statName: String, username: String) -> Unit = { s, username ->
+        navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/$username") {
             launchSingleTop = true
             restoreState = true
         }

@@ -167,11 +167,11 @@ object FirestoreChat {
 
             val chatChannels = ArrayList<ChatChannelResponse>()
 
-            for (dc in snapshot.documentChanges) {
+            for (dc in snapshot.documents) {
                 val behavior = DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
-                val recentMessageTime: Date = dc.document.getDate("recentMessageTime", behavior)!!
+                val recentMessageTime: Date = dc.getDate("recentMessageTime", behavior)!!
                 chatChannels.add(
-                    dc.document.toObject(ChatChannelResponse::class.java)
+                    dc.toObject(ChatChannelResponse::class.java)!!
                         .copy(recentMessageTime = recentMessageTime)
                 )
             }
@@ -227,14 +227,30 @@ object FirestoreChat {
 
     fun seenLastMessage(
         channelId: String,
-        messageId: String
+        recentMessage: TextMessage,
     ) {
         val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
 
-        chatChannelsCollectionRef.document(channelId)
+        if (recentMessage.seenBy.contains(currentUserId))
+            return
+
+        val seenBy = (recentMessage.seenBy + currentUserId).toSet().toList()
+
+        val channelRef = chatChannelsCollectionRef.document(channelId)
+        val messageRef = chatChannelsCollectionRef
+            .document(channelId)
             .collection("messages")
-            .document(messageId)
-            .update("seenBy", FieldValue.arrayUnion(currentUserId))
+            .document(recentMessage.id)
+
+        firestoreInstance.runBatch { batch ->
+            // Update the message seenBy
+            batch.update(messageRef, "seenBy", seenBy)
+
+            // Update the channel last message
+            batch.update(channelRef, "recentMessage", recentMessage.copy(seenBy = seenBy))
+        }.addOnFailureListener {
+            Log.e("FIRESTORE", it.toString())
+        }
     }
 
     fun sendMessageTo(

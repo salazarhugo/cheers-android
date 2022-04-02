@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -64,7 +65,9 @@ private data class ProfileStatsViewModelState @OptIn(ExperimentalPagerApi::class
 }
 
 @HiltViewModel
-class ProfileStatsViewModel @Inject constructor() : ViewModel() {
+class ProfileStatsViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
 
     private val viewModelState =
         MutableStateFlow(ProfileStatsViewModelState(isLoading = true))
@@ -98,10 +101,6 @@ class ProfileStatsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun toggle() {
-        viewModelState.update { it.copy(isFollowers = !it.isFollowers) }
-    }
-
     private fun refreshFollowing() {
         viewModelState.update { it.copy(isLoading = true) }
 
@@ -119,9 +118,9 @@ class ProfileStatsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun unfollow(userId: String) {
+    fun toggleFollow(user: User) {
         viewModelScope.launch {
-            Neo4jUtil.unfollowUser(userId)
+            userRepository.toggleFollow(user = user)
         }
     }
 }

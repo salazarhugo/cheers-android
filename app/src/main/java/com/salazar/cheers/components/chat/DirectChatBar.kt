@@ -60,18 +60,23 @@ fun DirectChatBar(
                 )
                 Spacer(Modifier.width(8.dp))
                 Column {
-                    // Name
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    // Username
-                    Username(
-                        username = username,
-                        verified = verified,
-                        textStyle = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    if (name.isNotBlank())
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    else
+                        Username(
+                            username = username,
+                            verified = verified,
+                        )
+                    if (name.isNotBlank())
+                        Username(
+                            username = username,
+                            verified = verified,
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                 }
             }
         },

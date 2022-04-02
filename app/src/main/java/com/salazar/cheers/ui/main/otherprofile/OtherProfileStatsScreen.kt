@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.profile
+package com.salazar.cheers.ui.main.otherprofile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,14 +18,10 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,8 +47,8 @@ import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileStatsScreen(
-    uiState: ProfileStatsUiState,
+fun OtherProfileStatsScreen(
+    uiState: OtherProfileStatsUiState,
     username: String,
     verified: Boolean,
     onBackPressed: () -> Unit,
@@ -76,11 +72,11 @@ fun ProfileStatsScreen(
 
 @Composable
 fun Tabs(
-    uiState: ProfileStatsUiState,
+    uiState: OtherProfileStatsUiState,
     onUserClicked: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
-    val pages = if (uiState is ProfileStatsUiState.HasFollowers)
+    val pages = if (uiState is OtherProfileStatsUiState.HasFollowers)
         listOf("${uiState.followers.size} followers", "${uiState.following.size} following")
     else
         listOf("Followers", "Following")
@@ -129,11 +125,11 @@ fun Tabs(
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
                 0 -> {
-                    if (uiState is ProfileStatsUiState.HasFollowers)
+                    if (uiState is OtherProfileStatsUiState.HasFollowers)
                         Followers(followers = uiState.followers, onUserClicked)
                 }
                 1 -> {
-                    if (uiState is ProfileStatsUiState.HasFollowers)
+                    if (uiState is OtherProfileStatsUiState.HasFollowers)
                         Following(following = uiState.following, onUserClicked, onFollowToggle)
                 }
             }
@@ -205,12 +201,6 @@ fun FollowerCard(
                 )
             }
         }
-        OutlinedButton(
-            shape = RoundedCornerShape(8.dp),
-            onClick = { /* TODO */ }
-        ) {
-            Text("Remove")
-        }
     }
 }
 
@@ -225,7 +215,7 @@ fun FollowingCard(
             .fillMaxWidth()
             .clickable { onUserClicked(user.username) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
-    verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -257,9 +247,13 @@ fun FollowingCard(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+            var isFollowed by remember { mutableStateOf(user.isFollowed)}
             FollowButton(
-                isFollowing = true,
-                onClick = { onFollowToggle(user) }
+                isFollowing = isFollowed,
+                onClick = {
+                    onFollowToggle(user)
+                    isFollowed = !isFollowed
+                }
             )
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(Icons.Default.MoreVert, null)
@@ -346,4 +340,3 @@ fun Toolbar(
         )
     }
 }
-

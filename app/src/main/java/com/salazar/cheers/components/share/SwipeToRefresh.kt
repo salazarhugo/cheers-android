@@ -21,6 +21,7 @@ import com.salazar.cheers.components.CircularProgressIndicatorM3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Composable
@@ -68,7 +69,7 @@ fun SwipeToRefresh(
         RefreshSection(state)
         Box(
             Modifier
-                .offset(y = state.indicatorOffset.roundToInt().dp)
+                .offset(y = min(state.indicatorOffset.roundToInt(), 100).dp)
                 .fillMaxSize()
         ) {
             content()

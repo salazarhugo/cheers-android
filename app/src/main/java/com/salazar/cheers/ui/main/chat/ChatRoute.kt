@@ -3,8 +3,10 @@ package com.salazar.cheers.ui.main.chat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -30,7 +32,13 @@ fun ChatRoute(
     when (uiState) {
         is ChatUiState.HasChannel -> {
             val ui = (uiState as ChatUiState.HasChannel)
-            val otherUser = if (ui.channel.members.isNotEmpty()) ui.channel.members[0] else User()
+            val otherUser =
+                ui.channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid!! }
+                    ?: User()
+
+            LaunchedEffect(Unit) {
+                chatViewModel.seenLastMessage()
+            }
 
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,
@@ -46,6 +54,7 @@ fun ChatRoute(
                 verified = otherUser.verified,
                 name = otherUser.fullName,
                 profilePicturePath = otherUser.profilePictureUrl,
+                onAuthorClick = { navActions.navigateToOtherProfile(it) },
             )
         }
         is ChatUiState.NoChannel -> {

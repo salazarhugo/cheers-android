@@ -91,9 +91,9 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
-    fun onFollowClick(username: String) {
+    fun onFollowToggle(user: User) {
         viewModelScope.launch {
-            userRepository.followUser(username = username)
+            userRepository.toggleFollow(user = user)
         }
     }
 }

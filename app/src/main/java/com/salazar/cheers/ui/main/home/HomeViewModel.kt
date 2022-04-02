@@ -133,12 +133,6 @@ class HomeViewModel @Inject constructor(
         refreshStoryFlow()
         refreshSuggestions()
 
-        // Observe for like changes in the repo layer
-        viewModelScope.launch {
-            repository.observeLikes().collect { likes ->
-                viewModelState.update { it.copy(likes = likes) }
-            }
-        }
         viewModelScope.launch {
             viewModelState.update {
                 it.copy(user = userRepository.getCurrentUser())
@@ -214,12 +208,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun unfollowUser(username: String) {
-        viewModelScope.launch {
-            Neo4jUtil.unfollowUser(username = username)
-        }
-    }
-
     fun deletePost(postId: String) {
         viewModelScope.launch {
             repository.postDao.deleteWithId(postId)
@@ -228,12 +216,6 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }
-        }
-    }
-
-    fun deleteErrorMessage() {
-        viewModelState.update {
-            it.copy(errorMessages = emptyList())
         }
     }
 

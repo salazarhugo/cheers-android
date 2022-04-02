@@ -1,8 +1,11 @@
 package com.salazar.cheers.backend
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.salazar.cheers.backend.Neo4jUtil.sendFollowNotification
+import com.salazar.cheers.backend.Neo4jUtil.sendLikeNotification
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.entities.StoryResponse
 import com.salazar.cheers.data.entities.UserStats
@@ -193,7 +196,7 @@ class Neo4jService {
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
                             "OPTIONAL MATCH (p)-[:WITH]->(w:User) \n" +
                             "WITH p, author, count(DISTINCT authorPosts) as postCount, exists((u)-[:LIKED]->(p)) as liked, count(DISTINCT authorFollowing) as following,\n" +
-                            "count(DISTINCT authorFollowers) as followers, count(DISTINCT r) as likes, collect(DISTINCT properties(w)) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed\n" +
+                            "count(DISTINCT authorFollowers) as followers, count(DISTINCT r) as likes, collect(DISTINCT properties(w {.*, isFollowed: exists((u)-[:FOLLOWS]-(w) )})) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed\n" +
                             "RETURN p {.*, likes: likes, liked: liked}," +
                             "       author {.*, postCount: postCount, isFollowed: isFollowed, following: following, followers: followers}, " +
                             "       tags\n" +
@@ -224,6 +227,7 @@ class Neo4jService {
                 }
                 return@withContext Result.Success(posts.toList())
             } catch (e: Exception) {
+                Log.e("Neo4j", e.message.toString())
                 return@withContext Result.Error(e)
             }
         }
@@ -245,8 +249,8 @@ class Neo4jService {
                             "OPTIONAL MATCH (suggestion)-[posts:POSTED]->(:Post)\n" +
                             "OPTIONAL MATCH (suggestion)-[following:FOLLOWS]->(:User)\n" +
                             "OPTIONAL MATCH (:User)-[followers:FOLLOWS]->(suggestion)\n" +
-                            "WITH suggestion, count(DISTINCT posts) as posts, count(DISTINCT followers) as followers, count(DISTINCT following) as following\n" +
-                            "RETURN suggestion {.*,  postCount: posts, followers: followers, following: following, isFollowed: false }",
+                            "WITH suggestion, count(DISTINCT posts) as posts, count(DISTINCT followers) as followers, count(DISTINCT following) as following, exists((u)-[:FOLLOWS]->(suggestion)) as isFollowed\n" +
+                            "RETURN suggestion {.*,  postCount: posts, followers: followers, following: following, isFollowed: isFollowed }",
                     params
                 )
 
@@ -362,8 +366,33 @@ class Neo4jService {
                 "MATCH (p:Post), (u:User) WHERE p.id = \$postId AND u.id = \$userId MERGE (u)-[:LIKED]->(p)",
                 params = params
             )
-//            sendLikeNotification(postId = postId)
+            sendLikeNotification(postId = postId)
         }
+    }
+
+    suspend fun unfollowUser(username: String) = withContext(Dispatchers.IO) {
+        val params: MutableMap<String, Any> = mutableMapOf()
+        params["userId"] = FirebaseAuth.getInstance().uid!!
+        params["username"] = username
+
+        write(
+            "MATCH (u:User)-[r:FOLLOWS]->(u2:User)" +
+                    " WHERE u.id = \$userId AND u2.username = \$username" +
+                    " DELETE r", params
+        )
+    }
+
+    suspend fun followUser(username: String) = withContext(Dispatchers.IO) {
+        val params: MutableMap<String, Any> = mutableMapOf()
+        params["userId"] = FirebaseAuth.getInstance().uid!!
+        params["username"] = username
+
+        write(
+            "MATCH (u:User), (u2:User)" +
+                    " WHERE u.id = \$userId AND u2.username = \$username" +
+                    " MERGE (u)-[:FOLLOWS]->(u2)", params
+        )
+        sendFollowNotification(username = username)
     }
 
 

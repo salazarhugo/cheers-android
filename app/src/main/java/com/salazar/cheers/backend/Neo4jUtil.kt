@@ -43,30 +43,6 @@ object Neo4jUtil {
         return map
     }
 
-    fun unfollowUser(username: String) {
-        val params: MutableMap<String, Any> = mutableMapOf()
-        params["userId"] = FirebaseAuth.getInstance().uid!!
-        params["username"] = username
-
-        write(
-            "MATCH (u:User)-[r:FOLLOWS]->(u2:User)" +
-                    " WHERE u.id = \$userId AND u2.username = \$username" +
-                    " DELETE r", params
-        )
-    }
-
-    fun followUser(username: String) {
-        val params: MutableMap<String, Any> = mutableMapOf()
-        params["userId"] = FirebaseAuth.getInstance().uid!!
-        params["username"] = username
-
-        write(
-            "MATCH (u:User), (u2:User)" +
-                    " WHERE u.id = \$userId AND u2.username = \$username" +
-                    " MERGE (u)-[:FOLLOWS]->(u2)", params
-        )
-    }
-
     suspend fun blockUser(otherUserId: String) = withContext(Dispatchers.IO) {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = FirebaseAuth.getInstance().uid!!
@@ -165,8 +141,21 @@ object Neo4jUtil {
         sendPostNotification(finalPost.id)
     }
 
-    private fun sendLikeNotification(postId: String): Task<String> {
+    fun sendFollowNotification(username: String): Task<String> {
+        val data = hashMapOf(
+            "username" to username,
+        )
 
+        return FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("followNotification")
+            .call(data)
+            .continueWith { task ->
+                val result = task.result?.data as String
+                result
+            }
+    }
+
+    fun sendLikeNotification(postId: String): Task<String> {
         // Create the arguments to the callable function.
         val data = hashMapOf(
             "postId" to postId,
@@ -293,35 +282,29 @@ object Neo4jUtil {
         return withContext(Dispatchers.IO) {
             try {
                 val params: MutableMap<String, Any> = mutableMapOf()
+                params["userId"] = FirebaseAuth.getInstance().currentUser?.uid!!
+                params["userIdOrUsername"] = username ?: FirebaseAuth.getInstance().currentUser?.uid!!
 
-                if (username != null)
-                    params["username"] = username
-                else
-                    params["userId"] = FirebaseAuth.getInstance().uid!!
-
-                val records = if (username != null)
-                    query(
-                        "MATCH (u:User)-[:FOLLOWS]->(u2:User) WHERE u.username = \$username RETURN properties(u2)",
-                        params
-                    )
-                else
-                    query(
-                        "MATCH (u:User)-[:FOLLOWS]->(u2:User) WHERE u.id = \$userId RETURN properties(u2)",
-                        params
-                    )
+                val records = query(
+                    "MATCH (u:User)-[:FOLLOWS]->(f:User)\n" +
+                            "MATCH (me:User {id: \$userId})\n" +
+                            "WHERE u.username = \$userIdOrUsername OR u.id = \$userIdOrUsername\n" +
+                            "WITH f, exists((me)-[:FOLLOWS]->(f)) as isFollowed\n" +
+                            "RETURN f { .*, isFollowed: isFollowed }",
+                    params
+                )
 
                 val following = mutableListOf<User>()
 
                 records.forEach { record ->
-                    Log.d("HAHA", record.values().size.toString())
-                    val gson = Gson()
                     val user =
-                        gson.fromJson(record.values()[0].toString(), User::class.java)
+                        Gson().fromJson(record.values()[0].toString(), User::class.java)
                     following.add(user)
                 }
 
                 return@withContext Result.Success(following.toList())
             } catch (e: Exception) {
+                Log.e("Neo4j", e.toString())
                 return@withContext Result.Error(e)
             }
         }
@@ -360,6 +343,7 @@ object Neo4jUtil {
 
                 return@withContext Result.Success(followers.toList())
             } catch (e: Exception) {
+                Log.e("Neo4j", e.toString())
                 return@withContext Result.Error(e)
             }
         }

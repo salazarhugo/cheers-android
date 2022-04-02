@@ -29,6 +29,7 @@ import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
 import com.salazar.cheers.ui.main.comment.CommentsViewModel
 import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.event.detail.EventDetailViewModel
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsViewModel
 import com.salazar.cheers.ui.sheets.SendGiftViewModel
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         fun postDetailViewModelFactory(): PostDetailViewModel.PostDetailViewModelFactory
         fun eventDetailViewModelFactory(): EventDetailViewModel.EventDetailViewModelFactory
         fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
+        fun otherProfileStatsViewModelFactory(): OtherProfileStatsViewModel.OtherProfileStatsViewModelFactory
         fun drinkingStatsViewModelFactory(): DrinkingStatsViewModel.DrinkingStatsViewModelFactory
         fun chatViewModelFactory(): ChatViewModel.ChatViewModelFactory
         fun chatsSheetViewModelFactory(): ChatsSheetViewModel.ChatsSheetViewModelFactory

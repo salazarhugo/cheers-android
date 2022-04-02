@@ -26,13 +26,11 @@ sealed interface OtherProfileUiState {
 
     val isLoading: Boolean
     val errorMessages: List<String>
-    val isFollowing: Boolean
     val shortLink: String?
 
     data class NoUser(
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
-        override val isFollowing: Boolean,
         override val shortLink: String?,
     ) : OtherProfileUiState
 
@@ -41,7 +39,6 @@ sealed interface OtherProfileUiState {
         val user: User,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
-        override val isFollowing: Boolean,
         override val shortLink: String?,
     ) : OtherProfileUiState
 }
@@ -61,14 +58,12 @@ private data class OtherProfileViewModelState(
                 postFlow = postFlow,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
-                isFollowing = isFollowing,
                 shortLink = shortLink,
             )
         } else {
             OtherProfileUiState.NoUser(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
-                isFollowing = isFollowing,
                 shortLink = shortLink,
             )
         }
@@ -101,9 +96,13 @@ class OtherProfileViewModel @AssistedInject constructor(
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
 
-    private fun toggleIsFollowed() {
-        val isFollowed = viewModelState.value.user?.isFollowed ?: return
-        updateIsFollowed(isFollowed = !isFollowed)
+    fun toggleFollow(user: User) {
+        viewModelScope.launch {
+            userRepository.toggleFollow(user = user)
+            viewModelState.update {
+                it.copy(user = user.copy(isFollowed = !user.isFollowed))
+            }
+        }
     }
 
     fun toggleLike(post: Post) {
@@ -112,34 +111,16 @@ class OtherProfileViewModel @AssistedInject constructor(
         }
     }
 
-    fun followUser() {
-        viewModelScope.launch {
-            userRepository.followUser(username = username)
-        }
-        toggleIsFollowed()
-    }
-
-    fun unfollowUser() {
-        viewModelScope.launch {
-            userRepository.unfollowUser(username = username)
-        }
-        toggleIsFollowed()
-    }
-
     fun updateShortLink(shortLink: String) {
         viewModelState.update {
             it.copy(shortLink = shortLink)
         }
     }
 
-    private fun updateIsFollowed(isFollowed: Boolean) {
-        viewModelState.update {
-            it.copy(user = it.user?.copy(isFollowed = isFollowed))
-        }
-    }
-
     private fun getUser(username: String) {
-        viewModelState.update { it.copy(isLoading = true) }
+        viewModelState.update {
+            it.copy(isLoading = true)
+        }
 
         viewModelScope.launch {
             val user = userRepository.getUser(userIdOrUsername = username)

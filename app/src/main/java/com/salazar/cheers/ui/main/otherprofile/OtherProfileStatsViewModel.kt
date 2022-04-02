@@ -1,19 +1,25 @@
 package com.salazar.cheers.ui.main.otherprofile
 
+import android.app.Activity
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.accompanist.pager.ExperimentalPagerApi
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-sealed interface FollowersFollowingUiState {
+sealed interface OtherProfileStatsUiState {
 
     val isLoading: Boolean
     val isFollowers: Boolean
@@ -25,7 +31,7 @@ sealed interface FollowersFollowingUiState {
         override val isFollowers: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String
-    ) : FollowersFollowingUiState
+    ) : OtherProfileStatsUiState
 
     data class HasFollowers(
         val followers: List<User>,
@@ -34,10 +40,10 @@ sealed interface FollowersFollowingUiState {
         override val isFollowers: Boolean,
         override val errorMessages: List<String>,
         override val searchInput: String
-    ) : FollowersFollowingUiState
+    ) : OtherProfileStatsUiState
 }
 
-private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi::class) constructor(
+private data class OtherProfileStatsViewModelState constructor(
     val followers: List<User>? = null,
     val following: List<User>? = null,
     val isLoading: Boolean = false,
@@ -45,9 +51,9 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 ) {
-    fun toUiState(): FollowersFollowingUiState =
+    fun toUiState(): OtherProfileStatsUiState =
         if (followers != null && following != null) {
-            FollowersFollowingUiState.HasFollowers(
+            OtherProfileStatsUiState.HasFollowers(
                 followers = followers,
                 following = following,
                 isLoading = isLoading,
@@ -56,7 +62,7 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
                 searchInput = searchInput
             )
         } else {
-            FollowersFollowingUiState.NoUsers(
+            OtherProfileStatsUiState.NoUsers(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 isFollowers = isFollowers,
@@ -65,12 +71,13 @@ private data class FollowersFollowingViewModelState @OptIn(ExperimentalPagerApi:
         }
 }
 
-class OtherFollowersFollowingViewModel @AssistedInject constructor(
-    @Assisted private val username: String
+class OtherProfileStatsViewModel @AssistedInject constructor(
+    @Assisted private val username: String,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val viewModelState =
-        MutableStateFlow(FollowersFollowingViewModelState(isLoading = true))
+        MutableStateFlow(OtherProfileStatsViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -101,8 +108,10 @@ class OtherFollowersFollowingViewModel @AssistedInject constructor(
         }
     }
 
-    fun toggle() {
-        viewModelState.update { it.copy(isFollowers = !it.isFollowers) }
+    fun toggleFollow(user: User) {
+        viewModelScope.launch {
+            userRepository.toggleFollow(user = user)
+        }
     }
 
     private fun refreshFollowing() {
@@ -122,20 +131,14 @@ class OtherFollowersFollowingViewModel @AssistedInject constructor(
         }
     }
 
-    fun unfollow(userId: String) {
-        viewModelScope.launch {
-            Neo4jUtil.unfollowUser(userId)
-        }
-    }
-
     @AssistedFactory
-    interface OtherFollowersFollowingViewModelFactory {
-        fun create(username: String): OtherFollowersFollowingViewModel
+    interface OtherProfileStatsViewModelFactory {
+        fun create(username: String): OtherProfileStatsViewModel
     }
 
     companion object {
         fun provideFactory(
-            assistedFactory: OtherFollowersFollowingViewModelFactory,
+            assistedFactory: OtherProfileStatsViewModelFactory,
             username: String
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -144,4 +147,19 @@ class OtherFollowersFollowingViewModel @AssistedInject constructor(
             }
         }
     }
+}
+
+@Composable
+fun otherProfileStatsViewModel(username: String): OtherProfileStatsViewModel {
+    val factory = EntryPointAccessors.fromActivity(
+        LocalContext.current as Activity,
+        MainActivity.ViewModelFactoryProvider::class.java
+    ).otherProfileStatsViewModelFactory()
+
+    return viewModel(
+        factory = OtherProfileStatsViewModel.provideFactory(
+            factory,
+            username = username
+        )
+    )
 }

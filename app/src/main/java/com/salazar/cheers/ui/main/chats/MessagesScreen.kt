@@ -17,7 +17,8 @@ import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +55,7 @@ fun MessagesScreen(
     onNewMessageClicked: () -> Unit,
     onChannelClicked: (channelId: String) -> Unit,
     onLongPress: (String, String) -> Unit,
-    onFollowClick: (String) -> Unit,
+    onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
     onSwipeRefresh: () -> Unit,
@@ -80,7 +81,7 @@ fun MessagesScreen(
                     uiState = uiState,
                     onChannelClicked = onChannelClicked,
                     onLongPress = onLongPress,
-                    onFollowClick = onFollowClick,
+                    onFollowToggle = onFollowToggle,
                     onUserClick = onUserClick,
                 )
             }
@@ -93,7 +94,7 @@ fun Tabs(
     uiState: MessagesUiState,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String, String) -> Unit,
-    onFollowClick: (String) -> Unit,
+    onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     val tabs = listOf("Direct", "Groups")
@@ -146,7 +147,7 @@ fun Tabs(
                             onChannelClicked = onChannelClicked,
                             onLongPress = onLongPress,
                             suggestions = suggestions,
-                            onFollowClick = onFollowClick,
+                            onFollowToggle = onFollowToggle,
                             onUserClick = onUserClick,
                         )
                 }
@@ -160,7 +161,7 @@ fun Tabs(
 //                            onChannelClicked = onChannelClicked,
 //                            onLongPress = onLongPress,
 //                            suggestions = suggestions,
-//                            onFollowClick = onFollowClick,
+//                            onFollowToggle = onFollowToggle,
 //                        )
                 }
             }
@@ -174,7 +175,7 @@ fun ConversationList(
     suggestions: List<User>?,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String, String) -> Unit,
-    onFollowClick: (String) -> Unit,
+    onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     if (channels.isEmpty())
@@ -200,7 +201,7 @@ fun ConversationList(
                 UserItem(
                     user = user,
                     onUserClick = onUserClick,
-                    onFollowClick = onFollowClick,
+                    onFollowToggle = onFollowToggle,
                 )
             }
     }
@@ -211,7 +212,7 @@ fun UserItem(
     user: User,
     isAuthor: Boolean = false,
     onUserClick: (String) -> Unit,
-    onFollowClick: (String) -> Unit,
+    onFollowToggle: (User) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -243,11 +244,7 @@ fun UserItem(
                     .size(16.dp),
                 contentDescription = null,
             )
-        var isFollowed by remember { mutableStateOf(false) }
-        FollowButton(isFollowing = isFollowed, onClick = {
-            onFollowClick(user.username)
-            isFollowed = !isFollowed
-        })
+        FollowButton(isFollowing = user.isFollowed, onClick = { onFollowToggle(user) })
     }
 }
 
@@ -322,10 +319,10 @@ fun DirectConversation(
                 else "New chat"
 
                 val subtitle = buildAnnotatedString {
-                    if (channel.recentMessage != null) {
-                        append(channel.recentMessage.text)
-                        append("  •  ")
-                    }
+//                    if (channel.recentMessage != null) {
+//                        append(channel.recentMessage.text)
+//                        append("  •  ")
+//                    }
                     append(lastMessageStatus)
                     append("  •  ")
                     append(

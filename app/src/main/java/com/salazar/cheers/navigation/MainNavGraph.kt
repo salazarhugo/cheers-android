@@ -47,6 +47,8 @@ import com.salazar.cheers.ui.main.map.MapViewModel
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.nfc.NfcViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
+import com.salazar.cheers.ui.main.otherprofile.otherProfileStatsViewModel
 import com.salazar.cheers.ui.main.otherprofile.otherProfileViewModel
 import com.salazar.cheers.ui.main.profile.*
 import com.salazar.cheers.ui.main.search.SearchRoute
@@ -300,6 +302,7 @@ fun NavGraphBuilder.mainNavGraph(
             OtherProfileRoute(
                 otherProfileViewModel = otherProfileViewModel,
                 navActions = navActions,
+                username = username,
             )
         }
 
@@ -324,6 +327,22 @@ fun NavGraphBuilder.mainNavGraph(
             PostDetailRoute(
                 postDetailViewModel = postDetailViewModel,
                 navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}",
+        ) {
+
+            val username = it.arguments?.getString("username")!!
+
+            val otherProfileStatsViewModel = otherProfileStatsViewModel(username = username)
+
+            OtherProfileStatsRoute(
+                otherProfileStatsViewModel = otherProfileStatsViewModel,
+                navActions = navActions,
+                username = user.username,
+                verified = user.verified,
             )
         }
 

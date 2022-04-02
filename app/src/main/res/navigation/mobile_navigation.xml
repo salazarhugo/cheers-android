@@ -179,7 +179,7 @@
         android:label="MoreOtherProfileBottomSheet" />
     <fragment
         android:id="@+id/otherFollowersFollowing"
-        android:name="com.salazar.cheers.ui.main.otherprofile.OtherFollowersFollowing"
+        android:name="com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsScreen"
         android:label="OtherFollowersFollowing" >
         <argument
             android:name="username"

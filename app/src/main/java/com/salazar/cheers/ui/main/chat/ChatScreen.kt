@@ -1,7 +1,10 @@
 package com.salazar.cheers.ui.main.chat
 
 import OnMessageLongClickDialog
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.LocalWindowInsets
@@ -60,6 +65,7 @@ fun ChatScreen(
     onUnlike: (msgId: String) -> Unit,
     onTitleClick: (username: String) -> Unit,
     onCopyText: (String) -> Unit,
+    onAuthorClick: (String) -> Unit,
     onImageSelectorClick: () -> Unit,
     onPoBackStack: () -> Unit,
 ) {
@@ -78,9 +84,9 @@ fun ChatScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 Messages(
-                    uiState = uiState,
+                    members = uiState.channel.members.map { it.id },
                     messages = uiState.messages,
-                    navigateToProfile = {},
+                    navigateToProfile = onAuthorClick,
                     modifier = Modifier.weight(1f),
                     scrollState = scrollState,
                     onLongClickMessage = {
@@ -103,15 +109,15 @@ fun ChatScreen(
                 )
             }
 //            if (channel.type == ChatChannelType.DIRECT)
-                DirectChatBar(
-                    name = name,
-                    username = username,
-                    verified = verified,
-                    profilePictureUrl = profilePicturePath,
-                    onNavIconPressed = { onPoBackStack() },
-                    onTitleClick = onTitleClick,
-                    scrollBehavior = scrollBehavior,
-                )
+            DirectChatBar(
+                name = name,
+                username = username,
+                verified = verified,
+                profilePictureUrl = profilePicturePath,
+                onNavIconPressed = { onPoBackStack() },
+                onTitleClick = onTitleClick,
+                scrollBehavior = scrollBehavior,
+            )
 //            else if (channel.type == ChatChannelType.GROUP)
 //                GroupChatBar(
 //                    name = channel.name,
@@ -137,8 +143,8 @@ fun ChatScreen(
 
 @Composable
 fun Messages(
-    uiState: ChatUiState.HasChannel,
     messages: List<Message>,
+    members: List<String>,
     navigateToProfile: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
@@ -175,13 +181,13 @@ fun Messages(
 
                 item {
                     Message(
-                        uiState = uiState,
 //                        modifier = Modifier.animateItemPlacement(),
                         onAuthorClick = { name -> navigateToProfile(name) },
                         onLongClickMessage = onLongClickMessage,
                         onDoubleTapMessage = onDoubleTapMessage,
                         message = message,
                         isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                        seen = index == 0 && message.seenBy.containsAll(members),
                         isFirstMessageByAuthor = isFirstMessageByAuthor,
                         isLastMessageByAuthor = isLastMessageByAuthor,
                     )
@@ -217,12 +223,12 @@ fun Messages(
 
 @Composable
 fun Message(
-    uiState: ChatUiState.HasChannel,
     modifier: Modifier = Modifier,
     onAuthorClick: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
     isUserMe: Boolean,
+    seen: Boolean,
     message: Message,
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean
@@ -240,7 +246,7 @@ fun Message(
                     data = message.senderProfilePictureUrl,
                 ),
                 modifier = Modifier
-                    .clickable(onClick = { onAuthorClick(message.senderId) })
+                    .clickable(onClick = { onAuthorClick(message.senderUsername) })
                     .padding(horizontal = 16.dp)
                     .size(42.dp)
                     .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
@@ -254,9 +260,9 @@ fun Message(
             Spacer(modifier = Modifier.width(74.dp))
         }
         AuthorAndTextMessage(
-            uiState = uiState,
             msg = message,
             isUserMe = isUserMe,
+            seen = seen,
             isFirstMessageByAuthor = isFirstMessageByAuthor,
             isLastMessageByAuthor = isLastMessageByAuthor,
             authorClicked = onAuthorClick,
@@ -270,9 +276,9 @@ fun Message(
 
 @Composable
 fun AuthorAndTextMessage(
-    uiState: ChatUiState.HasChannel,
     msg: Message,
     isUserMe: Boolean,
+    seen: Boolean,
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean,
     authorClicked: (String) -> Unit,
@@ -281,14 +287,14 @@ fun AuthorAndTextMessage(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        if (isLastMessageByAuthor && !isUserMe && false) {
+        if (isLastMessageByAuthor && !isUserMe) {
             AuthorNameTimestamp(msg)
         }
         if (msg is TextMessage)
             ChatItemBubble(
-                uiState = uiState,
                 msg,
-                isUserMe,
+                isUserMe = isUserMe,
+                seen = seen,
                 authorClicked = authorClicked,
                 onLongClickMessage = onLongClickMessage,
                 onDoubleTapMessage = onDoubleTapMessage
@@ -392,12 +398,11 @@ fun ImageMessageBubble(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatItemBubble(
-    uiState: ChatUiState.HasChannel,
     message: Message,
     isUserMe: Boolean,
+    seen: Boolean,
     authorClicked: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
@@ -427,12 +432,12 @@ fun ChatItemBubble(
                 authorClicked = authorClicked
             )
         }
-
-//        if (isUserMe && message.id == uiState.channel.recentMessage.id &&
-//            uiState.channel.recentMessage.seenBy.containsAll(uiState.channel.members)
-//        ) {
-//            Text("Seen", color = MaterialTheme.colorScheme.onBackground)
-//        }
+        if (isUserMe && seen)
+            Text(
+                text = "\uD83D\uDC40",
+                textAlign = TextAlign.End,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
         if (message.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)) {
             AnimateHeart {
                 Surface(
@@ -484,28 +489,23 @@ fun ClickableMessage(
     val color = if (isUserMe) MaterialTheme.colorScheme.onPrimary else
         MaterialTheme.colorScheme.onSurfaceVariant
 
-    Text(
+    ClickableText(
         text = styledMessage,
         style = MaterialTheme.typography.bodyLarge.copy(color = color),
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+        onClick = {
+            styledMessage
+                .getStringAnnotations(start = it, end = it)
+                .firstOrNull()
+                ?.let { annotation ->
+                    when (annotation.tag) {
+                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
+                        else -> Unit
+                    }
+                }
+        }
     )
-//    ClickableText(
-//        text = styledMessage,
-//        style = MaterialTheme.typography.bodyLarge.copy(color = color),
-//        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-//        onClick = {
-//            styledMessage
-//                .getStringAnnotations(start = it, end = it)
-//                .firstOrNull()
-//                ?.let { annotation ->
-//                    when (annotation.tag) {
-//                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-//                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
-//                        else -> Unit
-//                    }
-//                }
-//        }
-//    )
 }
 
 private val JumpToBottomThreshold = 56.dp

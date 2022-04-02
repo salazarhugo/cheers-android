@@ -30,7 +30,7 @@ fun MessagesRoute(
         },
         onNewMessageClicked = {
         },
-        onFollowClick = messagesViewModel::onFollowClick,
+        onFollowToggle = messagesViewModel::onFollowToggle,
         onUserClick = { navActions.navigateToOtherProfile(it) },
     )
 }

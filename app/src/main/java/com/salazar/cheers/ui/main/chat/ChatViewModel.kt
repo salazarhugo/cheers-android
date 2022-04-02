@@ -90,7 +90,6 @@ class ChatViewModel @AssistedInject constructor(
         viewModelScope.launch {
             chatRepository.getMessages(channelId = channelId).collect { messages ->
                 viewModelState.update { it.copy(messages = messages, isLoading = false) }
-                seenLastMessage()
             }
         }
     }
@@ -112,17 +111,17 @@ class ChatViewModel @AssistedInject constructor(
         }
     }
 
-    private fun seenLastMessage() {
+    fun seenLastMessage() {
         val state = uiState.value
         if (state is ChatUiState.NoChannel) return
 
         val stateWithChannel = (state as ChatUiState.HasChannel)
         if (stateWithChannel.messages.isEmpty()) return
 
-        val lastMessageId = stateWithChannel.messages.last().id
+        val recentMessage = stateWithChannel.channel.recentMessage ?: return
 
         viewModelScope.launch {
-            FirestoreChat.seenLastMessage(channelId = channelId, messageId = lastMessageId)
+            FirestoreChat.seenLastMessage(channelId = channelId, recentMessage = recentMessage)
         }
     }
 

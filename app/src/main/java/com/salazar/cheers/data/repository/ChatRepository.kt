@@ -1,8 +1,6 @@
 package com.salazar.cheers.data.repository
 
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.db.ChatDao
-import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatChannelResponse
@@ -16,9 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class ChatRepository @Inject constructor(
     private val service: Neo4jService,
-    private val database: CheersDatabase,
     private val userDao: UserDao,
-    private val chatDao: ChatDao,
+    private val userRepository: UserRepository,
 ) {
 
     suspend fun getMessages(channelId: String): Flow<List<Message>> =
@@ -36,7 +33,7 @@ class ChatRepository @Inject constructor(
         return ChatChannel().copy(
             id = id,
             name = name,
-            members = userDao.getUsersWithListOfIds(ids = members),
+            members = userRepository.getUsersWithListOfIds(ids = members),
             otherUserId = "",
             createdAt = createdAt,
             createdBy = createdBy,
