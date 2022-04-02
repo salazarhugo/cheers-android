@@ -5,6 +5,8 @@ import android.widget.TextView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -592,11 +595,18 @@ fun PhotoCarousel(
     pagerState: PagerState,
     onPostClick: () -> Unit,
 ) {
-
     HorizontalPager(
         count = photos.size,
         state = pagerState,
     ) { page ->
+        var scale by remember { mutableStateOf(1f) }
+        var offset by remember { mutableStateOf(Offset.Zero) }
+
+        val state = rememberTransformableState { zoomChange, offsetChange, _ ->
+            scale *= zoomChange
+            offset += offsetChange
+        }
+
         PrettyImage(
             data = photos[page],
             contentDescription = "avatar",
@@ -607,6 +617,13 @@ fun PhotoCarousel(
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .fillMaxWidth()
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
+                .transformable(state = state)
                 .clickable { onPostClick() }
         )
     }

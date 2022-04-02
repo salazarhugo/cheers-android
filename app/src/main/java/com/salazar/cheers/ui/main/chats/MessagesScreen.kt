@@ -333,7 +333,14 @@ fun DirectConversation(
                 }
 
                 val fontWeight = if (seen) FontWeight.Normal else FontWeight.Bold
-                Text(text = title, style = Typography.bodyMedium, fontWeight = fontWeight)
+                if (title.isNotBlank())
+                    Text(
+                        text = title,
+                        style = Typography.bodyMedium,
+                        fontWeight = fontWeight,
+                    )
+                else
+                    Username(username = otherUser.username, verified = otherUser.verified)
                 Text(
                     text = subtitle,
                     style = Typography.bodySmall,
