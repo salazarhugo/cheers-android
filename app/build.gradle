@@ -15,8 +15,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 23
-        versionName "0.96"
+        versionCode 25
+        versionName "0.96.104"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

@@ -196,7 +196,7 @@ class Neo4jService {
                             "OPTIONAL MATCH (:User)-[r:LIKED]->(p) \n" +
                             "OPTIONAL MATCH (p)-[:WITH]->(w:User) \n" +
                             "WITH p, author, count(DISTINCT authorPosts) as postCount, exists((u)-[:LIKED]->(p)) as liked, count(DISTINCT authorFollowing) as following,\n" +
-                            "count(DISTINCT authorFollowers) as followers, count(DISTINCT r) as likes, collect(DISTINCT properties(w {.*, isFollowed: exists((u)-[:FOLLOWS]-(w) )})) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed\n" +
+                            "count(DISTINCT authorFollowers) as followers, count(DISTINCT r) as likes, collect(DISTINCT properties(w)) as tags, exists((u)-[:FOLLOWS]->(author)) as isFollowed\n" +
                             "RETURN p {.*, likes: likes, liked: liked}," +
                             "       author {.*, postCount: postCount, isFollowed: isFollowed, following: following, followers: followers}, " +
                             "       tags\n" +

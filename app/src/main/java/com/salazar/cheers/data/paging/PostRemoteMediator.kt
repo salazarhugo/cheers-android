@@ -56,7 +56,7 @@ class PostRemoteMediator(
                     database.withTransaction {
                         if (loadType == LoadType.REFRESH) {
                             remoteKeyDao.clear()
-                            postDao.clearAll()
+//                            postDao.clearAll()
                         }
 
                         val prevKey = if (page == initialPage) null else page - 1
