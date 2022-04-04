@@ -34,8 +34,6 @@ import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsViewModel
 import com.salazar.cheers.ui.sheets.SendGiftViewModel
 import com.stripe.android.PaymentConfiguration
-import com.stripe.android.paymentsheet.PaymentSheet
-import com.stripe.android.paymentsheet.PaymentSheetResult
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +59,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     }
 
     private val cheersViewModel: CheersViewModel by viewModels()
-    lateinit var paymentSheet: PaymentSheet
     private var mInterstitialAd: InterstitialAd? = null
 
     @Inject
@@ -73,7 +70,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
         setContent {
             CheersApp(
-                presentPaymentSheet = ::presentPaymentSheet,
                 showInterstitialAd = ::showInterstitialAd,
             )
         }
@@ -82,44 +78,11 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             this,
             "pk_live_51KWqPTAga4Q2CELO2K93NrScmrQOQf0Pbvn0XpDXSqW4gzgXFWpMx1lnSjTfR8251B3TI4zHmQ0MqFDCYdpKD2D200KhtML5F7"
         )
-        paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
 //
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
         initInterstitialAd()
-    }
-
-    private fun presentPaymentSheet(clientSecret: String) {
-        val googlePayConfiguration = PaymentSheet.GooglePayConfiguration(
-            environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
-            countryCode = "US",
-            currencyCode = "USD" // Required for Setup Intents, optional for Payment Intents
-        )
-        paymentSheet.presentWithPaymentIntent(
-            clientSecret,
-            PaymentSheet.Configuration(
-                merchantDisplayName = "Cheers",
-                allowsDelayedPaymentMethods = true,
-                googlePay = googlePayConfiguration
-            )
-        )
-    }
-
-    fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
-        when (paymentSheetResult) {
-            is PaymentSheetResult.Canceled -> {
-                print("Canceled")
-            }
-            is PaymentSheetResult.Failed -> {
-                print("Error: ${paymentSheetResult.error}")
-            }
-            is PaymentSheetResult.Completed -> {
-                // Display for example, an order confirmation screen
-                cheersViewModel.completed.value = true
-                print("Completed")
-            }
-        }
     }
 
     private fun userConsentPolicy() {

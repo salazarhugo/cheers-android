@@ -52,7 +52,7 @@ fun ChatRoute(
                 onCopyText = {},
                 username = otherUser.username,
                 verified = otherUser.verified,
-                name = otherUser.fullName,
+                name = otherUser.name,
                 profilePicturePath = otherUser.profilePictureUrl,
                 onAuthorClick = { navActions.navigateToOtherProfile(it) },
             )

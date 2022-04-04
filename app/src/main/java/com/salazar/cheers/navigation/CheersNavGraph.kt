@@ -32,7 +32,6 @@ import com.salazar.cheers.ui.theme.GreySheet
 fun CheersNavGraph(
     navController: NavHostController = rememberAnimatedNavController(),
     darkTheme: Boolean,
-    presentPaymentSheet: (String) -> Unit,
     showInterstitialAd: () -> Unit,
     user: User?
 ) {
@@ -113,14 +112,12 @@ fun CheersNavGraph(
             ) {
                 settingNavGraph(
                     navActions = navActions,
-                    presentPaymentSheet = presentPaymentSheet,
                 )
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
                     navController = navController,
                     user = user ?: User(),
                     navActions = navActions,
-                    presentPaymentSheet = presentPaymentSheet,
                     bottomSheetNavigator = bottomSheetNavigator,
                     showInterstitialAd = showInterstitialAd,
                 )

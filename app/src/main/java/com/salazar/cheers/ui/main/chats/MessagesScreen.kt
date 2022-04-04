@@ -226,8 +226,8 @@ fun UserItem(
             UserProfilePicture(profilePictureUrl = user.profilePictureUrl)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                if (user.fullName.isNotBlank())
-                    Text(text = user.fullName, style = MaterialTheme.typography.bodyMedium)
+                if (user.name.isNotBlank())
+                    Text(text = user.name, style = MaterialTheme.typography.bodyMedium)
                 Username(
                     username = user.username,
                     verified = user.verified,
@@ -310,7 +310,7 @@ fun DirectConversation(
             )
             Spacer(modifier = Modifier.width(14.dp))
             Column {
-                val title = otherUser.fullName
+                val title = otherUser.name
                 val seenByOthers =
                     if (channel.recentMessage != null) channel.recentMessage.seenBy.size > 1 else true
                 val lastMessageStatus = if (isLastMessageMe && seenByOthers) "Opened"

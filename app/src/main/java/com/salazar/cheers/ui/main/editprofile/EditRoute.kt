@@ -22,6 +22,7 @@ fun EditProfileRoute(
         onWebsiteChanged = editProfileViewModel::onWebsiteChanged,
         onNameChanged = editProfileViewModel::onNameChanged,
         onBioChanged = editProfileViewModel::onBioChanged,
+        onUsernameChanged = editProfileViewModel::onUsernameChange,
         onSelectImage = editProfileViewModel::onSelectPicture,
         onDismiss = { navActions.navigateBack() },
         onSave = {

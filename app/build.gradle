@@ -15,8 +15,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 25
-        versionName "0.96.104"
+        versionCode 26
+        versionName "0.97.914"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -27,8 +27,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -86,8 +86,13 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
 
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0'
+
+    // Klaxon
+    implementation 'com.beust:klaxon:5.5'
+
     // Neo4j Driver
-    implementation 'org.neo4j.driver:neo4j-java-driver:4.3.5'
+//    implementation 'org.neo4j.driver:neo4j-java-driver:4.3.5'
 
     // Navigation
     implementation "androidx.navigation:navigation-ui-ktx:2.5.0-alpha03"

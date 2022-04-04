@@ -2,6 +2,7 @@ package com.salazar.cheers.data.db
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
@@ -11,8 +12,8 @@ import java.util.*
 interface PostDao {
 
     @Transaction
-    @Query("SELECT * FROM posts ORDER BY posts.created DESC")
-    fun pagingSourceFeed(): PagingSource<Int, PostFeed>
+    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
+    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, PostFeed>
 
     @Transaction
     @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE (authorId = :userIdOrUsername OR users.username = :userIdOrUsername) ORDER BY posts.created DESC")

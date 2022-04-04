@@ -11,7 +11,6 @@ import com.salazar.cheers.data.paging.PostRemoteMediator
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,13 +21,12 @@ class PostRepository @Inject constructor(
     private val database: CheersDatabase
 ) {
     val postDao = database.postDao()
-    private val likes = MutableStateFlow<Set<String>>(setOf())
 
     fun getPosts(): Flow<PagingData<PostFeed>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
-                enablePlaceholders = true,
+                enablePlaceholders = false,
             ),
             remoteMediator = PostRemoteMediator(database = database, networkService = service),
         ) {
@@ -63,6 +61,8 @@ class PostRepository @Inject constructor(
     suspend fun getPostsWithAuthorId(authorId: String): List<Post> {
         return postDao.getPostsWithAuthorId(authorId = authorId)
     }
+
+    suspend fun deletePost(postId: String) = service.deletePost(postId = postId)
 
     suspend fun getMapPosts(privacy: Privacy): List<PostFeed> {
         return postDao.getMapPosts(privacy = privacy).map {

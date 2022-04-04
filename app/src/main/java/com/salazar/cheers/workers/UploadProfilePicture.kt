@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -20,6 +19,8 @@ import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
 @HiltWorker
@@ -39,7 +40,14 @@ class UploadProfilePicture @AssistedInject constructor(
             val photoBytes = extractImage(Uri.parse(photoUriInput))
 
             StorageUtil.uploadProfilePhoto(photoBytes) { downloadUrl ->
-                Neo4jUtil.updateProfilePicture(downloadUrl)
+                GlobalScope.launch {
+                    Neo4jUtil.updateUser(
+                        name = "",
+                        website = "",
+                        bio = "",
+                        profilePictureUrl = downloadUrl
+                    )
+                }
             }
             return Result.success()
         } catch (throwable: Throwable) {
@@ -48,7 +56,6 @@ class UploadProfilePicture @AssistedInject constructor(
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val notification = NotificationCompat.Builder(
             applicationContext,

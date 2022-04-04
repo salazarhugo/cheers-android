@@ -13,9 +13,7 @@ data class User(
     @PrimaryKey
     val id: String,
     val username: String,
-    val firstName: String,
-    val lastName: String,
-    val fullName: String,
+    val name: String,
     val postCount: Int,
     val followers: Int,
     val following: Int,
@@ -34,8 +32,6 @@ data class User(
 ) : Serializable {
 
     constructor() : this(
-        "",
-        "",
         "",
         "",
         "",

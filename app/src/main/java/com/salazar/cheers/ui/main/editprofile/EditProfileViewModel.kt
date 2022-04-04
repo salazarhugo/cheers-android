@@ -95,7 +95,7 @@ class EditProfileViewModel @Inject constructor(
 
     fun onNameChanged(name: String) {
         viewModelState.update {
-            val newUser = it.user?.copy(fullName = name)
+            val newUser = it.user?.copy(name = name)
             it.copy(user = newUser)
         }
     }
@@ -103,6 +103,13 @@ class EditProfileViewModel @Inject constructor(
     fun onWebsiteChanged(website: String) {
         viewModelState.update {
             val newUser = it.user?.copy(website = website)
+            it.copy(user = newUser)
+        }
+    }
+
+    fun onUsernameChange(username: String) {
+        viewModelState.update {
+            val newUser = it.user?.copy(username = username)
             it.copy(user = newUser)
         }
     }
@@ -120,7 +127,13 @@ class EditProfileViewModel @Inject constructor(
         val user = viewModelState.value.user ?: return
 
         viewModelScope.launch {
-            Neo4jUtil.updateUser(user)
+            Neo4jUtil.updateUser(
+                username = user.username,
+                profilePictureUrl = user.profilePictureUrl,
+                name = user.name,
+                bio = user.bio,
+                website = user.website,
+            )
             viewModelState.update {
                 it.copy(done = true, isLoading = false)
             }

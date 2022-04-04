@@ -67,7 +67,6 @@ fun NavGraphBuilder.mainNavGraph(
     navController: NavController,
     user: User,
     navActions: CheersNavigationActions,
-    presentPaymentSheet: (String) -> Unit,
     showInterstitialAd: () -> Unit,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {

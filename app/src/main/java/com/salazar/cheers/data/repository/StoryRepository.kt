@@ -46,7 +46,7 @@ class StoryRepository @Inject constructor(
                 TextMessage().copy(
                     senderId = FirebaseAuth.getInstance().currentUser?.uid!!,
                     text = text,
-                    senderName = user.fullName,
+                    senderName = user.name,
                     senderUsername = user.username,
                     chatChannelId = channelId,
                     senderProfilePictureUrl = user.profilePictureUrl,

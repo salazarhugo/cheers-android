@@ -90,7 +90,7 @@ object FirestoreUtil {
 
             val newUser = User().copy(
                 id = id,
-                fullName = name,
+                name = name,
                 username = username,
                 profilePictureUrl = profilePicturePath,
                 email = FirebaseAuth.getInstance().currentUser?.email ?: email,
@@ -232,9 +232,7 @@ object FirestoreUtil {
             }
             if (documentSnapshot != null) {
                 val user = documentSnapshot.toObject(User::class.java)
-                if (user != null) {
-                    currentUser.value = user.copy(fullName = "${user.firstName} ${user.lastName}")
-                }
+                currentUser.value = user
             }
         }
         return currentUser

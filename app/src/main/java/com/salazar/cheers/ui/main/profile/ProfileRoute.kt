@@ -1,8 +1,11 @@
 package com.salazar.cheers.ui.main.profile
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import com.salazar.cheers.navigation.CheersNavigationActions
 
@@ -19,7 +22,13 @@ fun ProfileRoute(
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
+    if (uiState.errorMessages.isNotBlank()) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, uiState.errorMessages, Toast.LENGTH_SHORT).show()
+        }
+    }
     ProfileScreen(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::refresh,

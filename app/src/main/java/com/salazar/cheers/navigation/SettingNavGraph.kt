@@ -15,7 +15,6 @@ import com.salazar.cheers.ui.settings.theme.ThemeRoute
 
 fun NavGraphBuilder.settingNavGraph(
     navActions: CheersNavigationActions,
-    presentPaymentSheet: (String) -> Unit,
 ) {
     navigation(
         route = CheersDestinations.SETTING_ROUTE,
@@ -45,7 +44,6 @@ fun NavGraphBuilder.settingNavGraph(
             RechargeRoute(
                 rechargeViewModel = rechargeViewModel,
                 navActions = navActions,
-                presentPaymentSheet = presentPaymentSheet,
             )
         }
 
@@ -104,7 +102,6 @@ fun NavGraphBuilder.settingNavGraph(
             SettingsRoute(
                 settingsViewModel = settingsViewModel,
                 navActions = navActions,
-                presentPaymentSheet = presentPaymentSheet,
             )
         }
 

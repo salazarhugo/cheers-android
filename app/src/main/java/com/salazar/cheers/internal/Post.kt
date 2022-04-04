@@ -37,4 +37,5 @@ data class Post(
     val allowJoin: Boolean = true,
     val tagUsersId: List<String> = emptyList(),
     val type: String = PostType.TEXT,
+    val accountId: String = "",
 )

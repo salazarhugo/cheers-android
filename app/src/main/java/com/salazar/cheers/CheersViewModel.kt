@@ -1,7 +1,6 @@
 package com.salazar.cheers
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -31,8 +30,6 @@ class CheersViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val billingRepository: BillingRepository,
 ) : ViewModel() {
-
-    val completed = mutableStateOf(false)
 
     private val viewModelState = MutableStateFlow(CheersUiState(isLoading = true))
 

@@ -135,7 +135,7 @@ class ChatViewModel @AssistedInject constructor(
                     workDataOf(
                         "CHANNEL_ID" to channelId,
                         "USERNAME" to user.username,
-                        "FULL_NAME" to user.fullName,
+                        "FULL_NAME" to user.name,
                         "IMAGES_URI" to images.map { it.toString() }.toTypedArray(),
                         "PROFILE_PICTURE_PATH" to user.profilePictureUrl,
                     )
@@ -155,7 +155,7 @@ class ChatViewModel @AssistedInject constructor(
                 TextMessage().copy(
                     senderId = FirebaseAuth.getInstance().currentUser?.uid!!,
                     text = text,
-                    senderName = user.fullName,
+                    senderName = user.name,
                     senderUsername = user.username,
                     chatChannelId = channelId,
                     senderProfilePictureUrl = user.profilePictureUrl,

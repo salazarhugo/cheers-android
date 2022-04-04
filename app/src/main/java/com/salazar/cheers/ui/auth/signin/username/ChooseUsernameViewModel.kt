@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.auth.signin.username
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,9 @@ data class ChooseUsernameState(
 )
 
 @HiltViewModel
-class ChooseUsernameViewModel @Inject constructor() : ViewModel() {
+class ChooseUsernameViewModel @Inject constructor(
+    service: Neo4jService,
+) : ViewModel() {
 
     val uiState = MutableStateFlow(ChooseUsernameState(isLoading = false))
 

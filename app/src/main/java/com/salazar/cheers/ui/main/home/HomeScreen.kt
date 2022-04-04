@@ -387,7 +387,7 @@ fun Suggestion(
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 )
                 Text(
-                    text = suggestedUser.user.fullName,
+                    text = suggestedUser.user.name,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                 )
                 Row(
@@ -513,6 +513,7 @@ fun PostList(
                         CircularProgressIndicatorM3(
                             modifier = Modifier
                                 .fillMaxSize()
+                                .padding(16.dp)
                                 .wrapContentSize(Alignment.Center)
                         )
                     }

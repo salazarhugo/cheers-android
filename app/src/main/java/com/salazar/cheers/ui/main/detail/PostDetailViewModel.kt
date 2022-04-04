@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
+import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
@@ -59,6 +60,7 @@ private data class PostDetailViewModelState(
 
 class PostDetailViewModel @AssistedInject constructor(
     private val postRepository: PostRepository,
+    private val service: Neo4jService,
     @Assisted private val postId: String
 ) : ViewModel() {
 
@@ -104,7 +106,7 @@ class PostDetailViewModel @AssistedInject constructor(
     fun deletePost() {
         viewModelScope.launch {
             try {
-                Neo4jUtil.deletePost(postId = postId)
+                service.deletePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("PostDetailViewModel", e.toString())
             }

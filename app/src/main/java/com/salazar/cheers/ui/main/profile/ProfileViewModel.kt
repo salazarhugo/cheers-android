@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -20,12 +21,12 @@ import javax.inject.Inject
 sealed interface ProfileUiState {
 
     val isLoading: Boolean
-    val errorMessages: List<String>
+    val errorMessages: String
     val sheetState: ModalBottomSheetState
 
     data class Loading(
         override val isLoading: Boolean,
-        override val errorMessages: List<String>,
+        override val errorMessages: String,
         override val sheetState: ModalBottomSheetState,
     ) : ProfileUiState
 
@@ -34,7 +35,7 @@ sealed interface ProfileUiState {
         val postFlow: Flow<PagingData<PostFeed>>,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
-        override val errorMessages: List<String>,
+        override val errorMessages: String,
     ) : ProfileUiState
 }
 
@@ -42,7 +43,7 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
     val user: User? = null,
     val posts: Flow<PagingData<PostFeed>> = emptyFlow(),
     val isLoading: Boolean = false,
-    val errorMessages: List<String> = emptyList(),
+    val errorMessages: String = "",
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
 ) {
     fun toUiState(): ProfileUiState =
@@ -79,7 +80,8 @@ class ProfileViewModel @Inject constructor(
         )
 
     init {
-        refresh()
+        getUser()
+        refreshUserPosts()
     }
 
     fun refresh() {
@@ -98,13 +100,26 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun refreshUser() {
+    private fun getUser() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             val user = userRepository.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
             viewModelState.update {
                 it.copy(user = user, isLoading = false)
+            }
+        }
+    }
+
+    private fun refreshUser() {
+        viewModelState.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            val result = userRepository.refreshUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+            when (result) {
+                is Result.Success -> viewModelState.update { it.copy( user = result.data, isLoading = false )
+                }
+                is Result.Error -> viewModelState.update { it.copy(errorMessages = "Couldn't refresh") }
             }
         }
     }

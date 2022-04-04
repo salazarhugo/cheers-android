@@ -3,7 +3,6 @@ package com.salazar.cheers.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.repository.StoryRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.EventUi
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -16,18 +15,7 @@ class EventsPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, EventUi> {
         val position = params.key ?: POST_STARTING_PAGE_INDEX
-        val response = service.events(position, params.loadSize)
-        return when (response) {
-            is com.salazar.cheers.data.Result.Success -> {
-                val events = response.data
-                LoadResult.Page(
-                    data = events,
-                    prevKey = if (position == POST_STARTING_PAGE_INDEX) null else position - 1,
-                    nextKey = if (events.isEmpty()) null else position + (params.loadSize / NETWORK_PAGE_SIZE)
-                )
-            }
-            is com.salazar.cheers.data.Result.Error -> LoadResult.Error(response.exception)
-        }
+        return LoadResult.Error(throw Exception())
     }
 
     override fun getRefreshKey(state: PagingState<Int, EventUi>): Int? {

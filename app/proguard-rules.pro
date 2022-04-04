@@ -20,9 +20,9 @@
 # hide the original source file name.
 -renamesourcefileattribute SourceFile
 
-#-keep class com.salazar.cheers.backend.*
-#-keep class com.salazar.cheers.internal.*
-#-keep class com.salazar.cheers.data.entities.*
+-keep class com.salazar.cheers.backend.*
+-keep class com.salazar.cheers.internal.*
+-keep class com.salazar.cheers.data.entities.*
 
 # ServiceLoader support
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
@@ -35,3 +35,4 @@
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
+

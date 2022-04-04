@@ -72,7 +72,7 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             val recentUser = RecentUser(
                 id = user.id,
-                fullName = user.fullName,
+                fullName = user.name,
                 username = user.username,
                 profilePictureUrl = user.profilePictureUrl,
                 verified = user.verified,

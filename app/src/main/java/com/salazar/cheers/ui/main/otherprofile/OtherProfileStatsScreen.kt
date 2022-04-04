@@ -192,8 +192,8 @@ fun FollowerCard(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                if (user.fullName.isNotBlank())
-                    Text(text = user.fullName, style = Typography.bodyMedium)
+                if (user.name.isNotBlank())
+                    Text(text = user.name, style = Typography.bodyMedium)
                 Username(
                     username = user.username,
                     verified = user.verified,
@@ -235,8 +235,8 @@ fun FollowingCard(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                if (user.fullName.isNotBlank())
-                    Text(text = user.fullName, style = Typography.bodyMedium)
+                if (user.name.isNotBlank())
+                    Text(text = user.name, style = Typography.bodyMedium)
                 Username(
                     username = user.username,
                     verified = user.verified,

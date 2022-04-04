@@ -11,13 +11,8 @@ import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.search.MapboxSearchSdk
-import com.salazar.cheers.internal.Environment
 import com.stripe.android.PaymentConfiguration
 import dagger.hilt.android.HiltAndroidApp
-import org.neo4j.driver.AuthTokens
-import org.neo4j.driver.Config
-import org.neo4j.driver.GraphDatabase
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -31,7 +26,6 @@ class CheersApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         initFirebase()
-        initDatabase()
         initStripe()
         initMapBox()
         createNotificationChannel()
@@ -58,16 +52,6 @@ class CheersApplication : Application(), Configuration.Provider {
         firebaseAppCheck.installAppCheckProviderFactory(
 //            DebugAppCheckProviderFactory.getInstance()
             SafetyNetAppCheckProviderFactory.getInstance()
-        )
-    }
-
-    private fun initDatabase() {
-        GraphDatabase.driver(
-            Environment.DEFAULT_URL,
-            AuthTokens.basic(Environment.DEFAULT_USER, Environment.DEFAULT_PASS),
-            Config.builder()
-                .withMaxConnectionLifetime(8, TimeUnit.MINUTES)
-                .withConnectionLivenessCheckTimeout(2, TimeUnit.MINUTES).build()
         )
     }
 

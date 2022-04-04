@@ -11,7 +11,6 @@ import androidx.paging.PagingData
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.data.repository.EventRepository
@@ -111,7 +110,7 @@ private data class HomeViewModelState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: PostRepository,
+    private val postRepository: PostRepository,
     private val eventRepository: EventRepository,
     private val storyRepository: StoryRepository,
     val userRepository: UserRepository,
@@ -149,7 +148,7 @@ class HomeViewModel @Inject constructor(
     private fun refreshEventsFlow() {
 //        viewModelState.update { it.copy(isLoading = true) }
         viewModelState.update {
-            it.copy(eventsFlow = flow { emptyList<Event>()  })
+            it.copy(eventsFlow = flow { emptyList<Event>() })
         }
     }
 
@@ -163,7 +162,7 @@ class HomeViewModel @Inject constructor(
     private fun refreshPostsFlow() {
         viewModelState.update { it.copy(isLoading = true) }
         viewModelState.update {
-            it.copy(postsFlow = repository.getPosts(), isLoading = false)
+            it.copy(postsFlow = postRepository.getPosts(), isLoading = false)
         }
     }
 
@@ -173,7 +172,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             viewModelState.update {
                 it.copy(
-                    postsFlow = repository.getPosts(),
+                    postsFlow = postRepository.getPosts(),
                     eventsFlow = eventRepository.getEvents(),
                     storiesFlow = storyRepository.getStories(),
                     user = userRepository.getCurrentUser(),
@@ -198,7 +197,7 @@ class HomeViewModel @Inject constructor(
 
     fun toggleLike(post: Post) {
         viewModelScope.launch {
-            repository.toggleLike(post = post)
+            postRepository.toggleLike(post = post)
         }
     }
 
@@ -210,9 +209,9 @@ class HomeViewModel @Inject constructor(
 
     fun deletePost(postId: String) {
         viewModelScope.launch {
-            repository.postDao.deleteWithId(postId)
+            postRepository.postDao.deleteWithId(postId)
             try {
-                Neo4jUtil.deletePost(postId = postId)
+                postRepository.deletePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }

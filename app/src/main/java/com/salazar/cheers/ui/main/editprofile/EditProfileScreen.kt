@@ -32,6 +32,7 @@ fun EditProfileScreen(
     uiState: EditProfileUiState,
     onBioChanged: (String) -> Unit,
     onNameChanged: (String) -> Unit,
+    onUsernameChanged: (String) -> Unit,
     onWebsiteChanged: (String) -> Unit,
     onSelectImage: (Uri) -> Unit,
     onDismiss: () -> Unit,
@@ -56,6 +57,7 @@ fun EditProfileScreen(
                     onBioChanged = onBioChanged,
                     onNameChanged = onNameChanged,
                     onWebsiteChanged = onWebsiteChanged,
+                    onUsernameChange = onUsernameChanged,
                 )
             }
         }
@@ -132,6 +134,7 @@ fun EditProfileBody(
     user: User,
     onBioChanged: (String) -> Unit,
     onNameChanged: (String) -> Unit,
+    onUsernameChange: (String) -> Unit,
     onWebsiteChanged: (String) -> Unit,
 ) {
     Column(
@@ -151,7 +154,7 @@ fun EditProfileBody(
                 backgroundColor = Color.Transparent,
                 textColor = MaterialTheme.colorScheme.onBackground,
             ),
-            value = user.fullName,
+            value = user.name,
             onValueChange = {
                 if (it.length <= NAME_MAX_CHAR)
                     onNameChanged(it)
@@ -172,8 +175,8 @@ fun EditProfileBody(
                 textColor = MaterialTheme.colorScheme.onBackground,
             ),
             value = user.username,
-            onValueChange = { onBioChanged(it) },
-            enabled = false,
+            onValueChange = { onUsernameChange(it) },
+            enabled = true,
         )
         Spacer(modifier = Modifier.height(8.dp))
         TextField(

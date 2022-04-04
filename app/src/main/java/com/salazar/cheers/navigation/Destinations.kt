@@ -283,10 +283,11 @@ class CheersNavigationActions(private val navController: NavHostController) {
     }
 
     val navigateToOtherProfile: (username: String) -> Unit = { username ->
-        navController.navigate("${MainDestinations.OTHER_PROFILE_ROUTE}/$username") {
-            launchSingleTop = true
-            restoreState = true
-        }
+        if (username.isNotBlank())
+            navController.navigate("${MainDestinations.OTHER_PROFILE_ROUTE}/$username") {
+                launchSingleTop = true
+                restoreState = true
+            }
     }
 
     val navigateToPostDetail: (postId: String) -> Unit = { postId ->

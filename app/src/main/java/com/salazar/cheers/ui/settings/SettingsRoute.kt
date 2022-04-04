@@ -5,8 +5,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -18,29 +16,9 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 fun SettingsRoute(
     settingsViewModel: SettingsViewModel,
     navActions: CheersNavigationActions,
-    presentPaymentSheet: (String) -> Unit,
 ) {
     val uiState by settingsViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
-
-    fun callCreatePaymentIntent(amount: Int) {
-        val data = hashMapOf(
-            "amount" to amount,
-            "currency" to "eur"
-        )
-        val paymentDocument = Firebase.firestore.collection("stripe_customers")
-            .document(FirebaseAuth.getInstance().currentUser?.uid!!)
-            .collection("payments")
-            .document()
-
-        paymentDocument.set(data)
-        paymentDocument.addSnapshotListener { value, error ->
-            if (value == null) return@addSnapshotListener
-            if (value.data == null || value.data?.get("client_secret") == null) return@addSnapshotListener
-            val clientSecret = value.data?.get("client_secret") as String;
-            presentPaymentSheet(clientSecret)
-        }
-    }
 
     SettingsScreen(
         uiState = uiState,
@@ -61,7 +39,7 @@ fun SettingsRoute(
                 is SettingsUIAction.OnTermsOfUseClick -> uriHandler.openUri("https://cheers-a275e.web.app/terms-of-use")
             }
         },
-        navigateToBecomeVip = { callCreatePaymentIntent(49999) },
+        navigateToBecomeVip = {},
     )
 }
 

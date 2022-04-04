@@ -46,7 +46,7 @@ class PostRemoteMediator(
                     remoteKeys.nextKey ?: return MediatorResult.Success(true)
                 }
             }
-            val response = networkService.posts(page, NETWORK_PAGE_SIZE)
+            val response = networkService.getPostFeed(page, NETWORK_PAGE_SIZE)
 
             when (response) {
                 is Result.Success -> {

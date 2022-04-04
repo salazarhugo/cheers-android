@@ -61,9 +61,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         if (profilePictureUrl != null && profilePictureUrl.isNotBlank()) {
-            val url = URL(profilePictureUrl)
-            val image = BitmapFactory.decodeStream(url.openConnection().getInputStream()).getCircledBitmap()
-            builder.setLargeIcon(image)
+            try {
+                val url = URL(profilePictureUrl)
+                val image = BitmapFactory.decodeStream(url.openConnection().getInputStream()).getCircledBitmap()
+                builder.setLargeIcon(image)
+            } catch (e: Exception) {
+                Log.e("FirebaseMessagingService", e.toString())
+            }
 
             with(NotificationManagerCompat.from(this)) {
                 notify(1, builder.build())

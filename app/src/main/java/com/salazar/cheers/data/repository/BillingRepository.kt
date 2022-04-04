@@ -60,7 +60,7 @@ class BillingRepository @Inject constructor(
         )
 
         return FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("handlePurchase")
+            .getHttpsCallable("rechargeCoins")
             .call(data)
             .continueWith { task ->
                 val result = task.result?.data as HashMap<*, *>

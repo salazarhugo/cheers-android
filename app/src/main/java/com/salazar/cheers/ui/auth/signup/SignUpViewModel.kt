@@ -10,7 +10,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.service.MyFirebaseMessagingService
-import com.salazar.cheers.util.FirestoreUtil
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -219,7 +218,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun getAndSaveRegistrationToken() {
+    private suspend fun getAndSaveRegistrationToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("FCM", "Fetching FCM registration token failed", task.exception)
@@ -234,20 +233,14 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun signInSuccessful(
-        email: String,
         username: String,
-        name: String = "",
     ) {
-        FirestoreUtil.checkIfUserExists { exists ->
-            if (exists) {
-                updateIsSignedIn(true)
-                getAndSaveRegistrationToken()
-            } else {
-                FirestoreUtil.initCurrentUserIfFirstTime(email = email, username = username, name = name) {
-                    updateIsSignedIn(true)
-                    getAndSaveRegistrationToken()
-                }
-            }
+        updateIsSignedIn(true)
+        viewModelScope.launch {
+            Neo4jUtil.updateUser(
+                username = username
+            )
+            getAndSaveRegistrationToken()
         }
     }
 
@@ -274,18 +267,19 @@ class SignUpViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     if (state.withGoogle)
-                        signInSuccessful(email = email, username = username, name = name)
-                    else
+                        signInSuccessful(username = username)
+                    else {
                         Firebase.auth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    signInSuccessful(email = email, username = username, name = name)
+                                    signInSuccessful(username = username)
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     updateErrorMessage(task.exception?.message)
                                 }
                                 updateIsLoading(false)
                             }
+                    }
                 }
                 else -> {
                     updateErrorMessage("Username not available")
