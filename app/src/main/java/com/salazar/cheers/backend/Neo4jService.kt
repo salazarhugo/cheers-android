@@ -42,12 +42,12 @@ class Neo4jService {
                         val post =
                             Klaxon().parse<StoryResponse>(postFeed.asJsonObject["story"].toString())!!
                         val author =
-                            Klaxon().parse<User>(postFeed.asJsonObject["author"].toString())
+                            Klaxon().parse<User>(postFeed.asJsonObject["author"].toString())!!
                         val tagUsers =
                             Klaxon().parseArray<User>(postFeed.asJsonObject["tags"].toString())
                                 ?: emptyList()
-                        tagUsers.toMutableList().add(author!!)
-                        posts.add(Pair(post, tagUsers))
+
+                        posts.add(Pair(post, tagUsers + author))
                     }
                     return@continueWith Result.Success(posts.toList())
                 } catch (e: Exception) {
@@ -81,14 +81,14 @@ class Neo4jService {
                     response.asJsonArray.forEach { postFeed ->
                         val post = Klaxon().parse<Post>(postFeed.asJsonObject["post"].toString())!!
                         val author =
-                            Klaxon().parse<User>(postFeed.asJsonObject["author"].toString())
+                            Klaxon().parse<User>(postFeed.asJsonObject["author"].toString())!!
                         val tagUsers =
                             Klaxon().parseArray<User>(postFeed.asJsonObject["users"].toString())
                                 ?: emptyList()
-                        tagUsers.toMutableList().add(author!!)
 
-                        posts.add(Pair(post.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!), tagUsers))
+                        posts.add(Pair(post.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!), tagUsers + author))
                     }
+                    Log.d("Cloud Posts:", posts.toString())
                     return@continueWith Result.Success(posts.toList())
                 } catch (e: Exception) {
                     Log.e("Cloud", "Failed to parse posts: $e")
@@ -108,7 +108,10 @@ class Neo4jService {
             .call(data)
             .continueWith { task ->
                 if (task.result == null || task.result.data == null)
-                    return@continueWith  Result.Error(java.lang.Exception("Data is null"))
+                    return@continueWith  Result.Error(java.lang.Exception("Network error"))
+
+                if (task.result.data.toString() == "[]")
+                    return@continueWith Result.Error(java.lang.Exception("User doesn't exist."))
 
                 val result = task.result.data as HashMap<*, *>
                 Log.d("Cloud", result["response"].toString())
@@ -200,6 +203,30 @@ class Neo4jService {
 //        }
     }
 
+    suspend fun getFollowersFollowing(userIdOrUsername: String): Pair<List<User>, List<User>> = withContext(Dispatchers.IO) {
+            val data = hashMapOf(
+                "userIdOrUsername" to userIdOrUsername,
+            )
+
+        return@withContext FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("getFollowersFollowing")
+            .call(data)
+            .continueWith { task ->
+                try {
+                    val result = task.result?.data as HashMap<*, *>
+                    val response =
+                        Gson().fromJson(result["response"].toString(), com.google.gson.JsonObject::class.java)
+                    val followers = Klaxon().parseArray<User>(response["followers"].toString()) ?: emptyList()
+                    val following = Klaxon().parseArray<User>(response["following"].toString()) ?: emptyList()
+                    Pair(followers, following)
+                }catch (e:Exception) {
+                    Log.e("Cloud", e.toString())
+                    Pair(emptyList(), emptyList())
+                }
+            }
+            .await()
+    }
+
     suspend fun queryUsers(query: String): List<User> = withContext(Dispatchers.IO) {
         // Create the arguments to the callable function.
         val data = hashMapOf(
@@ -215,6 +242,20 @@ class Neo4jService {
                 user
             }
             .await()
+    }
+
+    suspend fun deleteStory(storyId: String) = withContext(Dispatchers.IO) {
+        val data = hashMapOf(
+            "storyId" to storyId,
+        )
+
+        return@withContext FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("deleteStory")
+            .call(data)
+            .continueWith { task ->
+                val result = task.result?.data as String
+                result
+            }
     }
 
     suspend fun deletePost(postId: String) = withContext(Dispatchers.IO) {

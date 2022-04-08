@@ -1,13 +1,14 @@
 package com.salazar.cheers.ui.auth.signin
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
+import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.repository.AuthRepository
 import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignInUiState(isLoading = false))
@@ -32,7 +33,21 @@ class SignInViewModel @Inject constructor(
             viewModelState.value
         )
 
-    init {}
+    init {
+        viewModelScope.launch {
+            authRepository.getUserAuthState().collect {
+                when(val result = authRepository.getUser()) {
+                    is Result.Success -> {
+                        viewModelState.update {
+                            it.copy(isSignedIn = result.data != null)
+                        }
+                        getAndSaveRegistrationToken()
+                    }
+                    is Result.Error -> {}
+                }
+            }
+        }
+    }
 
     fun onPasswordChange(password: String) {
         viewModelState.update {
@@ -68,6 +83,9 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun getAndSaveRegistrationToken() {
+        if (FirebaseAuth.getInstance().currentUser == null)
+            return
+
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("FCM", "Fetching FCM registration token failed", task.exception)
@@ -92,6 +110,15 @@ class SignInViewModel @Inject constructor(
         }
 
         updateIsLoading(true)
+
+//        viewModelScope.launch {
+//            authRepository.signInWithEmailAndPassword(email = email, password = password).collect { response ->
+//                viewModelState.update {
+//                    it.copy(isSignedIn = response)
+//                }
+//            }
+//        }
+
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnFailureListener {
                 updateErrorMessage("Authentication failed: ${it.message}")
@@ -121,14 +148,8 @@ class SignInViewModel @Inject constructor(
 
     private fun signInSuccessful(acct: GoogleSignInAccount? = null) {
         if (acct == null) return
-        FirestoreUtil.checkIfUserExists { exists ->
-            if (exists) {
-                getAndSaveRegistrationToken()
-            } else {
-                viewModelState.update {
-                    it.copy(acct = acct)
-                }
-            }
+        viewModelState.update {
+            it.copy(acct = acct)
         }
     }
 }

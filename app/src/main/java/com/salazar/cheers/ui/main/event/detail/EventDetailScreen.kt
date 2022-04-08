@@ -47,7 +47,7 @@ fun EventHeader(eventUi: EventUi) {
         painter = rememberImagePainter(
             data = event.imageUrl,
             builder = {
-                error(com.salazar.cheers.R.drawable.image_placeholder)
+                error(com.salazar.cheers.R.drawable.default_profile_picture)
             }
         ),
         contentDescription = null,

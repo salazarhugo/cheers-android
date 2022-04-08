@@ -32,10 +32,17 @@ fun ProfileRoute(
     ProfileScreen(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::refresh,
-        onStatClicked = { statName, username ->
+        onPostMoreClicked = { postId, authorId ->
+            navActions.navigateToPostMoreSheet(
+                postId,
+                authorId
+            )
+        },
+        onStatClicked = { statName, username, verified ->
             navActions.navigateToProfileStats(
                 statName,
-                username
+                username,
+                verified,
             )
         },
         onPostClicked = { navActions.navigateToPostDetail(it) },

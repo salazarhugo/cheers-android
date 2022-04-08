@@ -60,10 +60,7 @@ interface PostDao {
     fun pagingSource(): PagingSource<Int, Post>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(
-        post: Post,
-        users: List<User>,
-    )
+    suspend fun insert(post: Post)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(posts: List<Post>)

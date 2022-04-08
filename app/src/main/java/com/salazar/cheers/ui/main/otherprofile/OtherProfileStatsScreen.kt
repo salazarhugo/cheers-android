@@ -41,6 +41,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.SwipeToRefresh
+import com.salazar.cheers.components.share.rememberSwipeRefreshState
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -51,6 +53,7 @@ fun OtherProfileStatsScreen(
     uiState: OtherProfileStatsUiState,
     username: String,
     verified: Boolean,
+    onSwipeRefresh: () -> Unit,
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
@@ -64,8 +67,14 @@ fun OtherProfileStatsScreen(
             )
         }
     ) {
-        Column {
-            Tabs(uiState, onUserClicked = onUserClicked, onFollowToggle)
+
+        SwipeToRefresh(
+            state = rememberSwipeRefreshState(isRefreshing = false),
+            onRefresh = onSwipeRefresh,
+        ) {
+            Column {
+                Tabs(uiState, onUserClicked = onUserClicked, onFollowToggle)
+            }
         }
     }
 }

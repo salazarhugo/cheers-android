@@ -13,8 +13,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
@@ -22,7 +20,9 @@ import com.salazar.cheers.data.entities.StoryResponse
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
@@ -62,43 +62,32 @@ class UploadStoryWorker @AssistedInject constructor(
             inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
 
         try {
-            val tasks: MutableList<Deferred<Task<*>>> = mutableListOf()
+
+            val downloadUrls = mutableListOf<String>()
 
             coroutineScope {
                 photos.toList().forEach { photoUri ->
                     val photoBytes = extractImage(Uri.parse(photoUri))
-                    val task = async {
-                        StorageUtil.uploadPostImage2(photoBytes)
-                    }
-                    tasks.add(task)
+                    val uri = StorageUtil.uploadStoryImage(photoBytes)
+                    downloadUrls.add(uri.toString())
                 }
             }
 
-            Tasks.whenAllComplete(tasks.awaitAll()).addOnSuccessListener {
-                val downloadUrls = mutableListOf<String>()
+            val story = StoryResponse(
+                type = storyType,
+                photos = downloadUrls,
+                locationName = locationName,
+                locationLatitude = latitude,
+                locationLongitude = longitude,
+                privacy = privacy,
+                tagUsersId = tagUserIds.toList()
+            )
 
-                it.forEach { task ->
-                    task.addOnSuccessListener { downloadUrl ->
-                        downloadUrls.add(downloadUrl.toString())
-                    }
-                }
-
-                val story = StoryResponse(
-                    type = storyType,
-                    photos = downloadUrls,
-                    locationName = locationName,
-                    locationLatitude = latitude,
-                    locationLongitude = longitude,
-                    privacy = privacy,
-                    tagUsersId = tagUserIds.toList()
-                )
-
-                GlobalScope.launch {
-                    Neo4jUtil.addStory(story)
-                }
-
-                makeStatusNotification("Successfully uploaded", appContext)
+            GlobalScope.launch {
+                Neo4jUtil.addStory(story)
             }
+
+            makeStatusNotification("Successfully uploaded", appContext)
             return Result.success()
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")

@@ -1,5 +1,7 @@
 package com.salazar.cheers.components.animations
 
+import android.graphics.Color
+import android.graphics.Paint
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -99,6 +101,20 @@ fun AnimatedLogo() {
         ),
         exit = slideOutVertically() + shrinkVertically() + fadeOut()
     ) {
+        val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            strokeWidth = 5f
+            style = Paint.Style.STROKE
+        }
+//        Canvas(modifier = Modifier, onDraw = {
+//            glowPaint.setShadowLayer(
+//                1f,
+//                0f,
+//                0f,
+//                Color.WHITE
+//            )
+//            drawArc(glowPaint.color, 0f, 360f, true)
+//        })
         Image(
             painter = rememberImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
             contentDescription = null,

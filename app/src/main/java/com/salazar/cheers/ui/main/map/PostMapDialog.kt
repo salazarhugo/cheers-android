@@ -72,6 +72,9 @@ fun Post(
                 post = post,
                 onPostClicked = {},
                 onLike = {},
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(16.dp)),
             )
             PostFooter(post = post, false, onDelete = {}, onToggleLike = {})
         }

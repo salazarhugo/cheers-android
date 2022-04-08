@@ -34,10 +34,11 @@ fun OtherProfileScreen(
     uiState: OtherProfileUiState.HasUser,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
-    onStatClicked: (statName: String, username: String) -> Unit,
+    onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     onFollowToggle: (User) -> Unit,
     onMessageClicked: () -> Unit,
     onWebsiteClick: (String) -> Unit,
+    onPostMoreClicked: (String, String) -> Unit,
     onGiftClick: () -> Unit,
 ) {
     val posts = uiState.postFlow.collectAsLazyPagingItems()
@@ -106,6 +107,7 @@ fun OtherProfileScreen(
                                     postFeed,
                                     onPostClicked,
                                     onPostLike = onPostLike,
+                                    onPostMoreClicked = onPostMoreClicked,
                                 )
                         }
                         1 -> FunctionalityNotAvailablePanel()

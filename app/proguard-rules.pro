@@ -14,20 +14,25 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 -renamesourcefileattribute SourceFile
+-keep class com.salazar.cheers.** { *; }
+-keep class com.salazar.cheers.backend.** { *; }
+-keep class com.salazar.cheers.data.** { *; }
+-keep class com.salazar.cheers.internal.** { *; }
 
--keep class com.salazar.cheers.backend.*
--keep class com.salazar.cheers.internal.*
--keep class com.salazar.cheers.data.entities.*
+-keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
 
 # ServiceLoader support
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keep class com.google.googlesignin.** { *; }
+-keepnames class com.google.googlesignin.* { *; }
 
+-keep class com.google.android.gms.auth.** { *; }
 -keep class kotlinx.coroutines.android.AndroidExceptionPreHandler
 -keep class kotlinx.coroutines.android.AndroidDispatcherFactory
 

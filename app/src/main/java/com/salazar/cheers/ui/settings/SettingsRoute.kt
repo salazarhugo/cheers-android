@@ -25,7 +25,7 @@ fun SettingsRoute(
         onBackPressed = { navActions.navigateToProfile() },
         onSignOut = {
             FirebaseAuth.getInstance().signOut()
-//            navActions.navigateToSignIn()
+            navActions.navigateToSignIn()
         },
         onSettingsUIAction = { action ->
             when (action) {

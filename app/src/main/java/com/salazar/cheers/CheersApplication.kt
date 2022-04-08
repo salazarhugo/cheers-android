@@ -11,7 +11,6 @@ import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.search.MapboxSearchSdk
-import com.stripe.android.PaymentConfiguration
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -26,7 +25,6 @@ class CheersApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         initFirebase()
-        initStripe()
         initMapBox()
         createNotificationChannel()
     }
@@ -36,13 +34,6 @@ class CheersApplication : Application(), Configuration.Provider {
             application = this,
             accessToken = getString(R.string.mapbox_access_token),
             locationEngine = LocationEngineProvider.getBestLocationEngine(this)
-        )
-    }
-
-    private fun initStripe() {
-        PaymentConfiguration.init(
-            applicationContext,
-            "pk_live_51KWqPTAga4Q2CELO2K93NrScmrQOQf0Pbvn0XpDXSqW4gzgXFWpMx1lnSjTfR8251B3TI4zHmQ0MqFDCYdpKD2D200KhtML5F7"
         )
     }
 

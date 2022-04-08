@@ -57,6 +57,8 @@ import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.stats.drinkingStatsViewModel
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.StoryViewModel
+import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
+import com.salazar.cheers.ui.main.story.stats.storyStatsViewModel
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.sendGiftViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
@@ -318,6 +320,19 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
+            route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{storyId}" })
+        ) {
+            val storyId = it.arguments?.getString("storyId")!!
+            val storyStatsViewModel = storyStatsViewModel(storyId = storyId)
+
+            StoryStatsRoute(
+                storyStatsViewModel = storyStatsViewModel,
+                navActions = navActions,
+            )
+        }
+
+        composable(
             route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
         ) {
@@ -330,28 +345,43 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
-            route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}",
+            route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
+            arguments = listOf(
+                navArgument("username") { nullable = false },
+                navArgument("verified") { defaultValue = false}
+            ),
         ) {
 
             val username = it.arguments?.getString("username")!!
+            val verified = it.arguments?.getBoolean("verified")!!
 
             val otherProfileStatsViewModel = otherProfileStatsViewModel(username = username)
 
             OtherProfileStatsRoute(
                 otherProfileStatsViewModel = otherProfileStatsViewModel,
                 navActions = navActions,
-                username = user.username,
-                verified = user.verified,
+                username = username,
+                verified = verified,
             )
         }
 
-        composable(MainDestinations.PROFILE_STATS_ROUTE) {
+        composable(
+            route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
+            arguments = listOf(
+                navArgument("username") { nullable = false },
+                navArgument("verified") { defaultValue = false}
+            )
+        ) {
             val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
+
+            val username = it.arguments?.getString("username")!!
+            val verified = it.arguments?.getBoolean("verified")!!
+
             ProfileStatsRoute(
                 profileStatsViewModel = profileStatsViewModel,
                 navActions = navActions,
-                username = user.username,
-                verified = user.verified,
+                username = username,
+                verified = verified,
             )
         }
 

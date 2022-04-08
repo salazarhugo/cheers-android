@@ -167,7 +167,7 @@ class AddPostViewModel @Inject constructor(application: Application) : ViewModel
 
     fun uploadPost() {
         val uiState = viewModelState.value
-        Log.d("HAHA", uiState.photos.toString())
+        Log.d("Cloud", uiState.photos.toString())
         val uploadWorkRequest: WorkRequest =
             OneTimeWorkRequestBuilder<UploadPostWorker>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

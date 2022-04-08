@@ -39,9 +39,10 @@ class AddPeopleViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val users = userRepository.queryUsers(query = query)
-            viewModelState.update {
-                it.copy(users = users, isLoading = false)
+             userRepository.queryUsers(query = query).collect { users ->
+                viewModelState.update {
+                    it.copy(users = users, isLoading = false)
+                }
             }
         }
     }

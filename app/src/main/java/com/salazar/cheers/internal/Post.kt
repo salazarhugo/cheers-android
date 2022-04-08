@@ -2,6 +2,8 @@ package com.salazar.cheers.internal
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
 import androidx.room.PrimaryKey
 
 object PostType {
@@ -10,7 +12,18 @@ object PostType {
     const val VIDEO = "VIDEO"
 }
 
-@Entity(tableName = "posts")
+@Entity(
+    tableName = "posts",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["authorId"],
+            onDelete = CASCADE,
+            onUpdate = CASCADE,
+        )
+    ]
+)
 data class Post(
     @PrimaryKey
     @ColumnInfo(name = "postId")

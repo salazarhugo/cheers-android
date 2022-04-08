@@ -43,7 +43,10 @@ import com.salazar.cheers.components.LikeButton
 import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.post.PostBody
+import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.theme.Roboto
@@ -226,19 +229,20 @@ fun Post(
                 )
             }
 
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom,
-                ) {
-                    Text(
-                        text = "Hangout event",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Column() {
+            if (post.locationName.isNotBlank())
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        Text(
+                            text = "Hangout event",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Column() {
 //                        Text(
 //                            text = String.format("%.2f", post.locationLongitude),
 //                            style = MaterialTheme.typography.titleMedium
@@ -247,16 +251,34 @@ fun Post(
 //                            text = String.format("%.2f", post.locationLatitude),
 //                            style = MaterialTheme.typography.titleMedium
 //                        )
+                        }
                     }
+                    StaticMap(
+                        longitude = post.locationLongitude,
+                        latitude = post.locationLatitude,
+                        onMapClick = onMapClick,
+                    )
                 }
-                StaticMap(
-                    longitude = post.locationLongitude,
-                    latitude = post.locationLatitude,
-                    onMapClick = onMapClick,
-                )
-            }
             item {
-                PostBody(post = post, {}, {}, pagerState = rememberPagerState())
+                PostHeader(
+                    username = author.username,
+                    verified = author.verified,
+                    beverage = Beverage.fromName(post.beverage),
+                    public = post.privacy == Privacy.PUBLIC.name,
+                    created = post.created,
+                    profilePictureUrl = author.profilePictureUrl,
+                    locationName = post.locationName,
+                )
+                PostText(
+                    caption = post.caption,
+                    onUserClicked = {},
+                )
+                PostBody(
+                    post = post,
+                    onPostClicked = {},
+                    onLike = {},
+                    pagerState = rememberPagerState()
+                )
                 PostFooter(
                     post = post,
                     onDelete = onDelete,

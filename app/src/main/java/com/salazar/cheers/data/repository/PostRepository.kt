@@ -10,8 +10,10 @@ import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.paging.PostRemoteMediator
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,11 +24,11 @@ class PostRepository @Inject constructor(
 ) {
     val postDao = database.postDao()
 
-    fun getPosts(): Flow<PagingData<PostFeed>> {
+    suspend fun getPosts(): Flow<PagingData<PostFeed>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
-                enablePlaceholders = false,
+                enablePlaceholders = true,
             ),
             remoteMediator = PostRemoteMediator(database = database, networkService = service),
         ) {
@@ -75,7 +77,7 @@ class PostRepository @Inject constructor(
         return post.copy(tagUsers = postDao.getPostUsers(post.post.tagUsersId))
     }
 
-    suspend fun toggleLike(post: Post) {
+    suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {
         val likes = if (post.liked) post.likes - 1 else post.likes + 1
 
         postDao.update(post.copy(liked = !post.liked, likes = likes))

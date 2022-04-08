@@ -3,7 +3,7 @@ package com.salazar.cheers.components.post
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
@@ -15,6 +15,7 @@ import com.salazar.cheers.ui.main.home.VideoPlayer
 fun PostBody(
     post: Post,
     onPostClicked: (postId: String) -> Unit,
+    modifier: Modifier = Modifier,
     onLike: (post: Post) -> Unit,
     pagerState: PagerState = rememberPagerState(),
 ) {
@@ -28,6 +29,7 @@ fun PostBody(
             )
         else if (post.photos.isNotEmpty())
             PhotoCarousel(
+                modifier = modifier,
                 photos = post.photos,
                 pagerState = pagerState,
             ) { onPostClicked(post.id) }

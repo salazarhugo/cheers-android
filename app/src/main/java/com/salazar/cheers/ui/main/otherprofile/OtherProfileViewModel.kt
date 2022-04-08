@@ -87,11 +87,18 @@ class OtherProfileViewModel @AssistedInject constructor(
 
     init {
         refresh()
+        viewModelScope.launch {
+            userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
+                updateUser(user)
+            }
+        }
     }
 
     fun refresh() {
-        getUser(username = username)
-        refreshUserPosts(username = username)
+        viewModelScope.launch {
+            userRepository.refreshUser(userIdOrUsername = username)
+            refreshUserPosts(username = username)
+        }
     }
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
@@ -99,9 +106,12 @@ class OtherProfileViewModel @AssistedInject constructor(
     fun toggleFollow(user: User) {
         viewModelScope.launch {
             userRepository.toggleFollow(user = user)
-            viewModelState.update {
-                it.copy(user = user.copy(isFollowed = !user.isFollowed))
-            }
+        }
+    }
+
+    fun updateUser(user: User?) {
+        viewModelState.update {
+           it.copy(user = user)
         }
     }
 
@@ -114,19 +124,6 @@ class OtherProfileViewModel @AssistedInject constructor(
     fun updateShortLink(shortLink: String) {
         viewModelState.update {
             it.copy(shortLink = shortLink)
-        }
-    }
-
-    private fun getUser(username: String) {
-        viewModelState.update {
-            it.copy(isLoading = true)
-        }
-
-        viewModelScope.launch {
-            val user = userRepository.getUser(userIdOrUsername = username)
-            viewModelState.update {
-                it.copy(user = user, isLoading = false)
-            }
         }
     }
 

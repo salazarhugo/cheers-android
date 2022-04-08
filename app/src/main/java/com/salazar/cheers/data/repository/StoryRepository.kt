@@ -7,11 +7,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.data.entities.StoryResponse
 import com.salazar.cheers.data.paging.StoryRemoteMediator
 import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.internal.TextMessage
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreChat
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,7 +26,9 @@ class StoryRepository @Inject constructor(
 
     private val storyDao = database.storyDao()
 
-    fun getStories(): Flow<PagingData<Story>> {
+    suspend fun getMyStories(): Flow<List<Story>> = storyDao.getStoriesByAuthor()
+
+    suspend fun getStories(): Flow<PagingData<Story>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
@@ -32,15 +36,29 @@ class StoryRepository @Inject constructor(
             ),
             remoteMediator = StoryRemoteMediator(database = database, networkService = service),
         ) {
-            storyDao.pagingSource()
+            return@Pager storyDao.pagingSource()
         }.flow
     }
 
-    suspend fun seenStory(storyId: String) {
-        service.seenStory(storyId = storyId)
+    suspend fun delete(storyId: String) {
+        coroutineScope {
+            service.deleteStory(storyId = storyId)
+        }
+        storyDao.deleteWithId(storyId = storyId)
     }
 
-    fun sendReaction(user: User, text: String) {
+    suspend fun seenStory(storyId: String) {
+        coroutineScope {
+            service.seenStory(storyId = storyId)
+        }
+        val story = storyDao.getStory(storyId = storyId)
+        storyDao.update(story = story.copy(seenBy = story.seenBy + FirebaseAuth.getInstance().currentUser?.uid!!))
+    }
+
+    fun sendReaction(
+        user: User,
+        text: String
+    ) {
         FirestoreChat.getOrCreateChatChannel(user.id) { channelId ->
             val textMessage =
                 TextMessage().copy(

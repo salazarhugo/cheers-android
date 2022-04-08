@@ -8,12 +8,12 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import com.salazar.cheers.R
-import org.jetbrains.anko.toast
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,7 +25,7 @@ object Utils {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("label",text)
         clipboard.setPrimaryClip(clip)
-        toast("Link copied")
+        Toast.makeText(this, "Link copied", Toast.LENGTH_SHORT).show()
     }
 
     fun Context.getActivity(): AppCompatActivity? = when (this) {

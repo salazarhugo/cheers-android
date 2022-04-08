@@ -17,7 +17,7 @@ import com.salazar.cheers.ui.main.profile.ProfileStats
 @Composable
 fun ProfileHeader(
     user: User,
-    onStatClicked: (statName: String, username: String) -> Unit,
+    onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

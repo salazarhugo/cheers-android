@@ -7,10 +7,7 @@ import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
@@ -32,6 +29,15 @@ class SearchViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            uiState.flatMapLatest {
+                userRepository.queryUsers(it.searchInput)
+            }.collect { users ->
+                viewModelState.update {
+                    it.copy(users = users, isLoading = false)
+                }
+            }
+        }
         refreshUserRecommendations()
         updateRecentUser()
     }
@@ -48,17 +54,14 @@ class SearchViewModel @Inject constructor(
 
     fun onSearchInputChanged(searchInput: String) {
         viewModelState.update {
-            it.copy(searchInput = searchInput)
+            it.copy(searchInput = searchInput, isLoading = true)
         }
-        refreshUsers(searchInput = searchInput)
+        queryUsers(searchInput = searchInput)
     }
 
-    fun refreshUsers(searchInput: String) {
+    fun queryUsers(searchInput: String) {
         viewModelScope.launch {
-            val users = userRepository.queryUsers(searchInput)
-            viewModelState.update {
-                it.copy(users = users)
-            }
+            userRepository.refreshQueryUsers(searchInput)
         }
     }
 

@@ -53,14 +53,19 @@ class CheersViewModel @Inject constructor(
 
         if (auth.currentUser == null) {
             viewModelState.update {
-                it.copy(user = null)
+                it.copy(user = null, isLoading = false)
             }
             return
         }
+
+        viewModelState.update {
+            it.copy(isLoading = true)
+        }
+
         viewModelScope.launch {
             viewModelState.update {
                 val user = userRepository.getCurrentUser()
-                it.copy(user = user)
+                it.copy(user = user, isLoading = false)
             }
         }
     }

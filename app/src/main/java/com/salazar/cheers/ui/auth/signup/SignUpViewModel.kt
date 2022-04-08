@@ -12,6 +12,7 @@ import com.salazar.cheers.data.Result
 import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -237,6 +238,7 @@ class SignUpViewModel @Inject constructor(
     ) {
         updateIsSignedIn(true)
         viewModelScope.launch {
+            delay(5000)
             Neo4jUtil.updateUser(
                 username = username
             )
@@ -248,7 +250,6 @@ class SignUpViewModel @Inject constructor(
         val state = uiState.value
         val username = state.username
         val email = state.email
-        val name = state.name
         val password = state.password
 
         updateIsLoading(true)
@@ -263,29 +264,16 @@ class SignUpViewModel @Inject constructor(
             return
         }
 
-        isUsernameAvailable(username) { result ->
-            when (result) {
-                is Result.Success -> {
-                    if (state.withGoogle)
+        if (state.withGoogle)
+            signInSuccessful(username = username)
+        else
+            Firebase.auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful)
                         signInSuccessful(username = username)
-                    else {
-                        Firebase.auth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    signInSuccessful(username = username)
-                                } else {
-                                    // If sign in fails, display a message to the user.
-                                    updateErrorMessage(task.exception?.message)
-                                }
-                                updateIsLoading(false)
-                            }
-                    }
+                    else
+                        updateErrorMessage(task.exception?.message)
+                    updateIsLoading(false)
                 }
-                else -> {
-                    updateErrorMessage("Username not available")
-                    return@isUsernameAvailable
-                }
-            }
-        }
     }
 }

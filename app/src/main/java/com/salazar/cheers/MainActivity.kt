@@ -32,8 +32,8 @@ import com.salazar.cheers.ui.main.event.detail.EventDetailViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsViewModel
+import com.salazar.cheers.ui.main.story.stats.StoryStatsViewModel
 import com.salazar.cheers.ui.sheets.SendGiftViewModel
-import com.stripe.android.PaymentConfiguration
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @InstallIn(ActivityComponent::class)
     interface ViewModelFactoryProvider {
         fun postDetailViewModelFactory(): PostDetailViewModel.PostDetailViewModelFactory
+        fun storyStatsViewModelFactory(): StoryStatsViewModel.StoryStatsViewModelFactory
         fun eventDetailViewModelFactory(): EventDetailViewModel.EventDetailViewModelFactory
         fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
         fun otherProfileStatsViewModelFactory(): OtherProfileStatsViewModel.OtherProfileStatsViewModelFactory
@@ -74,11 +75,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             )
         }
 
-        PaymentConfiguration.init(
-            this,
-            "pk_live_51KWqPTAga4Q2CELO2K93NrScmrQOQf0Pbvn0XpDXSqW4gzgXFWpMx1lnSjTfR8251B3TI4zHmQ0MqFDCYdpKD2D200KhtML5F7"
-        )
-//
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()

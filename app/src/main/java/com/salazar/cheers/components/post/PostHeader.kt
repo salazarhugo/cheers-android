@@ -36,8 +36,8 @@ fun PostHeader(
     locationName: String,
     profilePictureUrl: String,
     darkMode: Boolean = false,
-    onHeaderClicked: (username: String) -> Unit,
-    onMoreClicked: () -> Unit,
+    onHeaderClicked: (username: String) -> Unit = {},
+    onMoreClicked: () -> Unit = {},
 ) {
     val color = if (darkMode) Color.White else MaterialTheme.colorScheme.onBackground
 

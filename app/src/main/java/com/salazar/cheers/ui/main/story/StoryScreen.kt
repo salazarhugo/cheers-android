@@ -12,6 +12,8 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -50,12 +52,11 @@ import kotlin.math.absoluteValue
 @Composable
 fun StoryScreen(
     uiState: StoryUiState,
-    onStoryClick: () -> Unit,
+    onStoryUIAction: (StoryUIAction, String) -> Unit,
     onStoryOpen: (String) -> Unit,
     onNavigateBack: () -> Unit,
     onUserClick: (String) -> Unit,
     value: String,
-    pause: Boolean,
     onFocusChange: (Boolean) -> Unit,
     onInputChange: (String) -> Unit,
     onSendReaction: (Story, String) -> Unit,
@@ -71,7 +72,6 @@ fun StoryScreen(
         StoryCarousel(
             stories = stories.itemSnapshotList.items,
             pagerState = pagerState,
-            onStoryClick = onStoryClick,
             onStoryOpen = onStoryOpen,
             onStoryFinish = {
                 if (pagerState.currentPage + 1 >= stories.itemCount)
@@ -85,9 +85,9 @@ fun StoryScreen(
             value = value,
             onInputChange = onInputChange,
             onSendReaction = onSendReaction,
-            pause = pause,
             onFocusChange = onFocusChange,
             showInterstitialAd = showInterstitialAd,
+            onStoryUIAction = onStoryUIAction,
         )
     }
 }
@@ -95,14 +95,13 @@ fun StoryScreen(
 @Composable
 fun StoryCarousel(
     stories: List<Story>,
+    onStoryUIAction: (StoryUIAction, String) -> Unit,
     showInterstitialAd: () -> Unit,
     pagerState: PagerState,
-    onStoryClick: () -> Unit,
     onStoryFinish: () -> Unit,
     onStoryOpen: (String) -> Unit,
     onUserClick: (String) -> Unit,
     value: String,
-    pause: Boolean,
     onFocusChange: (Boolean) -> Unit,
     onInputChange: (String) -> Unit,
     onSendReaction: (Story, String) -> Unit,
@@ -128,10 +127,13 @@ fun StoryCarousel(
         Scaffold(
             bottomBar = {
                 StoryFooter(
+                    story = story,
                     value = value,
+                    isUserMe = story.author.id == FirebaseAuth.getInstance().currentUser?.uid!!,
                     onInputChange = onInputChange,
                     onSendReaction = { onSendReaction(story, it) },
                     onFocusChange = { isPaused = it },
+                    onStoryUIAction = onStoryUIAction,
                 )
             },
             backgroundColor = Color.Black,
@@ -162,7 +164,9 @@ fun StoryCarousel(
                     .aspectRatio(9 / 16f)
                     .clip(RoundedCornerShape(16.dp))
                     .fillMaxWidth()
-                    .clickable { onStoryClick() }
+                    .clickable {
+                        onStoryUIAction(StoryUIAction.OnTap, story.story.id)
+                    }
             )
             StoryHeader(
                 currentPage = currentPage,
@@ -215,23 +219,79 @@ fun StoryHeader(
 
 @Composable
 fun StoryFooter(
+    story: Story,
     value: String,
+    isUserMe: Boolean,
+    onStoryUIAction: (StoryUIAction, String) -> Unit,
     onInputChange: (String) -> Unit,
     onSendReaction: (String) -> Unit,
     onFocusChange: (Boolean) -> Unit,
 ) {
+    if (isUserMe)
+        StoryMeFooter(
+            story = story,
+            onStoryUIAction = onStoryUIAction,
+        )
+    else
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .imePadding()
+                .padding(16.dp)
+        ) {
+            StoryInputField(
+                value = value,
+                onInputChange = onInputChange,
+                onSendReaction = onSendReaction,
+                onFocusChange = onFocusChange
+            )
+        }
+}
+
+@Composable
+fun StoryMeFooter(
+    story: Story,
+    onStoryUIAction: (StoryUIAction, String) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .imePadding()
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
     ) {
-        StoryInputField(
-            value = value,
-            onInputChange = onInputChange,
-            onSendReaction = onSendReaction,
-            onFocusChange = onFocusChange
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable {
+                onStoryUIAction(StoryUIAction.OnActivity, story.story.id)
+            }
+        ) {
+            Icon(
+                Icons.Outlined.AccountCircle,
+                contentDescription = null,
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Activity",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable {
+                onStoryUIAction(StoryUIAction.OnDelete, story.story.id)
+            }
+        ) {
+            Icon(
+                Icons.Outlined.Delete,
+                contentDescription = null, tint = MaterialTheme.colorScheme.error
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Delete",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
 

@@ -4,7 +4,6 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.bumptech.glide.load.HttpException
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.CheersDatabase
@@ -23,6 +22,7 @@ class PostRemoteMediator(
 ) : RemoteMediator<Int, PostFeed>() {
 
     val postDao = database.postDao()
+    val userDao = database.userDao()
     val remoteKeyDao = database.remoteKeyDao()
     val initialPage = 0
 
@@ -53,10 +53,8 @@ class PostRemoteMediator(
                     val result = response.data
                     val endOfPaginationReached = result.size < state.config.pageSize
 
-                    database.withTransaction {
                         if (loadType == LoadType.REFRESH) {
                             remoteKeyDao.clear()
-//                            postDao.clearAll()
                         }
 
                         val prevKey = if (page == initialPage) null else page - 1
@@ -64,22 +62,19 @@ class PostRemoteMediator(
                         val keys = result.map {
                             RemoteKey(postId = it.first.id, prevKey = prevKey, nextKey = nextKey)
                         }
-
                         remoteKeyDao.insertAll(keys)
                         result.forEach {
-                            postDao.insert(
-                                it.first,//.copy(relativeTime = prettyDate(it.first.createdTime)),
-                                it.second,
-                            )
+                            userDao.insertOrUpdateAll(it.second)
+                            postDao.insert(it.first)
                         }
-                    }
+//                    }
                     MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
                 }
                 is Result.Error -> MediatorResult.Error(response.exception)
             }
         } catch (e: IOException) {
             MediatorResult.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             MediatorResult.Error(e)
         }
     }

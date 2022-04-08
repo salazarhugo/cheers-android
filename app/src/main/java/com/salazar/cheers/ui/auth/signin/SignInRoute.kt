@@ -3,10 +3,7 @@ package com.salazar.cheers.ui.auth.signin
 import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -38,17 +35,18 @@ fun SignInRoute(
             }
         }
 
-    val acct = uiState.acct
-    if (acct != null)
-        SideEffect {
-            navActions.navigateToSignUpWithGoogle(acct.email!!, acct.displayName ?: "")
-        }
+    val signedIn = uiState.isSignedIn
 
+//            navActions.navigateToSignUpWithGoogle(acct.email!!, acct.displayName ?: "")
+    if (signedIn)
+        LaunchedEffect(Unit) {
+            navActions.navigateToMain()
+        }
+    else
     SignInScreen(
         uiState = uiState,
         signInWithEmailPassword = {
             signInViewModel.signInWithEmailPassword()
-            keyboardController?.hide()
         },
         signInWithGoogle = { authResultLauncher.launch(1) },
         navigateToPhone = { navActions.navigateToPhone() },

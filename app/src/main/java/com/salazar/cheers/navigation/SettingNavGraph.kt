@@ -54,11 +54,11 @@ fun NavGraphBuilder.settingNavGraph(
         ) {
             val addPaymentViewModel = hiltViewModel<AddPaymentViewModel>()
 
-            AddPaymentMethod(
-                addPaymentViewModel = addPaymentViewModel,
-                navActions = navActions,
-                onAddCard = {}
-            )
+//            AddPaymentMethod(
+//                addPaymentViewModel = addPaymentViewModel,
+//                navActions = navActions,
+//                onAddCard = {}
+//            )
         }
 
         composable(

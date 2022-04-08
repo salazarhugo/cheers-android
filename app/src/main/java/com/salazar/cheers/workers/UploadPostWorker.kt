@@ -13,8 +13,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
@@ -23,7 +21,8 @@ import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
@@ -144,47 +143,37 @@ class UploadPostWorker @AssistedInject constructor(
                 }
                 PostType.IMAGE -> {
 
-                    val tasks: MutableList<Deferred<Task<*>>> = mutableListOf()
+                    val downloadUrls = mutableListOf<String>()
 
                     coroutineScope {
                         photos.toList().forEach { photoUri ->
                             val photoBytes = extractImage(Uri.parse(photoUri))
-                            val task = async {
-                                StorageUtil.uploadPostImage2(photoBytes)
+                            async {
+                                val uri = StorageUtil.uploadPostImage(photoBytes)
+                                downloadUrls.add(uri.toString())
                             }
-                            tasks.add(task)
                         }
                     }
 
-                    Tasks.whenAllComplete(tasks.awaitAll()).addOnSuccessListener {
-                        val downloadUrls = mutableListOf<String>()
+                    Log.d("Cloud Download Urls", downloadUrls.toString())
 
-                        it.forEach { task ->
-                            task.addOnSuccessListener { downloadUrl ->
-                                downloadUrls.add(downloadUrl.toString())
-                            }
-                        }
+                    val post = Post(
+                        name = name,
+                        type = postType,
+                        caption = photoCaption,
+                        photos = downloadUrls,
+                        drunkenness = drunkenness,
+                        beverage = beverage,
+                        locationName = locationName,
+                        locationLatitude = latitude,
+                        locationLongitude = longitude,
+                        privacy = privacy,
+                        allowJoin = allowJoin,
+                        tagUsersId = tagUserIds.toList()
+                    )
 
-                        val post = Post(
-                            name = name,
-                            type = postType,
-                            caption = photoCaption,
-                            photos = downloadUrls,
-                            drunkenness = drunkenness,
-                            beverage = beverage,
-                            locationName = locationName,
-                            locationLatitude = latitude,
-                            locationLongitude = longitude,
-                            privacy = privacy,
-                            allowJoin = allowJoin,
-                            tagUsersId = tagUserIds.toList()
-                        )
-
-                        GlobalScope.launch {
-                            Neo4jUtil.addPost(post)
-                        }
-                        makeStatusNotification("Successfully uploaded", appContext)
-                    }
+                    Neo4jUtil.addPost(post)
+                    makeStatusNotification("Successfully uploaded", appContext)
 
                 }
                 PostType.TEXT -> {

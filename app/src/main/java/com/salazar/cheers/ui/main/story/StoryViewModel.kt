@@ -7,9 +7,17 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.data.repository.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class StoryUIAction {
+    object OnTap : StoryUIAction()
+    object OnDelete : StoryUIAction()
+    object OnSeen : StoryUIAction()
+    object OnActivity : StoryUIAction()
+}
 
 
 data class StoryUiState(
@@ -51,6 +59,12 @@ class StoryViewModel @Inject constructor(
         }
     }
 
+    fun onDelete(storyId: String) {
+        viewModelScope.launch {
+            storyRepository.delete(storyId = storyId)
+        }
+    }
+
     fun onSendReaction(
         story: Story,
         text: String
@@ -73,8 +87,10 @@ class StoryViewModel @Inject constructor(
 
     private fun refreshStoryFlow() {
         viewModelState.update { it.copy(isLoading = true) }
-        viewModelState.update {
-            it.copy(storiesFlow = storyRepository.getStories(), isLoading = false)
+        viewModelScope.launch(Dispatchers.IO) {
+            viewModelState.update {
+                it.copy(storiesFlow = storyRepository.getStories(), isLoading = false)
+            }
         }
     }
 

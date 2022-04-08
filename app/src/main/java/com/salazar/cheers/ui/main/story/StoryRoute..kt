@@ -42,14 +42,18 @@ fun StoryRoute(
 
     StoryScreen(
         uiState = uiState,
-        onStoryClick = {},
+        onStoryUIAction = { action, storyId ->
+            when (action) {
+                is StoryUIAction.OnDelete -> storyViewModel.onDelete(storyId = storyId)
+                is StoryUIAction.OnActivity -> navActions.navigateToStoryStats(storyId)
+            }
+        },
         onStoryOpen = storyViewModel::onStoryOpen,
         onNavigateBack = { navActions.navigateBack() },
         onUserClick = { navActions.navigateToOtherProfile(it) },
         value = uiState.input,
         onInputChange = storyViewModel::onInputChange,
         onSendReaction = storyViewModel::onSendReaction,
-        pause = uiState.pause,
         onFocusChange = storyViewModel::onPauseChange,
         showInterstitialAd = showInterstitialAd,
     )

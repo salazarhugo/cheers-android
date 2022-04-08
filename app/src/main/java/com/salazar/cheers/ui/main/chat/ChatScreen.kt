@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.chat
 
 import OnMessageLongClickDialog
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
@@ -315,14 +316,13 @@ fun AuthorAndTextMessage(
     }
 }
 
-
 @Composable
 private fun AuthorNameTimestamp(msg: Message) {
     // Combine author and timestamp for a11y.
     Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
         Text(
             text = msg.senderUsername,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .alignBy(LastBaseline)
@@ -379,17 +379,20 @@ fun ImageMessageBubble(
 ) {
     Column {
         message.imagesDownloadUrl.forEach { downloadUrl ->
+            var tap by remember { mutableStateOf(false)}
             Image(
                 painter = rememberImagePainter(data = downloadUrl),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(200.dp)
+                    .let { if (tap) it.fillMaxSize() else it.aspectRatio(3/4f) }
+                    .animateContentSize()
                     .padding(3.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onLongPress = { onLongClickMessage(message.id) },
-                            onDoubleTap = { onDoubleTapMessage(message.id) }
+                            onDoubleTap = { onDoubleTapMessage(message.id) },
+                            onTap = { tap = !tap }
                         )
                     },
                 contentScale = ContentScale.Crop,

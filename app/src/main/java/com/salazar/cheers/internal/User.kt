@@ -7,7 +7,7 @@ import java.io.Serializable
 
 @Entity(
     tableName = "users",
-    indices = [Index(value = ["username"], unique = true)],
+    indices = [Index(value = ["username"], unique = true)]
 )
 data class User(
     @PrimaryKey

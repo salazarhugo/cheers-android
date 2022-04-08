@@ -9,6 +9,7 @@ import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserStatsDao
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -27,6 +28,10 @@ class UserRepository @Inject constructor(
         service.blockUser(otherUserId = userId)
     }
 
+    suspend fun getFollowersFollowing(userIdOrUsername: String) = withContext(Dispatchers.IO) {
+        return@withContext service.getFollowersFollowing(userIdOrUsername = userIdOrUsername)
+    }
+
     suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {
         when (val result = service.getUserStats(username = username)) {
             is Result.Success -> userStatsDao.insert(userStats = result.data)
@@ -35,15 +40,17 @@ class UserRepository @Inject constructor(
         return@withContext userStatsDao.getUserStats(username)
     }
 
-    suspend fun queryUsers(query: String) = withContext(Dispatchers.IO) {
-        launch {
-            userDao.insertAll(service.queryUsers(query = query))
-        }
-        return@withContext userDao.queryUsers(query = query)
+    suspend fun refreshQueryUsers(query: String) = withContext(Dispatchers.IO) {
+        userDao.insertOrUpdateAll(service.queryUsers(query = query))
     }
 
+    suspend fun queryUsers(query: String) = userDao.queryUsers(query = query)
+
     suspend fun toggleFollow(user: User) {
-        userDao.update(user.copy(isFollowed = !user.isFollowed))
+        val newFollowersCount = if (user.isFollowed) user.followers - 1 else user.followers + 1
+        val newUser = user.copy(isFollowed = !user.isFollowed, followers = newFollowersCount)
+
+        userDao.update(newUser)
 
         if (user.isFollowed)
             service.unfollowUser(user.username)
@@ -65,6 +72,9 @@ class UserRepository @Inject constructor(
         return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 
+    fun getUserFlow(userIdOrUsername: String): Flow<User> =
+        userDao.getUserFlowWithUsername(userIdOrUsername = userIdOrUsername)
+
     suspend fun getUser(userIdOrUsername: String): User = withContext(Dispatchers.IO) {
         launch(Dispatchers.IO) {
             refreshUser(userIdOrUsername = userIdOrUsername)
@@ -77,7 +87,7 @@ class UserRepository @Inject constructor(
         when (result) {
             is Result.Success -> {
                 if (result.data != null)
-                    userDao.insert(result.data)
+                    userDao.insertOrUpdate(result.data)
             }
             is Result.Error -> {}
         }
@@ -88,7 +98,7 @@ class UserRepository @Inject constructor(
         when (val result = service.getSuggestions()) {
             is Result.Success -> {
                 val suggestions = result.data
-                userDao.insertAll(suggestions)
+                userDao.insertOrUpdateAll(suggestions)
                 val ids = suggestions.map { it.id }
                 return@withContext userDao.getUsersWithListOfIds(ids)
             }

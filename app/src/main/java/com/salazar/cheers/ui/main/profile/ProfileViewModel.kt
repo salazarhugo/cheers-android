@@ -80,7 +80,13 @@ class ProfileViewModel @Inject constructor(
         )
 
     init {
-        getUser()
+        viewModelScope.launch {
+            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!).collect { user ->
+                viewModelState.update {
+                    it.copy(user = user)
+                }
+            }
+        }
         refreshUserPosts()
     }
 
@@ -100,17 +106,6 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun getUser() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val user = userRepository.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
-            viewModelState.update {
-                it.copy(user = user, isLoading = false)
-            }
-        }
-    }
-
     private fun refreshUser() {
         viewModelState.update { it.copy(isLoading = true) }
 
@@ -119,7 +114,7 @@ class ProfileViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> viewModelState.update { it.copy( user = result.data, isLoading = false )
                 }
-                is Result.Error -> viewModelState.update { it.copy(errorMessages = "Couldn't refresh") }
+                is Result.Error -> viewModelState.update { it.copy(errorMessages = "Couldn't refresh", isLoading = false) }
             }
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,8 +57,9 @@ fun ProfileScreen(
     onDrinkingStatsClick: () -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
-    onStatClicked: (statName: String, username: String) -> Unit,
+    onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: () -> Unit,
+    onPostMoreClicked: (String, String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
 ) {
     when (uiState) {
@@ -72,6 +74,7 @@ fun ProfileScreen(
             onDrinkingStatsClick = onDrinkingStatsClick,
             onSwipeRefresh = onSwipeRefresh,
             onPostLike = onPostLike,
+            onPostMoreClicked = onPostMoreClicked,
         )
     }
 }
@@ -82,9 +85,10 @@ fun Profile(
     onEditProfileClicked: () -> Unit,
     onDrinkingStatsClick: () -> Unit,
     onSwipeRefresh: () -> Unit,
+    onPostMoreClicked: (String, String) -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
-    onStatClicked: (statName: String, username: String) -> Unit,
+    onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: () -> Unit,
     onWebsiteClicked: (String) -> Unit,
 ) {
@@ -158,6 +162,7 @@ fun Profile(
                                             postFeed,
                                             onPostClicked,
                                             onPostLike = onPostLike,
+                                            onPostMoreClicked = onPostMoreClicked,
                                         )
                                 }
                                 1 -> FunctionalityNotAvailablePanel()
@@ -197,6 +202,7 @@ fun Post(
     postFeed: PostFeed,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
+    onPostMoreClicked: (String, String) -> Unit,
 ) {
     val pagerState = rememberPagerState()
     val post = postFeed.post
@@ -211,7 +217,7 @@ fun Post(
         profilePictureUrl = author.profilePictureUrl,
         locationName = post.locationName,
         onHeaderClicked = {},
-        onMoreClicked = {},
+        onMoreClicked = { onPostMoreClicked(postFeed.post.id, postFeed.author.id)},
     )
     PostText(
         caption = post.caption,
@@ -219,6 +225,9 @@ fun Post(
     )
     PostBody(
         post = post,
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(16.dp)),
         onPostClicked = onPostClicked,
         onLike = {},
         pagerState = pagerState,
@@ -316,15 +325,15 @@ fun Toolbar(
 @Composable
 fun ProfileStats(
     user: User,
-    onStatClicked: (statName: String, username: String) -> Unit,
+    onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(26.dp)
     ) {
         val items = listOf(
             Counter("Posts", user.postCount, null),
-            Counter("Followers", user.followers, R.id.followersFollowingFragment),
-            Counter("Following", user.following, R.id.followersFollowingFragment),
+            Counter("Followers", user.followers),
+            Counter("Following", user.following),
         )
 
         items.forEach { item ->
@@ -332,7 +341,7 @@ fun ProfileStats(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.clickable {
                     if (item.navId != null) {
-                        onStatClicked(item.name, user.username)
+                        onStatClicked(item.name, user.username, user.verified)
                     }
                 }
             ) {

@@ -67,8 +67,6 @@ import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Typography
-import org.jetbrains.anko.collections.forEachWithIndex
-import org.jetbrains.anko.image
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.absoluteValue
@@ -246,7 +244,7 @@ fun NativeAdPost(ad: NativeAd) {
                 ad.images.forEach {
                     adView.addView(ImageView(context).apply {
                         scaleType = ImageView.ScaleType.CENTER_CROP
-                        this.image = it.drawable
+                        setImageDrawable(it.drawable)
                     })
                 }
 
@@ -279,7 +277,7 @@ fun TopTabs(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        tabs.forEachWithIndex { i, s ->
+        tabs.forEachIndexed { i, s ->
             val a =
                 if (tab == tabs.indexOf(s)) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors()
             FilledTonalButton(
@@ -467,7 +465,7 @@ fun PostList(
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
 //    val events = uiState.eventsFlow?.collectAsLazyPagingItems()
 
-    LazyColumn(state = uiState.listState) {
+    LazyColumn() {
         item {
             Stories(
                 uiState = uiState,
@@ -476,32 +474,22 @@ fun PostList(
             )
             DividerM3()
         }
-//        if (uiState.selectedTab == 1 && events != null)
-//            items(events) { event ->
-//                Event(
-//                    event!!,
-//                    onEventClicked = onEventClicked,
-//                )
-//            }
-//        else {
-        itemsIndexed(posts) { i, post ->
+        itemsIndexed(posts) { i, postFeed ->
             if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
                 DividerM3()
                 NativeAdPost(ad = uiState.nativeAd)
             }
-            if (post != null) {
+            if (postFeed != null)
                 Post(
                     modifier = Modifier.animateItemPlacement(),
-                    postFeed = post,
+                    postFeed = postFeed,
                     navigateToComments = navigateToComments,
                     onPostClicked = onPostClicked,
                     onUserClicked = onUserClicked,
                     onPostMoreClicked = onPostMoreClicked,
                     onLike = onLike,
                 )
-            }
         }
-//        }
 
         posts.apply {
             when {
@@ -577,6 +565,9 @@ fun Post(
         )
         PostBody(
             postFeed.post,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(16.dp)),
             onPostClicked = onPostClicked,
             onLike = onLike,
             pagerState = pagerState
@@ -592,6 +583,7 @@ fun Post(
 
 @Composable
 fun PhotoCarousel(
+    modifier: Modifier = Modifier,
     photos: List<String>,
     pagerState: PagerState,
     onPostClick: () -> Unit,
@@ -613,10 +605,8 @@ fun PhotoCarousel(
             contentDescription = "avatar",
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
+            modifier = modifier
                 .aspectRatio(1f)// or 4/5f
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp))
                 .fillMaxWidth()
                 .graphicsLayer(
                     scaleX = scale,
@@ -791,7 +781,7 @@ fun Event(
             painter = rememberImagePainter(
                 data = event.imageUrl,
                 builder = {
-                    error(R.drawable.image_placeholder)
+                    error(R.drawable.default_group_picture)
                 }
             ),
             contentDescription = null,

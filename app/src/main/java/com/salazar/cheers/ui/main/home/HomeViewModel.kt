@@ -127,16 +127,16 @@ class HomeViewModel @Inject constructor(
         )
 
     init {
-        refreshPostsFlow()
-        refreshEventsFlow()
+//        refreshEventsFlow()
         refreshStoryFlow()
-        refreshSuggestions()
+//        refreshSuggestions()
 
         viewModelScope.launch {
             viewModelState.update {
                 it.copy(user = userRepository.getCurrentUser())
             }
         }
+        refreshPostsFlow()
     }
 
     fun selectTab(index: Int) {
@@ -154,15 +154,23 @@ class HomeViewModel @Inject constructor(
 
     private fun refreshStoryFlow() {
         viewModelState.update { it.copy(isLoading = true) }
-        viewModelState.update {
-            it.copy(storiesFlow = storyRepository.getStories(), isLoading = false)
+
+        viewModelScope.launch {
+            val stories = storyRepository.getStories()
+            viewModelState.update {
+                it.copy(storiesFlow = stories, isLoading = false)
+            }
         }
     }
 
     private fun refreshPostsFlow() {
         viewModelState.update { it.copy(isLoading = true) }
-        viewModelState.update {
-            it.copy(postsFlow = postRepository.getPosts(), isLoading = false)
+
+        viewModelScope.launch {
+            val posts = postRepository.getPosts()
+            viewModelState.update {
+                it.copy(postsFlow = posts, isLoading = false)
+            }
         }
     }
 
@@ -173,7 +181,7 @@ class HomeViewModel @Inject constructor(
             viewModelState.update {
                 it.copy(
                     postsFlow = postRepository.getPosts(),
-                    eventsFlow = eventRepository.getEvents(),
+//                    eventsFlow = eventRepository.getEvents(),
                     storiesFlow = storyRepository.getStories(),
                     user = userRepository.getCurrentUser(),
                     isLoading = false
@@ -225,7 +233,6 @@ class HomeViewModel @Inject constructor(
     }
 
     fun initNativeAdd(context: Context) {
-//        return
         val configuration = RequestConfiguration.Builder()
             .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
         MobileAds.setRequestConfiguration(configuration)

@@ -2,7 +2,9 @@ package com.salazar.cheers.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.salazar.cheers.internal.User
 
 object StoryType {
     const val TEXT = "TEXT"
@@ -10,7 +12,18 @@ object StoryType {
     const val VIDEO = "VIDEO"
 }
 
-@Entity(tableName = "story")
+@Entity(
+    tableName = "story",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["authorId"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ]
+)
 data class StoryResponse(
     @PrimaryKey
     @ColumnInfo(name = "storyId")

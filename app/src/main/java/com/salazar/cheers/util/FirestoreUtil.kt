@@ -14,7 +14,6 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.Comment
-import com.salazar.cheers.internal.Payment
 import com.salazar.cheers.internal.Source
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.GlobalScope
@@ -103,31 +102,6 @@ object FirestoreUtil {
         }.addOnFailureListener {
             Log.e("Firestore", it.toString())
         }
-    }
-
-    fun getPaymentHistory(
-        onSuccess: (List<Payment>) -> Unit
-    ) {
-        firestoreInstance.collection("stripe_customers")
-            .document(FirebaseAuth.getInstance().currentUser?.uid!!)
-            .collection("payments")
-            .orderBy("created", Query.Direction.DESCENDING)
-            .addSnapshotListener { value, firebaseFirestoreException ->
-                if (firebaseFirestoreException != null) {
-                    Log.e("FIRESTORE", "Users listener error.", firebaseFirestoreException)
-                    return@addSnapshotListener
-                }
-
-                if (value == null) return@addSnapshotListener
-
-                val payments = mutableListOf<Payment>()
-
-                value.documents.forEach {
-                    val payment = it.toObject(Payment::class.java)!!
-                    payments.add(payment)
-                }
-                onSuccess(payments)
-            }
     }
 
     fun getComments(postId: String): Flow<List<Comment>> = callbackFlow {

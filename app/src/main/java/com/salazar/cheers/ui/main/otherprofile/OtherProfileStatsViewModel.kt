@@ -8,8 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.assisted.Assisted
@@ -88,22 +86,20 @@ class OtherProfileStatsViewModel @AssistedInject constructor(
         )
 
     init {
-        refreshFollowers()
-        refreshFollowing()
+        refreshFollowersFollowing()
     }
 
-    private fun refreshFollowers() {
+    fun onSwipeRefresh() {
+        refreshFollowersFollowing()
+    }
+
+    private fun refreshFollowersFollowing() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             viewModelState.update {
-                when (val result = Neo4jUtil.getFollowers(username = username)) {
-                    is Result.Success -> it.copy(followers = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
+                val result = userRepository.getFollowersFollowing(userIdOrUsername = username)
+                it.copy(followers = result.first, following = result.second, isLoading = false)
             }
         }
     }
@@ -111,23 +107,6 @@ class OtherProfileStatsViewModel @AssistedInject constructor(
     fun toggleFollow(user: User) {
         viewModelScope.launch {
             userRepository.toggleFollow(user = user)
-        }
-    }
-
-    private fun refreshFollowing() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            viewModelState.update {
-                val result = Neo4jUtil.getFollowing(username = username)
-                when (result) {
-                    is Result.Success -> it.copy(following = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
-            }
         }
     }
 

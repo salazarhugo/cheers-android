@@ -12,8 +12,8 @@ fun PaymentHistoryRoute(
 ) {
     val uiState by paymentHistoryViewModel.uiState.collectAsState()
 
-    PaymentHistoryScreen(
-        onBackPressed = { navActions.navigateBack() },
-        payments = uiState.payments
-    )
+//    PaymentHistoryScreen(
+//        onBackPressed = { navActions.navigateBack() },
+//        payments = uiState.payments
+//    )
 }

@@ -60,14 +60,21 @@ fun OtherProfileRoute(
                     onPostClicked = { navActions.navigateToPostDetail(it) },
                     onPostLike = otherProfileViewModel::toggleLike,
                     onFollowToggle = otherProfileViewModel::toggleFollow,
+                    onPostMoreClicked = { postId, authorId ->
+                        navActions.navigateToPostMoreSheet(
+                            postId,
+                            authorId
+                        )
+                    },
                     onGiftClick = {
                         val receiverId = uiState.user.id
                         navActions.navigateToSendGift(receiverId)
                     },
-                    onStatClicked = { statName, username ->
+                    onStatClicked = { statName, username, verified ->
                         navActions.navigateToOtherProfileStats(
                             statName,
-                            username
+                            username,
+                            verified,
                         )
                     },
                     onMessageClicked = {

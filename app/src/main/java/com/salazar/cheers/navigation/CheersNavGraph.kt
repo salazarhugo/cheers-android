@@ -7,11 +7,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -33,14 +31,9 @@ fun CheersNavGraph(
     navController: NavHostController = rememberAnimatedNavController(),
     darkTheme: Boolean,
     showInterstitialAd: () -> Unit,
-    user: User?
+    user: User?,
 ) {
-    val startDestination =
-        when {
-            user != null -> CheersDestinations.MAIN_ROUTE
-            else -> CheersDestinations.AUTH_ROUTE
-        }
-
+    val startDestination = CheersDestinations.AUTH_ROUTE
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     navController.navigatorProvider += bottomSheetNavigator
 
@@ -51,18 +44,6 @@ fun CheersNavGraph(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
-
-    val a =
-        navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE }
-
-    LaunchedEffect(user) {
-        when {
-            user != null -> {
-                if (a == true) navActions.navigateToMain()
-            }
-            else -> navActions.navigateToSignIn()
-        }
-    }
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
@@ -81,12 +62,6 @@ fun CheersNavGraph(
                             !currentRoute.contains(MainDestinations.STORY_ROUTE) && !currentRoute.contains(
                         MainDestinations.CHAT_ROUTE
                     )
-                val density = LocalDensity.current
-//                AnimatedVisibility(
-//                    visible = visible,
-//                    enter = slideInVertically { with(density) { 52.dp.roundToPx() } },
-//                    exit = slideOutVertically { with(density) { 52.dp.roundToPx() } }
-//                ) {
                 if (visible)
                     Column {
                         DividerM3()

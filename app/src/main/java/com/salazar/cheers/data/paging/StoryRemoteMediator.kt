@@ -5,13 +5,13 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.bumptech.glide.load.HttpException
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.data.entities.StoryRemoteKey
 import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
+import retrofit2.HttpException
 import java.io.IOException
 
 class StoryRemoteMediator(
@@ -20,6 +20,7 @@ class StoryRemoteMediator(
 ) : RemoteMediator<Int, Story>() {
 
     private val storyDao = database.storyDao()
+    private val userDao = database.userDao()
     private val remoteKeyDao = database.storyRemoteKeyDao()
     private val initialPage = 0
 
@@ -51,7 +52,6 @@ class StoryRemoteMediator(
                     val endOfPaginationReached = result.size < state.config.pageSize
                     Log.d("HAHA", result.toString())
 
-                    database.withTransaction {
                         if (loadType == LoadType.REFRESH) {
                             remoteKeyDao.clear()
                             storyDao.clearAll()
@@ -65,12 +65,9 @@ class StoryRemoteMediator(
 
                         remoteKeyDao.insertAll(keys)
                         result.forEach {
-                            storyDao.insert(
-                                it.first,
-                                it.second,
-                            )
+                            userDao.insertOrUpdateAll(it.second)
+                            storyDao.insert(it.first)
                         }
-                    }
                     MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
                 }
                 is Result.Error -> MediatorResult.Error(response.exception)

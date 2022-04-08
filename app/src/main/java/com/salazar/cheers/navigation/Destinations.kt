@@ -30,6 +30,7 @@ object MainDestinations {
     const val OTHER_PROFILE_ROUTE = "otherProfile"
     const val ACTIVITY_ROUTE = "activity"
     const val LIKES_ROUTE = "likes"
+    const val STORY_STATS_ROUTE = "storyStats"
     const val CHAT_ROUTE = "chat"
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
@@ -290,6 +291,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
             }
     }
 
+    val navigateToStoryStats: (storyId: String) -> Unit = { storyId ->
+        navController.navigate("${MainDestinations.STORY_STATS_ROUTE}/$storyId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToPostDetail: (postId: String) -> Unit = { postId ->
         navController.navigate("${MainDestinations.POST_DETAIL_ROUTE}/$postId") {
             launchSingleTop = true
@@ -328,15 +336,15 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToOtherProfileStats: (statName: String, username: String) -> Unit = { s, username ->
-        navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/$username") {
+    val navigateToOtherProfileStats: (statName: String, username: String, verified: Boolean) -> Unit = { s, username, verified ->
+        navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/$username/$verified") {
             launchSingleTop = true
             restoreState = true
         }
     }
 
-    val navigateToProfileStats: (statName: String, username: String) -> Unit = { s, u ->
-        navController.navigate(MainDestinations.PROFILE_STATS_ROUTE) {
+    val navigateToProfileStats: (statName: String, username: String, verified: Boolean) -> Unit = { s, username, verified ->
+        navController.navigate("${MainDestinations.PROFILE_STATS_ROUTE}/$username/$verified") {
             launchSingleTop = true
             restoreState = true
         }

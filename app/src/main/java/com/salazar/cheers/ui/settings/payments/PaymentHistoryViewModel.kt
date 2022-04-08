@@ -2,8 +2,6 @@ package com.salazar.cheers.ui.settings.payments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.internal.Payment
-import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,11 +23,6 @@ class PaymentHistoryViewModel @Inject constructor() : ViewModel() {
         )
 
     init {
-        FirestoreUtil.getPaymentHistory { payments ->
-            viewModelState.update {
-                it.copy(payments = payments)
-            }
-        }
     }
 
     fun updateIsLoading(isLoading: Boolean) {
@@ -43,6 +36,6 @@ class PaymentHistoryViewModel @Inject constructor() : ViewModel() {
 data class PaymentHistoryUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val payments: List<Payment> = emptyList(),
+    val payments: List<String> = emptyList(),
 )
 

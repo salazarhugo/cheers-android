@@ -22,6 +22,7 @@ fun OtherProfileStatsRoute(
         uiState = uiState,
         username = username,
         verified = verified,
+        onSwipeRefresh = otherProfileStatsViewModel::onSwipeRefresh,
         onFollowToggle = otherProfileStatsViewModel::toggleFollow,
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         onBackPressed = navActions.navigateBack,

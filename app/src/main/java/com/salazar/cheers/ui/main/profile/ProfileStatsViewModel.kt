@@ -3,8 +3,7 @@ package com.salazar.cheers.ui.main.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -81,39 +80,20 @@ class ProfileStatsViewModel @Inject constructor(
         )
 
     init {
-        refreshFollowers()
-        refreshFollowing()
+        refreshFollowersFollowing()
     }
 
-    private fun refreshFollowers() {
+    fun onSwipeRefresh() {
+        refreshFollowersFollowing()
+    }
+
+    private fun refreshFollowersFollowing() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             viewModelState.update {
-                when (val result = Neo4jUtil.getFollowers()) {
-                    is Result.Success -> it.copy(followers = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
-            }
-        }
-    }
-
-    private fun refreshFollowing() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            viewModelState.update {
-                val result = Neo4jUtil.getFollowing()
-                when (result) {
-                    is Result.Success -> it.copy(following = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
+                val result = userRepository.getFollowersFollowing(FirebaseAuth.getInstance().currentUser?.uid!!)
+                it.copy(followers = result.first, following = result.second, isLoading = false)
             }
         }
     }

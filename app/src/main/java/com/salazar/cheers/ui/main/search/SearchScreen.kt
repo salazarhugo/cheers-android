@@ -24,12 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
+import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
@@ -65,35 +67,49 @@ private fun SearchBody(
     Column {
         val users = uiState.users
         val recommendation = uiState.userRecommendations
-        if (users.isNullOrEmpty() && uiState.searchInput.isNotBlank()) {
-            Text("No results")
-            Spacer(Modifier.height(32.dp))
-        } else if (users.isNotEmpty())
-            UserList(users = users, onUserClicked = onUserClicked)
-        RecentUserList(
-            recent = uiState.recentUsers,
-            recommendations = recommendation,
-            onUserClicked = onUserClicked,
-            onDeleteRecentUser = onDeleteRecentUser,
-            onRecentUserClicked = onRecentUserClicked,
-        )
+//        if (users.isNullOrEmpty() && uiState.searchInput.isNotBlank()) {
+//            Text("No results")
+//            Spacer(Modifier.height(32.dp))
+        if (uiState.searchInput.isBlank())
+            RecentUserList(
+                recent = uiState.recentUsers,
+                recommendations = recommendation,
+                onUserClicked = onUserClicked,
+                onDeleteRecentUser = onDeleteRecentUser,
+                onRecentUserClicked = onRecentUserClicked,
+            )
+        else if (users.isNotEmpty())
+            UserList(
+                users = users,
+                onUserClicked = onUserClicked,
+                isLoading = uiState.isLoading,
+            )
     }
 }
 
 @Composable
 fun UserList(
     users: List<User>,
-    onUserClicked: (User) -> Unit
+    isLoading: Boolean,
+    onUserClicked: (User) -> Unit,
 ) {
     LazyColumn {
         item {
             Text(
                 text = "Result",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
                 modifier = Modifier.padding(16.dp),
             )
-//            Spacer(Modifier.height(8.dp))
         }
+        if (isLoading)
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicatorM3()
+                }
+            }
         items(users) { user ->
             UserCard(
                 modifier = Modifier.animateItemPlacement(),
@@ -117,7 +133,7 @@ fun RecentUserList(
             item {
                 Text(
                     text = "Recent",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
                     modifier = Modifier.padding(16.dp),
                 )
             }
@@ -229,9 +245,9 @@ fun UserCard(
 //                    Text(text = user.username, style = Typography.bodyMedium)
             }
         }
-        IconButton(onClick = {}) {
-            Icon(Icons.Default.Close, null)
-        }
+//        IconButton(onClick = {}) {
+//            Icon(Icons.Default.Close, null)
+//        }
     }
 }
 
