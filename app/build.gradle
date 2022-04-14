@@ -16,8 +16,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 31
-        versionCode 32
-        versionName "0.99.44"
+        versionCode 34
+        versionName "0.99.555"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -83,22 +83,22 @@ java {
 
 //protobuf {
 //    protoc {
-//        artifact = "com.google.protobuf:protoc:3.20.0"
+//        artifact = "com.google.protobuf:protoc:3.12.0"
 //    }
 //    plugins {
-//        javalite { artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0' }
-//        grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.45.1' }
+//        grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.41.0' }
+//        grpckt {
+//            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.2.1:jdk7@jar"
+//        }
 //    }
 //    generateProtoTasks {
 //        all().forEach { task ->
 //            task.builtins {
-//                remove java
+//                java { option 'lite' }
 //            }
 //            task.plugins {
-//                javalite{}
-//                grpc {
-//                    option 'lite'
-//                }
+//                grpc { option 'lite' }
+//                grpckt {}
 //            }
 //        }
 //    }
@@ -114,11 +114,13 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0'
 
-//    implementation("javax.annotation:javax.annotation-api:1.3.2")
+
 //    implementation("io.grpc:grpc-okhttp:1.41.0")
-//    implementation("io.grpc:grpc-stub:1.41.0")
 //    implementation("io.grpc:grpc-protobuf-lite:1.45.1")
+//    implementation("io.grpc:grpc-stub:1.41.0")
+//    implementation("io.grpc:grpc-kotlin-stub:1.2.1")
 //    implementation("io.grpc:grpc-netty-shaded:1.20.0")
+//    implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     // Klaxon
     implementation 'com.beust:klaxon:5.5'
@@ -253,12 +255,9 @@ dependencies {
     implementation("androidx.room:room-ktx:2.4.2")
 
     // Map Box SDK
-    implementation 'com.mapbox.maps:android:10.1.0'
+    implementation 'com.mapbox.maps:android:10.4.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.8.0'
-
-    // MapBox Geocoding
-    implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.23"
-//    implementation "com.mapbox.search:mapbox-search-android-ui:1.0.0-beta.23"
+    implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.28"
 
     // Paging
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")

@@ -156,7 +156,7 @@ fun StoryCarousel(
                 }
         ) {
             PrettyImage(
-                data = stories[page].story.photos[0],
+                data = stories[page].story.photoUrl,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,

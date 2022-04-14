@@ -1,10 +1,7 @@
 package com.salazar.cheers.internal
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
+import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
-import androidx.room.PrimaryKey
 
 object PostType {
     const val TEXT = "TEXT"
@@ -22,6 +19,9 @@ object PostType {
             onDelete = CASCADE,
             onUpdate = CASCADE,
         )
+    ],
+    indices = [
+        Index(value = ["authorId"])
     ]
 )
 data class Post(

@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.theme.GreyYoutube
 
 @Composable
 fun YourStory(
@@ -65,7 +64,7 @@ fun Story(
     username: String,
 ) {
     val border = if (seen)
-        BorderStroke(1.dp, GreyYoutube)
+        BorderStroke(1.dp, Color(0xFFBBBBBB))
     else
         BorderStroke(
             2.dp,

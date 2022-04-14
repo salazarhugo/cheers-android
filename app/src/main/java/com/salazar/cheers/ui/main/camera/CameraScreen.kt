@@ -1,14 +1,15 @@
 package com.salazar.cheers.ui.main.camera
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.View
 import android.webkit.MimeTypeMap
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
@@ -302,6 +303,7 @@ fun CameraControls(
     }
 }
 
+@SuppressLint("ClickableViewAccessibility")
 @Composable
 fun CameraPreview(
     uiState: CameraUiState,
@@ -317,18 +319,42 @@ fun CameraPreview(
         .requireLensFacing(lensFacing)
         .build()
 
+
     val previewView = remember { PreviewView(context) }
 
     LaunchedEffect(lensFacing, uiState.imageUri, uiState.flashMode) {
         val cameraProvider = context.getCameraProvider()
         cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
+        val camera = cameraProvider.bindToLifecycle(
             lifecycleOwner,
             cameraSelector,
             preview,
             imageCapture
         )
         preview.setSurfaceProvider(previewView.surfaceProvider)
+        val listener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                val currentZoomRatio = camera.cameraInfo.zoomState.value?.zoomRatio ?: 0F
+                val delta = detector.scaleFactor
+                camera.cameraControl.setZoomRatio(currentZoomRatio * delta)
+                return true
+            }
+        }
+        val scaleGestureDetector = ScaleGestureDetector(context, listener)
+        previewView.setOnTouchListener { view: View, motionEvent: MotionEvent ->
+            scaleGestureDetector.onTouchEvent(motionEvent)
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> true
+                MotionEvent.ACTION_UP -> {
+                    val factory = previewView.meteringPointFactory
+                    val point = factory.createPoint(motionEvent.x, motionEvent.y)
+                    val action = FocusMeteringAction.Builder(point).build()
+                    camera.cameraControl.startFocusAndMetering(action)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     Box(

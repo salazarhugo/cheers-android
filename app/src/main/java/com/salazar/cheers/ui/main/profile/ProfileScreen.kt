@@ -13,7 +13,6 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.Celebration
-import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
@@ -191,9 +190,9 @@ fun ProfileButtons(
         ) {
             Text("Edit Profile")
         }
-        IconButton(onClick = onDrinkingStatsClick) {
-            Icon(Icons.Outlined.QueryStats, null)
-        }
+//        IconButton(onClick = onDrinkingStatsClick) {
+//            Icon(Icons.Outlined.QueryStats, null)
+//        }
     }
 }
 
@@ -217,7 +216,7 @@ fun Post(
         profilePictureUrl = author.profilePictureUrl,
         locationName = post.locationName,
         onHeaderClicked = {},
-        onMoreClicked = { onPostMoreClicked(postFeed.post.id, postFeed.author.id)},
+        onMoreClicked = { onPostMoreClicked(postFeed.post.id, postFeed.author.id) },
     )
     PostText(
         caption = post.caption,
@@ -340,9 +339,7 @@ fun ProfileStats(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.clickable {
-                    if (item.navId != null) {
-                        onStatClicked(item.name, user.username, user.verified)
-                    }
+                    onStatClicked(item.name, user.username, user.verified)
                 }
             ) {
                 Text(

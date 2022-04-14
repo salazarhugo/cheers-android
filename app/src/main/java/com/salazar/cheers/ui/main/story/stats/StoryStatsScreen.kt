@@ -171,7 +171,7 @@ fun StoryCard(
             ) {
                 Image(
                     painter = rememberImagePainter(
-                        suggestedUser.story.photos.get(0)
+                        suggestedUser.story.photoUrl
                     ),
                     modifier = Modifier
                         .aspectRatio(9 / 16.0f),

@@ -33,6 +33,8 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.SwipeToRefresh
+import com.salazar.cheers.components.share.rememberSwipeRefreshState
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Typography
@@ -43,17 +45,23 @@ fun SearchScreen(
     onSearchInputChanged: (String) -> Unit,
     onUserClicked: (User) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
+    onSwipeRefresh: () -> Unit,
     onRecentUserClicked: (String) -> Unit,
 ) {
     Scaffold(
         topBar = { SearchBar(uiState, onSearchInputChanged) },
     ) {
-        SearchBody(
-            uiState = uiState,
-            onUserClicked = onUserClicked,
-            onDeleteRecentUser = onDeleteRecentUser,
-            onRecentUserClicked = onRecentUserClicked,
-        )
+        SwipeToRefresh(
+            state = rememberSwipeRefreshState(isRefreshing = false),
+            onRefresh = onSwipeRefresh,
+        ) {
+            SearchBody(
+                uiState = uiState,
+                onUserClicked = onUserClicked,
+                onDeleteRecentUser = onDeleteRecentUser,
+                onRecentUserClicked = onRecentUserClicked,
+            )
+        }
     }
 }
 

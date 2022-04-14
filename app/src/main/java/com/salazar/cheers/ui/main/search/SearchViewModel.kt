@@ -2,12 +2,18 @@ package com.salazar.cheers.ui.main.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
@@ -20,6 +26,7 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SearchUiState(isLoading = true))
+    private var searchJob: Job? = null
 
     val uiState = viewModelState
         .stateIn(
@@ -29,15 +36,6 @@ class SearchViewModel @Inject constructor(
         )
 
     init {
-        viewModelScope.launch {
-            uiState.flatMapLatest {
-                userRepository.queryUsers(it.searchInput)
-            }.collect { users ->
-                viewModelState.update {
-                    it.copy(users = users, isLoading = false)
-                }
-            }
-        }
         refreshUserRecommendations()
         updateRecentUser()
     }
@@ -52,16 +50,45 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    fun onSwipeRefresh() {
+        queryUsers(fetchFromRemote = true)
+    }
+
     fun onSearchInputChanged(searchInput: String) {
         viewModelState.update {
             it.copy(searchInput = searchInput, isLoading = true)
         }
-        queryUsers(searchInput = searchInput)
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(500L)
+            queryUsers(query = searchInput)
+        }
     }
 
-    fun queryUsers(searchInput: String) {
+    private fun queryUsers(
+        query: String = uiState.value.searchInput.lowercase(),
+        fetchFromRemote: Boolean = false,
+    ) {
         viewModelScope.launch {
-            userRepository.refreshQueryUsers(searchInput)
+            userRepository
+                .queryUsers(fetchFromRemote = fetchFromRemote, query = query)
+                .collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        result.data?.let {
+                            viewModelState.update {
+                                it.copy(users = result.data)
+                            }
+                        }
+                    }
+                    is Resource.Error -> Unit
+                    is Resource.Loading -> {
+                        viewModelState.update {
+                            it.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
+            }
         }
     }
 

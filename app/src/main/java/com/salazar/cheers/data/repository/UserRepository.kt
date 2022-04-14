@@ -3,6 +3,7 @@ package com.salazar.cheers.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.PostDao
 import com.salazar.cheers.data.db.UserDao
@@ -10,8 +11,11 @@ import com.salazar.cheers.data.db.UserStatsDao
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,11 +44,45 @@ class UserRepository @Inject constructor(
         return@withContext userStatsDao.getUserStats(username)
     }
 
-    suspend fun refreshQueryUsers(query: String) = withContext(Dispatchers.IO) {
-        userDao.insertOrUpdateAll(service.queryUsers(query = query))
-    }
+    suspend fun queryUsers(
+        fetchFromRemote: Boolean,
+        query: String,
+    ): Flow<Resource<List<User>>>  {
+        return flow {
+            emit(Resource.Loading(true))
+            val localUsers = userDao.searchUser(query = query)
+            emit(Resource.Success(
+                data = localUsers
+            ))
 
-    suspend fun queryUsers(query: String) = userDao.queryUsers(query = query)
+            val isDbEmpty = localUsers.isEmpty() && query.isBlank()
+            val shouldLoadFromCache = !isDbEmpty  && !fetchFromRemote
+            if (shouldLoadFromCache) {
+                emit(Resource.Loading(false))
+                return@flow
+            }
+
+            val remoteUsers = try {
+                service.queryUsers(query = query)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("Couldn't load data"))
+                null
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("Couldn't load data"))
+                null
+            }
+
+            remoteUsers?.let { users ->
+                userDao.insertOrUpdateAll(users)
+                emit(Resource.Success(
+                    data = users
+                ))
+                emit(Resource.Loading(false))
+            }
+        }
+    }
 
     suspend fun toggleFollow(user: User) {
         val newFollowersCount = if (user.isFollowed) user.followers - 1 else user.followers + 1

@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.map
 import android.Manifest
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.border
@@ -30,33 +29,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.extension.style.style
-import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.attribution.attribution
-import com.mapbox.maps.plugin.gestures.OnMoveListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.plugin.scalebar.scalebar
-import com.mapbox.search.*
-import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.R
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
 import com.salazar.cheers.util.Utils.getCircularBitmapWithWhiteBorder
-import com.salazar.cheers.util.Utils.isDarkModeOn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,6 +58,7 @@ fun MapScreen(
     onTogglePublic: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     onAddPostClicked: () -> Unit,
+    onMapReady: (MapView, Context) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     val context = LocalContext.current
@@ -140,23 +128,11 @@ private fun addPostsAnnotations(
     val annotationApi = mapView.annotations
     posts?.forEach {
         if (it.post.type == PostType.IMAGE) {
-            val pointAnnotationManager =
-                annotationApi.createPointAnnotationManager(mapView)
-            val pointAnnotationOptions: PointAnnotationOptions =
-                PointAnnotationOptions()
-                    .withPoint(
-                        Point.fromLngLat(
-                            it.post.locationLongitude,
-                            it.post.locationLatitude
-                        )
-                    )
-                    .withIconImage(
-                        bitmapFromDrawableRes(
-                            context,
-                            resourceId = com.salazar.cheers.R.drawable.ic_beer
-                        )!!
-                    )
-                    .withIconSize(1.0)
+            val pointAnnotationManager = annotationApi.createPointAnnotationManager()
+            val pointAnnotationOptions = PointAnnotationOptions()
+                .withPoint(Point.fromLngLat(it.post.locationLongitude, it.post.locationLatitude))
+                .withIconImage(bitmapFromDrawableRes(context, resourceId = R.drawable.ic_beer)!!)
+                .withIconSize(1.5)
             pointAnnotationManager.create(pointAnnotationOptions)
             pointAnnotationManager.addClickListener(
                 onPostAnnotationClick(
@@ -227,7 +203,7 @@ fun UiLayer(
                 .clickable { scope2.launch { uiState.postSheetState.hide() } },
         ) {
             Text(
-                text = uiState.posts?.size.toString(),
+                text = uiState.city,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             )
         }
@@ -291,48 +267,6 @@ fun UiLayer(
     }
 }
 
-private fun initLocationComponent(
-    mapView: MapView,
-    context: Context,
-    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
-) {
-    val locationComponentPlugin = mapView.location
-
-    locationComponentPlugin.updateSettings {
-        pulsingEnabled = true
-        enabled = true
-        locationPuck = LocationPuck2D(
-            topImage = AppCompatResources.getDrawable(
-                context,
-                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
-            ),
-//            bearingImage = AppCompatResources.getDrawable(
-//                context,
-//                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_bearing_icon
-//            ),
-            shadowImage = AppCompatResources.getDrawable(
-                context,
-                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_stroke_icon
-            ),
-            scaleExpression = interpolate {
-                linear()
-                zoom()
-                stop {
-                    literal(0.0)
-                    literal(0.6)
-                }
-                stop {
-                    literal(20.0)
-                    literal(1.0)
-                }
-            }.toJson()
-        )
-    }
-    locationComponentPlugin.addOnIndicatorPositionChangedListener(
-        onIndicatorPositionChangedListener
-    )
-}
-
 private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) {
     val urlObj = URL(url)
 
@@ -376,116 +310,3 @@ private fun bitmapFromDrawableRes(
     Utils.convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
 
 
-private fun onIndicatorPositionChangedListener(
-    mapView: MapView,
-) = OnIndicatorPositionChangedListener {
-    mapView.getMapboxMap().flyTo(CameraOptions.Builder().center(it).zoom(13.0).build())
-    mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
-}
-
-private fun onCameraTrackingDismissed(
-    mapView: MapView,
-    onMoveListener: OnMoveListener,
-    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
-) {
-    mapView.location
-        .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-    mapView.gestures.removeOnMoveListener(onMoveListener)
-}
-
-private fun onMoveListener(
-    mapView: MapView,
-    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
-) = object : OnMoveListener {
-    override fun onMoveBegin(detector: MoveGestureDetector) {
-        onCameraTrackingDismissed(mapView, this, onIndicatorPositionChangedListener)
-    }
-
-    override fun onMove(detector: MoveGestureDetector): Boolean {
-        return false
-    }
-
-    override fun onMoveEnd(detector: MoveGestureDetector) {
-        val cameraState = mapView.getMapboxMap().cameraState
-        val center = cameraState.center
-
-        val queryType = when {
-            cameraState.zoom < 5.0 -> QueryType.COUNTRY
-            cameraState.zoom < 10.0 -> QueryType.REGION
-            else -> QueryType.PLACE
-        }
-
-        val options = ReverseGeoOptions(
-            center = center,
-            types = listOf(queryType)
-        )
-        searchRequestTask = reverseGeocoding.search(options, searchCallback)
-    }
-}
-
-private fun setupGesturesListener(
-    mapView: MapView,
-    onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
-) {
-    mapView.gestures.addOnMoveListener(onMoveListener(mapView, onIndicatorPositionChangedListener))
-}
-
-private fun onCameraTrackingDismissed(
-    mapView: MapView,
-    onMoveListener: OnMoveListener
-) {
-    mapView.location
-        .removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener(mapView))
-    mapView.gestures.removeOnMoveListener(onMoveListener)
-}
-
-private lateinit var reverseGeocoding: ReverseGeocodingSearchEngine
-private lateinit var searchRequestTask: SearchRequestTask
-
-private val searchCallback = object : SearchCallback {
-
-    override fun onResults(
-        results: List<SearchResult>,
-        responseInfo: ResponseInfo
-    ) {
-        if (results.isEmpty()) {
-            Log.i("SearchApiExample", "No reverse geocoding results")
-        } else {
-            Log.i("SearchApiExample", "Reverse geocoding results: $results")
-        }
-    }
-
-    override fun onError(e: Exception) {
-        Log.i("SearchApiExample", "Reverse geocoding error", e)
-    }
-
-}
-
-private fun onMapReady(
-    mapView: MapView,
-    context: Context
-) {
-    reverseGeocoding = MapboxSearchSdk.getReverseGeocodingSearchEngine()
-    mapView.gestures.rotateEnabled = false
-    mapView.attribution.enabled = false
-    mapView.scalebar.enabled = false
-
-    mapView.getMapboxMap().flyTo(
-        CameraOptions.Builder()
-            .zoom(1.0)
-            .build()
-    )
-
-    val style = if (context.isDarkModeOn())
-        "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0"
-    else
-        "mapbox://styles/salazarbrock/ckzsmluho004114lmeb8rl2zi"
-
-    mapView.getMapboxMap().loadStyle(
-        style(styleUri = style) { }
-    ) {
-        val positionChangedListener = onIndicatorPositionChangedListener(mapView)
-        initLocationComponent(mapView, context, positionChangedListener)
-        setupGesturesListener(mapView, positionChangedListener)
-    }
-}

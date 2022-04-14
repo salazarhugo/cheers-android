@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.main.taguser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,10 +40,11 @@ class AddPeopleViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-             userRepository.queryUsers(query = query).collect { users ->
-                viewModelState.update {
-                    it.copy(users = users, isLoading = false)
-                }
+             userRepository.queryUsers(query = query, fetchFromRemote = false).collect { result ->
+                 if (result is Resource.Success)
+                    viewModelState.update {
+                        it.copy(users = result.data, isLoading = false)
+                    }
             }
         }
     }

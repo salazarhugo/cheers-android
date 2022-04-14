@@ -49,7 +49,7 @@ class CameraViewModel @Inject constructor(
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(
                     workDataOf(
-                        "PHOTOS" to arrayOf(imageUri.toString()),
+                        "PHOTO" to imageUri.toString(),
                         "STORY_TYPE" to "IMAGE",
                         "PRIVACY" to "FRIENDS",
                     )

@@ -64,6 +64,26 @@ class MessagesViewModel @Inject constructor(
     init {
         refreshSuggestions()
         listenChannels()
+
+//        val channel = ManagedChannelBuilder.forAddress("https://chat-r3a2dr4u4a-nw.a.run.app", 8080)
+////            .executor(Dispatchers.IO.asExecutor())
+//            .build()
+//        val client = ServicesGrpcKt.ServicesCoroutineStub(channel = channel)
+//
+//        viewModelScope.launch {
+//            val a = flow {
+//                emit(
+//                    FromClient.newBuilder()
+//                        .setBody("Hello there!")
+//                        .setName("Lars")
+//                        .build()
+//                )
+//            }
+//            client.chatService(a).collect {
+//                Log.d("gRPC", it.toString())
+//            }
+//        }
+
     }
 
     private fun listenChannels() {
@@ -96,4 +116,6 @@ class MessagesViewModel @Inject constructor(
             userRepository.toggleFollow(user = user)
         }
     }
+
+
 }

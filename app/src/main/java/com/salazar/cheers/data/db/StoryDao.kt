@@ -18,9 +18,11 @@ interface StoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(story: StoryResponse)
 
+    @Transaction
     @Query("SELECT * FROM story WHERE authorId = :authorId")
     fun getStoriesByAuthor(authorId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Story>>
 
+    @Transaction
     @Query("SELECT * FROM story WHERE storyId = :storyId")
     suspend fun getStory(storyId: String): StoryResponse
 

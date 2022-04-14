@@ -19,7 +19,7 @@ interface UserDao {
     suspend fun getUserNullable(userId: String): User?
 
     @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' ")
-    fun queryUsers(query: String): Flow<List<User>>
+    suspend fun searchUser(query: String): List<User>
 
     @Query("SELECT * FROM users WHERE id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUserWithUsername(userIdOrUsername: String): User

@@ -11,6 +11,7 @@ import androidx.paging.PagingData
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.data.repository.EventRepository
@@ -132,8 +133,10 @@ class HomeViewModel @Inject constructor(
 //        refreshSuggestions()
 
         viewModelScope.launch {
-            viewModelState.update {
-                it.copy(user = userRepository.getCurrentUser())
+            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!).collect { user ->
+                viewModelState.update {
+                    it.copy(user = user)
+                }
             }
         }
         refreshPostsFlow()

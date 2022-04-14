@@ -34,6 +34,24 @@ class SignInViewModel @Inject constructor(
         )
 
     init {
+//        val channel = ManagedChannelBuilder.forAddress("localhost", 5000)
+//            .executor(Dispatchers.IO.asExecutor())
+//            .build()
+//        val client = ServicesGrpcKt.ServicesCoroutineStub(channel = channel)
+//
+//        viewModelScope.launch {
+//            client.chatService(flow {
+//                emit(
+//                    FromClient.newBuilder()
+//                        .setBody("Hello there!")
+//                        .setName("Lars")
+//                        .build()
+//                )
+//            }).collect {
+//                Log.d("gRPC", it.toString())
+//            }
+//        }
+
         viewModelScope.launch {
             authRepository.getUserAuthState().collect {
                 when(val result = authRepository.getUser()) {

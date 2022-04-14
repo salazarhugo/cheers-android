@@ -37,7 +37,7 @@ object Utils {
     fun Bitmap.getCircularBitmapWithWhiteBorder(borderWidth: Int): Bitmap? {
         if (this.isRecycled) return null
 
-        val size = 2000
+        val size = 0
         val width = size + borderWidth
         val height = size + borderWidth
         val canvasBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

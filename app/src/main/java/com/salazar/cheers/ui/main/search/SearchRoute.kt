@@ -20,6 +20,7 @@ fun SearchRoute(
         uiState = uiState,
         onSearchInputChanged = { searchViewModel.onSearchInputChanged(it) },
         onDeleteRecentUser = { searchViewModel.deleteRecentUser(it) },
+        onSwipeRefresh = searchViewModel::onSwipeRefresh,
         onUserClicked = {
             searchViewModel.insertRecentUser(it)
             navActions.navigateToOtherProfile(it.username)

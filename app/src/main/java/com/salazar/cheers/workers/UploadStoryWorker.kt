@@ -1,5 +1,6 @@
 package com.salazar.cheers.workers
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -13,6 +14,8 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
@@ -21,10 +24,11 @@ import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
+
 
 @HiltWorker
 class UploadStoryWorker @AssistedInject constructor(
@@ -32,16 +36,17 @@ class UploadStoryWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters
 ) : CoroutineWorker(appContext, params) {
 
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
 
+    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val appContext = applicationContext
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
 
         makeStatusNotification("Uploading", appContext)
 
-        val photos =
-            inputData.getStringArray("PHOTOS") ?: emptyArray()
-
-        if (photos.size > 5) return Result.failure()
+        val photoUri =
+            inputData.getString("PHOTO") ?: return Result.failure()
 
         val storyType =
             inputData.getString("STORY_TYPE") ?: return Result.failure()
@@ -49,11 +54,17 @@ class UploadStoryWorker @AssistedInject constructor(
         val locationName =
             inputData.getString("LOCATION_NAME") ?: ""
 
-        val latitude =
+        var latitude: Double? =
             inputData.getDouble("LOCATION_LATITUDE", 0.0)
+        if (latitude == 0.0) latitude = null
 
-        val longitude =
+        var longitude: Double? =
             inputData.getDouble("LOCATION_LONGITUDE", 0.0)
+        if (longitude == 0.0) longitude = null
+
+        var altitude: Double? =
+            inputData.getDouble("ALTITUDE", 0.0)
+        if (altitude == 0.0) altitude = null
 
         val privacy =
             inputData.getString("PRIVACY") ?: return Result.failure()
@@ -63,22 +74,27 @@ class UploadStoryWorker @AssistedInject constructor(
 
         try {
 
-            val downloadUrls = mutableListOf<String>()
+            val photoBytes = extractImage(Uri.parse(photoUri))
+            val uri = StorageUtil.uploadStoryImage(photoBytes)
+            val downloadUrl = uri.toString()
 
-            coroutineScope {
-                photos.toList().forEach { photoUri ->
-                    val photoBytes = extractImage(Uri.parse(photoUri))
-                    val uri = StorageUtil.uploadStoryImage(photoBytes)
-                    downloadUrls.add(uri.toString())
+            try {
+                mFusedLocationClient?.lastLocation?.await()?.let {
+                    longitude = it.longitude
+                    latitude = it.latitude
+                    altitude = it.altitude
                 }
+            }catch (e: Exception) {
+                Log.e("Location", "Couldn't get last location")
             }
 
             val story = StoryResponse(
                 type = storyType,
-                photos = downloadUrls,
+                photoUrl = downloadUrl,
                 locationName = locationName,
-                locationLatitude = latitude,
-                locationLongitude = longitude,
+                latitude = latitude,
+                longitude = longitude,
+                altitude = altitude,
                 privacy = privacy,
                 tagUsersId = tagUserIds.toList()
             )
