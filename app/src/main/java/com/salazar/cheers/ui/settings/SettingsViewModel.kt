@@ -39,7 +39,7 @@ class SettingsViewModel @Inject constructor(
         viewModelState.update {
             it.copy(theme = theme)
         }
-        
+
         val preference = UserPreference(FirebaseAuth.getInstance().currentUser?.uid!!, theme)
         viewModelScope.launch {
             preferenceDao.insert(preference)

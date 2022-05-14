@@ -1,25 +1,18 @@
 package com.salazar.cheers.ui.main.detail
 
-import android.app.Activity
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.salazar.cheers.MainActivity
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface PostDetailUiState {
 
@@ -58,10 +51,11 @@ private data class PostDetailViewModelState(
         }
 }
 
-class PostDetailViewModel @AssistedInject constructor(
+@HiltViewModel
+class PostDetailViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val service: Neo4jService,
-    @Assisted private val postId: String
+    stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PostDetailViewModelState(isLoading = true))
@@ -74,8 +68,13 @@ class PostDetailViewModel @AssistedInject constructor(
             viewModelState.value.toUiState()
         )
 
+    var postId: String = ""
+
     init {
-        refreshPost()
+        stateHandle.get<String>("postId")?.let { postId ->
+            this@PostDetailViewModel.postId = postId
+            refreshPost()
+        }
     }
 
     private fun refreshPost() {
@@ -112,31 +111,4 @@ class PostDetailViewModel @AssistedInject constructor(
             }
         }
     }
-
-    @AssistedFactory
-    interface PostDetailViewModelFactory {
-        fun create(postId: String): PostDetailViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: PostDetailViewModelFactory,
-            postId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(postId = postId) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun postDetailViewModel(postId: String): PostDetailViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).postDetailViewModelFactory()
-
-    return viewModel(factory = PostDetailViewModel.provideFactory(factory, postId = postId))
 }

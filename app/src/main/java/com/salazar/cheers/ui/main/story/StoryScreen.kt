@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,16 +33,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.accompanist.insets.imePadding
-import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.story.StoryProgressBar
+import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.data.db.Story
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.User
@@ -136,7 +135,7 @@ fun StoryCarousel(
                     onStoryUIAction = onStoryUIAction,
                 )
             },
-            backgroundColor = Color.Black,
+            containerColor = Color.Black,
             modifier = Modifier
                 .graphicsLayer {
                     val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
@@ -194,7 +193,7 @@ fun StoryHeader(
     onUserClick: (String) -> Unit,
     pause: Boolean,
 ) {
-    Column() {
+    Column {
         StoryProgressBar(
             steps = 1,
             currentStep = 1,

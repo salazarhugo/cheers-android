@@ -3,6 +3,7 @@ package com.salazar.cheers.util
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toFile
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -41,7 +42,8 @@ object StorageUtil {
     ) {
         if (imageBytes.size > IMAGE_SIZE_LIMIT)
             return
-        val ref = currentUserRef.child("profilePictures/${FirebaseAuth.getInstance().currentUser?.uid!!}")
+        val ref =
+            currentUserRef.child("profilePictures/${FirebaseAuth.getInstance().currentUser?.uid!!}")
         ref.putBytes(imageBytes)
             .addOnSuccessListener {
                 ref.downloadUrl.addOnSuccessListener { downloadUri ->
@@ -52,16 +54,13 @@ object StorageUtil {
 
     fun uploadMessageImage(
         imageBytes: ByteArray,
-        onSuccess: (downloadUrl: String) -> Unit,
-    ) {
-        if (imageBytes.size > IMAGE_SIZE_LIMIT)
-            return
+    ): Task<Uri> {
+//        if (imageBytes.size > IMAGE_SIZE_LIMIT)
+//            return
         val ref = currentUserRef.child("messages/${UUID.randomUUID()}")
-        ref.putBytes(imageBytes)
-            .addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener { downloadUri ->
-                    onSuccess(downloadUri.toString())
-                }
+        return ref.putBytes(imageBytes)
+            .continueWithTask {
+                ref.downloadUrl
             }
     }
 

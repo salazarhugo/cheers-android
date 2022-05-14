@@ -22,7 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -126,7 +126,7 @@ fun Views(
             )
         }
 
-        items(viewers) { user ->
+        items(viewers, key = { it.id }) { user ->
             UserCard(user = user, onUserClicked = {})
         }
     }
@@ -170,7 +170,7 @@ fun StoryCard(
                 }
             ) {
                 Image(
-                    painter = rememberImagePainter(
+                    painter = rememberAsyncImagePainter(
                         suggestedUser.story.photoUrl
                     ),
                     modifier = Modifier

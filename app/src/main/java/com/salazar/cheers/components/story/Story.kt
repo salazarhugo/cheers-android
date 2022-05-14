@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 
@@ -31,12 +33,12 @@ fun YourStory(
     ) {
 
         Image(
-            painter = rememberImagePainter(
-                data = profilePictureUrl,
-                builder = {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                },
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }).build()
             ),
             modifier = Modifier
                 .padding(start = 8.dp, end = 4.dp)
@@ -84,12 +86,12 @@ fun Story(
         ) { onStoryClick() },
     ) {
         Image(
-            painter = rememberImagePainter(
-                data = profilePictureUrl,
-                builder = {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                },
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }).build()
             ),
             modifier = Modifier
                 .padding(horizontal = 6.dp)

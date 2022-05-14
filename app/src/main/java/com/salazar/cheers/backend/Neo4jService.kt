@@ -86,7 +86,12 @@ class Neo4jService {
                             Klaxon().parseArray<User>(postFeed.asJsonObject["users"].toString())
                                 ?: emptyList()
 
-                        posts.add(Pair(post.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!), tagUsers + author))
+                        posts.add(
+                            Pair(
+                                post.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!),
+                                tagUsers + author
+                            )
+                        )
                     }
                     Log.d("Cloud Posts:", posts.toString())
                     return@continueWith Result.Success(posts.toList())
@@ -108,7 +113,7 @@ class Neo4jService {
             .call(data)
             .continueWith { task ->
                 if (task.result == null || task.result.data == null)
-                    return@continueWith  Result.Error(java.lang.Exception("Network error"))
+                    return@continueWith Result.Error(java.lang.Exception("Network error"))
 
                 if (task.result.data.toString() == "[]")
                     return@continueWith Result.Error(java.lang.Exception("User doesn't exist."))
@@ -203,29 +208,35 @@ class Neo4jService {
 //        }
     }
 
-    suspend fun getFollowersFollowing(userIdOrUsername: String): Pair<List<User>, List<User>> = withContext(Dispatchers.IO) {
+    suspend fun getFollowersFollowing(userIdOrUsername: String): Pair<List<User>, List<User>> =
+        withContext(Dispatchers.IO) {
             val data = hashMapOf(
                 "userIdOrUsername" to userIdOrUsername,
             )
 
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("getFollowersFollowing")
-            .call(data)
-            .continueWith { task ->
-                try {
-                    val result = task.result?.data as HashMap<*, *>
-                    val response =
-                        Gson().fromJson(result["response"].toString(), com.google.gson.JsonObject::class.java)
-                    val followers = Klaxon().parseArray<User>(response["followers"].toString()) ?: emptyList()
-                    val following = Klaxon().parseArray<User>(response["following"].toString()) ?: emptyList()
-                    Pair(followers, following)
-                }catch (e:Exception) {
-                    Log.e("Cloud", e.toString())
-                    Pair(emptyList(), emptyList())
+            return@withContext FirebaseFunctions.getInstance("europe-west2")
+                .getHttpsCallable("getFollowersFollowing")
+                .call(data)
+                .continueWith { task ->
+                    try {
+                        val result = task.result?.data as HashMap<*, *>
+                        val response =
+                            Gson().fromJson(
+                                result["response"].toString(),
+                                com.google.gson.JsonObject::class.java
+                            )
+                        val followers = Klaxon().parseArray<User>(response["followers"].toString())
+                            ?: emptyList()
+                        val following = Klaxon().parseArray<User>(response["following"].toString())
+                            ?: emptyList()
+                        Pair(followers, following)
+                    } catch (e: Exception) {
+                        Log.e("Cloud", e.toString())
+                        Pair(emptyList(), emptyList())
+                    }
                 }
-            }
-            .await()
-    }
+                .await()
+        }
 
     suspend fun queryUsers(query: String): List<User> = withContext(Dispatchers.IO) {
         // Create the arguments to the callable function.

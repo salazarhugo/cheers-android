@@ -20,8 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ClearRippleTheme
@@ -79,14 +81,14 @@ fun CheersNavigationBar(
             navigateToMessages,
             {
                 Icon(
-                    painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+                    painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
                     null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             },
             {
                 Icon(
-                    painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+                    painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
                     null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -123,12 +125,12 @@ fun CheersNavigationBar(
             NavigationBarItem(
                 icon = {
                     Image(
-                        painter = rememberImagePainter(
-                            data = profilePictureUrl,
-                            builder = {
-                                transformations(CircleCropTransformation())
-                                error(R.drawable.default_profile_picture)
-                            },
+                        painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
+                                    transformations(CircleCropTransformation())
+                                    error(R.drawable.default_profile_picture)
+                                }).build()
                         ),
                         modifier = Modifier
                             .size(30.dp)

@@ -27,22 +27,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
-import com.salazar.cheers.components.FollowButton
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeRefreshState
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -69,7 +71,7 @@ fun OtherProfileStatsScreen(
     ) {
 
         SwipeToRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
         ) {
             Column {
@@ -152,7 +154,7 @@ fun Followers(
     onUserClicked: (username: String) -> Unit,
 ) {
     LazyColumn {
-        items(followers) { follower ->
+        items(followers, key = { it.id }) { follower ->
             FollowerCard(follower, onUserClicked)
         }
     }
@@ -165,7 +167,7 @@ fun Following(
     onFollowToggle: (User) -> Unit,
 ) {
     LazyColumn {
-        items(following) { following ->
+        items(following, key = { it.id }) { following ->
             FollowingCard(following, onUserClicked, onFollowToggle = onFollowToggle)
         }
     }
@@ -186,12 +188,12 @@ fun FollowerCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(
-                    data = user.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    }
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
@@ -229,12 +231,12 @@ fun FollowingCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(
-                    data = user.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    }
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
@@ -256,7 +258,7 @@ fun FollowingCard(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            var isFollowed by remember { mutableStateOf(user.isFollowed)}
+            var isFollowed by remember { mutableStateOf(user.isFollowed) }
             FollowButton(
                 isFollowing = isFollowed,
                 onClick = {

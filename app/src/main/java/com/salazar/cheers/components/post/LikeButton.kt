@@ -1,4 +1,4 @@
-package com.salazar.cheers.components
+package com.salazar.cheers.components.post
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 import com.salazar.cheers.components.animations.AnimatedTextCounter
 
@@ -51,7 +51,7 @@ fun LikeButton(
         }
 
         Icon(
-            rememberImagePainter(icon),
+            rememberAsyncImagePainter(icon),
             null,
             modifier = Modifier
                 .size(22.dp)

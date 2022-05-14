@@ -33,19 +33,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.imePadding
-import com.google.accompanist.insets.rememberInsetsPaddingValues
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.MessageType
+import com.salazar.cheers.RoomStatus
+import com.salazar.cheers.RoomType
 import com.salazar.cheers.components.UserInput
 import com.salazar.cheers.components.animations.AnimateHeart
 import com.salazar.cheers.components.chat.DirectChatBar
+import com.salazar.cheers.components.chat.GroupChatBar
 import com.salazar.cheers.components.chat.JumpToBottom
-import com.salazar.cheers.internal.ImageMessage
-import com.salazar.cheers.internal.Message
-import com.salazar.cheers.internal.MessageType
-import com.salazar.cheers.internal.TextMessage
+import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -69,12 +68,14 @@ fun ChatScreen(
     onAuthorClick: (String) -> Unit,
     onImageSelectorClick: () -> Unit,
     onPoBackStack: () -> Unit,
+    onTextChanged: () -> Unit,
+    onInfoClick: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
-    val selectedMessage = remember { mutableStateOf<Message?>(null) }
+    val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }
     val channel = uiState.channel
 
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -85,7 +86,7 @@ fun ChatScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 Messages(
-                    members = uiState.channel.members.map { it.id },
+                    seen = uiState.channel.status == RoomStatus.OPENED,
                     messages = uiState.messages,
                     navigateToProfile = onAuthorClick,
                     modifier = Modifier.weight(1f),
@@ -100,6 +101,7 @@ fun ChatScreen(
                     onMessageSent = {
                         onMessageSent(it)
                     },
+                    onTextChanged = onTextChanged,
                     resetScroll = {
                         scope.launch {
                             scrollState.scrollToItem(0)
@@ -109,32 +111,36 @@ fun ChatScreen(
                     onImageSelectorClick = onImageSelectorClick,
                 )
             }
-//            if (channel.type == ChatChannelType.DIRECT)
-            DirectChatBar(
-                name = name,
-                username = username,
-                verified = verified,
-                profilePictureUrl = profilePicturePath,
-                onNavIconPressed = { onPoBackStack() },
-                onTitleClick = onTitleClick,
-                scrollBehavior = scrollBehavior,
-            )
-//            else if (channel.type == ChatChannelType.GROUP)
-//                GroupChatBar(
-//                    name = channel.name,
-//                    members = channel.members.size,
-//                    profilePictureUrl = profilePicturePath,
-//                    onNavIconPressed = { onPoBackStack() },
-//                    onTitleClick = {},
-//                    scrollBehavior = scrollBehavior,
-//                )
+            if (channel.type == RoomType.DIRECT)
+                DirectChatBar(
+                    name = name,
+                    username = username,
+                    verified = verified,
+                    profilePictureUrl = profilePicturePath,
+                    onNavIconPressed = { onPoBackStack() },
+                    onTitleClick = onTitleClick,
+                    scrollBehavior = scrollBehavior,
+                    onInfoClick = onInfoClick,
+                )
+            else if (channel.type == RoomType.GROUP)
+                GroupChatBar(
+                    name = channel.name,
+                    members = channel.members.size,
+                    profilePictureUrl = profilePicturePath,
+                    onNavIconPressed = { onPoBackStack() },
+                    onTitleClick = {},
+                    onInfoClick = onInfoClick,
+                    scrollBehavior = scrollBehavior,
+                )
         }
     }
 
-    if (openDialog.value)
+    val a = selectedMessage.value
+
+    if (openDialog.value && a != null)
         OnMessageLongClickDialog(
             openDialog,
-            msg = selectedMessage.value ?: TextMessage(),
+            msg = a,
             onUnsendMessage = onUnsendMessage,
             onCopyText = onCopyText,
             onLike = onLike,
@@ -144,8 +150,8 @@ fun ChatScreen(
 
 @Composable
 fun Messages(
-    messages: List<Message>,
-    members: List<String>,
+    messages: List<ChatMessage>,
+    seen: Boolean,
     navigateToProfile: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
@@ -157,10 +163,10 @@ fun Messages(
         LazyColumn(
             reverseLayout = true,
             state = scrollState,
-            contentPadding = rememberInsetsPaddingValues(
-                insets = LocalWindowInsets.current.statusBars,
-                additionalTop = 56.dp
-            ),
+            contentPadding = WindowInsets.statusBars.asPaddingValues(),
+//                insets = LocalWindowInsets.current.statusBars,
+//                additionalTop = 56.dp
+//            ),
             modifier = Modifier
                 .testTag(ConversationTestTag)
                 .fillMaxSize()
@@ -174,7 +180,7 @@ fun Messages(
                 val isLastMessageByAuthor = nextAuthor != message.senderId
 
                 // Hardcode day dividers for simplicity
-                if (message.time?.isToday() == false && prevMessage?.time?.isToday() == true) {
+                if (!message.time.isToday() && prevMessage?.time?.isToday() == true) {
                     item {
                         DayHeader("Today")
                     }
@@ -188,7 +194,7 @@ fun Messages(
                         onDoubleTapMessage = onDoubleTapMessage,
                         message = message,
                         isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
-                        seen = index == 0 && message.seenBy.containsAll(members),
+                        seen = index == 0 && seen,
                         isFirstMessageByAuthor = isFirstMessageByAuthor,
                         isLastMessageByAuthor = isLastMessageByAuthor,
                     )
@@ -230,7 +236,7 @@ fun Message(
     onDoubleTapMessage: (String) -> Unit,
     isUserMe: Boolean,
     seen: Boolean,
-    message: Message,
+    message: ChatMessage,
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean
 ) {
@@ -243,9 +249,7 @@ fun Message(
         if (isLastMessageByAuthor && !isUserMe) {
             // Avatar
             Image(
-                painter = rememberImagePainter(
-                    data = message.senderProfilePictureUrl,
-                ),
+                painter = rememberAsyncImagePainter(model = message.senderProfilePictureUrl),
                 modifier = Modifier
                     .clickable(onClick = { onAuthorClick(message.senderUsername) })
                     .padding(horizontal = 16.dp)
@@ -277,7 +281,7 @@ fun Message(
 
 @Composable
 fun AuthorAndTextMessage(
-    msg: Message,
+    msg: ChatMessage,
     isUserMe: Boolean,
     seen: Boolean,
     isFirstMessageByAuthor: Boolean,
@@ -291,7 +295,7 @@ fun AuthorAndTextMessage(
         if (isLastMessageByAuthor && !isUserMe) {
             AuthorNameTimestamp(msg)
         }
-        if (msg is TextMessage)
+        if (msg.type == MessageType.TEXT)
             ChatItemBubble(
                 msg,
                 isUserMe = isUserMe,
@@ -300,7 +304,7 @@ fun AuthorAndTextMessage(
                 onLongClickMessage = onLongClickMessage,
                 onDoubleTapMessage = onDoubleTapMessage
             )
-        else if (msg is ImageMessage)
+        else if (msg.type == MessageType.IMAGE)
             ImageMessageBubble(
                 msg,
                 onLongClickMessage = onLongClickMessage,
@@ -317,7 +321,7 @@ fun AuthorAndTextMessage(
 }
 
 @Composable
-private fun AuthorNameTimestamp(msg: Message) {
+private fun AuthorNameTimestamp(msg: ChatMessage) {
     // Combine author and timestamp for a11y.
     Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
         Text(
@@ -330,8 +334,10 @@ private fun AuthorNameTimestamp(msg: Message) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         val formatter = SimpleDateFormat("HH:mm")
+        val date = Date()
+        date.time = msg.time.seconds
         Text(
-            text = formatter.format(msg.time ?: Date(0)),
+            text = formatter.format(date),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.alignBy(LastBaseline),
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -373,37 +379,36 @@ private fun RowScope.DayHeaderLine() {
 
 @Composable
 fun ImageMessageBubble(
-    message: ImageMessage,
+    message: ChatMessage,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
 ) {
     Column {
-        message.imagesDownloadUrl.forEach { downloadUrl ->
-            var tap by remember { mutableStateOf(false)}
-            Image(
-                painter = rememberImagePainter(data = downloadUrl),
-                contentDescription = null,
-                modifier = Modifier
-                    .let { if (tap) it.fillMaxSize() else it.aspectRatio(3/4f) }
-                    .animateContentSize()
-                    .padding(3.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = { onLongClickMessage(message.id) },
-                            onDoubleTap = { onDoubleTapMessage(message.id) },
-                            onTap = { tap = !tap }
-                        )
-                    },
-                contentScale = ContentScale.Crop,
-            )
-        }
+//        message.imagesDownloadUrl.forEach { downloadUrl ->
+        var tap by remember { mutableStateOf(false) }
+        AsyncImage(
+            model = message.photoUrl,
+            contentDescription = null,
+            modifier = Modifier
+                .let { if (tap) it.fillMaxSize() else it.aspectRatio(4 / 5f) }
+                .animateContentSize()
+                .padding(3.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = { onLongClickMessage(message.id) },
+                        onDoubleTap = { onDoubleTapMessage(message.id) },
+                        onTap = { tap = !tap }
+                    )
+                },
+            contentScale = ContentScale.Crop,
+        )
     }
 }
 
 @Composable
 fun ChatItemBubble(
-    message: Message,
+    message: ChatMessage,
     isUserMe: Boolean,
     seen: Boolean,
     authorClicked: (String) -> Unit,
@@ -472,24 +477,28 @@ fun ChatItemBubble(
 
 @Composable
 fun ClickableMessage(
-    message: Message,
+    message: ChatMessage,
     isUserMe: Boolean,
     authorClicked: (String) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
 
-    val textMessage =
+    val chatMessage =
         if (message.type == MessageType.TEXT)
-            message as TextMessage
+            message
         else
             null
 
     val styledMessage = messageFormatter(
-        text = textMessage?.text ?: "Not a text message",
+        text = chatMessage?.text ?: "Not a text message",
         primary = isUserMe
     )
 
-    val color = if (isUserMe) MaterialTheme.colorScheme.onPrimary else
+    val color = if (!message.acknowledged)
+        MaterialTheme.colorScheme.onError
+    else if (isUserMe)
+        MaterialTheme.colorScheme.onPrimary
+    else
         MaterialTheme.colorScheme.onSurfaceVariant
 
     ClickableText(

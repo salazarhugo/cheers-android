@@ -81,11 +81,12 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!).collect { user ->
-                viewModelState.update {
-                    it.copy(user = user)
+            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!)
+                .collect { user ->
+                    viewModelState.update {
+                        it.copy(user = user)
+                    }
                 }
-            }
         }
         refreshUserPosts()
     }
@@ -95,9 +96,6 @@ class ProfileViewModel @Inject constructor(
         refreshUserPosts()
     }
 
-    /**
-     * Toggle like of a post
-     */
     fun toggleLike(
         post: Post,
     ) {
@@ -112,9 +110,15 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val result = userRepository.refreshUser(FirebaseAuth.getInstance().currentUser?.uid!!)
             when (result) {
-                is Result.Success -> viewModelState.update { it.copy( user = result.data, isLoading = false )
+                is Result.Success -> viewModelState.update {
+                    it.copy(user = result.data, isLoading = false)
                 }
-                is Result.Error -> viewModelState.update { it.copy(errorMessages = "Couldn't refresh", isLoading = false) }
+                is Result.Error -> viewModelState.update {
+                    it.copy(
+                        errorMessages = "Couldn't refresh",
+                        isLoading = false
+                    )
+                }
             }
         }
     }

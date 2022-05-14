@@ -8,9 +8,13 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.layers.generated.circleLayer
+import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.attribution.attribution
@@ -22,11 +26,10 @@ import com.mapbox.maps.plugin.locationcomponent.location2
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.R
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.Utils.isDarkModeOn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,9 +39,24 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+data class MapUiState(
+    val geojson: FeatureCollection? = null,
+    val users: List<Feature> = emptyList(),
+    val posts: List<PostFeed>? = null,
+    val city: String = "",
+    val selectedPost: PostFeed? = null,
+    val isLoading: Boolean = false,
+    val isPublic: Boolean = false,
+    val postSheetState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    val errorMessages: List<String> = emptyList(),
+    val searchInput: String = "",
+)
+
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val postRepository: PostRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapUiState(isLoading = true))
@@ -52,6 +70,11 @@ class MapViewModel @Inject constructor(
 
     init {
         refreshPosts()
+        viewModelScope.launch {
+            val geojson = userRepository.getLocations()
+            if (geojson.features() != null)
+                viewModelState.update { it.copy(users = geojson.features()!!.toList()) }
+        }
     }
 
     private fun refreshPosts() {
@@ -132,7 +155,15 @@ class MapViewModel @Inject constructor(
             "mapbox://styles/salazarbrock/ckzsmluho004114lmeb8rl2zi"
 
         mapView.getMapboxMap().loadStyle(
-            com.mapbox.maps.extension.style.style(styleUri = style) { }
+            com.mapbox.maps.extension.style.style(styleUri = style) {
+                val geojson = uiState.value.geojson
+                +geoJsonSource(id = "users") {
+                    data(geojson?.toJson().toString())
+                    cluster(true)
+                }
+                +circleLayer("layer-1", "users") {
+                }
+            }
         ) {
             val positionChangedListener = onIndicatorPositionChangedListener(mapView)
             initLocationComponent(mapView, context, positionChangedListener)
@@ -174,7 +205,12 @@ class MapViewModel @Inject constructor(
         mapView: MapView,
         onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener
     ) {
-        mapView.gestures.addOnMoveListener(onMoveListener(mapView, onIndicatorPositionChangedListener))
+        mapView.gestures.addOnMoveListener(
+            onMoveListener(
+                mapView,
+                onIndicatorPositionChangedListener
+            )
+        )
     }
 
     private fun onCameraTrackingDismissed(
@@ -217,11 +253,11 @@ class MapViewModel @Inject constructor(
             locationPuck = LocationPuck2D(
                 topImage = AppCompatResources.getDrawable(
                     context,
-                    R.drawable.ic_bitmoji
+                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
                 ),
                 shadowImage = AppCompatResources.getDrawable(
                     context,
-                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_stroke_icon
+                    com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon_shadow
                 ),
                 scaleExpression = interpolate {
                     linear()
@@ -243,16 +279,3 @@ class MapViewModel @Inject constructor(
     }
 
 }
-
-data class MapUiState(
-    val users: List<User> = emptyList(),
-    val posts: List<PostFeed>? = null,
-    val city: String = "",
-    val selectedPost: PostFeed? = null,
-    val isLoading: Boolean = false,
-    val isPublic: Boolean = false,
-    val postSheetState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val errorMessages: List<String> = emptyList(),
-    val searchInput: String = "",
-)
-

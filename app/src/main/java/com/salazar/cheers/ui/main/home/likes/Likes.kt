@@ -16,10 +16,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
-import com.salazar.cheers.components.FollowButton
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -67,7 +67,7 @@ fun Toolbar(
 @Composable
 fun UserList(users: List<User>) {
     LazyColumn {
-        items(users) { user ->
+        items(users, key = { it.id }) { user ->
             UserCard(user)
         }
     }
@@ -86,7 +86,7 @@ fun UserCard(user: User) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(data = user.profilePictureUrl),
+                painter = rememberAsyncImagePainter(model = user.profilePictureUrl),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(54.dp)

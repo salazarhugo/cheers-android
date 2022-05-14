@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.android.billingclient.api.SkuDetails
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.animations.AnimatedTextCounter
@@ -46,7 +46,7 @@ fun RechargeScreen(
                 )
             }
             DividerM3(modifier = Modifier.padding(vertical = 16.dp))
-            LazyColumn() {
+            LazyColumn {
                 items(recharges) {
                     RechargeItem(it, onRecharge = onRecharge)
                 }
@@ -69,7 +69,7 @@ fun RechargeItem(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(data = recharge.iconUrl),
+                painter = rememberAsyncImagePainter(model = recharge.iconUrl),
                 contentDescription = null,
             )
             Spacer(Modifier.width(16.dp))

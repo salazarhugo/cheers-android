@@ -1,33 +1,33 @@
 package com.salazar.cheers.internal
 
-import com.google.firebase.firestore.ServerTimestamp
-import java.util.*
+import com.google.protobuf.Timestamp
 
 data class ImageMessage(
     val imagesDownloadUrl: List<String>,
     override var id: String,
     override var chatChannelId: String,
-    @ServerTimestamp
-    override val time: Date? = null,
+    override val time: Timestamp,
     override val senderId: String,
     override val senderName: String,
     override val senderProfilePictureUrl: String,
     override val senderUsername: String,
     override val likedBy: List<String>,
     override val seenBy: List<String>,
-    override val type: String = MessageType.IMAGE
+    override val acknowledged: Boolean,
+    override val type: String = "IMAGE",
 ) : Message {
 
     constructor() : this(
         listOf(),
         "",
         "",
-        null,
+        Timestamp.getDefaultInstance(),
         "",
         "",
         "",
         "",
         arrayListOf(),
         listOf(),
+        false,
     )
 }

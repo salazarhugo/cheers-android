@@ -1,17 +1,101 @@
 syntax = "proto3";
+package chatpb;
 
+option java_package = "com.salazar.cheers";
+option java_outer_classname = "ChatProto";
 option java_multiple_files = true;
 
-message FromClient {
-  string name = 1;
-  string body = 2;
+import "google/protobuf/timestamp.proto";
+
+service ChatService {
+  rpc GetRooms(Empty) returns (stream Room) {}
+  rpc GetRoomId(GetRoomIdReq) returns (RoomId) {}
+  rpc CreateChat(CreateChatReq) returns (Room) {}
+  rpc JoinRoom(RoomId) returns (stream Message) {}
+  rpc LeaveRoom(RoomId) returns (Empty) {}
+  rpc DeleteRoom(RoomId) returns (Empty) {}
+  rpc SendMessage(stream Message) returns (MessageAck) {}
+  rpc TypingStart(TypingReq) returns (Empty) {}
+  rpc TypingEnd(TypingReq) returns (Empty) {}
+  rpc AddToken(AddTokenReq) returns (Empty) {}
 }
 
-message FromServer {
-  string name = 1;
-  string body = 2;
+message Empty {
 }
 
-service Services {
-  rpc ChatService(stream FromClient) returns (stream FromServer){};
+message AddTokenReq {
+  string token = 1;
+}
+
+message CreateChatReq {
+  repeated string user_ids = 1;
+  string group_name = 2;
+}
+
+message TypingReq {
+  string room_id = 1;
+  string username = 2;
+  string avatar_url = 3;
+}
+
+message RoomId {
+  string room_id = 1;
+}
+
+message GetRoomIdReq {
+  string recipient_id = 1;
+}
+
+enum RoomStatus {
+  EMPTY = 0;
+  OPENED = 1;
+  SENT = 2;
+  RECEIVED = 3;
+  NEW = 4;
+}
+
+enum RoomType {
+  DIRECT = 0;
+  GROUP = 1;
+}
+
+message Room {
+  string id = 1;
+  string name = 2;
+  bool typing = 3;
+  bool verified = 4;
+  string owner = 5;
+  RoomType type = 6;
+  string username = 7;
+  RoomStatus status = 8;
+  repeated string admins = 9;
+  repeated string members = 10;
+  string last_message_text = 11;
+  string profile_picture_url = 12;
+  MessageType last_message_type = 13;
+  google.protobuf.Timestamp created = 14;
+  google.protobuf.Timestamp last_message_time = 15;
+}
+
+enum MessageType {
+  TEXT = 0;
+  IMAGE = 1;
+  VIDEO = 2;
+}
+
+message Message {
+  string id = 1;
+  string sender = 2;
+  Room room = 3;
+  string message = 4;
+  string senderProfilePictureUrl = 5;
+  string senderName = 6;
+  string senderUsername = 7;
+  google.protobuf.Timestamp created = 8;
+  string photo_url = 9;
+  MessageType type = 10;
+}
+
+message MessageAck {
+  string status = 1;
 }

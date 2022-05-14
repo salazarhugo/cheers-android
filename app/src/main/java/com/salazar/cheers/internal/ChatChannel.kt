@@ -1,33 +1,28 @@
 package com.salazar.cheers.internal
 
-import com.google.firebase.Timestamp
-import java.util.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.protobuf.Timestamp
+import com.salazar.cheers.MessageType
+import com.salazar.cheers.RoomStatus
+import com.salazar.cheers.RoomType
 
-object ChatChannelType {
-    const val DIRECT = "DIRECT"
-    const val GROUP = "GROUP"
-}
-
+@Entity(tableName = "room")
 data class ChatChannel(
+    @PrimaryKey
     val id: String = "",
     val name: String = "",
-    val members: List<User> = emptyList(),
+    val verified: Boolean = false,
+    val members: List<String> = emptyList(),
     val otherUserId: String = "",
-    val createdAt: Timestamp = Timestamp.now(),
+    val createdAt: Timestamp = Timestamp.getDefaultInstance(),
     val createdBy: String = "",
-    val recentMessage: TextMessage? = null,
-    val recentMessageTime: Date = Date(),
-    val type: String = "",
-)
-
-data class ChatChannelResponse(
-    val id: String = "",
-    val name: String = "",
-    var members: List<String> = emptyList(),
-    val otherUserId: String = "",
-    val createdAt: Timestamp = Timestamp.now(),
-    val createdBy: String = "",
-    val recentMessage: TextMessage? = null,
-    val recentMessageTime: Date = Date(),
-    val type: String = "",
+    val avatarUrl: String = "",
+    val recentMessage: String = "",
+    val status: RoomStatus = RoomStatus.UNRECOGNIZED,
+    val recentMessageTime: Timestamp = Timestamp.getDefaultInstance(),
+    val recentMessageType: MessageType = MessageType.TEXT,
+    val type: RoomType = RoomType.DIRECT,
+    val accountId: String = "",
+    val ownerId: String = "",
 )

@@ -14,11 +14,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.salazar.cheers.R
-import com.salazar.cheers.components.LikeButton
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
@@ -84,7 +83,7 @@ fun PostFooterButtons(
             )
             Icon(
                 modifier = Modifier.clickable { navigateToComments(post.id) },
-                painter = rememberImagePainter(R.drawable.ic_bubble_icon),
+                painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
                 contentDescription = null
             )
             Icon(Icons.Outlined.Share, null)

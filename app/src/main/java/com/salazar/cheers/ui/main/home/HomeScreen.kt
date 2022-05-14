@@ -42,7 +42,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.*
 import com.google.android.exoplayer2.C
@@ -61,8 +62,10 @@ import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.share.SwipeToRefresh
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
+import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -89,11 +92,11 @@ fun HomeScreen(
     onAddStoryClick: () -> Unit,
     onLike: (post: Post) -> Unit,
 ) {
-    val showDivider =
-        if (uiState is HomeUiState.HasPosts)
-            uiState.listState.firstVisibleItemIndex > 0
-        else
-            false
+    val showDivider by remember {
+        derivedStateOf {
+            uiState is HomeUiState.HasPosts && uiState.listState.firstVisibleItemIndex > 0
+        }
+    }
 
     var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
     Scaffold(
@@ -136,8 +139,8 @@ fun HomeScreen(
         }
     ) {
         SwipeToRefresh(
-            state = com.salazar.cheers.components.share.rememberSwipeRefreshState(isRefreshing = false),
-            onRefresh = onSwipeRefresh,
+            state = rememberSwipeToRefreshState(isRefreshing = false),
+            onRefresh = { onSwipeRefresh() },
         ) {
             Column(
                 modifier = Modifier
@@ -210,7 +213,7 @@ fun NativeAdPost(ad: NativeAd) {
         ) {
             if (ad.icon != null) {
                 Image(
-                    rememberImagePainter(data = ad.icon.uri),
+                    rememberAsyncImagePainter(model = ad.icon.uri),
                     null,
                     modifier = Modifier.size(24.dp)
                 )
@@ -366,12 +369,12 @@ fun Suggestion(
             ) {
 
                 Image(
-                    painter = rememberImagePainter(
-                        data = suggestedUser.user.profilePictureUrl,
-                        builder = {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        },
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(data = suggestedUser.user.profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
+                                transformations(CircleCropTransformation())
+                                error(R.drawable.default_profile_picture)
+                            }).build()
                     ),
                     contentDescription = "Profile image",
                     modifier = Modifier
@@ -393,7 +396,7 @@ fun Suggestion(
                 ) {
                     repeat(3) {
                         Image(
-                            painter = rememberImagePainter(
+                            painter = rememberAsyncImagePainter(
                                 suggestedUser.posts.getOrNull(it)?.photos?.get(
                                     0
                                 )
@@ -465,7 +468,7 @@ fun PostList(
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
 //    val events = uiState.eventsFlow?.collectAsLazyPagingItems()
 
-    LazyColumn() {
+    LazyColumn {
         item {
             Stories(
                 uiState = uiState,
@@ -629,12 +632,12 @@ fun TagUsers(tagUsers: List<User>) {
         repeat(n) { i ->
             val u = tagUsers[i]
             Image(
-                painter = rememberImagePainter(
-                    data = u.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = u.profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 modifier = Modifier
                     .size(24.dp)
@@ -690,7 +693,7 @@ fun MyAppBar(
                 TopTabs(tab = tab, onSelectTab = onSelectTab)
                 IconButton(onClick = navigateToSearch) {
                     Icon(
-                        painter = rememberImagePainter(data = R.drawable.ic_search_icon),
+                        painter = rememberAsyncImagePainter(model = R.drawable.ic_search_icon),
                         contentDescription = "Search icon"
                     )
                 }
@@ -778,11 +781,10 @@ fun Event(
         modifier = Modifier.clickable { onEventClicked(event.id) }
     ) {
         Image(
-            painter = rememberImagePainter(
-                data = event.imageUrl,
-                builder = {
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = event.imageUrl).apply(block = fun ImageRequest.Builder.() {
                     error(R.drawable.default_group_picture)
-                }
+                }).build()
             ),
             contentDescription = null,
             modifier = Modifier

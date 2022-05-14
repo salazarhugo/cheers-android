@@ -56,7 +56,7 @@ class SendGiftViewModel @AssistedInject constructor(
 
     fun selectSticker(sticker: Sticker) {
         viewModelState.update {
-            it.copy(selectedSticker =  sticker)
+            it.copy(selectedSticker = sticker)
         }
         updateConfirmation(true)
     }
@@ -75,7 +75,10 @@ class SendGiftViewModel @AssistedInject constructor(
 
     fun sendGift() {
         updateIsLoading(true)
-        FirestoreUtil.sendGift(receiverId = receiverId, price = uiState.value.selectedSticker?.price ?: 50).addOnSuccessListener { result ->
+        FirestoreUtil.sendGift(
+            receiverId = receiverId,
+            price = uiState.value.selectedSticker?.price ?: 50
+        ).addOnSuccessListener { result ->
             Log.e("SendGift", result.toString())
 
             val success = result["success"] as Boolean

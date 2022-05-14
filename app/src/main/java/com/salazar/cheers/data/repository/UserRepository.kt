@@ -2,12 +2,16 @@ package com.salazar.cheers.data.repository
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.mapbox.geojson.FeatureCollection
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.PostDao
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserStatsDao
+import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,10 +25,12 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor(
+    private val goApi: GoApi,
     private val service: Neo4jService,
     private val userDao: UserDao,
     private val userStatsDao: UserStatsDao,
     private val postDao: PostDao,
+    private val cheersDao: CheersDao,
 ) {
 
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {
@@ -36,6 +42,17 @@ class UserRepository @Inject constructor(
         return@withContext service.getFollowersFollowing(userIdOrUsername = userIdOrUsername)
     }
 
+    suspend fun getLocations(): FeatureCollection {
+        return withContext(Dispatchers.IO) {
+            try {
+                val json = goApi.getLocations().toString()
+                return@withContext FeatureCollection.fromJson(json)
+            } catch (e: HttpException) {
+                Log.e("User REpo", e.toString())
+            }
+        } as FeatureCollection
+    }
+
     suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {
         when (val result = service.getUserStats(username = username)) {
             is Result.Success -> userStatsDao.insert(userStats = result.data)
@@ -44,19 +61,25 @@ class UserRepository @Inject constructor(
         return@withContext userStatsDao.getUserStats(username)
     }
 
+    fun getRecentUsers(): Flow<List<RecentUser>> {
+        return cheersDao.getRecentUsers()
+    }
+
     suspend fun queryUsers(
         fetchFromRemote: Boolean,
         query: String,
-    ): Flow<Resource<List<User>>>  {
+    ): Flow<Resource<List<User>>> {
         return flow {
             emit(Resource.Loading(true))
             val localUsers = userDao.searchUser(query = query)
-            emit(Resource.Success(
-                data = localUsers
-            ))
+            emit(
+                Resource.Success(
+                    data = localUsers
+                )
+            )
 
             val isDbEmpty = localUsers.isEmpty() && query.isBlank()
-            val shouldLoadFromCache = !isDbEmpty  && !fetchFromRemote
+            val shouldLoadFromCache = !isDbEmpty && !fetchFromRemote
             if (shouldLoadFromCache) {
                 emit(Resource.Loading(false))
                 return@flow
@@ -76,9 +99,11 @@ class UserRepository @Inject constructor(
 
             remoteUsers?.let { users ->
                 userDao.insertOrUpdateAll(users)
-                emit(Resource.Success(
-                    data = users
-                ))
+                emit(
+                    Resource.Success(
+                        data = users
+                    )
+                )
                 emit(Resource.Loading(false))
             }
         }
@@ -102,11 +127,6 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getUsersWithListOfIds(ids: List<String>): List<User> = withContext(Dispatchers.IO) {
-        launch(Dispatchers.IO) {
-            ids.forEach { id ->
-                refreshUser(userIdOrUsername = id)
-            }
-        }
         return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 

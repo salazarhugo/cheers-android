@@ -93,7 +93,7 @@ object Neo4jUtil {
     }
 
     suspend fun addStory(story: StoryResponse) = withContext(Dispatchers.IO) {
-        val json =  Gson().toJson(story)
+        val json = Gson().toJson(story)
 
         val data = hashMapOf(
             "story" to json,
@@ -109,7 +109,7 @@ object Neo4jUtil {
     }
 
     fun addPost(post: Post) {
-        val json =  Gson().toJson(post)
+        val json = Gson().toJson(post)
 
         val data = hashMapOf(
             "post" to json,

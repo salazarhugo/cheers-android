@@ -30,7 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
@@ -54,14 +54,17 @@ fun AddPeopleScreen(
         LoadingScreen()
 
     Scaffold(
-        topBar = { AddPeopleTopBar(
-            onDismiss = onBackPressed,
-            onDone = onDone
-        ) },
+        topBar = {
+            AddPeopleTopBar(
+                onDismiss = onBackPressed,
+                onDone = onDone
+            )
+        },
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize().animateContentSize()
+                .fillMaxSize()
+                .animateContentSize()
         ) {
             DividerM3()
             ChipInput(
@@ -106,7 +109,7 @@ fun Users(
     onSelectUser: (User) -> Unit,
 ) {
     LazyColumn {
-        items(users) { user ->
+        items(users, key = { it.id }) { user ->
             UserCard(user, selectedUsers.contains(user), onSelectUser = onSelectUser)
         }
     }
@@ -128,7 +131,7 @@ fun UserCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(data = user.profilePictureUrl),
+                painter = rememberAsyncImagePainter(model = user.profilePictureUrl),
                 contentDescription = "Profile image",
                 modifier = Modifier
                     .size(54.dp)

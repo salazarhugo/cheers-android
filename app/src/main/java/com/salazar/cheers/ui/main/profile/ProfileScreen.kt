@@ -33,7 +33,6 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostFooter
@@ -42,7 +41,8 @@ import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeRefreshState
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.theme.Roboto
@@ -103,7 +103,7 @@ fun Profile(
         )
 
         SwipeToRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
         ) {
             LazyColumn {
@@ -248,7 +248,7 @@ fun GridViewPosts(
         columns = GridCells.Fixed(count = 3),
         modifier = Modifier.height(800.dp),
     ) {
-        items(posts) { post ->
+        items(posts, key = { it.id }) { post ->
             PostItem(post, onPostClicked)
         }
     }

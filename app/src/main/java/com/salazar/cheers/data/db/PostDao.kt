@@ -47,7 +47,10 @@ interface PostDao {
 
     @Transaction
     @Query("SELECT * FROM posts WHERE privacy = :privacy AND created > :yesterday")
-    suspend fun getMapPosts(privacy: Privacy, yesterday: Long = Date().time - 24 * 60 * 60 * 1000): List<PostFeed>
+    suspend fun getMapPosts(
+        privacy: Privacy,
+        yesterday: Long = Date().time - 24 * 60 * 60 * 1000
+    ): List<PostFeed>
 
 //    @Transaction
 //    @Query("SELECT * FROM posts WHERE tagUsersId")

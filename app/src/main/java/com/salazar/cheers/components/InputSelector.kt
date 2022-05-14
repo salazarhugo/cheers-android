@@ -67,6 +67,7 @@ fun UserInput(
     onMessageSent: (String) -> Unit,
     onImageSelectorClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTextChanged: () -> Unit = {},
     resetScroll: () -> Unit = {},
 ) {
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
@@ -94,7 +95,10 @@ fun UserInput(
                     dismissKeyboard()
                 },
                 textFieldValue = textState,
-                onTextChanged = { textState = it },
+                onTextChanged = {
+                    textState = it
+                    onTextChanged()
+                },
                 // Only show the keyboard if there's no input selector and text field has focus
                 keyboardShown = currentInputSelector == InputSelector.NONE && textFieldFocusState,
                 // Close extended selector if text field receives focus
@@ -501,7 +505,6 @@ fun ExtendedSelectorInnerButton(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageGrid(images: List<String>) {
 
@@ -509,7 +512,7 @@ fun ImageGrid(images: List<String>) {
         columns = GridCells.Adaptive(minSize = 100.dp),
     ) {
         items(images) { uri ->
-            Text(uri.toString())
+            Text(uri)
         }
     }
 }

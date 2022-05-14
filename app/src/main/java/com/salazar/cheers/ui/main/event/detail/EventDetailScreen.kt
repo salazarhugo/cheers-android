@@ -9,9 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.salazar.cheers.R
 import com.salazar.cheers.internal.EventUi
 import com.salazar.cheers.ui.theme.Typography
 import java.time.ZonedDateTime
@@ -44,11 +47,10 @@ fun Event(eventUi: EventUi) {
 fun EventHeader(eventUi: EventUi) {
     val event = eventUi.event
     Image(
-        painter = rememberImagePainter(
-            data = event.imageUrl,
-            builder = {
-                error(com.salazar.cheers.R.drawable.default_profile_picture)
-            }
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = event.imageUrl).apply(block = fun ImageRequest.Builder.() {
+                error(R.drawable.default_profile_picture)
+            }).build()
         ),
         contentDescription = null,
         modifier = Modifier

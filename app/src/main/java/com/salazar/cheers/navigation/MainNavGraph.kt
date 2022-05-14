@@ -7,6 +7,8 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -20,6 +22,7 @@ import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.add.AddPostRoute
@@ -27,15 +30,11 @@ import com.salazar.cheers.ui.main.add.AddPostViewModel
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.CameraViewModel
 import com.salazar.cheers.ui.main.chat.ChatRoute
-import com.salazar.cheers.ui.main.chat.chatViewModel
-import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
-import com.salazar.cheers.ui.main.chats.MessagesRoute
-import com.salazar.cheers.ui.main.chats.MessagesViewModel
-import com.salazar.cheers.ui.main.chats.chatsSheetViewModel
+import com.salazar.cheers.ui.main.chats.*
 import com.salazar.cheers.ui.main.comment.CommentsRoute
 import com.salazar.cheers.ui.main.comment.commentsViewModel
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
-import com.salazar.cheers.ui.main.detail.postDetailViewModel
+import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.main.event.detail.EventDetailRoute
@@ -48,9 +47,10 @@ import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.nfc.NfcViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.ui.main.otherprofile.otherProfileStatsViewModel
-import com.salazar.cheers.ui.main.otherprofile.otherProfileViewModel
 import com.salazar.cheers.ui.main.profile.*
+import com.salazar.cheers.ui.main.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.search.SearchViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
@@ -99,11 +99,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/chat/{channelId}" })
         ) {
-            val channelId = it.arguments?.getString("channelId")!!
-            val chatViewModel = chatViewModel(channelId = channelId)
-
             ChatRoute(
-                chatViewModel = chatViewModel,
                 navActions = navActions,
             )
         }
@@ -156,16 +152,38 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         bottomSheet(
-            route = "${MainDestinations.MESSAGES_MORE_SHEET}/{name}/{channelId}",
+            route = "${MainDestinations.MESSAGES_MORE_SHEET}/{channelId}",
         ) {
-            val name = it.arguments?.getString("name")!!
-            val channelId = it.arguments?.getString("channelId")!!
-            val chatsSheetViewModel = chatsSheetViewModel(channelId = channelId)
+            val chatsSheetViewModel = hiltViewModel<ChatsSheetViewModel>()
 
-            ChatsMoreBottomSheet(
-                name = name,
-                onSettingsClick = { },
-                onDeleteClick = chatsSheetViewModel::deleteChannel,
+            val uiState by chatsSheetViewModel.uiState.collectAsState()
+            val room = uiState.room
+
+            if (room != null)
+                ChatsMoreBottomSheet(
+                    name = room.name,
+                    ownerId = room.ownerId,
+                    roomType = room.type,
+                    onDeleteClick = {
+                        chatsSheetViewModel.deleteChannel()
+                        navActions.navigateBack()
+                    },
+                    onLeaveClick = {
+                        chatsSheetViewModel.leaveChannel()
+                        navActions.navigateBack()
+                    },
+                )
+            else
+                LoadingScreen()
+        }
+
+        composable(
+            route = "${MainDestinations.ROOM_DETAILS}/{roomId}",
+            enterTransition = { scaleIn(animationSpec = tween(500)) },
+            exitTransition = { scaleOut(animationSpec = tween(500)) },
+        ) {
+            RoomRoute(
+                navActions = navActions,
             )
         }
 
@@ -298,7 +316,7 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
 
             val username = it.arguments?.getString("username")!!
-            val otherProfileViewModel = otherProfileViewModel(username = username)
+            val otherProfileViewModel = hiltViewModel<OtherProfileViewModel>()
 
             OtherProfileRoute(
                 otherProfileViewModel = otherProfileViewModel,
@@ -336,8 +354,8 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
         ) {
-            val postId = it.arguments?.getString("postId")!!
-            val postDetailViewModel = postDetailViewModel(postId = postId)
+            val postDetailViewModel = hiltViewModel<PostDetailViewModel>()
+
             PostDetailRoute(
                 postDetailViewModel = postDetailViewModel,
                 navActions = navActions,
@@ -348,7 +366,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
             arguments = listOf(
                 navArgument("username") { nullable = false },
-                navArgument("verified") { defaultValue = false}
+                navArgument("verified") { defaultValue = false }
             ),
         ) {
 
@@ -369,7 +387,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
             arguments = listOf(
                 navArgument("username") { nullable = false },
-                navArgument("verified") { defaultValue = false}
+                navArgument("verified") { defaultValue = false }
             )
         ) {
             val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
@@ -397,6 +415,13 @@ fun NavGraphBuilder.mainNavGraph(
                 navActions = navActions,
             )
         }
+
+        bottomSheet(MainDestinations.NEW_CHAT_ROUTE) {
+            NewChatRoute(
+                navActions = navActions,
+            )
+        }
+
 
         dialog(MainDestinations.EDIT_PROFILE_ROUTE) {
             val editProfileViewModel = hiltViewModel<EditProfileViewModel>()

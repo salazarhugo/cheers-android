@@ -36,7 +36,7 @@ fun PostMapScreen(
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.outline)
         )
-        Column() {
+        Column {
             if (uiState.selectedPost != null)
                 Post(
                     postFeed = uiState.selectedPost,
@@ -100,7 +100,7 @@ fun Post(
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp),
                 )
             }
-        items(postUsers) { user ->
+        items(postUsers, key = { it.id }) { user ->
             UserItem(user = user, onUserClick = onUserClick)
         }
     }

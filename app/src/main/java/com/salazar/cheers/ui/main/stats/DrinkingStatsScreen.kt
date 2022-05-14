@@ -33,7 +33,7 @@ fun Stat(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {  }
+            .clickable { }
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

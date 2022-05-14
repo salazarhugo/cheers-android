@@ -1,4 +1,4 @@
-package com.salazar.cheers
+package com.salazar.cheers.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -7,8 +7,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.salazar.cheers.CheersViewModel
 import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.ui.theme.CheersTheme
@@ -31,13 +31,11 @@ fun CheersApp(
     SetStatusBars(darkTheme = darkTheme)
 
     CheersTheme(darkTheme = darkTheme) {
-        ProvideWindowInsets {
-            CheersNavGraph(
-                darkTheme = darkTheme,
-                user = uiState.user,
-                showInterstitialAd = showInterstitialAd,
-            )
-        }
+        CheersNavGraph(
+            darkTheme = darkTheme,
+            user = uiState.user,
+            showInterstitialAd = showInterstitialAd,
+        )
     }
 }
 

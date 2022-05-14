@@ -1,4 +1,4 @@
-package com.salazar.cheers.components
+package com.salazar.cheers.components.user
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource

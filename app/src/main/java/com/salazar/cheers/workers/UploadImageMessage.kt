@@ -8,29 +8,29 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.ImageMessage
-import com.salazar.cheers.internal.MessageType
-import com.salazar.cheers.util.FirestoreChat
+import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineScope
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
 @HiltWorker
 class UploadImageMessage @AssistedInject constructor(
     @Assisted appContext: Context,
-    @Assisted params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+    @Assisted params: WorkerParameters,
+    private val chatRepository: ChatRepository,
+) : CoroutineWorker(appContext, params), CoroutineScope {
 
     override suspend fun doWork(): Result {
         val appContext = applicationContext
@@ -43,41 +43,19 @@ class UploadImageMessage @AssistedInject constructor(
         val channelId =
             inputData.getString("CHANNEL_ID") ?: return Result.failure()
 
-        val fullName =
-            inputData.getString("FULL_NAME") ?: return Result.failure()
-
-        val username =
-            inputData.getString("USERNAME") ?: return Result.failure()
-
-        val profilePicturePath =
-            inputData.getString("PROFILE_PICTURE_PATH") ?: return Result.failure()
-
         try {
-
-            // TODO (Implement multiple images upload)
-//            val imagesPath = mutableListOf<String>()
-//            imagesUri.forEach {
-//            }
 
             val first = if (imagesUri.isNotEmpty()) imagesUri.first() else return Result.failure()
 
             val photoBytes = extractImage(Uri.parse(first))
 
-            StorageUtil.uploadMessageImage(photoBytes) { downloadUrl ->
-                val imageMessage =
-                    ImageMessage().copy(
-                        imagesDownloadUrl = listOf(downloadUrl),
-                        senderId = FirebaseAuth.getInstance().currentUser?.uid!!,
-                        senderName = fullName,
-                        senderUsername = username,
-                        chatChannelId = channelId,
-                        senderProfilePictureUrl = profilePicturePath,
-                        type = MessageType.IMAGE,
-                    )
+            val task: Task<Uri> = StorageUtil.uploadMessageImage(photoBytes)
+            val downloadUrl = Tasks.await(task)
 
-                FirestoreChat.sendMessage(imageMessage, channelId)
-            }
-
+            chatRepository.sendImageMessage(
+                channelId = channelId,
+                photoUrl = downloadUrl.toString(),
+            )
 
             return Result.success()
         } catch (throwable: Throwable) {
@@ -86,7 +64,6 @@ class UploadImageMessage @AssistedInject constructor(
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val notification = NotificationCompat.Builder(applicationContext, "CHANNEL_ID")
             .setContentIntent(
@@ -119,4 +96,5 @@ class UploadImageMessage @AssistedInject constructor(
 
         return outputStream.toByteArray()
     }
+
 }

@@ -8,6 +8,7 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 val BlueGoogle = Color(0xFF4285F4)
+val BlueCheers = Color(0xFF0095F6)
 val GreenGoogle = Color(0xFF0F9D58)
 val GreyYoutube = Color(0xFFF9F9F9)
 

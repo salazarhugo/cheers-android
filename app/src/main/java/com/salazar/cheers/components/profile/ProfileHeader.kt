@@ -7,8 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.User
@@ -28,12 +30,12 @@ fun ProfileHeader(
     ) {
 
         Image(
-            painter = rememberImagePainter(
-                data = user.profilePictureUrl,
-                builder = {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                },
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }).build()
             ),
             modifier = Modifier
                 .size(80.dp)

@@ -121,7 +121,7 @@ fun AcceptTerms(
         pop()
     }
 
-    Row() {
+    Row {
         Checkbox(checked = acceptTerms, onCheckedChange = onAcceptTermsChange)
         ClickableText(
             text = annotatedText,

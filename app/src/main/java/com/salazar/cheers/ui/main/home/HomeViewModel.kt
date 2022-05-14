@@ -133,11 +133,12 @@ class HomeViewModel @Inject constructor(
 //        refreshSuggestions()
 
         viewModelScope.launch {
-            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!).collect { user ->
-                viewModelState.update {
-                    it.copy(user = user)
+            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!)
+                .collect { user ->
+                    viewModelState.update {
+                        it.copy(user = user)
+                    }
                 }
-            }
         }
         refreshPostsFlow()
     }

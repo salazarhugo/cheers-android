@@ -84,7 +84,7 @@ class UploadStoryWorker @AssistedInject constructor(
                     latitude = it.latitude
                     altitude = it.altitude
                 }
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("Location", "Couldn't get last location")
             }
 

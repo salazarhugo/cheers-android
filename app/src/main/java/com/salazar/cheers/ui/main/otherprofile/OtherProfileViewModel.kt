@@ -1,26 +1,28 @@
 package com.salazar.cheers.ui.main.otherprofile
 
-import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.PagingData
-import com.salazar.cheers.MainActivity
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GetTokenResult
+import com.salazar.cheers.ChatServiceGrpcKt
+import com.salazar.cheers.GetRoomIdReq
+import com.salazar.cheers.backend.ChatService
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.FirestoreUtil
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface OtherProfileUiState {
 
@@ -69,13 +71,15 @@ private data class OtherProfileViewModelState(
         }
 }
 
-class OtherProfileViewModel @AssistedInject constructor(
+@HiltViewModel
+class OtherProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
-    @Assisted private val username: String
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))
+    lateinit var chatService: ChatService
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -86,22 +90,56 @@ class OtherProfileViewModel @AssistedInject constructor(
         )
 
     init {
-        refresh()
-        viewModelScope.launch {
-            userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
-                updateUser(user)
+        savedStateHandle.get<String>("username")?.let { username ->
+            viewModelScope.launch {
+                userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
+                    updateUser(user)
+                }
             }
+        }
+        refresh()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val user2 =
+                FirebaseAuth.getInstance().currentUser ?: throw Exception("User is not logged in.")
+            val task: Task<GetTokenResult> = user2.getIdToken(false)
+            val tokenResult = Tasks.await(task)
+            val idToken = tokenResult.token ?: throw Exception("idToken is null")
+
+            val managedChannel = ManagedChannelBuilder
+                .forAddress("chat-r3a2dr4u4a-nw.a.run.app", 443)
+                .build()
+
+            val client = ChatServiceGrpcKt
+                .ChatServiceCoroutineStub(managedChannel)
+                .withInterceptors(ErrorHandleInterceptor(idToken = idToken))
+
+
+            chatService = ChatService(client)
+        }
+    }
+
+    fun getRoomId(onSuccess: (String) -> Unit) {
+        val otherUserId = viewModelState.value.user?.id ?: return
+
+        viewModelScope.launch {
+            onSuccess(
+                chatService.getRoomId(
+                    GetRoomIdReq.newBuilder().setRecipientId(otherUserId).build()
+                ).roomId
+            )
         }
     }
 
     fun refresh() {
-        viewModelScope.launch {
-            userRepository.refreshUser(userIdOrUsername = username)
-            refreshUserPosts(username = username)
+        savedStateHandle.get<String>("username")?.let { username ->
+            viewModelScope.launch {
+                userRepository.refreshUser(userIdOrUsername = username)
+                refreshUserPosts(username = username)
+            }
         }
     }
 
-    val user = FirestoreUtil.getCurrentUserDocumentLiveData()
 
     fun toggleFollow(user: User) {
         viewModelScope.launch {
@@ -111,7 +149,7 @@ class OtherProfileViewModel @AssistedInject constructor(
 
     fun updateUser(user: User?) {
         viewModelState.update {
-           it.copy(user = user)
+            it.copy(user = user)
         }
     }
 
@@ -135,31 +173,4 @@ class OtherProfileViewModel @AssistedInject constructor(
             }
         }
     }
-
-    @AssistedFactory
-    interface OtherProfileViewModelFactory {
-        fun create(username: String): OtherProfileViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: OtherProfileViewModelFactory,
-            username: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(username = username) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun otherProfileViewModel(username: String): OtherProfileViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).otherProfileViewModelFactory()
-
-    return viewModel(factory = OtherProfileViewModel.provideFactory(factory, username = username))
 }

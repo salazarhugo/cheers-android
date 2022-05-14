@@ -1,6 +1,6 @@
 package com.salazar.cheers.internal
 
-enum class Language() {
+enum class Language {
     English,
     Francais,
     Deutsh,

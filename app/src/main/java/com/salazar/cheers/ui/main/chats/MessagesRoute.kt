@@ -25,11 +25,12 @@ fun MessagesRoute(
         onChannelClicked = { channelId ->
             navActions.navigateToChat(channelId)
         },
-        onLongPress = { name, channelId ->
-            if (name.isNotBlank() && channelId.isNotBlank())
-                navActions.navigateToChatsMoreSheet(name, channelId)
+        onLongPress = { channelId ->
+            if (channelId.isNotBlank())
+                navActions.navigateToChatsMoreSheet(channelId)
         },
-        onNewMessageClicked = {
+        onNewChatClicked = {
+            navActions.navigateToNewChat()
         },
         onFollowToggle = messagesViewModel::onFollowToggle,
         onUserClick = { navActions.navigateToOtherProfile(it) },

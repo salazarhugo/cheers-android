@@ -14,9 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.CheersAppBar
@@ -30,6 +32,7 @@ fun GroupChatBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavIconPressed: () -> Unit = { },
     onTitleClick: () -> Unit = { },
+    onInfoClick: () -> Unit,
 ) {
     CheersAppBar(
         modifier = modifier,
@@ -49,12 +52,12 @@ fun GroupChatBar(
                 }
             ) {
                 Image(
-                    painter = rememberImagePainter(
-                        data = profilePictureUrl,
-                        builder = {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_group_picture)
-                        },
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                transformations(CircleCropTransformation())
+                                error(R.drawable.default_group_picture)
+                            }).build()
                     ),
                     contentDescription = "Profile image",
                     modifier = Modifier
@@ -95,7 +98,7 @@ fun GroupChatBar(
                 imageVector = Icons.Outlined.Info,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
-                    .clickable(onClick = {})
+                    .clickable(onClick = onInfoClick)
                     .padding(horizontal = 12.dp, vertical = 16.dp)
                     .height(24.dp),
                 contentDescription = stringResource(id = R.string.info)

@@ -28,7 +28,7 @@ fun ChipGroup(
 ) {
     Column(modifier = Modifier.padding(8.dp)) {
         LazyRow {
-            items(users) {
+            items(users, key = { it }) {
                 Animate {
                     Chip(
                         name = it,

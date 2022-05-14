@@ -21,7 +21,7 @@ fun CommentsRoute(
 ) {
     val uiState by commentsViewModel.uiState.collectAsState()
 
-    when(uiState) {
+    when (uiState) {
         is CommentsUiState.HasPosts ->
             CommentsScreen(
                 uiState = uiState,

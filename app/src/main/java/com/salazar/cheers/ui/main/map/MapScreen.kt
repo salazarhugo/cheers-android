@@ -19,19 +19,23 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.PublicOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.google.accompanist.permissions.PermissionRequired
-import com.google.accompanist.permissions.rememberPermissionState
+import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
+import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.annotations
@@ -39,6 +43,7 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.salazar.cheers.R
+import com.salazar.cheers.components.utils.Permission
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.ui.theme.GreySheet
@@ -68,6 +73,14 @@ fun MapScreen(
         )
     }
 
+    LaunchedEffect(uiState.geojson) {
+        if (uiState.geojson != null)
+            mapView.getMapboxMap().getStyle {
+                val users = it.getSourceAs<GeoJsonSource>("users")
+                users?.data(uiState.geojson.toJson())
+            }
+    }
+
     ModalBottomSheetLayout(
         sheetState = uiState.postSheetState,
         sheetContent = {
@@ -88,7 +101,7 @@ fun MapScreen(
                 }
             }
         ) {
-            LocationPermission(navigateToSettingsScreen) {
+            Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                 Box(contentAlignment = Alignment.BottomCenter) {
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
@@ -97,6 +110,11 @@ fun MapScreen(
                             mapView
                         },
                     ) { mapView ->
+//                        addUserAnnotations(
+//                            context = context,
+//                            features = uiState.users,
+//                            mapView = mapView,
+//                        )
                         addPostsAnnotations(
                             context = context,
                             posts = uiState.posts,
@@ -116,6 +134,23 @@ fun MapScreen(
                 }
             }
         }
+    }
+}
+
+private fun addUserAnnotations(
+    context: Context,
+    features: List<Feature>,
+    mapView: MapView,
+) {
+    val annotationApi = mapView.annotations
+    features.forEach {
+        val point = it.geometry() as Point
+        val pointAnnotationManager = annotationApi.createPointAnnotationManager()
+        val pointAnnotationOptions = PointAnnotationOptions()
+            .withPoint(point)
+            .withIconImage(bitmapFromDrawableRes(context, resourceId = R.drawable.ic_bitmoji)!!)
+            .withIconAnchor(iconAnchor = IconAnchor.BOTTOM)
+        pointAnnotationManager.create(pointAnnotationOptions)
     }
 }
 
@@ -142,41 +177,6 @@ private fun addPostsAnnotations(
                 )
             )
         }
-    }
-}
-
-@Composable
-fun LocationPermission(
-    navigateToSettingsScreen: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    // Track if the user doesn't want to see the rationale any more.
-    val doNotShowRationale = rememberSaveable { mutableStateOf(false) }
-
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-
-    PermissionRequired(
-        permissionState = cameraPermissionState,
-        permissionNotGrantedContent = {
-            if (doNotShowRationale.value)
-                Text("Feature not available")
-            else
-                LaunchedEffect(Unit) { cameraPermissionState.launchPermissionRequest() }
-        },
-        permissionNotAvailableContent = {
-            Column {
-                Text(
-                    "Location permission denied. See this FAQ with information about why we " +
-                            "need this permission. Please, grant us access on the Settings screen."
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = navigateToSettingsScreen) {
-                    Text("Open Settings")
-                }
-            }
-        }
-    ) {
-        content()
     }
 }
 

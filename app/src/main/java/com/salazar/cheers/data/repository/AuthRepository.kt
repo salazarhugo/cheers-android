@@ -22,7 +22,10 @@ class AuthRepository @Inject constructor(
 
     fun isUserAuthenticatedInFirebase() = auth.currentUser != null
 
-     suspend fun signInWithEmailAndPassword(email: String, password: String): Flow<Result<Boolean>> = flow {
+    suspend fun signInWithEmailAndPassword(
+        email: String,
+        password: String
+    ): Flow<Result<Boolean>> = flow {
         try {
 //            emit(Result.Loading)
             auth.signInWithEmailAndPassword(email, password).await()
@@ -44,7 +47,7 @@ class AuthRepository @Inject constructor(
         return service.getUser(userIdOrUsername = userId)
     }
 
-    fun getUserAuthState() = callbackFlow  {
+    fun getUserAuthState() = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser == null)
         }

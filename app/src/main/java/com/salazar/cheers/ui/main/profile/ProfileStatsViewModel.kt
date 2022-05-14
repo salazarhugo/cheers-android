@@ -92,7 +92,8 @@ class ProfileStatsViewModel @Inject constructor(
 
         viewModelScope.launch {
             viewModelState.update {
-                val result = userRepository.getFollowersFollowing(FirebaseAuth.getInstance().currentUser?.uid!!)
+                val result =
+                    userRepository.getFollowersFollowing(FirebaseAuth.getInstance().currentUser?.uid!!)
                 it.copy(followers = result.first, following = result.second, isLoading = false)
             }
         }

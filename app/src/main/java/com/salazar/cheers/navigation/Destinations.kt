@@ -18,9 +18,11 @@ object CheersDestinations {
 object MainDestinations {
     const val HOME_ROUTE = "home"
     const val SEARCH_ROUTE = "search"
+    const val ROOM_DETAILS = "roomDetails"
     const val MAP_ROUTE = "map"
     const val MESSAGES_ROUTE = "messages"
     const val MESSAGES_MORE_SHEET = "messagesMoreSheet"
+    const val NEW_CHAT_ROUTE = "newChat"
     const val PROFILE_ROUTE = "profile"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
@@ -75,6 +77,18 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToRoomDetails: (String) -> Unit = { roomId ->
+        navController.navigate("${MainDestinations.ROOM_DETAILS}/$roomId") {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToNewChat: () -> Unit = {
+        navController.navigate(route = MainDestinations.NEW_CHAT_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToNfc: () -> Unit = {
@@ -199,8 +213,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToChatsMoreSheet: (name: String, channelId: String) -> Unit = { name, channelId ->
-        navController.navigate("${MainDestinations.MESSAGES_MORE_SHEET}/$name/$channelId") {
+    val navigateToChatsMoreSheet: (channelId: String) -> Unit = { channelId ->
+        navController.navigate("${MainDestinations.MESSAGES_MORE_SHEET}/$channelId") {
             launchSingleTop = true
             restoreState = true
         }
@@ -336,19 +350,21 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToOtherProfileStats: (statName: String, username: String, verified: Boolean) -> Unit = { s, username, verified ->
-        navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/$username/$verified") {
-            launchSingleTop = true
-            restoreState = true
+    val navigateToOtherProfileStats: (statName: String, username: String, verified: Boolean) -> Unit =
+        { s, username, verified ->
+            navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/$username/$verified") {
+                launchSingleTop = true
+                restoreState = true
+            }
         }
-    }
 
-    val navigateToProfileStats: (statName: String, username: String, verified: Boolean) -> Unit = { s, username, verified ->
-        navController.navigate("${MainDestinations.PROFILE_STATS_ROUTE}/$username/$verified") {
-            launchSingleTop = true
-            restoreState = true
+    val navigateToProfileStats: (statName: String, username: String, verified: Boolean) -> Unit =
+        { s, username, verified ->
+            navController.navigate("${MainDestinations.PROFILE_STATS_ROUTE}/$username/$verified") {
+                launchSingleTop = true
+                restoreState = true
+            }
         }
-    }
 
     val navigateToCamera: () -> Unit = {
         navController.navigate(MainDestinations.CAMERA_ROUTE) {

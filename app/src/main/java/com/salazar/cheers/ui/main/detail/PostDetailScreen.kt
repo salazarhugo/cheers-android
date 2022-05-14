@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -39,12 +39,12 @@ import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
 import com.salazar.cheers.R
-import com.salazar.cheers.components.LikeButton
-import com.salazar.cheers.components.PrettyImage
 import com.salazar.cheers.components.items.UserItem
+import com.salazar.cheers.components.post.LikeButton
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
+import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
@@ -211,7 +211,7 @@ fun Post(
     val joined = post.tagUsersId.contains(uid)
 
     Column {
-        LazyColumn() {
+        LazyColumn {
 
             item {
                 PostDetails(
@@ -242,7 +242,7 @@ fun Post(
                             text = "Hangout event",
                             style = MaterialTheme.typography.titleMedium
                         )
-                        Column() {
+                        Column {
 //                        Text(
 //                            text = String.format("%.2f", post.locationLongitude),
 //                            style = MaterialTheme.typography.titleMedium
@@ -295,7 +295,7 @@ fun Post(
                 UserItem(user = author, isAuthor = true, onUserClick = onUserClick)
             }
             if (postUsers.isNotEmpty())
-                items(postUsers) { user ->
+                items(postUsers, key = { it.id }) { user ->
                     UserItem(user = user, onUserClick = onUserClick)
                 }
 
@@ -354,7 +354,7 @@ fun PostFooter(
                 like = post.liked,
                 likes = post.likes,
                 onToggle = { onToggleLike(post) })
-            Icon(painter = rememberImagePainter(R.drawable.ic_bubble_icon), "")
+            Icon(painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon), "")
             Icon(Icons.Outlined.Share, null)
         }
         if (isAuthor)

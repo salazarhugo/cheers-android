@@ -2,19 +2,61 @@ package com.salazar.cheers.di
 
 import android.content.Context
 import androidx.room.Room
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.*
+import com.salazar.cheers.data.remote.FirebaseUserIdTokenInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+//    @Provides
+//    @Singleton
+//    fun provideChatServiceCoroutineStub(): ChatServiceGrpcKt.ChatServiceCoroutineStub {
+//
+//        //192.168.1.35
+//        val managedChannel = ManagedChannelBuilder
+//            .forAddress("chat-r3a2dr4u4a-nw.a.run.app", 443)
+//            .build()
+//
+//        val client = ChatServiceGrpcKt
+//            .ChatServiceCoroutineStub(managedChannel)
+//            .withInterceptors(ErrorHandleInterceptor(""))
+////            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(header))
+//
+//        return client
+//    }
+
+    @Provides
+    @Singleton
+    fun provideGoApi(): GoApi {
+
+        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+            .addInterceptor(FirebaseUserIdTokenInterceptor())
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BASIC
+            })
+            .build()
+
+        val retrofit = retrofit2.Retrofit.Builder()
+            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+            .baseUrl(GoApi.BASE_URL)
+            .client(okHttpClient)
+            .build()
+
+        return retrofit.create(GoApi::class.java)
+    }
 
     @Singleton
     @Provides
@@ -76,6 +118,4 @@ object AppModule {
 
 @Module
 @InstallIn(ViewComponent::class)
-object ChatModule {
-
-}
+object ChatModule

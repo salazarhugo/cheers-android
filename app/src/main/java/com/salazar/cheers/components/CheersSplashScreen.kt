@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 
 @Composable
@@ -21,7 +21,7 @@ fun CheersSplashScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = rememberImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
+            painter = rememberAsyncImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
             modifier = Modifier.size(56.dp),
             contentDescription = null,
         )

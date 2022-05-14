@@ -18,8 +18,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
@@ -62,12 +64,12 @@ fun PostHeader(
             )
 
             Image(
-                painter = rememberImagePainter(
-                    data = profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
@@ -118,7 +120,7 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = relativeTimeFormatter(timestamp = created),
+                text = relativeTimeFormatter(timestamp = created / 1000),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
                 color = color,

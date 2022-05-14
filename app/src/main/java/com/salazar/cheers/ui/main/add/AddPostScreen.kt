@@ -41,7 +41,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
 import com.google.android.exoplayer2.ExoPlayer
@@ -120,6 +121,7 @@ fun AddPostScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(top = it.calculateTopPadding())
             ) {
                 AddPhotoOrVideo(
                     photos = uiState.photos,
@@ -614,7 +616,7 @@ fun CaptionSection(
                         modifier = Modifier
                             .clickable(onClick = { openPhotoVideoChooser() })
                             .size(50.dp),
-                        painter = rememberImagePainter(data = photos[0]),
+                        painter = rememberAsyncImagePainter(model = photos[0]),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )
@@ -697,12 +699,11 @@ fun VideoPlayer(
 @Composable
 fun ProfilePicture(profilePictureUrl: String) {
     Image(
-        painter = rememberImagePainter(
-            data = profilePictureUrl,
-            builder = {
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
                 transformations(CircleCropTransformation())
                 error(R.drawable.default_profile_picture)
-            },
+            }).build()
         ),
         contentDescription = "Profile image",
         modifier = Modifier

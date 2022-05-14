@@ -42,7 +42,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -499,7 +500,7 @@ fun NameTextField(
                         .clickable(onClick = { openPhotoVideoChooser() })
                         .padding(horizontal = 16.dp)
                         .size(50.dp),
-                    painter = rememberImagePainter(data = uiState.imageUri),
+                    painter = rememberAsyncImagePainter(model = uiState.imageUri),
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
@@ -743,7 +744,7 @@ fun CaptionSection(
                             .clickable(onClick = { openPhotoVideoChooser() })
                             .padding(horizontal = 16.dp)
                             .size(50.dp),
-                        painter = rememberImagePainter(data = mediaUri),
+                        painter = rememberAsyncImagePainter(model = mediaUri),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )
@@ -802,12 +803,11 @@ fun VideoPlayer(
 @Composable
 fun ProfilePicture(profilePictureUrl: String) {
     Image(
-        painter = rememberImagePainter(
-            data = profilePictureUrl,
-            builder = {
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
                 transformations(CircleCropTransformation())
                 error(R.drawable.default_profile_picture)
-            },
+            }).build()
         ),
         contentDescription = "Profile image",
         modifier = Modifier

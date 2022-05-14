@@ -62,10 +62,10 @@ fun VersionSection() {
 fun LoginsSection(
     onSignOut: () -> Unit,
 ) {
-    Column() {
+    Column {
         SettingTitle(title = "Logins")
         SignOutButton(onSignOut = onSignOut)
-        DeleteAccountButton()
+        RedButton(text = "Delete Account") { }
     }
 }
 
@@ -73,7 +73,7 @@ fun LoginsSection(
 fun HelpSection(
     onSettingsUIAction: (SettingsUIAction) -> Unit,
 ) {
-    Column() {
+    Column {
         SettingTitle(title = "Help")
         SettingItem("Ask a Question", Icons.Outlined.QuestionAnswer, {})
         SettingItem("Privacy Policy", Icons.Outlined.Policy) {
@@ -89,7 +89,7 @@ fun HelpSection(
 fun AccountSection(
     navigateToBecomeVip: () -> Unit,
 ) {
-    Column() {
+    Column {
         SettingTitle(title = "Account")
         SettingItem("Become VIP", Icons.Outlined.WorkspacePremium, navigateToBecomeVip)
     }
@@ -99,7 +99,7 @@ fun AccountSection(
 fun SettingsSection(
     onSettingsUIAction: (SettingsUIAction) -> Unit,
 ) {
-    Column() {
+    Column {
         SettingTitle(title = "Settings")
         SettingItem("Notifications and Sounds", Icons.Outlined.Notifications) {
             onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
@@ -128,13 +128,16 @@ fun SettingsSection(
 }
 
 @Composable
-fun DeleteAccountButton() {
+fun RedButton(
+    text: String,
+    onClick: () -> Unit,
+) {
     TextButton(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(4.dp),
     ) {
         Text(
-            text = "Delete account",
+            text = text,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),

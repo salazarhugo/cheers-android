@@ -22,19 +22,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeRefreshState
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Typography
@@ -49,10 +51,10 @@ fun SearchScreen(
     onRecentUserClicked: (String) -> Unit,
 ) {
     Scaffold(
-        topBar = { SearchBar(uiState, onSearchInputChanged) },
+        topBar = { SearchBar(uiState.searchInput, onSearchInputChanged) },
     ) {
         SwipeToRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
         ) {
             SearchBody(
@@ -112,13 +114,15 @@ fun UserList(
         if (isLoading)
             item {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicatorM3()
                 }
             }
-        items(users) { user ->
+        items(users, key = { it.id }) { user ->
             UserCard(
                 modifier = Modifier.animateItemPlacement(),
                 user = user,
@@ -145,7 +149,7 @@ fun RecentUserList(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-        items(recent) { user ->
+        items(recent, key = { it.id }) { user ->
             RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
         }
         if (recommendations.isNotEmpty())
@@ -156,7 +160,7 @@ fun RecentUserList(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-        items(recommendations) { user ->
+        items(recommendations, key = { it.id }) { user ->
             UserCard(
                 modifier = Modifier.animateItemPlacement(),
                 user = user,
@@ -182,12 +186,12 @@ fun RecentUserCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(
-                    data = user.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
@@ -228,12 +232,12 @@ fun UserCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter(
-                    data = user.profilePictureUrl,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
@@ -261,7 +265,7 @@ fun UserCard(
 
 @Composable
 fun SearchBar(
-    uiState: SearchUiState,
+    searchInput: String,
     onSearchInputChanged: (String) -> Unit
 ) {
     Box(
@@ -277,7 +281,6 @@ fun SearchBar(
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
         ) {}
 
-        val searchInput = uiState.searchInput
         val focusManager = LocalFocusManager.current
 
         TextField(

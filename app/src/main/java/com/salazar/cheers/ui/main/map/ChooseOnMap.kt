@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.map
 
+import android.Manifest
 import android.content.Context
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
+import com.salazar.cheers.components.utils.Permission
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
 
@@ -58,7 +60,7 @@ fun ChooseOnMapScreen(
             }
         }
     ) {
-        LocationPermission({}) {
+        Permission(Manifest.permission.ACCESS_COARSE_LOCATION) {
             Box(contentAlignment = Alignment.Center) {
                 AndroidView(factory = { mapView }, Modifier.fillMaxSize()) {
                     onMapReady(it, context)

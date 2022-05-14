@@ -1,12 +1,5 @@
 package com.salazar.cheers.ui.settings.payments
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import com.salazar.cheers.navigation.CheersNavigationActions
 //import com.stripe.android.view.CardInputWidget
 //
 //@Composable

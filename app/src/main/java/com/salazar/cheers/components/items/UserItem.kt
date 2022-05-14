@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.UserProfilePicture
@@ -45,8 +45,10 @@ fun UserItem(
         }
         if (isAuthor)
             Image(
-                rememberImagePainter(R.drawable.ic_crown),
-                modifier = Modifier.padding(end = 8.dp).size(16.dp),
+                rememberAsyncImagePainter(R.drawable.ic_crown),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(16.dp),
                 contentDescription = null,
             )
 //        FollowButton(isFollowing = true, onClick = { /*TODO*/ })

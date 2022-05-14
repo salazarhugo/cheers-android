@@ -8,53 +8,50 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.Sms
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.components.FollowButton
+import com.salazar.cheers.RoomStatus
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.chat.*
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.UserProfilePicture
-import com.salazar.cheers.components.share.rememberSwipeRefreshState
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.ui.theme.BlueCheers
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import kotlinx.coroutines.launch
+
 
 @Composable
 fun MessagesScreen(
     uiState: MessagesUiState,
-    onNewMessageClicked: () -> Unit,
+    onNewChatClicked: () -> Unit,
     onChannelClicked: (channelId: String) -> Unit,
-    onLongPress: (String, String) -> Unit,
+    onLongPress: (String) -> Unit,
     onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
@@ -67,14 +64,14 @@ fun MessagesScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onNewMessageClicked) {
+            FloatingActionButton(onClick = onNewChatClicked) {
                 Icon(Icons.Default.Edit, "")
             }
         }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = false),
-            onRefresh = onSwipeRefresh,
+            state = rememberSwipeToRefreshState(isRefreshing = false),
+            onRefresh = { onSwipeRefresh() },
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Tabs(
@@ -93,79 +90,28 @@ fun MessagesScreen(
 fun Tabs(
     uiState: MessagesUiState,
     onChannelClicked: (String) -> Unit,
-    onLongPress: (String, String) -> Unit,
+    onLongPress: (String) -> Unit,
     onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
-    val tabs = listOf("Direct", "Groups")
-    val pagerState = rememberPagerState()
-    val scope = rememberCoroutineScope()
     val suggestions = uiState.suggestions
 
-    TabRow(
-        // Our selected tab is our current page
-        selectedTabIndex = pagerState.currentPage,
-        // Override the indicator, using the provided pagerTabIndicatorOffset modifier
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-            )
-        },
-        backgroundColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
+    Column(
+        modifier = Modifier.fillMaxSize(),
     ) {
-        // Add tabs for all of our pages
-        tabs.forEachIndexed { index, title ->
-            Tab(
-                icon = { Text(title, style = MaterialTheme.typography.titleSmall) },
-                selected = pagerState.currentPage == index,
-                onClick = {
-                    scope.launch {
-                        pagerState.scrollToPage(index)
-                    }
-//                        viewModel.toggle()
-                },
+
+        if (uiState.isLoading)
+            LoadingScreen()
+
+        if (uiState.channels != null)
+            ConversationList(
+                channels = uiState.channels,
+                onChannelClicked = onChannelClicked,
+                onLongPress = onLongPress,
+                suggestions = suggestions,
+                onFollowToggle = onFollowToggle,
+                onUserClick = onUserClick,
             )
-        }
-    }
-    HorizontalPager(
-        count = tabs.size,
-        state = pagerState,
-    ) { page ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            when (page) {
-                0 -> {
-                    val directChats =
-                        uiState.channels//?.filter { it.type == ChatChannelType.DIRECT }
-                    if (uiState.isLoading)
-                        LoadingScreen()
-                    if (directChats != null)
-                        ConversationList(
-                            channels = directChats,
-                            onChannelClicked = onChannelClicked,
-                            onLongPress = onLongPress,
-                            suggestions = suggestions,
-                            onFollowToggle = onFollowToggle,
-                            onUserClick = onUserClick,
-                        )
-                }
-                1 -> {
-//                    val groupChats = uiState.channels?.filter { it.type == ChatChannelType.GROUP }
-//                    if (uiState.isLoading)
-//                        LoadingScreen()
-//                    if (groupChats != null)
-//                        ConversationList(
-//                            channels = groupChats,
-//                            onChannelClicked = onChannelClicked,
-//                            onLongPress = onLongPress,
-//                            suggestions = suggestions,
-//                            onFollowToggle = onFollowToggle,
-//                        )
-                }
-            }
-        }
     }
 }
 
@@ -174,15 +120,30 @@ fun ConversationList(
     channels: List<ChatChannel>,
     suggestions: List<User>?,
     onChannelClicked: (String) -> Unit,
-    onLongPress: (String, String) -> Unit,
+    onLongPress: (String) -> Unit,
     onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     if (channels.isEmpty())
         NoMessages()
-    LazyColumn(modifier = Modifier.fillMaxHeight()) {
-        items(channels) { channel ->
+
+    LazyColumn(
+        modifier = Modifier.fillMaxHeight()
+    ) {
+//        item {
+//            DirectConversation(
+//                modifier = Modifier.animateItemPlacement(),
+//                channel = ChatChannel(
+//                    id = "room:WaaRV588wxVStvC1yE3Zb1c7N3z2:iSU43WFi6nf1Ke2SucdkYG0yGRl2",
+//                    name = "Test",
+//                ),
+//                onChannelClicked,
+//                onLongPress
+//            )
+//        }
+        items(channels, key = { it.id }) { channel ->
             DirectConversation(
+                modifier = Modifier.animateItemPlacement(),
                 channel = channel,
                 onChannelClicked,
                 onLongPress
@@ -238,7 +199,7 @@ fun UserItem(
         }
         if (isAuthor)
             Image(
-                rememberImagePainter(R.drawable.ic_crown),
+                rememberAsyncImagePainter(R.drawable.ic_crown),
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .size(16.dp),
@@ -257,119 +218,110 @@ fun LinkContactsItem() {
 
 @Composable
 fun DirectConversation(
+    modifier: Modifier = Modifier,
     channel: ChatChannel,
     onChannelClicked: (String) -> Unit,
-    onLongPress: (String, String) -> Unit,
+    onLongPress: (String) -> Unit,
 ) {
-    val otherUser =
-        channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid!! }
-            ?: User()
-
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = { onChannelClicked(channel.id) },
                 onLongClick = {
-                    onLongPress(
-                        otherUser.username,
-                        channel.id
-                    )
+                    onLongPress(channel.id)
                 })
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-
-        val image = otherUser.profilePictureUrl
-        val seen = if (channel.recentMessage != null)
-            channel.recentMessage.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)
-        else true
-
-        val isLastMessageMe = if (channel.recentMessage != null)
-            channel.recentMessage.senderId == FirebaseAuth.getInstance().currentUser?.uid!!
-        else true
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
             Image(
-                painter = rememberImagePainter(
-                    data = image,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = channel.avatarUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
-                    .size(54.dp)
+                    .size(50.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(14.dp))
             Column {
-                val title = otherUser.name
-                val seenByOthers =
-                    if (channel.recentMessage != null) channel.recentMessage.seenBy.size > 1 else true
-                val lastMessageStatus = if (isLastMessageMe && seenByOthers) "Opened"
-                else if (isLastMessageMe && !seenByOthers) "Delivered"
-                else if (!isLastMessageMe) "Received"
-                else "New chat"
+                val title = channel.name
 
                 val subtitle = buildAnnotatedString {
-//                    if (channel.recentMessage != null) {
-//                        append(channel.recentMessage.text)
-//                        append("  •  ")
-//                    }
-                    append(lastMessageStatus)
                     append("  •  ")
                     append(
                         relativeTimeFormatter(
-                            timestamp = channel.recentMessageTime.time
+                            timestamp = channel.recentMessageTime.seconds
                         )
                     )
                 }
 
-                val fontWeight = if (seen) FontWeight.Normal else FontWeight.Bold
-                if (title.isNotBlank())
+                val fontWeight =
+                    if (channel.status == RoomStatus.NEW) FontWeight.Bold else FontWeight.Normal
+//                if (title.isNotBlank())
+//                    Text(
+//                        text = title,
+//                        style = Typography.bodyMedium,
+//                        fontWeight = fontWeight,
+//                    )
+//                else
+                Username(username = channel.name, verified = channel.verified)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    with(channel.recentMessageType) {
+                        when (channel.status) {
+                            RoomStatus.NEW -> NewChat(this)
+                            RoomStatus.EMPTY -> EmptyChat()
+                            RoomStatus.OPENED -> OpenedChat()
+                            RoomStatus.SENT -> DeliveredChat(this)
+                            RoomStatus.RECEIVED -> ReceivedChat(this)
+                            RoomStatus.UNRECOGNIZED -> {}
+                        }
+                    }
                     Text(
-                        text = title,
-                        style = Typography.bodyMedium,
+                        text = subtitle,
+                        style = Typography.bodySmall,
                         fontWeight = fontWeight,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
                     )
-                else
-                    Username(username = otherUser.username, verified = otherUser.verified)
-                Text(
-                    text = subtitle,
-                    style = Typography.bodySmall,
-                    fontWeight = fontWeight,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                )
+                }
             }
         }
         val tint =
-            if (seen) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
+            if (channel.status == RoomStatus.NEW) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (!seen) {
+            if (channel.status == RoomStatus.NEW) {
                 Box(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF0095F6))
+                        .background(BlueCheers)
                 )
                 Spacer(Modifier.width(12.dp))
             }
 
+            val icon =
+                if (channel.status == RoomStatus.NEW) Icons.Outlined.Sms else Icons.Outlined.PhotoCamera
+
             IconButton(onClick = {}) {
                 Icon(
-                    Icons.Outlined.PhotoCamera,
-                    "Camera Icon",
+                    imageVector = icon,
+                    contentDescription = "Camera Icon",
                     tint = tint,
                 )
             }

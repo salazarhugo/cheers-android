@@ -8,13 +8,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.Message
-import com.salazar.cheers.internal.TextMessage
+import com.salazar.cheers.internal.ChatMessage
 
 @Composable
 fun OnMessageLongClickDialog(
     openDialog: MutableState<Boolean>,
-    msg: Message,
+    msg: ChatMessage,
     onUnsendMessage: (String) -> Unit = {},
     onCopyText: (String) -> Unit,
     onSaveReply: () -> Unit = {},
@@ -27,7 +26,7 @@ fun OnMessageLongClickDialog(
         },
         text = {
             Column {
-                val text = if (msg is TextMessage) msg.text else ""
+                val text = msg.text
                 Text(
                     text = text,
                     maxLines = 1,
@@ -45,7 +44,7 @@ fun OnMessageLongClickDialog(
                     }
                 TextButton(
                     onClick = {
-                        val text = if (msg is TextMessage) msg.text else ""
+                        val text = msg.text
                         onCopyText(text)
                         openDialog.value = false
                     },

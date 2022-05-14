@@ -1,14 +1,14 @@
 package com.salazar.cheers.ui.main.chats
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.Room
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +24,7 @@ data class MessagesUiState(
 
 private data class MessagesViewModelState(
     val channels: List<ChatChannel>? = null,
+    val rooms: List<Room>? = null,
     val suggestions: List<User>? = null,
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -47,11 +48,8 @@ class MessagesViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
-    val user = FirestoreUtil.getCurrentUserDocumentLiveData()
-    val name = mutableStateOf("")
-
     private val viewModelState =
-        MutableStateFlow(MessagesViewModelState(isLoading = true))
+        MutableStateFlow(MessagesViewModelState(isLoading = false))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -62,32 +60,8 @@ class MessagesViewModel @Inject constructor(
         )
 
     init {
-        refreshSuggestions()
-        listenChannels()
-
-//        val channel = ManagedChannelBuilder.forAddress("https://chat-r3a2dr4u4a-nw.a.run.app", 8080)
-////            .executor(Dispatchers.IO.asExecutor())
-//            .build()
-//        val client = ServicesGrpcKt.ServicesCoroutineStub(channel = channel)
-//
-//        viewModelScope.launch {
-//            val a = flow {
-//                emit(
-//                    FromClient.newBuilder()
-//                        .setBody("Hello there!")
-//                        .setName("Lars")
-//                        .build()
-//                )
-//            }
-//            client.chatService(a).collect {
-//                Log.d("gRPC", it.toString())
-//            }
-//        }
-
-    }
-
-    private fun listenChannels() {
-        viewModelScope.launch {
+        onSwipeRefresh()
+        viewModelScope.launch(Dispatchers.IO) {
             chatRepository.getChannels().collect { channels ->
                 viewModelState.update {
                     it.copy(channels = channels, isLoading = false)
@@ -97,7 +71,9 @@ class MessagesViewModel @Inject constructor(
     }
 
     fun onSwipeRefresh() {
-        refreshSuggestions()
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRepository.fetchRoomsFromRemote()
+        }
     }
 
     private fun refreshSuggestions() {
@@ -116,6 +92,4 @@ class MessagesViewModel @Inject constructor(
             userRepository.toggleFollow(user = user)
         }
     }
-
-
 }

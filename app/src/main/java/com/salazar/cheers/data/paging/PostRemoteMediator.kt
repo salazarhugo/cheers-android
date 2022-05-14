@@ -53,20 +53,20 @@ class PostRemoteMediator(
                     val result = response.data
                     val endOfPaginationReached = result.size < state.config.pageSize
 
-                        if (loadType == LoadType.REFRESH) {
-                            remoteKeyDao.clear()
-                        }
+                    if (loadType == LoadType.REFRESH) {
+                        remoteKeyDao.clear()
+                    }
 
-                        val prevKey = if (page == initialPage) null else page - 1
-                        val nextKey = if (endOfPaginationReached) null else page + 1
-                        val keys = result.map {
-                            RemoteKey(postId = it.first.id, prevKey = prevKey, nextKey = nextKey)
-                        }
-                        remoteKeyDao.insertAll(keys)
-                        result.forEach {
-                            userDao.insertOrUpdateAll(it.second)
-                            postDao.insert(it.first)
-                        }
+                    val prevKey = if (page == initialPage) null else page - 1
+                    val nextKey = if (endOfPaginationReached) null else page + 1
+                    val keys = result.map {
+                        RemoteKey(postId = it.first.id, prevKey = prevKey, nextKey = nextKey)
+                    }
+                    remoteKeyDao.insertAll(keys)
+                    result.forEach {
+                        userDao.insertOrUpdateAll(it.second)
+                        postDao.insert(it.first)
+                    }
 //                    }
                     MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
                 }

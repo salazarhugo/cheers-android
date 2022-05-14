@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -27,9 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.insets.imePadding
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
@@ -65,7 +66,7 @@ fun CommentsScreen(
 
 @Composable
 fun Comments(comments: List<CommentWithAuthor>) {
-    LazyColumn() {
+    LazyColumn {
         item {
             GuidelinesBanner()
         }
@@ -169,12 +170,12 @@ fun CommentBottomBar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = rememberImagePainter(
-                        data = profilePictureUrl,
-                        builder = {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        },
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                transformations(CircleCropTransformation())
+                                error(R.drawable.default_profile_picture)
+                            }).build()
                     ),
                     modifier = Modifier
                         .size(40.dp)

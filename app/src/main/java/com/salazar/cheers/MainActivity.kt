@@ -1,16 +1,20 @@
 package com.salazar.cheers
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Looper
 import android.os.StrictMode
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.ads.AdRequest
@@ -19,18 +23,20 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.data.repository.BillingRepository
-import com.salazar.cheers.ui.main.chat.ChatViewModel
-import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
+import com.salazar.cheers.ui.CheersApp
 import com.salazar.cheers.ui.main.comment.CommentsViewModel
-import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.event.detail.EventDetailViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsViewModel
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsViewModel
 import com.salazar.cheers.ui.main.story.stats.StoryStatsViewModel
 import com.salazar.cheers.ui.sheets.SendGiftViewModel
@@ -47,23 +53,27 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @EntryPoint
     @InstallIn(ActivityComponent::class)
     interface ViewModelFactoryProvider {
-        fun postDetailViewModelFactory(): PostDetailViewModel.PostDetailViewModelFactory
         fun storyStatsViewModelFactory(): StoryStatsViewModel.StoryStatsViewModelFactory
         fun eventDetailViewModelFactory(): EventDetailViewModel.EventDetailViewModelFactory
-        fun otherProfileViewModelFactory(): OtherProfileViewModel.OtherProfileViewModelFactory
         fun otherProfileStatsViewModelFactory(): OtherProfileStatsViewModel.OtherProfileStatsViewModelFactory
         fun drinkingStatsViewModelFactory(): DrinkingStatsViewModel.DrinkingStatsViewModelFactory
-        fun chatViewModelFactory(): ChatViewModel.ChatViewModelFactory
-        fun chatsSheetViewModelFactory(): ChatsSheetViewModel.ChatsSheetViewModelFactory
         fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
         fun sendGiftViewModelFactory(): SendGiftViewModel.SendGiftViewModelFactory
     }
 
     private val cheersViewModel: CheersViewModel by viewModels()
     private var mInterstitialAd: InterstitialAd? = null
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     @Inject
-    lateinit var billingRepository: BillingRepository
+    lateinit var firebaseAuth: FirebaseAuth
+
+    @Inject
+    lateinit var goApi: GoApi
+
+    @Inject
+    lateinit var billijngRepository: BillingRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +89,18 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
         initInterstitialAd()
+
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                if (firebaseAuth.currentUser == null) return
+                for (location in p0.locations) {
+//                    GlobalScope.launch {
+//                        goApi.updateLocation(longitude = location.longitude, latitude = location.latitude)
+//                    }
+                }
+            }
+        }
     }
 
     private fun userConsentPolicy() {
@@ -127,7 +149,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             this,
             { consentForm ->
                 val consentForm = consentForm
-                if (consentInformation.getConsentStatus() === ConsentInformation.ConsentStatus.REQUIRED) {
+                if (consentInformation.consentStatus === ConsentInformation.ConsentStatus.REQUIRED) {
                     consentForm.show(
                         this@MainActivity
                     ) { // Handle dismissal by reloading form.
@@ -139,10 +161,29 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(
+            LocationRequest.create()
+                .setInterval(60000)
+                .setFastestInterval(60000)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
 
-        cheersViewModel.queryPurchases()
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     override fun onStart() {

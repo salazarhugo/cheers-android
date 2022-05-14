@@ -67,28 +67,28 @@ class SearchViewModel @Inject constructor(
 
     private fun queryUsers(
         query: String = uiState.value.searchInput.lowercase(),
-        fetchFromRemote: Boolean = false,
+        fetchFromRemote: Boolean = true,
     ) {
         viewModelScope.launch {
             userRepository
                 .queryUsers(fetchFromRemote = fetchFromRemote, query = query)
                 .collect { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        result.data?.let {
+                    when (result) {
+                        is Resource.Success -> {
+                            result.data?.let {
+                                viewModelState.update {
+                                    it.copy(users = result.data)
+                                }
+                            }
+                        }
+                        is Resource.Error -> Unit
+                        is Resource.Loading -> {
                             viewModelState.update {
-                                it.copy(users = result.data)
+                                it.copy(isLoading = result.isLoading)
                             }
                         }
                     }
-                    is Resource.Error -> Unit
-                    is Resource.Loading -> {
-                        viewModelState.update {
-                            it.copy(isLoading = result.isLoading)
-                        }
-                    }
                 }
-            }
         }
     }
 

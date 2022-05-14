@@ -26,9 +26,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,9 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
-import coil.compose.rememberImagePainter
-import com.google.accompanist.permissions.PermissionRequired
-import com.google.accompanist.permissions.rememberPermissionState
+import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.components.utils.Permission
 import com.salazar.cheers.util.Utils.createFile
 import com.salazar.cheers.util.Utils.getOutputDirectory
 import com.salazar.cheers.util.Utils.getOutputFileOptions
@@ -83,7 +80,7 @@ fun CameraScreen(
             )
         }
     ) {
-        CameraPermission {
+        Permission(Manifest.permission.CAMERA) {
             CameraPreview(
                 imageCapture = imageCapture,
                 lensFacing = uiState.lensFacing,
@@ -365,7 +362,7 @@ fun CameraPreview(
     ) {
         if (uiState.imageUri != null)
             Image(
-                painter = rememberImagePainter(uiState.imageUri),
+                painter = rememberAsyncImagePainter(uiState.imageUri),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -383,40 +380,6 @@ fun CameraPreview(
             hasImage = uiState.imageUri != null,
             flashMode = uiState.flashMode,
         )
-    }
-}
-
-@Composable
-private fun CameraPermission(
-    navigateToSettingsScreen: () -> Unit = {},
-    content: @Composable () -> Unit,
-) {
-    // Track if the user doesn't want to see the rationale any more.
-    val doNotShowRationale = rememberSaveable { mutableStateOf(false) }
-
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-    PermissionRequired(
-        permissionState = cameraPermissionState,
-        permissionNotGrantedContent = {
-            if (doNotShowRationale.value)
-                Text("Feature not available")
-            else
-                LaunchedEffect(Unit) { cameraPermissionState.launchPermissionRequest() }
-        },
-        permissionNotAvailableContent = {
-            Column {
-                Text(
-                    "Camera permission denied. See this FAQ with information about why we " +
-                            "need this permission. Please, grant us access on the Settings screen."
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = navigateToSettingsScreen) {
-                    Text("Open Settings")
-                }
-            }
-        }
-    ) {
-        content()
     }
 }
 

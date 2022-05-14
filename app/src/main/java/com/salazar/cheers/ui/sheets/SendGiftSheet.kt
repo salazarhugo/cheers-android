@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
@@ -12,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.components.DividerM3
 
@@ -92,7 +93,9 @@ fun SendGiftSheet(
             price = 50000,
         )
     )
-    LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(4)) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(4)
+    ) {
         items(items) {
             Item(
                 text = it.name,
@@ -118,7 +121,7 @@ fun Item(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = rememberImagePainter(data = icon),
+            painter = rememberAsyncImagePainter(model = icon),
             contentDescription = null,
             modifier = Modifier.size(44.dp)
         )

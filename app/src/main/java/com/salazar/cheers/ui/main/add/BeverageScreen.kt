@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.ui.theme.Roboto
 
@@ -46,12 +46,12 @@ fun Drinks(
     grouped: Map<Char, List<Beverage>>,
     onBeverageClick: (Beverage) -> Unit,
 ) {
-    LazyColumn() {
+    LazyColumn {
         grouped.forEach { (initial, drinks) ->
             stickyHeader {
                 CharacterHeader(initial)
             }
-            items(drinks) { drink ->
+            items(drinks, key = { it.name }) { drink ->
                 Drink(drink = drink, onBeverageClick = onBeverageClick)
             }
         }
@@ -95,7 +95,7 @@ fun Drink(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            painter = rememberImagePainter(drink.icon),
+            painter = rememberAsyncImagePainter(drink.icon),
             contentDescription = null,
             modifier = Modifier.size(32.dp)
         )

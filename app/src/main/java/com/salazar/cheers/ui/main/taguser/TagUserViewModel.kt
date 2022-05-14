@@ -40,8 +40,8 @@ class AddPeopleViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-             userRepository.queryUsers(query = query, fetchFromRemote = false).collect { result ->
-                 if (result is Resource.Success)
+            userRepository.queryUsers(query = query, fetchFromRemote = false).collect { result ->
+                if (result is Resource.Success)
                     viewModelState.update {
                         it.copy(users = result.data, isLoading = false)
                     }

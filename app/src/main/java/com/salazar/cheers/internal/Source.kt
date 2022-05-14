@@ -25,5 +25,4 @@ data class Source(
     val last4: String? = null,
     val name: String? = null,
     val tokenization_method: String? = null
-) {
-}
+)

@@ -113,7 +113,6 @@ object FirestoreUtil {
 
         val subscription = commentsDocument.addSnapshotListener { snapshot, e ->
             if (e != null) {
-                Log.e(FirestoreChat.TAG, "Users listener error.", e)
                 return@addSnapshotListener
             }
             val items = mutableListOf<Comment>()
@@ -142,7 +141,6 @@ object FirestoreUtil {
 
         val subscription = sourcesRef.addSnapshotListener { snapshot, e ->
             if (e != null) {
-                Log.e(FirestoreChat.TAG, "Users listener error.", e)
                 return@addSnapshotListener
             }
 
@@ -163,7 +161,6 @@ object FirestoreUtil {
 
         val subscription = currentUserDocRef.addSnapshotListener { snapshot, e ->
             if (e != null) {
-                Log.e(FirestoreChat.TAG, "Users listener error.", e)
                 return@addSnapshotListener
             }
 

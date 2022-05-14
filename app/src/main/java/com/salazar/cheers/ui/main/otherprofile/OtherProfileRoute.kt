@@ -8,10 +8,9 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeRefreshState
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.util.FirestoreChat
 
 /**
  * Stateful composable that displays the Navigation route for the Other profile screen.
@@ -49,7 +48,7 @@ fun OtherProfileRoute(
         }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = otherProfileViewModel::refresh,
         ) {
             if (uiState is OtherProfileUiState.HasUser) {
@@ -78,8 +77,8 @@ fun OtherProfileRoute(
                         )
                     },
                     onMessageClicked = {
-                        FirestoreChat.getOrCreateChatChannel(uiState.user.id) { channelId ->
-                            navActions.navigateToChat(channelId)
+                        otherProfileViewModel.getRoomId { roomId ->
+                            navActions.navigateToChat(roomId)
                         }
                     },
                     onWebsiteClick = { website ->

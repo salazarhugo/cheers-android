@@ -9,6 +9,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.repository.AuthRepository
+import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignInUiState(isLoading = false))
@@ -54,7 +56,7 @@ class SignInViewModel @Inject constructor(
 
         viewModelScope.launch {
             authRepository.getUserAuthState().collect {
-                when(val result = authRepository.getUser()) {
+                when (val result = authRepository.getUser()) {
                     is Result.Success -> {
                         viewModelState.update {
                             it.copy(isSignedIn = result.data != null)
@@ -112,6 +114,7 @@ class SignInViewModel @Inject constructor(
             // Get new FCM registration token
             val token = task.result
             viewModelScope.launch {
+                chatRepository.addToken(token = token)
                 MyFirebaseMessagingService.addTokenToNeo4j(token)
                 FirestoreUtil.addFCMRegistrationToken(token = token)
             }

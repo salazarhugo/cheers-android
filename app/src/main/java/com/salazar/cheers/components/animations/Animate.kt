@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 
 @Composable
@@ -116,7 +116,7 @@ fun AnimatedLogo() {
 //            drawArc(glowPaint.color, 0f, 360f, true)
 //        })
         Image(
-            painter = rememberImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
+            painter = rememberAsyncImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
             contentDescription = null,
             modifier = Modifier
                 .size(80.dp)

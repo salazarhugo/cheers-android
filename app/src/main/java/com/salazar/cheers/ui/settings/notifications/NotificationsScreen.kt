@@ -17,7 +17,7 @@ fun NotificationsScreen(
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Notifications") },
     ) {
-        Column() {
+        Column {
             NotificationsSection()
         }
     }
@@ -26,7 +26,7 @@ fun NotificationsScreen(
 @Composable
 fun NotificationsSection(
 ) {
-    Column() {
+    Column {
         SettingTitle(title = "Notifications for chats")
         SettingItem("Private Chats", Icons.Outlined.PrivateConnectivity, {})
         SettingItem("Groups", Icons.Outlined.Group, {})

@@ -60,7 +60,7 @@ fun OtherProfileScreen(
                 val isFollowed = uiState.user.isFollowed
                 HeaderButtons(
                     isFollowed = isFollowed,
-                    onFollowToggle = { onFollowToggle(uiState.user)},
+                    onFollowToggle = { onFollowToggle(uiState.user) },
                     onMessageClicked = onMessageClicked,
                     onGiftClick = onGiftClick,
                 )

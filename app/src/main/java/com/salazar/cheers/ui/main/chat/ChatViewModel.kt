@@ -1,29 +1,21 @@
 package com.salazar.cheers.ui.main.chat
 
-import android.app.Activity
 import android.app.Application
 import android.net.Uri
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
-import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.repository.ChatRepository
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.*
-import com.salazar.cheers.util.FirestoreChat
+import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.workers.UploadImageMessage
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface ChatUiState {
 
@@ -37,7 +29,7 @@ sealed interface ChatUiState {
 
     data class HasChannel(
         val channel: ChatChannel,
-        val messages: List<Message>,
+        val messages: List<ChatMessage>,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : ChatUiState
@@ -47,7 +39,7 @@ private data class ChatViewModelState(
     val channel: ChatChannel? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
-    val messages: List<Message> = emptyList(),
+    val messages: List<ChatMessage> = emptyList(),
 ) {
     fun toUiState(): ChatUiState =
         if (channel != null) {
@@ -65,15 +57,17 @@ private data class ChatViewModelState(
         }
 }
 
-class ChatViewModel @AssistedInject constructor(
+@HiltViewModel
+class ChatViewModel @Inject constructor(
     application: Application,
-    private val userRepository: UserRepository,
+    statsHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
-    @Assisted private val channelId: String
 ) : ViewModel() {
 
     private val workManager = WorkManager.getInstance(application)
-    private val viewModelState = MutableStateFlow(ChatViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(ChatViewModelState(isLoading = false))
+    private var channelId = ""
+    private var typingJob: Job? = null
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -84,130 +78,83 @@ class ChatViewModel @AssistedInject constructor(
         )
 
     init {
-        refreshCurrentUser()
-        refreshChannel()
+        statsHandle.get<String>("channelId")?.let {
+            channelId = it
+        }
+
+        viewModelScope.launch {
+            chatRepository.joinChannel(channelId = channelId)
+        }
+
+        viewModelScope.launch {
+            chatRepository.getChannel(channelId = channelId).collect { channel ->
+                viewModelState.update {
+                    it.copy(channel = channel)
+                }
+            }
+        }
 
         viewModelScope.launch {
             chatRepository.getMessages(channelId = channelId).collect { messages ->
-                viewModelState.update { it.copy(messages = messages, isLoading = false) }
+                viewModelState.update {
+                    it.copy(messages = messages, isLoading = false)
+                }
             }
-        }
-    }
-
-    private val user2 = mutableStateOf<User?>(null)
-
-    private fun refreshChannel() {
-        viewModelScope.launch {
-            chatRepository.getChannel(channelId = channelId).collect { channel ->
-                viewModelState.update { it.copy(channel = channel, isLoading = false) }
-            }
-        }
-    }
-
-    private fun refreshCurrentUser() {
-        viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            user2.value = user
-        }
-    }
-
-    fun seenLastMessage() {
-        val state = uiState.value
-        if (state is ChatUiState.NoChannel) return
-
-        val stateWithChannel = (state as ChatUiState.HasChannel)
-        if (stateWithChannel.messages.isEmpty()) return
-
-        val recentMessage = stateWithChannel.channel.recentMessage ?: return
-
-        viewModelScope.launch {
-            FirestoreChat.seenLastMessage(channelId = channelId, recentMessage = recentMessage)
         }
     }
 
     fun sendImageMessage(images: List<Uri>) {
-        val user = user2.value ?: return
-
-        val uploadImageMessageWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadImageMessage>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(
-                    workDataOf(
-                        "CHANNEL_ID" to channelId,
-                        "USERNAME" to user.username,
-                        "FULL_NAME" to user.name,
-                        "IMAGES_URI" to images.map { it.toString() }.toTypedArray(),
-                        "PROFILE_PICTURE_PATH" to user.profilePictureUrl,
+        viewModelScope.launch {
+            val uploadImageMessageWorkRequest: WorkRequest =
+                OneTimeWorkRequestBuilder<UploadImageMessage>().apply {
+                    setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    setInputData(
+                        workDataOf(
+                            "CHANNEL_ID" to channelId,
+                            "IMAGES_URI" to images.map { it.toString() }.toTypedArray(),
+                        )
                     )
-                )
-            }
-                .build()
-
-        // Actually start the work
-        workManager.enqueue(uploadImageMessageWorkRequest)
+                }
+                    .build()
+            workManager.enqueue(uploadImageMessageWorkRequest)
+        }
     }
 
     fun sendTextMessage(text: String) {
-        val user = user2.value ?: return
         viewModelScope.launch {
-//            chatRepository.insertMessage(TextMessage().copy(id = text, text = text, chatChannelId = channelId))
-            val textMessage =
-                TextMessage().copy(
-                    senderId = FirebaseAuth.getInstance().currentUser?.uid!!,
-                    text = text,
-                    senderName = user.name,
-                    senderUsername = user.username,
-                    chatChannelId = channelId,
-                    senderProfilePictureUrl = user.profilePictureUrl,
-                    type = MessageType.TEXT,
-                )
-
-            FirestoreChat.sendMessage(textMessage, channelId)
+            chatRepository.sendMessage(channelId = channelId, text)
         }
     }
 
     fun unsendMessage(messageId: String) {
         viewModelScope.launch {
-            FirestoreChat.unsendMessage(channelId = channelId, messageId = messageId)
+//            FirestoreChat.unsendMessage(channelId = channelId, messageId = messageId)
+        }
+    }
+
+    fun onTextChanged() {
+        if (typingJob?.isCompleted == false) {
+            typingJob = viewModelScope.launch {
+                delay(2000L)
+            }
+            return
+        }
+
+        typingJob = viewModelScope.launch {
+            chatRepository.startTyping(channelId = channelId)
+            delay(2000L)
         }
     }
 
     fun likeMessage(messageId: String) {
         viewModelScope.launch {
-            FirestoreChat.likeMessage(channelId = channelId, messageId = messageId)
+//            FirestoreChat.likeMessage(channelId = channelId, messageId = messageId)
         }
     }
 
     fun unlikeMessage(messageId: String) {
         viewModelScope.launch {
-            FirestoreChat.unlikeMessage(channelId = channelId, messageId = messageId)
+//            FirestoreChat.unlikeMessage(channelId = channelId, messageId = messageId)
         }
     }
-
-    @AssistedFactory
-    interface ChatViewModelFactory {
-        fun create(channelId: String): ChatViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: ChatViewModelFactory,
-            channelId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(channelId = channelId) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun chatViewModel(channelId: String): ChatViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).chatViewModelFactory()
-
-    return viewModel(factory = ChatViewModel.provideFactory(factory, channelId = channelId))
 }

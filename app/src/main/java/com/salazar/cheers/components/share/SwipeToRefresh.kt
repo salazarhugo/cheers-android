@@ -1,15 +1,13 @@
-package com.salazar.cheers.components.share;
+package com.salazar.cheers.components.share
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -62,14 +60,19 @@ fun SwipeToRefresh(
         this.refreshTrigger = refreshTriggerPx
     }
 
+    val offset = remember(state.indicatorOffset) {
+        min(state.indicatorOffset.roundToInt(), 100).dp
+    }
+
     Box(
         modifier.nestedScroll(connection = nestedScrollConnection),
         contentAlignment = Alignment.TopCenter
     ) {
-        RefreshSection(state)
+        if (state.isSwipeInProgress && state.indicatorOffset > 10)
+            RefreshSection()
         Box(
             Modifier
-                .offset(y = min(state.indicatorOffset.roundToInt(), 100).dp)
+                .offset(y = offset)
                 .fillMaxSize()
         ) {
             content()
@@ -80,7 +83,7 @@ fun SwipeToRefresh(
 private const val DragMultiplier = 0.5f
 
 @Composable
-fun rememberSwipeRefreshState(
+fun rememberSwipeToRefreshState(
     isRefreshing: Boolean
 ): SwipeRefreshState {
     return remember {
@@ -183,10 +186,7 @@ private class SwipeRefreshNestedScrollConnection(
 }
 
 @Composable
-private fun RefreshSection(
-    state: SwipeRefreshState,
-    progressBarColor: Color? = null,
-) {
+private fun RefreshSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -200,8 +200,6 @@ private fun RefreshSection(
             CircularProgressIndicatorM3(
                 modifier = Modifier
                     .size(40.dp),
-                color = progressBarColor
-                    ?: if (state.isSwipeInProgress && state.indicatorOffset > 10) MaterialTheme.colorScheme.onBackground else Color.Transparent,
                 strokeWidth = 1.dp
             )
         }

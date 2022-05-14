@@ -43,17 +43,17 @@ fun SignInRoute(
             navActions.navigateToMain()
         }
     else
-    SignInScreen(
-        uiState = uiState,
-        signInWithEmailPassword = {
-            signInViewModel.signInWithEmailPassword()
-        },
-        signInWithGoogle = { authResultLauncher.launch(1) },
-        navigateToPhone = { navActions.navigateToPhone() },
-        navigateToSignUp = { navActions.navigateToSignUp() },
-        onPasswordChanged = signInViewModel::onPasswordChange,
-        onEmailChanged = signInViewModel::onEmailChange,
-    )
+        SignInScreen(
+            uiState = uiState,
+            signInWithEmailPassword = {
+                signInViewModel.signInWithEmailPassword()
+            },
+            signInWithGoogle = { authResultLauncher.launch(1) },
+            navigateToPhone = { navActions.navigateToPhone() },
+            navigateToSignUp = { navActions.navigateToSignUp() },
+            onPasswordChanged = signInViewModel::onPasswordChange,
+            onEmailChanged = signInViewModel::onEmailChange,
+        )
 }
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {

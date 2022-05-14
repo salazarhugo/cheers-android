@@ -3,10 +3,9 @@ package com.salazar.cheers.ui.main.chat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.google.firebase.auth.FirebaseAuth
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -18,7 +17,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun ChatRoute(
-    chatViewModel: ChatViewModel,
+    chatViewModel: ChatViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by chatViewModel.uiState.collectAsState()
@@ -32,13 +31,7 @@ fun ChatRoute(
     when (uiState) {
         is ChatUiState.HasChannel -> {
             val ui = (uiState as ChatUiState.HasChannel)
-            val otherUser =
-                ui.channel.members.firstOrNull { it.id != FirebaseAuth.getInstance().currentUser?.uid!! }
-                    ?: User()
-
-            LaunchedEffect(Unit) {
-                chatViewModel.seenLastMessage()
-            }
+            val otherUser = User()
 
             ChatScreen(
                 uiState = uiState as ChatUiState.HasChannel,
@@ -50,11 +43,13 @@ fun ChatRoute(
                 onMessageSent = chatViewModel::sendTextMessage,
                 onImageSelectorClick = { launcher.launch("image/*") },
                 onCopyText = {},
-                username = otherUser.username,
-                verified = otherUser.verified,
-                name = otherUser.name,
-                profilePicturePath = otherUser.profilePictureUrl,
+                username = ui.channel.name,
+                verified = ui.channel.verified,
+                name = ui.channel.name,
+                profilePicturePath = ui.channel.avatarUrl,
                 onAuthorClick = { navActions.navigateToOtherProfile(it) },
+                onTextChanged = chatViewModel::onTextChanged,
+                onInfoClick = { navActions.navigateToRoomDetails(ui.channel.id) },
             )
         }
         is ChatUiState.NoChannel -> {

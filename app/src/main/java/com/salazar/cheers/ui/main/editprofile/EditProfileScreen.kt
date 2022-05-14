@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.LoadingScreen
@@ -89,12 +91,11 @@ fun EditProfileHeader(
         val photo = photoUri ?: user.profilePictureUrl
 
         Image(
-            painter = rememberImagePainter(
-                data = photo,
-                builder = {
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = photo).apply(block = fun ImageRequest.Builder.() {
                     transformations(CircleCropTransformation())
                     error(R.drawable.default_profile_picture)
-                }
+                }).build()
             ),
             contentDescription = "Profile image",
             modifier = Modifier

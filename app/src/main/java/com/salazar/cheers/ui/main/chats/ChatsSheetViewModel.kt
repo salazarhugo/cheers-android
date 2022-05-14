@@ -1,31 +1,28 @@
 package com.salazar.cheers.ui.main.chats
 
-import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.repository.ChatRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
+import com.salazar.cheers.internal.ChatChannel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class ChatsSheetUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
+    val room: ChatChannel? = null,
 )
 
-class ChatsSheetViewModel @AssistedInject constructor(
+@HiltViewModel
+class ChatsSheetViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-    @Assisted private val channelId: String
+    stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ChatsSheetUiState(isLoading = true))
@@ -37,39 +34,31 @@ class ChatsSheetViewModel @AssistedInject constructor(
             viewModelState.value
         )
 
+    lateinit var channelId: String
+
     init {
+        stateHandle.get<String>("channelId")?.let { roomId ->
+            channelId = roomId
+
+            viewModelScope.launch {
+                chatRepository.getChannel(roomId).collect { room ->
+                    viewModelState.update {
+                        it.copy(room = room)
+                    }
+                }
+            }
+        }
+    }
+
+    fun leaveChannel() {
+        viewModelScope.launch {
+            chatRepository.leaveRoom(channelId = channelId)
+        }
     }
 
     fun deleteChannel() {
         viewModelScope.launch {
-//            chatRepository.deleteChannel(channelId = channelId)
+            chatRepository.deleteRoom(channelId = channelId)
         }
     }
-
-    @AssistedFactory
-    interface ChatsSheetViewModelFactory {
-        fun create(channelId: String): ChatsSheetViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: ChatsSheetViewModelFactory,
-            channelId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(channelId = channelId) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun chatsSheetViewModel(channelId: String): ChatsSheetViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).chatsSheetViewModelFactory()
-
-    return viewModel(factory = ChatsSheetViewModel.provideFactory(factory, channelId = channelId))
 }

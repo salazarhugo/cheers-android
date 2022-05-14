@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import com.google.protobuf.Timestamp
 import com.salazar.cheers.R
 import java.io.File
 import java.text.SimpleDateFormat
@@ -21,9 +22,9 @@ import java.util.*
 
 object Utils {
 
-    fun Context.copyToClipboard(text: CharSequence){
+    fun Context.copyToClipboard(text: CharSequence) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("label",text)
+        val clip = ClipData.newPlainText("label", text)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(this, "Link copied", Toast.LENGTH_SHORT).show()
     }
@@ -171,7 +172,7 @@ object Utils {
         return output
     }
 
-    fun Date.isToday(): Boolean {
+    fun Timestamp.isToday(): Boolean {
         val c = Calendar.getInstance()
 
         c[Calendar.HOUR_OF_DAY] = 0
@@ -181,7 +182,7 @@ object Utils {
 
         val today = c.time
 
-        return this.after(today)
+        return this.seconds > today.time
     }
 
 }

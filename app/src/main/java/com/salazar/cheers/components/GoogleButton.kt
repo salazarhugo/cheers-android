@@ -32,7 +32,8 @@ fun GoogleButton(
     var clicked by remember { mutableStateOf(false) }
 
     Surface(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable {
                 clicked = !clicked
                 onClicked()

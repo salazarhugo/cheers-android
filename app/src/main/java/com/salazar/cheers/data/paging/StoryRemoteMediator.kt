@@ -52,22 +52,22 @@ class StoryRemoteMediator(
                     val endOfPaginationReached = result.size < state.config.pageSize
                     Log.d("HAHA", result.toString())
 
-                        if (loadType == LoadType.REFRESH) {
-                            remoteKeyDao.clear()
-                            storyDao.clearAll()
-                        }
+                    if (loadType == LoadType.REFRESH) {
+                        remoteKeyDao.clear()
+                        storyDao.clearAll()
+                    }
 
-                        val prevKey = if (page == initialPage) null else page - 1
-                        val nextKey = if (endOfPaginationReached) null else page + 1
-                        val keys = result.map {
-                            StoryRemoteKey(storyId = it.first.id, prevKey = prevKey, nextKey = nextKey)
-                        }
+                    val prevKey = if (page == initialPage) null else page - 1
+                    val nextKey = if (endOfPaginationReached) null else page + 1
+                    val keys = result.map {
+                        StoryRemoteKey(storyId = it.first.id, prevKey = prevKey, nextKey = nextKey)
+                    }
 
-                        remoteKeyDao.insertAll(keys)
-                        result.forEach {
-                            userDao.insertOrUpdateAll(it.second)
-                            storyDao.insert(it.first)
-                        }
+                    remoteKeyDao.insertAll(keys)
+                    result.forEach {
+                        userDao.insertOrUpdateAll(it.second)
+                        storyDao.insert(it.first)
+                    }
                     MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
                 }
                 is Result.Error -> MediatorResult.Error(response.exception)
