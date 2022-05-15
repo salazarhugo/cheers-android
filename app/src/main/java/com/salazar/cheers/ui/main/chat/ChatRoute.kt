@@ -43,7 +43,7 @@ fun ChatRoute(
                 onMessageSent = chatViewModel::sendTextMessage,
                 onImageSelectorClick = { launcher.launch("image/*") },
                 onCopyText = {},
-                username = ui.channel.name,
+                username = ui.channel.username,
                 verified = ui.channel.verified,
                 name = ui.channel.name,
                 profilePicturePath = ui.channel.avatarUrl,

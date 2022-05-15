@@ -56,6 +56,7 @@ fun MessagesScreen(
     onUserClick: (String) -> Unit,
     onActivityIconClicked: () -> Unit,
     onSwipeRefresh: () -> Unit,
+    onCameraClick: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -80,6 +81,7 @@ fun MessagesScreen(
                     onLongPress = onLongPress,
                     onFollowToggle = onFollowToggle,
                     onUserClick = onUserClick,
+                    onCameraClick = onCameraClick,
                 )
             }
         }
@@ -93,6 +95,7 @@ fun Tabs(
     onLongPress: (String) -> Unit,
     onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
+    onCameraClick: (String) -> Unit,
 ) {
     val suggestions = uiState.suggestions
 
@@ -111,6 +114,7 @@ fun Tabs(
                 suggestions = suggestions,
                 onFollowToggle = onFollowToggle,
                 onUserClick = onUserClick,
+                onCameraClick = onCameraClick,
             )
     }
 }
@@ -123,6 +127,7 @@ fun ConversationList(
     onLongPress: (String) -> Unit,
     onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
+    onCameraClick: (String) -> Unit,
 ) {
     if (channels.isEmpty())
         NoMessages()
@@ -130,23 +135,13 @@ fun ConversationList(
     LazyColumn(
         modifier = Modifier.fillMaxHeight()
     ) {
-//        item {
-//            DirectConversation(
-//                modifier = Modifier.animateItemPlacement(),
-//                channel = ChatChannel(
-//                    id = "room:WaaRV588wxVStvC1yE3Zb1c7N3z2:iSU43WFi6nf1Ke2SucdkYG0yGRl2",
-//                    name = "Test",
-//                ),
-//                onChannelClicked,
-//                onLongPress
-//            )
-//        }
         items(channels, key = { it.id }) { channel ->
             DirectConversation(
                 modifier = Modifier.animateItemPlacement(),
                 channel = channel,
                 onChannelClicked,
-                onLongPress
+                onLongPress,
+                onCameraClick = onCameraClick,
             )
         }
         if (suggestions != null && suggestions.isNotEmpty())
@@ -222,6 +217,7 @@ fun DirectConversation(
     channel: ChatChannel,
     onChannelClicked: (String) -> Unit,
     onLongPress: (String) -> Unit,
+    onCameraClick: (String) -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -286,6 +282,7 @@ fun DirectConversation(
                             RoomStatus.OPENED -> OpenedChat()
                             RoomStatus.SENT -> DeliveredChat(this)
                             RoomStatus.RECEIVED -> ReceivedChat(this)
+                            RoomStatus.SENDING -> SendingChat()
                             RoomStatus.UNRECOGNIZED -> {}
                         }
                     }
@@ -318,7 +315,7 @@ fun DirectConversation(
             val icon =
                 if (channel.status == RoomStatus.NEW) Icons.Outlined.Sms else Icons.Outlined.PhotoCamera
 
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onCameraClick(channel.id) }) {
                 Icon(
                     imageVector = icon,
                     contentDescription = "Camera Icon",

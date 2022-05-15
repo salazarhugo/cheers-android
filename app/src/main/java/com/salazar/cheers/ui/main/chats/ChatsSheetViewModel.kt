@@ -56,6 +56,12 @@ class ChatsSheetViewModel @Inject constructor(
         }
     }
 
+    fun deleteChats() {
+        viewModelScope.launch {
+            chatRepository.deleteChats(channelId = channelId)
+        }
+    }
+
     fun deleteChannel() {
         viewModelScope.launch {
             chatRepository.deleteRoom(channelId = channelId)

@@ -10,9 +10,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
@@ -35,7 +33,7 @@ class UploadImageMessage @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val appContext = applicationContext
 
-        makeStatusNotification("Uploading", appContext)
+//        makeStatusNotification("Uploading", appContext)
 
         val imagesUri =
             inputData.getStringArray("IMAGES_URI") ?: return Result.failure()
@@ -57,7 +55,9 @@ class UploadImageMessage @AssistedInject constructor(
                 photoUrl = downloadUrl.toString(),
             )
 
-            return Result.success()
+            val output: Data = workDataOf("result" to downloadUrl)
+
+            return Result.success(output)
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")
             return Result.failure()

@@ -41,7 +41,6 @@ interface ChatDao {
     @Query("SELECT * FROM room WHERE id = :channelId")
     fun getChannelFlow(channelId: String): Flow<ChatChannel>
 
-    @Transaction
     @Query("UPDATE room SET status = :status WHERE id = :channelId")
     suspend fun setStatus(
         channelId: String,

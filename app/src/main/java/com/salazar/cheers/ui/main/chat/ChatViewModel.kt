@@ -59,12 +59,9 @@ private data class ChatViewModelState(
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    application: Application,
     statsHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
-
-    private val workManager = WorkManager.getInstance(application)
     private val viewModelState = MutableStateFlow(ChatViewModelState(isLoading = false))
     private var channelId = ""
     private var typingJob: Job? = null
@@ -105,18 +102,7 @@ class ChatViewModel @Inject constructor(
 
     fun sendImageMessage(images: List<Uri>) {
         viewModelScope.launch {
-            val uploadImageMessageWorkRequest: WorkRequest =
-                OneTimeWorkRequestBuilder<UploadImageMessage>().apply {
-                    setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                    setInputData(
-                        workDataOf(
-                            "CHANNEL_ID" to channelId,
-                            "IMAGES_URI" to images.map { it.toString() }.toTypedArray(),
-                        )
-                    )
-                }
-                    .build()
-            workManager.enqueue(uploadImageMessageWorkRequest)
+            chatRepository.sendImage(channelId, images)
         }
     }
 

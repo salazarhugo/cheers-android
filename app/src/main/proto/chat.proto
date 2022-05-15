@@ -52,6 +52,7 @@ enum RoomStatus {
   SENT = 2;
   RECEIVED = 3;
   NEW = 4;
+  SENDING = 5;
 }
 
 enum RoomType {

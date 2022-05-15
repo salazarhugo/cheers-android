@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.MessageType
+import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.theme.BlueCheers
 
 @Preview
@@ -129,6 +130,24 @@ fun ReceivedChat(
         Spacer(Modifier.width(8.dp))
         Text(
             text = "Received",
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+        )
+    }
+}
+
+@Preview
+@Composable
+fun SendingChat() {
+    Row(
+        modifier = Modifier.padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CircularProgressIndicatorM3(
+            modifier = Modifier.size(12.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = "Sending",
             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
         )
     }

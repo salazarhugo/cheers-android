@@ -1,6 +1,10 @@
 package com.salazar.cheers.data.repository
 
+import android.app.Application
+import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.work.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
@@ -14,9 +18,11 @@ import com.salazar.cheers.data.mapper.toTextMessage
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -27,10 +33,11 @@ import javax.inject.Singleton
 
 @Singleton
 class ChatRepository @Inject constructor(
+    application: Application,
     private val chatDao: ChatDao,
     private val userRepository: UserRepository
 ) {
-
+    private val workManager = WorkManager.getInstance(application)
     private lateinit var managedChannel: ManagedChannel
 
     private fun getClient(): ChatService? {
@@ -101,6 +108,8 @@ class ChatRepository @Inject constructor(
         getClient()!!.leaveRoom(request)
     }
 
+    suspend fun deleteChats(channelId: String) = chatDao.deleteChannel(channelId)
+
     suspend fun deleteRoom(channelId: String) = withContext(Dispatchers.IO) {
         val request = RoomId.newBuilder()
             .setRoomId(channelId)
@@ -123,6 +132,24 @@ class ChatRepository @Inject constructor(
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())
         }
+    }
+
+    suspend fun sendImage(channelId: String, images: List<Uri>): LiveData<WorkInfo> {
+        chatDao.setStatus(channelId, RoomStatus.SENDING)
+        val uploadWork =
+            OneTimeWorkRequestBuilder<UploadImageMessage>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(
+                    workDataOf(
+                        "CHANNEL_ID" to channelId,
+                        "IMAGES_URI" to images.map { it.toString() }.toTypedArray(),
+                    )
+                )
+                .build()
+
+        workManager.enqueue(uploadWork)
+
+        return workManager.getWorkInfoByIdLiveData(uploadWork.id)
     }
 
     suspend fun sendImageMessage(

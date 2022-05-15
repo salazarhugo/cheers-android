@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 
@@ -23,16 +24,15 @@ fun Permission(
         }
         is PermissionStatus.Denied -> {
             Column {
-                val textToShow =
-                    if ((permissionState.status as PermissionStatus.Denied).shouldShowRationale) {
-                        "The  is important for this app. Please grant the permission."
-                    } else {
-                        "Camera permission required for this feature to be available. " +
-                                "Please grant the permission"
+                if ((permissionState.status as PermissionStatus.Denied).shouldShowRationale) {
+                    Text("The  is important for this app. Please grant the permission.")
+                    Button(onClick = { permissionState.launchPermissionRequest() }) {
+                        Text("Request permission")
                     }
-                Text(textToShow)
-                Button(onClick = { permissionState.launchPermissionRequest() }) {
-                    Text("Request permission")
+                } else {
+                    LaunchedEffect(Unit) {
+                        permissionState.launchPermissionRequest()
+                    }
                 }
             }
         }

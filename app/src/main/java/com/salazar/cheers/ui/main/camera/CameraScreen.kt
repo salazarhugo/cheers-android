@@ -55,6 +55,7 @@ sealed class CameraUIAction {
     object OnCameraClick : CameraUIAction()
     object OnFlashClick : CameraUIAction()
     object OnGalleryViewClick : CameraUIAction()
+    object OnSendClick : CameraUIAction()
     object OnSwitchCameraClick : CameraUIAction()
 }
 
@@ -85,7 +86,8 @@ fun CameraScreen(
                 imageCapture = imageCapture,
                 lensFacing = uiState.lensFacing,
                 onCameraUIAction = onCameraUIAction,
-                uiState = uiState,
+                flashMode = uiState.flashMode,
+                imageUri = uiState.imageUri,
             )
         }
     }
@@ -174,7 +176,7 @@ fun CameraFooterIdle(
     }
 }
 
-private suspend fun Context.getCameraProvider(): ProcessCameraProvider =
+suspend fun Context.getCameraProvider(): ProcessCameraProvider =
     suspendCoroutine { continuation ->
         ProcessCameraProvider.getInstance(this).also { cameraProvider ->
             cameraProvider.addListener({
@@ -303,7 +305,8 @@ fun CameraControls(
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun CameraPreview(
-    uiState: CameraUiState,
+    imageUri: Uri?,
+    flashMode: Int,
     imageCapture: ImageCapture,
     lensFacing: Int,
     onCameraUIAction: (CameraUIAction) -> Unit,
@@ -319,7 +322,7 @@ fun CameraPreview(
 
     val previewView = remember { PreviewView(context) }
 
-    LaunchedEffect(lensFacing, uiState.imageUri, uiState.flashMode) {
+    LaunchedEffect(lensFacing, imageUri, flashMode) {
         val cameraProvider = context.getCameraProvider()
         cameraProvider.unbindAll()
         val camera = cameraProvider.bindToLifecycle(
@@ -360,9 +363,9 @@ fun CameraPreview(
             .aspectRatio(9 / 16f)
             .clip(RoundedCornerShape(22.dp)),
     ) {
-        if (uiState.imageUri != null)
+        if (imageUri != null)
             Image(
-                painter = rememberAsyncImagePainter(uiState.imageUri),
+                painter = rememberAsyncImagePainter(imageUri),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -377,8 +380,8 @@ fun CameraPreview(
             )
         Controls(
             cameraUIAction = onCameraUIAction,
-            hasImage = uiState.imageUri != null,
-            flashMode = uiState.flashMode,
+            hasImage = imageUri != null,
+            flashMode = flashMode,
         )
     }
 }

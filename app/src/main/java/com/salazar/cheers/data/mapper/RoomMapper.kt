@@ -8,6 +8,7 @@ fun Room.toChatChannel(): ChatChannel {
     return ChatChannel(
         id = id,
         name = name,
+        username = username,
         verified = verified,
         avatarUrl = profilePictureUrl,
         createdAt = created,

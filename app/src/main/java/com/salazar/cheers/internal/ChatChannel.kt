@@ -12,6 +12,7 @@ data class ChatChannel(
     @PrimaryKey
     val id: String = "",
     val name: String = "",
+    val username: String = "",
     val verified: Boolean = false,
     val members: List<String> = emptyList(),
     val otherUserId: String = "",

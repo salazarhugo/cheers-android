@@ -34,5 +34,6 @@ fun MessagesRoute(
         },
         onFollowToggle = messagesViewModel::onFollowToggle,
         onUserClick = { navActions.navigateToOtherProfile(it) },
+        onCameraClick = { navActions.navigateToChatCamera(it) },
     )
 }

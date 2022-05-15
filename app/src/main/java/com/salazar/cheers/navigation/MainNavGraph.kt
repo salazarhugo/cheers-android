@@ -6,6 +6,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,6 +30,8 @@ import com.salazar.cheers.ui.main.add.AddPostRoute
 import com.salazar.cheers.ui.main.add.AddPostViewModel
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.CameraViewModel
+import com.salazar.cheers.ui.main.camera.ChatCameraRoute
+import com.salazar.cheers.ui.main.camera.ChatCameraViewModel
 import com.salazar.cheers.ui.main.chat.ChatRoute
 import com.salazar.cheers.ui.main.chats.*
 import com.salazar.cheers.ui.main.comment.CommentsRoute
@@ -172,6 +175,10 @@ fun NavGraphBuilder.mainNavGraph(
                         chatsSheetViewModel.leaveChannel()
                         navActions.navigateBack()
                     },
+                    onDeleteChats = {
+                        chatsSheetViewModel.deleteChats()
+                        navActions.navigateBack()
+                    }
                 )
             else
                 LoadingScreen()
@@ -260,6 +267,12 @@ fun NavGraphBuilder.mainNavGraph(
             val mapViewModel = hiltViewModel<MapViewModel>()
             MapRoute(
                 mapViewModel = mapViewModel,
+                navActions = navActions
+            )
+        }
+
+        bottomSheet("${MainDestinations.CHAT_CAMERA_ROUTE}/{roomId}") {
+            ChatCameraRoute(
                 navActions = navActions
             )
         }

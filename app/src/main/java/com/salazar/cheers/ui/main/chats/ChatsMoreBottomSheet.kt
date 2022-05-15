@@ -30,9 +30,12 @@ fun ChatsMoreBottomSheet(
     ownerId: String,
     roomType: RoomType,
     onDeleteClick: () -> Unit,
+    onDeleteChats: () -> Unit,
     onLeaveClick: () -> Unit,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(
             modifier = Modifier
                 .padding(vertical = 10.dp)
@@ -65,6 +68,12 @@ fun ChatsMoreBottomSheet(
                     onClick = onDeleteClick,
                 )
         }
+        Item(
+            text = "Delete Chats",
+            icon = Icons.Outlined.Delete,
+            red = false,
+            onClick = onDeleteChats,
+        )
         Item(text = "Mute messages", icon = Icons.Outlined.NotificationsOff)
         Item(text = "Mute call notifications", icon = Icons.Outlined.NotificationsOff)
     }

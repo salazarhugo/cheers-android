@@ -44,6 +44,7 @@ import com.salazar.cheers.components.animations.AnimateHeart
 import com.salazar.cheers.components.chat.DirectChatBar
 import com.salazar.cheers.components.chat.GroupChatBar
 import com.salazar.cheers.components.chat.JumpToBottom
+import com.salazar.cheers.components.chat.SendingChat
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
@@ -77,6 +78,7 @@ fun ChatScreen(
     val openDialog = remember { mutableStateOf(false) }
     val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }
     val channel = uiState.channel
+    val sending = uiState.channel.status == RoomStatus.SENDING
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -87,6 +89,7 @@ fun ChatScreen(
             ) {
                 Messages(
                     seen = uiState.channel.status == RoomStatus.OPENED,
+                    sending = sending,
                     messages = uiState.messages,
                     navigateToProfile = onAuthorClick,
                     modifier = Modifier.weight(1f),
@@ -152,6 +155,7 @@ fun ChatScreen(
 fun Messages(
     messages: List<ChatMessage>,
     seen: Boolean,
+    sending: Boolean,
     navigateToProfile: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
@@ -200,6 +204,10 @@ fun Messages(
                     )
                 }
             }
+            if (sending)
+                item {
+                    SendingChat()
+                }
         }
 
         val jumpThreshold = with(LocalDensity.current) {

@@ -29,6 +29,7 @@ object MainDestinations {
     const val OTHER_PROFILE_STATS_ROUTE = "otherProfileStats"
     const val POST_COMMENTS = "comments"
     const val CAMERA_ROUTE = "camera"
+    const val CHAT_CAMERA_ROUTE = "chatCamera"
     const val OTHER_PROFILE_ROUTE = "otherProfile"
     const val ACTIVITY_ROUTE = "activity"
     const val LIKES_ROUTE = "likes"
@@ -368,6 +369,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateToCamera: () -> Unit = {
         navController.navigate(MainDestinations.CAMERA_ROUTE) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToChatCamera: (String) -> Unit = { roomId ->
+        navController.navigate("${MainDestinations.CHAT_CAMERA_ROUTE}/$roomId") {
             launchSingleTop = true
             restoreState = true
         }
