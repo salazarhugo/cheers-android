@@ -10,15 +10,15 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        release {
-        storeFile file('C:\\Users\\hugob\\keystores\\keystore.jks')
-            storePassword 'Hugosalazar1'
-            keyAlias 'key0'
-            keyPassword 'Hugosalazar1'
-        }
-    }
-    compileSdk 31
+//    signingConfigs {
+//        release {
+//        storeFile file('C:\\Users\\hugob\\keystores\\keystore.jks')
+//            storePassword 'Hugosalazar1'
+//            keyAlias 'key0'
+//            keyPassword 'Hugosalazar1'
+//        }
+//    }
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "com.salazar.cheers"
@@ -39,7 +39,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
 
