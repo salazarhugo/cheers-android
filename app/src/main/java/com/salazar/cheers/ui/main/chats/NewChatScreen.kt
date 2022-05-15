@@ -221,9 +221,9 @@ fun NewGroupNameInput(
         TextField(
             value = groupName,
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
+                containerColor = Color.Transparent
             ),
             isError = groupName.isBlank(),
             modifier = Modifier.fillMaxWidth(),
@@ -273,7 +273,7 @@ fun SearchBar(
             value = searchInput,
             leadingIcon = { Text("To:") },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
+                containerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),

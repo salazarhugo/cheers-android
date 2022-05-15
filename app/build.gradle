@@ -42,28 +42,32 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
+
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
         useIR = true
     }
+
     buildFeatures {
         compose true
         viewBinding true
         dataBinding true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.1.1"
     }
+
     namespace 'com.salazar.cheers'
     allprojects {
         tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
             kotlinOptions {
                 freeCompilerArgs += [
-                        "-Xcontext-receivers",
                         "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes",
                         "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
                         "-Xuse-experimental=kotlinx.coroutines.InternalCoroutinesApi",
@@ -85,11 +89,6 @@ android {
             }
         }
     }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 protobuf {
@@ -115,16 +114,12 @@ protobuf {
     }
 }
 
-//configurations.implementation.exclude(group: 'com.google.protobuf', module: 'protobuf-javalite')
-//configurations.implementation.exclude(group: 'com.google.firebase', module: 'protolite-well-known-types')
-//configurations.implementation.exclude(group: 'com.google.firebase', module: 'protobuf-java')
 dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
-
 
     implementation("io.grpc:grpc-okhttp:1.44.1")
     implementation("io.grpc:grpc-protobuf-lite:1.45.1")
@@ -141,15 +136,15 @@ dependencies {
     implementation "com.google.accompanist:accompanist-navigation-animation:0.24.8-beta"
 
     // Jetpack Compose
-    implementation "androidx.compose.ui:ui:1.2.0-alpha07"
-    implementation "androidx.compose.ui:ui-util:1.2.0-alpha07"
-    implementation "androidx.compose.material:material:1.2.0-alpha07"
-    implementation "androidx.compose.foundation:foundation:1.2.0-alpha07"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.2.0-alpha07"
-    implementation 'androidx.compose.ui:ui-viewbinding:1.2.0-alpha07'
+    implementation "androidx.compose.ui:ui:1.2.0-beta01"
+    implementation "androidx.compose.ui:ui-util:1.2.0-beta01"
+    implementation "androidx.compose.material:material:1.2.0-beta01"
+    implementation "androidx.compose.foundation:foundation:1.2.0-beta01"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.2.0-alpha08"
+    implementation 'androidx.compose.ui:ui-viewbinding:1.2.0-alpha08'
     implementation 'androidx.activity:activity-compose:1.4.0'
     implementation "androidx.compose.runtime:runtime-livedata:1.1.1"
-    implementation "androidx.compose.material3:material3:1.0.0-alpha09"
+    implementation "androidx.compose.material3:material3:1.0.0-alpha10"
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
