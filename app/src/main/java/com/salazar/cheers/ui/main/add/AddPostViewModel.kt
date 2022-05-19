@@ -48,7 +48,9 @@ data class AddPostUiState(
 )
 
 @HiltViewModel
-class AddPostViewModel @Inject constructor(application: Application) : ViewModel() {
+class AddPostViewModel @Inject constructor(
+    application: Application
+) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPostUiState(isLoading = true))
 

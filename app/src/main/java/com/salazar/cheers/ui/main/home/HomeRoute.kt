@@ -41,7 +41,10 @@ fun HomeRoute(
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         navigateToAddEvent = { navActions.navigateToAddEvent() },
         navigateToAddPost = { navActions.navigateToAddPostSheet() },
-        onSelectTab = homeViewModel::selectTab,
+        onSelectTab = {
+            if (it == 1)
+                navActions.navigateToEvents()
+        },
         onLike = homeViewModel::toggleLike,
         navigateToComments = { navActions.navigateToPostComments(it.post.id) },
         navigateToSearch = { navActions.navigateToSearch() },

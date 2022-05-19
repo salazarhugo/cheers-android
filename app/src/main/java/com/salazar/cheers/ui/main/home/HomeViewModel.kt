@@ -128,7 +128,7 @@ class HomeViewModel @Inject constructor(
         )
 
     init {
-//        refreshEventsFlow()
+        refreshEventsFlow()
         refreshStoryFlow()
 //        refreshSuggestions()
 
@@ -150,10 +150,10 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun refreshEventsFlow() {
-//        viewModelState.update { it.copy(isLoading = true) }
-        viewModelState.update {
-            it.copy(eventsFlow = flow { emptyList<Event>() })
-        }
+//        viewModelState.update {
+//            val events = eventRepository.getEvents()
+//            it.copy(eventsFlow = events)
+//        }
     }
 
     private fun refreshStoryFlow() {

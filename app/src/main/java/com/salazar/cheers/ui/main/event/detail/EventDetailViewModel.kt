@@ -4,18 +4,23 @@ import android.app.Activity
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
+import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.EventUi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface EventDetailUiState {
 
@@ -28,37 +33,40 @@ sealed interface EventDetailUiState {
     ) : EventDetailUiState
 
     data class HasEvent(
-        val eventUi: EventUi,
+        val event: Event,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : EventDetailUiState
 }
 
 private data class EventDetailViewModelState(
-    val eventUi: EventUi? = null,
+    val event: Event? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
     fun toUiState(): EventDetailUiState =
-        if (eventUi == null) {
+        if (event == null) {
             EventDetailUiState.NoEvents(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
         } else {
             EventDetailUiState.HasEvent(
-                eventUi = eventUi,
+                event = event,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
         }
 }
 
-class EventDetailViewModel @AssistedInject constructor(
-    @Assisted private val eventId: String
+@HiltViewModel
+class EventDetailViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
+    private val eventRepository: EventRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EventDetailViewModelState(isLoading = true))
+    private lateinit var eventId: String
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -69,20 +77,40 @@ class EventDetailViewModel @AssistedInject constructor(
         )
 
     init {
-        refreshEvent()
-    }
+        stateHandle.get<String>("eventId")?.let { eventId ->
+            this.eventId = eventId
+        }
 
-    private fun refreshEvent() {
-        viewModelScope.launch { }
-    }
-
-    fun deleteEvent() {
         viewModelScope.launch {
-            try {
-            } catch (e: Exception) {
-                Log.e("EventDetailViewModel", e.toString())
+            eventRepository.getEvent(eventId = eventId).collect { event ->
+                onEventChange(event = event)
             }
         }
+    }
+
+    private fun onEventChange(event: Event) {
+        viewModelState.update {
+            it.copy(event = event)
+        }
+    }
+
+    fun onGoingToggle() {
+//        viewModelScope.launch {
+//            eventRepository.toggleGoing(eventId = eventId)
+//        }
+    }
+
+    fun onInterestedToggle() {
+        viewModelScope.launch {
+            eventRepository.toggleInterested(eventId = eventId)
+        }
+    }
+
+
+    fun deleteEvent() {
+//        viewModelScope.launch {
+//            eventRepository.deleteEvent(eventId = eventId)
+//        }
     }
 
     fun deleteErrorMessage() {
@@ -90,31 +118,4 @@ class EventDetailViewModel @AssistedInject constructor(
             it.copy(errorMessages = emptyList())
         }
     }
-
-    @AssistedFactory
-    interface EventDetailViewModelFactory {
-        fun create(eventId: String): EventDetailViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: EventDetailViewModelFactory,
-            eventId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(eventId = eventId) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun eventDetailViewModel(eventId: String): EventDetailViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).eventDetailViewModelFactory()
-
-    return viewModel(factory = EventDetailViewModel.provideFactory(factory, eventId = eventId))
 }

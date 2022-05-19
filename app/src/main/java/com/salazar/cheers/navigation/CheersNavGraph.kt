@@ -24,14 +24,13 @@ import com.salazar.cheers.ui.theme.GreySheet
 
 @Composable
 fun CheersNavGraph(
-    navController: NavHostController = rememberAnimatedNavController(),
     darkTheme: Boolean,
     showInterstitialAd: () -> Unit,
     user: User?,
 ) {
     val startDestination = CheersDestinations.AUTH_ROUTE
     val bottomSheetNavigator = rememberBottomSheetNavigator()
-    navController.navigatorProvider += bottomSheetNavigator
+    val navController = rememberAnimatedNavController(bottomSheetNavigator)
 
     val navActions = remember(navController) {
         CheersNavigationActions(navController)
@@ -56,8 +55,7 @@ fun CheersNavGraph(
                 val visible =
                     navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.MAIN_ROUTE } == true &&
                             !currentRoute.contains(MainDestinations.STORY_ROUTE) && !currentRoute.contains(
-                        MainDestinations.CHAT_ROUTE
-                    )
+                        MainDestinations.CHAT_ROUTE) && !currentRoute.contains(MainDestinations.EVENT_DETAIL_ROUTE)
                 if (visible)
                     Column {
                         DividerM3()

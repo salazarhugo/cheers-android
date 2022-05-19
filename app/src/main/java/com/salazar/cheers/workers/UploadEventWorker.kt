@@ -12,11 +12,16 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -27,7 +32,9 @@ import java.util.*
 @HiltWorker
 class UploadEventWorker @AssistedInject constructor(
     @Assisted appContext: Context,
-    @Assisted params: WorkerParameters
+    @Assisted params: WorkerParameters,
+    private val eventRepository: EventRepository,
+    private val userRepository: UserRepository,
 ) : CoroutineWorker(appContext, params) {
 
 
@@ -37,7 +44,7 @@ class UploadEventWorker @AssistedInject constructor(
         makeStatusNotification("Uploading", appContext)
 
         val name =
-            inputData.getString("NAME") ?: ""
+            inputData.getString("NAME") ?: return Result.failure()
 
         val description =
             inputData.getString("DESCRIPTION") ?: ""
@@ -45,8 +52,8 @@ class UploadEventWorker @AssistedInject constructor(
         val imageUri =
             inputData.getString("IMAGE_URI")
 
-        val eventType =
-            inputData.getString("EVENT_TYPE") ?: return Result.failure()
+        val eventPrivacy =
+            inputData.getString("EVENT_PRIVACY") ?: return Result.failure()
 
         val locationName =
             inputData.getString("LOCATION_NAME") ?: ""
@@ -57,45 +64,42 @@ class UploadEventWorker @AssistedInject constructor(
         val longitude =
             inputData.getDouble("LOCATION_LONGITUDE", 0.0)
 
-        val showOnMap =
-            inputData.getBoolean("SHOW_ON_MAP", true)
-
-        val participants =
-            inputData.getStringArray("PARTICIPANTS") ?: emptyArray()
-
         val startDateTime =
-            inputData.getString("START_DATETIME") ?: ""
+            inputData.getLong("START_DATETIME", 0L)
 
         val endDateTime =
-            inputData.getString("END_DATETIME") ?: ""
+            inputData.getLong("END_DATETIME", 0L)
 
         try {
+            val user = userRepository.getCurrentUser()
             val event = Event(
                 id = UUID.randomUUID().toString(),
-                host = FirebaseAuth.getInstance().currentUser?.uid!!,
+                hostId = FirebaseAuth.getInstance().currentUser?.uid!!,
+                hostName = user.name,
                 name = name,
                 description = description,
-                type = eventType,
+                privacy = Privacy.valueOf(eventPrivacy),
                 startDate = startDateTime,
                 endDate = endDateTime,
                 locationName = locationName,
                 latitude = latitude,
                 longitude = longitude,
-                showOnMap = showOnMap,
             )
 
             if (imageUri == null || imageUri == "null")
                 Neo4jUtil.addEvent(event)
             else {
                 val photoBytes = extractImage(Uri.parse(imageUri))
-                StorageUtil.uploadEventImage(photoBytes) { downloadUrl ->
-                    Neo4jUtil.addEvent(event.copy(imageUrl = downloadUrl))
-                }
+
+                val task: Task<Uri> = StorageUtil.uploadEventImage(photoBytes)
+                val downloadUrl = Tasks.await(task)
+
+                val event = event.copy(imageUrl = downloadUrl.toString())
+                eventRepository.uploadEvent(event)
             }
 
             return Result.success()
         } catch (throwable: Throwable) {
-            Log.e("UploadEvent", "Error uploading event")
             Log.e("UploadEvent", throwable.message.toString())
             return Result.failure()
         }
@@ -130,13 +134,6 @@ class UploadEventWorker @AssistedInject constructor(
 
         val outputStream = ByteArrayOutputStream()
         selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-
-        return outputStream.toByteArray()
-    }
-
-    private fun extractBitmap(bitmap: Bitmap): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
 
         return outputStream.toByteArray()
     }

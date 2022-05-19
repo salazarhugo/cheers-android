@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
@@ -45,6 +47,7 @@ import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
+import com.salazar.cheers.ui.main.event.Event
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -105,6 +108,7 @@ fun Profile(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
+            modifier = Modifier.padding(it),
         ) {
             LazyColumn {
                 item {
@@ -164,7 +168,13 @@ fun Profile(
                                             onPostMoreClicked = onPostMoreClicked,
                                         )
                                 }
-                                1 -> FunctionalityNotAvailablePanel()
+                                1 -> uiState.events?.forEach {
+                                    Event(
+                                        event = it,
+                                        onEventClicked = {},
+                                        onInterestedToggle = {},
+                                    )
+                                }
                                 2 -> FunctionalityNotAvailablePanel()
                             }
                         }
@@ -173,6 +183,24 @@ fun Profile(
             }
         }
     }
+}
+
+@Composable
+fun EventList(
+    events: List<Event>?,
+) {
+    if (events != null)
+    LazyColumn {
+        items(events, key = { it.id }) { event ->
+            Event(
+                event = event,
+                onEventClicked = {},
+                onInterestedToggle = {},
+            )
+        }
+    }
+    else
+        LoadingScreen()
 }
 
 @Composable

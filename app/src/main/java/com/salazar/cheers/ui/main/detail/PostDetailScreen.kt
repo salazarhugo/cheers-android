@@ -116,6 +116,7 @@ fun PrivacyText(
 
 @Composable
 fun StaticMap(
+    modifier: Modifier = Modifier,
     longitude: Double,
     latitude: Double,
     onMapClick: () -> Unit,
@@ -145,11 +146,7 @@ fun StaticMap(
 
     val url = remember { staticImage.url().toString() }
     PrettyImage(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .aspectRatio(1f)
+        modifier = modifier
             .clickable { onMapClick() },
         data = url,
     )
@@ -257,6 +254,11 @@ fun Post(
                         longitude = post.locationLongitude,
                         latitude = post.locationLatitude,
                         onMapClick = onMapClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .aspectRatio(1f),
                     )
                 }
             item {

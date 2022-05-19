@@ -93,7 +93,6 @@ class Neo4jService {
                             )
                         )
                     }
-                    Log.d("Cloud Posts:", posts.toString())
                     return@continueWith Result.Success(posts.toList())
                 } catch (e: Exception) {
                     Log.e("Cloud", "Failed to parse posts: $e")

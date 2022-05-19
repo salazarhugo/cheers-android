@@ -51,11 +51,18 @@ fun SearchScreen(
     onRecentUserClicked: (String) -> Unit,
 ) {
     Scaffold(
-        topBar = { SearchBar(uiState.searchInput, onSearchInputChanged) },
+        topBar = {
+            SearchBar(
+                modifier = Modifier.padding(16.dp),
+                searchInput = uiState.searchInput,
+                onSearchInputChanged = onSearchInputChanged,
+            )
+        },
     ) {
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
+            modifier = Modifier.padding(it),
         ) {
             SearchBody(
                 uiState = uiState,
@@ -265,11 +272,12 @@ fun UserCard(
 
 @Composable
 fun SearchBar(
+    modifier: Modifier = Modifier,
     searchInput: String,
     onSearchInputChanged: (String) -> Unit
 ) {
     Box(
-        modifier = Modifier.padding(15.dp),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         Card(

@@ -10,3 +10,11 @@ data class StoryRemoteKey(
     val prevKey: Int?,
     val nextKey: Int?,
 )
+
+@Entity(tableName = "event_remote_keys")
+data class EventRemoteKey(
+    @PrimaryKey
+    val eventId: String,
+    val prevKey: Int?,
+    val nextKey: Int?,
+)

@@ -31,7 +31,6 @@ import com.salazar.cheers.ui.main.add.AddPostViewModel
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.CameraViewModel
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
-import com.salazar.cheers.ui.main.camera.ChatCameraViewModel
 import com.salazar.cheers.ui.main.chat.ChatRoute
 import com.salazar.cheers.ui.main.chats.*
 import com.salazar.cheers.ui.main.comment.CommentsRoute
@@ -40,8 +39,10 @@ import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
+import com.salazar.cheers.ui.main.event.EventsRoute
+import com.salazar.cheers.ui.main.event.add.AddEventRoute
 import com.salazar.cheers.ui.main.event.detail.EventDetailRoute
-import com.salazar.cheers.ui.main.event.detail.eventDetailViewModel
+import com.salazar.cheers.ui.main.event.edit.EditEventRoute
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapRoute
@@ -234,6 +235,15 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         dialog(
+            route = "${MainDestinations.ADD_EVENT_SHEET}?photoUri={photoUri}",
+            arguments = listOf(navArgument("photoUri") { nullable = true })
+        ) {
+            AddEventRoute(
+                navActions = navActions,
+            )
+        }
+
+        dialog(
             route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
@@ -252,8 +262,15 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
+            route = MainDestinations.EVENTS_ROUTE,
+        ) {
+            EventsRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
             route = MainDestinations.HOME_ROUTE,
-//            exitTransition = {},
         ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
 
@@ -340,12 +357,20 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/e/{eventId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
         ) {
-            val eventId = it.arguments?.getString("eventId")!!
-            val eventDetailViewModel = eventDetailViewModel(eventId = eventId)
+
             EventDetailRoute(
-                eventDetailViewModel = eventDetailViewModel,
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/edit/{eventId}" })
+        ) {
+
+            EditEventRoute(
                 navActions = navActions,
             )
         }
@@ -463,12 +488,5 @@ fun NavGraphBuilder.mainNavGraph(
                 username = user.username,
             )
         }
-
-//        composable(CheersDestinations.MESSAGES_ROUTE) {
-//            val mapViewModel = hiltViewModel<MapViewModel>()
-//            MapRoute(
-//                mapViewModel = mapViewModel,
-//            )
-//        }
     }
 }

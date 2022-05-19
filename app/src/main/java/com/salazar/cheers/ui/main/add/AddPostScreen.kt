@@ -63,10 +63,9 @@ import com.salazar.cheers.components.post.MultipleAnnotation
 import com.salazar.cheers.components.share.ErrorMessage
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.event.Item
+import com.salazar.cheers.ui.main.event.add.Item
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.util.Utils
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -114,14 +113,18 @@ fun AddPostScreen(
         reverseGeocoding.search(options, searchCallback)
     }
 
-    PrivacyBottomSheet(uiState = uiState, onSelectPrivacy = onSelectPrivacy) {
+    PrivacyBottomSheet(
+        privacy = uiState.privacy,
+        privacyState = uiState.privacyState,
+        onSelectPrivacy = onSelectPrivacy,
+    ) {
         Scaffold(
             topBar = { TopAppBar(onDismiss = onDismiss) },
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = it.calculateTopPadding())
+                    .padding(it)
             ) {
                 AddPhotoOrVideo(
                     photos = uiState.photos,
@@ -408,15 +411,6 @@ fun AddPhotoOrVideo(
     onSelectMedia: (Uri) -> Unit,
     onMediaSelectorClicked: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val takePictureLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-            if (it != null) {
-                val uri = Utils.getImageUri(context, it)
-                if (uri != null)
-                    onSelectMedia(uri)
-            }
-        }
     if (photos.isNotEmpty())
         return
     Row(
@@ -715,15 +709,15 @@ fun ProfilePicture(profilePictureUrl: String) {
 
 @Composable
 fun PrivacyBottomSheet(
-    uiState: AddPostUiState,
+    privacy: Privacy,
+    privacyState: ModalBottomSheetState,
     onSelectPrivacy: (Privacy) -> Unit,
     content: @Composable () -> Unit
 ) {
-    val state = uiState.privacyState
     val scope = rememberCoroutineScope()
 
     ModalBottomSheetLayout(
-        sheetState = state,
+        sheetState = privacyState,
         sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
         sheetElevation = 0.dp,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -754,10 +748,10 @@ fun PrivacyBottomSheet(
             }
 
             Privacy.values().forEach {
-                Item(it, it == uiState.privacy, onSelectPrivacy = {
+                Item(it, it == privacy, onSelectPrivacy = {
                     onSelectPrivacy(it)
                     scope.launch {
-                        state.animateTo(ModalBottomSheetValue.Expanded)
+                        privacyState.animateTo(ModalBottomSheetValue.Expanded)
                     }
                 })
             }
@@ -765,7 +759,7 @@ fun PrivacyBottomSheet(
             Button(
                 onClick = {
                     scope.launch {
-                        uiState.privacyState.hide()
+                        privacyState.hide()
                     }
                 },
                 modifier = Modifier

@@ -45,10 +45,10 @@ class UserRepository @Inject constructor(
     suspend fun getLocations(): FeatureCollection {
         return withContext(Dispatchers.IO) {
             try {
-                val json = goApi.getLocations().toString()
+                val json = goApi.getLocations().string()
                 return@withContext FeatureCollection.fromJson(json)
             } catch (e: HttpException) {
-                Log.e("User REpo", e.toString())
+                Log.e("User Repository", e.toString())
             }
         } as FeatureCollection
     }

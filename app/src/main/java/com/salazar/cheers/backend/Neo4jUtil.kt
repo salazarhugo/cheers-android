@@ -76,21 +76,6 @@ object Neo4jUtil {
             }
     }
 
-    fun addEvent(event: Event) {
-//        try {
-//            val params: MutableMap<String, Any> = mutableMapOf()
-//            params["userId"] = FirebaseAuth.getInstance().uid!!
-//            params["event"] = toMap(event)
-//            write(
-//                "MATCH (u:User { id: \$userId}) CREATE (e: Event \$event)" +
-//                        " SET e += { created: datetime().epochMillis, startDate: datetime(e.startDate), endDate: datetime(e.endDate)} CREATE (u)-[:POSTED]->(e)" +
-//                        " WITH e UNWIND e.participants as tagUserId MATCH (u2:User {id: tagUserId}) CREATE (p)-[:WITH]->(u2)",
-//                params = params
-//            )
-//        } catch (e: Exception) {
-//            Log.e("HAHA", e.toString())
-//        }
-    }
 
     suspend fun addStory(story: StoryResponse) = withContext(Dispatchers.IO) {
         val json = Gson().toJson(story)
@@ -101,6 +86,22 @@ object Neo4jUtil {
 
         FirebaseFunctions.getInstance("europe-west2")
             .getHttpsCallable("createStory")
+            .call(data)
+            .continueWith { task ->
+                val result = task.result?.data as String
+                result
+            }
+    }
+
+    fun addEvent(event: Event) {
+        val json = Gson().toJson(event)
+
+        val data = hashMapOf(
+            "post" to json,
+        )
+
+        FirebaseFunctions.getInstance("europe-west2")
+            .getHttpsCallable("createPost")
             .call(data)
             .continueWith { task ->
                 val result = task.result?.data as String

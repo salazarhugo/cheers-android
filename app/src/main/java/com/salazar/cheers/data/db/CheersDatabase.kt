@@ -15,10 +15,12 @@ import java.util.*
     entities = [
         RecentUser::class,
         Post::class,
+        Event::class,
         User::class,
-        RemoteKey::class,
         UserPreference::class,
+        RemoteKey::class,
         StoryRemoteKey::class,
+        EventRemoteKey::class,
         StoryResponse::class,
         ChatChannel::class,
         ChatMessage::class,
@@ -34,6 +36,7 @@ abstract class CheersDatabase : RoomDatabase() {
 
     abstract fun cheersDao(): CheersDao
     abstract fun postDao(): PostDao
+    abstract fun eventDao(): EventDao
     abstract fun storyDao(): StoryDao
     abstract fun userDao(): UserDao
     abstract fun userStatsDao(): UserStatsDao
@@ -41,6 +44,7 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun userPreferenceDao(): UserPreferenceDao
     abstract fun remoteKeyDao(): RemoteKeyDao
     abstract fun storyRemoteKeyDao(): StoryRemoteKeyDao
+    abstract fun eventRemoteKeyDao(): EventRemoteKeyDao
 
     companion object {
         @Volatile

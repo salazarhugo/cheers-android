@@ -6,6 +6,9 @@ import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.FirebaseUserIdTokenInterceptor
+import com.salazar.cheers.internal.PrivacyAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.wire.EnumAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +17,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 
@@ -42,16 +46,18 @@ object AppModule {
     @Singleton
     fun provideGoApi(): GoApi {
 
+        val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
+
         val okHttpClient: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(FirebaseUserIdTokenInterceptor())
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
+                level = HttpLoggingInterceptor.Level.BODY
             })
             .build()
 
         val retrofit = retrofit2.Retrofit.Builder()
-            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
             .baseUrl(GoApi.BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(okHttpClient)
             .build()
 

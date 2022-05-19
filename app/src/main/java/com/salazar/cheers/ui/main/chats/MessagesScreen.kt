@@ -73,6 +73,7 @@ fun MessagesScreen(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = { onSwipeRefresh() },
+            modifier = Modifier.padding(it),
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Tabs(

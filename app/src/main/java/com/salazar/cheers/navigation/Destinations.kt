@@ -20,6 +20,8 @@ object MainDestinations {
     const val SEARCH_ROUTE = "search"
     const val ROOM_DETAILS = "roomDetails"
     const val MAP_ROUTE = "map"
+    const val EVENTS_ROUTE = "events"
+    const val EDIT_EVENT_ROUTE = "event/edit"
     const val MESSAGES_ROUTE = "messages"
     const val MESSAGES_MORE_SHEET = "messagesMoreSheet"
     const val NEW_CHAT_ROUTE = "newChat"
@@ -80,8 +82,20 @@ class CheersNavigationActions(private val navController: NavHostController) {
         navController.popBackStack()
     }
 
+    val navigateToEditEvent: (String) -> Unit = { eventId ->
+        navController.navigate("${MainDestinations.EDIT_EVENT_ROUTE}/$eventId") {
+            launchSingleTop = true
+        }
+    }
+
     val navigateToRoomDetails: (String) -> Unit = { roomId ->
         navController.navigate("${MainDestinations.ROOM_DETAILS}/$roomId") {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToEvents: () -> Unit = {
+        navController.navigate(route = MainDestinations.EVENTS_ROUTE) {
             launchSingleTop = true
         }
     }
@@ -201,10 +215,10 @@ class CheersNavigationActions(private val navController: NavHostController) {
     }
 
     val navigateToAddEvent: () -> Unit = {
-//        navController.navigate(MainDestinations.ADD_EVENT_SHEET) {
-//            launchSingleTop = true
-//            restoreState = true
-//        }
+        navController.navigate(MainDestinations.ADD_EVENT_SHEET) {
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->

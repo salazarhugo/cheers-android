@@ -70,8 +70,10 @@ import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Typography
+import java.text.SimpleDateFormat
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.math.absoluteValue
 
 @Composable
@@ -136,42 +138,43 @@ fun HomeScreen(
                         navigateToAddPost()
                 }
             )
-        }
-    ) {
-        SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
-            onRefresh = { onSwipeRefresh() },
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background),
+        },
+        content = {
+            SwipeToRefresh(
+                state = rememberSwipeToRefreshState(isRefreshing = false),
+                onRefresh = { onSwipeRefresh() },
+                modifier = Modifier.padding(it),
             ) {
-                when (uiState) {
-                    is HomeUiState.HasPosts -> {
-                        PostList(
-                            uiState = uiState,
-                            onPostClicked = onPostClicked,
-                            onUserClicked = onUserClicked,
-                            onPostMoreClicked = onPostMoreClicked,
-                            onLike = onLike,
-                            navigateToComments = navigateToComments,
-                            onEventClicked = onEventClicked,
-                            onStoryClick = onStoryClick,
-                            onAddStoryClick = onAddStoryClick,
-                        )
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background),
+                ) {
+                    when (uiState) {
+                        is HomeUiState.HasPosts -> {
+                            PostList(
+                                uiState = uiState,
+                                onPostClicked = onPostClicked,
+                                onUserClicked = onUserClicked,
+                                onPostMoreClicked = onPostMoreClicked,
+                                onLike = onLike,
+                                navigateToComments = navigateToComments,
+                                onStoryClick = onStoryClick,
+                                onAddStoryClick = onAddStoryClick,
+                            )
+                        }
+                        else -> {}
                     }
-                    else -> {}
                 }
+                val alpha = if (toState == MultiFabState.EXPANDED) 0.92f else 0f
+                Box(
+                    modifier = Modifier
+                        .alpha(animateFloatAsState(alpha).value)
+                        .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
+                        .fillMaxSize()
+                )
             }
-            val alpha = if (toState == MultiFabState.EXPANDED) 0.92f else 0f
-            Box(
-                modifier = Modifier
-                    .alpha(animateFloatAsState(alpha).value)
-                    .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
-                    .fillMaxSize()
-            )
         }
-    }
+    )
 }
 
 @Composable
@@ -457,7 +460,6 @@ fun ConnectContacts() {
 fun PostList(
     uiState: HomeUiState.HasPosts,
     onPostClicked: (postId: String) -> Unit,
-    onEventClicked: (String) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onLike: (post: Post) -> Unit,
@@ -466,7 +468,6 @@ fun PostList(
     onAddStoryClick: () -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
-//    val events = uiState.eventsFlow?.collectAsLazyPagingItems()
 
     LazyColumn {
         item {
@@ -767,67 +768,6 @@ fun VideoPlayer(
     ) {
         onDispose {
             player.release()
-        }
-    }
-}
-
-@Composable
-fun Event(
-    event: EventUi,
-    onEventClicked: (String) -> Unit,
-) {
-    val event = event.event
-    Column(
-        modifier = Modifier.clickable { onEventClicked(event.id) }
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = event.imageUrl).apply(block = fun ImageRequest.Builder.() {
-                    error(R.drawable.default_group_picture)
-                }).build()
-            ),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2f),
-            contentScale = ContentScale.Crop,
-        )
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            val d = remember { ZonedDateTime.parse(event.startDate) }
-            Text(
-                d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            if (event.name.isNotBlank())
-                Text(event.name, style = MaterialTheme.typography.titleLarge)
-
-            if (event.description.isNotBlank())
-                Text(
-                    event.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            if (event.locationName.isNotBlank())
-                Text(text = event.locationName, style = Typography.labelSmall)
-            Text("4.8k interested - 567 going", modifier = Modifier.padding(vertical = 8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                FilledTonalButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(Icons.Rounded.Star, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Interested")
-                }
-                FilledTonalButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Going")
-                }
-            }
         }
     }
 }

@@ -51,7 +51,7 @@ val Typography = Typography(
     ),
     headlineMedium = TextStyle(
         fontFamily = Roboto,
-        fontWeight = FontWeight.W400,
+        fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
     ),

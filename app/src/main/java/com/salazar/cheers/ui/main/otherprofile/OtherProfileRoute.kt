@@ -1,9 +1,11 @@
 package com.salazar.cheers.ui.main.otherprofile
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -50,6 +52,7 @@ fun OtherProfileRoute(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = otherProfileViewModel::refresh,
+            modifier = Modifier.padding(it),
         ) {
             if (uiState is OtherProfileUiState.HasUser) {
                 val uiState = uiState as OtherProfileUiState.HasUser

@@ -73,6 +73,7 @@ fun OtherProfileStatsScreen(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
+            modifier = Modifier.padding(it),
         ) {
             Column {
                 Tabs(uiState, onUserClicked = onUserClicked, onFollowToggle)

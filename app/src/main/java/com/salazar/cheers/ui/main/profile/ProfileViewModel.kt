@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.main.profile
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
@@ -9,8 +8,10 @@ import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,15 +34,17 @@ sealed interface ProfileUiState {
     data class HasUser(
         val user: User,
         val postFlow: Flow<PagingData<PostFeed>>,
+        val events: List<Event>?,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: String,
     ) : ProfileUiState
 }
 
-private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
+private data class ProfileViewModelState(
     val user: User? = null,
     val posts: Flow<PagingData<PostFeed>> = emptyFlow(),
+    val events: List<Event>? = null,
     val isLoading: Boolean = false,
     val errorMessages: String = "",
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
@@ -51,6 +54,7 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
             ProfileUiState.HasUser(
                 postFlow = posts,
                 user = user,
+                events = events,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 sheetState = sheetState,
@@ -67,6 +71,7 @@ private data class ProfileViewModelState @ExperimentalMaterialApi constructor(
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
+    private val eventRepository: EventRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = false))
@@ -88,10 +93,14 @@ class ProfileViewModel @Inject constructor(
                     }
                 }
         }
+        getUserEvents()
         refreshUserPosts()
     }
 
     fun refresh() {
+        viewModelScope.launch {
+            eventRepository.refreshMyEvents()
+        }
         refreshUser()
         refreshUserPosts()
     }
@@ -129,6 +138,16 @@ class ProfileViewModel @Inject constructor(
             val posts = postRepository.profilePostFeed(userIdOrUsername = userId)
             viewModelState.update {
                 it.copy(posts = posts, isLoading = false)
+            }
+        }
+    }
+
+    private fun getUserEvents() {
+        viewModelScope.launch {
+            eventRepository.getEvents().collect { events ->
+                viewModelState.update {
+                    it.copy(events = events)
+                }
             }
         }
     }

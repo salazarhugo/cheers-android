@@ -1,109 +1,215 @@
 package com.salazar.cheers.ui.main.event.detail
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.EventUi
+import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.event.*
+import com.salazar.cheers.internal.*
+import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Typography
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun EventDetailScreen(
-    uiState: EventDetailUiState
+    uiState: EventDetailUiState,
+    onMapClick: () -> Unit,
+    onUserClicked: (String) -> Unit,
+    onCopyLink: () -> Unit,
+    onEditClick: () -> Unit,
+    onGoing: () -> Unit,
+    onInterested: () -> Unit,
 ) {
-    Scaffold {
-        when (uiState) {
-            is EventDetailUiState.HasEvent -> Event(eventUi = uiState.eventUi)
-            is EventDetailUiState.NoEvents -> {
-                Text("No event")
+    val state = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
+    val scope = rememberCoroutineScope()
+
+    ModalBottomSheetLayout(
+        sheetState = state,
+        sheetContent = {
+            EventManageSheet(
+                onCopyLink = onCopyLink,
+                onEditClick = onEditClick,
+            )
+        },
+        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+    ) {
+        Scaffold {
+            when (uiState) {
+                is EventDetailUiState.HasEvent -> Event(
+                    event = uiState.event,
+                    onMapClick = onMapClick,
+                    onUserClicked = onUserClicked,
+                    onManageClick = {
+                        scope.launch {
+                            state.show()
+                        }
+                    },
+                    onGoing = onGoing,
+                    onInterested = onInterested,
+                )
+                is EventDetailUiState.NoEvents -> {
+                    Text("No event")
+                }
             }
         }
     }
 }
 
 @Composable
-fun Event(eventUi: EventUi) {
-    Column {
-        EventHeader(eventUi = eventUi)
-        EventBody(event = eventUi)
+fun Event(
+    event: Event,
+    onMapClick: () -> Unit,
+    onUserClicked: (String) -> Unit,
+    onManageClick: () -> Unit,
+    onGoing: () -> Unit,
+    onInterested: () -> Unit,
+) {
+    val state =  rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    LazyColumn(state = state) {
+
+        item {
+            EventHeader(
+                event = event,
+                onAboutClick = {
+                    scope.launch {
+                        state.animateScrollToItem(1)
+                    }
+                },
+                onManageClick = onManageClick,
+                onInterested = onInterested,
+                onGoing = onGoing,
+            )
+        }
+
+        item {
+            EventDescription(
+                description = event.description,
+                modifier = Modifier.padding(16.dp),
+                onUserClicked = onUserClicked,
+            )
+            DividerM3()
+        }
+
+        item {
+            EventVenue(
+                address = "Avenue Darcel, 75019",
+                latitude = event.latitude,
+                longitude = event.longitude,
+                modifier = Modifier.padding(16.dp),
+                onMapClick = onMapClick,
+            )
+        }
+
+        item {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(16.dp),
+            ) {
+                FilledTonalButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(Icons.Default.StarBorder, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Interested")
+                }
+                FilledTonalButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Going")
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun EventHeader(eventUi: EventUi) {
-    val event = eventUi.event
-    Image(
-        painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = event.imageUrl).apply(block = fun ImageRequest.Builder.() {
-                error(R.drawable.default_profile_picture)
-            }).build()
-        ),
-        contentDescription = null,
+fun EventHeader(
+    event: Event,
+    onAboutClick: () -> Unit,
+    onManageClick: () -> Unit,
+    onGoing: () -> Unit,
+    onInterested: () -> Unit,
+) {
+    AsyncImage(
+        model = event.imageUrl,
+        contentDescription =null,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(2f),
+            .aspectRatio(16 / 9f),
         contentScale = ContentScale.Crop,
+        alignment = Alignment.Center
     )
-    Column(
-        modifier = Modifier.padding(16.dp),
-    ) {
-        val d = remember { ZonedDateTime.parse(event.startDate) }
-        Text(
-            d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM hh:mm a")),
-            style = MaterialTheme.typography.bodyMedium
+    Column {
+        EventDetails(
+            name = event.name,
+            privacy = event.privacy,
+            startTimeSeconds = event.startDate,
+            onEventDetailsClick = {},
         )
-        if (event.name.isNotBlank())
-            Text(
-                event.name,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-            )
-        Text("${
-            event.type.lowercase(Locale.getDefault())
-                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        } event"
+        EventHeaderButtons(
+            event.hostId,
+            onManageClick = onManageClick,
+            onGoingClick = onGoing,
+            onInterestedClick = onInterested,
+            onInviteClick = {},
         )
-        if (event.description.isNotBlank())
-            Text(
-                event.description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        if (event.locationName.isNotBlank())
-            Text(text = event.locationName, style = Typography.labelSmall)
-        Text("4.8k interested - 567 going", modifier = Modifier.padding(vertical = 8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        EventInfo(
+            hostName = event.hostName,
+            price = event.price,
+            privacy = event.privacy,
+            startTimeSeconds = event.startDate,
+            interestedCount = event.interestedCount,
+            goingCount = event.goingCount,
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(16.dp),
+        ) {
             FilledTonalButton(
-                onClick = { /*TODO*/ },
+                onClick = onAboutClick,
                 modifier = Modifier.weight(1f)
             ) {
-                Icon(Icons.Default.StarBorder, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Interested")
+                Text("About")
             }
             FilledTonalButton(
                 onClick = { /*TODO*/ },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Going")
+                Text("Discussion")
             }
         }
+        DividerM3()
     }
-}
-
-@Composable
-fun EventBody(event: EventUi) {
 }
