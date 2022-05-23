@@ -55,14 +55,17 @@ class UploadEventWorker @AssistedInject constructor(
         val eventPrivacy =
             inputData.getString("EVENT_PRIVACY") ?: return Result.failure()
 
+        val address =
+            inputData.getString("ADDRESS") ?: ""
+
         val locationName =
             inputData.getString("LOCATION_NAME") ?: ""
 
         val latitude =
-            inputData.getDouble("LOCATION_LATITUDE", 0.0)
+            inputData.getDouble("LATITUDE", 0.0)
 
         val longitude =
-            inputData.getDouble("LOCATION_LONGITUDE", 0.0)
+            inputData.getDouble("LONGITUDE", 0.0)
 
         val startDateTime =
             inputData.getLong("START_DATETIME", 0L)
@@ -77,6 +80,7 @@ class UploadEventWorker @AssistedInject constructor(
                 hostId = FirebaseAuth.getInstance().currentUser?.uid!!,
                 hostName = user.name,
                 name = name,
+                address = address,
                 description = description,
                 privacy = Privacy.valueOf(eventPrivacy),
                 startDate = startDateTime,

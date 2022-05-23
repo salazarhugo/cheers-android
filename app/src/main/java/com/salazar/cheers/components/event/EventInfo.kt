@@ -1,12 +1,8 @@
 package com.salazar.cheers.components.event
 
-import android.text.format.DateUtils
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,20 +15,20 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.dateTimeFormatter
 import com.salazar.cheers.internal.numberFormatter
 import com.salazar.cheers.internal.relativeTimeFormatter
 
 @Composable
 fun EventInfo(
+    address: String,
     hostName: String,
     privacy: Privacy,
     price: Int,
     startTimeSeconds: Long,
     interestedCount: Int,
     goingCount: Int,
+    locationName: String,
 ) {
     Column() {
         EventHeaderItem(
@@ -43,7 +39,8 @@ fun EventInfo(
         EventHeaderItem(
             icon = Icons.Default.Group,
             text = "${numberFormatter(value = interestedCount)} interested - ${
-                numberFormatter(value = goingCount)} going",
+                numberFormatter(value = goingCount)
+            } going",
             modifier = Modifier.padding(16.dp, vertical = 8.dp),
         )
         val eventBy = buildAnnotatedString {
@@ -62,7 +59,24 @@ fun EventInfo(
                 text = eventBy,
             )
         }
-        val text = if (price <= 0) "Free" else "Price ${price/100}"
+        Row(
+            modifier = Modifier.padding(16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Default.PinDrop, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Column() {
+                Text(
+                    text = locationName,
+                )
+                if (address.isNotBlank())
+                Text(
+                    text = address,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+        val text = if (price <= 0) "Free" else "Price ${price / 100}"
         EventHeaderItem(
             icon = Icons.Default.Paid,
             text = text,

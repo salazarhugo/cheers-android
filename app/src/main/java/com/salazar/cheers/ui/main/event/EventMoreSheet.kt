@@ -1,4 +1,4 @@
-package com.salazar.cheers.components
+package com.salazar.cheers.ui.main.event
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,15 +17,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PostMoreBottomSheet(
+fun EventMoreBottomSheet(
     isAuthor: Boolean,
     onDetails: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
-    onBlock: () -> Unit,
     onShare: () -> Unit,
     onLinkClick: () -> Unit,
-    onUnfollow: () -> Unit,
+    onHide: () -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -38,13 +37,11 @@ fun PostMoreBottomSheet(
         )
         Item(text = "Details", icon = Icons.Outlined.OpenInNew, onDetails)
         Item(text = "Link", icon = Icons.Outlined.Link, onLinkClick)
+        Item(text = "Hide", icon = Icons.Outlined.HideImage, onHide)
         if (isAuthor)
             Item(text = "Delete", icon = Icons.Outlined.Delete, onDelete)
         Item(text = "Share", icon = Icons.Outlined.Share, onShare)
         Item(text = "Report", icon = Icons.Outlined.Report, onReport)
-        Item(text = "Block", icon = Icons.Outlined.Block, onBlock)
-        if (!isAuthor)
-            Item(text = "Unfollow", icon = Icons.Outlined.UnfoldLess, onUnfollow)
     }
 }
 

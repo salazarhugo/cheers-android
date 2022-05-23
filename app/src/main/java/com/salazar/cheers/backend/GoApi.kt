@@ -1,17 +1,17 @@
 package com.salazar.cheers.backend
 
-import com.google.gson.JsonObject
-import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.internal.Event
-import com.squareup.moshi.Json
+import com.salazar.cheers.internal.User
 import okhttp3.ResponseBody
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 
 interface GoApi {
+
+    @GET("users/search/{query}")
+    suspend fun searchUsers(
+        @Path("query") query: String,
+    ): List<User>
 
     @GET("events")
     suspend fun getEvents(
@@ -38,6 +38,26 @@ interface GoApi {
     @POST("event/delete")
     suspend fun deleteEvent(
         @Query("eventId") eventId: String,
+    )
+
+    @POST("follow")
+    suspend fun followUser(
+        @Query("username") username: String,
+    )
+
+    @POST("unfollow")
+    suspend fun unfollowUser(
+        @Query("username") username: String,
+    )
+
+    @POST("posts/{postId}/like")
+    suspend fun likePost(
+        @Path("postId") postId: String,
+    )
+
+    @POST("posts/{postId}/unlike")
+    suspend fun unlikePost(
+        @Path("postId") postId: String,
     )
 
     @POST("event/interest")

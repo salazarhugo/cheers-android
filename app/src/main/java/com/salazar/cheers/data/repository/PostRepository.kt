@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PostFeed
@@ -19,6 +20,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PostRepository @Inject constructor(
+    private val goApi: GoApi,
     private val service: Neo4jService,
     private val database: CheersDatabase
 ) {
@@ -83,9 +85,9 @@ class PostRepository @Inject constructor(
         postDao.update(post.copy(liked = !post.liked, likes = likes))
 
         if (post.liked)
-            service.unlikePost(post.id)
+            goApi.unlikePost(postId = post.id)
         else
-            service.likePost(post.id)
+            goApi.likePost(postId = post.id)
     }
 
     companion object {

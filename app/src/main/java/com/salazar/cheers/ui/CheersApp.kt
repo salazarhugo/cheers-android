@@ -17,7 +17,6 @@ import com.salazar.cheers.ui.theme.CheersTheme
 fun CheersApp(
     showInterstitialAd: () -> Unit,
 ) {
-
     val cheersViewModel = hiltViewModel<CheersViewModel>()
     val uiState by cheersViewModel.uiState.collectAsState()
 

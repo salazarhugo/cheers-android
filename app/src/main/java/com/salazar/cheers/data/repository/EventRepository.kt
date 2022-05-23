@@ -19,6 +19,7 @@ import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.workers.UploadEventWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
@@ -71,15 +72,20 @@ class EventRepository @Inject constructor(
         goApi.updateEvent(event = event)
     }
 
-    suspend fun uninterestEvent(eventId: String) {
+    private suspend fun uninterestEvent(eventId: String) {
         goApi.uninterestEvent(eventId = eventId)
     }
 
-    suspend fun interestEvent(eventId: String) {
+    private suspend fun interestEvent(eventId: String) {
         goApi.interestEvent(eventId = eventId)
     }
 
-    suspend fun deleteEvent(eventId: String) {
+    suspend fun hideEvent(eventId: String) = withContext(Dispatchers.IO) {
+        eventDao.deleteWithId(eventId = eventId)
+    }
+
+    suspend fun deleteEvent(eventId: String) = withContext(Dispatchers.IO) {
+        eventDao.deleteWithId(eventId = eventId)
         goApi.deleteEvent(eventId = eventId)
     }
 
@@ -100,28 +106,29 @@ class EventRepository @Inject constructor(
     }
 
     fun createEvent(
-        name: String,
-        description: String,
-        privacy: Privacy,
-        imageUri: Uri,
-        startTimeSeconds: Long,
-        endTimeSeconds: Long,
+        event: Event,
     ) {
-        val uploadWorkRequest = OneTimeWorkRequestBuilder<UploadEventWorker>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setInputData(
-                workDataOf(
-                    "NAME" to name,
-                    "DESCRIPTION" to description,
-                    "EVENT_PRIVACY" to privacy.name,
-                    "IMAGE_URI" to imageUri.toString(),
-                    "START_DATETIME" to startTimeSeconds,
-                    "END_DATETIME" to endTimeSeconds,
+        event.apply {
+            val uploadWorkRequest = OneTimeWorkRequestBuilder<UploadEventWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(
+                    workDataOf(
+                        "NAME" to name,
+                        "ADDRESS" to address,
+                        "DESCRIPTION" to description,
+                        "EVENT_PRIVACY" to privacy.name,
+                        "IMAGE_URI" to imageUrl,
+                        "START_DATETIME" to startDate,
+                        "END_DATETIME" to endDate,
+                        "LOCATION_NAME" to locationName,
+                        "LATITUDE" to latitude,
+                        "LONGITUDE" to longitude,
+                    )
                 )
-            )
-            .build()
+                .build()
 
-        workManager.enqueue(uploadWorkRequest)
+            workManager.enqueue(uploadWorkRequest)
+        }
     }
 
     companion object { }

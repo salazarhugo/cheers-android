@@ -3,6 +3,12 @@ package com.salazar.cheers.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.search.MapboxSearchSdk
+import com.mapbox.search.ResponseInfo
+import com.mapbox.search.SearchOptions
+import com.mapbox.search.SearchSelectionCallback
+import com.mapbox.search.result.SearchResult
+import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Resource
@@ -57,6 +63,7 @@ class UserRepository @Inject constructor(
         when (val result = service.getUserStats(username = username)) {
             is Result.Success -> userStatsDao.insert(userStats = result.data)
             is Result.Error -> {}
+
         }
         return@withContext userStatsDao.getUserStats(username)
     }
@@ -86,7 +93,7 @@ class UserRepository @Inject constructor(
             }
 
             val remoteUsers = try {
-                service.queryUsers(query = query)
+                goApi.searchUsers(query = query)
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load data"))
@@ -94,6 +101,10 @@ class UserRepository @Inject constructor(
             } catch (e: HttpException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load data"))
+                null
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+                emit(Resource.Error("Response is null"))
                 null
             }
 
@@ -109,6 +120,22 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun followUser(username: String) {
+        try {
+            goApi.followUser(username = username)
+        }catch (e:Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun unfollowUser(username: String) {
+        try {
+            goApi.unfollowUser(username = username)
+        }catch (e:Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun toggleFollow(user: User) {
         val newFollowersCount = if (user.isFollowed) user.followers - 1 else user.followers + 1
         val newUser = user.copy(isFollowed = !user.isFollowed, followers = newFollowersCount)
@@ -116,9 +143,9 @@ class UserRepository @Inject constructor(
         userDao.update(newUser)
 
         if (user.isFollowed)
-            service.unfollowUser(user.username)
+            unfollowUser(username = user.username)
         else
-            service.followUser(user.username)
+            followUser(username = user.username)
     }
 
     suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {

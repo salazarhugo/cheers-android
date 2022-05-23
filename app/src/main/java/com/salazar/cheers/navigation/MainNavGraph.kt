@@ -1,12 +1,12 @@
 package com.salazar.cheers.navigation
 
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,7 +24,7 @@ import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.PostMoreBottomSheet
+import com.salazar.cheers.components.post.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.add.AddPostRoute
 import com.salazar.cheers.ui.main.add.AddPostViewModel
@@ -39,6 +39,8 @@ import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
+import com.salazar.cheers.ui.main.event.EventMoreBottomSheet
+import com.salazar.cheers.ui.main.event.EventMoreSheetViewModel
 import com.salazar.cheers.ui.main.event.EventsRoute
 import com.salazar.cheers.ui.main.event.add.AddEventRoute
 import com.salazar.cheers.ui.main.event.detail.EventDetailRoute
@@ -127,7 +129,19 @@ fun NavGraphBuilder.mainNavGraph(
                 onDelete = { homeViewModel.deletePost(postId); navActions.navigateBack() },
                 onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
-                onShare = {},
+                onShare = {
+                    FirebaseDynamicLinksUtil.createShortLink("p/$postId")
+                        .addOnSuccessListener { shortLink ->
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shortLink.shortLink.toString())
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }
+                    navActions.navigateBack()
+                },
                 onBlock = {
                     homeViewModel.blockUser(authorId)
                     navActions.navigateBack()
@@ -365,128 +379,165 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/edit/{eventId}" })
-        ) {
+        bottomSheet("${MainDestinations.EVENT_MORE_SHEET}/{eventId}") {
+            val eventId = it.arguments?.getString("eventId")!!
+            val context = LocalContext.current
+            val viewModel = hiltViewModel<EventMoreSheetViewModel>()
 
-            EditEventRoute(
-                navActions = navActions,
+            EventMoreBottomSheet(
+                isAuthor = false,
+                onDetails = { navActions.navigateToEventDetail(eventId) },
+                onDelete = { },
+                onReport = { /*TODO*/ },
+                onShare = {
+                    FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
+                        .addOnSuccessListener { shortLink ->
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shortLink.shortLink.toString())
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }
+                    navActions.navigateBack()
+                },
+                onLinkClick = {
+                    FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
+                        .addOnSuccessListener { shortLink ->
+                            context.copyToClipboard(shortLink.shortLink.toString())
+                        }
+                    navActions.navigateBack()
+                },
+                onHide = {
+                    viewModel.onHide()
+                    navActions.navigateBack()
+                },
             )
         }
+    }
 
-        composable(
-            route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{storyId}" })
-        ) {
-            val storyId = it.arguments?.getString("storyId")!!
-            val storyStatsViewModel = storyStatsViewModel(storyId = storyId)
+    composable(
+        route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
+        deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/edit/{eventId}" })
+    ) {
 
-            StoryStatsRoute(
-                storyStatsViewModel = storyStatsViewModel,
-                navActions = navActions,
-            )
+        EditEventRoute(
+            navActions = navActions,
+        )
+    }
+
+    composable(
+        route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",
+        deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{storyId}" })
+    ) {
+        val storyId = it.arguments?.getString("storyId")!!
+        val storyStatsViewModel = storyStatsViewModel(storyId = storyId)
+
+        StoryStatsRoute(
+            storyStatsViewModel = storyStatsViewModel,
+            navActions = navActions,
+        )
+    }
+
+    composable(
+        route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
+        deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
+    ) {
+        val postDetailViewModel = hiltViewModel<PostDetailViewModel>()
+
+        PostDetailRoute(
+            postDetailViewModel = postDetailViewModel,
+            navActions = navActions,
+        )
+    }
+
+    composable(
+        route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
+        arguments = listOf(
+            navArgument("username") { nullable = false },
+            navArgument("verified") { defaultValue = false }
+        ),
+    ) {
+
+        val username = it.arguments?.getString("username")!!
+        val verified = it.arguments?.getBoolean("verified")!!
+
+        val otherProfileStatsViewModel = otherProfileStatsViewModel(username = username)
+
+        OtherProfileStatsRoute(
+            otherProfileStatsViewModel = otherProfileStatsViewModel,
+            navActions = navActions,
+            username = username,
+            verified = verified,
+        )
+    }
+
+    composable(
+        route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
+        arguments = listOf(
+            navArgument("username") { nullable = false },
+            navArgument("verified") { defaultValue = false }
+        )
+    ) {
+        val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
+
+        val username = it.arguments?.getString("username")!!
+        val verified = it.arguments?.getBoolean("verified")!!
+
+        ProfileStatsRoute(
+            profileStatsViewModel = profileStatsViewModel,
+            navActions = navActions,
+            username = username,
+            verified = verified,
+        )
+    }
+
+    composable(
+        MainDestinations.MESSAGES_ROUTE,
+        enterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
+        exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
+    ) {
+        val messagesViewModel = hiltViewModel<MessagesViewModel>()
+
+        MessagesRoute(
+            messagesViewModel = messagesViewModel,
+            navActions = navActions,
+        )
+    }
+
+    bottomSheet(MainDestinations.NEW_CHAT_ROUTE) {
+        NewChatRoute(
+            navActions = navActions,
+        )
+    }
+
+
+    dialog(MainDestinations.EDIT_PROFILE_ROUTE) {
+        val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
+        EditProfileRoute(
+            editProfileViewModel = editProfileViewModel,
+            navActions = navActions,
+        )
+    }
+
+    composable(
+        MainDestinations.PROFILE_ROUTE,
+        enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+        exitTransition = {
+            if (targetState.destination.hierarchy.any { it.route == CheersDestinations.SETTING_ROUTE })
+                slideOutHorizontally(targetOffsetX = { -1000 })
+            else
+                slideOutHorizontally(targetOffsetX = { 1000 })
         }
 
-        composable(
-            route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
-        ) {
-            val postDetailViewModel = hiltViewModel<PostDetailViewModel>()
+    ) {
+        val profileViewModel = hiltViewModel<ProfileViewModel>()
 
-            PostDetailRoute(
-                postDetailViewModel = postDetailViewModel,
-                navActions = navActions,
-            )
-        }
-
-        composable(
-            route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
-            arguments = listOf(
-                navArgument("username") { nullable = false },
-                navArgument("verified") { defaultValue = false }
-            ),
-        ) {
-
-            val username = it.arguments?.getString("username")!!
-            val verified = it.arguments?.getBoolean("verified")!!
-
-            val otherProfileStatsViewModel = otherProfileStatsViewModel(username = username)
-
-            OtherProfileStatsRoute(
-                otherProfileStatsViewModel = otherProfileStatsViewModel,
-                navActions = navActions,
-                username = username,
-                verified = verified,
-            )
-        }
-
-        composable(
-            route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
-            arguments = listOf(
-                navArgument("username") { nullable = false },
-                navArgument("verified") { defaultValue = false }
-            )
-        ) {
-            val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
-
-            val username = it.arguments?.getString("username")!!
-            val verified = it.arguments?.getBoolean("verified")!!
-
-            ProfileStatsRoute(
-                profileStatsViewModel = profileStatsViewModel,
-                navActions = navActions,
-                username = username,
-                verified = verified,
-            )
-        }
-
-        composable(
-            MainDestinations.MESSAGES_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
-        ) {
-            val messagesViewModel = hiltViewModel<MessagesViewModel>()
-
-            MessagesRoute(
-                messagesViewModel = messagesViewModel,
-                navActions = navActions,
-            )
-        }
-
-        bottomSheet(MainDestinations.NEW_CHAT_ROUTE) {
-            NewChatRoute(
-                navActions = navActions,
-            )
-        }
-
-
-        dialog(MainDestinations.EDIT_PROFILE_ROUTE) {
-            val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
-            EditProfileRoute(
-                editProfileViewModel = editProfileViewModel,
-                navActions = navActions,
-            )
-        }
-
-        composable(
-            MainDestinations.PROFILE_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = {
-                if (targetState.destination.hierarchy.any { it.route == CheersDestinations.SETTING_ROUTE })
-                    slideOutHorizontally(targetOffsetX = { -1000 })
-                else
-                    slideOutHorizontally(targetOffsetX = { 1000 })
-            }
-
-        ) {
-            val profileViewModel = hiltViewModel<ProfileViewModel>()
-
-            ProfileRoute(
-                profileViewModel = profileViewModel,
-                navActions = navActions,
-                username = user.username,
-            )
-        }
+        ProfileRoute(
+            profileViewModel = profileViewModel,
+            navActions = navActions,
+            username = user.username,
+        )
     }
 }

@@ -1,8 +1,6 @@
 package com.salazar.cheers.ui.main.add
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -109,7 +108,7 @@ fun AddPostScreen(
         val options = ReverseGeoOptions(
             center = uiState.locationPoint,
         )
-        val reverseGeocoding = remember { MapboxSearchSdk.getReverseGeocodingSearchEngine() }
+        val reverseGeocoding = remember { MapboxSearchSdk.getSearchEngine() }
         reverseGeocoding.search(options, searchCallback)
     }
 
@@ -396,10 +395,9 @@ fun SwitchPreference(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
-        SwitchM3(
+        Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            enabled = false,
         )
     }
 }

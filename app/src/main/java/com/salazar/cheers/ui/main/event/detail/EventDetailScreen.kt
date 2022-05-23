@@ -43,6 +43,7 @@ fun EventDetailScreen(
     onEditClick: () -> Unit,
     onGoing: () -> Unit,
     onInterested: () -> Unit,
+    onDeleteClick: () -> Unit,
 ) {
     val state = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -56,6 +57,7 @@ fun EventDetailScreen(
             EventManageSheet(
                 onCopyLink = onCopyLink,
                 onEditClick = onEditClick,
+                onDeleteClick = onDeleteClick,
             )
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -186,6 +188,8 @@ fun EventHeader(
             onInviteClick = {},
         )
         EventInfo(
+            locationName = event.locationName,
+            address = event.address,
             hostName = event.hostName,
             price = event.price,
             privacy = event.privacy,

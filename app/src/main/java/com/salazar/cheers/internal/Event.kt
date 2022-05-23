@@ -27,6 +27,7 @@ data class Event(
     val interestedCount: Int = 0,
     val goingCount: Int = 0,
     val imageUrl: String = "",
+    val address: String = "",
     val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,

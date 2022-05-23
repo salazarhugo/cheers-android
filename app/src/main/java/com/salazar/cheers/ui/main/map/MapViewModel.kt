@@ -132,14 +132,14 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private lateinit var reverseGeocoding: ReverseGeocodingSearchEngine
+    private lateinit var reverseGeocoding: SearchEngine
     private lateinit var searchRequestTask: SearchRequestTask
 
     fun onMapReady(
         mapView: MapView,
         context: Context
     ) {
-        reverseGeocoding = MapboxSearchSdk.getReverseGeocodingSearchEngine()
+        reverseGeocoding = MapboxSearchSdk.getSearchEngine()
         mapView.gestures.rotateEnabled = false
         mapView.attribution.enabled = false
         mapView.scalebar.enabled = false

@@ -3,29 +3,25 @@ package com.salazar.cheers.components.event
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Link
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.main.chat.SymbolAnnotationType
-import com.salazar.cheers.ui.main.chat.messageFormatter
 import com.salazar.cheers.ui.main.profile.Item
-import com.salazar.cheers.ui.main.profile.ProfileSheetUIAction
 
 
 @Composable
 fun EventManageSheet(
     onEditClick: () -> Unit,
     onCopyLink: () -> Unit,
+    onDeleteClick: () -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -40,6 +36,11 @@ fun EventManageSheet(
             text = "Edit",
             icon = Icons.Outlined.Edit,
             onClick = onEditClick,
+        )
+        Item(
+            text = "Delete",
+            icon = Icons.Outlined.Delete,
+            onClick = onDeleteClick,
         )
         Item(
             text = "Copy link",

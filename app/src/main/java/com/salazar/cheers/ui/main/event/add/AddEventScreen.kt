@@ -7,6 +7,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,9 +24,7 @@ import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,14 +43,17 @@ import coil.compose.AsyncImage
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.components.event.EventDetails
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.internal.startDateFormatter
+import com.salazar.cheers.internal.timeFormatter
 import com.salazar.cheers.ui.main.add.LocationSection
 import com.salazar.cheers.ui.main.add.PrivacyBottomSheet
 import com.salazar.cheers.ui.main.chat.messageFormatter
-import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
+import com.salazar.cheers.ui.main.search.SearchLocation
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 import java.util.*
@@ -65,7 +67,9 @@ fun AddEventScreen(
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onStartTimeSecondsChange: (Long) -> Unit,
-    onEndTimeSecondsChange: (Long) -> Unit
+    onEndTimeSecondsChange: (Long) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onLocationClick: (SearchSuggestion) -> Unit,
 ) {
     PrivacyBottomSheet(
         privacy = uiState.privacy,
@@ -73,10 +77,12 @@ fun AddEventScreen(
         onSelectPrivacy = onPrivacyChange,
     ) {
         Scaffold(
-            topBar = { TopAppBar(
-                onDismiss = { onAddEventUIAction(AddEventUIAction.OnDismiss)},
-            title = "New Event")
-                     },
+            topBar = {
+                TopAppBar(
+                    onDismiss = { onAddEventUIAction(AddEventUIAction.OnDismiss) },
+                    title = "New Event"
+                )
+            },
         ) {
             Column(
                 modifier = Modifier
@@ -90,6 +96,8 @@ fun AddEventScreen(
                     onDescriptionChange = onDescriptionChange,
                     onStartTimeSecondsChange = onStartTimeSecondsChange,
                     onEndTimeSecondsChange = onEndTimeSecondsChange,
+                    onQueryChange = onQueryChange,
+                    onLocationClick = onLocationClick,
                 )
             }
         }
@@ -118,7 +126,9 @@ fun Tabs(
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onStartTimeSecondsChange: (Long) -> Unit,
-    onEndTimeSecondsChange: (Long) -> Unit
+    onEndTimeSecondsChange: (Long) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onLocationClick: (SearchSuggestion) -> Unit,
 ) {
     val tabs = 4
     val pagerState = rememberPagerState()
@@ -137,13 +147,19 @@ fun Tabs(
                     onEventNameChange = onNameChange,
                     onStartDateChanged = onStartTimeSecondsChange,
                     onEndTimeSecondsChange = onEndTimeSecondsChange,
-                    onHasEndDateToggle = { onAddEventUIAction(AddEventUIAction.OnHasEndDateToggle)}
+                    onHasEndDateToggle = { onAddEventUIAction(AddEventUIAction.OnHasEndDateToggle) }
                 )
                 1 -> DescriptionPage(
                     uiState = uiState,
                     onDescriptionChange = onDescriptionChange,
                 )
-                2 -> LocationPage()
+                2 -> LocationPage(
+                    locationName = uiState.locationName,
+                    query = uiState.locationQuery,
+                    results = uiState.locationResults,
+                    onQueryChange = onQueryChange,
+                    onLocationClick = onLocationClick,
+                )
                 3 -> FirstScreen(
                     uiState = uiState,
                     onAddEventUIAction = {
@@ -161,7 +177,7 @@ fun Tabs(
                                     pagerState.animateScrollToPage(2)
                                 }
                         }
-                         onAddEventUIAction(it)
+                        onAddEventUIAction(it)
                     },
                 )
             }
@@ -193,18 +209,18 @@ fun FirstScreen(
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         AddPhoto(
             photo = uiState.photo,
-            onAddPhotoClick = { onAddEventUIAction(AddEventUIAction.OnAddPhoto)},
+            onAddPhotoClick = { onAddEventUIAction(AddEventUIAction.OnAddPhoto) },
         )
         EventDetails(
             name = uiState.name,
             privacy = uiState.privacy,
             startTimeSeconds = uiState.startTimeSeconds,
-            onEventDetailsClick = { onAddEventUIAction(AddEventUIAction.OnEventDetailsClick)}
+            onEventDetailsClick = { onAddEventUIAction(AddEventUIAction.OnEventDetailsClick) }
         )
         DividerM3()
         Description(
             description = uiState.description,
-            onDescriptionClick = { onAddEventUIAction(AddEventUIAction.OnDescriptionClick)}
+            onDescriptionClick = { onAddEventUIAction(AddEventUIAction.OnDescriptionClick) }
         )
         DividerM3()
         CategorySection(
@@ -292,40 +308,40 @@ fun StartDateInput(
     val startDatePicker = DatePickerDialog(
         context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds*1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000)
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            onStartDateChanged(calendar.time.time/1000)
+            onStartDateChanged(calendar.time.time / 1000)
         }, year, month, day
     )
     val endDatePicker = DatePickerDialog(
         context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds*1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000)
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            onEndDateChanged(calendar.time.time/1000)
+            onEndDateChanged(calendar.time.time / 1000)
         }, year, month, day
     )
     val startTimePicker = TimePickerDialog(
         context, { _: TimePicker, hourOfDay: Int, minute: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds*1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000)
             calendar.set(Calendar.MINUTE, minute)
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-            onStartDateChanged(calendar.time.time/1000)
+            onStartDateChanged(calendar.time.time / 1000)
         }, hourOfDay, minute, true
     )
 
     val endTimePicker = TimePickerDialog(
         context, { _: TimePicker, hourOfDay: Int, minute: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds*1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000)
             calendar.set(Calendar.MINUTE, minute)
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-            onEndDateChanged(calendar.time.time/1000)
+            onEndDateChanged(calendar.time.time / 1000)
         }, hourOfDay, minute, true
     )
 
@@ -498,7 +514,7 @@ fun AddPhoto(
         if (photo != null) {
             AsyncImage(
                 model = photo.toString(),
-                contentDescription =null,
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16 / 9f)
@@ -506,8 +522,7 @@ fun AddPhoto(
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.Center
             )
-        }
-        else {
+        } else {
             FilledTonalButton(onClick = onAddPhotoClick) {
                 Icon(Icons.Outlined.PhotoCamera, null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -577,7 +592,7 @@ fun Description(
                     primary = false,
                 )
                 Text(
-                    text = styledDescription.ifBlank { buildAnnotatedString { append("Add a description") }},
+                    text = styledDescription.ifBlank { buildAnnotatedString { append("Add a description") } },
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Light),
                 )
             }
@@ -588,26 +603,51 @@ fun Description(
 
 @Composable
 fun LocationPage(
+    locationName: String,
+    query: String,
+    results: List<SearchSuggestion>,
+    onQueryChange: (String) -> Unit,
+    onLocationClick: (SearchSuggestion) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.padding(16.dp),
-    ) {
-        Text(
-            text = "Location",
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+    var search by remember { mutableStateOf(false) }
+
+    if (search)
+        SearchLocation(
+            searchInput = query,
+            results = results,
+            onSearchInputChanged = onQueryChange,
+            onLocationClick = {
+                onLocationClick(it)
+                search = false
+            },
         )
-        Text(
-            text = "Add a physical location for people to join your event.",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-        Button(
-            onClick = {},
-            shape = RoundedCornerShape(4.dp),
+    else
+        Column(
+            modifier = Modifier.padding(16.dp),
         ) {
-            Text("Choose on map")
+            Text(
+                text = "Location",
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            )
+            Text(
+                text = "Add a physical location for people to join your event.",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+            OutlinedTextField(
+                value = locationName,
+                onValueChange = {},
+                placeholder = {
+                    Text("Add a location")
+                },
+                modifier = Modifier
+                    .clickable {
+                        search = true
+                    },
+                readOnly = true,
+                enabled = false
+            )
         }
-    }
 }
 
 @Composable

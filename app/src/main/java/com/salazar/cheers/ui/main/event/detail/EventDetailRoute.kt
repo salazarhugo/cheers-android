@@ -41,7 +41,8 @@ fun EventDetailRoute(
             onEditClick = {
                 val eventId = (uiState as EventDetailUiState.HasEvent).event.id
                 navActions.navigateToEditEvent(eventId)
-            }
+            },
+            onDeleteClick = eventDetailViewModel::deleteEvent,
         )
     else
         LoadingScreen()

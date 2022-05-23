@@ -22,6 +22,7 @@ object MainDestinations {
     const val MAP_ROUTE = "map"
     const val EVENTS_ROUTE = "events"
     const val EDIT_EVENT_ROUTE = "event/edit"
+    const val EVENT_MORE_SHEET = "eventMoreSheet"
     const val MESSAGES_ROUTE = "messages"
     const val MESSAGES_MORE_SHEET = "messagesMoreSheet"
     const val NEW_CHAT_ROUTE = "newChat"
@@ -80,6 +81,12 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToEventMoreSheet: (String) -> Unit = { eventId ->
+        navController.navigate("${MainDestinations.EVENT_MORE_SHEET}/$eventId") {
+            launchSingleTop = true
+        }
     }
 
     val navigateToEditEvent: (String) -> Unit = { eventId ->

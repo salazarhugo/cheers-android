@@ -69,7 +69,6 @@ fun OtherProfileStatsScreen(
             )
         }
     ) {
-
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,

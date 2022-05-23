@@ -173,6 +173,7 @@ fun Profile(
                                         event = it,
                                         onEventClicked = {},
                                         onInterestedToggle = {},
+                                        onMoreClick = {},
                                     )
                                 }
                                 2 -> FunctionalityNotAvailablePanel()
@@ -196,6 +197,7 @@ fun EventList(
                 event = event,
                 onEventClicked = {},
                 onInterestedToggle = {},
+                onMoreClick = {},
             )
         }
     }

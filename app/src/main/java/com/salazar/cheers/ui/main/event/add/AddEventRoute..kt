@@ -28,6 +28,8 @@ fun AddEventRoute(
         uiState = uiState,
         onPrivacyChange = addEventViewModel::setPrivacy,
         onNameChange = addEventViewModel::setName,
+        onQueryChange = addEventViewModel::onQueryChange,
+        onLocationClick = addEventViewModel::onLocationClick,
         onDescriptionChange = addEventViewModel::onDescriptionChange,
         onStartTimeSecondsChange = addEventViewModel::onStartTimeSecondsChange,
         onEndTimeSecondsChange = addEventViewModel::onEndTimeSecondsChange,

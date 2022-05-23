@@ -108,9 +108,9 @@ class EventDetailViewModel @Inject constructor(
 
 
     fun deleteEvent() {
-//        viewModelScope.launch {
-//            eventRepository.deleteEvent(eventId = eventId)
-//        }
+        viewModelScope.launch {
+            eventRepository.deleteEvent(eventId = eventId)
+        }
     }
 
     fun deleteErrorMessage() {
