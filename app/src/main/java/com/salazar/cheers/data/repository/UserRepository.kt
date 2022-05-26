@@ -3,12 +3,6 @@ package com.salazar.cheers.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.geojson.FeatureCollection
-import com.mapbox.search.MapboxSearchSdk
-import com.mapbox.search.ResponseInfo
-import com.mapbox.search.SearchOptions
-import com.mapbox.search.SearchSelectionCallback
-import com.mapbox.search.result.SearchResult
-import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Resource
@@ -22,7 +16,6 @@ import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -39,9 +32,35 @@ class UserRepository @Inject constructor(
     private val cheersDao: CheersDao,
 ) {
 
+    suspend fun createUser(
+        username: String,
+        email: String,
+    ): User? {
+        try {
+            val user = goApi.createUser(
+                User().copy(
+                    id = FirebaseAuth.getInstance().currentUser?.uid!!,
+                    username = username,
+                    email = email,
+                )
+            )
+            userDao.insert(user)
+            Log.d("YES", "Created User")
+            return user
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("YES", e.toString())
+            return null
+        }
+    }
+
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {
-        postDao.deleteWithAuthorId(authorId = userId)
-        service.blockUser(otherUserId = userId)
+        try {
+            postDao.deleteWithAuthorId(authorId = userId)
+            goApi.blockUser(userId = userId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     suspend fun getFollowersFollowing(userIdOrUsername: String) = withContext(Dispatchers.IO) {
@@ -120,10 +139,18 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun updateUser(username: String) {
+        try {
+            goApi.followUser(username = username)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun followUser(username: String) {
         try {
             goApi.followUser(username = username)
-        }catch (e:Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -131,10 +158,20 @@ class UserRepository @Inject constructor(
     suspend fun unfollowUser(username: String) {
         try {
             goApi.unfollowUser(username = username)
-        }catch (e:Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
+    suspend fun isUsernameAvailable(username: String): Boolean {
+        return try {
+            goApi.isUsernameAvailable(username = username)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
 
     suspend fun toggleFollow(user: User) {
         val newFollowersCount = if (user.isFollowed) user.followers - 1 else user.followers + 1
@@ -148,35 +185,39 @@ class UserRepository @Inject constructor(
             followUser(username = user.username)
     }
 
-    suspend fun getCurrentUser(): User = withContext(Dispatchers.IO) {
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid!!
-        return@withContext getUser(userIdOrUsername = currentUserId)
-    }
-
     suspend fun getUsersWithListOfIds(ids: List<String>): List<User> = withContext(Dispatchers.IO) {
         return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 
-    fun getUserFlow(userIdOrUsername: String): Flow<User> =
-        userDao.getUserFlowWithUsername(userIdOrUsername = userIdOrUsername)
-
-    suspend fun getUser(userIdOrUsername: String): User = withContext(Dispatchers.IO) {
-        launch(Dispatchers.IO) {
-            refreshUser(userIdOrUsername = userIdOrUsername)
-        }
-        return@withContext userDao.getUserWithUsername(userIdOrUsername = userIdOrUsername)
+    suspend fun getCurrentUser(): User {
+        return userDao.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
     }
 
-    suspend fun refreshUser(userIdOrUsername: String): Result<User?> {
-        val result = service.getUser(userIdOrUsername = userIdOrUsername)
-        when (result) {
-            is Result.Success -> {
-                if (result.data != null)
-                    userDao.insertOrUpdate(result.data)
+    fun getUserFlow(
+        userIdOrUsername: String,
+        fetchFromRemote: Boolean = false,
+    ): Flow<User> {
+        return flow {
+            val user = userDao.getUserNullable(userIdOrUsername = userIdOrUsername)
+
+            if (user != null)
+                emit(user)
+
+            if (user != null && !fetchFromRemote)
+                return@flow
+
+            val remoteUser = try {
+                goApi.getUser(userIdOrUsername = userIdOrUsername)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
-            is Result.Error -> {}
+
+            remoteUser?.let { user ->
+                userDao.insertOrUpdate(user)
+                emit(user)
+            }
         }
-        return result
     }
 
     suspend fun getSuggestions(): List<User> = withContext(Dispatchers.IO) {

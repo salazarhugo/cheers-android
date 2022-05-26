@@ -1,11 +1,13 @@
 package com.salazar.cheers
 
 import android.Manifest
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.os.StrictMode
@@ -14,8 +16,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import androidx.core.app.TaskStackBuilder
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -31,7 +37,10 @@ import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.ui.CheersApp
 import com.salazar.cheers.ui.main.comment.CommentsViewModel
@@ -44,6 +53,10 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.components.ActivityComponent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 
@@ -71,9 +84,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @Inject
     lateinit var goApi: GoApi
 
-    @Inject
-    lateinit var billijngRepository: BillingRepository
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -100,6 +110,24 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val data = intent.data ?: return
+
+        val continueUrl = data.getQueryParameter("continueUrl") ?: return
+        val encodedUrl = URLEncoder.encode(data.toString(), StandardCharsets.UTF_8.toString())
+
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "$continueUrl/$encodedUrl".toUri(),
+            this,
+            MainActivity::class.java,
+        )
+
+        startActivity(deepLinkIntent)
     }
 
     private fun userConsentPolicy() {

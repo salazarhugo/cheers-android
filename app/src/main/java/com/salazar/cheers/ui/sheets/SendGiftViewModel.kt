@@ -47,9 +47,10 @@ class SendGiftViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            val receiver = userRepository.getUser(userIdOrUsername = receiverId)
-            viewModelState.update {
-                it.copy(receiver = receiver)
+            userRepository.getUserFlow(userIdOrUsername = receiverId).collect { receiver ->
+                viewModelState.update {
+                    it.copy(receiver = receiver)
+                }
             }
         }
     }

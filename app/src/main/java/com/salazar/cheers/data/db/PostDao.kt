@@ -13,18 +13,18 @@ interface PostDao {
 
     @Transaction
     @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
-    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, PostFeed>
+    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, Post>
 
     @Transaction
     @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE (authorId = :userIdOrUsername OR users.username = :userIdOrUsername) ORDER BY posts.created DESC")
-    fun profilePostFeed(userIdOrUsername: String): PagingSource<Int, PostFeed>
+    fun profilePost(userIdOrUsername: String): PagingSource<Int, Post>
 
 //    /**
 //     ** Get User posts and posts where they are tagged in. Only IMAGE, VIDEO posts.
 //     **/
 //    @Transaction
 //    @Query("SELECT * FROM posts WHERE (authorId = :authorId OR tagUsersId LIKE '%' || :authorId || '%') AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
-//    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed>
+//    suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     /**
      ** Get User posts. Only IMAGE, VIDEO posts.
@@ -34,27 +34,23 @@ interface PostDao {
     suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
-    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE username = :username AND type <> 'TEXT' ORDER BY posts.created DESC")
+    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE users.username = :username AND type <> 'TEXT' ORDER BY posts.created DESC")
     suspend fun getPostsWithUsername(username: String): List<Post>
 
 //    @Transaction
 //    @Query("SELECT users.id FROM users WHERE username = :username")
-//    suspend fun getPostsWithAuthorId(authorId: String): List<PostFeed>
+//    suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
-    suspend fun getPost(postId: String): PostFeed
+    suspend fun getPost(postId: String): Post
 
     @Transaction
     @Query("SELECT * FROM posts WHERE privacy = :privacy AND created > :yesterday")
     suspend fun getMapPosts(
         privacy: Privacy,
         yesterday: Long = Date().time - 24 * 60 * 60 * 1000
-    ): List<PostFeed>
-
-//    @Transaction
-//    @Query("SELECT * FROM posts WHERE tagUsersId")
-//    suspend fun getUserPosts(userId:): List<PostFeed>
+    ): List<Post>
 
     @Query("SELECT * FROM users WHERE id IN (:tagUsersId)")
     suspend fun getPostUsers(tagUsersId: List<String>): List<User>
@@ -84,17 +80,3 @@ interface PostDao {
     @Query("DELETE FROM posts")
     suspend fun clearAll()
 }
-
-data class PostFeed(
-    @Embedded
-    val post: Post,
-
-    @Relation(parentColumn = "authorId", entityColumn = "id")
-    val author: User,
-
-    @Relation(
-        parentColumn = "tagUsersId",
-        entityColumn = "id",
-    )
-    val tagUsers: List<User> = ArrayList()
-)

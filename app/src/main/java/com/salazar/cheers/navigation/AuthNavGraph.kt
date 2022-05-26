@@ -1,10 +1,13 @@
 package com.salazar.cheers.navigation
 
+import androidx.compose.material3.Text
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
+import com.salazar.cheers.ui.auth.register.RegisterRoute
 import com.salazar.cheers.ui.auth.signin.SignInRoute
 import com.salazar.cheers.ui.auth.signin.SignInViewModel
 import com.salazar.cheers.ui.auth.signup.SignUpRoute
@@ -13,6 +16,8 @@ import com.salazar.cheers.ui.auth.signup.SignUpViewModel
 fun NavGraphBuilder.authNavGraph(
     navActions: CheersNavigationActions,
 ) {
+    val uri = "https://cheers-a275e.web.app"
+
     navigation(
         route = CheersDestinations.AUTH_ROUTE,
         startDestination = AuthDestinations.SIGN_IN_ROUTE,
@@ -43,7 +48,17 @@ fun NavGraphBuilder.authNavGraph(
             )
         }
 
-        composable(AuthDestinations.SIGN_IN_ROUTE) {
+        composable(
+            route = "${AuthDestinations.REGISTER_ROUTE}/{username}/{emailLink}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/register/{username}/{emailLink}"}),
+        ) {
+            RegisterRoute(navActions = navActions)
+        }
+
+        composable(
+            route = AuthDestinations.SIGN_IN_ROUTE,
+            deepLinks = listOf(),
+        ) {
             val signInViewModel = hiltViewModel<SignInViewModel>()
 
             SignInRoute(

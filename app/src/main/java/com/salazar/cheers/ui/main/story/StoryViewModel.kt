@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.repository.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +69,7 @@ class StoryViewModel @Inject constructor(
         story: Story,
         text: String
     ) {
-        storyRepository.sendReaction(story.author, text)
+//        storyRepository.sendReaction(story.authorId, text)
         onInputChange("")
     }
 

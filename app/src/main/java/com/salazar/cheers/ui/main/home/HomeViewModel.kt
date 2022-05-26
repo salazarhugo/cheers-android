@@ -12,8 +12,7 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.db.PostFeed
-import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.StoryRepository
@@ -45,7 +44,7 @@ sealed interface HomeUiState {
     ) : HomeUiState
 
     data class HasPosts(
-        val postsFlow: Flow<PagingData<PostFeed>>,
+        val postsFlow: Flow<PagingData<Post>>,
         val eventsFlow: Flow<PagingData<EventUi>>?,
         val storiesFlow: Flow<PagingData<Story>>?,
         val stories: PagingData<Story>?,
@@ -64,7 +63,7 @@ sealed interface HomeUiState {
 
 private data class HomeViewModelState(
     val user: User? = null,
-    val postsFlow: Flow<PagingData<PostFeed>>? = null,
+    val postsFlow: Flow<PagingData<Post>>? = null,
     val eventsFlow: Flow<PagingData<EventUi>>? = null,
     val storiesFlow: Flow<PagingData<Story>>? = null,
     val stories: PagingData<Story>? = null,

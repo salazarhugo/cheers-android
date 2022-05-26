@@ -3,14 +3,19 @@ package com.salazar.cheers.navigation
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavArgument
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.salazar.cheers.ui.settings.SettingsRoute
 import com.salazar.cheers.ui.settings.SettingsViewModel
 import com.salazar.cheers.ui.settings.language.LanguageRoute
 import com.salazar.cheers.ui.settings.notifications.NotificationsRoute
+import com.salazar.cheers.ui.settings.password.CreatePasswordRoute
 import com.salazar.cheers.ui.settings.payments.*
+import com.salazar.cheers.ui.settings.security.SecurityRoute
 import com.salazar.cheers.ui.settings.theme.ThemeRoute
 
 fun NavGraphBuilder.settingNavGraph(
@@ -20,6 +25,32 @@ fun NavGraphBuilder.settingNavGraph(
         route = CheersDestinations.SETTING_ROUTE,
         startDestination = SettingDestinations.SETTINGS_ROUTE,
     ) {
+
+        composable(
+            route = "${SettingDestinations.PASSWORD_ROUTE}/{hasPassword}",
+            arguments = listOf(
+                navArgument("hasPassword") {
+                    type = NavType.BoolType
+                }
+            ),
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
+
+            CreatePasswordRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            SettingDestinations.SECURITY_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
+            SecurityRoute(
+                navActions = navActions,
+            )
+        }
 
         composable(
             SettingDestinations.PAYMENT_HISTORY_ROUTE,

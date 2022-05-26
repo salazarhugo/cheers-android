@@ -29,27 +29,26 @@ fun RechargeScreen(
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Recharge") },
     ) {
-        Column {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "Coins Balance",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                AnimatedTextCounter(
-                    targetState = coins,
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-            }
-            DividerM3(modifier = Modifier.padding(vertical = 16.dp))
-            LazyColumn {
-                items(recharges) {
-                    RechargeItem(it, onRecharge = onRecharge)
-                }
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Coins Balance",
+                style = MaterialTheme.typography.titleLarge,
+            )
+            AnimatedTextCounter(
+                targetState = coins,
+                style = MaterialTheme.typography.headlineLarge,
+            )
+        }
+        DividerM3(modifier = Modifier.padding(vertical = 16.dp))
+        LazyColumn {
+            items(recharges) {
+                RechargeItem(it, onRecharge = onRecharge)
             }
         }
     }

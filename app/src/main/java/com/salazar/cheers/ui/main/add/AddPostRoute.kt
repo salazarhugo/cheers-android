@@ -48,7 +48,6 @@ fun AddPostRoute(
                 onSelectMedia = addPostViewModel::addPhoto,
                 onMediaSelectorClicked = { launcher.launch("image/* video/*") },
                 onSelectPrivacy = addPostViewModel::selectPrivacy,
-                onNameChanged = addPostViewModel::onNameChanged,
                 onAllowJoinChange = addPostViewModel::toggleAllowJoin
             )
         AddPostPage.ChooseOnMap ->

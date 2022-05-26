@@ -4,18 +4,23 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.paging.StoryRemoteMediator
+import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StoryRepository @Inject constructor(
+    private val goApi: GoApi,
     private val service: Neo4jService,
     private val database: CheersDatabase
 ) {
@@ -30,25 +35,49 @@ class StoryRepository @Inject constructor(
                 pageSize = NETWORK_PAGE_SIZE,
                 enablePlaceholders = true,
             ),
-            remoteMediator = StoryRemoteMediator(database = database, networkService = service),
+            remoteMediator = StoryRemoteMediator(database = database, networkService = goApi),
         ) {
             return@Pager storyDao.pagingSource()
         }.flow
     }
 
+    suspend fun addStory(story: Story) = withContext(Dispatchers.IO) {
+        try {
+            goApi.createStory(story = story)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun seenRemote(storyId: String) {
+        try {
+            goApi.seenStory(storyId = storyId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun deleteRemote(storyId: String) {
+        try {
+            goApi.deleteStory(storyId = storyId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun delete(storyId: String) {
         coroutineScope {
-            service.deleteStory(storyId = storyId)
+            deleteRemote(storyId = storyId)
         }
         storyDao.deleteWithId(storyId = storyId)
     }
 
     suspend fun seenStory(storyId: String) {
         coroutineScope {
-            service.seenStory(storyId = storyId)
+            seenRemote(storyId = storyId)
         }
         val story = storyDao.getStory(storyId = storyId)
-        storyDao.update(story = story.copy(seenBy = story.seenBy + FirebaseAuth.getInstance().currentUser?.uid!!))
+        storyDao.update(story = story.copy(seen = true))
     }
 
     fun sendReaction(

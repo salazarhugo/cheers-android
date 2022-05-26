@@ -1,6 +1,8 @@
 package com.salazar.cheers.backend
 
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -15,15 +17,42 @@ interface GoApi {
 
     @GET("events")
     suspend fun getEvents(
-        @Query("skip") skip: Int,
+        @Query("page") skip: Int,
         @Query("pageSize") pageSize: Int,
     ): List<Event>
 
     @GET("event/feed")
     suspend fun getEventFeed(
-        @Query("skip") skip: Int,
+        @Query("page") skip: Int,
         @Query("pageSize") pageSize: Int,
     ): List<Event>
+
+    @GET("posts/feed")
+    suspend fun postFeed(
+        @Query("page") skip: Int,
+        @Query("pageSize") pageSize: Int,
+    ): List<Post>
+
+    @GET("stories/feed")
+    suspend fun storyFeed(
+        @Query("page") skip: Int,
+        @Query("pageSize") pageSize: Int,
+    ): List<Story>
+
+    @POST("posts/create")
+    suspend fun createPost(
+        @Body() post: Post,
+    )
+
+    @POST("stories/create")
+    suspend fun createStory(
+        @Body() story: Story,
+    )
+
+    @POST("users/create")
+    suspend fun createUser(
+        @Body() user: User,
+    ): User
 
     @POST("event/create")
     suspend fun createEvent(
@@ -33,6 +62,36 @@ interface GoApi {
     @POST("event/update")
     suspend fun updateEvent(
         @Body() event: Event,
+    )
+
+    @GET("users/available/{username}")
+    suspend fun isUsernameAvailable(
+        @Path("username") username: String,
+    ): Boolean
+
+    @GET("users/{userIdOrUsername}")
+    suspend fun getUser(
+        @Path("userIdOrUsername") userIdOrUsername: String,
+    ): User
+
+    @POST("users/{userId}/block")
+    suspend fun blockUser(
+        @Path("userId") userId: String,
+    )
+
+    @POST("stories/{storyId}/seen")
+    suspend fun seenStory(
+        @Path("storyId") storyId: String,
+    )
+
+    @POST("posts/{postId}/delete")
+    suspend fun deletePost(
+        @Path("postId") postId: String,
+    )
+
+    @POST("stories/{storyId}/delete")
+    suspend fun deleteStory(
+        @Path("storyId") storyId: String,
     )
 
     @POST("event/delete")

@@ -3,7 +3,7 @@ package com.salazar.cheers.backend
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.gson.Gson
 import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.entities.StoryResponse
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -26,33 +26,7 @@ object Neo4jUtil {
         return map
     }
 
-    suspend fun addUser(user: User) {
-        val data = hashMapOf(
-            "user" to toMap(user),
-        )
-
-        FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("createUser")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-            .await()
-    }
-
-    fun updateProfilePicture(profilePictureUrl: String) {
-//        val params: MutableMap<String, Any> = mutableMapOf()
-//        params["profilePictureUrl"] = profilePictureUrl
-//        params["userId"] = FirebaseAuth.getInstance().uid!!
-//
-//        write(
-//            "MATCH (u:User { id: \$userId }) SET u.profilePictureUrl = \$profilePictureUrl",
-//            params
-//        )
-    }
-
-    suspend fun updateUser(
+    fun updateUser(
         username: String = "",
         name: String = "",
         bio: String = "",
@@ -77,138 +51,13 @@ object Neo4jUtil {
     }
 
 
-    suspend fun addStory(story: StoryResponse) = withContext(Dispatchers.IO) {
-        val json = Gson().toJson(story)
-
-        val data = hashMapOf(
-            "story" to json,
-        )
-
-        FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("createStory")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    fun addEvent(event: Event) {
-        val json = Gson().toJson(event)
-
-        val data = hashMapOf(
-            "post" to json,
-        )
-
-        FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("createPost")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    fun addPost(post: Post) {
-        val json = Gson().toJson(post)
-
-        val data = hashMapOf(
-            "post" to json,
-        )
-
-        FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("createPost")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    suspend fun leavePost(postId: String) {
-        val data = hashMapOf(
-            "postId" to postId,
-        )
-
-        FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("leavePost")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
     suspend fun getPostLikes(postId: String): Result<List<User>> {
         return Result.Success(emptyList())
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val params: MutableMap<String, Any> = mutableMapOf()
-//                params["postId"] = postId
-//
-//                val records = query(
-//                    "MATCH (p:Post { id: \$postId})<-[:LIKED]-(u:User) " +
-//                            "RETURN properties(u)",
-//                    params
-//                )
-//
-//                val users = mutableListOf<User>()
-//
-//                records.forEach { record ->
-//                    val gson = Gson()
-//                    val user = gson.fromJson(record.values()[0].toString(), User::class.java)
-//                    users.add(user)
-//                }
-//                return@withContext Result.Success(users.toList())
-//            } catch (e: Exception) {
-//                return@withContext Result.Error(e)
-//            }
-//        }
     }
 
     suspend fun queryFriends(query: String): List<User> {
         return emptyList()
-//        return withContext(Dispatchers.IO) {
-//            val params: MutableMap<String, Any> = mutableMapOf()
-//            params["query"] = query
-//            params["userId"] = FirebaseAuth.getInstance().uid!!
-//
-//            val records = query(
-//                "MATCH (u:User)-[:FOLLOWS]->(u2:User) " +
-//                        "WHERE u.id = \$userId AND u2.username CONTAINS \$query AND u2.id <> \$userId " +
-//                        "RETURN properties(u2) LIMIT 20",
-//                params
-//            )
-//
-//            val users = mutableListOf<User>()
-//
-//            records.forEach { record ->
-//                val gson = Gson()
-//                val user =
-//                    gson.fromJson(record.values()[0].toString(), User::class.java)
-//                users.add(user)
-//            }
-//
-//            return@withContext users.toList()
-//        }
     }
-
-    suspend fun isUsernameAvailable(username: String): Result<Boolean> =
-        withContext(Dispatchers.IO) {
-            val data = hashMapOf(
-                "username" to username,
-            )
-
-            return@withContext FirebaseFunctions.getInstance("europe-west2")
-                .getHttpsCallable("isUsernameAvailable")
-                .call(data)
-                .continueWith { task ->
-                    val result = task.result?.data as HashMap<*, *>
-                    val available = result["response"] as Boolean
-                    Result.Success(available)
-                }
-                .await()
-        }
 
     suspend fun addRegistrationToken(registrationToken: String) = withContext(Dispatchers.IO) {
         val data = hashMapOf(

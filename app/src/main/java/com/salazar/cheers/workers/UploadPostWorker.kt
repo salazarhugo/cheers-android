@@ -15,21 +15,22 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
 @HiltWorker
 class UploadPostWorker @AssistedInject constructor(
     @Assisted appContext: Context,
-    @Assisted params: WorkerParameters
+    @Assisted params: WorkerParameters,
+    private val postRepository: PostRepository,
 ) : CoroutineWorker(appContext, params) {
 
 
@@ -45,9 +46,6 @@ class UploadPostWorker @AssistedInject constructor(
 
         val postType =
             inputData.getString("POST_TYPE") ?: return Result.failure()
-
-        val name =
-            inputData.getString("NAME") ?: ""
 
         val beverage =
             inputData.getString("BEVERAGE") ?: return Result.failure()
@@ -148,58 +146,49 @@ class UploadPostWorker @AssistedInject constructor(
                     coroutineScope {
                         photos.toList().forEach { photoUri ->
                             val photoBytes = extractImage(Uri.parse(photoUri))
-                            async {
+                            launch {
                                 val uri = StorageUtil.uploadPostImage(photoBytes)
                                 downloadUrls.add(uri.toString())
                             }
                         }
                     }
 
-                    Log.d("Cloud Download Urls", downloadUrls.toString())
 
                     val post = Post(
-                        name = name,
                         type = postType,
                         caption = photoCaption,
                         photos = downloadUrls,
                         drunkenness = drunkenness,
                         beverage = beverage,
                         locationName = locationName,
-                        locationLatitude = latitude,
-                        locationLongitude = longitude,
+                        latitude = latitude,
+                        longitude = longitude,
                         privacy = privacy,
                         allowJoin = allowJoin,
                         tagUsersId = tagUserIds.toList()
                     )
 
-                    Neo4jUtil.addPost(post)
+                    postRepository.addPost(post = post)
                     makeStatusNotification("Successfully uploaded", appContext)
 
                 }
                 PostType.TEXT -> {
                     val post = Post(
-                        name = name,
                         type = postType,
                         caption = photoCaption,
                         drunkenness = drunkenness,
                         beverage = beverage,
                         locationName = locationName,
-                        locationLatitude = latitude,
-                        locationLongitude = longitude,
+                        latitude = latitude,
+                        longitude = longitude,
                         privacy = privacy,
                         allowJoin = allowJoin,
                         tagUsersId = tagUserIds.toList()
                     )
-                    Neo4jUtil.addPost(post)
+                    postRepository.addPost(post = post)
                     makeStatusNotification("Successfully uploaded", appContext)
                 }
             }
-//            setProgressAsync(workDataOf("Progress" to 0.0))
-//            delay(2000)
-//            setProgressAsync(workDataOf("Progress" to 50.0))
-//            delay(2000)
-//            setProgressAsync(workDataOf("Progress" to 100.0))
-//            delay(2000)
             return Result.success()
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")

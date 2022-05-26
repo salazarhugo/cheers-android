@@ -119,6 +119,10 @@ class ChatRepository @Inject constructor(
         getClient()!!.deleteRoom(request)
     }
 
+    suspend fun getRoomId(request: GetRoomIdReq) = withContext(Dispatchers.IO) {
+        return@withContext getClient()!!.getRoomId(request = request)
+    }
+
     suspend fun startTyping(channelId: String) = withContext(Dispatchers.IO) {
         try {
             val user = userRepository.getCurrentUser()

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
@@ -71,21 +72,17 @@ class EditProfileViewModel @Inject constructor(
         )
 
     init {
-        refreshUser()
+        viewModelScope.launch {
+            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!).collect { user ->
+                viewModelState.update {
+                    it.copy(user = user, isLoading = false)
+                }
+            }
+        }
     }
 
     val currentUser = mutableStateOf(User())
 
-    private fun refreshUser() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            viewModelState.update {
-                it.copy(user = user, isLoading = false)
-            }
-        }
-    }
 
     fun onSelectPicture(pictureUri: Uri) {
         viewModelState.update {

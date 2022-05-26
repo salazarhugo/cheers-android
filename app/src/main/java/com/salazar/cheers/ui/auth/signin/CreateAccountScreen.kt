@@ -33,9 +33,9 @@ import com.salazar.cheers.ui.auth.signup.SignUpUiState
 
 @Composable
 fun CreateAccountScreen(
-    uiState: SignUpUiState,
-    onPasswordChanged: (String) -> Unit,
-    onEmailChanged: (String) -> Unit,
+    username: String,
+    acceptTerms: Boolean,
+    isLoading: Boolean,
     onAcceptTermsChange: (Boolean) -> Unit,
     onSignUp: () -> Unit,
 ) {
@@ -53,24 +53,21 @@ fun CreateAccountScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(8.dp))
-            Text("Sign up as ${uiState.username}?", style = MaterialTheme.typography.headlineMedium)
+            Text("Sign up as $username?", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(8.dp))
             Text("You can't change it later")
             Spacer(Modifier.height(32.dp))
             AcceptTerms(
                 onAcceptTermsChange = onAcceptTermsChange,
-                acceptTerms = uiState.acceptTerms,
+                acceptTerms = acceptTerms,
                 onOpenLink = {
                     uriHandler.openUri(it)
                 })
             Spacer(Modifier.height(32.dp))
             SignUpButton(
-                uiState = uiState,
+                acceptTerms = acceptTerms,
+                isLoading = isLoading,
                 onSignUp = onSignUp,
-            )
-            ErrorMessage(
-                errorMessage = uiState.errorMessage,
-                paddingValues = PaddingValues(vertical = 8.dp)
             )
         }
 
@@ -147,7 +144,8 @@ fun AcceptTerms(
 
 @Composable
 fun SignUpButton(
-    uiState: SignUpUiState,
+    acceptTerms: Boolean,
+    isLoading: Boolean,
     onSignUp: () -> Unit,
 ) {
     Button(
@@ -156,9 +154,9 @@ fun SignUpButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = !uiState.isLoading && uiState.acceptTerms,
+        enabled = acceptTerms,
     ) {
-        if (uiState.isLoading)
+        if (isLoading)
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(30.dp)

@@ -69,32 +69,4 @@ class ChooseUsernameViewModel @Inject constructor(
         return isLowerCase(username) && hasValidChars(username) && username.matches(regex)
     }
 
-    fun isUsernameAvailable() {
-        updateErrorMessage("")
-        val username = uiState.value.username
-        // Ui state is refreshing
-        uiState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val result = Neo4jUtil.isUsernameAvailable(username)
-            if (result is Result.Success && !result.data)
-                updateErrorMessage("This username is taken")
-            uiState.update {
-                when (result) {
-                    is Result.Success -> it.copy(
-                        isAvailable = result.data && validateUsername(username = username),
-                        username = username,
-                        isLoading = false
-                    )
-                    is Result.Error -> {
-                        it.copy(
-                            isAvailable = false,
-                            errorMessage = it.errorMessage,
-                            isLoading = false
-                        )
-                    }
-                }
-            }
-        }
-    }
 }

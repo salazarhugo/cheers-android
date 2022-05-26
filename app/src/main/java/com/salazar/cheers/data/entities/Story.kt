@@ -2,7 +2,6 @@ package com.salazar.cheers.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.salazar.cheers.internal.User
 
@@ -12,25 +11,16 @@ object StoryType {
     const val VIDEO = "VIDEO"
 }
 
-@Entity(
-    tableName = "story",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["id"],
-            childColumns = ["authorId"],
-            onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.CASCADE
-        )
-    ]
-)
-data class StoryResponse(
+@Entity(tableName = "story")
+data class Story(
     @PrimaryKey
     @ColumnInfo(name = "storyId")
     val id: String = "",
     val authorId: String = "",
-    val name: String = "",
-    val seenBy: List<String> = emptyList(),
+    val username: String = "",
+    val verified: Boolean = false,
+    val profilePictureUrl: String = "",
+    val seen: Boolean = false,
     val created: Long = 0L,
     val relativeTime: String = "",
     val privacy: String = "",
@@ -42,4 +32,10 @@ data class StoryResponse(
     val locationName: String = "",
     val tagUsersId: List<String> = emptyList(),
     val type: String = StoryType.TEXT,
+)
+
+data class StoryDetail(
+    val story: Story,
+    val author: User = User(),
+    val viewers: List<User> = ArrayList()
 )

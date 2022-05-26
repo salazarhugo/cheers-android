@@ -22,6 +22,10 @@ import java.util.*
 
 object Utils {
 
+    fun getCurrentUserToken(): String {
+        return ""
+    }
+
     fun Context.copyToClipboard(text: CharSequence) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("label", text)

@@ -11,8 +11,8 @@ import com.google.firebase.auth.GetTokenResult
 import com.salazar.cheers.ChatServiceGrpcKt
 import com.salazar.cheers.GetRoomIdReq
 import com.salazar.cheers.backend.ChatService
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
+import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
@@ -28,30 +28,26 @@ sealed interface OtherProfileUiState {
 
     val isLoading: Boolean
     val errorMessages: List<String>
-    val shortLink: String?
 
     data class NoUser(
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
-        override val shortLink: String?,
     ) : OtherProfileUiState
 
     data class HasUser(
-        val postFlow: Flow<PagingData<PostFeed>> = emptyFlow(),
+        val postFlow: Flow<PagingData<Post>> = emptyFlow(),
         val user: User,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
-        override val shortLink: String?,
     ) : OtherProfileUiState
 }
 
 private data class OtherProfileViewModelState(
     val user: User? = null,
-    val postFlow: Flow<PagingData<PostFeed>> = emptyFlow(),
+    val postFlow: Flow<PagingData<Post>> = emptyFlow(),
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
-    val shortLink: String? = null,
 ) {
     fun toUiState(): OtherProfileUiState =
         if (user != null) {
@@ -60,13 +56,11 @@ private data class OtherProfileViewModelState(
                 postFlow = postFlow,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
-                shortLink = shortLink,
             )
         } else {
             OtherProfileUiState.NoUser(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
-                shortLink = shortLink,
             )
         }
 }
@@ -75,11 +69,12 @@ private data class OtherProfileViewModelState(
 class OtherProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
+    private val chatRepository: ChatRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))
-    lateinit var chatService: ChatService
+    lateinit var username: String
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -91,31 +86,17 @@ class OtherProfileViewModel @Inject constructor(
 
     init {
         savedStateHandle.get<String>("username")?.let { username ->
-            viewModelScope.launch {
-                userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
-                    updateUser(user)
-                }
-            }
+            this.username = username
         }
-        refresh()
+        getUser(false)
+        refreshUserPosts()
+    }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val user2 =
-                FirebaseAuth.getInstance().currentUser ?: throw Exception("User is not logged in.")
-            val task: Task<GetTokenResult> = user2.getIdToken(false)
-            val tokenResult = Tasks.await(task)
-            val idToken = tokenResult.token ?: throw Exception("idToken is null")
-
-            val managedChannel = ManagedChannelBuilder
-                .forAddress("chat-r3a2dr4u4a-nw.a.run.app", 443)
-                .build()
-
-            val client = ChatServiceGrpcKt
-                .ChatServiceCoroutineStub(managedChannel)
-                .withInterceptors(ErrorHandleInterceptor(idToken = idToken))
-
-
-            chatService = ChatService(client)
+    private fun getUser(fetchFromRemote: Boolean) {
+        viewModelScope.launch {
+            userRepository.getUserFlow(userIdOrUsername = username, fetchFromRemote).collect { user ->
+                updateUser(user)
+            }
         }
     }
 
@@ -124,20 +105,16 @@ class OtherProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             onSuccess(
-                chatService.getRoomId(
+                chatRepository.getRoomId(
                     GetRoomIdReq.newBuilder().setRecipientId(otherUserId).build()
                 ).roomId
             )
         }
     }
 
-    fun refresh() {
-        savedStateHandle.get<String>("username")?.let { username ->
-            viewModelScope.launch {
-                userRepository.refreshUser(userIdOrUsername = username)
-                refreshUserPosts(username = username)
-            }
-        }
+    fun onSwipeRefresh() {
+        getUser(true)
+        refreshUserPosts()
     }
 
 
@@ -159,15 +136,9 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateShortLink(shortLink: String) {
-        viewModelState.update {
-            it.copy(shortLink = shortLink)
-        }
-    }
-
-    private fun refreshUserPosts(username: String) {
+    private fun refreshUserPosts() {
         viewModelScope.launch {
-            val posts = postRepository.profilePostFeed(userIdOrUsername = username)
+            val posts = postRepository.profilePost(userIdOrUsername = username)
             viewModelState.update {
                 it.copy(postFlow = posts, isLoading = false)
             }

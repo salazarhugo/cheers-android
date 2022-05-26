@@ -30,7 +30,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.animations.AnimatedTextCounter
-import com.salazar.cheers.data.db.StoryDetail
+import com.salazar.cheers.data.entities.StoryDetail
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.search.UserCard
 import kotlin.math.absoluteValue
@@ -57,7 +57,7 @@ fun StoryStatsScreen(
             }
             val story = stories[pagerState.currentPage]
             Views(
-                views = story.story.seenBy.size,
+                views = 999,//story.story.seenBy.size,
                 viewers = story.viewers,
                 onUserClick = onUserClick,
                 onDeleteStory = { onDeleteStory(story.story.id) },

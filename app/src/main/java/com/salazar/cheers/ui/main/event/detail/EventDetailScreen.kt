@@ -64,21 +64,25 @@ fun EventDetailScreen(
         sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
     ) {
         Scaffold {
-            when (uiState) {
-                is EventDetailUiState.HasEvent -> Event(
-                    event = uiState.event,
-                    onMapClick = onMapClick,
-                    onUserClicked = onUserClicked,
-                    onManageClick = {
-                        scope.launch {
-                            state.show()
-                        }
-                    },
-                    onGoing = onGoing,
-                    onInterested = onInterested,
-                )
-                is EventDetailUiState.NoEvents -> {
-                    Text("No event")
+            Box(
+                modifier = Modifier.padding(it)
+            ) {
+                when (uiState) {
+                    is EventDetailUiState.HasEvent -> Event(
+                        event = uiState.event,
+                        onMapClick = onMapClick,
+                        onUserClicked = onUserClicked,
+                        onManageClick = {
+                            scope.launch {
+                                state.show()
+                            }
+                        },
+                        onGoing = onGoing,
+                        onInterested = onInterested,
+                    )
+                    is EventDetailUiState.NoEvents -> {
+                        Text("No event")
+                    }
                 }
             }
         }

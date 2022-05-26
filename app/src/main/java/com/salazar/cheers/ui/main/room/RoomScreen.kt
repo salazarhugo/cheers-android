@@ -42,6 +42,7 @@ fun RoomScreen(
     ) {
         LazyColumn(
             modifier = Modifier
+                .padding(it)
                 .fillMaxWidth()
         ) {
             item {

@@ -5,8 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,14 +23,14 @@ sealed interface PostDetailUiState {
     ) : PostDetailUiState
 
     data class HasPost(
-        val postFeed: PostFeed,
+        val postFeed: Post,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : PostDetailUiState
 }
 
 private data class PostDetailViewModelState(
-    val postFeed: PostFeed? = null,
+    val postFeed: Post? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
@@ -59,6 +57,7 @@ class PostDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PostDetailViewModelState(isLoading = true))
+    lateinit var postId: String
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -68,7 +67,6 @@ class PostDetailViewModel @Inject constructor(
             viewModelState.value.toUiState()
         )
 
-    var postId: String = ""
 
     init {
         stateHandle.get<String>("postId")?.let { postId ->
@@ -95,7 +93,7 @@ class PostDetailViewModel @Inject constructor(
     fun leavePost() {
         viewModelScope.launch {
             try {
-                Neo4jUtil.leavePost(postId = postId)
+//                Neo4jUtil.leavePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("HomeViewModel", e.toString())
             }
@@ -105,7 +103,7 @@ class PostDetailViewModel @Inject constructor(
     fun deletePost() {
         viewModelScope.launch {
             try {
-                service.deletePost(postId = postId)
+                postRepository.deletePost(postId = postId)
             } catch (e: Exception) {
                 Log.e("PostDetailViewModel", e.toString())
             }

@@ -7,8 +7,8 @@ import androidx.paging.map
 import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.paging.PostRemoteMediator
+import com.salazar.cheers.data.repository.StoryRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
@@ -26,37 +26,38 @@ class PostRepository @Inject constructor(
 ) {
     val postDao = database.postDao()
 
-    suspend fun getPosts(): Flow<PagingData<PostFeed>> {
+    fun getPosts(): Flow<PagingData<Post>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
                 enablePlaceholders = true,
             ),
-            remoteMediator = PostRemoteMediator(database = database, networkService = service),
+            remoteMediator = PostRemoteMediator(database = database, service = goApi),
         ) {
             postDao.pagingSourceFeed()
-        }.flow.map {
-            it.map {
-                it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
-            }
+        }.flow
+    }
+
+    fun profilePost(userIdOrUsername: String): Flow<PagingData<Post>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = NETWORK_PAGE_SIZE,
+                enablePlaceholders = true,
+            ),
+            remoteMediator = PostRemoteMediator(database = database, service = goApi),
+        ) {
+            postDao.profilePost(userIdOrUsername = userIdOrUsername)
+        }.flow
+    }
+
+    suspend fun addPost(post: Post) {
+        try {
+            goApi.createPost(post = post)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    fun profilePostFeed(userIdOrUsername: String): Flow<PagingData<PostFeed>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = NETWORK_PAGE_SIZE,
-                enablePlaceholders = true,
-            ),
-            remoteMediator = PostRemoteMediator(database = database, networkService = service),
-        ) {
-            postDao.profilePostFeed(userIdOrUsername = userIdOrUsername)
-        }.flow.map {
-            it.map {
-                it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
-            }
-        }
-    }
 
     suspend fun getPostsWithUsername(username: String): List<Post> {
         return postDao.getPostsWithUsername(username = username)
@@ -66,31 +67,39 @@ class PostRepository @Inject constructor(
         return postDao.getPostsWithAuthorId(authorId = authorId)
     }
 
-    suspend fun deletePost(postId: String) = service.deletePost(postId = postId)
-
-    suspend fun getMapPosts(privacy: Privacy): List<PostFeed> {
-        return postDao.getMapPosts(privacy = privacy).map {
-            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+    suspend fun deletePost(postId: String) {
+        try {
+            goApi.deletePost(postId = postId)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    suspend fun getPost(postId: String): PostFeed {
-        val post = postDao.getPost(postId = postId)
-        return post.copy(tagUsers = postDao.getPostUsers(post.post.tagUsersId))
-    }
+        suspend fun getMapPosts(privacy: Privacy): List<Post> {
+            return postDao.getMapPosts(privacy = privacy)
+//            .map {
+//            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
+//        }
+        }
 
-    suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {
-        val likes = if (post.liked) post.likes - 1 else post.likes + 1
+        suspend fun getPost(postId: String): Post {
+            val post = postDao.getPost(postId = postId)
+            return post.copy()
+        }
 
-        postDao.update(post.copy(liked = !post.liked, likes = likes))
+        suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {
+            val likes = if (post.liked) post.likes - 1 else post.likes + 1
 
-        if (post.liked)
-            goApi.unlikePost(postId = post.id)
-        else
-            goApi.likePost(postId = post.id)
-    }
+            postDao.update(post.copy(liked = !post.liked, likes = likes))
 
-    companion object {
+            if (post.liked)
+                goApi.unlikePost(postId = post.id)
+            else
+                goApi.likePost(postId = post.id)
+        }
+
+        companion object {
         const val NETWORK_PAGE_SIZE = 10
+    }
     }
 }

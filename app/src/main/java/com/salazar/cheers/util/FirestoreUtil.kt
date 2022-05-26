@@ -70,40 +70,6 @@ object FirestoreUtil {
         }
     }
 
-    fun initCurrentUserIfFirstTime(
-        acct: GoogleSignInAccount? = null,
-        email: String = "",
-        username: String,
-        name: String = "",
-        onComplete: (exists: Boolean) -> Unit,
-    ) {
-        currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot.exists()) {
-                onComplete(true)
-                return@addOnSuccessListener
-            }
-
-            val id = FirebaseAuth.getInstance().currentUser!!.uid
-//            val fullName = if (acct != null) "${acct.givenName} ${acct.familyName}" else ""
-            val profilePicturePath = if (acct?.photoUrl != null) acct.photoUrl.toString() else ""
-
-            val newUser = User().copy(
-                id = id,
-                name = name,
-                username = username,
-                profilePictureUrl = profilePicturePath,
-                email = FirebaseAuth.getInstance().currentUser?.email ?: email,
-            )
-            currentUserDocRef.set(newUser)
-            GlobalScope.launch {
-                Neo4jUtil.addUser(newUser)
-            }
-            onComplete(false)
-        }.addOnFailureListener {
-            Log.e("Firestore", it.toString())
-        }
-    }
-
     fun getComments(postId: String): Flow<List<Comment>> = callbackFlow {
 
         val commentsDocument = firestoreInstance
@@ -175,25 +141,6 @@ object FirestoreUtil {
     }
 
 
-    suspend fun listenUser(): Flow<User> = callbackFlow {
-        val subscription = currentUserDocRef.addSnapshotListener { doc, e ->
-            if (e != null) {
-                Log.e(TAG, "Listen failed", e)
-                return@addSnapshotListener
-            }
-
-            if (doc == null || !doc.exists())
-                return@addSnapshotListener
-
-            val pro = doc.toObject(User::class.java)!!
-            trySend(pro).isSuccess
-        }
-
-        awaitClose {
-            subscription.remove()
-        }
-    }
-
     fun getCurrentUserDocumentLiveData(): LiveData<User> {
         val currentUser: MutableLiveData<User> = MutableLiveData()
         currentUserDocRef.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -254,7 +201,6 @@ object FirestoreUtil {
             .addOnFailureListener { }
     }
 
-    //region FCM
     fun getFCMRegistrationTokens(onComplete: (tokens: MutableList<String>) -> Unit) {
         currentUserDocRef.get().addOnSuccessListener {
             val user = it.toObject(User::class.java)!!
@@ -265,6 +211,4 @@ object FirestoreUtil {
     fun addFCMRegistrationToken(token: String) {
         currentUserDocRef.update("registrationTokens", FieldValue.arrayUnion(token))
     }
-//endregion FCM
-
 }

@@ -41,7 +41,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.story.StoryProgressBar
 import com.salazar.cheers.components.utils.PrettyImage
-import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.launch
@@ -115,8 +115,8 @@ fun StoryCarousel(
         var isPaused by remember { mutableStateOf(false) }
 
         LaunchedEffect(currentPage) {
-            if (page == currentPage && !story.story.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid))
-                onStoryOpen(story.story.id)
+            if (page == currentPage && !story.seen)
+                onStoryOpen(story.id)
         }
 
         if ((page - 1) % 3 == 0) {
@@ -128,7 +128,7 @@ fun StoryCarousel(
                 StoryFooter(
                     story = story,
                     value = value,
-                    isUserMe = story.author.id == FirebaseAuth.getInstance().currentUser?.uid!!,
+                    isUserMe = story.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
                     onInputChange = onInputChange,
                     onSendReaction = { onSendReaction(story, it) },
                     onFocusChange = { isPaused = it },
@@ -155,29 +155,32 @@ fun StoryCarousel(
                 }
         ) {
             PrettyImage(
-                data = stories[page].story.photoUrl,
+                data = stories[page].photoUrl,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
+                    .padding(it)
                     .aspectRatio(9 / 16f)
                     .clip(RoundedCornerShape(16.dp))
                     .fillMaxWidth()
                     .clickable {
-                        onStoryUIAction(StoryUIAction.OnTap, story.story.id)
+                        onStoryUIAction(StoryUIAction.OnTap, story.id)
                     }
             )
             StoryHeader(
                 currentPage = currentPage,
                 page = page,
-                user = stories[page].author,
+                username = story.username,
+                profilePictureUrl = story.profilePictureUrl,
+                verified = story.verified,
                 onStoryFinish = {
                     isPaused = false
                     onStoryFinish()
                 },
                 onUserClick = onUserClick,
                 pause = isPaused,
-                created = story.story.created,
+                created = story.created,
             )
         }
     }
@@ -187,8 +190,10 @@ fun StoryCarousel(
 fun StoryHeader(
     currentPage: Int,
     page: Int,
+    username: String,
+    verified: Boolean,
+    profilePictureUrl: String,
     created: Long,
-    user: User,
     onStoryFinish: () -> Unit,
     onUserClick: (String) -> Unit,
     pause: Boolean,
@@ -202,14 +207,14 @@ fun StoryHeader(
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
         PostHeader(
-            username = user.username,
-            verified = user.verified,
+            username = username,
+            verified = verified,
             created = created,
             beverage = Beverage.NONE,
             darkMode = true,
             public = false,
             locationName = "",
-            profilePictureUrl = user.profilePictureUrl,
+            profilePictureUrl = profilePictureUrl,
             onHeaderClicked = onUserClick,
             onMoreClicked = {},
         )
@@ -262,7 +267,7 @@ fun StoryMeFooter(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.clickable {
-                onStoryUIAction(StoryUIAction.OnActivity, story.story.id)
+                onStoryUIAction(StoryUIAction.OnActivity, story.id)
             }
         ) {
             Icon(
@@ -278,7 +283,7 @@ fun StoryMeFooter(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.clickable {
-                onStoryUIAction(StoryUIAction.OnDelete, story.story.id)
+                onStoryUIAction(StoryUIAction.OnDelete, story.id)
             }
         ) {
             Icon(

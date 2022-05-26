@@ -37,6 +37,7 @@ fun SettingsRoute(
                 is SettingsUIAction.OnNotificationsClick -> navActions.navigateToNotifications()
                 is SettingsUIAction.OnPrivacyPolicyClick -> uriHandler.openUri("https://cheers-a275e.web.app/privacy-policy")
                 is SettingsUIAction.OnTermsOfUseClick -> uriHandler.openUri("https://cheers-a275e.web.app/terms-of-use")
+                is SettingsUIAction.OnSecurityClick -> navActions.navigateToSecurity()
             }
         },
         navigateToBecomeVip = {},
@@ -52,4 +53,5 @@ sealed class SettingsUIAction {
     object OnRechargeClick : SettingsUIAction()
     object OnPrivacyPolicyClick : SettingsUIAction()
     object OnTermsOfUseClick : SettingsUIAction()
+    object OnSecurityClick : SettingsUIAction()
 }

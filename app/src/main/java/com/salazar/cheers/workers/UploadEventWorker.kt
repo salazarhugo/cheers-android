@@ -91,7 +91,7 @@ class UploadEventWorker @AssistedInject constructor(
             )
 
             if (imageUri == null || imageUri == "null")
-                Neo4jUtil.addEvent(event)
+                eventRepository.uploadEvent(event)
             else {
                 val photoBytes = extractImage(Uri.parse(imageUri))
 

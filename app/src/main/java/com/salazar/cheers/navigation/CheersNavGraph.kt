@@ -5,6 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,6 +39,12 @@ fun CheersNavGraph(
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
 
+    LaunchedEffect(user) {
+        if (user == null)
+            return@LaunchedEffect
+        navActions.navigateToMain()
+    }
+
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -50,11 +57,11 @@ fun CheersNavGraph(
     ) {
         Scaffold(
             bottomBar = {
-                val visible =
-                    navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.MAIN_ROUTE } == true &&
-                            !currentRoute.contains(MainDestinations.STORY_ROUTE) && !currentRoute.contains(
-                        MainDestinations.CHAT_ROUTE) && !currentRoute.contains(MainDestinations.EVENT_DETAIL_ROUTE)
-                if (visible)
+                val hide = navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
+                        || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
+                        || currentRoute.contains(MainDestinations.STORY_ROUTE)
+
+                if (!hide)
                     Column {
                         DividerM3()
                         CheersNavigationBar(

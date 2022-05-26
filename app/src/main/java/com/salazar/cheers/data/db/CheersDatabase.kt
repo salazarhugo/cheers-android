@@ -21,7 +21,7 @@ import java.util.*
         RemoteKey::class,
         StoryRemoteKey::class,
         EventRemoteKey::class,
-        StoryResponse::class,
+        Story::class,
         ChatChannel::class,
         ChatMessage::class,
         UserStats::class,

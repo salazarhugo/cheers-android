@@ -12,11 +12,11 @@ interface UserDao {
     @Query("SELECT * FROM users")
     fun pagingSource(): PagingSource<Int, User>
 
-    @Query("SELECT * FROM users WHERE users.id = :userId")
-    suspend fun getUser(userId: String): User
+    @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
+    suspend fun getUser(userIdOrUsername: String): User
 
-    @Query("SELECT * FROM users WHERE users.id = :userId")
-    suspend fun getUserNullable(userId: String): User?
+    @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
+    suspend fun getUserNullable(userIdOrUsername: String): User?
 
     @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' ")
     suspend fun searchUser(query: String): List<User>
@@ -25,7 +25,7 @@ interface UserDao {
     suspend fun getUserWithUsername(userIdOrUsername: String): User
 
     @Query("SELECT * FROM users WHERE id = :userIdOrUsername OR username = :userIdOrUsername")
-    fun getUserFlowWithUsername(userIdOrUsername: String): Flow<User>
+    fun getUserFlow(userIdOrUsername: String): Flow<User?>
 
     @Query("SELECT users.id FROM users WHERE users.username = :username")
     suspend fun getUserIdWithUsername(username: String): String

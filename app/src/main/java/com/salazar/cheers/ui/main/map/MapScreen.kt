@@ -44,7 +44,7 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.salazar.cheers.R
 import com.salazar.cheers.components.utils.Permission
-import com.salazar.cheers.data.db.PostFeed
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
@@ -59,7 +59,7 @@ import java.net.URL
 fun MapScreen(
     uiState: MapUiState,
     onCityChanged: (String) -> Unit,
-    onSelectPost: (PostFeed) -> Unit,
+    onSelectPost: (Post) -> Unit,
     onTogglePublic: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     onAddPostClicked: () -> Unit,
@@ -101,8 +101,11 @@ fun MapScreen(
                 }
             }
         ) {
-            Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
-                Box(contentAlignment = Alignment.BottomCenter) {
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier.padding(it),
+                ) {
+                    Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
                         factory = {
@@ -156,16 +159,16 @@ private fun addUserAnnotations(
 
 private fun addPostsAnnotations(
     context: Context,
-    posts: List<PostFeed>?,
+    posts: List<Post>?,
     mapView: MapView,
-    onSelectPost: (PostFeed) -> Unit,
+    onSelectPost: (Post) -> Unit,
 ) {
     val annotationApi = mapView.annotations
     posts?.forEach {
-        if (it.post.type == PostType.IMAGE) {
+        if (it.type == PostType.IMAGE) {
             val pointAnnotationManager = annotationApi.createPointAnnotationManager()
             val pointAnnotationOptions = PointAnnotationOptions()
-                .withPoint(Point.fromLngLat(it.post.locationLongitude, it.post.locationLatitude))
+                .withPoint(Point.fromLngLat(it.longitude, it.latitude))
                 .withIconImage(bitmapFromDrawableRes(context, resourceId = R.drawable.ic_beer)!!)
                 .withIconSize(1.5)
             pointAnnotationManager.create(pointAnnotationOptions)
@@ -186,7 +189,7 @@ fun UiLayer(
     uiState: MapUiState,
     mapView: MapView,
     isPublic: Boolean,
-    onSelectPost: (PostFeed) -> Unit,
+    onSelectPost: (Post) -> Unit,
     onTogglePublic: () -> Unit,
     onAddPostClicked: () -> Unit,
 ) {
@@ -279,8 +282,8 @@ private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) 
 }
 
 private fun onPostAnnotationClick(
-    post: PostFeed,
-    onSelectPost: (PostFeed) -> Unit,
+    post: Post,
+    onSelectPost: (Post) -> Unit,
     mapView: MapView,
 ): OnPointAnnotationClickListener {
     return OnPointAnnotationClickListener {
@@ -289,8 +292,8 @@ private fun onPostAnnotationClick(
             cameraOptions = CameraOptions.Builder()
                 .center(
                     Point.fromLngLat(
-                        post.post.locationLongitude,
-                        post.post.locationLatitude - 0.01
+                        post.longitude,
+                        post.latitude - 0.01
                     )
                 )
                 .zoom(13.0)

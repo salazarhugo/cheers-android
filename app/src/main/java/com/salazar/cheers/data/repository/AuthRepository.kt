@@ -1,24 +1,37 @@
 package com.salazar.cheers.data.repository
 
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.actionCodeSettings
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.service.MyFirebaseMessagingService
+import com.salazar.cheers.util.FirestoreUtil
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val service: Neo4jService,
+    private val service: GoApi,
     private val userDao: UserDao,
     private val auth: FirebaseAuth,
 ) {
+
 
     fun isUserAuthenticatedInFirebase() = auth.currentUser != null
 
@@ -40,16 +53,47 @@ class AuthRepository @Inject constructor(
             return Result.Success(null)
 
         val userId = auth.currentUser?.uid!!
-        val user = userDao.getUserNullable(userId = userId)
+        val user = userDao.getUserNullable(userIdOrUsername = userId)
         if (user != null)
             return Result.Success(user)
 
-        return service.getUser(userIdOrUsername = userId)
+        return try {
+            val user = service.getUser(userIdOrUsername = userId)
+            Result.Success(user)
+        }catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    fun sendSignInLink(email: String): Task<Void> {
+        val actionCodeSettings = actionCodeSettings {
+            url = "https://cheers-a275e.web.app/signIn"
+            handleCodeInApp = true
+            setIOSBundleId("com.salazar.cheers")
+            setAndroidPackageName(
+                "com.salazar.cheers",
+                true,
+                "12"
+            )
+        }
+        return Firebase.auth.sendSignInLinkToEmail(email, actionCodeSettings)
+    }
+
+    fun reAuthenticate(email: String) {
+//        val user = Firebase.auth.currentUser!!
+//        sendSignInLink(email = email)
+//
+//        val credential = EmailAuthProvider
+//            .getCredentialWithLink("user@example.com", )
+//
+//        user.reauthenticate(credential)
+//            .addOnCompleteListener { Log.d(TAG, "User re-authenticated.") }
     }
 
     fun getUserAuthState() = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
-            trySend(auth.currentUser == null)
+            trySend(auth.currentUser)
         }
 
         auth.addAuthStateListener(authStateListener)
@@ -58,5 +102,18 @@ class AuthRepository @Inject constructor(
             auth.removeAuthStateListener(authStateListener)
         }
     }
+
+    fun getUserIdToken() = callbackFlow {
+        val authStateListener = FirebaseAuth.IdTokenListener { auth ->
+            trySend(auth.currentUser)
+        }
+
+        auth.addIdTokenListener(authStateListener)
+
+        awaitClose {
+            auth.removeIdTokenListener(authStateListener)
+        }
+    }
+
 }
 

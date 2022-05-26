@@ -30,7 +30,6 @@ class UploadProfilePicture @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val appContext = applicationContext
 
         val photoUriInput =
             inputData.getString("PHOTO_URI") ?: return Result.failure()
@@ -40,14 +39,12 @@ class UploadProfilePicture @AssistedInject constructor(
             val photoBytes = extractImage(Uri.parse(photoUriInput))
 
             StorageUtil.uploadProfilePhoto(photoBytes) { downloadUrl ->
-                GlobalScope.launch {
-                    Neo4jUtil.updateUser(
-                        name = "",
-                        website = "",
-                        bio = "",
-                        profilePictureUrl = downloadUrl
-                    )
-                }
+                Neo4jUtil.updateUser(
+                    name = "",
+                    website = "",
+                    bio = "",
+                    profilePictureUrl = downloadUrl
+                )
             }
             return Result.success()
         } catch (throwable: Throwable) {

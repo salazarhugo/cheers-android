@@ -45,7 +45,11 @@ fun EditProfileScreen(
             MyTopAppBar("Edit Profile", onDismiss, onSave)
         },
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .verticalScroll(rememberScrollState())
+        ) {
             if (uiState.isLoading)
                 LoadingScreen()
             else {

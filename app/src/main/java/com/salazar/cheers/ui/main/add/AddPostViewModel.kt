@@ -30,7 +30,6 @@ data class AddPostUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
-    val name: String = "",
     val drunkenness: Int = 0,
     val caption: String = "",
     val beverage: Beverage = Beverage.NONE,
@@ -122,12 +121,6 @@ class AddPostViewModel @Inject constructor(
         }
     }
 
-    fun onNameChanged(name: String) {
-        viewModelState.update {
-            it.copy(name = name)
-        }
-    }
-
     fun updateLocationPoint(point: Point) {
         viewModelState.update {
             it.copy(locationPoint = point)
@@ -178,7 +171,6 @@ class AddPostViewModel @Inject constructor(
                         "PHOTOS" to uiState.photos.map { it.toString() }.toTypedArray(),
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
-                        "NAME" to uiState.name,
                         "DRUNKENNESS" to uiState.drunkenness,
                         "BEVERAGE" to uiState.beverage.name,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,

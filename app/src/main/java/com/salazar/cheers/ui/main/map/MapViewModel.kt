@@ -26,9 +26,9 @@ import com.mapbox.maps.plugin.locationcomponent.location2
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.util.Utils.isDarkModeOn
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,9 +43,9 @@ import javax.inject.Inject
 data class MapUiState(
     val geojson: FeatureCollection? = null,
     val users: List<Feature> = emptyList(),
-    val posts: List<PostFeed>? = null,
+    val posts: List<Post>? = null,
     val city: String = "",
-    val selectedPost: PostFeed? = null,
+    val selectedPost: Post? = null,
     val isLoading: Boolean = false,
     val isPublic: Boolean = false,
     val postSheetState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
@@ -89,7 +89,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateMapPosts(mapPosts: List<PostFeed>) {
+    private fun updateMapPosts(mapPosts: List<Post>) {
         viewModelState.update {
             it.copy(posts = mapPosts, isLoading = false)
         }
@@ -101,7 +101,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectPost(post: PostFeed) {
+    fun selectPost(post: Post) {
         viewModelState.update {
             it.copy(selectedPost = post)
         }

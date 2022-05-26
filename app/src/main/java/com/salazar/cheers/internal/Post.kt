@@ -11,15 +11,15 @@ object PostType {
 
 @Entity(
     tableName = "posts",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["id"],
-            childColumns = ["authorId"],
-            onDelete = CASCADE,
-            onUpdate = CASCADE,
-        )
-    ],
+//    foreignKeys = [
+//        ForeignKey(
+//            entity = User::class,
+//            parentColumns = ["id"],
+//            childColumns = ["authorId"],
+//            onDelete = CASCADE,
+//            onUpdate = CASCADE,
+//        )
+//    ],
     indices = [
         Index(value = ["authorId"])
     ]
@@ -29,13 +29,14 @@ data class Post(
     @ColumnInfo(name = "postId")
     val id: String = "",
     val authorId: String = "",
-    val name: String = "",
     val caption: String = "",
+    val username: String = "",
+    val verified: Boolean = false,
+    val profilePictureUrl: String = "",
     val created: Long = 0,
     val relativeTime: String = "",
-    var likes: Int = 0,
-    var liked: Boolean = false,
-    val duration: String = "",
+    val likes: Int = 0,
+    val liked: Boolean = false,
     val beverage: String = "",
     val comments: Int = 0,
     val shares: Int = 0,
@@ -44,8 +45,8 @@ data class Post(
     val videoUrl: String = "",
     val videoThumbnailUrl: String = "",
     val drunkenness: Int = 0,
-    val locationLatitude: Double = 0.0,
-    val locationLongitude: Double = 0.0,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
     val locationName: String = "",
     val allowJoin: Boolean = true,
     val tagUsersId: List<String> = emptyList(),

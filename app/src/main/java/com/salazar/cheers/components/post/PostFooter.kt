@@ -18,16 +18,14 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.salazar.cheers.R
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.ui.main.home.TagUsers
 
 @Composable
 fun PostFooter(
-    postFeed: PostFeed,
+    post: Post,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (PostFeed) -> Unit,
+    navigateToComments: (Post) -> Unit,
     pagerState: PagerState,
 ) {
     Column(
@@ -36,7 +34,7 @@ fun PostFooter(
             .padding(16.dp),
     ) {
 
-        if (postFeed.post.photos.size > 1)
+        if (post.photos.size > 1)
             HorizontalPagerIndicator(
                 pagerState = pagerState,
                 modifier = Modifier
@@ -46,17 +44,17 @@ fun PostFooter(
 //        Text(postFeed.post.tagUsersId.toString())
 //        Text(postFeed.tagUsers.toString())
         PostFooterButtons(
-            postFeed.post,
+            post,
             onLike = onLike,
-            navigateToComments = { navigateToComments(postFeed) },
+            navigateToComments = { navigateToComments(post) },
         )
-        if (postFeed.post.type != PostType.TEXT) {
+        if (post.type != PostType.TEXT) {
 //            LikedBy(post = postFeed.post)
-            if (postFeed.tagUsers.isNotEmpty())
-                TagUsers(postFeed.tagUsers)
+//            if (post.tagUsers.isNotEmpty())
+//                TagUsers(postFeed.tagUsers)
         }
     }
-    if (postFeed.post.type != PostType.TEXT)
+    if (post.type != PostType.TEXT)
         Spacer(Modifier.height(12.dp))
 }
 

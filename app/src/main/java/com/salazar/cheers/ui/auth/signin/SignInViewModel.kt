@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.actionCodeSettings
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.repository.AuthRepository
@@ -35,39 +38,7 @@ class SignInViewModel @Inject constructor(
             viewModelState.value
         )
 
-    init {
-//        val channel = ManagedChannelBuilder.forAddress("localhost", 5000)
-//            .executor(Dispatchers.IO.asExecutor())
-//            .build()
-//        val client = ServicesGrpcKt.ServicesCoroutineStub(channel = channel)
-//
-//        viewModelScope.launch {
-//            client.chatService(flow {
-//                emit(
-//                    FromClient.newBuilder()
-//                        .setBody("Hello there!")
-//                        .setName("Lars")
-//                        .build()
-//                )
-//            }).collect {
-//                Log.d("gRPC", it.toString())
-//            }
-//        }
-
-        viewModelScope.launch {
-            authRepository.getUserAuthState().collect {
-                when (val result = authRepository.getUser()) {
-                    is Result.Success -> {
-                        viewModelState.update {
-                            it.copy(isSignedIn = result.data != null)
-                        }
-                        getAndSaveRegistrationToken()
-                    }
-                    is Result.Error -> {}
-                }
-            }
-        }
-    }
+    init {}
 
     fun onPasswordChange(password: String) {
         viewModelState.update {
@@ -95,11 +66,8 @@ class SignInViewModel @Inject constructor(
 
     private fun validateInput(
         email: String,
-        password: String
     ): Boolean {
-        if (email.isBlank() || password.isBlank())
-            return false
-        return true
+        return email.isNotBlank()
     }
 
     private fun getAndSaveRegistrationToken() {
@@ -125,31 +93,26 @@ class SignInViewModel @Inject constructor(
         val email = uiState.value.email
         val password = uiState.value.password
 
-        if (!validateInput(email, password)) {
-            updateErrorMessage("Fields can't be empty")
+        if (!validateInput(email )) {
+            updateErrorMessage("Email can't be empty")
             return
         }
 
         updateIsLoading(true)
 
-//        viewModelScope.launch {
-//            authRepository.signInWithEmailAndPassword(email = email, password = password).collect { response ->
-//                viewModelState.update {
-//                    it.copy(isSignedIn = response)
-//                }
-//            }
-//        }
-
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-            .addOnFailureListener {
-                updateErrorMessage("Authentication failed: ${it.message}")
-            }
-            .addOnSuccessListener {
-                getAndSaveRegistrationToken()
-            }
-            .addOnCompleteListener { task ->
-                updateIsLoading(false)
-            }
+        if (password.isBlank())
+            authRepository.sendSignInLink(email)
+        else
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnFailureListener {
+                    updateErrorMessage("Authentication failed: ${it.message}")
+                }
+                .addOnSuccessListener {
+                    getAndSaveRegistrationToken()
+                }
+                .addOnCompleteListener { task ->
+                    updateIsLoading(false)
+                }
     }
 
     fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
@@ -159,6 +122,8 @@ class SignInViewModel @Inject constructor(
                 updateErrorMessage("Authentication failed: ${it.message}")
             }
             .addOnSuccessListener {
+                val isNew = it.additionalUserInfo!!.isNewUser
+
                 getAndSaveRegistrationToken()
                 signInSuccessful(acct)
             }

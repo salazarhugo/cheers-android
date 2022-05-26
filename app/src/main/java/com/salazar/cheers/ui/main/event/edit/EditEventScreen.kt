@@ -69,9 +69,7 @@ fun EditEventScreen(
                 )
                 DividerM3()
                 LocationSection("", navigateToChooseOnMap = {})
-                ShareButton(onDismiss = { /*TODO*/ }) {
-                    onSave()
-                }
+                ShareButton(onClick = onSave, text = "Share")
             }
         }
 }

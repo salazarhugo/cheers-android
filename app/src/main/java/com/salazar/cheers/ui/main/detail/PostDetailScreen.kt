@@ -45,7 +45,6 @@ import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.utils.PrettyImage
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
@@ -65,7 +64,7 @@ fun PostDetailScreen(
     onToggleLike: (Post) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
-    val post = uiState.postFeed.post
+    val post = uiState.postFeed
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
 
     Scaffold(
@@ -81,6 +80,7 @@ fun PostDetailScreen(
         Column(
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .padding(it)
         ) {
             Post(
                 postFeed = uiState.postFeed,
@@ -190,7 +190,7 @@ fun PostDetails(
 
 @Composable
 fun Post(
-    postFeed: PostFeed,
+    postFeed: Post,
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
     onDelete: () -> Unit,
@@ -200,109 +200,109 @@ fun Post(
     onToggleLike: (Post) -> Unit,
     isAuthor: Boolean,
 ) {
-    val post = postFeed.post
-    val author = postFeed.author
-    val postUsers = postFeed.tagUsers
-
-    val uid = FirebaseAuth.getInstance().currentUser?.uid
-    val joined = post.tagUsersId.contains(uid)
-
-    Column {
-        LazyColumn {
-
-            item {
-                PostDetails(
-                    privacy = Privacy.valueOf(postFeed.post.privacy),
-                    created = post.created,
-                    drunkenness = post.drunkenness,
-                )
-            }
-
-            item {
-                Buttons(
-                    joined = joined,
-                    onLeave = onLeave,
-                    onMessageClicked = onMessageClicked
-                )
-            }
-
-            if (post.locationName.isNotBlank())
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Bottom,
-                    ) {
-                        Text(
-                            text = "Hangout event",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Column {
+//    val post = postFeed.post
+//    val author = postFeed.author
+//    val postUsers = postFeed.tagUsers
+//
+//    val uid = FirebaseAuth.getInstance().currentUser?.uid
+//    val joined = post.tagUsersId.contains(uid)
+//
+//    Column {
+//        LazyColumn {
+//
+//            item {
+//                PostDetails(
+//                    privacy = Privacy.valueOf(postFeed.post.privacy),
+//                    created = post.created,
+//                    drunkenness = post.drunkenness,
+//                )
+//            }
+//
+//            item {
+//                Buttons(
+//                    joined = joined,
+//                    onLeave = onLeave,
+//                    onMessageClicked = onMessageClicked
+//                )
+//            }
+//
+//            if (post.locationName.isNotBlank())
+//                item {
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(horizontal = 16.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.Bottom,
+//                    ) {
 //                        Text(
-//                            text = String.format("%.2f", post.locationLongitude),
+//                            text = "Hangout event",
 //                            style = MaterialTheme.typography.titleMedium
 //                        )
-//                        Text(
-//                            text = String.format("%.2f", post.locationLatitude),
-//                            style = MaterialTheme.typography.titleMedium
-//                        )
-                        }
-                    }
-                    StaticMap(
-                        longitude = post.locationLongitude,
-                        latitude = post.locationLatitude,
-                        onMapClick = onMapClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .aspectRatio(1f),
-                    )
-                }
-            item {
-                PostHeader(
-                    username = author.username,
-                    verified = author.verified,
-                    beverage = Beverage.fromName(post.beverage),
-                    public = post.privacy == Privacy.PUBLIC.name,
-                    created = post.created,
-                    profilePictureUrl = author.profilePictureUrl,
-                    locationName = post.locationName,
-                )
-                PostText(
-                    caption = post.caption,
-                    onUserClicked = {},
-                )
-                PostBody(
-                    post = post,
-                    onPostClicked = {},
-                    onLike = {},
-                    pagerState = rememberPagerState()
-                )
-                PostFooter(
-                    post = post,
-                    onDelete = onDelete,
-                    isAuthor = isAuthor,
-                    onToggleLike = onToggleLike,
-                )
-            }
-            item {
-                Text(
-                    text = "With",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 8.dp),
-                )
-                UserItem(user = author, isAuthor = true, onUserClick = onUserClick)
-            }
-            if (postUsers.isNotEmpty())
-                items(postUsers, key = { it.id }) { user ->
-                    UserItem(user = user, onUserClick = onUserClick)
-                }
-
-        }
-    }
+//                        Column {
+////                        Text(
+////                            text = String.format("%.2f", post.locationLongitude),
+////                            style = MaterialTheme.typography.titleMedium
+////                        )
+////                        Text(
+////                            text = String.format("%.2f", post.locationLatitude),
+////                            style = MaterialTheme.typography.titleMedium
+////                        )
+//                        }
+//                    }
+//                    StaticMap(
+//                        longitude = post.longitude,
+//                        latitude = post.latitude,
+//                        onMapClick = onMapClick,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                            .clip(RoundedCornerShape(16.dp))
+//                            .aspectRatio(1f),
+//                    )
+//                }
+//            item {
+//                PostHeader(
+//                    username = author.username,
+//                    verified = author.verified,
+//                    beverage = Beverage.fromName(post.beverage),
+//                    public = post.privacy == Privacy.PUBLIC.name,
+//                    created = post.created,
+//                    profilePictureUrl = author.profilePictureUrl,
+//                    locationName = post.locationName,
+//                )
+//                PostText(
+//                    caption = post.caption,
+//                    onUserClicked = {},
+//                )
+//                PostBody(
+//                    post = post,
+//                    onPostClicked = {},
+//                    onLike = {},
+//                    pagerState = rememberPagerState()
+//                )
+//                PostFooter(
+//                    post = post,
+//                    onDelete = onDelete,
+//                    isAuthor = isAuthor,
+//                    onToggleLike = onToggleLike,
+//                )
+//            }
+//            item {
+//                Text(
+//                    text = "With",
+//                    style = MaterialTheme.typography.titleMedium,
+//                    modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 8.dp),
+//                )
+//                UserItem(user = author, isAuthor = true, onUserClick = onUserClick)
+//            }
+//            if (postUsers.isNotEmpty())
+//                items(postUsers, key = { it.id }) { user ->
+//                    UserItem(user = user, onUserClick = onUserClick)
+//                }
+//
+//        }
+//    }
 }
 
 @Composable

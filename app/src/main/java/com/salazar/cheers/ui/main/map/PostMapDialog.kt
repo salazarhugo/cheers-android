@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.map
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,9 +14,10 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostHeader
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.Beverage
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.detail.PostFooter
 
 
@@ -39,7 +39,7 @@ fun PostMapScreen(
         Column {
             if (uiState.selectedPost != null)
                 Post(
-                    postFeed = uiState.selectedPost,
+                    post = uiState.selectedPost,
                     onUserClick = onUserClick,
                 )
         }
@@ -48,23 +48,19 @@ fun PostMapScreen(
 
 @Composable
 fun Post(
-    postFeed: PostFeed,
+    post: Post,
     onUserClick: (String) -> Unit,
 ) {
-    val post = postFeed.post
-    val author = postFeed.author
-    val postUsers = postFeed.tagUsers
-
     LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
         item {
             PostHeader(
-                username = author.username,
-                verified = author.verified,
+                username = post.username,
+                verified = post.verified,
                 beverage = Beverage.fromName(post.beverage),
                 public = post.privacy == Privacy.PUBLIC.name,
                 locationName = post.locationName,
-                profilePictureUrl = author.profilePictureUrl,
-                onHeaderClicked = { onUserClick(author.username) },
+                profilePictureUrl = post.profilePictureUrl,
+                onHeaderClicked = { onUserClick(post.username) },
                 onMoreClicked = {},
                 created = post.created,
             )
@@ -87,12 +83,12 @@ fun Post(
         }
         item {
             UserItem(
-                user = author,
+                user = User(),
                 isAuthor = true,
                 onUserClick = onUserClick,
             )
         }
-        if (postUsers.isNotEmpty())
+//        if (postUsers.isNotEmpty())
             item {
                 Text(
                     text = "With",
@@ -100,9 +96,9 @@ fun Post(
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp),
                 )
             }
-        items(postUsers, key = { it.id }) { user ->
-            UserItem(user = user, onUserClick = onUserClick)
-        }
+//        items(postUsers, key = { it.id }) { user ->
+//            UserItem(user = user, onUserClick = onUserClick)
+//        }
     }
 
 }

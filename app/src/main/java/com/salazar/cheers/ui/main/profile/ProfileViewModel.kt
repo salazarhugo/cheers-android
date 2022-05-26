@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -33,7 +32,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val postFlow: Flow<PagingData<PostFeed>>,
+        val postFlow: Flow<PagingData<Post>>,
         val events: List<Event>?,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
@@ -43,7 +42,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState(
     val user: User? = null,
-    val posts: Flow<PagingData<PostFeed>> = emptyFlow(),
+    val posts: Flow<PagingData<Post>> = emptyFlow(),
     val events: List<Event>? = null,
     val isLoading: Boolean = false,
     val errorMessages: String = "",
@@ -117,16 +116,12 @@ class ProfileViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = userRepository.refreshUser(FirebaseAuth.getInstance().currentUser?.uid!!)
-            when (result) {
-                is Result.Success -> viewModelState.update {
-                    it.copy(user = result.data, isLoading = false)
-                }
-                is Result.Error -> viewModelState.update {
-                    it.copy(
-                        errorMessages = "Couldn't refresh",
-                        isLoading = false
-                    )
+            userRepository.getUserFlow(
+                FirebaseAuth.getInstance().currentUser?.uid!!,
+                true
+            ).collect { user ->
+                viewModelState.update {
+                    it.copy(user = user, isLoading = false)
                 }
             }
         }
@@ -135,7 +130,7 @@ class ProfileViewModel @Inject constructor(
     private fun refreshUserPosts() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid!!
         viewModelScope.launch {
-            val posts = postRepository.profilePostFeed(userIdOrUsername = userId)
+            val posts = postRepository.profilePost(userIdOrUsername = userId)
             viewModelState.update {
                 it.copy(posts = posts, isLoading = false)
             }

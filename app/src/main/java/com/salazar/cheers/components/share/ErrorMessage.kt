@@ -15,7 +15,7 @@ fun ErrorMessage(
     errorMessage: String?,
     paddingValues: PaddingValues,
 ) {
-    if (errorMessage == null) return
+    if (errorMessage == null || errorMessage.isBlank()) return
 
     Surface(
         modifier = Modifier.padding(paddingValues = paddingValues),

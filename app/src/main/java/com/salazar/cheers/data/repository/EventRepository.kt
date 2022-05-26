@@ -1,25 +1,18 @@
 package com.salazar.cheers.data.repository
 
 import android.app.Application
-import android.net.Uri
 import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.RemoteMediator
 import androidx.work.*
 import com.salazar.cheers.backend.GoApi
-import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.data.paging.EventRemoteMediator
 import com.salazar.cheers.internal.Event
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.workers.UploadEventWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject

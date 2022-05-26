@@ -66,13 +66,9 @@ import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.components.utils.PrettyImage
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Typography
-import java.text.SimpleDateFormat
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.absoluteValue
 
@@ -87,7 +83,7 @@ fun HomeScreen(
     onUserClicked: (username: String) -> Unit,
     navigateToAddEvent: () -> Unit,
     navigateToAddPost: () -> Unit,
-    navigateToComments: (PostFeed) -> Unit,
+    navigateToComments: (Post) -> Unit,
     navigateToSearch: () -> Unit,
     onSelectTab: (Int) -> Unit,
     onStoryClick: () -> Unit,
@@ -192,13 +188,13 @@ fun Stories(
         item {
             YourStory(profilePictureUrl = profilePictureUrl, onAddStoryClick)
         }
-        items(items = stories, key = { it.story.id }) { story ->
+        items(items = stories, key = { it.id }) { story ->
             if (story != null)
                 Story(
                     modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
-                    username = story.author.username,
-                    seen = story.story.seenBy.contains(FirebaseAuth.getInstance().currentUser?.uid),
-                    profilePictureUrl = story.author.profilePictureUrl,
+                    username = story.username,
+                    seen = story.seen,
+                    profilePictureUrl = story.profilePictureUrl,
                     onStoryClick = onStoryClick
                 )
         }
@@ -463,7 +459,7 @@ fun PostList(
     onUserClicked: (username: String) -> Unit,
     onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (PostFeed) -> Unit,
+    navigateToComments: (Post) -> Unit,
     onStoryClick: () -> Unit,
     onAddStoryClick: () -> Unit,
 ) {
@@ -478,15 +474,15 @@ fun PostList(
             )
             DividerM3()
         }
-        itemsIndexed(posts) { i, postFeed ->
+        itemsIndexed(posts) { i, post ->
             if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
                 DividerM3()
                 NativeAdPost(ad = uiState.nativeAd)
             }
-            if (postFeed != null)
+            if (post != null)
                 Post(
                     modifier = Modifier.animateItemPlacement(),
-                    postFeed = postFeed,
+                    post = post,
                     navigateToComments = navigateToComments,
                     onPostClicked = onPostClicked,
                     onUserClicked = onUserClicked,
@@ -535,32 +531,30 @@ fun PostList(
 
 @Composable
 fun Post(
-    postFeed: PostFeed,
+    post: Post,
     modifier: Modifier = Modifier,
     onPostClicked: (postId: String) -> Unit,
     onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (PostFeed) -> Unit,
+    navigateToComments: (Post) -> Unit,
 ) {
-    val author = postFeed.author
-    val post = postFeed.post
     val pagerState = rememberPagerState()
 
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         PostHeader(
-            username = author.username,
-            verified = author.verified,
+            username = post.username,
+            verified = post.verified,
             beverage = Beverage.fromName(post.beverage),
             public = post.privacy == Privacy.PUBLIC.name,
             created = post.created,
-            profilePictureUrl = author.profilePictureUrl,
+            profilePictureUrl = post.profilePictureUrl,
             locationName = post.locationName,
             onHeaderClicked = onUserClicked,
             onMoreClicked = {
-                onPostMoreClicked(post.id, author.id)
+                onPostMoreClicked(post.id, post.authorId)
             },
         )
         PostText(
@@ -568,7 +562,7 @@ fun Post(
             onUserClicked = onUserClicked,
         )
         PostBody(
-            postFeed.post,
+            post,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp)),
@@ -577,7 +571,7 @@ fun Post(
             pagerState = pagerState
         )
         PostFooter(
-            postFeed,
+            post,
             onLike = onLike,
             navigateToComments = navigateToComments,
             pagerState = pagerState

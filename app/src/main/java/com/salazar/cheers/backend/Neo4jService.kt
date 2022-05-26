@@ -2,14 +2,10 @@ package com.salazar.cheers.backend
 
 import android.util.Log
 import com.beust.klaxon.Klaxon
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.entities.StoryResponse
 import com.salazar.cheers.data.entities.UserStats
-import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -17,115 +13,6 @@ import kotlinx.coroutines.withContext
 
 
 class Neo4jService {
-
-    suspend fun getStoryFeed(
-        page: Int,
-        pageSize: Int
-    ): Result<List<Pair<StoryResponse, List<User>>>> = withContext(Dispatchers.IO) {
-
-        val data = hashMapOf(
-            "page" to page,
-            "pageSize" to pageSize,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("getStoryFeed")
-            .call(data)
-            .continueWith { task ->
-                val posts = mutableListOf<Pair<StoryResponse, List<User>>>()
-                try {
-                    val result = task.result?.data as HashMap<*, *>
-                    val response =
-                        Gson().fromJson(result["response"].toString(), JsonArray::class.java)
-
-                    response.asJsonArray.forEach { postFeed ->
-                        val post =
-                            Klaxon().parse<StoryResponse>(postFeed.asJsonObject["story"].toString())!!
-                        val author =
-                            Klaxon().parse<User>(postFeed.asJsonObject["author"].toString())!!
-                        val tagUsers =
-                            Klaxon().parseArray<User>(postFeed.asJsonObject["tags"].toString())
-                                ?: emptyList()
-
-                        posts.add(Pair(post, tagUsers + author))
-                    }
-                    return@continueWith Result.Success(posts.toList())
-                } catch (e: Exception) {
-                    Log.e("Cloud", "Failed to parse posts: $e")
-                    return@continueWith Result.Error(e)
-                }
-            }
-            .await()
-    }
-
-    suspend fun getPostFeed(
-        page: Int,
-        pageSize: Int
-    ): Result<List<Pair<Post, List<User>>>> = withContext(Dispatchers.IO) {
-
-        val data = hashMapOf(
-            "page" to page,
-            "pageSize" to pageSize,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("getPostFeed")
-            .call(data)
-            .continueWith { task ->
-                val posts = mutableListOf<Pair<Post, List<User>>>()
-                try {
-                    val result = task.result?.data as HashMap<*, *>
-                    val response =
-                        Gson().fromJson(result["response"].toString(), JsonArray::class.java)
-
-                    response.asJsonArray.forEach { postFeed ->
-                        val post = Klaxon().parse<Post>(postFeed.asJsonObject["post"].toString())!!
-                        val author =
-                            Klaxon().parse<User>(postFeed.asJsonObject["author"].toString())!!
-                        val tagUsers =
-                            Klaxon().parseArray<User>(postFeed.asJsonObject["users"].toString())
-                                ?: emptyList()
-
-                        posts.add(
-                            Pair(
-                                post.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!),
-                                tagUsers + author
-                            )
-                        )
-                    }
-                    return@continueWith Result.Success(posts.toList())
-                } catch (e: Exception) {
-                    Log.e("Cloud", "Failed to parse posts: $e")
-                    return@continueWith Result.Error(e)
-                }
-            }
-            .await()
-    }
-
-    suspend fun getUser(userIdOrUsername: String): Result<User?> = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "userIdOrUsername" to userIdOrUsername,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("getUser")
-            .call(data)
-            .continueWith { task ->
-                if (task.result == null || task.result.data == null)
-                    return@continueWith Result.Error(java.lang.Exception("Network error"))
-
-                if (task.result.data.toString() == "[]")
-                    return@continueWith Result.Error(java.lang.Exception("User doesn't exist."))
-
-                val result = task.result.data as HashMap<*, *>
-                Log.d("Cloud", result["response"].toString())
-
-                val user = Klaxon().parse<User>(result["response"].toString())
-
-                return@continueWith Result.Success(user)
-            }
-            .await()
-    }
 
     suspend fun getSuggestions(): Result<List<User>> = withContext(Dispatchers.IO) {
         return@withContext Result.Success(emptyList())
@@ -163,20 +50,6 @@ class Neo4jService {
 //                return@withContext Result.Error(e)
 //            }
 //        }
-    }
-
-    suspend fun seenStory(storyId: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "storyId" to storyId,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("seenStory")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
     }
 
     suspend fun getUserStats(username: String): Result<UserStats> = withContext(Dispatchers.IO) {
@@ -237,122 +110,4 @@ class Neo4jService {
                 .await()
         }
 
-    suspend fun queryUsers(query: String): List<User> = withContext(Dispatchers.IO) {
-        // Create the arguments to the callable function.
-        val data = hashMapOf(
-            "query" to query,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("queryUser")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as HashMap<*, *>
-                val user = Klaxon().parseArray<User>(result["response"].toString()) ?: emptyList()
-                user
-            }
-            .await()
-    }
-
-    suspend fun deleteStory(storyId: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "storyId" to storyId,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("deleteStory")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    suspend fun deletePost(postId: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "postId" to postId,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("deletePost")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    suspend fun unlikePost(postId: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "postId" to postId,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("unlikePost")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    suspend fun likePost(postId: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "postId" to postId,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("likePost")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    suspend fun blockUser(otherUserId: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "otherUserId" to otherUserId,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("blockUser")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-
-    suspend fun unfollowUser(username: String) = withContext(Dispatchers.IO) {
-        // Create the arguments to the callable function.
-        val data = hashMapOf(
-            "username" to username,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("unfollowUser")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                result
-            }
-    }
-
-    suspend fun followUser(username: String) = withContext(Dispatchers.IO) {
-        // Create the arguments to the callable function.
-        val data = hashMapOf(
-            "username" to username,
-        )
-
-        return@withContext FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("followUser")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as String
-                Log.i("Cloud Functions", result)
-                result
-            }
-    }
 }

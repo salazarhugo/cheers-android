@@ -5,10 +5,9 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.Result
+import com.salazar.cheers.backend.GoApi
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.Story
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.entities.StoryRemoteKey
 import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
 import retrofit2.HttpException
@@ -16,11 +15,10 @@ import java.io.IOException
 
 class StoryRemoteMediator(
     private val database: CheersDatabase,
-    private val networkService: Neo4jService,
+    private val networkService: GoApi,
 ) : RemoteMediator<Int, Story>() {
 
     private val storyDao = database.storyDao()
-    private val userDao = database.userDao()
     private val remoteKeyDao = database.storyRemoteKeyDao()
     private val initialPage = 0
 
@@ -44,34 +42,23 @@ class StoryRemoteMediator(
                     remoteKeys.nextKey ?: return MediatorResult.Success(true)
                 }
             }
-            val response = networkService.getStoryFeed(page, NETWORK_PAGE_SIZE)
+            val response = networkService.storyFeed(page, NETWORK_PAGE_SIZE)
+            val endOfPaginationReached = response.size < state.config.pageSize
 
-            when (response) {
-                is Result.Success -> {
-                    val result = response.data
-                    val endOfPaginationReached = result.size < state.config.pageSize
-                    Log.d("HAHA", result.toString())
-
-                    if (loadType == LoadType.REFRESH) {
-                        remoteKeyDao.clear()
-                        storyDao.clearAll()
-                    }
-
-                    val prevKey = if (page == initialPage) null else page - 1
-                    val nextKey = if (endOfPaginationReached) null else page + 1
-                    val keys = result.map {
-                        StoryRemoteKey(storyId = it.first.id, prevKey = prevKey, nextKey = nextKey)
-                    }
-
-                    remoteKeyDao.insertAll(keys)
-                    result.forEach {
-                        userDao.insertOrUpdateAll(it.second)
-                        storyDao.insert(it.first)
-                    }
-                    MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
-                }
-                is Result.Error -> MediatorResult.Error(response.exception)
+            if (loadType == LoadType.REFRESH) {
+                remoteKeyDao.clear()
+                storyDao.clearAll()
             }
+
+            val prevKey = if (page == initialPage) null else page - 1
+            val nextKey = if (endOfPaginationReached) null else page + 1
+            val keys = response.map {
+                StoryRemoteKey(storyId = it.id, prevKey = prevKey, nextKey = nextKey)
+            }
+            remoteKeyDao.insertAll(keys)
+            storyDao.insertAll(response)
+
+            MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {
@@ -82,14 +69,14 @@ class StoryRemoteMediator(
     private suspend fun getStoryRemoteKeyForLastItem(state: PagingState<Int, Story>): StoryRemoteKey? {
         return state.lastItemOrNull()?.let { story ->
             database.withTransaction {
-                remoteKeyDao.remoteKeyByStoryId(story.story.id)
+                remoteKeyDao.remoteKeyByStoryId(story.id)
             }
         }
     }
 
     private suspend fun getStoryRemoteKeyClosestToCurrentPosition(state: PagingState<Int, Story>): StoryRemoteKey? {
         return state.anchorPosition?.let { position ->
-            state.closestItemToPosition(position)?.story?.id?.let { id ->
+            state.closestItemToPosition(position)?.id?.let { id ->
                 database.withTransaction { remoteKeyDao.remoteKeyByStoryId(id) }
             }
         }

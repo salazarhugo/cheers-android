@@ -82,7 +82,6 @@ fun AddPostScreen(
     onSelectLocation: (SearchResult) -> Unit,
     onSelectMedia: (Uri) -> Unit,
     onCaptionChanged: (String) -> Unit,
-    onNameChanged: (String) -> Unit,
     onAllowJoinChange: (Boolean) -> Unit,
     unselectLocation: () -> Unit,
     updateLocationName: (String) -> Unit,
@@ -189,7 +188,10 @@ fun AddPostScreen(
                     checked = uiState.allowJoin,
                     onCheckedChange = onAllowJoinChange
                 )
-                ShareButton(onDismiss, onUploadPost = onUploadPost)
+                ShareButton("Share", onClick = {
+                    onUploadPost()
+                    onDismiss()
+                })
             }
         }
     }
@@ -358,8 +360,8 @@ fun TopAppBar(
 
 @Composable
 fun ShareButton(
-    onDismiss: () -> Unit,
-    onUploadPost: () -> Unit,
+    text: String,
+    onClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxHeight(),
@@ -367,16 +369,13 @@ fun ShareButton(
     ) {
         DividerM3()
         Button(
-            onClick = {
-                onUploadPost()
-                onDismiss()
-            },
+            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Text("Share")
+            Text(text = text)
         }
     }
 }

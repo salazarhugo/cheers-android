@@ -19,7 +19,8 @@ import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.entities.StoryResponse
+import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -33,7 +34,8 @@ import java.io.ByteArrayOutputStream
 @HiltWorker
 class UploadStoryWorker @AssistedInject constructor(
     @Assisted appContext: Context,
-    @Assisted params: WorkerParameters
+    @Assisted params: WorkerParameters,
+    private val storyRepository: StoryRepository,
 ) : CoroutineWorker(appContext, params) {
 
     private var mFusedLocationClient: FusedLocationProviderClient? = null
@@ -88,7 +90,7 @@ class UploadStoryWorker @AssistedInject constructor(
                 Log.e("Location", "Couldn't get last location")
             }
 
-            val story = StoryResponse(
+            val story = Story(
                 type = storyType,
                 photoUrl = downloadUrl,
                 locationName = locationName,
@@ -99,9 +101,7 @@ class UploadStoryWorker @AssistedInject constructor(
                 tagUsersId = tagUserIds.toList()
             )
 
-            GlobalScope.launch {
-                Neo4jUtil.addStory(story)
-            }
+            storyRepository.addStory(story)
 
             makeStatusNotification("Successfully uploaded", appContext)
             return Result.success()

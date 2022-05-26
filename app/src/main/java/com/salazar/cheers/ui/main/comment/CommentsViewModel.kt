@@ -98,12 +98,12 @@ class CommentsViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            FirestoreUtil.getComments(postId).collect { comments ->
-                val commentWithAuthor = comments.map {
-                    CommentWithAuthor(comment = it, author = userRepository.getUser(it.authorId))
-                }
-                viewModelState.update { it.copy(comments = commentWithAuthor) }
-            }
+//            FirestoreUtil.getComments(postId).collect { comments ->
+//                val commentWithAuthor = comments.map {
+//                    CommentWithAuthor(comment = it, author = userRepository.getUser(it.authorId))
+//                }
+//                viewModelState.update { it.copy(comments = commentWithAuthor) }
+//            }
         }
     }
 

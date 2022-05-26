@@ -31,7 +31,11 @@ fun SettingsScreen(
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Settings") },
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .verticalScroll(rememberScrollState())
+        ) {
             AccountSection(navigateToBecomeVip = navigateToBecomeVip)
             Spacer(modifier = Modifier.height(16.dp))
             SettingsSection(onSettingsUIAction = onSettingsUIAction)
@@ -106,6 +110,9 @@ fun SettingsSection(
         }
         SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline) {
             onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
+        }
+        SettingItem("Security", Icons.Outlined.Security) {
+            onSettingsUIAction(SettingsUIAction.OnSecurityClick)
         }
         SettingItem("Devices", Icons.Outlined.Computer, {})
 //        SettingItem("Payment Methods", Icons.Outlined.CreditCard) {

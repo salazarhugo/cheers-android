@@ -1,6 +1,8 @@
 package com.salazar.cheers.navigation
 
 import androidx.navigation.NavHostController
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Destinations used in the [CheersApp].
@@ -56,6 +58,7 @@ object MainDestinations {
 object AuthDestinations {
     const val SIGN_IN_ROUTE = "signIn"
     const val SIGN_UP_ROUTE = "signUp"
+    const val REGISTER_ROUTE = "register"
     const val CHOOSE_USERNAME = "chooseUsername"
     const val PHONE_ROUTE = "phone"
 }
@@ -72,6 +75,8 @@ object SettingDestinations {
     const val ADD_PAYMENT_METHOD_ROUTE = "addPaymentMethod"
     const val RECHARGE_ROUTE = "recharge"
     const val PAYMENT_HISTORY_ROUTE = "paymentHistory"
+    const val SECURITY_ROUTE = "security"
+    const val PASSWORD_ROUTE = "password"
 }
 
 /**
@@ -81,6 +86,18 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToPassword: (Boolean) -> Unit = { hasPassword ->
+        navController.navigate("${SettingDestinations.PASSWORD_ROUTE}/$hasPassword") {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToSecurity = {
+        navController.navigate(SettingDestinations.SECURITY_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToEventMoreSheet: (String) -> Unit = { eventId ->

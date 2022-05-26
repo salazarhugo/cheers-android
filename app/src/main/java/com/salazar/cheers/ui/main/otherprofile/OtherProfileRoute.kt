@@ -7,12 +7,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.util.Utils.copyToClipboard
 
 /**
  * Stateful composable that displays the Navigation route for the Other profile screen.
@@ -27,11 +29,7 @@ fun OtherProfileRoute(
 ) {
     val uiState by otherProfileViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
-
-    if (uiState.shortLink != null) {
-        val localClipboardManager = LocalClipboardManager.current
-        localClipboardManager.setText(AnnotatedString(uiState.shortLink!!))
-    }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -43,7 +41,7 @@ fun OtherProfileRoute(
                     if (uiState is OtherProfileUiState.HasUser)
                         FirebaseDynamicLinksUtil.createShortLink((uiState as OtherProfileUiState.HasUser).user.username)
                             .addOnSuccessListener { shortLink ->
-                                otherProfileViewModel.updateShortLink(shortLink.shortLink.toString())
+                                context.copyToClipboard(shortLink.shortLink.toString())
                             }
                 },
             )
@@ -51,7 +49,7 @@ fun OtherProfileRoute(
     ) {
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
-            onRefresh = otherProfileViewModel::refresh,
+            onRefresh = otherProfileViewModel::onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {
             if (uiState is OtherProfileUiState.HasUser) {

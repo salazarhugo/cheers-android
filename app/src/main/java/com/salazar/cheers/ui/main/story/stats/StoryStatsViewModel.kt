@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.salazar.cheers.MainActivity
-import com.salazar.cheers.data.db.StoryDetail
+import com.salazar.cheers.data.entities.StoryDetail
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
 import dagger.assisted.Assisted
@@ -46,15 +46,15 @@ class StoryStatsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             storyRepository.getMyStories().collect { stories ->
                 val storiesDetail = stories.map {
-                    StoryDetail(
-                        story = it.story,
-                        author = it.author,
-                        viewers = userRepository.getUsersWithListOfIds(it.story.seenBy)
-                    )
+//                    StoryDetail(
+//                        story = it.story,
+//                        author = it.author,
+//                        viewers = userRepository.getUsersWithListOfIds(it.story.seenBy)
+//                    )
                 }
-                viewModelState.update {
-                    it.copy(stories = storiesDetail)
-                }
+//                viewModelState.update {
+//                    it.copy(stories = storiesDetail)
+//                }
             }
         }
     }

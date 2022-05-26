@@ -45,7 +45,6 @@ import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.utils.PrettyImage
-import com.salazar.cheers.data.db.PostFeed
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.main.event.Event
 import com.salazar.cheers.ui.theme.Roboto
@@ -228,25 +227,23 @@ fun ProfileButtons(
 
 @Composable
 fun Post(
-    postFeed: PostFeed,
+    post: Post,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
 ) {
     val pagerState = rememberPagerState()
-    val post = postFeed.post
-    val author = postFeed.author
 
     PostHeader(
-        username = author.username,
-        verified = author.verified,
+        username = post.username,
+        verified = post.verified,
         beverage = Beverage.fromName(post.beverage),
         public = post.privacy == Privacy.PUBLIC.name,
         created = post.created,
-        profilePictureUrl = author.profilePictureUrl,
+        profilePictureUrl = post.profilePictureUrl,
         locationName = post.locationName,
         onHeaderClicked = {},
-        onMoreClicked = { onPostMoreClicked(postFeed.post.id, postFeed.author.id) },
+        onMoreClicked = { onPostMoreClicked(post.id, post.authorId) },
     )
     PostText(
         caption = post.caption,
@@ -262,7 +259,7 @@ fun Post(
         pagerState = pagerState,
     )
     PostFooter(
-        postFeed,
+        post,
         onLike = onPostLike,
         navigateToComments = {},
         pagerState = pagerState,

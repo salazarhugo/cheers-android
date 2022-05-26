@@ -1,23 +1,31 @@
 package com.salazar.cheers.ui.auth.signup
 
+import android.content.Context
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.StoreUserEmail
+import com.salazar.cheers.data.db.UserDao
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.service.MyFirebaseMessagingService
+import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.prefs.Preferences
 import javax.inject.Inject
 
 
@@ -29,6 +37,7 @@ data class SignUpUiState(
     val email: String = "",
     val name: String = "",
     val password: String = "",
+    val sentSignInLinkToEmail: Boolean = false,
     val withGoogle: Boolean = false,
     val isSignedIn: Boolean = false,
     val acceptTerms: Boolean = false,
@@ -37,7 +46,9 @@ data class SignUpUiState(
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    val userDao: UserDao,
+    private val userRepository: UserRepository,
+    private val storeUserEmail: StoreUserEmail,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignUpUiState(isLoading = false))
@@ -49,7 +60,8 @@ class SignUpViewModel @Inject constructor(
             viewModelState.value
         )
 
-    init {}
+    init {
+    }
 
     fun onClearUsername() {
         viewModelState.update {
@@ -159,7 +171,7 @@ class SignUpViewModel @Inject constructor(
 
     fun verifyEmail() {
         if (uiState.value.email.isEmailValid())
-            nextPage()
+            sendSignInLinkToEmail()
     }
 
     fun verifyPassword() {
@@ -180,42 +192,31 @@ class SignUpViewModel @Inject constructor(
 
         isUsernameAvailable(username) { result ->
 
-            if (result is Result.Success && !result.data) {
+            if (!result) {
                 updateErrorMessage("This username is taken")
                 updateIsLoading(false)
                 return@isUsernameAvailable
             }
 
             viewModelState.update {
-                when (result) {
-                    is Result.Success -> {
-                        val page = if (it.email.isNotBlank()) it.page + 3 else it.page + 1
-                        it.copy(
-                            isUsernameAvailable = result.data,
-                            username = username,
-                            isLoading = false,
-                            page = page,
-                        )
-                    }
-                    is Result.Error -> {
-                        it.copy(
-                            isUsernameAvailable = false,
-                            errorMessage = it.errorMessage,
-                            isLoading = false
-                        )
-                    }
-                }
+                val page = if (it.email.isNotBlank()) it.page + 3 else it.page + 1
+                it.copy(
+                    isUsernameAvailable = result,
+                    username = username,
+                    isLoading = false,
+                    page = page,
+                )
             }
         }
     }
 
     private fun isUsernameAvailable(
         username: String,
-        onResponse: (Result<Boolean>) -> Unit
+        onResponse: (Boolean) -> Unit,
     ) {
         viewModelScope.launch {
-            val result = Neo4jUtil.isUsernameAvailable(username)
-            onResponse(result)
+            val res = userRepository.isUsernameAvailable(username = username)
+            onResponse(res)
         }
     }
 
@@ -233,47 +234,35 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun signInSuccessful(
-        username: String,
-    ) {
-        updateIsSignedIn(true)
-        viewModelScope.launch {
-            delay(5000)
-            Neo4jUtil.updateUser(
-                username = username
-            )
-            getAndSaveRegistrationToken()
-        }
-    }
-
-    fun createAccount() {
+    private fun sendSignInLinkToEmail() {
         val state = uiState.value
         val username = state.username
         val email = state.email
-        val password = state.password
 
         updateIsLoading(true)
 
-        if (!validateEmail(email)) {
-            updateErrorMessage("Email can't be empty")
-            return
-        }
+        viewModelScope.launch {
+            val actionCodeSettings = actionCodeSettings {
+                url = "https://cheers-a275e.web.app/register/$username"
+                handleCodeInApp = true
+                setIOSBundleId("com.salazar.cheers")
+                setAndroidPackageName(
+                    "com.salazar.cheers",
+                    true,
+                    "8"
+                )
+            }
 
-        if (!state.withGoogle && !validatePassword(password)) {
-            updateErrorMessage("Password can't be empty")
-            return
-        }
-
-        if (state.withGoogle)
-            signInSuccessful(username = username)
-        else
-            Firebase.auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful)
-                        signInSuccessful(username = username)
-                    else
-                        updateErrorMessage(task.exception?.message)
-                    updateIsLoading(false)
+            Firebase.auth.sendSignInLinkToEmail(email, actionCodeSettings).addOnCompleteListener {
+                if (!it.isSuccessful) {
+                    Log.e("Email Link", it.exception.toString())
+                    return@addOnCompleteListener
                 }
+
+                viewModelScope.launch { storeUserEmail.saveEmail(email) }
+                updateIsLoading(false)
+                nextPage()
+            }
+        }
     }
 }

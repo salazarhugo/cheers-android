@@ -42,8 +42,8 @@ object AppModule {
 //        return client
 //    }
 
-    @Provides
     @Singleton
+    @Provides
     fun provideGoApi(): GoApi {
 
         val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
