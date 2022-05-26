@@ -1,13 +1,11 @@
 package com.salazar.cheers
 
 import android.Manifest
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.os.StrictMode
@@ -16,12 +14,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
-import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -39,12 +34,9 @@ import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.backend.GoApi
-import com.salazar.cheers.data.StoreUserEmail
-import com.salazar.cheers.data.repository.BillingRepository
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.ui.CheersApp
 import com.salazar.cheers.ui.main.comment.CommentsViewModel
-import com.salazar.cheers.ui.main.event.detail.EventDetailViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsViewModel
 import com.salazar.cheers.ui.main.story.stats.StoryStatsViewModel
@@ -53,8 +45,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.components.ActivityComponent
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -82,7 +72,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     lateinit var firebaseAuth: FirebaseAuth
 
     @Inject
-    lateinit var goApi: GoApi
+    lateinit var coreService: CoreService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +106,10 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         super.onResume()
 
         val data = intent.data ?: return
+        val auth = Firebase.auth
+
+        if (!auth.isSignInWithEmailLink(data.toString()))
+            return
 
         val continueUrl = data.getQueryParameter("continueUrl") ?: return
         val encodedUrl = URLEncoder.encode(data.toString(), StandardCharsets.UTF_8.toString())

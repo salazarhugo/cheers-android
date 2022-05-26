@@ -5,7 +5,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.entities.EventRemoteKey
 import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
@@ -16,7 +16,7 @@ private const val POST_STARTING_PAGE_INDEX = 0
 
 class EventRemoteMediator(
     private val database: CheersDatabase,
-    private val service: GoApi,
+    private val service: CoreService,
 ) : RemoteMediator<Int, Event>() {
 
     private val eventDao = database.eventDao()

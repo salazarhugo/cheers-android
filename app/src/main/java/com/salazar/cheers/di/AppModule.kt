@@ -2,13 +2,13 @@ package com.salazar.cheers.di
 
 import android.content.Context
 import androidx.room.Room
-import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.FirebaseUserIdTokenInterceptor
 import com.salazar.cheers.internal.PrivacyAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.wire.EnumAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,7 +44,28 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideGoApi(): GoApi {
+    fun providePublicService(): PublicService {
+
+        val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
+
+        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
+
+        val retrofit = retrofit2.Retrofit.Builder()
+            .baseUrl(PublicService.BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(okHttpClient)
+            .build()
+
+        return retrofit.create(PublicService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGoApi(): CoreService {
 
         val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
 
@@ -56,12 +77,12 @@ object AppModule {
             .build()
 
         val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl(GoApi.BASE_URL)
+            .baseUrl(CoreService.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(okHttpClient)
             .build()
 
-        return retrofit.create(GoApi::class.java)
+        return retrofit.create(CoreService::class.java)
     }
 
     @Singleton

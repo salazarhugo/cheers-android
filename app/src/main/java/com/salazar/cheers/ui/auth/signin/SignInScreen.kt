@@ -42,9 +42,10 @@ import com.salazar.cheers.ui.theme.Typography
 @Composable
 fun SignInScreen(
     uiState: SignInUiState,
-    signInWithEmailPassword: () -> Unit,
+    onSignInClick: () -> Unit,
     signInWithGoogle: () -> Unit,
     navigateToPhone: () -> Unit,
+    onPasswordLessChange: () -> Unit,
     navigateToSignUp: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
@@ -67,7 +68,7 @@ fun SignInScreen(
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().animateContentSize(),
         ) {
             Column(
                 modifier = Modifier
@@ -79,17 +80,23 @@ fun SignInScreen(
                 AnimatedLogo()
                 Spacer(modifier = Modifier.height(30.dp))
                 EmailTextField(uiState, onEmailChanged = onEmailChanged)
-                Spacer(Modifier.height(8.dp))
-                PasswordTextField(uiState, onPasswordChanged = onPasswordChanged)
+                if (!uiState.isPasswordless) {
+                    Spacer(Modifier.height(8.dp))
+                    PasswordTextField(uiState, onPasswordChanged = onPasswordChanged)
+                }
                 Spacer(Modifier.height(16.dp))
                 LoginButton(
                     uiState = uiState,
-                    signInWithEmailPassword = signInWithEmailPassword,
+                    signInWithEmailPassword = onSignInClick,
                 )
                 if (uiState.errorMessage != null)
                     Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.height(16.dp))
                 TextDivider(dayString = "OR")
+                val text = if (uiState.isPasswordless) "Sign in with password" else "Sign in with email link"
+                TextButton(onClick = onPasswordLessChange) {
+                    Text(text = text)
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 GoogleButton { signInWithGoogle() }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -215,7 +222,7 @@ fun LoginButton(
         if (uiState.isLoading)
             CircularProgressIndicatorM3()
         else
-            Text(text = "Log In")
+            Text(text = "Sign In")
     }
 }
 

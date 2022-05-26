@@ -32,8 +32,6 @@ import javax.inject.Inject
 data class SignUpUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
-    val username: String = "",
-    val isUsernameAvailable: Boolean = false,
     val email: String = "",
     val name: String = "",
     val password: String = "",
@@ -63,12 +61,6 @@ class SignUpViewModel @Inject constructor(
     init {
     }
 
-    fun onClearUsername() {
-        viewModelState.update {
-            it.copy(username = "")
-        }
-    }
-
     fun updateWithGoogle(withGoogle: Boolean) {
         viewModelState.update {
             it.copy(withGoogle = withGoogle)
@@ -78,12 +70,6 @@ class SignUpViewModel @Inject constructor(
     fun onNameChange(name: String) {
         viewModelState.update {
             it.copy(name = name)
-        }
-    }
-
-    fun onUsernameChanged(username: String) {
-        viewModelState.update {
-            it.copy(username = username)
         }
     }
 
@@ -130,39 +116,6 @@ class SignUpViewModel @Inject constructor(
         return email.isNotBlank()
     }
 
-    private fun validatePassword(
-        password: String
-    ): Boolean {
-        return password.isNotBlank()
-    }
-
-    private fun isLowerCase(username: String): Boolean {
-        val isLower = username == username.lowercase()
-        if (!isLower)
-            updateErrorMessage("Must be lowercase")
-        return isLower
-    }
-
-    private fun hasValidChars(username: String): Boolean {
-        val regex = Regex("^[._a-z0-9]+\$")
-        val validChars = username.matches(regex)
-        if (!validChars)
-            updateErrorMessage("Only dots and underscores are allowed")
-        return validChars
-    }
-
-    private fun validateUsername(username: String): Boolean {
-        val regex = Regex("^(?!.*\\.\\.)(?!.*\\.\$)[^\\W][\\w.]{0,29}\$")
-        return isLowerCase(username) && hasValidChars(username) && username.matches(regex)
-    }
-
-    fun prevPage() {
-        viewModelState.update {
-            if (it.page < 1) return
-            it.copy(page = it.page - 1)
-        }
-    }
-
     fun nextPage() {
         viewModelState.update {
             it.copy(page = it.page + 1)
@@ -174,76 +127,15 @@ class SignUpViewModel @Inject constructor(
             sendSignInLinkToEmail()
     }
 
-    fun verifyPassword() {
-        val state = uiState.value
-        if (state.password.isNotBlank())
-            nextPage()
-    }
-
-    fun checkUsername() {
-        val username = uiState.value.username
-        updateIsLoading(true)
-
-        if (!validateUsername(username = username)) {
-            updateErrorMessage("Invalid username")
-            updateIsLoading(false)
-            return
-        }
-
-        isUsernameAvailable(username) { result ->
-
-            if (!result) {
-                updateErrorMessage("This username is taken")
-                updateIsLoading(false)
-                return@isUsernameAvailable
-            }
-
-            viewModelState.update {
-                val page = if (it.email.isNotBlank()) it.page + 3 else it.page + 1
-                it.copy(
-                    isUsernameAvailable = result,
-                    username = username,
-                    isLoading = false,
-                    page = page,
-                )
-            }
-        }
-    }
-
-    private fun isUsernameAvailable(
-        username: String,
-        onResponse: (Boolean) -> Unit,
-    ) {
-        viewModelScope.launch {
-            val res = userRepository.isUsernameAvailable(username = username)
-            onResponse(res)
-        }
-    }
-
-    private suspend fun getAndSaveRegistrationToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            // Get new FCM registration token
-            val token = task.result
-            viewModelScope.launch {
-                MyFirebaseMessagingService.addTokenToNeo4j(token)
-            }
-        }
-    }
-
     private fun sendSignInLinkToEmail() {
         val state = uiState.value
-        val username = state.username
         val email = state.email
 
         updateIsLoading(true)
 
         viewModelScope.launch {
             val actionCodeSettings = actionCodeSettings {
-                url = "https://cheers-a275e.web.app/register/$username"
+                url = "https://cheers-a275e.web.app/register"
                 handleCodeInApp = true
                 setIOSBundleId("com.salazar.cheers")
                 setAndroidPackageName(

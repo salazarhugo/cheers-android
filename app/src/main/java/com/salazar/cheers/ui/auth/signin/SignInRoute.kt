@@ -23,21 +23,19 @@ fun SignInRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by signInViewModel.uiState.collectAsState()
-    val keyboardController = LocalSoftwareKeyboardController.current
     val authResultLauncher =
-        rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
-            try {
-                val account = task?.getResult(ApiException::class.java)
-                if (account != null)
-                    signInViewModel.firebaseAuthWithGoogle(account)
-            } catch (e: ApiException) {
-                Log.e("SIGN IN", e.toString())
-            }
-        }
+        rememberLauncherForActivityResult(
+            contract = AuthResultContract(),
+            onResult = signInViewModel::onGoogleSignInResult,
+        )
 
     val signedIn = uiState.isSignedIn
 
-//            navActions.navigateToSignUpWithGoogle(acct.email!!, acct.displayName ?: "")
+    LaunchedEffect(uiState.navigateToRegister) {
+        if (uiState.navigateToRegister)
+            navActions.navigateToRegister()
+    }
+
     if (signedIn)
         LaunchedEffect(Unit) {
             navActions.navigateToMain()
@@ -45,14 +43,15 @@ fun SignInRoute(
     else
         SignInScreen(
             uiState = uiState,
-            signInWithEmailPassword = {
-                signInViewModel.signInWithEmailPassword()
+            onSignInClick = {
+                signInViewModel.onSignInClick()
             },
             signInWithGoogle = { authResultLauncher.launch(1) },
             navigateToPhone = { navActions.navigateToPhone() },
             navigateToSignUp = { navActions.navigateToSignUp() },
             onPasswordChanged = signInViewModel::onPasswordChange,
             onEmailChanged = signInViewModel::onEmailChange,
+            onPasswordLessChange = signInViewModel::onPasswordlessChange,
         )
 }
 

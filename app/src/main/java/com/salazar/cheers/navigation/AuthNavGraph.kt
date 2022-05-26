@@ -49,15 +49,15 @@ fun NavGraphBuilder.authNavGraph(
         }
 
         composable(
-            route = "${AuthDestinations.REGISTER_ROUTE}/{username}/{emailLink}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/register/{username}/{emailLink}"}),
+            route = "${AuthDestinations.REGISTER_ROUTE}/{emailLink}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/register/{emailLink}"}),
         ) {
             RegisterRoute(navActions = navActions)
         }
 
         composable(
             route = AuthDestinations.SIGN_IN_ROUTE,
-            deepLinks = listOf(),
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/signIn/{emailLink}" }),
         ) {
             val signInViewModel = hiltViewModel<SignInViewModel>()
 

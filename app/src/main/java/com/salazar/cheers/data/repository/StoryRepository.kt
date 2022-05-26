@@ -3,13 +3,11 @@ package com.salazar.cheers.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.paging.StoryRemoteMediator
-import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -20,7 +18,7 @@ import javax.inject.Singleton
 
 @Singleton
 class StoryRepository @Inject constructor(
-    private val goApi: GoApi,
+    private val coreService: CoreService,
     private val service: Neo4jService,
     private val database: CheersDatabase
 ) {
@@ -35,7 +33,7 @@ class StoryRepository @Inject constructor(
                 pageSize = NETWORK_PAGE_SIZE,
                 enablePlaceholders = true,
             ),
-            remoteMediator = StoryRemoteMediator(database = database, networkService = goApi),
+            remoteMediator = StoryRemoteMediator(database = database, networkService = coreService),
         ) {
             return@Pager storyDao.pagingSource()
         }.flow
@@ -43,7 +41,7 @@ class StoryRepository @Inject constructor(
 
     suspend fun addStory(story: Story) = withContext(Dispatchers.IO) {
         try {
-            goApi.createStory(story = story)
+            coreService.createStory(story = story)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -51,7 +49,7 @@ class StoryRepository @Inject constructor(
 
     suspend fun seenRemote(storyId: String) {
         try {
-            goApi.seenStory(storyId = storyId)
+            coreService.seenStory(storyId = storyId)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -59,7 +57,7 @@ class StoryRepository @Inject constructor(
 
     suspend fun deleteRemote(storyId: String) {
         try {
-            goApi.deleteStory(storyId = storyId)
+            coreService.deleteStory(storyId = storyId)
         } catch (e: Exception) {
             e.printStackTrace()
         }

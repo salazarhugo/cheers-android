@@ -1,11 +1,10 @@
 package com.salazar.cheers.data.paging
 
-import android.util.Log
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.entities.StoryRemoteKey
@@ -15,7 +14,7 @@ import java.io.IOException
 
 class StoryRemoteMediator(
     private val database: CheersDatabase,
-    private val networkService: GoApi,
+    private val networkService: CoreService,
 ) : RemoteMediator<Int, Story>() {
 
     private val storyDao = database.storyDao()

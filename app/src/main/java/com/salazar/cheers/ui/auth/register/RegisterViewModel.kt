@@ -1,7 +1,5 @@
 package com.salazar.cheers.ui.auth.register
 
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -10,13 +8,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.util.Utils.validateUsername
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 data class RegisterUiState(
@@ -25,6 +23,7 @@ data class RegisterUiState(
     val username: String = "",
     val termsAccepted: Boolean = false,
     val success: Boolean = false,
+    val isUsernameAvailable: Boolean = false,
 )
 
 @HiltViewModel
@@ -35,6 +34,7 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RegisterUiState(isLoading = false))
+    lateinit var emailLink: String
 
     val uiState = viewModelState
         .stateIn(
@@ -43,16 +43,22 @@ class RegisterViewModel @Inject constructor(
             viewModelState.value
         )
 
-    lateinit var emailLink: String
-    lateinit var username: String
 
     init {
         stateHandle.get<String>("emailLink")?.let {
             emailLink = it
         }
-        stateHandle.get<String>("username")?.let { username ->
-            this.username = username
-            viewModelState.update { it.copy(username = username) }
+    }
+
+    fun onClearUsername() {
+        viewModelState.update {
+            it.copy(username = "")
+        }
+    }
+
+    fun onUsernameChanged(username: String) {
+        viewModelState.update {
+            it.copy(username = username)
         }
     }
 
@@ -68,11 +74,55 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    private fun updateErrorMessage(errorMessage: String) {
+        viewModelState.update {
+            it.copy(errorMessage = errorMessage)
+        }
+    }
+
+    private fun updateUsernameAvailable(available: Boolean) {
+        viewModelState.update {
+            it.copy(isUsernameAvailable = available)
+        }
+    }
+
+    fun checkUsername() {
+        val username = uiState.value.username
+        updateIsLoading(true)
+
+        if (!username.validateUsername()) {
+            updateErrorMessage("Invalid username")
+            updateIsLoading(false)
+            return
+        }
+
+        isUsernameAvailable(username) { result ->
+            updateIsLoading(false)
+            if (!result) {
+                updateErrorMessage("This username is taken")
+                return@isUsernameAvailable
+            }
+            updateUsernameAvailable(result)
+        }
+    }
+
+    private fun isUsernameAvailable(
+        username: String,
+        onResponse: (Boolean) -> Unit,
+    ) {
+        viewModelScope.launch {
+            val res = userRepository.isUsernameAvailable(username = username)
+            onResponse(res)
+        }
+    }
+
     fun register() {
         val auth = Firebase.auth
+        val username = uiState.value.username
 
         if (!auth.isSignInWithEmailLink(emailLink))
             return
+
         updateIsLoading(true)
 
         viewModelScope.launch {

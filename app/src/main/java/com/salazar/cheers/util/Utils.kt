@@ -22,6 +22,20 @@ import java.util.*
 
 object Utils {
 
+    fun isLowerCase(username: String): Boolean {
+        return username == username.lowercase()
+    }
+
+    fun hasValidChars(username: String): Boolean {
+        val regex = Regex("^[._a-z0-9]+\$")
+        return username.matches(regex)
+    }
+
+    fun String.validateUsername(): Boolean {
+        val regex = Regex("^(?!.*\\.\\.)(?!.*\\.\$)[^\\W][\\w.]{0,29}\$")
+        return isLowerCase(this) && hasValidChars(this) && matches(regex)
+    }
+
     fun getCurrentUserToken(): String {
         return ""
     }

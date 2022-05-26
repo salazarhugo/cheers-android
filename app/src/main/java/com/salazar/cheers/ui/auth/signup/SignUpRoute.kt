@@ -52,28 +52,20 @@ fun SignUpRoute(
                     title = "",
                     center = true,
                     backNavigation = true,
-                    onNavigateBack = { if (uiState.page > 0) signUpViewModel.prevPage() else navActions.navigateBack() })
+                    onNavigateBack = { navActions.navigateBack() })
             }
         ) {
             Column(
                 modifier = Modifier.padding(it),
             ) {
                 when (uiState.page) {
-                    0 -> ChooseUsernameScreen(
-                        username = uiState.username,
-                        errorMessage = uiState.errorMessage,
-                        isLoading = uiState.isLoading,
-                        isUsernameAvailable = uiState.isUsernameAvailable,
-                        onClearUsername = signUpViewModel::onClearUsername,
-                        onUsernameChanged = signUpViewModel::onUsernameChanged,
-                        onNextClicked = signUpViewModel::checkUsername,
-                    )
-                    1 -> EmailScreen(
+                    0 -> EmailScreen(
                         email = uiState.email,
+                        isLoading = uiState.isLoading,
                         onEmailChanged = signUpViewModel::onEmailChange,
                         onNextClicked = signUpViewModel::verifyEmail,
                     )
-                    2 -> SentSignInLinkToEmailScreen()
+                    1 -> SentSignInLinkToEmailScreen()
 //                    2 -> PasswordScreen(
 //                        password = uiState.password,
 //                        onPasswordChanged = signUpViewModel::onPasswordChange,

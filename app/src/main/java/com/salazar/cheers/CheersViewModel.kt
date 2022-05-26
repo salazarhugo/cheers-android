@@ -76,18 +76,18 @@ class CheersViewModel @Inject constructor(
         viewModelState.update {
             it.copy(isLoading = true)
         }
-        getAndSaveRegistrationToken()
+//        getAndSaveRegistrationToken()
 
-        viewModelScope.launch {
-            userRepository.getUserFlow(
-                FirebaseAuth.getInstance().currentUser?.uid!!,
-                true
-            ).collect { user ->
-                viewModelState.update {
-                    it.copy(user = user, isLoading = false)
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            userRepository.getUserFlow(
+//                FirebaseAuth.getInstance().currentUser?.uid!!,
+//                true
+//            ).collect { user ->
+//                viewModelState.update {
+//                    it.copy(user = user, isLoading = false)
+//                }
+//            }
+//        }
     }
 
     private fun getAndSaveRegistrationToken() {

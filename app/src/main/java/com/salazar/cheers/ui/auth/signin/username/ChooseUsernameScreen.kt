@@ -9,10 +9,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -27,6 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.share.ButtonWithLoading
+import com.salazar.cheers.ui.main.add.TopAppBar
 
 @Composable
 fun ChooseUsernameScreen(
@@ -38,31 +36,37 @@ fun ChooseUsernameScreen(
     onUsernameChanged: (String) -> Unit,
     onNextClicked: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp),
+    Scaffold(
+        topBar = { TopAppBar {}}
     ) {
-        Text(
-            text = "Choose username",
-            style = MaterialTheme.typography.titleLarge
-        )
-        Spacer(Modifier.height(8.dp))
-        Text("You can't change it later")
-        Spacer(Modifier.height(36.dp))
-        UsernameTextField(
-            username = username,
-            isUsernameAvailable = isUsernameAvailable,
-            errorMessage = errorMessage,
-            onClearUsername = onClearUsername,
-            onUsernameChanged = onUsernameChanged,
-        )
-        Spacer(Modifier.height(8.dp))
-        ButtonWithLoading(
-            text = "Next",
-            isLoading = isLoading,
-            onClick = onNextClicked,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(it)
+                .padding(16.dp),
+        ) {
+            Text(
+                text = "Choose username",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(Modifier.height(8.dp))
+            Text("You can't change it later")
+            Spacer(Modifier.height(36.dp))
+            UsernameTextField(
+                username = username,
+                isUsernameAvailable = isUsernameAvailable,
+                errorMessage = errorMessage,
+                onClearUsername = onClearUsername,
+                onUsernameChanged = onUsernameChanged,
+            )
+            Spacer(Modifier.height(8.dp))
+            ButtonWithLoading(
+                text = "Next",
+                isLoading = isLoading,
+                onClick = onNextClicked,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

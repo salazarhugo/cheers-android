@@ -3,8 +3,9 @@ package com.salazar.cheers.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.geojson.FeatureCollection
-import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.CheersDao
@@ -24,7 +25,8 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor(
-    private val goApi: GoApi,
+    private val coreService: CoreService,
+    private val publicService: PublicService,
     private val service: Neo4jService,
     private val userDao: UserDao,
     private val userStatsDao: UserStatsDao,
@@ -37,7 +39,7 @@ class UserRepository @Inject constructor(
         email: String,
     ): User? {
         try {
-            val user = goApi.createUser(
+            val user = coreService.createUser(
                 User().copy(
                     id = FirebaseAuth.getInstance().currentUser?.uid!!,
                     username = username,
@@ -57,7 +59,7 @@ class UserRepository @Inject constructor(
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {
         try {
             postDao.deleteWithAuthorId(authorId = userId)
-            goApi.blockUser(userId = userId)
+            coreService.blockUser(userId = userId)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -70,7 +72,7 @@ class UserRepository @Inject constructor(
     suspend fun getLocations(): FeatureCollection {
         return withContext(Dispatchers.IO) {
             try {
-                val json = goApi.getLocations().string()
+                val json = coreService.getLocations().string()
                 return@withContext FeatureCollection.fromJson(json)
             } catch (e: HttpException) {
                 Log.e("User Repository", e.toString())
@@ -112,7 +114,7 @@ class UserRepository @Inject constructor(
             }
 
             val remoteUsers = try {
-                goApi.searchUsers(query = query)
+                coreService.searchUsers(query = query)
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load data"))
@@ -141,7 +143,7 @@ class UserRepository @Inject constructor(
 
     suspend fun updateUser(username: String) {
         try {
-            goApi.followUser(username = username)
+            coreService.followUser(username = username)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -149,7 +151,7 @@ class UserRepository @Inject constructor(
 
     suspend fun followUser(username: String) {
         try {
-            goApi.followUser(username = username)
+            coreService.followUser(username = username)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -157,7 +159,7 @@ class UserRepository @Inject constructor(
 
     suspend fun unfollowUser(username: String) {
         try {
-            goApi.unfollowUser(username = username)
+            coreService.unfollowUser(username = username)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -165,7 +167,7 @@ class UserRepository @Inject constructor(
 
     suspend fun isUsernameAvailable(username: String): Boolean {
         return try {
-            goApi.isUsernameAvailable(username = username)
+            publicService.isUsernameAvailable(username = username)
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -193,6 +195,33 @@ class UserRepository @Inject constructor(
         return userDao.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
     }
 
+    suspend fun getUserSignIn(userId: String): Flow<Resource<User>> {
+        return flow {
+            emit(Resource.Loading(true))
+            val user = userDao.getUserNullable(userIdOrUsername = userId)
+
+            if (user != null)
+                emit(Resource.Success(user))
+
+            val remoteUser = try {
+                coreService.getUser(userIdOrUsername = userId)
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+                emit(Resource.Error("User not found!"))
+                null
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+
+            remoteUser?.let { safeRemoteUser ->
+                userDao.insertOrUpdate(safeRemoteUser)
+                emit(Resource.Success(userDao.getUser(userId)))
+            }
+            emit(Resource.Loading(false))
+        }
+    }
+
     fun getUserFlow(
         userIdOrUsername: String,
         fetchFromRemote: Boolean = false,
@@ -207,7 +236,7 @@ class UserRepository @Inject constructor(
                 return@flow
 
             val remoteUser = try {
-                goApi.getUser(userIdOrUsername = userIdOrUsername)
+                coreService.getUser(userIdOrUsername = userIdOrUsername)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null

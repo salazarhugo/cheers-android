@@ -8,7 +8,7 @@ import okhttp3.ResponseBody
 import retrofit2.http.*
 
 
-interface GoApi {
+interface CoreService {
 
     @GET("users/search/{query}")
     suspend fun searchUsers(
@@ -63,11 +63,6 @@ interface GoApi {
     suspend fun updateEvent(
         @Body() event: Event,
     )
-
-    @GET("users/available/{username}")
-    suspend fun isUsernameAvailable(
-        @Path("username") username: String,
-    ): Boolean
 
     @GET("users/{userIdOrUsername}")
     suspend fun getUser(

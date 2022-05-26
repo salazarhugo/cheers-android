@@ -88,6 +88,12 @@ class CheersNavigationActions(private val navController: NavHostController) {
         navController.popBackStack()
     }
 
+    val navigateToRegister: () -> Unit = {
+        navController.navigate("${AuthDestinations.REGISTER_ROUTE}/emailLink") {
+            launchSingleTop = true
+        }
+    }
+
     val navigateToPassword: (Boolean) -> Unit = { hasPassword ->
         navController.navigate("${SettingDestinations.PASSWORD_ROUTE}/$hasPassword") {
             launchSingleTop = true

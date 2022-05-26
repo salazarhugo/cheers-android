@@ -33,6 +33,7 @@ import com.salazar.cheers.util.Utils.isEmailValid
 @Composable
 fun EmailScreen(
     email: String,
+    isLoading: Boolean,
     onEmailChanged: (String) -> Unit,
     onNextClicked: () -> Unit,
 ) {
@@ -41,13 +42,13 @@ fun EmailScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Saisissez votre adresse email",
+            text = "Enter your email",
             style = MaterialTheme.typography.titleMedium,
         )
         EmailTextField(email = email, onEmailChanged = onEmailChanged)
         ButtonWithLoading(
             text = "Next",
-            isLoading = false,
+            isLoading = isLoading,
             onClick = onNextClicked,
             modifier = Modifier.fillMaxWidth()
         )

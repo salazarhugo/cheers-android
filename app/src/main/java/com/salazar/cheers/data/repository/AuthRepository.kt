@@ -1,33 +1,25 @@
 package com.salazar.cheers.data.repository
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
-import com.salazar.cheers.backend.GoApi
-import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.service.MyFirebaseMessagingService
-import com.salazar.cheers.util.FirestoreUtil
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val service: GoApi,
+    private val service: CoreService,
     private val userDao: UserDao,
     private val auth: FirebaseAuth,
 ) {

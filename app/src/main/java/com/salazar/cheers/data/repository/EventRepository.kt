@@ -6,7 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.work.*
-import com.salazar.cheers.backend.GoApi
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.EventRemoteMediator
 import com.salazar.cheers.internal.Event
@@ -22,7 +22,7 @@ import javax.inject.Singleton
 @Singleton
 class EventRepository @Inject constructor(
     application: Application,
-    private val goApi: GoApi,
+    private val coreService: CoreService,
     private val database: CheersDatabase,
 ) {
 
@@ -39,7 +39,7 @@ class EventRepository @Inject constructor(
                 pageSize = PostRepository.NETWORK_PAGE_SIZE,
                 enablePlaceholders = true,
             ),
-            remoteMediator = EventRemoteMediator(database = database, service = goApi),
+            remoteMediator = EventRemoteMediator(database = database, service = coreService),
         ) {
             eventDao.pagingSourceFeed()
         }.flow
@@ -51,7 +51,7 @@ class EventRepository @Inject constructor(
 
     suspend fun refreshMyEvents() = withContext(Dispatchers.IO) {
         try {
-            val myEvents = goApi.getEvents(0, 10)
+            val myEvents = coreService.getEvents(0, 10)
             Log.d("DORA", myEvents.toString())
             eventDao.insertAll(myEvents)
         } catch (e: IOException) {
@@ -62,15 +62,15 @@ class EventRepository @Inject constructor(
     }
 
     suspend fun updateEvent(event: Event) = withContext(Dispatchers.IO) {
-        goApi.updateEvent(event = event)
+        coreService.updateEvent(event = event)
     }
 
     private suspend fun uninterestEvent(eventId: String) {
-        goApi.uninterestEvent(eventId = eventId)
+        coreService.uninterestEvent(eventId = eventId)
     }
 
     private suspend fun interestEvent(eventId: String) {
-        goApi.interestEvent(eventId = eventId)
+        coreService.interestEvent(eventId = eventId)
     }
 
     suspend fun hideEvent(eventId: String) = withContext(Dispatchers.IO) {
@@ -79,11 +79,11 @@ class EventRepository @Inject constructor(
 
     suspend fun deleteEvent(eventId: String) = withContext(Dispatchers.IO) {
         eventDao.deleteWithId(eventId = eventId)
-        goApi.deleteEvent(eventId = eventId)
+        coreService.deleteEvent(eventId = eventId)
     }
 
     suspend fun uploadEvent(event: Event) {
-        goApi.createEvent(event = event)
+        coreService.createEvent(event = event)
     }
 
     suspend fun toggleInterested(eventId: String) {
