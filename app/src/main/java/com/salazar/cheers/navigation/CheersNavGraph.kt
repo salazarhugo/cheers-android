@@ -39,12 +39,6 @@ fun CheersNavGraph(
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
 
-    LaunchedEffect(user) {
-        if (user == null)
-            return@LaunchedEffect
-        navActions.navigateToMain()
-    }
-
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -60,6 +54,8 @@ fun CheersNavGraph(
                 val hide = navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
                         || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
                         || currentRoute.contains(MainDestinations.STORY_ROUTE)
+                        || currentRoute.contains(MainDestinations.CHAT_ROUTE)
+                        || currentRoute.contains(MainDestinations.ROOM_DETAILS)
 
                 if (!hide)
                     Column {

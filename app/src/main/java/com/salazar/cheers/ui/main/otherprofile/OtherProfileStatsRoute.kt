@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.otherprofile
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -12,16 +13,13 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun OtherProfileStatsRoute(
-    otherProfileStatsViewModel: OtherProfileStatsViewModel,
+    otherProfileStatsViewModel: OtherProfileStatsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
-    username: String,
-    verified: Boolean,
 ) {
     val uiState by otherProfileStatsViewModel.uiState.collectAsState()
+
     OtherProfileStatsScreen(
         uiState = uiState,
-        username = username,
-        verified = verified,
         onSwipeRefresh = otherProfileStatsViewModel::onSwipeRefresh,
         onFollowToggle = otherProfileStatsViewModel::toggleFollow,
         onUserClicked = { navActions.navigateToOtherProfile(it) },

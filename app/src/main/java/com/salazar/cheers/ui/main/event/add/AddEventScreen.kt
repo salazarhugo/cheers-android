@@ -150,7 +150,7 @@ fun Tabs(
                     onHasEndDateToggle = { onAddEventUIAction(AddEventUIAction.OnHasEndDateToggle) }
                 )
                 1 -> DescriptionPage(
-                    uiState = uiState,
+                    description = uiState.description,
                     onDescriptionChange = onDescriptionChange,
                 )
                 2 -> LocationPage(
@@ -432,6 +432,7 @@ fun NameTextField(
     onEventNameChanged: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+
     OutlinedTextField(
         value = name,
         modifier = Modifier
@@ -652,7 +653,7 @@ fun LocationPage(
 
 @Composable
 fun DescriptionPage(
-    uiState: AddEventUiState,
+    description: String,
     onDescriptionChange: (String) -> Unit,
 ) {
     Column(
@@ -668,7 +669,7 @@ fun DescriptionPage(
             modifier = Modifier.padding(vertical = 16.dp)
         )
         DescriptionInput(
-            description = uiState.description,
+            description = description,
             onDescriptionChanged = onDescriptionChange,
         )
     }

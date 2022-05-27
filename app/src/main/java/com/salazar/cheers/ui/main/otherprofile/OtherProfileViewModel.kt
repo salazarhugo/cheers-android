@@ -67,10 +67,10 @@ private data class OtherProfileViewModelState(
 
 @HiltViewModel
 class OtherProfileViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
     private val chatRepository: ChatRepository,
-    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))

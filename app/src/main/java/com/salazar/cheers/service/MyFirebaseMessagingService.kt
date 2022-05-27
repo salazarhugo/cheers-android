@@ -15,12 +15,15 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
+import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.ui.theme.Purple200
 import com.salazar.cheers.util.Utils.getCircledBitmap
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.URL
+import javax.inject.Inject
 
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -31,9 +34,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (FirebaseAuth.getInstance().currentUser == null)
             return
 
-        GlobalScope.launch {
-            addTokenToNeo4j(newRegistrationToken)
-        }
+//        GlobalScope.launch {
+//            userRepository.addTokenToNeo4j(newRegistrationToken)
+//        }
     }
 
 
@@ -119,12 +122,4 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     }
 
-    companion object {
-        suspend fun addTokenToNeo4j(newRegistrationToken: String?) {
-            if (newRegistrationToken == null)
-                throw NullPointerException("FCM token is null.")
-
-            Neo4jUtil.addRegistrationToken(newRegistrationToken)
-        }
-    }
 }

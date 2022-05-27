@@ -1,105 +1,87 @@
 package com.salazar.cheers.ui.main.otherprofile
 
-import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.flow.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-sealed interface OtherProfileStatsUiState {
-
-    val isLoading: Boolean
-    val isFollowers: Boolean
-    val errorMessages: List<String>
-    val searchInput: String
-
-    data class NoUsers(
-        override val isLoading: Boolean,
-        override val isFollowers: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : OtherProfileStatsUiState
-
-    data class HasFollowers(
-        val followers: List<User>,
-        val following: List<User>,
-        override val isLoading: Boolean,
-        override val isFollowers: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String
-    ) : OtherProfileStatsUiState
-}
-
-private data class OtherProfileStatsViewModelState constructor(
-    val followers: List<User>? = null,
-    val following: List<User>? = null,
-    val isLoading: Boolean = false,
+data class OtherProfileStatsUiState(
+    val isLoadingFollowers: Boolean = true,
+    val isLoadingFollowing: Boolean = true,
     val isFollowers: Boolean = true,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
-) {
-    fun toUiState(): OtherProfileStatsUiState =
-        if (followers != null && following != null) {
-            OtherProfileStatsUiState.HasFollowers(
-                followers = followers,
-                following = following,
-                isLoading = isLoading,
-                isFollowers = isFollowers,
-                errorMessages = errorMessages,
-                searchInput = searchInput
-            )
-        } else {
-            OtherProfileStatsUiState.NoUsers(
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                isFollowers = isFollowers,
-                searchInput = searchInput
-            )
-        }
-}
+    val followers: List<User>? = null,
+    val following: List<User>? = null,
+    val username: String = "",
+    val verified: Boolean = false,
+)
 
-class OtherProfileStatsViewModel @AssistedInject constructor(
-    @Assisted private val username: String,
+
+@HiltViewModel
+class OtherProfileStatsViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val viewModelState =
-        MutableStateFlow(OtherProfileStatsViewModelState(isLoading = true))
+        MutableStateFlow(OtherProfileStatsUiState())
+
+    private lateinit var username: String
 
     val uiState = viewModelState
-        .map { it.toUiState() }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
+            viewModelState.value
         )
 
     init {
-        refreshFollowersFollowing()
+        stateHandle.get<Boolean>("verified")?.let { verified ->
+            viewModelState.update { it.copy(verified = verified) }
+        }
+        stateHandle.get<String>("username")?.let { username ->
+            viewModelState.update { it.copy(username = username) }
+            this.username = username
+        }
+        onSwipeRefresh()
     }
 
     fun onSwipeRefresh() {
-        refreshFollowersFollowing()
+        refreshFollowers()
+        refreshFollowing()
     }
 
-    private fun refreshFollowersFollowing() {
-        viewModelState.update { it.copy(isLoading = true) }
+    private fun refreshFollowing() {
+        viewModelState.update {
+            it.copy(isLoadingFollowing = true)
+        }
 
         viewModelScope.launch {
+            val following = userRepository.getFollowing(username)
             viewModelState.update {
-                val result = userRepository.getFollowersFollowing(userIdOrUsername = username)
-                it.copy(followers = result.first, following = result.second, isLoading = false)
+                it.copy(following = following, isLoadingFollowing = false)
+            }
+        }
+    }
+
+    private fun refreshFollowers() {
+        viewModelState.update {
+            it.copy(isLoadingFollowers = true)
+        }
+
+        viewModelScope.launch {
+            val followers = userRepository.getFollowers(username)
+            viewModelState.update {
+                it.copy(followers = followers, isLoadingFollowers = false)
             }
         }
     }
@@ -109,36 +91,4 @@ class OtherProfileStatsViewModel @AssistedInject constructor(
             userRepository.toggleFollow(user = user)
         }
     }
-
-    @AssistedFactory
-    interface OtherProfileStatsViewModelFactory {
-        fun create(username: String): OtherProfileStatsViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: OtherProfileStatsViewModelFactory,
-            username: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(username = username) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun otherProfileStatsViewModel(username: String): OtherProfileStatsViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).otherProfileStatsViewModelFactory()
-
-    return viewModel(
-        factory = OtherProfileStatsViewModel.provideFactory(
-            factory,
-            username = username
-        )
-    )
 }

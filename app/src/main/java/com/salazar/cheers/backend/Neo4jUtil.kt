@@ -58,15 +58,4 @@ object Neo4jUtil {
     suspend fun queryFriends(query: String): List<User> {
         return emptyList()
     }
-
-    suspend fun addRegistrationToken(registrationToken: String) = withContext(Dispatchers.IO) {
-        val data = hashMapOf(
-            "registrationToken" to registrationToken,
-        )
-
-        FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("setRegistrationToken")
-            .call(data)
-            .await()
-    }
 }

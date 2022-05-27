@@ -16,13 +16,14 @@ fun ButtonWithLoading(
     text: String,
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    valid: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         shape = RoundedCornerShape(8.dp),
         onClick = onClick,
         modifier = modifier,
-        enabled = !isLoading,
+        enabled = !isLoading && valid,
     ) {
         if (isLoading)
             CircularProgressIndicator(

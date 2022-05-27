@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @InstallIn(ActivityComponent::class)
     interface ViewModelFactoryProvider {
         fun storyStatsViewModelFactory(): StoryStatsViewModel.StoryStatsViewModelFactory
-        fun otherProfileStatsViewModelFactory(): OtherProfileStatsViewModel.OtherProfileStatsViewModelFactory
         fun drinkingStatsViewModelFactory(): DrinkingStatsViewModel.DrinkingStatsViewModelFactory
         fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
         fun sendGiftViewModelFactory(): SendGiftViewModel.SendGiftViewModelFactory

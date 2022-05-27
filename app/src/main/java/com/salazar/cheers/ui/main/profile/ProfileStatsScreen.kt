@@ -45,6 +45,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
@@ -76,9 +77,13 @@ fun ProfileStatsScreen(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
+            modifier = Modifier.padding(it),
         ) {
             Column {
-                Tabs(uiState, onUserClicked = onUserClicked, onFollowToggle)
+                Tabs(
+                    uiState = uiState,
+                    onUserClicked = onUserClicked, onFollowToggle
+                )
             }
         }
     }
@@ -90,11 +95,10 @@ fun Tabs(
     onUserClicked: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
-    val pages = if (uiState is ProfileStatsUiState.HasFollowers)
-        listOf("${uiState.followers.size} followers", "${uiState.following.size} following")
-    else
-        listOf("Followers", "Following")
+    val followersTitle = if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
+    val followingTitle = if (uiState.following == null) "Following" else "${uiState.following.size} following"
 
+    val pages = listOf(followersTitle, followingTitle)
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
 
@@ -124,13 +128,6 @@ fun Tabs(
             )
         }
     }
-    if (uiState.isLoading)
-        LinearProgressIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp),
-            color = MaterialTheme.colorScheme.onBackground,
-        )
     SearchBar()
     HorizontalPager(
         count = pages.size,
@@ -138,14 +135,8 @@ fun Tabs(
     ) { page ->
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
-                0 -> {
-                    if (uiState is ProfileStatsUiState.HasFollowers)
-                        Followers(followers = uiState.followers, onUserClicked)
-                }
-                1 -> {
-                    if (uiState is ProfileStatsUiState.HasFollowers)
-                        Following(following = uiState.following, onUserClicked, onFollowToggle)
-                }
+                0 -> Followers(followers = uiState.followers, onUserClicked)
+                1 -> Following(following = uiState.following, onUserClicked, onFollowToggle)
             }
         }
     }
@@ -153,27 +144,35 @@ fun Tabs(
 
 @Composable
 fun Followers(
-    followers: List<User>,
+    followers: List<User>?,
     onUserClicked: (username: String) -> Unit,
 ) {
-    LazyColumn {
-        items(followers, key = { it.id }) { follower ->
-            FollowerCard(follower, onUserClicked)
-        }
+    if (followers == null) {
+        LoadingScreen()
     }
+    else
+        LazyColumn {
+            items(followers, key = { it.id }) { follower ->
+                FollowerCard(follower, onUserClicked)
+            }
+        }
 }
 
 @Composable
 fun Following(
-    following: List<User>,
+    following: List<User>?,
     onUserClicked: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
-    LazyColumn {
-        items(following, key = { it.id }) { following ->
-            FollowingCard(following, onUserClicked, onFollowToggle = onFollowToggle)
-        }
+    if (following == null) {
+        LoadingScreen()
     }
+    else
+        LazyColumn {
+            items(following, key = { it.id }) { following ->
+                FollowingCard(following, onUserClicked, onFollowToggle = onFollowToggle)
+            }
+        }
 }
 
 @Composable
@@ -200,7 +199,7 @@ fun FollowerCard(
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(54.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
             )
@@ -217,6 +216,7 @@ fun FollowerCard(
         }
         OutlinedButton(
             shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.height(34.dp),
             onClick = { /* TODO */ }
         ) {
             Text("Remove")
@@ -249,7 +249,7 @@ fun FollowingCard(
                 ),
                 contentDescription = "Profile image",
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(54.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
             )

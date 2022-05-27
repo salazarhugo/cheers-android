@@ -54,7 +54,6 @@ import com.salazar.cheers.ui.main.nfc.NfcViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
-import com.salazar.cheers.ui.main.otherprofile.otherProfileStatsViewModel
 import com.salazar.cheers.ui.main.profile.*
 import com.salazar.cheers.ui.main.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
@@ -459,17 +458,8 @@ fun NavGraphBuilder.mainNavGraph(
             navArgument("verified") { defaultValue = false }
         ),
     ) {
-
-        val username = it.arguments?.getString("username")!!
-        val verified = it.arguments?.getBoolean("verified")!!
-
-        val otherProfileStatsViewModel = otherProfileStatsViewModel(username = username)
-
         OtherProfileStatsRoute(
-            otherProfileStatsViewModel = otherProfileStatsViewModel,
             navActions = navActions,
-            username = username,
-            verified = verified,
         )
     }
 

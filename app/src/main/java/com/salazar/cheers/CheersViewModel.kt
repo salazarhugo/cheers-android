@@ -76,18 +76,14 @@ class CheersViewModel @Inject constructor(
         viewModelState.update {
             it.copy(isLoading = true)
         }
-//        getAndSaveRegistrationToken()
+        getAndSaveRegistrationToken()
 
-//        viewModelScope.launch {
-//            userRepository.getUserFlow(
-//                FirebaseAuth.getInstance().currentUser?.uid!!,
-//                true
-//            ).collect { user ->
-//                viewModelState.update {
-//                    it.copy(user = user, isLoading = false)
-//                }
-//            }
-//        }
+        viewModelScope.launch {
+            val user = userRepository.getCurrentUserNullable() ?: return@launch
+            viewModelState.update {
+                it.copy(user = user, isLoading = false)
+            }
+        }
     }
 
     private fun getAndSaveRegistrationToken() {
@@ -103,11 +99,12 @@ class CheersViewModel @Inject constructor(
             val token = task.result
             viewModelScope.launch {
                 chatRepository.addToken(token = token)
-                MyFirebaseMessagingService.addTokenToNeo4j(token)
+                userRepository.addTokenToNeo4j(token)
                 FirestoreUtil.addFCMRegistrationToken(token = token)
             }
         }
     }
+
     fun onNewMessage() {
     }
 }

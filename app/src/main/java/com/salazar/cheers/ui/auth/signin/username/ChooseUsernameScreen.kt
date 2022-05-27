@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.components.share.AppBar
 import com.salazar.cheers.components.share.ButtonWithLoading
 import com.salazar.cheers.ui.main.add.TopAppBar
 
@@ -35,9 +36,17 @@ fun ChooseUsernameScreen(
     onClearUsername: () -> Unit,
     onUsernameChanged: (String) -> Unit,
     onNextClicked: () -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     Scaffold(
-        topBar = { TopAppBar {}}
+        topBar = {
+            AppBar(
+                title = "",
+                center = true,
+                backNavigation = true,
+                onNavigateBack = onBackPressed,
+            )
+        }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

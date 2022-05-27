@@ -33,19 +33,11 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE users.id IN (:ids)")
     suspend fun getUsersWithListOfIds(ids: List<String>): List<User>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User): Long
 
-    suspend fun insertOrUpdate(user: User) {
-        if (insert(user = user) == -1L)
-            update(user = user)
-    }
-
-    suspend fun insertOrUpdateAll(users: List<User>) {
-        users.forEach {
-            insertOrUpdate(user = it)
-        }
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(users: List<User>)
 
     @Delete
     suspend fun delete(user: User)

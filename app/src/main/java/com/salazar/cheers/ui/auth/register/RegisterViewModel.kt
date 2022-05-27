@@ -116,9 +116,32 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun register() {
+    private fun createUser(
+        email: String,
+        username: String,
+    ) {
+        viewModelScope.launch {
+            val user = userRepository.createUser(
+                username = username,
+                email = email,
+            )
+            if (user != null)
+                viewModelState.update { it.copy(success = true) }
+        }
+    }
+
+    fun registerUser() {
         val auth = Firebase.auth
         val username = uiState.value.username
+
+        if (auth.currentUser != null) {
+            viewModelScope.launch {
+                storeUserEmail.getEmail.collect { email ->
+                    if (email == null) return@collect
+                    createUser(email = email, username = username)
+                }
+            }
+        }
 
         if (!auth.isSignInWithEmailLink(emailLink))
             return
@@ -137,15 +160,10 @@ class RegisterViewModel @Inject constructor(
                     }
 
                     Log.d("YES", "Successfully signed in with email link!")
-
-                    viewModelScope.launch {
-                        val user = userRepository.createUser(
-                            username = username,
-                            email = email,
-                        )
-                        if (user != null)
-                            viewModelState.update { it.copy(success = true) }
-                    }
+                    createUser(
+                        email = email,
+                        username = username,
+                    )
                 }
             }
         }

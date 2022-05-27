@@ -57,11 +57,14 @@ fun RegisterRoute(
                         onNextClicked = {
                             registerViewModel.checkUsername()
                         },
+                        onBackPressed = {
+                            navActions.navigateToSignIn()
+                        }
                     )
                 1 ->
                     RegisterScreen(
                         uiState = uiState,
-                        onRegisterClick = registerViewModel::register,
+                        onRegisterClick = registerViewModel::registerUser,
                         onAcceptTermsChange = registerViewModel::onAcceptTermsChange,
                     )
             }

@@ -32,23 +32,28 @@ fun RechargeScreen(
         Column(
             modifier = Modifier
                 .padding(it)
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "Coins Balance",
-                style = MaterialTheme.typography.titleLarge,
-            )
-            AnimatedTextCounter(
-                targetState = coins,
-                style = MaterialTheme.typography.headlineLarge,
-            )
-        }
-        DividerM3(modifier = Modifier.padding(vertical = 16.dp))
-        LazyColumn {
-            items(recharges) {
-                RechargeItem(it, onRecharge = onRecharge)
+                .fillMaxWidth(),
+        ){
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "Coins Balance",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                AnimatedTextCounter(
+                    targetState = coins,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+            }
+            DividerM3(modifier = Modifier.padding(vertical = 16.dp))
+            LazyColumn {
+                items(recharges) {
+                    RechargeItem(it, onRecharge = onRecharge)
+                }
             }
         }
     }

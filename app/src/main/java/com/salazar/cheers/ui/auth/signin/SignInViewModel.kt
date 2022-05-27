@@ -50,6 +50,18 @@ class SignInViewModel @Inject constructor(
         stateHandle.get<String>("emailLink")?.let { emailLink ->
             signInWithEmailLink(emailLink = emailLink)
         }
+        checkIfAlreadySignedIn()
+    }
+
+    private fun checkIfAlreadySignedIn() {
+        if (Firebase.auth.currentUser != null) {
+            viewModelScope.launch {
+                userRepository.getCurrentUserNullable() ?: return@launch
+                viewModelState.update {
+                    it.copy(isSignedIn = true)
+                }
+            }
+        }
     }
 
     private fun signInWithEmailLink(emailLink: String) {
@@ -115,25 +127,6 @@ class SignInViewModel @Inject constructor(
         return email.isNotBlank()
     }
 
-    private fun getAndSaveRegistrationToken() {
-        if (FirebaseAuth.getInstance().currentUser == null)
-            return
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            // Get new FCM registration token
-            val token = task.result
-            viewModelScope.launch {
-                chatRepository.addToken(token = token)
-                MyFirebaseMessagingService.addTokenToNeo4j(token)
-                FirestoreUtil.addFCMRegistrationToken(token = token)
-            }
-        }
-    }
-
     fun onSignInClick() {
         updateIsLoading(true)
         val state = uiState.value
@@ -153,11 +146,10 @@ class SignInViewModel @Inject constructor(
         authRepository.sendSignInLink(email = email)
             .addOnSuccessListener {
                 updateErrorMessage("Email sent")
-                updateIsLoading(false)
+                viewModelScope.launch { storeUserEmail.saveEmail(email) }
             }
             .addOnFailureListener {
                 updateErrorMessage(it.message)
-                updateIsLoading(false)
             }
     }
 

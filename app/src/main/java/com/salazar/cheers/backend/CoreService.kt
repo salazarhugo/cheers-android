@@ -1,5 +1,6 @@
 package com.salazar.cheers.backend
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.Post
@@ -63,6 +64,21 @@ interface CoreService {
     suspend fun updateEvent(
         @Body() event: Event,
     )
+
+    @POST("users/tokens/{token}")
+    suspend fun addRegistrationToken(
+        @Path("token") token: String,
+    )
+
+    @GET("followers/list")
+    suspend fun followersList(
+        @Query("userIdOrUsername") userIdOrUsername: String,
+    ): List<User>
+
+    @GET("following/list")
+    suspend fun followingList(
+        @Query("userIdOrUsername") userIdOrUsername: String,
+    ): List<User>
 
     @GET("users/{userIdOrUsername}")
     suspend fun getUser(

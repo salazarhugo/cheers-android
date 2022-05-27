@@ -65,8 +65,22 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getFollowersFollowing(userIdOrUsername: String) = withContext(Dispatchers.IO) {
-        return@withContext service.getFollowersFollowing(userIdOrUsername = userIdOrUsername)
+    suspend fun getFollowers(userIdOrUsername: String) = withContext(Dispatchers.IO) {
+        return@withContext try {
+            coreService.followersList(userIdOrUsername = userIdOrUsername)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getFollowing(userIdOrUsername: String) = withContext(Dispatchers.IO) {
+        return@withContext try {
+            coreService.followingList(userIdOrUsername = userIdOrUsername)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     suspend fun getLocations(): FeatureCollection {
@@ -130,7 +144,7 @@ class UserRepository @Inject constructor(
             }
 
             remoteUsers?.let { users ->
-                userDao.insertOrUpdateAll(users)
+                userDao.insertAll(users)
                 emit(
                     Resource.Success(
                         data = users
@@ -191,6 +205,10 @@ class UserRepository @Inject constructor(
         return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 
+    suspend fun getCurrentUserNullable(): User? {
+        return userDao.getUserNullable(FirebaseAuth.getInstance().currentUser?.uid!!)
+    }
+
     suspend fun getCurrentUser(): User {
         return userDao.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
     }
@@ -215,7 +233,7 @@ class UserRepository @Inject constructor(
             }
 
             remoteUser?.let { safeRemoteUser ->
-                userDao.insertOrUpdate(safeRemoteUser)
+                userDao.insert(safeRemoteUser)
                 emit(Resource.Success(userDao.getUser(userId)))
             }
             emit(Resource.Loading(false))
@@ -228,6 +246,7 @@ class UserRepository @Inject constructor(
     ): Flow<User> {
         return flow {
             val user = userDao.getUserNullable(userIdOrUsername = userIdOrUsername)
+            Log.d("HAHA", user.toString())
 
             if (user != null)
                 emit(user)
@@ -243,7 +262,7 @@ class UserRepository @Inject constructor(
             }
 
             remoteUser?.let { user ->
-                userDao.insertOrUpdate(user)
+                userDao.insert(user)
                 emit(user)
             }
         }
@@ -253,7 +272,7 @@ class UserRepository @Inject constructor(
         when (val result = service.getSuggestions()) {
             is Result.Success -> {
                 val suggestions = result.data
-                userDao.insertOrUpdateAll(suggestions)
+                userDao.insertAll(suggestions)
                 val ids = suggestions.map { it.id }
                 return@withContext userDao.getUsersWithListOfIds(ids)
             }
@@ -262,5 +281,12 @@ class UserRepository @Inject constructor(
                 return@withContext emptyList()
             }
         }
+    }
+
+    suspend fun addTokenToNeo4j(newRegistrationToken: String?) {
+        if (newRegistrationToken == null)
+            throw NullPointerException("FCM token is null.")
+
+        coreService.addRegistrationToken(newRegistrationToken)
     }
 }
