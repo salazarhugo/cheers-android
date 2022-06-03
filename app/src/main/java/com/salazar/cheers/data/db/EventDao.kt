@@ -44,6 +44,17 @@ interface EventDao {
     @Query("UPDATE events SET interested = :interested, interestedCount = :count WHERE eventId = :eventId")
     suspend fun updateInterested(eventId: String, interested: Boolean, count: Int)
 
+    @Query("UPDATE events SET going = :going, goingCount = :count WHERE eventId = :eventId")
+    suspend fun updateGoing(eventId: String, going: Boolean, count: Int)
+
+    @Transaction
+    suspend fun toggleGoing(eventId: String) {
+        val event = getEventT(eventId)
+        val going = !event.going
+        val count = if (event.going) event.goingCount - 1 else event.goingCount + 1
+        updateGoing(eventId, going, count)
+    }
+
     @Transaction
     suspend fun toggleInterested(eventId: String) {
         val event = getEventT(eventId)

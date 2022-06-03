@@ -7,8 +7,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Badge
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FilterCenterFocus
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.rounded.Home
@@ -62,14 +64,14 @@ fun CheersNavigationBar(
             navigateToCamera,
             {
                 Icon(
-                    Icons.Default.FilterCenterFocus,
+                    Icons.Outlined.Event,
                     null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             },
             {
                 Icon(
-                    Icons.Default.FilterCenterFocus,
+                    Icons.Default.Event,
                     null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )

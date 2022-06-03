@@ -65,6 +65,14 @@ class EventRepository @Inject constructor(
         coreService.updateEvent(event = event)
     }
 
+    private suspend fun goingEvent(eventId: String) {
+        coreService.goingEvent(eventId = eventId)
+    }
+
+    private suspend fun ungoingEvent(eventId: String) {
+        coreService.ungoingEvent(eventId = eventId)
+    }
+
     private suspend fun uninterestEvent(eventId: String) {
         coreService.uninterestEvent(eventId = eventId)
     }
@@ -86,8 +94,20 @@ class EventRepository @Inject constructor(
         coreService.createEvent(event = event)
     }
 
+    suspend fun toggleGoing(eventId: String) {
+        eventDao.toggleGoing(eventId = eventId)
+    }
+
     suspend fun toggleInterested(eventId: String) {
         eventDao.toggleInterested(eventId = eventId)
+    }
+
+    suspend fun toggleGoing(event: Event) {
+        eventDao.update(event.copy(going = !event.going))
+        if (event.going)
+            ungoingEvent(event.id)
+        else
+            goingEvent(event.id)
     }
 
     suspend fun toggleInterested(event: Event) {

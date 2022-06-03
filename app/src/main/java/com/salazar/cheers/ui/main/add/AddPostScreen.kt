@@ -545,11 +545,13 @@ fun AddPeople(
         )
         if (selectedTagUsers.size == 1)
             Text(text = selectedTagUsers[0].username, style = MaterialTheme.typography.labelLarge)
-        if (selectedTagUsers.size > 1)
+        else if (selectedTagUsers.size > 1)
             Text(
-                text = "${selectedTagUsers.size} people",
+                text = "${selectedTagUsers.size} friends",
                 style = MaterialTheme.typography.labelLarge
             )
+        else
+            Icon(Icons.Outlined.People, contentDescription = null)
     }
 }
 

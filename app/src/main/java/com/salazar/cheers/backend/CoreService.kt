@@ -133,6 +133,16 @@ interface CoreService {
         @Path("postId") postId: String,
     )
 
+    @POST("event/{eventId}/going")
+    suspend fun goingEvent(
+        @Path("eventId") eventId: String,
+    )
+
+    @POST("event/{eventId}/ungoing")
+    suspend fun ungoingEvent(
+        @Path("eventId") eventId: String,
+    )
+
     @POST("event/interest")
     suspend fun interestEvent(
         @Query("eventId") eventId: String,

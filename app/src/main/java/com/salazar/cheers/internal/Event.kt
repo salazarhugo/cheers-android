@@ -25,6 +25,7 @@ data class Event(
     val showOnMap: Boolean = false,
     val interested: Boolean = false,
     val interestedCount: Int = 0,
+    val going: Boolean = false,
     val goingCount: Int = 0,
     val imageUrl: String = "",
     val address: String = "",

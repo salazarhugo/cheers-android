@@ -5,7 +5,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Help
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material.icons.outlined.QuestionAnswer
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.DeviceUnknown
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.*
@@ -20,6 +25,8 @@ import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.event.EventDetails
+import com.salazar.cheers.components.event.EventGoingButton
+import com.salazar.cheers.components.event.EventInterestButton
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.Event
@@ -32,6 +39,7 @@ fun EventsScreen(
     events: LazyPagingItems<Event>,
     onEventClicked: (String) -> Unit,
     onInterestedToggle: (Event) -> Unit,
+    onGoingToggle: (Event) -> Unit,
     onQueryChange: (String) -> Unit,
     onMoreClick: (String) -> Unit,
 ) {
@@ -67,6 +75,7 @@ fun EventsScreen(
                 onEventClicked = onEventClicked,
                 onInterestedToggle = onInterestedToggle,
                 onMoreClick = onMoreClick,
+                onGoingToggle = onGoingToggle,
             )
         }
     }
@@ -77,6 +86,7 @@ fun EventList(
     events: LazyPagingItems<Event>,
     onEventClicked: (String) -> Unit,
     onInterestedToggle: (Event) -> Unit,
+    onGoingToggle: (Event) -> Unit,
     onMoreClick: (String) -> Unit,
 ) {
     LazyColumn(
@@ -89,6 +99,7 @@ fun EventList(
                     onEventClicked = onEventClicked,
                     onInterestedToggle = onInterestedToggle,
                     onMoreClick = onMoreClick,
+                    onGoingToggle = onGoingToggle,
                 )
             }
         }
@@ -100,6 +111,7 @@ fun Event(
     event: Event,
     onEventClicked: (String) -> Unit,
     onInterestedToggle: (Event) -> Unit,
+    onGoingToggle: (Event) -> Unit,
     onMoreClick: (String) -> Unit,
 ) {
     Column {
@@ -150,26 +162,20 @@ fun Event(
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
         )
 
-        val icon = if (event.interested) Icons.Rounded.Star else Icons.Rounded.StarBorder
-
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(16.dp)
         ) {
-            FilledTonalButton(
-                onClick = { onInterestedToggle(event) },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(icon, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Interested")
-            }
-            FilledTonalButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Going")
-            }
+            EventInterestButton(
+                interested = event.interested,
+                modifier = Modifier.weight(1f),
+                onInterestedToggle = { onInterestedToggle(event)},
+            )
+            EventGoingButton(
+                going = event.going,
+                modifier = Modifier.weight(1f),
+                onGoingToggle = { onGoingToggle(event)},
+            )
         }
     }
 }

@@ -28,8 +28,8 @@ fun EventDetailRoute(
             uiState = uiState as EventDetailUiState.HasEvent,
             onMapClick = { navActions.navigateToMap() },
             onUserClicked = { navActions.navigateToOtherProfile(it) },
-            onInterested = eventDetailViewModel::onInterestedToggle,
-            onGoing = eventDetailViewModel::onGoingToggle,
+            onInterestedToggle = eventDetailViewModel::onInterestedToggle,
+            onGoingToggle = eventDetailViewModel::onGoingToggle,
             onCopyLink = {
                 val eventId = (uiState as EventDetailUiState.HasEvent).event.id
                 FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
@@ -42,8 +42,11 @@ fun EventDetailRoute(
                 val eventId = (uiState as EventDetailUiState.HasEvent).event.id
                 navActions.navigateToEditEvent(eventId)
             },
-            onDeleteClick = eventDetailViewModel::deleteEvent,
+            onDeleteClick = {
+                eventDetailViewModel.deleteEvent()
+                navActions.navigateBack()
+            },
         )
-    else
-        LoadingScreen()
+        else
+            LoadingScreen()
 }

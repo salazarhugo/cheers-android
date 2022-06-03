@@ -41,9 +41,9 @@ fun EventDetailScreen(
     onUserClicked: (String) -> Unit,
     onCopyLink: () -> Unit,
     onEditClick: () -> Unit,
-    onGoing: () -> Unit,
-    onInterested: () -> Unit,
     onDeleteClick: () -> Unit,
+    onInterestedToggle: (Event) -> Unit,
+    onGoingToggle: (Event) -> Unit,
 ) {
     val state = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -77,8 +77,8 @@ fun EventDetailScreen(
                                 state.show()
                             }
                         },
-                        onGoing = onGoing,
-                        onInterested = onInterested,
+                        onInterestedToggle = onInterestedToggle,
+                        onGoingToggle = onGoingToggle,
                     )
                     is EventDetailUiState.NoEvents -> {
                         Text("No event")
@@ -95,8 +95,8 @@ fun Event(
     onMapClick: () -> Unit,
     onUserClicked: (String) -> Unit,
     onManageClick: () -> Unit,
-    onGoing: () -> Unit,
-    onInterested: () -> Unit,
+    onInterestedToggle: (Event) -> Unit,
+    onGoingToggle: (Event) -> Unit,
 ) {
     val state =  rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -112,8 +112,8 @@ fun Event(
                     }
                 },
                 onManageClick = onManageClick,
-                onInterested = onInterested,
-                onGoing = onGoing,
+                onInterested = {},
+                onGoing = {},
             )
         }
 
@@ -139,22 +139,18 @@ fun Event(
         item {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(16.dp)
             ) {
-                FilledTonalButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(Icons.Default.StarBorder, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Interested")
-                }
-                FilledTonalButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Going")
-                }
+                EventInterestButton(
+                    interested = event.interested,
+                    modifier = Modifier.weight(1f),
+                    onInterestedToggle = { onInterestedToggle(event)},
+                )
+                EventGoingButton(
+                    going = event.going,
+                    modifier = Modifier.weight(1f),
+                    onGoingToggle = { onGoingToggle(event)},
+                )
             }
         }
     }

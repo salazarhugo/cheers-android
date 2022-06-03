@@ -100,12 +100,17 @@ class EventDetailViewModel @Inject constructor(
 //        }
     }
 
-    fun onInterestedToggle() {
+    fun onGoingToggle(event: Event) {
         viewModelScope.launch {
-            eventRepository.toggleInterested(eventId = eventId)
+            eventRepository.toggleGoing(event = event)
         }
     }
 
+    fun onInterestedToggle(event: Event) {
+        viewModelScope.launch {
+            eventRepository.toggleInterested(event = event)
+        }
+    }
 
     fun deleteEvent() {
         viewModelScope.launch {

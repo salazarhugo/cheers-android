@@ -35,6 +35,7 @@ import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.UserProfilePicture
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
 import com.salazar.cheers.ui.theme.Roboto
@@ -63,6 +64,7 @@ fun AddPeopleScreen(
     ) {
         Column(
             modifier = Modifier
+                .padding(it)
                 .fillMaxSize()
                 .animateContentSize()
         ) {
@@ -130,14 +132,7 @@ fun UserCard(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(model = user.profilePictureUrl),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
+            UserProfilePicture(profilePictureUrl = user.profilePictureUrl)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (user.name.isNotBlank())

@@ -59,6 +59,12 @@ class EventsViewModel @Inject constructor(
         }
     }
 
+    fun onGoingToggle(event: Event) {
+        viewModelScope.launch {
+            eventRepository.toggleGoing(event = event)
+        }
+    }
+
     fun onInterestedToggle(event: Event) {
         viewModelScope.launch {
             eventRepository.toggleInterested(event = event)

@@ -20,15 +20,15 @@ fun CreatePasswordScreen(
     onPasswordChange: (String) -> Unit,
     onCreatePassword: () -> Unit,
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.errorMessage) {
         if (uiState.errorMessage.isNotBlank())
-            snackbarHostState.showSnackbar(uiState.errorMessage)
+            snackBarHostState.showSnackbar(uiState.errorMessage)
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Password") },
         bottomBar = {
             ShareButton(

@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,6 +18,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.salazar.cheers.CheersUiState
 import com.salazar.cheers.components.CheersNavigationBar
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.internal.User
@@ -23,6 +26,7 @@ import com.salazar.cheers.ui.theme.GreySheet
 
 @Composable
 fun CheersNavGraph(
+    uiState: CheersUiState,
     darkTheme: Boolean,
     showInterstitialAd: () -> Unit,
     user: User?,
@@ -30,6 +34,7 @@ fun CheersNavGraph(
     val startDestination = CheersDestinations.AUTH_ROUTE
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberAnimatedNavController(bottomSheetNavigator)
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val navActions = remember(navController) {
         CheersNavigationActions(navController)
@@ -38,6 +43,11 @@ fun CheersNavGraph(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
+
+    LaunchedEffect(uiState.errorMessage) {
+        if (uiState.errorMessage.isNotBlank())
+            snackBarHostState.showSnackbar(uiState.errorMessage)
+    }
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
@@ -50,6 +60,7 @@ fun CheersNavGraph(
             .navigationBarsPadding(),
     ) {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackBarHostState) },
             bottomBar = {
                 val hide = navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
                         || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
@@ -66,7 +77,7 @@ fun CheersNavGraph(
                             navigateToHome = navActions.navigateToHome,
                             navigateToMap = navActions.navigateToMap,
                             navigateToSearch = navActions.navigateToSearch,
-                            navigateToCamera = navActions.navigateToCamera,
+                            navigateToCamera = navActions.navigateToEvents,
                             navigateToMessages = navActions.navigateToMessages,
                             navigateToProfile = navActions.navigateToProfile,
                         )

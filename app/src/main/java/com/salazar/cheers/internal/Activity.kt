@@ -12,6 +12,7 @@ data class Activity(
     val type: ActivityType = NONE,
     val userId: String = "",
     val eventId: String = "",
+    val avatar: String = "",
     val photoUrl: String = "",
     val username: String = "",
     val verified: Boolean = false,

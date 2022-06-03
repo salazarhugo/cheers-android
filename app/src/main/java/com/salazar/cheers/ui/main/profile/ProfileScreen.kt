@@ -172,6 +172,7 @@ fun Profile(
                                         event = it,
                                         onEventClicked = {},
                                         onInterestedToggle = {},
+                                        onGoingToggle = {},
                                         onMoreClick = {},
                                     )
                                 }
@@ -195,6 +196,7 @@ fun EventList(
             Event(
                 event = event,
                 onEventClicked = {},
+                onGoingToggle = {},
                 onInterestedToggle = {},
                 onMoreClick = {},
             )

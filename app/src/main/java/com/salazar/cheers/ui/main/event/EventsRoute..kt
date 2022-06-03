@@ -29,6 +29,7 @@ fun EventsRoute(
         },
         onQueryChange = eventsViewModel::onQueryChange,
         onInterestedToggle = eventsViewModel::onInterestedToggle,
+        onGoingToggle = eventsViewModel::onGoingToggle,
         onMoreClick = {
             navActions.navigateToEventMoreSheet(it)
         }

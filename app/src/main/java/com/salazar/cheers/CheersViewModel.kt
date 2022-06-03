@@ -3,6 +3,7 @@ package com.salazar.cheers
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.EmailAuthCredential
@@ -11,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.ktx.messaging
 import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.data.entities.UserPreference
@@ -54,7 +56,6 @@ class CheersViewModel @Inject constructor(
         )
 
     init {
-
     }
 
     fun queryPurchases() {
