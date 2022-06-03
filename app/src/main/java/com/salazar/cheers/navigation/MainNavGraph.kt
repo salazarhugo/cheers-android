@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.post.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.AddPostRoute
 import com.salazar.cheers.ui.main.add.AddPostViewModel
 import com.salazar.cheers.ui.main.camera.CameraRoute
@@ -98,6 +99,12 @@ fun NavGraphBuilder.mainNavGraph(
                 nfcViewModel = nfcViewModel,
                 navActions = navActions
             )
+        }
+
+        composable(
+            route = MainDestinations.ACTIVITY_ROUTE,
+        ) {
+            ActivityRoute(navActions = navActions)
         }
 
         composable(
@@ -443,10 +450,8 @@ fun NavGraphBuilder.mainNavGraph(
         route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
         deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
     ) {
-        val postDetailViewModel = hiltViewModel<PostDetailViewModel>()
 
         PostDetailRoute(
-            postDetailViewModel = postDetailViewModel,
             navActions = navActions,
         )
     }

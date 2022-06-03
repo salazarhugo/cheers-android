@@ -4,22 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GetTokenResult
-import com.salazar.cheers.ChatServiceGrpcKt
 import com.salazar.cheers.GetRoomIdReq
-import com.salazar.cheers.backend.ChatService
-import com.salazar.cheers.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.grpc.ManagedChannelBuilder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -88,15 +79,18 @@ class OtherProfileViewModel @Inject constructor(
         savedStateHandle.get<String>("username")?.let { username ->
             this.username = username
         }
-        getUser(false)
+        viewModelScope.launch {
+            userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
+                updateUser(user)
+            }
+        }
+        refreshUser()
         refreshUserPosts()
     }
 
-    private fun getUser(fetchFromRemote: Boolean) {
+    private fun refreshUser() {
         viewModelScope.launch {
-            userRepository.getUserFlow(userIdOrUsername = username, fetchFromRemote).collect { user ->
-                updateUser(user)
-            }
+            userRepository.fetchUser(userIdOrUsername = username)
         }
     }
 
@@ -113,10 +107,9 @@ class OtherProfileViewModel @Inject constructor(
     }
 
     fun onSwipeRefresh() {
-        getUser(true)
+        refreshUser()
         refreshUserPosts()
     }
-
 
     fun toggleFollow(user: User) {
         viewModelScope.launch {
@@ -124,7 +117,7 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateUser(user: User?) {
+    private fun updateUser(user: User?) {
         viewModelState.update {
             it.copy(user = user)
         }

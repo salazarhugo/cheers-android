@@ -73,14 +73,23 @@ class PostDetailViewModel @Inject constructor(
             this@PostDetailViewModel.postId = postId
             refreshPost()
         }
+        viewModelScope.launch {
+            postRepository.postFlow(postId = postId).collect { post ->
+                updatePost(post)
+            }
+        }
     }
 
     private fun refreshPost() {
         viewModelScope.launch {
             val post = postRepository.getPost(postId = postId)
-            viewModelState.update {
-                it.copy(postFeed = post)
-            }
+            updatePost(post)
+        }
+    }
+
+    private fun updatePost(post: Post) {
+        viewModelState.update {
+            it.copy(postFeed = post)
         }
     }
 

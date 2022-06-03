@@ -51,5 +51,6 @@ fun HomeRoute(
         onEventClicked = { navActions.navigateToEventDetail(it) },
         onStoryClick = { navActions.navigateToStory() },
         onAddStoryClick = { navActions.navigateToCamera() },
+        onActivityClick = { navActions.navigateToActivity() }
     )
 }

@@ -2,9 +2,12 @@ package com.salazar.cheers.data.repository
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
@@ -13,8 +16,10 @@ import com.salazar.cheers.data.db.PostDao
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserStatsDao
 import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -155,11 +160,44 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun updateUser(username: String) {
+    suspend fun updateUser(user: User) = withContext(Dispatchers.IO) {
         try {
-            coreService.followUser(username = username)
+            userDao.update(user)
+            Neo4jUtil.updateUser(
+                username = user.username,
+                profilePictureUrl = user.profilePictureUrl,
+                name = user.name,
+                bio = user.bio,
+                website = user.website,
+            )
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    suspend fun getActivity(fetchFromRemote: Boolean = false): Flow<List<Activity>?> {
+        return flow {
+            val activity = userDao.getActivity()
+            emit(activity)
+
+            if (!fetchFromRemote)
+                return@flow
+
+            val remoteActivity =  try {
+                coreService.getActivity()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                null
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                null
+            }
+
+            remoteActivity?.let {
+                userDao.clearActivity()
+                userDao.insert(it.map { it.copy(accountId = Firebase.auth.currentUser?.uid!!) })
+                emit(userDao.getActivity())
+            }
         }
     }
 
@@ -240,31 +278,26 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun getUserFlow(
+    fun getCurrentUserFlow(): Flow<User> {
+        return userDao.getUserFlow(userIdOrUsername = Firebase.auth.currentUser?.uid!!)
+    }
+
+    fun getUserFlow(userIdOrUsername: String): Flow<User> {
+        return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
+    }
+
+    suspend fun fetchUser(
         userIdOrUsername: String,
-        fetchFromRemote: Boolean = false,
-    ): Flow<User> {
-        return flow {
-            val user = userDao.getUserNullable(userIdOrUsername = userIdOrUsername)
-            Log.d("HAHA", user.toString())
+    ) {
+        val remoteUser = try {
+            coreService.getUser(userIdOrUsername = userIdOrUsername)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
 
-            if (user != null)
-                emit(user)
-
-            if (user != null && !fetchFromRemote)
-                return@flow
-
-            val remoteUser = try {
-                coreService.getUser(userIdOrUsername = userIdOrUsername)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-
-            remoteUser?.let { user ->
-                userDao.insert(user)
-                emit(user)
-            }
+        remoteUser?.let { user ->
+            userDao.insert(user)
         }
     }
 

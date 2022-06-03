@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
@@ -41,7 +42,9 @@ interface PostDao {
 //    @Query("SELECT users.id FROM users WHERE username = :username")
 //    suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
-    @Transaction
+    @Query("SELECT * FROM posts WHERE posts.postId = :postId")
+    fun postFlow(postId: String): Flow<Post>
+
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
     suspend fun getPost(postId: String): Post
 

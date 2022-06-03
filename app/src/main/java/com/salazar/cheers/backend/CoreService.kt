@@ -1,7 +1,7 @@
 package com.salazar.cheers.backend
 
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable
 import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -15,6 +15,9 @@ interface CoreService {
     suspend fun searchUsers(
         @Path("query") query: String,
     ): List<User>
+
+    @GET("users/activity")
+    suspend fun getActivity(): List<Activity>
 
     @GET("events")
     suspend fun getEvents(

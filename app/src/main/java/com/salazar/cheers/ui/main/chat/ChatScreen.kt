@@ -16,9 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +71,7 @@ fun ChatScreen(
     onInfoClick: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
+    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(TopAppBarScrollState(0f, 0f, 0f )) }
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
     val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }

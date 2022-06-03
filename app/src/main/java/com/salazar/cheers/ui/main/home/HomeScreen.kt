@@ -14,9 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.ContactPage
-import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material.icons.outlined.PostAdd
+import androidx.compose.material.icons.filled.NotificationImportant
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -68,6 +67,7 @@ import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import java.util.*
 import kotlin.math.absoluteValue
@@ -87,6 +87,7 @@ fun HomeScreen(
     navigateToSearch: () -> Unit,
     onSelectTab: (Int) -> Unit,
     onStoryClick: () -> Unit,
+    onActivityClick: () -> Unit,
     onAddStoryClick: () -> Unit,
     onLike: (post: Post) -> Unit,
 ) {
@@ -104,6 +105,7 @@ fun HomeScreen(
                     navigateToSearch = navigateToSearch,
                     onSelectTab = onSelectTab,
                     tab = uiState.selectedTab,
+                    onActivityClick = onActivityClick,
                 )
                 if (showDivider)
                     DividerM3()
@@ -212,7 +214,7 @@ fun NativeAdPost(ad: NativeAd) {
         ) {
             if (ad.icon != null) {
                 Image(
-                    rememberAsyncImagePainter(model = ad.icon.uri),
+                    rememberAsyncImagePainter(model = ad.icon!!.uri),
                     null,
                     modifier = Modifier.size(24.dp)
                 )
@@ -250,7 +252,7 @@ fun NativeAdPost(ad: NativeAd) {
                     })
                 }
 
-                if (ad.mediaContent.hasVideoContent()) {
+//                if (ad.mediaContent.hasVideoContent()) {
 //                    val context = ()
 //                    val mediaView = MediaView(context).apply {
 //                        setMediaContent(ad.mediaContent!!)
@@ -258,7 +260,7 @@ fun NativeAdPost(ad: NativeAd) {
 //                    }
 //                    adView.addView(mediaView)
 //                    adView.mediaView = mediaView
-                }
+//                }
                 adView
             },
             modifier = Modifier.clickable {
@@ -661,60 +663,40 @@ fun MyAppBar(
     tab: Int,
     onSelectTab: (Int) -> Unit,
     navigateToSearch: () -> Unit,
+    onActivityClick: () -> Unit,
 ) {
     val icon =
         if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
     CenterAlignedTopAppBar(
-        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior { true },
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState()),
         colors = TopAppBarDefaults.smallTopAppBarColors(
 //            containerColor = Purple200
         ),
-//        CenterAlignedTopAppBar(
-//            modifier = Modifier.height(50.dp),
-        title = {
-            Row(
+        navigationIcon = {
+            Image(
+                painter = painterResource(icon),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Image(
-                    painter = painterResource(icon),
-                    modifier = Modifier
-                        .size(34.dp),
-                    contentDescription = "",
-                )
-                TopTabs(tab = tab, onSelectTab = onSelectTab)
-                IconButton(onClick = navigateToSearch) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(model = R.drawable.ic_search_icon),
-                        contentDescription = "Search icon"
-                    )
-                }
-            }
+                    .padding(horizontal = 16.dp)
+                    .size(34.dp),
+                contentDescription = null,
+            )
+        },
+        title = {
+            Text("Friends", fontWeight = FontWeight.Bold, fontFamily = Roboto)
         },
         actions = {
-//            IconButton(onClick = { navActions.navigateToSearch() }) {
-//                Icon(
-//                    painter = rememberImagePainter(data = R.drawable.ic_search_icon),
-//                    contentDescription = "Search icon"
-//                )
-//            }
-//            IconButton(onClick = { navActions.navigateToActivity() }) {
-//                Icon(
-//                    imageVector = Icons.Outlined.Notifications,
-//                    contentDescription = "Activity icon"
-//                )
-//            }
-//            IconButton(onClick = {
-//                navActions.navigateToCamera()
-//            }) {
-//                Icon(
-//                    Icons.Outlined.Camera,
-//                    contentDescription = "Activity icon"
-//                )
-//            }
+            IconButton(onClick = onActivityClick) {
+                Icon(
+                    Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Search icon"
+                )
+            }
+            IconButton(onClick = navigateToSearch) {
+                Icon(
+                    painter = rememberAsyncImagePainter(model = R.drawable.ic_search_icon),
+                    contentDescription = "Search icon"
+                )
+            }
         },
     )
 }

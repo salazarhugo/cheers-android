@@ -7,6 +7,7 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.PostRemoteMediator
+import com.salazar.cheers.data.repository.StoryRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,22 @@ class PostRepository @Inject constructor(
         }.flow
     }
 
+    suspend fun likePost(postId: String) {
+        try {
+            coreService.likePost(postId = postId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun unlikePost(postId: String) {
+        try {
+            coreService.unlikePost(postId = postId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun addPost(post: Post) {
         try {
             coreService.createPost(post = post)
@@ -79,7 +96,9 @@ class PostRepository @Inject constructor(
 //        }
         }
 
-        suspend fun getPost(postId: String): Post {
+        suspend fun postFlow(postId: String) = postDao.postFlow(postId = postId)
+
+         suspend fun getPost(postId: String): Post {
             val post = postDao.getPost(postId = postId)
             return post.copy()
         }
@@ -90,9 +109,9 @@ class PostRepository @Inject constructor(
             postDao.update(post.copy(liked = !post.liked, likes = likes))
 
             if (post.liked)
-                coreService.unlikePost(postId = post.id)
+                unlikePost(postId = post.id)
             else
-                coreService.likePost(postId = post.id)
+                likePost(postId = post.id)
         }
 
         companion object {

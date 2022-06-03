@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.components.DividerM3
@@ -89,8 +90,12 @@ fun AddEventScreen(
                     .fillMaxSize()
                     .padding(it),
             ) {
+                val pagerState = rememberPagerState()
+                val scope = rememberCoroutineScope()
                 Tabs(
                     uiState = uiState,
+                    modifier = Modifier.weight(1f),
+                    pagerState = pagerState,
                     onAddEventUIAction = onAddEventUIAction,
                     onNameChange = onNameChange,
                     onDescriptionChange = onDescriptionChange,
@@ -98,6 +103,22 @@ fun AddEventScreen(
                     onEndTimeSecondsChange = onEndTimeSecondsChange,
                     onQueryChange = onQueryChange,
                     onLocationClick = onLocationClick,
+                )
+                HorizontalPagerIndicator(
+                    pagerState = pagerState,
+                    modifier = Modifier.padding(16.dp),
+                )
+                ShareButton(
+                    page = pagerState.currentPage,
+                    uiState = uiState,
+                    onClick = {
+                        if (pagerState.currentPage == 3)
+                            onAddEventUIAction(AddEventUIAction.OnUploadEvent)
+                        else
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                    }
                 )
             }
         }
@@ -122,6 +143,8 @@ fun TopAppBar(
 @Composable
 fun Tabs(
     uiState: AddEventUiState,
+    pagerState: PagerState,
+    modifier: Modifier,
     onAddEventUIAction: (AddEventUIAction) -> Unit,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
@@ -131,13 +154,12 @@ fun Tabs(
     onLocationClick: (SearchSuggestion) -> Unit,
 ) {
     val tabs = 4
-    val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
 
     HorizontalPager(
+        modifier = modifier,
         count = tabs,
         state = pagerState,
-        modifier = Modifier.height(600.dp),
         userScrollEnabled = false,
     ) { page ->
         Column(modifier = Modifier.fillMaxHeight()) {
@@ -183,22 +205,6 @@ fun Tabs(
             }
         }
     }
-    HorizontalPagerIndicator(
-        pagerState = pagerState,
-        modifier = Modifier.padding(16.dp),
-    )
-    ShareButton(
-        page = pagerState.currentPage,
-        uiState = uiState,
-        onClick = {
-            if (pagerState.currentPage == 3)
-                onAddEventUIAction(AddEventUIAction.OnUploadEvent)
-            else
-                scope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                }
-        }
-    )
 }
 
 @Composable
@@ -455,13 +461,14 @@ fun NameTextField(
 
 @Composable
 fun ShareButton(
+    modifier: Modifier = Modifier,
     page: Int,
     uiState: AddEventUiState,
     onClick: () -> Unit,
 ) {
     val text = if (page == 3) "Create Event" else "Next"
     Column(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = modifier,
         verticalArrangement = Arrangement.Bottom,
     ) {
         DividerM3()

@@ -25,6 +25,7 @@ import java.util.*
         ChatChannel::class,
         ChatMessage::class,
         UserStats::class,
+        Activity::class,
     ],
     version = 1,
     exportSchema = false,
@@ -66,6 +67,15 @@ abstract class CheersDatabase : RoomDatabase() {
 }
 
 class Converters {
+    @TypeConverter
+    fun fromActivityType(value: ActivityType) = value.name
+
+    @TypeConverter
+    fun toActivityType(name: String) =
+        ActivityType.values()
+            .firstOrNull { it.name.equals(name, ignoreCase = true) }
+            ?: ActivityType.NONE
+
     @TypeConverter
     fun fromMessageType(value: com.salazar.cheers.MessageType) = value.name
 

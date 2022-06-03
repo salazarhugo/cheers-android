@@ -26,6 +26,7 @@ import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.profile.Post
+import com.salazar.cheers.ui.main.room.HeaderButtons
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 

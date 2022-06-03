@@ -17,9 +17,6 @@ import androidx.fragment.app.Fragment
 import com.salazar.cheers.ui.theme.Roboto
 
 class ActivityFragment : Fragment() {
-
-//    private val viewModel: ActivityViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,42 +24,7 @@ class ActivityFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                ActivityScreen()
             }
         }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun ActivityScreen() {
-        Scaffold(
-            topBar = { Toolbar() }
-        ) {
-            Column(
-                modifier = Modifier.padding(15.dp)
-            ) {
-            }
-        }
-    }
-
-    @Composable
-    fun Toolbar() {
-        SmallTopAppBar(
-            title = {
-                Text(
-                    text = "Activity",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
-                )
-            },
-            navigationIcon = {
-                Row {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.ArrowBack, "")
-                    }
-                    Spacer(Modifier.width(8.dp))
-                }
-            }
-        )
     }
 }

@@ -35,7 +35,9 @@ fun BeverageScreen(
             )
         },
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(it),
+        ) {
             Drinks(grouped = grouped, onBeverageClick = onSelectBeverage)
         }
     }

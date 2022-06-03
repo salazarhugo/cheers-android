@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 
@@ -15,7 +16,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun PostDetailRoute(
-    postDetailViewModel: PostDetailViewModel,
+    postDetailViewModel: PostDetailViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by postDetailViewModel.uiState.collectAsState()

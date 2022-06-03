@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.Result
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.backend.Neo4jUtil.updateUser
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -73,7 +75,7 @@ class ProfileViewModel @Inject constructor(
     private val eventRepository: EventRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = false))
+    private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -85,23 +87,27 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!)
-                .collect { user ->
-                    viewModelState.update {
-                        it.copy(user = user)
-                    }
-                }
+            userRepository.getCurrentUserFlow().collect { user ->
+                updateUser(user)
+            }
         }
+        refreshUser()
         getUserEvents()
         refreshUserPosts()
     }
 
-    fun refresh() {
+    fun onSwipeRefresh() {
+        refreshUser()
+        refreshUserPosts()
         viewModelScope.launch {
             eventRepository.refreshMyEvents()
         }
-        refreshUser()
-        refreshUserPosts()
+    }
+
+    private fun updateUser(user: User) {
+        viewModelState.update {
+            it.copy(user = user, isLoading = false)
+        }
     }
 
     fun toggleLike(
@@ -116,14 +122,7 @@ class ProfileViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            userRepository.getUserFlow(
-                FirebaseAuth.getInstance().currentUser?.uid!!,
-                true
-            ).collect { user ->
-                viewModelState.update {
-                    it.copy(user = user, isLoading = false)
-                }
-            }
+            userRepository.fetchUser(FirebaseAuth.getInstance().currentUser?.uid!!)
         }
     }
 

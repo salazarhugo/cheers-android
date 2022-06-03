@@ -21,12 +21,9 @@ import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,7 +38,7 @@ class ChatRepository @Inject constructor(
     private lateinit var managedChannel: ManagedChannel
 
     private fun getClient(): ChatService? {
-        try {
+        return try {
             val user2 =
                 FirebaseAuth.getInstance().currentUser ?: throw Exception("User is not logged in.")
             val task: Task<GetTokenResult> = user2.getIdToken(false)
@@ -56,10 +53,10 @@ class ChatRepository @Inject constructor(
                 .ChatServiceCoroutineStub(managedChannel)
                 .withInterceptors(ErrorHandleInterceptor(idToken = idToken))
 
-            return ChatService(client)
+            ChatService(client)
         } catch (e: Exception) {
             Log.e("Chat Repository", e.toString())
-            return null
+            null
         }
     }
 
@@ -236,11 +233,7 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    fun getChannels(): Flow<List<ChatChannel>> {
-        return chatDao.getChannels()
-    }
-
-    suspend fun fetchRoomsFromRemote() = withContext(Dispatchers.IO) {
+    suspend fun listenRooms() = withContext(Dispatchers.IO) {
         try {
             getClient()!!.getRooms(request = Empty.getDefaultInstance()).collect {
                 chatDao.insert(it.toChatChannel())
@@ -249,4 +242,9 @@ class ChatRepository @Inject constructor(
             Log.e("GRPC", e.toString())
         }
     }
+
+    fun getChannels(): Flow<List<ChatChannel>> {
+        return chatDao.getChannels()
+    }
+
 }

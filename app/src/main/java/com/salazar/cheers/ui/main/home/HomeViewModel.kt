@@ -127,18 +127,15 @@ class HomeViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            userRepository.getCurrentUserFlow().collect { user ->
+                viewModelState.update {
+                    it.copy(user = user)
+                }
+            }
+        }
         refreshEventsFlow()
         refreshStoryFlow()
-//        refreshSuggestions()
-
-        viewModelScope.launch {
-            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!)
-                .collect { user ->
-                    viewModelState.update {
-                        it.copy(user = user)
-                    }
-                }
-        }
         refreshPostsFlow()
     }
 

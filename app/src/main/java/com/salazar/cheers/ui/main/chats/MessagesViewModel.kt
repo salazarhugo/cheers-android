@@ -60,19 +60,19 @@ class MessagesViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            chatRepository.listenRooms()
+        }
         onSwipeRefresh()
-        viewModelScope.launch(Dispatchers.IO) {
+    }
+
+    fun onSwipeRefresh() {
+        viewModelScope.launch() {
             chatRepository.getChannels().collect { channels ->
                 viewModelState.update {
                     it.copy(channels = channels, isLoading = false)
                 }
             }
-        }
-    }
-
-    fun onSwipeRefresh() {
-        viewModelScope.launch(Dispatchers.IO) {
-            chatRepository.fetchRoomsFromRemote()
         }
     }
 

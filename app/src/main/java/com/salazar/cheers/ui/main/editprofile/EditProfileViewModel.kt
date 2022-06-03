@@ -73,7 +73,7 @@ class EditProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getUserFlow(FirebaseAuth.getInstance().currentUser?.uid!!).collect { user ->
+            userRepository.getCurrentUserFlow().collect { user ->
                 viewModelState.update {
                     it.copy(user = user, isLoading = false)
                 }
@@ -124,13 +124,7 @@ class EditProfileViewModel @Inject constructor(
         val user = viewModelState.value.user ?: return
 
         viewModelScope.launch {
-            Neo4jUtil.updateUser(
-                username = user.username,
-                profilePictureUrl = user.profilePictureUrl,
-                name = user.name,
-                bio = user.bio,
-                website = user.website,
-            )
+            userRepository.updateUser(user = user)
             viewModelState.update {
                 it.copy(done = true, isLoading = false)
             }

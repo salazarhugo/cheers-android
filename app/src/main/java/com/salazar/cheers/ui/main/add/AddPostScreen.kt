@@ -57,7 +57,6 @@ import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.components.post.MultipleAnnotation
 import com.salazar.cheers.components.share.ErrorMessage
 import com.salazar.cheers.internal.Privacy
@@ -142,7 +141,7 @@ fun AddPostScreen(
                     postType = uiState.postType,
                 )
                 DividerM3()
-                TagSection(
+                AddPeople(
                     selectedTagUsers = uiState.selectedTagUsers,
                     navigateToTagUser = navigateToTagUser,
                 )
@@ -349,7 +348,9 @@ fun TopAppBar(
     onDismiss: () -> Unit
 ) {
     SmallTopAppBar(
-        title = { Text("Add hangout", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
+        title = {
+            Text("New post", fontWeight = FontWeight.Bold, fontFamily = Roboto)
+                },
         navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, "")
@@ -526,7 +527,7 @@ fun SelectedLocation(
 }
 
 @Composable
-fun TagSection(
+fun AddPeople(
     selectedTagUsers: List<User>,
     navigateToTagUser: () -> Unit,
 ) {
