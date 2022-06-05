@@ -60,41 +60,17 @@ fun CheersNavigationBar(
             "Map"
         ),
         Screen(
-            MainDestinations.CAMERA_ROUTE,
+            MainDestinations.EVENTS_ROUTE,
             navigateToCamera,
-            {
-                Icon(
-                    Icons.Outlined.Event,
-                    null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            },
-            {
-                Icon(
-                    Icons.Default.Event,
-                    null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            },
+            { Icon( Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground ) },
+            { Icon( Icons.Default.Event, null, tint = MaterialTheme.colorScheme.onBackground ) },
             "Camera"
         ),
         Screen(
             MainDestinations.MESSAGES_ROUTE,
             navigateToMessages,
-            {
-                Icon(
-                    painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                    null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            },
-            {
-                Icon(
-                    painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                    null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            },
+            { Icon( painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground ) },
+            { Icon( painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground ) },
             "Messages"
         ),
     )

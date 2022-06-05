@@ -16,39 +16,21 @@
 
 @file:JvmName("WorkerUtils")
 
-
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.salazar.cheers.R
 
 private const val TAG = "WorkerUtils"
-private const val CHANNEL_ID = "CHANNEL_ID"
 
 fun makeStatusNotification(
     message: String,
     context: Context
 ) {
-
-    // Make a channel if necessary
-    val name = "name"
-    val description = "Description"
-    val importance = NotificationManager.IMPORTANCE_HIGH
-    val channel = NotificationChannel(CHANNEL_ID, name, importance)
-    channel.description = description
-
-    // Add the channel
-    val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
-
-    notificationManager?.createNotificationChannel(channel)
-
     // Create the notification
-    val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+    val builder = NotificationCompat.Builder(context, context.getString(R.string.upload_notification_channel_id))
         .setSmallIcon(R.drawable.ic_launcher_foreground)
-        .setContentTitle("Working...")
+        .setContentTitle("Uploading...")
         .setContentText(message)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setVibrate(LongArray(0))

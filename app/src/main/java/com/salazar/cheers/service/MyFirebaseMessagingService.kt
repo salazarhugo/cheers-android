@@ -4,8 +4,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.compose.ui.graphics.toArgb
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
@@ -15,15 +13,11 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.backend.CoreService
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.ui.theme.Purple200
+import com.salazar.cheers.notifications.defaultNotification
+import com.salazar.cheers.notifications.newFollowerNotification
+import com.salazar.cheers.notifications.newPostNotification
 import com.salazar.cheers.util.Utils.getCircledBitmap
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.net.URL
-import javax.inject.Inject
 
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -41,29 +35,25 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        Log.d("FCM", remoteMessage.data.toString())
+
         val notification = remoteMessage.notification
 
         if (notification != null) {
-            val avatar = remoteMessage.data["avatar"]
             makeNotification(
                 notification.title.toString(),
                 notification.body.toString(),
-                avatar
-            )
-        }
-
-        Log.d("FCM", remoteMessage.toString())
-
-        if (remoteMessage.data["type"] == "newMessage") {
-            makeNotification(
-                remoteMessage.data["title"].toString(),
-                remoteMessage.data["body"].toString(),
                 remoteMessage.data["avatar"],
-                remoteMessage.data["channelId"].toString(),
             )
+            return
         }
-        val intent = Intent("NewMessage")
-        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+
+        makeNotification(
+            remoteMessage.data["title"].toString(),
+            remoteMessage.data["body"].toString(),
+            remoteMessage.data["avatar"],
+            remoteMessage.data["channelId"].toString(),
+        )
     }
 
     private fun makeNotification(
@@ -72,15 +62,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         profilePictureUrl: String?,
         channelId: String? = null,
     ) {
-        val builder =
-            NotificationCompat.Builder(this, getString(R.string.default_notification_channel_id))
-                .setSmallIcon(R.drawable.ic_cheers_logo)
-                .setContentTitle(title)
-                .setColor(Purple200.toArgb())
-                .setContentText(body)
-                .setChannelId(getString(R.string.default_notification_channel_id))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
+        val builder = when(channelId) {
+            getString(R.string.default_notification_channel_id) -> defaultNotification(title, body)
+            getString(R.string.new_follower_notification_channel_id) -> newFollowerNotification(title, body)
+            getString(R.string.new_post_notification_channel_id) -> newPostNotification(title, body)
+            else -> defaultNotification(title, body)
+        }
 
         if (channelId != null) {
             val taskDetailIntent = Intent(
@@ -119,7 +106,5 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 notify(1, builder.build())
             }
         }
-
     }
-
 }

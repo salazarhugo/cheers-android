@@ -112,8 +112,8 @@ fun Event(
                     }
                 },
                 onManageClick = onManageClick,
-                onInterested = {},
-                onGoing = {},
+                onInterested = onInterestedToggle,
+                onGoing = onGoingToggle,
             )
         }
 
@@ -161,8 +161,8 @@ fun EventHeader(
     event: Event,
     onAboutClick: () -> Unit,
     onManageClick: () -> Unit,
-    onGoing: () -> Unit,
-    onInterested: () -> Unit,
+    onGoing: (Event) -> Unit,
+    onInterested: (Event) -> Unit,
 ) {
     AsyncImage(
         model = event.imageUrl,
@@ -183,8 +183,8 @@ fun EventHeader(
         EventHeaderButtons(
             event.hostId,
             onManageClick = onManageClick,
-            onGoingClick = onGoing,
-            onInterestedClick = onInterested,
+            onGoingClick = {onGoing(event)},
+            onInterestedClick = {onInterested(event)},
             onInviteClick = {},
         )
         EventInfo(

@@ -12,8 +12,23 @@
     <string name="stripe_pk" translatable="false"></string>
 
     <!-- Notifications -->
+    <string name="general_group_id" translatable="false">GENERAL_GROUP</string>
+    <string name="general_group_name" translatable="false">General</string>
+
+    <string name="messaging_group_id" translatable="false">MESSAGING_GROUP</string>
+    <string name="messaging_group_name" translatable="false">Messaging</string>
+
+    <string name="new_post_notification_channel_id" translatable="false">NEW_POST_CHANNEL</string>
+    <string name="new_post_notification_channel_name" translatable="false">Posts</string>
+
+    <string name="new_follower_notification_channel_id" translatable="false">NEW_FOLLOW_CHANNEL</string>
+    <string name="new_follower_notification_channel_name" translatable="false">New followers</string>
+
+    <string name="cheers_notification_channel_id" translatable="false">CHEERS_CHANNEL</string>
+    <string name="cheers_notification_channel_name" translatable="false">Cheers</string>
+
     <string name="default_notification_channel_id" translatable="false">DEFAULT_CHANNEL</string>
-    <string name="default_notification_channel_name" translatable="false">Messages</string>
+    <string name="default_notification_channel_name" translatable="false">Other</string>
     <string name="default_notification_channel_description" translatable="false">Channel for chat messages</string>
 
     <string name="upload_notification_channel_id" translatable="false">UPLOAD_CHANNEL</string>
