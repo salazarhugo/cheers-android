@@ -64,6 +64,9 @@ class CheersApplication : Application(), Configuration.Provider {
         val cheersChannel = NotificationChannel(getString(R.string.cheers_notification_channel_id), getString(R.string.cheers_notification_channel_name), importance)
         val newFollowChannel = NotificationChannel(getString(R.string.new_follower_notification_channel_id), getString(R.string.new_follower_notification_channel_name), importance)
         val newPostChannel = NotificationChannel(getString(R.string.new_post_notification_channel_id), getString(R.string.new_post_notification_channel_name), importance)
+        newFollowChannel.group = getString(R.string.general_group_id)
+        cheersChannel.group = getString(R.string.general_group_id)
+        newPostChannel.group = getString(R.string.general_group_id)
 
         notificationManager.createNotificationChannelGroups(
             listOf(

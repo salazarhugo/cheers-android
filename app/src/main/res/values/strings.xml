@@ -25,7 +25,7 @@
     <string name="new_follower_notification_channel_name" translatable="false">New followers</string>
 
     <string name="cheers_notification_channel_id" translatable="false">CHEERS_CHANNEL</string>
-    <string name="cheers_notification_channel_name" translatable="false">Cheers</string>
+    <string name="cheers_notification_channel_name" translatable="false">Likes</string>
 
     <string name="default_notification_channel_id" translatable="false">DEFAULT_CHANNEL</string>
     <string name="default_notification_channel_name" translatable="false">Other</string>
