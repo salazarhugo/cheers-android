@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Help
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.PinDrop
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.ChipGroup
 import com.salazar.cheers.components.event.EventDetails
 import com.salazar.cheers.components.event.EventGoingButton
@@ -113,6 +116,7 @@ fun Event(
     onInterestedToggle: (Event) -> Unit,
     onGoingToggle: (Event) -> Unit,
     onMoreClick: (String) -> Unit,
+    onShareClick: () -> Unit = {},
 ) {
     Column {
         Box(contentAlignment = Alignment.TopEnd) {
@@ -162,6 +166,20 @@ fun Event(
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
         )
 
+        val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
+
+        if (event.hostId == uid)
+            FilledTonalButton(
+                onClick = onShareClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            ) {
+                Icon(Icons.Default.Share, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Share")
+            }
+        else
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(16.dp)

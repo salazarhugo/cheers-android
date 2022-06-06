@@ -1,37 +1,33 @@
 package com.salazar.cheers.ui.main.event.detail
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.*
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.event.*
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.numberFormatter
 import com.salazar.cheers.ui.theme.GreySheet
-import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,6 +40,8 @@ fun EventDetailScreen(
     onDeleteClick: () -> Unit,
     onInterestedToggle: (Event) -> Unit,
     onGoingToggle: (Event) -> Unit,
+    onGoingCountClick: () -> Unit,
+    onInterestedCountClick: () -> Unit,
 ) {
     val state = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -79,6 +77,8 @@ fun EventDetailScreen(
                         },
                         onInterestedToggle = onInterestedToggle,
                         onGoingToggle = onGoingToggle,
+                        onGoingCountClick = onGoingCountClick,
+                        onInterestedCountClick = onInterestedCountClick,
                     )
                     is EventDetailUiState.NoEvents -> {
                         Text("No event")
@@ -97,8 +97,11 @@ fun Event(
     onManageClick: () -> Unit,
     onInterestedToggle: (Event) -> Unit,
     onGoingToggle: (Event) -> Unit,
+    onGoingCountClick: () -> Unit,
+    onInterestedCountClick: () -> Unit,
 ) {
-    val state =  rememberLazyListState()
+    val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
+    val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
     LazyColumn(state = state) {
@@ -116,6 +119,16 @@ fun Event(
                 onGoing = onGoingToggle,
             )
         }
+
+        if (event.hostId == uid)
+            item {
+                EventResponses(
+                    event = event,
+                    onGoingCountClick = onGoingCountClick,
+                    onInterestedCountClick = onInterestedCountClick,
+                )
+                DividerM3()
+            }
 
         item {
             EventDescription(
@@ -135,21 +148,61 @@ fun Event(
                 onMapClick = onMapClick,
             )
         }
+    }
+}
 
-        item {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp)
+@Composable
+fun EventResponses(
+    event: Event,
+    onInterestedCountClick: () -> Unit,
+    onGoingCountClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+    ) {
+        Text(
+            "Responses",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                    .clickable { onInterestedCountClick() } ,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
-                EventInterestButton(
-                    interested = event.interested,
-                    modifier = Modifier.weight(1f),
-                    onInterestedToggle = { onInterestedToggle(event)},
+                Text(
+                    text = "Interested",
+                    modifier = Modifier.padding(top = 16.dp)
                 )
-                EventGoingButton(
-                    going = event.going,
-                    modifier = Modifier.weight(1f),
-                    onGoingToggle = { onGoingToggle(event)},
+                Text(
+                    text = numberFormatter(value = event.interestedCount),
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                    .clickable { onGoingCountClick() },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = "Going",
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                Text(
+                    text = numberFormatter(value = event.goingCount),
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
         }
@@ -166,7 +219,7 @@ fun EventHeader(
 ) {
     AsyncImage(
         model = event.imageUrl,
-        contentDescription =null,
+        contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(16 / 9f),
@@ -183,9 +236,11 @@ fun EventHeader(
         EventHeaderButtons(
             event.hostId,
             onManageClick = onManageClick,
-            onGoingClick = {onGoing(event)},
-            onInterestedClick = {onInterested(event)},
+            onGoingClick = { onGoing(event) },
+            onInterestedClick = { onInterested(event) },
             onInviteClick = {},
+            interested = event.interested,
+            going = event.going,
         )
         EventInfo(
             locationName = event.locationName,

@@ -46,7 +46,15 @@ fun EventDetailRoute(
                 eventDetailViewModel.deleteEvent()
                 navActions.navigateBack()
             },
+            onGoingCountClick = {
+                val eventId = (uiState as EventDetailUiState.HasEvent).event.id
+                navActions.navigateToGuestList(eventId)
+            },
+            onInterestedCountClick = {
+                val eventId = (uiState as EventDetailUiState.HasEvent).event.id
+                navActions.navigateToGuestList(eventId)
+            },
         )
-        else
-            LoadingScreen()
+    else
+        LoadingScreen()
 }

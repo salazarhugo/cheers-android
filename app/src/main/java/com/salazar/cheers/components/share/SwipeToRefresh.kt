@@ -34,7 +34,7 @@ fun SwipeToRefresh(
     indicator: @Composable (state: SwipeRefreshState, refreshTrigger: Dp) -> Unit = { s, trigger ->
     },
     clipIndicatorToPadding: Boolean = true,
-    content: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
@@ -75,7 +75,9 @@ fun SwipeToRefresh(
                 .offset(y = offset)
                 .fillMaxSize()
         ) {
-            content()
+            Column() {
+                content()
+            }
         }
     }
 }

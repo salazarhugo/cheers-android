@@ -42,6 +42,7 @@ object MainDestinations {
     const val CHAT_ROUTE = "chat"
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
+    const val GUEST_LIST_ROUTE = "guestList"
     const val ADD_POST_SHEET = "addPostSheet"
     const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
@@ -359,6 +360,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateToPostDetail: (postId: String) -> Unit = { postId ->
         navController.navigate("${MainDestinations.POST_DETAIL_ROUTE}/$postId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToGuestList: (eventId: String) -> Unit = { eventId ->
+        navController.navigate("${MainDestinations.GUEST_LIST_ROUTE}/$eventId") {
             launchSingleTop = true
             restoreState = true
         }

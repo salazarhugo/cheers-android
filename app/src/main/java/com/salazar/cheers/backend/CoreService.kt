@@ -73,6 +73,16 @@ interface CoreService {
         @Path("token") token: String,
     )
 
+    @GET("event/{eventId}/interested/list")
+    suspend fun interestedList(
+        @Path("eventId") eventId: String,
+    ): List<User>
+
+    @GET("event/{eventId}/going/list")
+    suspend fun goingList(
+        @Path("eventId") eventId: String,
+    ): List<User>
+
     @GET("followers/list")
     suspend fun followersList(
         @Query("userIdOrUsername") userIdOrUsername: String,

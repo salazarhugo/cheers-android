@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun EventHeaderButtons(
     hostId: String,
+    going: Boolean,
+    interested: Boolean,
     onManageClick: () -> Unit,
     onInviteClick: () -> Unit,
     onInterestedClick: () -> Unit,
@@ -50,24 +52,18 @@ fun EventHeaderButtons(
             }
         }
         else {
-            Button(
-                onClick = onGoingClick,
-                shape = RoundedCornerShape(4.dp),
+            EventGoingButton(
+                going = going,
+                onGoingToggle = onGoingClick,
+//                shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.weight(1f),
-            ) {
-                Spacer(Modifier.width(4.dp))
-                Text("Going")
-            }
+            )
             Spacer(Modifier.width(8.dp))
-            FilledTonalButton(
-                onClick = onInterestedClick,
-                shape = RoundedCornerShape(4.dp),
+            EventInterestButton(
+                interested = interested,
                 modifier = Modifier.weight(1f),
-            ) {
-                Icon(Icons.Default.Star, null)
-                Spacer(Modifier.width(4.dp))
-                Text("Interested")
-            }
+                onInterestedToggle = { onInterestedClick()},
+            )
         }
     }
 }

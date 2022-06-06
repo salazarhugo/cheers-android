@@ -13,13 +13,16 @@ import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.UserProfilePicture
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.User
 
 @Composable
 fun UserItem(
     user: User,
     isAuthor: Boolean = false,
+    followButton: Boolean = false,
     onUserClick: (String) -> Unit,
+    onFollowToggle: (Boolean) -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -51,6 +54,7 @@ fun UserItem(
                     .size(16.dp),
                 contentDescription = null,
             )
-//        FollowButton(isFollowing = true, onClick = { /*TODO*/ })
+        if (followButton)
+            FollowButton(isFollowing = user.isFollowed, onClick = { onFollowToggle(user.isFollowed) })
     }
 }

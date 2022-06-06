@@ -98,6 +98,24 @@ class EventRepository @Inject constructor(
         eventDao.toggleGoing(eventId = eventId)
     }
 
+    suspend fun interestedList(eventId: String) = withContext(Dispatchers.IO) {
+        return@withContext try {
+            coreService.interestedList(eventId = eventId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun goingList(eventId: String) = withContext(Dispatchers.IO) {
+        return@withContext try {
+            coreService.goingList(eventId = eventId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     suspend fun toggleInterested(eventId: String) {
         eventDao.toggleInterested(eventId = eventId)
     }

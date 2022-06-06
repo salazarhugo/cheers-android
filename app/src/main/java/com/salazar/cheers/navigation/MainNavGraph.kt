@@ -46,6 +46,7 @@ import com.salazar.cheers.ui.main.event.EventsRoute
 import com.salazar.cheers.ui.main.event.add.AddEventRoute
 import com.salazar.cheers.ui.main.event.detail.EventDetailRoute
 import com.salazar.cheers.ui.main.event.edit.EditEventRoute
+import com.salazar.cheers.ui.main.event.guestlist.GuestListRoute
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapRoute
@@ -372,6 +373,15 @@ fun NavGraphBuilder.mainNavGraph(
                 otherProfileViewModel = otherProfileViewModel,
                 navActions = navActions,
                 username = username,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.GUEST_LIST_ROUTE}/{eventId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
+        ) {
+            GuestListRoute(
+                navActions = navActions,
             )
         }
 
