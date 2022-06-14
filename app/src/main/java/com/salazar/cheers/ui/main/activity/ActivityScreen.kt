@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.components.EmptyActivity
+import com.salazar.cheers.components.chat.EmptyChat
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.user.FollowButton
@@ -48,12 +50,16 @@ fun ActivityScreen(
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {
-            Column(
-            ) {
-                ActivityList(
-                    activities = uiState.activities,
-                    onActivityClick = onActivityClick,
-                )
+            Column {
+                val activities = uiState.activities
+
+                if (activities?.isEmpty() == true)
+                    EmptyActivity()
+                else
+                    ActivityList(
+                        activities = activities,
+                        onActivityClick = onActivityClick,
+                    )
             }
         }
     }
