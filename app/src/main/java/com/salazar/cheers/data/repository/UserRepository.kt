@@ -21,6 +21,7 @@ import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -43,11 +44,13 @@ class UserRepository @Inject constructor(
         email: String,
     ): User? {
         try {
+            val authUser = FirebaseAuth.getInstance().currentUser!!
             val user = coreService.createUser(
                 User().copy(
-                    id = FirebaseAuth.getInstance().currentUser?.uid!!,
                     username = username,
-                    email = email,
+                    email = authUser.email ?: email,
+                    name = authUser.displayName ?: "",
+                    phoneNumber = authUser.phoneNumber ?: "",
                 )
             )
             userDao.insert(user)
@@ -58,6 +61,12 @@ class UserRepository @Inject constructor(
             Log.e("YES", e.toString())
             return null
         }
+    }
+
+    suspend fun deleteAccount() = withContext(Dispatchers.IO) {
+        FirebaseAuth.getInstance().currentUser!!.delete()
+            .addOnSuccessListener {  }
+            .addOnFailureListener { }
     }
 
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {

@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
@@ -21,6 +22,10 @@ fun SettingsRoute(
     val uiState by settingsViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
 
+    LaunchedEffect(uiState.signedOut) {
+        if (uiState.signedOut)
+            navActions.navigateToSignIn()
+    }
     SettingsScreen(
         uiState = uiState,
         onBackPressed = { navActions.navigateToProfile() },
@@ -42,6 +47,7 @@ fun SettingsRoute(
             }
         },
         navigateToBecomeVip = {},
+        onDeleteAccount = settingsViewModel::onDeleteAccount,
     )
 }
 

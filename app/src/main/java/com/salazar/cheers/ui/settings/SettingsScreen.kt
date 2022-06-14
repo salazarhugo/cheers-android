@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.BuildConfig
 import com.salazar.cheers.components.items.SettingItem
 import com.salazar.cheers.components.items.SettingTitle
+import com.salazar.cheers.components.share.ErrorMessage
 import com.salazar.cheers.components.share.Toolbar
 
 @Composable
@@ -26,6 +27,7 @@ fun SettingsScreen(
     onSignOut: () -> Unit,
     navigateToBecomeVip: () -> Unit,
     onBackPressed: () -> Unit,
+    onDeleteAccount: () -> Unit,
 ) {
 
     Scaffold(
@@ -42,7 +44,8 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             HelpSection(onSettingsUIAction = onSettingsUIAction)
             Spacer(modifier = Modifier.height(16.dp))
-            LoginsSection(onSignOut = onSignOut)
+            LoginsSection(onSignOut = onSignOut, onDeleteAccount = onDeleteAccount)
+            ErrorMessage(errorMessage = uiState.errorMessage, paddingValues = PaddingValues(16.dp))
             Spacer(modifier = Modifier.height(16.dp))
             VersionSection()
         }
@@ -65,11 +68,12 @@ fun VersionSection() {
 @Composable
 fun LoginsSection(
     onSignOut: () -> Unit,
+    onDeleteAccount: () -> Unit,
 ) {
     Column {
         SettingTitle(title = "Logins")
         SignOutButton(onSignOut = onSignOut)
-        RedButton(text = "Delete Account") { }
+        RedButton(text = "Delete Account", onClick = onDeleteAccount)
     }
 }
 
