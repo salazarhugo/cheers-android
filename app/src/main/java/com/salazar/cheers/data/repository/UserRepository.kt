@@ -19,7 +19,6 @@ import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -163,13 +162,7 @@ class UserRepository @Inject constructor(
     suspend fun updateUser(user: User) = withContext(Dispatchers.IO) {
         try {
             userDao.update(user)
-            Neo4jUtil.updateUser(
-                username = user.username,
-                profilePictureUrl = user.profilePictureUrl,
-                name = user.name,
-                bio = user.bio,
-                website = user.website,
-            )
+            coreService.updateUser(user)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -183,7 +176,7 @@ class UserRepository @Inject constructor(
             if (!fetchFromRemote)
                 return@flow
 
-            val remoteActivity =  try {
+            val remoteActivity = try {
                 coreService.getActivity()
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -228,12 +221,12 @@ class UserRepository @Inject constructor(
 
 
     suspend fun toggleFollow(user: User) {
-        val newFollowersCount = if (user.isFollowed) user.followers - 1 else user.followers + 1
-        val newUser = user.copy(isFollowed = !user.isFollowed, followers = newFollowersCount)
+        val newFollowersCount = if (user.followBack) user.followers - 1 else user.followers + 1
+        val newUser = user.copy(followBack = !user.followBack, followers = newFollowersCount)
 
         userDao.update(newUser)
 
-        if (user.isFollowed)
+        if (user.followBack)
             unfollowUser(username = user.username)
         else
             followUser(username = user.username)
@@ -263,7 +256,7 @@ class UserRepository @Inject constructor(
                 coreService.getUser(userIdOrUsername = userId)
             } catch (e: NullPointerException) {
                 e.printStackTrace()
-                emit(Resource.Error("User not found!"))
+                emit(Resource.Error(""))
                 null
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -320,6 +313,10 @@ class UserRepository @Inject constructor(
         if (newRegistrationToken == null)
             throw NullPointerException("FCM token is null.")
 
-        coreService.addRegistrationToken(newRegistrationToken)
+        try {
+            coreService.addRegistrationToken(newRegistrationToken)
+        } catch (e: HttpException) {
+            e.printStackTrace()
+        }
     }
 }

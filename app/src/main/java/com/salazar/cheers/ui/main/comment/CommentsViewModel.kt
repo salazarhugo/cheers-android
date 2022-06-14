@@ -1,25 +1,17 @@
 package com.salazar.cheers.ui.main.comment
 
-import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.CommentWithAuthor
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface CommentsUiState {
 
@@ -81,12 +73,14 @@ private data class CommentsViewModelState(
             )
 }
 
-class CommentsViewModel @AssistedInject constructor(
+@HiltViewModel
+class CommentsViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
-    @Assisted private val postId: String
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CommentsViewModelState(isLoading = true))
+    private lateinit var postId: String
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -97,26 +91,21 @@ class CommentsViewModel @AssistedInject constructor(
         )
 
     init {
-        viewModelScope.launch {
-//            FirestoreUtil.getComments(postId).collect { comments ->
-//                val commentWithAuthor = comments.map {
-//                    CommentWithAuthor(comment = it, author = userRepository.getUser(it.authorId))
-//                }
-//                viewModelState.update { it.copy(comments = commentWithAuthor) }
-//            }
+        stateHandle.get<String>("postId")?.let {
+            postId = it
         }
     }
 
     val user = FirestoreUtil.getCurrentUserDocumentLiveData()
 
     private fun toggleIsFollowed() {
-        val isFollowed = viewModelState.value.user?.isFollowed ?: return
+        val isFollowed = viewModelState.value.user?.followBack ?: return
         updateIsFollowed(isFollowed = !isFollowed)
     }
 
     private fun updateIsFollowed(isFollowed: Boolean) {
         viewModelState.update {
-            it.copy(user = it.user?.copy(isFollowed = isFollowed))
+            it.copy(user = it.user?.copy(followBack = isFollowed))
         }
     }
 
@@ -137,31 +126,4 @@ class CommentsViewModel @AssistedInject constructor(
             it.copy(input = input)
         }
     }
-
-    @AssistedFactory
-    interface CommentsViewModelFactory {
-        fun create(postId: String): CommentsViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: CommentsViewModelFactory,
-            postId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(postId = postId) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun commentsViewModel(postId: String): CommentsViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).commentsViewModelFactory()
-
-    return viewModel(factory = CommentsViewModel.provideFactory(factory, postId = postId))
 }

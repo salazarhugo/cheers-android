@@ -5,7 +5,9 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -48,7 +50,8 @@ data class AddPostUiState(
 
 @HiltViewModel
 class AddPostViewModel @Inject constructor(
-    application: Application
+    application: Application,
+    stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPostUiState(isLoading = true))
@@ -61,6 +64,9 @@ class AddPostViewModel @Inject constructor(
         )
 
     init {
+        stateHandle.get<String>("photoUri")?.let {
+            addPhoto(Uri.parse(it))
+        }
     }
 
     private val workManager = WorkManager.getInstance(application)

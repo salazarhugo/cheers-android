@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -24,6 +25,7 @@ sealed interface PostDetailUiState {
 
     data class HasPost(
         val postFeed: Post,
+        val members: List<User>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : PostDetailUiState
@@ -31,6 +33,7 @@ sealed interface PostDetailUiState {
 
 private data class PostDetailViewModelState(
     val postFeed: Post? = null,
+    val members: List<User>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
@@ -43,6 +46,7 @@ private data class PostDetailViewModelState(
         } else {
             PostDetailUiState.HasPost(
                 postFeed = postFeed,
+                members = members,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
@@ -74,6 +78,10 @@ class PostDetailViewModel @Inject constructor(
             refreshPost()
         }
         viewModelScope.launch {
+            val members = postRepository.getPostMembers(postId = postId)
+            updateMembers(members)
+        }
+        viewModelScope.launch {
             postRepository.postFlow(postId = postId).collect { post ->
                 updatePost(post)
             }
@@ -84,6 +92,12 @@ class PostDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val post = postRepository.getPost(postId = postId)
             updatePost(post)
+        }
+    }
+
+    private fun updateMembers(members: List<User>?) {
+        viewModelState.update {
+            it.copy(members = members)
         }
     }
 

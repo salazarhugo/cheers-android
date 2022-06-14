@@ -120,7 +120,7 @@ fun Event(
             )
         }
 
-        if (event.hostId == uid)
+        if (event.hostId == uid || event.showGuestList)
             item {
                 EventResponses(
                     event = event,
@@ -161,7 +161,7 @@ fun EventResponses(
         modifier = Modifier.padding(16.dp),
     ) {
         Text(
-            "Responses",
+            "Guest list",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )

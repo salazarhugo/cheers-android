@@ -16,9 +16,14 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 32
-        versionCode 42
-        versionName "0.99.86"
+        versionCode 43
+        versionName "0.99.87"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -250,7 +255,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:1.0.0-alpha15")
 
     // Google's Fused Location Provider
-    implementation "com.google.android.gms:play-services-location:19.0.1"
+    implementation "com.google.android.gms:play-services-location:20.0.0"
 
     // Work Manager
     implementation "androidx.work:work-runtime-ktx:2.7.1"

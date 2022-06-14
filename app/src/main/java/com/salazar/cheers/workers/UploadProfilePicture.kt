@@ -13,9 +13,13 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.backend.Neo4jUtil
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -26,7 +30,8 @@ import java.io.ByteArrayOutputStream
 @HiltWorker
 class UploadProfilePicture @AssistedInject constructor(
     @Assisted appContext: Context,
-    @Assisted params: WorkerParameters
+    @Assisted params: WorkerParameters,
+    private val userRepository: UserRepository,
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
@@ -38,14 +43,12 @@ class UploadProfilePicture @AssistedInject constructor(
 
             val photoBytes = extractImage(Uri.parse(photoUriInput))
 
-            StorageUtil.uploadProfilePhoto(photoBytes) { downloadUrl ->
-                Neo4jUtil.updateUser(
-                    name = "",
-                    website = "",
-                    bio = "",
-                    profilePictureUrl = downloadUrl
-                )
-            }
+            val task: Task<Uri> = StorageUtil.uploadProfilePhoto(photoBytes)
+            val downloadUrl = Tasks.await(task)
+
+            val user = userRepository.getCurrentUser()
+            userRepository.updateUser(user.copy(profilePictureUrl = downloadUrl.toString()))
+
             return Result.success()
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")

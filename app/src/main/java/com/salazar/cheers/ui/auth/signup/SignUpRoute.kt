@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.components.share.AppBar
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -35,7 +36,7 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun SignUpRoute(
-    signUpViewModel: SignUpViewModel,
+    signUpViewModel: SignUpViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by signUpViewModel.uiState.collectAsState()

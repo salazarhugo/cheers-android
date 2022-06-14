@@ -111,32 +111,32 @@ fun HomeScreen(
                     DividerM3()
             }
         },
-        floatingActionButton = {
-            MultiFloatingActionButton(
-                Icons.Default.Add,
-                listOf(
-                    MultiFabItem(
-                        "event",
-                        Icons.Outlined.Event,
-                        "Party",
-                    ),
-                    MultiFabItem(
-                        "post",
-                        Icons.Outlined.PostAdd,
-                        "Hangout",
-                    )
-                ), toState, true, { state ->
-                    toState = state
-                },
-                onFabItemClicked = {
-                    toState = MultiFabState.COLLAPSED
-                    if (it.identifier == "event")
-                        navigateToAddEvent()
-                    else
-                        navigateToAddPost()
-                }
-            )
-        },
+//        floatingActionButton = {
+//            MultiFloatingActionButton(
+//                Icons.Default.Add,
+//                listOf(
+//                    MultiFabItem(
+//                        "event",
+//                        Icons.Outlined.Event,
+//                        "Party",
+//                    ),
+//                    MultiFabItem(
+//                        "post",
+//                        Icons.Outlined.PostAdd,
+//                        "Hangout",
+//                    )
+//                ), toState, true, { state ->
+//                    toState = state
+//                },
+//                onFabItemClicked = {
+//                    toState = MultiFabState.COLLAPSED
+//                    if (it.identifier == "event")
+//                        navigateToAddEvent()
+//                    else
+//                        navigateToAddPost()
+//                }
+//            )
+//        },
         content = {
             SwipeToRefresh(
                 state = rememberSwipeToRefreshState(isRefreshing = false),
@@ -562,6 +562,7 @@ fun Post(
         PostText(
             caption = post.caption,
             onUserClicked = onUserClicked,
+            onPostClicked = { onPostClicked(post.id)},
         )
         PostBody(
             post,

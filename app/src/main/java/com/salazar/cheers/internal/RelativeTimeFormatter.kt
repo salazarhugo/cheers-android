@@ -48,14 +48,14 @@ fun startDateFormatter(
     timestamp: Long,
 ): AnnotatedString {
     return buildAnnotatedString {
-        val date = Date(timestamp*1000)
+        val date = Date(timestamp * 1000)
 
-        if (DateUtils.isToday(timestamp  * 1000)) {
+        if (DateUtils.isToday(timestamp * 1000)) {
             append("Today")
             return@buildAnnotatedString
         }
 
-        if (DateUtils.isToday(timestamp  * 1000 - DateUtils.DAY_IN_MILLIS)) {
+        if (DateUtils.isToday(timestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
             append("Tomorrow")
             return@buildAnnotatedString
         }
@@ -81,12 +81,13 @@ fun timeFormatter(
 ): AnnotatedString {
 
     return buildAnnotatedString {
-        val date = Date(timestamp*1000)
+        val date = Date(timestamp * 1000)
         val res = SimpleDateFormat("HH:mm").format(date)
         append(res)
         return@buildAnnotatedString
     }
 }
+
 /*
  *  timestamp in seconds
  */
@@ -96,7 +97,26 @@ fun dateTimeFormatter(
 ): AnnotatedString {
 
     return buildAnnotatedString {
-        val date = Date(timestamp*1000)
+        val date = Date(timestamp * 1000)
+
+        val time = SimpleDateFormat("HH:mm").format(date)
+
+        if (DateUtils.isToday(timestamp * 1000)) {
+            append("Today, $time")
+            return@buildAnnotatedString
+        }
+
+        if (DateUtils.isToday(timestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
+            append("Tomorrow, $time")
+            return@buildAnnotatedString
+        }
+
+        if (Date().time > timestamp * 1000 - 5 * DateUtils.DAY_IN_MILLIS) {
+            val res = SimpleDateFormat("EEEE, HH:mm").format(date)
+            append(res)
+            return@buildAnnotatedString
+        }
+
         val res = SimpleDateFormat("dd MMMM yyyy, HH:mm").format(date)
         append(res)
         return@buildAnnotatedString

@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.stats
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 
@@ -13,7 +14,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun DrinkingStatsRoute(
-    drinkingStatsViewModel: DrinkingStatsViewModel,
+    drinkingStatsViewModel: DrinkingStatsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by drinkingStatsViewModel.uiState.collectAsState()

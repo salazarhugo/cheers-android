@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -12,7 +13,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun SearchRoute(
-    searchViewModel: SearchViewModel,
+    searchViewModel: SearchViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by searchViewModel.uiState.collectAsState()

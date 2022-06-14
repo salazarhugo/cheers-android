@@ -28,9 +28,9 @@ import java.util.*
         Activity::class,
     ],
     version = 1,
-    exportSchema = false,
+    exportSchema = true,
 //    autoMigrations = [
-//        AutoMigration (from = 1, to = 2)
+//        AutoMigration (from = 1, to = 2),
 //    ]
 )
 abstract class CheersDatabase : RoomDatabase() {

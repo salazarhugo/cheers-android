@@ -46,7 +46,7 @@ fun StoryProgressBar(
         for (index in 1..steps) {
             Row(
                 modifier = Modifier
-                    .height(4.dp)
+                    .height(2.dp)
                     .clip(RoundedCornerShape(50, 50, 50, 50))
                     .weight(1f)
                     .background(Color.White.copy(alpha = 0.4f))

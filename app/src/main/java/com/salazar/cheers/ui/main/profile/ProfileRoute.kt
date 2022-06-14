@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -16,9 +17,8 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun ProfileRoute(
-    profileViewModel: ProfileViewModel,
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
-    username: String,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
@@ -48,8 +48,8 @@ fun ProfileRoute(
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onPostLike = profileViewModel::toggleLike,
         onEditProfileClicked = { navActions.navigateToEditProfile() },
-        onDrinkingStatsClick = { navActions.navigateToDrinkingStats(username) },
-        navigateToProfileMoreSheet = navActions.navigateToProfileMoreSheet,
+        onDrinkingStatsClick = { navActions.navigateToDrinkingStats(it) },
+        navigateToProfileMoreSheet = { navActions.navigateToProfileMoreSheet(it) },
         onWebsiteClicked = { website ->
             var url = website
             if (!url.startsWith("www.") && !url.startsWith("http://"))

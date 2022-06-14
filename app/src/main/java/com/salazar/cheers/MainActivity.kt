@@ -36,15 +36,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.ui.CheersApp
-import com.salazar.cheers.ui.main.comment.CommentsViewModel
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsViewModel
-import com.salazar.cheers.ui.main.stats.DrinkingStatsViewModel
-import com.salazar.cheers.ui.main.story.stats.StoryStatsViewModel
-import com.salazar.cheers.ui.sheets.SendGiftViewModel
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.components.ActivityComponent
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -52,15 +44,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
-
-    @EntryPoint
-    @InstallIn(ActivityComponent::class)
-    interface ViewModelFactoryProvider {
-        fun storyStatsViewModelFactory(): StoryStatsViewModel.StoryStatsViewModelFactory
-        fun drinkingStatsViewModelFactory(): DrinkingStatsViewModel.DrinkingStatsViewModelFactory
-        fun commentsViewModelFactory(): CommentsViewModel.CommentsViewModelFactory
-        fun sendGiftViewModelFactory(): SendGiftViewModel.SendGiftViewModelFactory
-    }
 
     private val cheersViewModel: CheersViewModel by viewModels()
     private var mInterstitialAd: InterstitialAd? = null

@@ -3,7 +3,6 @@ package com.salazar.cheers.navigation
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavArgument
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -14,7 +13,9 @@ import com.salazar.cheers.ui.settings.SettingsViewModel
 import com.salazar.cheers.ui.settings.language.LanguageRoute
 import com.salazar.cheers.ui.settings.notifications.NotificationsRoute
 import com.salazar.cheers.ui.settings.password.CreatePasswordRoute
-import com.salazar.cheers.ui.settings.payments.*
+import com.salazar.cheers.ui.settings.payments.AddPaymentViewModel
+import com.salazar.cheers.ui.settings.payments.PaymentHistoryRoute
+import com.salazar.cheers.ui.settings.payments.RechargeRoute
 import com.salazar.cheers.ui.settings.security.SecurityRoute
 import com.salazar.cheers.ui.settings.theme.ThemeRoute
 
@@ -36,14 +37,13 @@ fun NavGraphBuilder.settingNavGraph(
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-
             CreatePasswordRoute(
                 navActions = navActions,
             )
         }
 
         composable(
-            SettingDestinations.SECURITY_ROUTE,
+            route = SettingDestinations.SECURITY_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
@@ -53,38 +53,30 @@ fun NavGraphBuilder.settingNavGraph(
         }
 
         composable(
-            SettingDestinations.PAYMENT_HISTORY_ROUTE,
+            route = SettingDestinations.PAYMENT_HISTORY_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            val paymentHistoryViewModel = hiltViewModel<PaymentHistoryViewModel>()
-
             PaymentHistoryRoute(
-                paymentHistoryViewModel = paymentHistoryViewModel,
                 navActions = navActions,
             )
         }
 
         composable(
-            SettingDestinations.RECHARGE_ROUTE,
+            route = SettingDestinations.RECHARGE_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            val rechargeViewModel = hiltViewModel<RechargeViewModel>()
-
             RechargeRoute(
-                rechargeViewModel = rechargeViewModel,
                 navActions = navActions,
             )
         }
 
         composable(
-            SettingDestinations.ADD_PAYMENT_METHOD_ROUTE,
+            route = SettingDestinations.ADD_PAYMENT_METHOD_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            val addPaymentViewModel = hiltViewModel<AddPaymentViewModel>()
-
 //            AddPaymentMethod(
 //                addPaymentViewModel = addPaymentViewModel,
 //                navActions = navActions,
@@ -93,7 +85,7 @@ fun NavGraphBuilder.settingNavGraph(
         }
 
         composable(
-            SettingDestinations.LANGUAGE_ROUTE,
+            route = SettingDestinations.LANGUAGE_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
@@ -105,36 +97,31 @@ fun NavGraphBuilder.settingNavGraph(
         }
 
         composable(
-            SettingDestinations.NOTIFICATIONS_ROUTE,
+            route = SettingDestinations.NOTIFICATIONS_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
             NotificationsRoute(
                 navActions = navActions,
-                settingsViewModel = settingsViewModel,
             )
         }
 
         composable(
-            SettingDestinations.THEME_ROUTE,
+            route = SettingDestinations.THEME_ROUTE,
             enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
             ThemeRoute(
                 navActions = navActions,
-                settingsViewModel = settingsViewModel,
             )
         }
 
-        composable(SettingDestinations.SETTINGS_ROUTE) {
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
+        composable(
+            route = SettingDestinations.SETTINGS_ROUTE,
+        ) {
             SettingsRoute(
-                settingsViewModel = settingsViewModel,
                 navActions = navActions,
             )
         }
-
     }
 }

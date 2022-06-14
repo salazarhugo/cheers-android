@@ -254,19 +254,19 @@ fun UiLayer(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             )
         }
-        Surface(
-            shape = CircleShape,
-            color = Color.White.copy(alpha = 0.5f),
-            shadowElevation = 0.dp,
-            modifier = Modifier
-                .padding(bottom = 26.dp)
-                .size(80.dp)
-                .border(4.dp, Color.White, CircleShape)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) { onAddPostClicked() }
-        ) {}
+//        Surface(
+//            shape = CircleShape,
+//            color = Color.White.copy(alpha = 0.5f),
+//            shadowElevation = 0.dp,
+//            modifier = Modifier
+//                .padding(bottom = 26.dp)
+//                .size(80.dp)
+//                .border(4.dp, Color.White, CircleShape)
+//                .clickable(
+//                    indication = null,
+//                    interactionSource = remember { MutableInteractionSource() }
+//                ) { onAddPostClicked() }
+//        ) {}
     }
 }
 

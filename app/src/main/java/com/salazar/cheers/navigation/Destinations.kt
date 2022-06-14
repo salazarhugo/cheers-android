@@ -1,8 +1,6 @@
 package com.salazar.cheers.navigation
 
 import androidx.navigation.NavHostController
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 /**
  * Destinations used in the [CheersApp].
@@ -273,8 +271,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToProfileMoreSheet: () -> Unit = {
-        navController.navigate(MainDestinations.PROFILE_MORE_SHEET) {
+    val navigateToProfileMoreSheet: (username: String) -> Unit = { username ->
+        navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$username") {
             launchSingleTop = true
             restoreState = true
         }

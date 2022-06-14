@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.util.Utils.getActivity
@@ -12,7 +13,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun RechargeRoute(
-    rechargeViewModel: RechargeViewModel,
+    rechargeViewModel: RechargeViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by rechargeViewModel.uiState.collectAsState()

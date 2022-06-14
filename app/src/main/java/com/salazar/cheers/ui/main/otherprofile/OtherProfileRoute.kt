@@ -6,10 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.AnnotatedString
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -23,7 +22,7 @@ import com.salazar.cheers.util.Utils.copyToClipboard
  */
 @Composable
 fun OtherProfileRoute(
-    otherProfileViewModel: OtherProfileViewModel,
+    otherProfileViewModel: OtherProfileViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
     username: String,
 ) {
@@ -39,7 +38,7 @@ fun OtherProfileRoute(
                 onBackPressed = { navActions.navigateBack() },
                 onCopyUrl = {
                     if (uiState is OtherProfileUiState.HasUser)
-                        FirebaseDynamicLinksUtil.createShortLink((uiState as OtherProfileUiState.HasUser).user.username)
+                        FirebaseDynamicLinksUtil.createShortLink("u/${(uiState as OtherProfileUiState.HasUser).user.username}")
                             .addOnSuccessListener { shortLink ->
                                 context.copyToClipboard(shortLink.shortLink.toString())
                             }

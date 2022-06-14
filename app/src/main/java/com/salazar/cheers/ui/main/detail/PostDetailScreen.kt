@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -47,6 +48,7 @@ import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
 import java.util.*
@@ -84,6 +86,7 @@ fun PostDetailScreen(
         ) {
             Post(
                 post = uiState.postFeed,
+                members = uiState.members,
                 onHeaderClicked = onHeaderClicked,
                 onDelete = onDelete,
                 isAuthor = post.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
@@ -191,6 +194,7 @@ fun PostDetails(
 @Composable
 fun Post(
     post: Post,
+    members: List<User>?,
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
     onDelete: () -> Unit,
@@ -219,6 +223,7 @@ fun Post(
                 PostText(
                     caption = post.caption,
                     onUserClicked = {},
+                    onPostClicked = {},
                 )
                 PostBody(
                     post = post,
@@ -235,12 +240,19 @@ fun Post(
             }
             item {
                 Text(
-                    text = "With",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 8.dp),
+                    text = "Drinkers",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
                 )
-//                UserItem(user = author, isAuthor = true, onUserClick = onUserClick)
             }
+            if (members != null)
+                items(members, key = { it.id }) { user ->
+                    UserItem(
+                        user = user,
+                        followButton = true,
+                        onUserClick = { onUserClick(user.username) },
+                    )
+                }
             if (post.locationName.isNotBlank())
                 item {
                     Row(
@@ -291,11 +303,6 @@ fun Post(
                     onMessageClicked = onMessageClicked
                 )
             }
-//            if (postUsers.isNotEmpty())
-//                items(postUsers, key = { it.id }) { user ->
-//                    UserItem(user = user, onUserClick = onUserClick)
-//                }
-
         }
     }
 }

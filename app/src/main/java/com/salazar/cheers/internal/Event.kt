@@ -3,10 +3,6 @@ package com.salazar.cheers.internal
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.ads.AdRequest
-import com.google.common.hash.HashCode.fromInt
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.ToJson
 
 @Entity(tableName = "events")
 data class Event(
@@ -22,6 +18,7 @@ data class Event(
     val hostName: String = "",
     val price: Int = 0,
     val participants: List<String> = emptyList(),
+    val showGuestList: Boolean = false,
     val showOnMap: Boolean = false,
     val interested: Boolean = false,
     val interestedCount: Int = 0,
@@ -29,6 +26,9 @@ data class Event(
     val goingCount: Int = 0,
     val imageUrl: String = "",
     val address: String = "",
+    val mutualProfilePictureUrls: List<String> = emptyList(),
+    val mutualUsernames: List<String> = emptyList(),
+    val mutualCount: Int = 0,
     val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,

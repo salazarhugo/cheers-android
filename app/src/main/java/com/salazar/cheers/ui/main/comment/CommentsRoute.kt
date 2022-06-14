@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.comment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -14,8 +15,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun CommentsRoute(
-    commentsViewModel: CommentsViewModel,
-    navActions: CheersNavigationActions,
+    commentsViewModel: CommentsViewModel = hiltViewModel(),
     profilePictureUrl: String,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {

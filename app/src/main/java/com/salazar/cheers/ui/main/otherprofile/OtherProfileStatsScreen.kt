@@ -249,7 +249,7 @@ fun FollowingCard(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            var isFollowed by remember { mutableStateOf(user.isFollowed) }
+            var isFollowed by remember { mutableStateOf(user.followBack) }
             FollowButton(
                 isFollowing = isFollowed,
                 onClick = {

@@ -1,25 +1,18 @@
 package com.salazar.cheers.ui.main.story.stats
 
-import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.salazar.cheers.MainActivity
 import com.salazar.cheers.data.entities.StoryDetail
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class StoryStatsViewModelUiState(
     val isLoading: Boolean = false,
@@ -27,13 +20,15 @@ data class StoryStatsViewModelUiState(
     val stories: List<StoryDetail>? = null,
 )
 
-class StoryStatsViewModel @AssistedInject constructor(
+@HiltViewModel
+class StoryStatsViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val storyRepository: StoryRepository,
-    @Assisted private val storyId: String,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(StoryStatsViewModelUiState(isLoading = true))
+    private lateinit var storyId: String
 
     val uiState = viewModelState
         .stateIn(
@@ -43,6 +38,9 @@ class StoryStatsViewModel @AssistedInject constructor(
         )
 
     init {
+        stateHandle.get<String>("storyId")?.let {
+            storyId = it
+        }
         viewModelScope.launch {
             storyRepository.getMyStories().collect { stories ->
                 val storiesDetail = stories.map {
@@ -64,31 +62,4 @@ class StoryStatsViewModel @AssistedInject constructor(
             storyRepository.delete(storyId = storyId)
         }
     }
-
-    @AssistedFactory
-    interface StoryStatsViewModelFactory {
-        fun create(storyId: String): StoryStatsViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: StoryStatsViewModelFactory,
-            storyId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(storyId = storyId) as T
-            }
-        }
-    }
-}
-
-@Composable
-fun storyStatsViewModel(storyId: String): StoryStatsViewModel {
-    val factory = EntryPointAccessors.fromActivity(
-        LocalContext.current as Activity,
-        MainActivity.ViewModelFactoryProvider::class.java
-    ).storyStatsViewModelFactory()
-
-    return viewModel(factory = StoryStatsViewModel.provideFactory(factory, storyId = storyId))
 }

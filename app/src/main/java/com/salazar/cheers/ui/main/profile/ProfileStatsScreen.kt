@@ -47,6 +47,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.user.FollowButton
@@ -95,8 +96,10 @@ fun Tabs(
     onUserClicked: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
-    val followersTitle = if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
-    val followingTitle = if (uiState.following == null) "Following" else "${uiState.following.size} following"
+    val followersTitle =
+        if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
+    val followingTitle =
+        if (uiState.following == null) "Following" else "${uiState.following.size} following"
 
     val pages = listOf(followersTitle, followingTitle)
     val pagerState = rememberPagerState()
@@ -149,8 +152,7 @@ fun Followers(
 ) {
     if (followers == null) {
         LoadingScreen()
-    }
-    else
+    } else
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
                 FollowerCard(follower, onUserClicked)
@@ -166,11 +168,15 @@ fun Following(
 ) {
     if (following == null) {
         LoadingScreen()
-    }
-    else
+    } else
         LazyColumn {
-            items(following, key = { it.id }) { following ->
-                FollowingCard(following, onUserClicked, onFollowToggle = onFollowToggle)
+            items(following, key = { it.id }) { user ->
+                UserItem(
+                    user = user,
+                    followButton = true,
+                    onUserClick = onUserClicked,
+                    onFollowToggle = { onFollowToggle(user) },
+                )
             }
         }
 }
@@ -220,60 +226,6 @@ fun FollowerCard(
             onClick = { /* TODO */ }
         ) {
             Text("Remove")
-        }
-    }
-}
-
-@Composable
-fun FollowingCard(
-    user: User,
-    onUserClicked: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onUserClicked(user.username) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = Typography.bodyMedium)
-                Username(
-                    username = user.username,
-                    verified = user.verified,
-                    textStyle = Typography.bodyMedium,
-                )
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FollowButton(
-                isFollowing = true,
-                onClick = { onFollowToggle(user) }
-            )
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Default.MoreVert, null)
-            }
         }
     }
 }

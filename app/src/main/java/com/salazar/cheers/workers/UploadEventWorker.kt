@@ -17,7 +17,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Event
@@ -55,6 +54,9 @@ class UploadEventWorker @AssistedInject constructor(
         val eventPrivacy =
             inputData.getString("EVENT_PRIVACY") ?: return Result.failure()
 
+        val showGuestList =
+            inputData.getBoolean("SHOW_GUEST_LIST", false)
+
         val address =
             inputData.getString("ADDRESS") ?: ""
 
@@ -81,6 +83,7 @@ class UploadEventWorker @AssistedInject constructor(
                 hostName = user.name,
                 name = name,
                 address = address,
+                showGuestList = showGuestList,
                 description = description,
                 privacy = Privacy.valueOf(eventPrivacy),
                 startDate = startDateTime,

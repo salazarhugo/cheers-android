@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -15,7 +16,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun HomeRoute(
-    homeViewModel: HomeViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by homeViewModel.uiState.collectAsState()

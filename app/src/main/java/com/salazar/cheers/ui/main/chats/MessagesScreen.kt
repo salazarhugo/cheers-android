@@ -201,7 +201,7 @@ fun UserItem(
                     .size(16.dp),
                 contentDescription = null,
             )
-        FollowButton(isFollowing = user.isFollowed, onClick = { onFollowToggle(user) })
+        FollowButton(isFollowing = user.followBack, onClick = { onFollowToggle(user) })
     }
 }
 

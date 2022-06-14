@@ -1,5 +1,6 @@
 package com.salazar.cheers.internal
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -27,7 +28,7 @@ data class User(
     val online: Boolean,
     val darkMode: Boolean,
     val registrationTokens: List<String>,
-    val isFollowed: Boolean,
+    val followBack: Boolean,
     val created: Long,
 ) : Serializable {
 
@@ -43,7 +44,7 @@ data class User(
         false,
         "",
         "",
-        "defaultPicture/default_profile_picture.jpg",
+        "",
         "",
         false,
         false,

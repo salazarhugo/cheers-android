@@ -58,13 +58,14 @@ fun NewChatScreen(
         floatingActionButtonPosition = FabPosition.Center,
     ) {
         Column(
-            modifier = Modifier.animateContentSize()
+            modifier = Modifier
+                .padding(it)
+                .animateContentSize(),
         ) {
             SearchBar(searchInput = uiState.query, onSearchInputChanged = onQueryChange)
             ChipGroup(
                 users = uiState.selectedUsers.map { it.name.ifBlank { it.username } },
                 onSelectedChanged = { name -> },
-                unselectedColor = MaterialTheme.colorScheme.outline,
             )
             if (uiState.selectedUsers.size > 1 || uiState.isGroup)
                 NewGroupNameInput(

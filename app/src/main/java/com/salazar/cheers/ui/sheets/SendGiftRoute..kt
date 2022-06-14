@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
@@ -33,7 +34,7 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun SendGiftRoute(
-    sendGiftViewModel: SendGiftViewModel,
+    sendGiftViewModel: SendGiftViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {

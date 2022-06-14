@@ -87,7 +87,7 @@ class StoryViewModel @Inject constructor(
 
     private fun refreshStoryFlow() {
         viewModelState.update { it.copy(isLoading = true) }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch() {
             viewModelState.update {
                 it.copy(storiesFlow = storyRepository.getStories(), isLoading = false)
             }

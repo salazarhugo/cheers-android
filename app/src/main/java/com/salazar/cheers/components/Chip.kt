@@ -21,23 +21,19 @@ import com.salazar.cheers.components.animations.Animate
 @Composable
 fun ChipGroup(
     users: List<String> = emptyList(),
-    selectedCar: String? = null,
+    isPrimary: Boolean = false,
     onSelectedChanged: (String) -> Unit = {},
-    selectedColor: Color = Color.LightGray,
-    unselectedColor: Color = MaterialTheme.colorScheme.primary,
 ) {
     Column(modifier = Modifier.padding(8.dp)) {
         LazyRow {
-            items(users, key = { it }) {
+            items(users) {
                 Animate {
                     Chip(
                         name = it,
-//                    isSelected = selectedCar == it,
+                        isSelected = true,
                         onSelectionChanged = {
                             onSelectedChanged(it)
                         },
-                        selectedColor = selectedColor,
-                        unselectedColor = unselectedColor,
                     )
                 }
             }
@@ -51,14 +47,19 @@ fun Chip(
     name: String = "Chip",
     isSelected: Boolean = false,
     onSelectionChanged: (String) -> Unit = {},
-    selectedColor: Color = Color.LightGray,
+    isPrimary: Boolean = false,
     unselectedColor: Color = MaterialTheme.colorScheme.primary,
 ) {
+    val backgroundColor =
+        if (isPrimary) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+    val textColor =
+        if (isPrimary) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer
+
     Surface(
         modifier = Modifier.padding(4.dp),
         shadowElevation = 8.dp,
         shape = CircleShape,
-        color = if (isSelected) Color.LightGray else MaterialTheme.colorScheme.primary
+        color = backgroundColor
     ) {
         Row(modifier = Modifier
             .toggleable(
@@ -71,7 +72,7 @@ fun Chip(
             Text(
                 text = name,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = textColor,
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
             )
         }

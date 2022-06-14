@@ -26,7 +26,6 @@ import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.profile.Post
-import com.salazar.cheers.ui.main.room.HeaderButtons
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -58,7 +57,7 @@ fun OtherProfileScreen(
                 ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
                 ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
                 Spacer(Modifier.height(8.dp))
-                val isFollowed = uiState.user.isFollowed
+                val isFollowed = uiState.user.followBack
                 HeaderButtons(
                     isFollowed = isFollowed,
                     onFollowToggle = { onFollowToggle(uiState.user) },

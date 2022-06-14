@@ -1,5 +1,7 @@
 package com.salazar.cheers.components.post
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +16,7 @@ import com.salazar.cheers.ui.main.chat.messageFormatter
 fun PostText(
     caption: String,
     onUserClicked: (username: String) -> Unit,
+    onPostClicked: () -> Unit,
 ) {
     if (caption.isBlank()) return
 
@@ -26,12 +29,17 @@ fun PostText(
     ClickableText(
         text = styledCaption,
         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
-        modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
         onClick = {
             styledCaption
                 .getStringAnnotations(start = it, end = it)
                 .firstOrNull()
-                ?.let { annotation ->
+                .let { annotation ->
+                    if (annotation == null)
+                        onPostClicked()
+                    else
                     when (annotation.tag) {
                         SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
                         SymbolAnnotationType.PERSON.name -> onUserClicked(annotation.item)

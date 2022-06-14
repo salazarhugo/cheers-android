@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 import kotlinx.coroutines.launch
 
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun MapRoute(
-    mapViewModel: MapViewModel,
+    mapViewModel: MapViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by mapViewModel.uiState.collectAsState()

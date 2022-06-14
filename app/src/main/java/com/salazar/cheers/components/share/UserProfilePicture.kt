@@ -18,6 +18,7 @@ import com.salazar.cheers.R
 
 @Composable
 fun UserProfilePicture(
+    modifier: Modifier = Modifier,
     profilePictureUrl: String,
     @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,
@@ -30,7 +31,7 @@ fun UserProfilePicture(
             }).build()
         ),
         contentDescription = "Profile picture",
-        modifier = Modifier
+        modifier = modifier
             .size(size)
             .clip(CircleShape),
         contentScale = ContentScale.Crop

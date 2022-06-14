@@ -21,7 +21,7 @@ fun AddEventRoute(
     val uiState by addEventViewModel.uiState.collectAsState()
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-                addEventViewModel.setPhoto(it)
+            addEventViewModel.setPhoto(it)
         }
 
     AddEventScreen(
@@ -33,8 +33,9 @@ fun AddEventRoute(
         onDescriptionChange = addEventViewModel::onDescriptionChange,
         onStartTimeSecondsChange = addEventViewModel::onStartTimeSecondsChange,
         onEndTimeSecondsChange = addEventViewModel::onEndTimeSecondsChange,
+        onShowGuestListToggle = addEventViewModel::onShowGuestListToggle,
         onAddEventUIAction = {
-            when(it) {
+            when (it) {
                 AddEventUIAction.OnDismiss -> {
                     navActions.navigateBack()
                 }
@@ -45,11 +46,11 @@ fun AddEventRoute(
                     navActions.navigateBack()
                 }
                 AddEventUIAction.OnAddPhoto -> {
-                     launcher.launch("image/*")
+                    launcher.launch("image/*")
                 }
-                AddEventUIAction.OnEventDetailsClick ->  {
+                AddEventUIAction.OnEventDetailsClick -> {
                 }
-                AddEventUIAction.OnHasEndDateToggle ->  addEventViewModel.hasEndDateToggle()
+                AddEventUIAction.OnHasEndDateToggle -> addEventViewModel.hasEndDateToggle()
             }
         },
     )

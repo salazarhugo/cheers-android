@@ -1,10 +1,14 @@
 package com.salazar.cheers.ui.main.add
 
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.salazar.cheers.components.utils.BackPressHandler
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
 
@@ -16,8 +20,8 @@ import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
 @Composable
 fun AddPostRoute(
     profilePictureUrl: String,
-    addPostViewModel: AddPostViewModel,
     navActions: CheersNavigationActions,
+    addPostViewModel: AddPostViewModel = hiltViewModel(),
 ) {
     val uiState by addPostViewModel.uiState.collectAsState()
     val launcher =
@@ -28,6 +32,11 @@ fun AddPostRoute(
                 addPostViewModel.updateErrorMessage("Maximum 8 photos.")
         }
 
+    BackHandler {
+        addPostViewModel.updatePage(AddPostPage.AddPost)
+        Log.d("HAHA", "System back intercepted")
+        println("System back intercepted")
+    }
     when (uiState.page) {
         AddPostPage.AddPost ->
             AddPostScreen(

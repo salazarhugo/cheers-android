@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.profile
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
@@ -55,11 +56,11 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     onSwipeRefresh: () -> Unit,
     onEditProfileClicked: () -> Unit,
-    onDrinkingStatsClick: () -> Unit,
+    onDrinkingStatsClick: (String) -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
-    navigateToProfileMoreSheet: () -> Unit,
+    navigateToProfileMoreSheet: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
 ) {
@@ -84,17 +85,21 @@ fun ProfileScreen(
 fun Profile(
     uiState: ProfileUiState.HasUser,
     onEditProfileClicked: () -> Unit,
-    onDrinkingStatsClick: () -> Unit,
+    onDrinkingStatsClick: (String) -> Unit,
     onSwipeRefresh: () -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
-    navigateToProfileMoreSheet: () -> Unit,
+    navigateToProfileMoreSheet: (String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
 ) {
     Scaffold(
-        topBar = { Toolbar(uiState = uiState, navigateToProfileMoreSheet) }
+        topBar = {
+            Toolbar(
+                uiState = uiState,
+            ) { navigateToProfileMoreSheet(uiState.user.username) }
+        }
     ) {
         val posts = uiState.postFlow.collectAsLazyPagingItems()
         val pagerState = rememberPagerState()
@@ -119,7 +124,7 @@ fun Profile(
                         Spacer(Modifier.height(8.dp))
                         ProfileButtons(
                             onEditProfileClicked = onEditProfileClicked,
-                            onDrinkingStatsClick = onDrinkingStatsClick,
+                            onDrinkingStatsClick = { onDrinkingStatsClick(uiState.user.username) },
                         )
                     }
                 }
@@ -191,17 +196,17 @@ fun EventList(
     events: List<Event>?,
 ) {
     if (events != null)
-    LazyColumn {
-        items(events, key = { it.id }) { event ->
-            Event(
-                event = event,
-                onEventClicked = {},
-                onGoingToggle = {},
-                onInterestedToggle = {},
-                onMoreClick = {},
-            )
+        LazyColumn {
+            items(events, key = { it.id }) { event ->
+                Event(
+                    event = event,
+                    onEventClicked = {},
+                    onGoingToggle = {},
+                    onInterestedToggle = {},
+                    onMoreClick = {},
+                )
+            }
         }
-    }
     else
         LoadingScreen()
 }
@@ -250,6 +255,7 @@ fun Post(
     PostText(
         caption = post.caption,
         onUserClicked = {},
+        onPostClicked = { onPostClicked(post.id) },
     )
     PostBody(
         post = post,
@@ -367,7 +373,9 @@ fun ProfileStats(
         items.forEach { item ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable {
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }) {
                     onStatClicked(item.name, user.username, user.verified)
                 }
             ) {

@@ -21,9 +21,11 @@ import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,7 +48,7 @@ class ChatRepository @Inject constructor(
             val idToken = tokenResult.token ?: throw Exception("idToken is null")
 
             managedChannel = ManagedChannelBuilder
-                .forAddress("chat-r3a2dr4u4a-nw.a.run.app", 443)
+                .forAddress("chat-service-r3a2dr4u4a-nw.a.run.app", 443)
                 .build()
 
             val client = ChatServiceGrpcKt
@@ -70,7 +72,7 @@ class ChatRepository @Inject constructor(
             launch {
                 chatDao.seenChannel(channelId)
             }
-            getClient()!!.joinRoom(RoomId.newBuilder().setRoomId(channelId).build()).collect {
+            getClient()?.joinRoom(RoomId.newBuilder().setRoomId(channelId).build())?.collect {
                 chatDao.insertMessage(it.toTextMessage().copy(acknowledged = true))
             }
         } catch (e: Exception) {
@@ -102,7 +104,7 @@ class ChatRepository @Inject constructor(
             .build()
 
         chatDao.deleteChannel(channelId)
-        getClient()!!.leaveRoom(request)
+        getClient()?.leaveRoom(request)
     }
 
     suspend fun deleteChats(channelId: String) = chatDao.deleteChannel(channelId)
@@ -113,7 +115,7 @@ class ChatRepository @Inject constructor(
             .build()
 
         chatDao.deleteChannel(channelId)
-        getClient()!!.deleteRoom(request)
+        getClient()?.deleteRoom(request)
     }
 
     suspend fun getRoomId(request: GetRoomIdReq) = withContext(Dispatchers.IO) {
@@ -123,7 +125,7 @@ class ChatRepository @Inject constructor(
     suspend fun startTyping(channelId: String) = withContext(Dispatchers.IO) {
         try {
             val user = userRepository.getCurrentUser()
-            getClient()!!.typingStart(
+            getClient()?.typingStart(
                 TypingReq.newBuilder()
                     .setRoomId(channelId)
                     .setUsername(user.name)
@@ -135,7 +137,10 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun sendImage(channelId: String, images: List<Uri>): LiveData<WorkInfo> {
+    suspend fun sendImage(
+        channelId: String,
+        images: List<Uri>
+    ): LiveData<WorkInfo> {
         chatDao.setStatus(channelId, RoomStatus.SENDING)
         val uploadWork =
             OneTimeWorkRequestBuilder<UploadImageMessage>()
@@ -156,7 +161,7 @@ class ChatRepository @Inject constructor(
     suspend fun sendImageMessage(
         channelId: String,
         photoUrl: String
-    ): MessageAck = withContext(Dispatchers.IO) {
+    ): MessageAck? = withContext(Dispatchers.IO) {
         val user = userRepository.getCurrentUser()
 
         val msg = Message.newBuilder()
@@ -179,9 +184,9 @@ class ChatRepository @Inject constructor(
             emit(msg)
         }
 
-        val acknowledge = getClient()!!.sendMessage(message)
+        val acknowledge = getClient()?.sendMessage(message)
 
-        if (acknowledge.status == "SENT")
+        if (acknowledge?.status == "SENT")
             chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
 
         return@withContext acknowledge

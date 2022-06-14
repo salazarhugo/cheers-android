@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -19,7 +20,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 @Composable
 fun StoryRoute(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    storyViewModel: StoryViewModel,
+    storyViewModel: StoryViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
     showInterstitialAd: () -> Unit,
 ) {

@@ -1,12 +1,13 @@
 package com.salazar.cheers.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Badge
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FilterCenterFocus
 import androidx.compose.material.icons.filled.Place
@@ -74,7 +75,6 @@ fun CheersNavigationBar(
             "Messages"
         ),
     )
-
     CompositionLocalProvider(
         LocalRippleTheme provides ClearRippleTheme
     ) {

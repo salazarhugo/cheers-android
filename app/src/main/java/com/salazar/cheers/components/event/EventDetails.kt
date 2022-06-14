@@ -21,6 +21,7 @@ fun EventDetails(
     name: String,
     privacy: Privacy,
     startTimeSeconds: Long,
+    showArrow: Boolean = false,
     onEventDetailsClick: () -> Unit,
 ) {
     Row(
@@ -47,7 +48,8 @@ fun EventDetails(
             )
 
         }
-        Icon(Icons.Outlined.ChevronRight, null)
+        if (showArrow)
+            Icon(Icons.Outlined.ChevronRight, null)
     }
 }
 

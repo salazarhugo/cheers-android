@@ -1,18 +1,15 @@
 package com.salazar.cheers.navigation
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
@@ -28,16 +25,15 @@ import com.salazar.cheers.components.post.PostMoreBottomSheet
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.AddPostRoute
-import com.salazar.cheers.ui.main.add.AddPostViewModel
 import com.salazar.cheers.ui.main.camera.CameraRoute
-import com.salazar.cheers.ui.main.camera.CameraViewModel
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
 import com.salazar.cheers.ui.main.chat.ChatRoute
-import com.salazar.cheers.ui.main.chats.*
+import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
+import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
+import com.salazar.cheers.ui.main.chats.MessagesRoute
+import com.salazar.cheers.ui.main.chats.NewChatRoute
 import com.salazar.cheers.ui.main.comment.CommentsRoute
-import com.salazar.cheers.ui.main.comment.commentsViewModel
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
-import com.salazar.cheers.ui.main.detail.PostDetailViewModel
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.main.event.EventMoreBottomSheet
@@ -50,54 +46,37 @@ import com.salazar.cheers.ui.main.event.guestlist.GuestListRoute
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapRoute
-import com.salazar.cheers.ui.main.map.MapViewModel
 import com.salazar.cheers.ui.main.nfc.NfcRoute
-import com.salazar.cheers.ui.main.nfc.NfcViewModel
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileViewModel
 import com.salazar.cheers.ui.main.profile.*
 import com.salazar.cheers.ui.main.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
-import com.salazar.cheers.ui.main.search.SearchViewModel
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
-import com.salazar.cheers.ui.main.stats.drinkingStatsViewModel
 import com.salazar.cheers.ui.main.story.StoryRoute
-import com.salazar.cheers.ui.main.story.StoryViewModel
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
-import com.salazar.cheers.ui.main.story.stats.storyStatsViewModel
 import com.salazar.cheers.ui.sheets.SendGiftRoute
-import com.salazar.cheers.ui.sheets.sendGiftViewModel
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.copyToClipboard
 
+
+const val uri = "https://cheers-a275e.web.app"
+
 fun NavGraphBuilder.mainNavGraph(
-    navController: NavController,
     user: User,
     navActions: CheersNavigationActions,
     showInterstitialAd: () -> Unit,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {
-    val uri = "https://cheers-a275e.web.app"
-
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
-
-//        settingNavGraph(
-//            navActions = navActions,
-//            presentPaymentSheet = presentPaymentSheet
-//        )
-
         composable(
             route = MainDestinations.NFC_ROUTE,
         ) {
-            val nfcViewModel = hiltViewModel<NfcViewModel>()
-
             NfcRoute(
-                nfcViewModel = nfcViewModel,
                 navActions = navActions
             )
         }
@@ -113,6 +92,250 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/chat/{channelId}" })
         ) {
             ChatRoute(
+                navActions = navActions,
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.SEND_GIFT_SHEET}/{receiverId}",
+        ) {
+            SendGiftRoute(
+                navActions = navActions,
+                bottomSheetNavigator = bottomSheetNavigator,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.ROOM_DETAILS}/{roomId}",
+            enterTransition = { scaleIn(animationSpec = tween(500)) },
+            exitTransition = { scaleOut(animationSpec = tween(500)) },
+        ) {
+            RoomRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.STORY_ROUTE}?userId={userId}",
+            arguments = listOf(navArgument("userId") { nullable = true }),
+            enterTransition = { scaleIn(animationSpec = tween(500)) },
+            exitTransition = { scaleOut(animationSpec = tween(500)) },
+        ) {
+            CheersTheme(darkTheme = true) {
+                StoryRoute(
+                    navActions = navActions,
+                    showInterstitialAd = showInterstitialAd,
+                )
+            }
+        }
+
+        dialog(
+            route = "${MainDestinations.ADD_EVENT_SHEET}?photoUri={photoUri}",
+            arguments = listOf(navArgument("photoUri") { nullable = true })
+        ) {
+            AddEventRoute(
+                navActions = navActions,
+            )
+        }
+
+        dialog(
+            route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
+            arguments = listOf(navArgument("photoUri") { nullable = true })
+        ) {
+            AddPostRoute(
+                navActions = navActions,
+                profilePictureUrl = user.profilePictureUrl,
+            )
+        }
+
+        composable(
+            route = MainDestinations.EVENTS_ROUTE,
+        ) {
+            EventsRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = MainDestinations.HOME_ROUTE,
+        ) {
+            HomeRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(MainDestinations.MAP_ROUTE) {
+            MapRoute(
+                navActions = navActions
+            )
+        }
+
+        bottomSheet("${MainDestinations.CHAT_CAMERA_ROUTE}/{roomId}") {
+            ChatCameraRoute(
+                navActions = navActions
+            )
+        }
+
+        dialog(MainDestinations.CAMERA_ROUTE) {
+            CameraRoute(
+                navActions = navActions
+            )
+        }
+
+        composable(MainDestinations.SEARCH_ROUTE) {
+            SearchRoute(
+                navActions = navActions,
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.POST_COMMENTS}/{postId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
+        ) {
+            CommentsRoute(
+                bottomSheetNavigator = bottomSheetNavigator,
+                profilePictureUrl = user.profilePictureUrl,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.DRINKING_STATS}/{username}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/stats/{username}" })
+        ) {
+            DrinkingStatsRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.OTHER_PROFILE_ROUTE}/{username}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/u/{username}" })
+        ) {
+
+            val username = it.arguments?.getString("username")!!
+
+            OtherProfileRoute(
+                navActions = navActions,
+                username = username,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.GUEST_LIST_ROUTE}/{eventId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
+        ) {
+            GuestListRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
+        ) {
+            EventDetailRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/edit/{eventId}" })
+        ) {
+            EditEventRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{storyId}" })
+        ) {
+            StoryStatsRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
+        ) {
+            PostDetailRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
+            arguments = listOf(
+                navArgument("username") { nullable = false },
+                navArgument("verified") { defaultValue = false }
+            ),
+        ) {
+            OtherProfileStatsRoute(
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
+            arguments = listOf(
+                navArgument("username") { nullable = false },
+                navArgument("verified") { defaultValue = false }
+            )
+        ) {
+            val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
+
+            val username = it.arguments?.getString("username")!!
+            val verified = it.arguments?.getBoolean("verified")!!
+
+            ProfileStatsRoute(
+                profileStatsViewModel = profileStatsViewModel,
+                navActions = navActions,
+                username = username,
+                verified = verified,
+            )
+        }
+
+        composable(
+            route = MainDestinations.MESSAGES_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
+        ) {
+            MessagesRoute(
+                navActions = navActions,
+            )
+        }
+
+        bottomSheet(
+            route = MainDestinations.NEW_CHAT_ROUTE,
+        ) {
+            NewChatRoute(
+                navActions = navActions,
+            )
+        }
+
+        dialog(
+            route = MainDestinations.EDIT_PROFILE_ROUTE,
+        ) {
+            val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
+            EditProfileRoute(
+                editProfileViewModel = editProfileViewModel,
+                navActions = navActions,
+            )
+        }
+
+        composable(
+            route = MainDestinations.PROFILE_ROUTE,
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = {
+                if (targetState.destination.hierarchy.any { it.route == CheersDestinations.SETTING_ROUTE })
+                    slideOutHorizontally(targetOffsetX = { -1000 })
+                else
+                    slideOutHorizontally(targetOffsetX = { 1000 })
+            }
+        ) {
+            ProfileRoute(
                 navActions = navActions,
             )
         }
@@ -163,238 +386,6 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        bottomSheet(
-            route = "${MainDestinations.SEND_GIFT_SHEET}/{receiverId}",
-        ) {
-            val receiverId = it.arguments?.getString("receiverId")!!
-            val sendGiftViewModel = sendGiftViewModel(receiverId = receiverId)
-
-            SendGiftRoute(
-                sendGiftViewModel = sendGiftViewModel,
-                navActions = navActions,
-                bottomSheetNavigator = bottomSheetNavigator,
-            )
-        }
-
-        bottomSheet(
-            route = "${MainDestinations.MESSAGES_MORE_SHEET}/{channelId}",
-        ) {
-            val chatsSheetViewModel = hiltViewModel<ChatsSheetViewModel>()
-
-            val uiState by chatsSheetViewModel.uiState.collectAsState()
-            val room = uiState.room
-
-            if (room != null)
-                ChatsMoreBottomSheet(
-                    name = room.name,
-                    ownerId = room.ownerId,
-                    roomType = room.type,
-                    onDeleteClick = {
-                        chatsSheetViewModel.deleteChannel()
-                        navActions.navigateBack()
-                    },
-                    onLeaveClick = {
-                        chatsSheetViewModel.leaveChannel()
-                        navActions.navigateBack()
-                    },
-                    onDeleteChats = {
-                        chatsSheetViewModel.deleteChats()
-                        navActions.navigateBack()
-                    }
-                )
-            else
-                LoadingScreen()
-        }
-
-        composable(
-            route = "${MainDestinations.ROOM_DETAILS}/{roomId}",
-            enterTransition = { scaleIn(animationSpec = tween(500)) },
-            exitTransition = { scaleOut(animationSpec = tween(500)) },
-        ) {
-            RoomRoute(
-                navActions = navActions,
-            )
-        }
-
-        composable(
-            route = "${MainDestinations.STORY_ROUTE}?userId={userId}",
-            arguments = listOf(navArgument("userId") { nullable = true }),
-            enterTransition = { scaleIn(animationSpec = tween(500)) },
-            exitTransition = { scaleOut(animationSpec = tween(500)) },
-        ) {
-            val storyViewModel = hiltViewModel<StoryViewModel>()
-            val userId = it.arguments?.getString("userId")
-//            if (userId != null)
-//                storyViewModel.
-
-            CheersTheme(darkTheme = true) {
-                StoryRoute(
-                    storyViewModel = storyViewModel,
-                    navActions = navActions,
-                    showInterstitialAd = showInterstitialAd,
-                )
-            }
-        }
-
-        bottomSheet(route = MainDestinations.PROFILE_MORE_SHEET) {
-            val context = LocalContext.current
-            ProfileMoreBottomSheet(
-                onProfileSheetUIAction = { action ->
-                    when (action) {
-                        is ProfileSheetUIAction.OnNfcClick -> navActions.navigateToNfc()
-                        is ProfileSheetUIAction.OnSettingsClick -> navActions.navigateToSettings()
-                        is ProfileSheetUIAction.OnCopyProfileClick -> {
-                            FirebaseDynamicLinksUtil.createShortLink(user.id)
-                                .addOnSuccessListener { shortLink ->
-                                    context.copyToClipboard(shortLink.shortLink.toString())
-                                }
-                            navActions.navigateBack()
-                        }
-                    }
-                },
-            )
-        }
-
-        dialog(
-            route = "${MainDestinations.ADD_EVENT_SHEET}?photoUri={photoUri}",
-            arguments = listOf(navArgument("photoUri") { nullable = true })
-        ) {
-            AddEventRoute(
-                navActions = navActions,
-            )
-        }
-
-        dialog(
-            route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
-            arguments = listOf(navArgument("photoUri") { nullable = true })
-        ) {
-            val viewModel = hiltViewModel<AddPostViewModel>()
-            AddPostRoute(
-                addPostViewModel = viewModel,
-                navActions = navActions,
-                profilePictureUrl = user.profilePictureUrl,
-            )
-            val photoUri = it.arguments?.getString("photoUri")
-            if (photoUri != null) {
-                LaunchedEffect(photoUri) {
-                    viewModel.addPhoto(Uri.parse(photoUri))
-                }
-            }
-        }
-
-        composable(
-            route = MainDestinations.EVENTS_ROUTE,
-        ) {
-            EventsRoute(
-                navActions = navActions,
-            )
-        }
-
-        composable(
-            route = MainDestinations.HOME_ROUTE,
-        ) {
-            val homeViewModel = hiltViewModel<HomeViewModel>()
-
-            HomeRoute(
-                homeViewModel = homeViewModel,
-                navActions = navActions,
-            )
-        }
-
-        composable(MainDestinations.MAP_ROUTE) {
-            val mapViewModel = hiltViewModel<MapViewModel>()
-            MapRoute(
-                mapViewModel = mapViewModel,
-                navActions = navActions
-            )
-        }
-
-        bottomSheet("${MainDestinations.CHAT_CAMERA_ROUTE}/{roomId}") {
-            ChatCameraRoute(
-                navActions = navActions
-            )
-        }
-
-        dialog(MainDestinations.CAMERA_ROUTE) {
-            val cameraViewModel = hiltViewModel<CameraViewModel>()
-            CameraRoute(
-                cameraViewModel = cameraViewModel,
-                navActions = navActions
-            )
-        }
-
-        composable(MainDestinations.SEARCH_ROUTE) {
-            val searchViewModel = hiltViewModel<SearchViewModel>()
-            SearchRoute(
-                searchViewModel = searchViewModel,
-                navActions = navActions,
-            )
-        }
-
-        bottomSheet(
-            route = "${MainDestinations.POST_COMMENTS}/{postId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
-        ) {
-
-            val postId = it.arguments?.getString("postId")!!
-            val commentsViewModel = commentsViewModel(postId = postId)
-            CommentsRoute(
-                commentsViewModel = commentsViewModel,
-                navActions = navActions,
-                bottomSheetNavigator = bottomSheetNavigator,
-                profilePictureUrl = user.profilePictureUrl,
-            )
-        }
-
-        composable(
-            route = "${MainDestinations.DRINKING_STATS}/{username}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/stats/{username}" })
-        ) {
-
-            val username = it.arguments?.getString("username")!!
-            val drinkingStatsViewModel = drinkingStatsViewModel(username = username)
-
-            DrinkingStatsRoute(
-                navActions = navActions,
-                drinkingStatsViewModel = drinkingStatsViewModel,
-            )
-
-        }
-
-        composable(
-            route = "${MainDestinations.OTHER_PROFILE_ROUTE}/{username}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/{username}" })
-        ) {
-
-            val username = it.arguments?.getString("username")!!
-            val otherProfileViewModel = hiltViewModel<OtherProfileViewModel>()
-
-            OtherProfileRoute(
-                otherProfileViewModel = otherProfileViewModel,
-                navActions = navActions,
-                username = username,
-            )
-        }
-
-        composable(
-            route = "${MainDestinations.GUEST_LIST_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
-        ) {
-            GuestListRoute(
-                navActions = navActions,
-            )
-        }
-
-        composable(
-            route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
-        ) {
-
-            EventDetailRoute(
-                navActions = navActions,
-            )
-        }
-
         bottomSheet("${MainDestinations.EVENT_MORE_SHEET}/{eventId}") {
             val eventId = it.arguments?.getString("eventId")!!
             val context = LocalContext.current
@@ -433,116 +424,54 @@ fun NavGraphBuilder.mainNavGraph(
         }
     }
 
-    composable(
-        route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
-        deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/edit/{eventId}" })
-    ) {
-
-        EditEventRoute(
-            navActions = navActions,
-        )
-    }
-
-    composable(
-        route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",
-        deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{storyId}" })
-    ) {
-        val storyId = it.arguments?.getString("storyId")!!
-        val storyStatsViewModel = storyStatsViewModel(storyId = storyId)
-
-        StoryStatsRoute(
-            storyStatsViewModel = storyStatsViewModel,
-            navActions = navActions,
-        )
-    }
-
-    composable(
-        route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
-        deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
-    ) {
-
-        PostDetailRoute(
-            navActions = navActions,
-        )
-    }
-
-    composable(
-        route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
-        arguments = listOf(
-            navArgument("username") { nullable = false },
-            navArgument("verified") { defaultValue = false }
-        ),
-    ) {
-        OtherProfileStatsRoute(
-            navActions = navActions,
-        )
-    }
-
-    composable(
-        route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
-        arguments = listOf(
-            navArgument("username") { nullable = false },
-            navArgument("verified") { defaultValue = false }
-        )
-    ) {
-        val profileStatsViewModel = hiltViewModel<ProfileStatsViewModel>()
-
+    bottomSheet(route = "${MainDestinations.PROFILE_MORE_SHEET}/{username}") {
+        val context = LocalContext.current
         val username = it.arguments?.getString("username")!!
-        val verified = it.arguments?.getBoolean("verified")!!
 
-        ProfileStatsRoute(
-            profileStatsViewModel = profileStatsViewModel,
-            navActions = navActions,
-            username = username,
-            verified = verified,
+        ProfileMoreBottomSheet(
+            onProfileSheetUIAction = { action ->
+                when (action) {
+                    is ProfileSheetUIAction.OnNfcClick -> navActions.navigateToNfc()
+                    is ProfileSheetUIAction.OnSettingsClick -> navActions.navigateToSettings()
+                    is ProfileSheetUIAction.OnCopyProfileClick -> {
+                        FirebaseDynamicLinksUtil.createShortLink("u/$username")
+                            .addOnSuccessListener { shortLink ->
+                                context.copyToClipboard(shortLink.shortLink.toString())
+                            }
+                        navActions.navigateBack()
+                    }
+                }
+            },
         )
     }
 
-    composable(
-        MainDestinations.MESSAGES_ROUTE,
-        enterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
-        exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
+    bottomSheet(
+        route = "${MainDestinations.MESSAGES_MORE_SHEET}/{channelId}",
     ) {
-        val messagesViewModel = hiltViewModel<MessagesViewModel>()
+        val chatsSheetViewModel = hiltViewModel<ChatsSheetViewModel>()
 
-        MessagesRoute(
-            messagesViewModel = messagesViewModel,
-            navActions = navActions,
-        )
-    }
+        val uiState by chatsSheetViewModel.uiState.collectAsState()
+        val room = uiState.room
 
-    bottomSheet(MainDestinations.NEW_CHAT_ROUTE) {
-        NewChatRoute(
-            navActions = navActions,
-        )
-    }
-
-
-    dialog(MainDestinations.EDIT_PROFILE_ROUTE) {
-        val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
-        EditProfileRoute(
-            editProfileViewModel = editProfileViewModel,
-            navActions = navActions,
-        )
-    }
-
-    composable(
-        MainDestinations.PROFILE_ROUTE,
-        enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-        exitTransition = {
-            if (targetState.destination.hierarchy.any { it.route == CheersDestinations.SETTING_ROUTE })
-                slideOutHorizontally(targetOffsetX = { -1000 })
-            else
-                slideOutHorizontally(targetOffsetX = { 1000 })
-        }
-
-    ) {
-        val profileViewModel = hiltViewModel<ProfileViewModel>()
-
-        ProfileRoute(
-            profileViewModel = profileViewModel,
-            navActions = navActions,
-            username = user.username,
-        )
+        if (room != null)
+            ChatsMoreBottomSheet(
+                name = room.name,
+                ownerId = room.ownerId,
+                roomType = room.type,
+                onDeleteClick = {
+                    chatsSheetViewModel.deleteChannel()
+                    navActions.navigateBack()
+                },
+                onLeaveClick = {
+                    chatsSheetViewModel.leaveChannel()
+                    navActions.navigateBack()
+                },
+                onDeleteChats = {
+                    chatsSheetViewModel.deleteChats()
+                    navActions.navigateBack()
+                }
+            )
+        else
+            LoadingScreen()
     }
 }

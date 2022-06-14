@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.navigation.CheersNavigationActions
 
@@ -14,7 +15,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun SettingsRoute(
-    settingsViewModel: SettingsViewModel,
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by settingsViewModel.uiState.collectAsState()

@@ -7,7 +7,6 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -46,13 +44,13 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.SwitchM3
 import com.salazar.cheers.components.event.EventDetails
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.startDateFormatter
 import com.salazar.cheers.internal.timeFormatter
 import com.salazar.cheers.ui.main.add.LocationSection
 import com.salazar.cheers.ui.main.add.PrivacyBottomSheet
+import com.salazar.cheers.ui.main.add.SwitchPreference
 import com.salazar.cheers.ui.main.chat.messageFormatter
 import com.salazar.cheers.ui.main.search.SearchLocation
 import com.salazar.cheers.ui.theme.Roboto
@@ -71,6 +69,7 @@ fun AddEventScreen(
     onEndTimeSecondsChange: (Long) -> Unit,
     onQueryChange: (String) -> Unit,
     onLocationClick: (SearchSuggestion) -> Unit,
+    onShowGuestListToggle: () -> Unit,
 ) {
     PrivacyBottomSheet(
         privacy = uiState.privacy,
@@ -103,6 +102,7 @@ fun AddEventScreen(
                     onEndTimeSecondsChange = onEndTimeSecondsChange,
                     onQueryChange = onQueryChange,
                     onLocationClick = onLocationClick,
+                    onShowGuestListToggle = onShowGuestListToggle,
                 )
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
@@ -152,6 +152,7 @@ fun Tabs(
     onEndTimeSecondsChange: (Long) -> Unit,
     onQueryChange: (String) -> Unit,
     onLocationClick: (SearchSuggestion) -> Unit,
+    onShowGuestListToggle: () -> Unit,
 ) {
     val tabs = 4
     val scope = rememberCoroutineScope()
@@ -169,7 +170,8 @@ fun Tabs(
                     onEventNameChange = onNameChange,
                     onStartDateChanged = onStartTimeSecondsChange,
                     onEndTimeSecondsChange = onEndTimeSecondsChange,
-                    onHasEndDateToggle = { onAddEventUIAction(AddEventUIAction.OnHasEndDateToggle) }
+                    onHasEndDateToggle = { onAddEventUIAction(AddEventUIAction.OnHasEndDateToggle) },
+                    onShowGuestListToggle = onShowGuestListToggle,
                 )
                 1 -> DescriptionPage(
                     description = uiState.description,
@@ -486,28 +488,6 @@ fun ShareButton(
 }
 
 @Composable
-fun SwitchPreference(
-    value: Boolean,
-    text: String,
-    onCheckedChange: (Boolean) -> Unit = {},
-) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp))
-        SwitchM3(
-            modifier = Modifier.background(Color.Red),
-            checked = value,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}
-
-@Composable
 fun AddPhoto(
     photo: Uri?,
     onAddPhotoClick: () -> Unit,
@@ -689,6 +669,7 @@ fun EventDetailsPage(
     onStartDateChanged: (Long) -> Unit,
     onEndTimeSecondsChange: (Long) -> Unit,
     onHasEndDateToggle: () -> Unit,
+    onShowGuestListToggle: () -> Unit,
 ) {
     NameTextField(
         name = uiState.name,
@@ -704,5 +685,11 @@ fun EventDetailsPage(
     Privacy(
         privacyState = uiState.privacyState,
         privacy = uiState.privacy,
+    )
+    DividerM3()
+    SwitchPreference(
+        checked = uiState.showGuestList,
+        text = "Show Guest List",
+        onCheckedChange = { onShowGuestListToggle() },
     )
 }

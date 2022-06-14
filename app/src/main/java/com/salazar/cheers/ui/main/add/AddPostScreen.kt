@@ -493,7 +493,6 @@ fun LocationResult(
             if (location != null)
                 onSelectLocation(location)
         },
-        unselectedColor = MaterialTheme.colorScheme.outline,
     )
 }
 
@@ -540,7 +539,7 @@ fun AddPeople(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Add people",
+            text = "Add friends",
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
         )
         if (selectedTagUsers.size == 1)

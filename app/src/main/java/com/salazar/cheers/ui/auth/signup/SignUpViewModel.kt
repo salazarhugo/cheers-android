@@ -1,23 +1,15 @@
 package com.salazar.cheers.ui.auth.signup
 
-import android.content.Context
 import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
-import com.salazar.cheers.backend.Neo4jUtil
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.service.MyFirebaseMessagingService
-import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +17,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.prefs.Preferences
 import javax.inject.Inject
 
 
@@ -45,6 +36,7 @@ data class SignUpUiState(
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     val userDao: UserDao,
+    stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val storeUserEmail: StoreUserEmail,
 ) : ViewModel() {
@@ -59,15 +51,22 @@ class SignUpViewModel @Inject constructor(
         )
 
     init {
+        stateHandle.get<String>("email")?.let {
+            onEmailChange(email = it)
+            updateWithGoogle(withGoogle = true)
+        }
+        stateHandle.get<String>("displayName")?.let {
+            onNameChange(name = it)
+        }
     }
 
-    fun updateWithGoogle(withGoogle: Boolean) {
+    private fun updateWithGoogle(withGoogle: Boolean) {
         viewModelState.update {
             it.copy(withGoogle = withGoogle)
         }
     }
 
-    fun onNameChange(name: String) {
+    private fun onNameChange(name: String) {
         viewModelState.update {
             it.copy(name = name)
         }

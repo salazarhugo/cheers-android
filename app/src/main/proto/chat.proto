@@ -18,6 +18,11 @@ service ChatService {
   rpc TypingStart(TypingReq) returns (Empty) {}
   rpc TypingEnd(TypingReq) returns (Empty) {}
   rpc AddToken(AddTokenReq) returns (Empty) {}
+  rpc DeleteUser(UserIdReq) returns (Empty) {}
+}
+
+message UserIdReq {
+  string userId = 1;
 }
 
 message Empty {

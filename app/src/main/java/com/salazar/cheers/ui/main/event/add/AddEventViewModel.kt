@@ -7,7 +7,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.search.MapboxSearchSdk
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchOptions
@@ -21,7 +20,10 @@ import com.salazar.cheers.internal.Privacy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -44,14 +46,15 @@ data class AddEventUiState(
     val errorMessage: String? = null,
     val name: String = "",
     val participants: List<String> = emptyList(),
-    val startTimeSeconds: Long = Date().time/1000 + 86400,
-    val endTimeSeconds: Long = Date().time/1000 + 86400,
+    val startTimeSeconds: Long = Date().time / 1000 + 86400,
+    val endTimeSeconds: Long = Date().time / 1000 + 86400,
     val endDate: String = "End date",
     val endTime: String = "End time",
     val address: String = "",
     val photo: Uri? = null,
     val description: String = "",
     val hasEndDate: Boolean = false,
+    val showGuestList: Boolean = false,
     val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
@@ -131,6 +134,12 @@ class AddEventViewModel @Inject constructor(
         }
     }
 
+    fun onShowGuestListToggle() {
+        viewModelState.update {
+            it.copy(showGuestList = !it.showGuestList)
+        }
+    }
+
     fun onLocationClick(result: SearchSuggestion) {
         searchEngine.select(result, searchCallback)
     }
@@ -189,6 +198,7 @@ class AddEventViewModel @Inject constructor(
                     name = name,
                     address = address,
                     description = description,
+                    showGuestList = showGuestList,
                     privacy = privacy,
                     startDate = startTimeSeconds,
                     endDate = endTimeSeconds,

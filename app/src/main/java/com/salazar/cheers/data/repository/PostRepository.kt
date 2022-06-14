@@ -7,7 +7,6 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.PostRemoteMediator
-import com.salazar.cheers.data.repository.StoryRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
@@ -89,32 +88,41 @@ class PostRepository @Inject constructor(
         }
     }
 
-        suspend fun getMapPosts(privacy: Privacy): List<Post> {
-            return postDao.getMapPosts(privacy = privacy)
+    suspend fun getPostMembers(postId: String) = withContext(Dispatchers.IO) {
+        return@withContext try {
+            coreService.postMembers(postId = postId, pageSize = 20, page = 0)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getMapPosts(privacy: Privacy): List<Post> {
+        return postDao.getMapPosts(privacy = privacy)
 //            .map {
 //            it.copy(tagUsers = postDao.getPostUsers(it.post.tagUsersId))
 //        }
-        }
+    }
 
-        suspend fun postFlow(postId: String) = postDao.postFlow(postId = postId)
+    suspend fun postFlow(postId: String) = postDao.postFlow(postId = postId)
 
-         suspend fun getPost(postId: String): Post {
-            val post = postDao.getPost(postId = postId)
-            return post.copy()
-        }
+    suspend fun getPost(postId: String): Post {
+        val post = postDao.getPost(postId = postId)
+        return post.copy()
+    }
 
-        suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {
-            val likes = if (post.liked) post.likes - 1 else post.likes + 1
+    suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {
+        val likes = if (post.liked) post.likes - 1 else post.likes + 1
 
-            postDao.update(post.copy(liked = !post.liked, likes = likes))
+        postDao.update(post.copy(liked = !post.liked, likes = likes))
 
-            if (post.liked)
-                unlikePost(postId = post.id)
-            else
-                likePost(postId = post.id)
-        }
+        if (post.liked)
+            unlikePost(postId = post.id)
+        else
+            likePost(postId = post.id)
+    }
 
-        companion object {
+    companion object {
         const val NETWORK_PAGE_SIZE = 10
     }
 }

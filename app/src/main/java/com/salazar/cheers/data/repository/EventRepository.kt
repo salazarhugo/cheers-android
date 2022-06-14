@@ -5,7 +5,10 @@ import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.work.*
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.EventRemoteMediator
@@ -153,6 +156,7 @@ class EventRepository @Inject constructor(
                         "END_DATETIME" to endDate,
                         "LOCATION_NAME" to locationName,
                         "LATITUDE" to latitude,
+                        "SHOW_GUEST_LIST" to showGuestList,
                         "LONGITUDE" to longitude,
                     )
                 )
@@ -162,5 +166,5 @@ class EventRepository @Inject constructor(
         }
     }
 
-    companion object { }
+    companion object {}
 }

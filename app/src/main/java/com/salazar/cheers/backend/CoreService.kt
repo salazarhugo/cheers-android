@@ -93,6 +93,11 @@ interface CoreService {
         @Query("userIdOrUsername") userIdOrUsername: String,
     ): List<User>
 
+    @PATCH("users")
+    suspend fun updateUser(
+        @Body() user: User,
+    )
+
     @GET("users/{userIdOrUsername}")
     suspend fun getUser(
         @Path("userIdOrUsername") userIdOrUsername: String,
@@ -108,19 +113,19 @@ interface CoreService {
         @Path("storyId") storyId: String,
     )
 
-    @POST("posts/{postId}/delete")
+    @DELETE("posts/{postId}")
     suspend fun deletePost(
         @Path("postId") postId: String,
     )
 
-    @POST("stories/{storyId}/delete")
+    @DELETE("stories/{storyId}")
     suspend fun deleteStory(
         @Path("storyId") storyId: String,
     )
 
-    @POST("event/delete")
+    @DELETE("events/{eventId}")
     suspend fun deleteEvent(
-        @Query("eventId") eventId: String,
+        @Path("eventId") eventId: String,
     )
 
     @POST("follow")
@@ -132,6 +137,13 @@ interface CoreService {
     suspend fun unfollowUser(
         @Query("username") username: String,
     )
+
+    @GET("posts/{postId}/members")
+    suspend fun postMembers(
+        @Path("postId") postId: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int,
+    ): List<User>
 
     @POST("posts/{postId}/like")
     suspend fun likePost(

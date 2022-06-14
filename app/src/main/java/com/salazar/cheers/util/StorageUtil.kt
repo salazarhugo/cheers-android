@@ -15,12 +15,20 @@ import java.util.*
 object StorageUtil {
     private val storageInstance: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
     private val storyBucket: FirebaseStorage by lazy { FirebaseStorage.getInstance("gs://cheers-stories") }
+    private val chatBucket: FirebaseStorage by lazy { FirebaseStorage.getInstance("gs://cheers-chat-bucket") }
 
     // 5 MB
     private const val IMAGE_SIZE_LIMIT = 5000000
 
     // 4 GB
     private const val VIDEO_SIZE_LIMIT = 4000000000
+
+    val currentUserRefChat: StorageReference
+        get() = storyBucket.reference
+            .child(
+                FirebaseAuth.getInstance().currentUser?.uid
+                    ?: throw NullPointerException("UID is null.")
+            )
 
     val currentUserRefStory: StorageReference
         get() = storyBucket.reference
@@ -36,28 +44,19 @@ object StorageUtil {
                     ?: throw NullPointerException("UID is null.")
             )
 
-    fun uploadProfilePhoto(
-        imageBytes: ByteArray,
-        onSuccess: (downloadUrl: String) -> Unit
-    ) {
-        if (imageBytes.size > IMAGE_SIZE_LIMIT)
-            return
+    fun uploadProfilePhoto(imageBytes: ByteArray): Task<Uri> {
         val ref =
             currentUserRef.child("profilePictures/${FirebaseAuth.getInstance().currentUser?.uid!!}")
-        ref.putBytes(imageBytes)
-            .addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener { downloadUri ->
-                    onSuccess(downloadUri.toString())
-                }
+        return ref.putBytes(imageBytes)
+            .continueWithTask {
+                ref.downloadUrl
             }
     }
 
     fun uploadMessageImage(
         imageBytes: ByteArray,
     ): Task<Uri> {
-//        if (imageBytes.size > IMAGE_SIZE_LIMIT)
-//            return
-        val ref = currentUserRef.child("messages/${UUID.randomUUID()}")
+        val ref = currentUserRefChat.child("messages/${UUID.randomUUID()}")
         return ref.putBytes(imageBytes)
             .continueWithTask {
                 ref.downloadUrl

@@ -2,10 +2,10 @@ package com.salazar.cheers.navigation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,7 +20,6 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.CheersUiState
 import com.salazar.cheers.components.CheersNavigationBar
-import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.GreySheet
 
@@ -49,6 +48,13 @@ fun CheersNavGraph(
             snackBarHostState.showSnackbar(uiState.errorMessage)
     }
 
+    val hide =
+        navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
+                || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
+                || currentRoute.contains(MainDestinations.STORY_ROUTE)
+                || currentRoute.contains(MainDestinations.CHAT_ROUTE)
+                || currentRoute.contains(MainDestinations.ROOM_DETAILS)
+
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -61,16 +67,27 @@ fun CheersNavGraph(
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(snackBarHostState) },
+            floatingActionButtonPosition = FabPosition.Center,
+            floatingActionButton = {
+                if (!hide)
+                FloatingActionButton(
+                    onClick = {
+                        navActions.navigateToAddPostSheet()
+                    },
+                    modifier = Modifier.offset(y = (+58).dp),
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
+            },
             bottomBar = {
-                val hide = navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
-                        || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
-                        || currentRoute.contains(MainDestinations.STORY_ROUTE)
-                        || currentRoute.contains(MainDestinations.CHAT_ROUTE)
-                        || currentRoute.contains(MainDestinations.ROOM_DETAILS)
-
                 if (!hide)
                     Column {
-                        DividerM3()
+//                        DividerM3()
                         CheersNavigationBar(
                             profilePictureUrl = user?.profilePictureUrl ?: "",
                             currentRoute = currentRoute,
@@ -96,7 +113,6 @@ fun CheersNavGraph(
                 )
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
-                    navController = navController,
                     user = user ?: User(),
                     navActions = navActions,
                     bottomSheetNavigator = bottomSheetNavigator,
