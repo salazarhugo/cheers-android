@@ -8,15 +8,15 @@ import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.dynamiclinks.ktx.shortLinkAsync
 import com.google.firebase.dynamiclinks.ktx.socialMetaTagParameters
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.util.Constants.URI
 
 
 object FirebaseDynamicLinksUtil {
 
-    val baseUrl = "https://cheers-a275e.web.app/"
 
     fun createShortLink(url: String): Task<ShortDynamicLink> {
         return Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
-            link = Uri.parse("$baseUrl$url")
+            link = Uri.parse("$URI/$url")
             domainUriPrefix = "https://cheers2cheers.page.link"
             androidParameters { }
             socialMetaTagParameters {

@@ -15,6 +15,7 @@ import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -36,7 +37,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.ui.CheersApp
+import com.snap.creativekit.SnapCreative
+import com.snap.creativekit.exceptions.SnapMediaSizeException
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -71,7 +75,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         userConsentPolicy()
         initInterstitialAd()
 
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 if (firebaseAuth.currentUser == null) return
@@ -81,6 +84,30 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 //                    }
                 }
             }
+        }
+        shareToSnapchat()
+    }
+
+    private fun shareToSnapchat() {
+
+        val snapCreativeKitApi = SnapCreative.getApi(this)
+        val snapMediaFactory = SnapCreative.getMediaFactory(this);
+
+//        val imagePath = File(filesDir, "images")
+//        imagePath.mkdir()
+//        val imageFile = File(imagePath.path, "test.jpg")
+        // Write data in your file
+//        val uri = FileProvider.getUriForFile(this, packageName, imageFile)
+
+        try {
+//            val uri = Uri.parse("https://arrival-project.com/assets/galery/cover.jpg")
+//            val file = File(uri.path)
+//            val photoFile = snapMediaFactory.getSnapPhotoFromFile(file)
+//            val snapPhotoContent = SnapPhotoContent(photoFile);
+//            snapCreativeKitApi.send(snapPhotoContent);
+        } catch (e: SnapMediaSizeException) {
+//            handleError(e);
+            return;
         }
     }
 

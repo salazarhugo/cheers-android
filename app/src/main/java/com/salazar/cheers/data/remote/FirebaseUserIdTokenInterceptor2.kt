@@ -1,6 +1,5 @@
 package com.salazar.cheers.data.remote
 
-import android.util.Log
 import io.grpc.*
 import io.grpc.ClientInterceptors.CheckedForwardingClientCall
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
@@ -21,7 +20,6 @@ class ErrorHandleInterceptor(
                 responseListener: Listener<RespT>?,
                 headers: Metadata
             ) {
-                Log.d("HAHA", idToken)
                 headers.put(
                     Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER),
                     format("Bearer %s", idToken)

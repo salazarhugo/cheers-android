@@ -38,7 +38,10 @@ fun CameraRoute(
     val scope = rememberCoroutineScope()
     val uiState by cameraViewModel.uiState.collectAsState()
     val imageCapture: ImageCapture = remember {
-        ImageCapture.Builder().setTargetAspectRatio(RATIO_16_9).build()
+        ImageCapture.Builder()
+            .setTargetAspectRatio(RATIO_16_9)
+            .setJpegQuality(75)
+            .build()
     }
 
     BackHandler(enabled = true) {

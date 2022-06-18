@@ -37,15 +37,18 @@ import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.entities.UserSuggestion
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.main.home.likes.UserList
 import com.salazar.cheers.ui.theme.Typography
 
 @Composable
 fun SearchScreen(
     uiState: SearchUiState,
     onSearchInputChanged: (String) -> Unit,
-    onUserClicked: (User) -> Unit,
+    onUserClicked: (String) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
     onSwipeRefresh: () -> Unit,
     onRecentUserClicked: (String) -> Unit,
@@ -77,7 +80,7 @@ fun SearchScreen(
 @Composable
 private fun SearchBody(
     uiState: SearchUiState,
-    onUserClicked: (User) -> Unit,
+    onUserClicked: (String) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
     onRecentUserClicked: (String) -> Unit,
 ) {
@@ -90,7 +93,7 @@ private fun SearchBody(
         if (uiState.searchInput.isBlank())
             RecentUserList(
                 recent = uiState.recentUsers,
-                recommendations = recommendation,
+                suggestions = uiState.userRecommendations,
                 onUserClicked = onUserClicked,
                 onDeleteRecentUser = onDeleteRecentUser,
                 onRecentUserClicked = onRecentUserClicked,
@@ -108,7 +111,7 @@ private fun SearchBody(
 fun UserList(
     users: List<User>,
     isLoading: Boolean,
-    onUserClicked: (User) -> Unit,
+    onUserClicked: (String) -> Unit,
 ) {
     LazyColumn {
         item {
@@ -142,8 +145,8 @@ fun UserList(
 @Composable
 fun RecentUserList(
     recent: List<RecentUser>,
-    recommendations: List<User>,
-    onUserClicked: (User) -> Unit,
+    suggestions: List<UserSuggestion>,
+    onUserClicked: (String) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
     onRecentUserClicked: (String) -> Unit,
 ) {
@@ -159,7 +162,7 @@ fun RecentUserList(
         items(recent, key = { it.id }) { user ->
             RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
         }
-        if (recommendations.isNotEmpty())
+        if (suggestions.isNotEmpty())
             item {
                 Text(
                     text = "Suggestions",
@@ -167,11 +170,12 @@ fun RecentUserList(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-        items(recommendations, key = { it.id }) { user ->
-            UserCard(
+        items(suggestions, key = { it.id }) { user ->
+            UserSuggestionCard(
                 modifier = Modifier.animateItemPlacement(),
                 user = user,
                 onUserClicked = onUserClicked,
+                onFollowToggle = {},
             )
         }
     }
@@ -224,15 +228,60 @@ fun RecentUserCard(
 }
 
 @Composable
-fun UserCard(
+fun UserSuggestionCard(
     modifier: Modifier = Modifier,
-    user: User,
-    onUserClicked: (User) -> Unit
+    user: UserSuggestion,
+    onUserClicked: (String) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onUserClicked(user) }
+            .clickable { onUserClicked(user.username) }
+            .padding(vertical = 6.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = user.avatar)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
+                ),
+                contentDescription = "Profile image",
+                modifier = Modifier
+                    .size(54.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                if (user.name.isNotBlank())
+                    Text(text = user.name, style = Typography.bodyMedium)
+                Username(
+                    username = user.username,
+                    verified = user.verified,
+                    textStyle = Typography.bodyMedium
+                )
+            }
+        }
+        FollowButton(isFollowing = user.followBack, onClick = { onFollowToggle(user.username) })
+    }
+}
+
+@Composable
+fun UserCard(
+    modifier: Modifier = Modifier,
+    user: User,
+    onUserClicked: (String) -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onUserClicked(user.username) }
             .padding(vertical = 6.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -261,12 +310,8 @@ fun UserCard(
                     verified = user.verified,
                     textStyle = Typography.bodyMedium
                 )
-//                    Text(text = user.username, style = Typography.bodyMedium)
             }
         }
-//        IconButton(onClick = {}) {
-//            Icon(Icons.Default.Close, null)
-//        }
     }
 }
 

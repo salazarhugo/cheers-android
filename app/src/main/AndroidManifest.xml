@@ -27,6 +27,16 @@
         android:theme="@style/Theme.Cheers">
 
         <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.salazar.cheers.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
@@ -60,7 +70,7 @@
             android:value="true" />
 
         <meta-data
-            android:name="com.snapchat.kit.sdk.clientId"
+            android:name="com.snap.kit.clientId"
             android:value="@string/snap_oauth_client_id_staging" />
         <meta-data
             android:name="com.snapchat.kit.sdk.redirectUrl"
@@ -105,7 +115,7 @@
 
             <intent-filter>
                 <data
-                    android:host="cheers-a275e.web.app"
+                    android:host="web-cheers.web.app"
                     android:scheme="https" />
                 <action android:name="android.intent.action.VIEW" />
 

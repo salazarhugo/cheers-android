@@ -91,7 +91,7 @@ class RegisterViewModel @Inject constructor(
         updateIsLoading(true)
 
         if (!username.validateUsername()) {
-            updateErrorMessage("Invalid username")
+            updateErrorMessage("Usernames can only include lowercase letters, numbers, underscores and full stops.")
             updateIsLoading(false)
             return
         }

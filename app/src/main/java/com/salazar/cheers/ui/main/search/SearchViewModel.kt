@@ -2,9 +2,11 @@ package com.salazar.cheers.ui.main.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.entities.UserSuggestion
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -113,22 +115,19 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun refreshUserRecommendations() {
-//        viewModelScope.launch {
-//            viewModelState.update {
-//                val result = Neo4jUtil.getUserRecommendations()
-//                when (result) {
-//                    is Result.Success -> it.copy(userRecommendations = result.data)
-//                    is Result.Error -> it.copy(errorMessage = result.exception.toString())
-//                }
-//            }
-//        }
+        viewModelScope.launch {
+            viewModelState.update {
+                val suggestions = userRepository.getSuggestions()
+                it.copy(userRecommendations = suggestions)
+            }
+        }
     }
 }
 
 data class SearchUiState(
     val name: String = "",
     val users: List<User> = emptyList(),
-    val userRecommendations: List<User> = emptyList(),
+    val userRecommendations: List<UserSuggestion> = emptyList(),
     val recentUsers: List<RecentUser> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String = "",

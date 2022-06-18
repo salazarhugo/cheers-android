@@ -88,7 +88,10 @@ fun OtherProfileRoute(
                         if (!url.startsWith("http://"))
                             url = "http://$url"
                         uriHandler.openUri(url)
-                    }
+                    },
+                    onStoryClick = {
+                        navActions.navigateToStory()
+                    },
                 )
             }
         }

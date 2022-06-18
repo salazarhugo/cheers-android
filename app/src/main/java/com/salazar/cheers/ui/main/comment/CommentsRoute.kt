@@ -16,22 +16,17 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 @Composable
 fun CommentsRoute(
     commentsViewModel: CommentsViewModel = hiltViewModel(),
-    profilePictureUrl: String,
-    bottomSheetNavigator: BottomSheetNavigator,
+    navActions: CheersNavigationActions,
+
 ) {
     val uiState by commentsViewModel.uiState.collectAsState()
 
-    when (uiState) {
-        is CommentsUiState.HasPosts ->
-            CommentsScreen(
-                uiState = uiState,
-                onComment = commentsViewModel::onComment,
-                comments = (uiState as CommentsUiState.HasPosts).comments,
-                bottomSheetNavigator = bottomSheetNavigator,
-                profilePictureUrl = profilePictureUrl,
-                onInputChange = commentsViewModel::onInputChange,
-            )
-        is CommentsUiState.NoPosts ->
-            LoadingScreen()
-    }
+    CommentsScreen(
+        uiState = uiState,
+        onComment = commentsViewModel::onComment,
+        profilePictureUrl = uiState.user?.profilePictureUrl ?: "",
+        onInputChange = commentsViewModel::onInputChange,
+        onBackPressed = { navActions.navigateBack() },
+        onDeleteComment = commentsViewModel::deleteComment,
+    )
 }

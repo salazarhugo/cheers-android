@@ -40,6 +40,7 @@ fun OtherProfileScreen(
     onWebsiteClick: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onGiftClick: () -> Unit,
+    onStoryClick: () -> Unit,
 ) {
     val posts = uiState.postFlow.collectAsLazyPagingItems()
     val pagerState = rememberPagerState()
@@ -54,7 +55,7 @@ fun OtherProfileScreen(
             Column(
                 modifier = Modifier.padding(15.dp)
             ) {
-                ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
+                ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
                 ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
                 Spacer(Modifier.height(8.dp))
                 val isFollowed = uiState.user.followBack

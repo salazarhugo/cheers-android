@@ -97,14 +97,14 @@ fun HomeScreen(
         }
     }
 
-    var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
+    val toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
     Scaffold(
         topBar = {
             Column {
                 MyAppBar(
                     navigateToSearch = navigateToSearch,
-                    onSelectTab = onSelectTab,
                     tab = uiState.selectedTab,
+                    notificationCount = uiState.notificationCount,
                     onActivityClick = onActivityClick,
                 )
                 if (showDivider)
@@ -467,7 +467,9 @@ fun PostList(
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
 
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier.fillMaxHeight(),
+    ) {
         item {
             Stories(
                 uiState = uiState,
@@ -662,7 +664,7 @@ fun TagUsers(tagUsers: List<User>) {
 @Composable
 fun MyAppBar(
     tab: Int,
-    onSelectTab: (Int) -> Unit,
+    notificationCount: Int,
     navigateToSearch: () -> Unit,
     onActivityClick: () -> Unit,
 ) {
@@ -687,10 +689,15 @@ fun MyAppBar(
         },
         actions = {
             IconButton(onClick = onActivityClick) {
-                Icon(
-                    Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Search icon"
-                )
+                BadgedBox(badge = {
+                    if (notificationCount > 0)
+                    Badge { Text(text = notificationCount.toString())}
+                }) {
+                    Icon(
+                        Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Search icon"
+                    )
+                }
             }
             IconButton(onClick = navigateToSearch) {
                 Icon(

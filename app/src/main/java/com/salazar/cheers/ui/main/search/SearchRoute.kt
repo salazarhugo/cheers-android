@@ -17,14 +17,15 @@ fun SearchRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by searchViewModel.uiState.collectAsState()
+
     SearchScreen(
         uiState = uiState,
         onSearchInputChanged = { searchViewModel.onSearchInputChanged(it) },
         onDeleteRecentUser = { searchViewModel.deleteRecentUser(it) },
         onSwipeRefresh = searchViewModel::onSwipeRefresh,
         onUserClicked = {
-            searchViewModel.insertRecentUser(it)
-            navActions.navigateToOtherProfile(it.username)
+//            searchViewModel.insertRecentUser(it)
+            navActions.navigateToOtherProfile(it)
         },
         onRecentUserClicked = { navActions.navigateToOtherProfile(it) },
     )

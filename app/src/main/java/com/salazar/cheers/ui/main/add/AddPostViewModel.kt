@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
@@ -21,6 +22,7 @@ import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadPostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -46,12 +48,14 @@ data class AddPostUiState(
     val privacy: Privacy = Privacy.FRIENDS,
     val allowJoin: Boolean = true,
     val page: AddPostPage = AddPostPage.AddPost,
+    val profilePictureUrl: String = "",
 )
 
 @HiltViewModel
 class AddPostViewModel @Inject constructor(
     application: Application,
     stateHandle: SavedStateHandle,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPostUiState(isLoading = true))
@@ -66,6 +70,12 @@ class AddPostViewModel @Inject constructor(
     init {
         stateHandle.get<String>("photoUri")?.let {
             addPhoto(Uri.parse(it))
+        }
+        viewModelScope.launch {
+            val user = userRepository.getCurrentUser()
+            viewModelState.update {
+                it.copy(profilePictureUrl = user.profilePictureUrl)
+            }
         }
     }
 

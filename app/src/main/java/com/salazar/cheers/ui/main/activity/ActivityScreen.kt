@@ -93,8 +93,8 @@ fun ActivityItem(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .clickable { onActivityClick(activity) }
+            .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,7 +130,6 @@ fun ActivityItem(
         else if (activity.type == ActivityType.POST_LIKE)
             Image(
                 modifier = Modifier
-                    .clickable(onClick = {})
                     .size(50.dp),
                 painter = rememberAsyncImagePainter(model = activity.photoUrl),
                 contentDescription = null,

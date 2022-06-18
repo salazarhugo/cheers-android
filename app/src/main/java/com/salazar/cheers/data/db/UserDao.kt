@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.data.entities.UserSuggestion
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,9 @@ interface UserDao {
 
     @Query("SELECT * FROM activity WHERE accountId = :accountId")
     suspend fun getActivity(accountId: String = Firebase.auth.currentUser?.uid!!): List<Activity>
+
+    @Query("SELECT * FROM user_suggestion")
+    suspend fun getUserSuggestions(): List<UserSuggestion>
 
     @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUser(userIdOrUsername: String): User
@@ -47,6 +51,9 @@ interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(users: List<User>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSuggestions(users: List<UserSuggestion>)
 
     @Delete
     suspend fun delete(user: User)

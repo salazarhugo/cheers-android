@@ -13,7 +13,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.ktx.messaging
+import com.mapbox.maps.extension.style.expressions.dsl.generated.not
 import com.salazar.cheers.data.StoreUserEmail
+import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.data.entities.UserPreference
 import com.salazar.cheers.data.repository.BillingRepository
@@ -23,10 +25,7 @@ import com.salazar.cheers.internal.User
 import com.salazar.cheers.service.MyFirebaseMessagingService
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,6 +35,7 @@ data class CheersUiState(
     val searchInput: String = "",
     val user: User? = null,
     val userPreference: UserPreference = UserPreference(id = "", theme = Theme.SYSTEM),
+    val notificationCount: Int = 0,
 )
 
 @HiltViewModel
@@ -44,6 +44,7 @@ class CheersViewModel @Inject constructor(
     private val billingRepository: BillingRepository,
     private val chatRepository: ChatRepository,
     private val storeUserEmail: StoreUserEmail,
+    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CheersUiState(isLoading = true))

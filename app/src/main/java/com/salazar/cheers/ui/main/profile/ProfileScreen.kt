@@ -63,6 +63,7 @@ fun ProfileScreen(
     navigateToProfileMoreSheet: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
+    onStoryClick: () -> Unit = {},
 ) {
     when (uiState) {
         is ProfileUiState.Loading -> LoadingScreen()
@@ -77,6 +78,7 @@ fun ProfileScreen(
             onSwipeRefresh = onSwipeRefresh,
             onPostLike = onPostLike,
             onPostMoreClicked = onPostMoreClicked,
+            onStoryClick = onStoryClick,
         )
     }
 }
@@ -93,6 +95,7 @@ fun Profile(
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: (String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
+    onStoryClick: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -114,12 +117,14 @@ fun Profile(
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.fillMaxHeight()
+            ) {
                 item {
                     Column(
                         modifier = Modifier.padding(15.dp)
                     ) {
-                        ProfileHeader(user = uiState.user, onStatClicked = onStatClicked)
+                        ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
                         ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
                         Spacer(Modifier.height(8.dp))
                         ProfileButtons(

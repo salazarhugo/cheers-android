@@ -16,6 +16,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.CheersUiState
@@ -23,6 +24,7 @@ import com.salazar.cheers.components.CheersNavigationBar
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.GreySheet
 
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 fun CheersNavGraph(
     uiState: CheersUiState,
@@ -54,6 +56,7 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.STORY_ROUTE)
                 || currentRoute.contains(MainDestinations.CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
+                || currentRoute.contains(MainDestinations.POST_COMMENTS)
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
@@ -113,7 +116,6 @@ fun CheersNavGraph(
                 )
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
-                    user = user ?: User(),
                     navActions = navActions,
                     bottomSheetNavigator = bottomSheetNavigator,
                     showInterstitialAd = showInterstitialAd,

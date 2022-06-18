@@ -222,7 +222,7 @@ fun Post(
                 )
                 PostText(
                     caption = post.caption,
-                    onUserClicked = {},
+                    onUserClicked = onUserClick,
                     onPostClicked = {},
                 )
                 PostBody(

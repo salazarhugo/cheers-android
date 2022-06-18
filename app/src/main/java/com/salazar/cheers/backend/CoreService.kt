@@ -1,6 +1,7 @@
 package com.salazar.cheers.backend
 
 import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.entities.UserSuggestion
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.Post
@@ -10,6 +11,9 @@ import retrofit2.http.*
 
 
 interface CoreService {
+
+    @GET("users/suggestions")
+    suspend fun suggestions(): List<UserSuggestion>
 
     @GET("users/search/{query}")
     suspend fun searchUsers(

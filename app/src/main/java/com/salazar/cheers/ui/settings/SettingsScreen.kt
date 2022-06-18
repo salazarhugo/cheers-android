@@ -29,7 +29,6 @@ fun SettingsScreen(
     onBackPressed: () -> Unit,
     onDeleteAccount: () -> Unit,
 ) {
-
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Settings") },
     ) {

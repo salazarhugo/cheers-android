@@ -19,7 +19,6 @@ import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
  */
 @Composable
 fun AddPostRoute(
-    profilePictureUrl: String,
     navActions: CheersNavigationActions,
     addPostViewModel: AddPostViewModel = hiltViewModel(),
 ) {
@@ -41,7 +40,7 @@ fun AddPostRoute(
         AddPostPage.AddPost ->
             AddPostScreen(
                 uiState = uiState,
-                profilePictureUrl = profilePictureUrl,
+                profilePictureUrl = uiState.profilePictureUrl,
                 onCaptionChanged = addPostViewModel::onCaptionChanged,
                 onSelectLocation = addPostViewModel::selectLocation,
                 onUploadPost = addPostViewModel::uploadPost,

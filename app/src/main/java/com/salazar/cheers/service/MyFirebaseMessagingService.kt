@@ -7,20 +7,27 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
+import androidx.datastore.preferences.core.edit
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
+import com.salazar.cheers.data.datastore.DataStoreRepository
+import com.salazar.cheers.data.datastore.DataStoreRepository.PreferenceKeys.notificationCount
+import com.salazar.cheers.data.datastore.dataStore
 import com.salazar.cheers.notifications.defaultNotification
 import com.salazar.cheers.notifications.newFollowerNotification
 import com.salazar.cheers.notifications.newPostNotification
 import com.salazar.cheers.util.Utils.getCircledBitmap
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
+import javax.inject.Inject
 
 
-class MyFirebaseMessagingService : FirebaseMessagingService() {
+class MyFirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onNewToken(newRegistrationToken: String) {
         super.onNewToken(newRegistrationToken)
@@ -36,6 +43,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d("FCM", remoteMessage.data.toString())
+
+        GlobalScope.launch {
+            dataStore.edit { preference ->
+                val current = preference[notificationCount] ?: 0
+                preference[notificationCount] = current + 1
+            }
+        }
 
         val notification = remoteMessage.notification
 

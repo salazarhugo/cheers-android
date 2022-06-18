@@ -4,6 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,36 +21,20 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.internal.Comment
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Preview
-@Composable
-fun CommentPreview() {
-    Comment(
-        profilePictureUrl = "",
-        username = "cheers",
-        verified = true,
-        text = "J'arrive les boys",
-        created = Date(),
-        onLike = {},
-        onReply = {},
-        onCommentClicked = {},
-    )
-}
-
 @Composable
 fun Comment(
-    profilePictureUrl: String,
-    username: String,
-    verified: Boolean,
-    created: Date,
+    comment: Comment,
     onLike: () -> Unit,
     onReply: () -> Unit,
+    onDeleteComment: (String) -> Unit,
     onCommentClicked: () -> Unit,
-    text: String,
 ) {
     Row(
         modifier = Modifier
@@ -59,7 +47,7 @@ fun Comment(
         Row {
             Image(
                 painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                    ImageRequest.Builder(LocalContext.current).data(data = comment.profilePictureUrl)
                         .apply(block = fun ImageRequest.Builder.() {
                             transformations(CircleCropTransformation())
                             error(R.drawable.default_profile_picture)
@@ -78,12 +66,12 @@ fun Comment(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Username(
-                        username = username,
-                        verified = verified,
+                        username = comment.username,
+                        verified = comment.verified,
                         textStyle = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(text)
+                    Text(comment.text)
                 }
                 Spacer(Modifier.height(4.dp))
                 Row(
@@ -91,7 +79,7 @@ fun Comment(
                 ) {
                     val dateFormatter = SimpleDateFormat("HH:mm")
                     Text(
-                        text = dateFormatter.format(created),
+                        text = dateFormatter.format(comment.created),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(Modifier.width(8.dp))
@@ -103,6 +91,17 @@ fun Comment(
                 }
             }
         }
+        if (comment.authorId == FirebaseAuth.getInstance().currentUser?.uid)
+//        TODO("LIKE COMMENT")
+            Icon(
+                Icons.Default.DeleteOutline,
+                tint = MaterialTheme.colorScheme.error,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .clip(CircleShape)
+                    .clickable { onDeleteComment(comment.id) }
+            )
 //        TODO("LIKE COMMENT")
 //        Icon(
 //            Icons.Default.FavoriteBorder,

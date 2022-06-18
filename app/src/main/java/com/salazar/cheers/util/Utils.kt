@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.compose.ui.Modifier
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.R
 import java.io.File
@@ -29,6 +30,14 @@ object Utils {
     fun hasValidChars(username: String): Boolean {
         val regex = Regex("^[._a-z0-9]+\$")
         return username.matches(regex)
+    }
+
+    fun Modifier.conditional(condition : Boolean, modifier : Modifier.() -> Modifier) : Modifier {
+        return if (condition) {
+            modifier.invoke(this)
+        } else {
+            this
+        }
     }
 
     fun String.validateUsername(): Boolean {

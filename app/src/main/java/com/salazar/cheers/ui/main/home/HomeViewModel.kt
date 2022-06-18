@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.home
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
@@ -32,6 +34,7 @@ sealed interface HomeUiState {
     val postSheetState: ModalBottomSheetState
     val nativeAd: NativeAd?
     val selectedTab: Int
+    val notificationCount: Int
 
     data class NoPosts(
         override val suggestions: List<SuggestionUser>?,
@@ -41,6 +44,7 @@ sealed interface HomeUiState {
         override val postSheetState: ModalBottomSheetState,
         override val nativeAd: NativeAd?,
         override val selectedTab: Int,
+        override val notificationCount: Int,
     ) : HomeUiState
 
     data class HasPosts(
@@ -58,6 +62,7 @@ sealed interface HomeUiState {
         override val searchInput: String,
         override val nativeAd: NativeAd?,
         override val selectedTab: Int,
+        override val notificationCount: Int,
     ) : HomeUiState
 }
 
@@ -76,6 +81,7 @@ private data class HomeViewModelState(
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     val nativeAd: NativeAd? = null,
     val selectedTab: Int = 0,
+    val notificationCount: Int = 0,
 ) {
     fun toUiState(): HomeUiState =
         if (postsFlow == null) {
@@ -83,6 +89,7 @@ private data class HomeViewModelState(
                 nativeAd = nativeAd,
                 postSheetState = sheetState,
                 isLoading = isLoading,
+                notificationCount = notificationCount,
                 errorMessages = errorMessages,
                 searchInput = searchInput,
                 suggestions = suggestions,
@@ -95,6 +102,7 @@ private data class HomeViewModelState(
                 postsFlow = postsFlow,
                 eventsFlow = eventsFlow,
                 storiesFlow = storiesFlow,
+                notificationCount = notificationCount,
                 listState = listState,
                 postSheetState = sheetState,
                 likes = likes,
@@ -108,12 +116,14 @@ private data class HomeViewModelState(
         }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val eventRepository: EventRepository,
     private val storyRepository: StoryRepository,
-    val userRepository: UserRepository,
+    private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
@@ -137,6 +147,13 @@ class HomeViewModel @Inject constructor(
         refreshEventsFlow()
         refreshStoryFlow()
         refreshPostsFlow()
+        viewModelScope.launch {
+            dataStoreRepository.readFromDataStore.collect { notificationCount ->
+                viewModelState.update {
+                    it.copy(notificationCount = notificationCount)
+                }
+            }
+        }
     }
 
     fun selectTab(index: Int) {

@@ -77,14 +77,14 @@ class MessagesViewModel @Inject constructor(
     }
 
     private fun refreshSuggestions() {
-        viewModelState.update { it.copy(isLoading = true, isRefreshing = true) }
-
-        viewModelScope.launch {
-            val suggestions = userRepository.getSuggestions()
-            viewModelState.update {
-                it.copy(suggestions = suggestions, isLoading = false, isRefreshing = false)
-            }
-        }
+//        viewModelState.update { it.copy(isLoading = true, isRefreshing = true) }
+//
+//        viewModelScope.launch {
+//            val suggestions = userRepository.getSuggestions()
+//            viewModelState.update {
+//                it.copy(suggestions = suggestions, isLoading = false, isRefreshing = false)
+//            }
+//        }
     }
 
     fun onFollowToggle(user: User) {

@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mapbox.maps.extension.style.expressions.dsl.generated.get
+import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Activity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,7 @@ data class ActivityUiState(
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ActivityUiState(isLoading = true))
@@ -36,6 +38,9 @@ class ActivityViewModel @Inject constructor(
 
     init {
         getActivity()
+        viewModelScope.launch {
+            dataStoreRepository.resetNotificationCount()
+        }
     }
 
     fun getActivity() {

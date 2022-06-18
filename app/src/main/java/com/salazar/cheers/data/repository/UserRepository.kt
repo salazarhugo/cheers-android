@@ -303,19 +303,19 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getSuggestions(): List<User> = withContext(Dispatchers.IO) {
-        when (val result = service.getSuggestions()) {
-            is Result.Success -> {
-                val suggestions = result.data
-                userDao.insertAll(suggestions)
-                val ids = suggestions.map { it.id }
-                return@withContext userDao.getUsersWithListOfIds(ids)
-            }
-            is Result.Error -> {
-                Log.e("User Service", result.exception.message.toString())
-                return@withContext emptyList()
-            }
+    suspend fun getSuggestions() = withContext(Dispatchers.IO) {
+
+        val suggestions = try {
+            coreService.suggestions()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+
+        suggestions?.let {
+            userDao.insertSuggestions(it)
+        }
+        return@withContext userDao.getUserSuggestions()
     }
 
     suspend fun addTokenToNeo4j(newRegistrationToken: String?) {

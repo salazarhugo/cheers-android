@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.*
-import com.salazar.cheers.backend.ChatService
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
@@ -26,7 +25,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.Closeable
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,11 +36,16 @@ class ChatRepository @Inject constructor(
     application: Application,
     private val chatDao: ChatDao,
     private val userRepository: UserRepository
-) {
+) : Closeable {
+
     private val workManager = WorkManager.getInstance(application)
     private lateinit var managedChannel: ManagedChannel
+    private lateinit var client: ChatServiceGrpcKt.ChatServiceCoroutineStub
 
-    private fun getClient(): ChatService? {
+
+    private fun getClient(): ChatServiceGrpcKt.ChatServiceCoroutineStub? {
+        if (this::client.isInitialized)
+            return client
         return try {
             val user2 =
                 FirebaseAuth.getInstance().currentUser ?: throw Exception("User is not logged in.")
@@ -49,13 +55,14 @@ class ChatRepository @Inject constructor(
 
             managedChannel = ManagedChannelBuilder
                 .forAddress("chat-service-r3a2dr4u4a-nw.a.run.app", 443)
+                .useTransportSecurity()
                 .build()
 
-            val client = ChatServiceGrpcKt
+            client = ChatServiceGrpcKt
                 .ChatServiceCoroutineStub(managedChannel)
                 .withInterceptors(ErrorHandleInterceptor(idToken = idToken))
 
-            ChatService(client)
+            client
         } catch (e: Exception) {
             Log.e("Chat Repository", e.toString())
             null
@@ -250,6 +257,11 @@ class ChatRepository @Inject constructor(
 
     fun getChannels(): Flow<List<ChatChannel>> {
         return chatDao.getChannels()
+    }
+
+    override fun close() {
+        if (this::managedChannel.isInitialized)
+            managedChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
     }
 
 }

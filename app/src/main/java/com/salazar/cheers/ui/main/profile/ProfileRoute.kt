@@ -50,6 +50,7 @@ fun ProfileRoute(
         onEditProfileClicked = { navActions.navigateToEditProfile() },
         onDrinkingStatsClick = { navActions.navigateToDrinkingStats(it) },
         navigateToProfileMoreSheet = { navActions.navigateToProfileMoreSheet(it) },
+        onStoryClick = { navActions.navigateToStory() },
         onWebsiteClicked = { website ->
             var url = website
             if (!url.startsWith("www.") && !url.startsWith("http://"))

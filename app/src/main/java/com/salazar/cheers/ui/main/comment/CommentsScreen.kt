@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,83 +35,109 @@ import coil.transform.CircleCropTransformation
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.comment.Comment
+import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.Toolbar
+import com.salazar.cheers.components.share.UserProfilePicture
+import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.CommentWithAuthor
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.theme.GreySheet
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
     uiState: CommentsUiState,
     profilePictureUrl: String,
     onComment: () -> Unit,
+    onBackPressed: () -> Unit,
     onInputChange: (String) -> Unit,
-    comments: List<CommentWithAuthor>,
-    bottomSheetNavigator: BottomSheetNavigator,
+    onDeleteComment: (String) -> Unit,
 ) {
     Scaffold(
-        topBar = { Toolbar(commentCount = comments.size, {}) },
+        topBar = {
+         Toolbar(title = "Comments", onBackPressed = onBackPressed)
+        },
         bottomBar = {
-            val y = bottomSheetNavigator.navigatorSheetState.offset.value
             CommentBottomBar(
                 input = uiState.input,
-                y = y,
                 onComment = onComment,
                 onInputChange = onInputChange,
                 profilePictureUrl = profilePictureUrl,
             )
         }
     ) {
-        Comments(comments = comments)
+        Column(
+            modifier = Modifier.padding(it),
+        ) {
+            Comments(comments = uiState.comments, post = uiState.post, onDeleteComment = onDeleteComment)
+        }
     }
 }
 
 @Composable
-fun Comments(comments: List<CommentWithAuthor>) {
+fun Comments(
+    comments: List<Comment>?,
+    post: Post?,
+    onDeleteComment: (String) -> Unit,
+) {
     LazyColumn {
         item {
             GuidelinesBanner()
         }
-        items(comments) { commentWithAuthor ->
-            val author = commentWithAuthor.author
-            val comment = commentWithAuthor.comment
-            Comment(
-                profilePictureUrl = author.profilePictureUrl,
-                username = author.username,
-                verified = author.verified,
-                text = comment.text,
-                created = comment.created,
+        if (post != null)
+        item {
+            Caption(post = post)
+            DividerM3()
+        }
+        if (comments != null)
+        items(comments) { comment ->
+            com.salazar.cheers.components.comment.Comment(
+                comment = comment,
                 onLike = {},
                 onReply = {},
                 onCommentClicked = {},
+                onDeleteComment = onDeleteComment,
             )
         }
     }
 }
 
 @Composable
-fun Toolbar(
-    commentCount: Int,
-    onCloseClicked: () -> Unit,
+fun Caption(
+    post: Post,
 ) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Comments",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = commentCount.toString(),
-                style = MaterialTheme.typography.titleSmall,
-            )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {  }
+            .padding(16.dp),
+    ) {
+        UserProfilePicture(
+            profilePictureUrl = post.profilePictureUrl,
+            modifier = Modifier.size(36.dp),
+        )
+        Spacer(Modifier.width(8.dp))
+        Column() {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Username(username = post.username, verified = post.verified)
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = post.caption,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = relativeTimeFormatter(timestamp = post.created/1000),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
         }
-        DividerM3()
     }
 }
 
@@ -119,7 +146,7 @@ fun GuidelinesBanner() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(16.dp)
     ) {
         val annotatedString = buildAnnotatedString {
@@ -128,7 +155,7 @@ fun GuidelinesBanner() {
                 tag = "Community Guidelines",
                 annotation = "https://google.com/terms"
             )
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSecondaryContainer)) {
                 append("Community Guidelines")
             }
         }
@@ -141,7 +168,6 @@ fun GuidelinesBanner() {
 
 @Composable
 fun CommentBottomBar(
-    y: Float,
     input: String,
     profilePictureUrl: String,
     onComment: () -> Unit,
@@ -153,7 +179,6 @@ fun CommentBottomBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .offset(y = -LocalDensity.current.run { y.toDp() })
             .imePadding()
     ) {
         DividerM3()
@@ -205,7 +230,7 @@ fun CommentBottomBar(
             ) {
                 Text(
                     text = "Post",
-                    color = MaterialTheme.colorScheme.primary
+//                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

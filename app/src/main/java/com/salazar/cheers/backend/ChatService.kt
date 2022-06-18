@@ -4,47 +4,45 @@ import com.salazar.cheers.*
 import kotlinx.coroutines.flow.Flow
 
 
-class ChatService constructor(
-    private val client: ChatServiceGrpcKt.ChatServiceCoroutineStub,
-) : ChatServiceGrpcKt.ChatServiceCoroutineImplBase() {
+class ChatService : ChatServiceGrpcKt.ChatServiceCoroutineImplBase() {
 
     override fun joinRoom(request: RoomId): Flow<Message> {
-        return client.joinRoom(request)
+        return joinRoom(request)
     }
 
     override suspend fun sendMessage(requests: Flow<Message>): MessageAck {
-        return client.sendMessage(requests = requests)
+        return sendMessage(requests = requests)
     }
 
     override suspend fun getRoomId(request: GetRoomIdReq): RoomId {
-        return client.getRoomId(request = request)
+        return getRoomId(request = request)
     }
 
     override fun getRooms(request: Empty): Flow<Room> {
-        return client.getRooms(request = request)
+        return getRooms(request = request)
     }
 
     override suspend fun typingStart(request: TypingReq): Empty {
-        return client.typingStart(request)
+        return typingStart(request)
     }
 
     override suspend fun typingEnd(request: TypingReq): Empty {
-        return client.typingEnd(request)
+        return typingEnd(request)
     }
 
     override suspend fun addToken(request: AddTokenReq): Empty {
-        return client.addToken(request)
+        return addToken(request)
     }
 
     override suspend fun createChat(request: CreateChatReq): Room {
-        return client.createChat(request)
+        return createChat(request)
     }
 
     override suspend fun deleteRoom(request: RoomId): Empty {
-        return client.deleteRoom(request)
+        return deleteRoom(request)
     }
 
     override suspend fun leaveRoom(request: RoomId): Empty {
-        return client.leaveRoom(request)
+        return leaveRoom(request)
     }
 }

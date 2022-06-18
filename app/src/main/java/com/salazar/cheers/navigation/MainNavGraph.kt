@@ -1,11 +1,8 @@
 package com.salazar.cheers.navigation
 
 import android.content.Intent
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +15,7 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.LoadingScreen
@@ -57,14 +55,14 @@ import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.theme.CheersTheme
+import com.salazar.cheers.util.Constants.URI
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.copyToClipboard
 
 
-const val uri = "https://cheers-a275e.web.app"
 
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.mainNavGraph(
-    user: User,
     navActions: CheersNavigationActions,
     showInterstitialAd: () -> Unit,
     bottomSheetNavigator: BottomSheetNavigator,
@@ -89,7 +87,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/chat/{channelId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" })
         ) {
             ChatRoute(
                 navActions = navActions,
@@ -144,7 +142,6 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
             AddPostRoute(
                 navActions = navActions,
-                profilePictureUrl = user.profilePictureUrl,
             )
         }
 
@@ -188,19 +185,20 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        bottomSheet(
+        composable(
             route = "${MainDestinations.POST_COMMENTS}/{postId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/comments/{postId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{postId}" }),
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             CommentsRoute(
-                bottomSheetNavigator = bottomSheetNavigator,
-                profilePictureUrl = user.profilePictureUrl,
+                navActions = navActions,
             )
         }
 
         composable(
             route = "${MainDestinations.DRINKING_STATS}/{username}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/stats/{username}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/stats/{username}" })
         ) {
             DrinkingStatsRoute(
                 navActions = navActions,
@@ -209,7 +207,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.OTHER_PROFILE_ROUTE}/{username}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/u/{username}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/u/{username}" })
         ) {
 
             val username = it.arguments?.getString("username")!!
@@ -222,7 +220,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.GUEST_LIST_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/{eventId}" })
         ) {
             GuestListRoute(
                 navActions = navActions,
@@ -231,7 +229,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/{eventId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/{eventId}" })
         ) {
             EventDetailRoute(
                 navActions = navActions,
@@ -240,7 +238,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/event/edit/{eventId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/edit/{eventId}" })
         ) {
             EditEventRoute(
                 navActions = navActions,
@@ -249,7 +247,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{storyId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/p/{storyId}" })
         ) {
             StoryStatsRoute(
                 navActions = navActions,
@@ -258,7 +256,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.POST_DETAIL_ROUTE}/{postId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/p/{postId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/p/{postId}" })
         ) {
             PostDetailRoute(
                 navActions = navActions,

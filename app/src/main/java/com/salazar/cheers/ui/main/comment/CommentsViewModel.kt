@@ -4,99 +4,70 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.CommentWithAuthor
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface CommentsUiState {
-
-    val isLoading: Boolean
-    val errorMessages: List<String>
-    val isFollowing: Boolean
-    val user: User
-    val input: String
-    val shortLink: String?
-
-    data class NoPosts(
-        override val input: String,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val isFollowing: Boolean,
-        override val user: User,
-        override val shortLink: String?,
-    ) : CommentsUiState
-
-    data class HasPosts(
-        val comments: List<CommentWithAuthor>,
-        override val input: String,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val isFollowing: Boolean,
-        override val user: User,
-        override val shortLink: String?,
-    ) : CommentsUiState
-}
-
-private data class CommentsViewModelState(
+data class CommentsUiState(
     val user: User? = null,
-    val comments: List<CommentWithAuthor>? = null,
+    val comments: List<Comment>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
     val input: String = "",
-) {
-    fun toUiState(): CommentsUiState =
-        if (comments != null)
-            CommentsUiState.HasPosts(
-                input = input,
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                isFollowing = isFollowing,
-                comments = comments,
-                user = user ?: User(),
-                shortLink = shortLink,
-            )
-        else
-            CommentsUiState.NoPosts(
-                input = input,
-                user = user ?: User(),
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                isFollowing = isFollowing,
-                shortLink = shortLink,
-            )
-}
+    val post: Post? = null,
+)
 
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
+    private val postRepository: PostRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(CommentsViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(CommentsUiState(isLoading = true))
     private lateinit var postId: String
 
     val uiState = viewModelState
-        .map { it.toUiState() }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
+            viewModelState.value
         )
 
     init {
         stateHandle.get<String>("postId")?.let {
             postId = it
         }
+        viewModelScope.launch {
+            val user = userRepository.getCurrentUser()
+            viewModelState.update {
+                it.copy(user = user)
+            }
+        }
+        viewModelScope.launch {
+            val post = postRepository.getPost(postId)
+            viewModelState.update {
+                it.copy(post = post)
+            }
+        }
+        viewModelScope.launch {
+            FirestoreUtil.getComments(postId).collect { comments ->
+                viewModelState.update {
+                    it.copy(comments = comments)
+                }
+            }
+        }
     }
-
-    val user = FirestoreUtil.getCurrentUserDocumentLiveData()
 
     private fun toggleIsFollowed() {
         val isFollowed = viewModelState.value.user?.followBack ?: return
@@ -109,10 +80,19 @@ class CommentsViewModel @Inject constructor(
         }
     }
 
+    fun deleteComment(commentId: String) {
+        FirestoreUtil.deleteComment(commentId = commentId)
+    }
+
     fun onComment() {
         val text = viewModelState.value.input
 
+        val user = viewModelState.value.user ?: return
+
         val comment = Comment(
+            username = user.username,
+            verified = user.verified,
+            profilePictureUrl = user.profilePictureUrl,
             postId = postId,
             authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
             text = text,

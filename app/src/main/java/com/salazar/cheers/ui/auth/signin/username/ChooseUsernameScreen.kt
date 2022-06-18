@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.share.AppBar
 import com.salazar.cheers.components.share.ButtonWithLoading
 import com.salazar.cheers.ui.main.add.TopAppBar
+import com.salazar.cheers.util.Utils.validateUsername
 
 @Composable
 fun ChooseUsernameScreen(
@@ -116,14 +117,19 @@ fun UsernameTextField(
         placeholder = { Text("Username") },
         trailingIcon = {
             if (isUsernameAvailable)
-                Icon(imageVector = Icons.Default.Check, "")
+                Icon(imageVector = Icons.Default.Check, null)
             else if (username.isNotEmpty())
                 IconButton(onClick = onClearUsername) {
-                    Icon(imageVector = Icons.Default.Close, "")
+                    Icon(imageVector = Icons.Default.Close, null)
                 }
         },
-        isError = !isUsernameAvailable,
+        isError = !isUsernameAvailable || !username.validateUsername(),
     )
     if (errorMessage?.isNotEmpty() == true)
-        Text(errorMessage, color = MaterialTheme.colorScheme.error)
+        Text(
+            text = errorMessage,
+            modifier = Modifier.padding(top = 8.dp),
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium,
+        )
 }

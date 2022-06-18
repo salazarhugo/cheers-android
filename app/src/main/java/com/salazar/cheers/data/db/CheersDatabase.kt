@@ -2,6 +2,8 @@ package com.salazar.cheers.data.db
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.data.entities.*
 import com.salazar.cheers.internal.*
@@ -26,15 +28,15 @@ import java.util.*
         ChatMessage::class,
         UserStats::class,
         Activity::class,
+        UserSuggestion::class,
     ],
-    version = 1,
+    version = 3,
     exportSchema = true,
-//    autoMigrations = [
-//        AutoMigration (from = 1, to = 2),
-//    ]
+    autoMigrations = [
+        AutoMigration (from = 1, to = 2),
+    ]
 )
 abstract class CheersDatabase : RoomDatabase() {
-
     abstract fun cheersDao(): CheersDao
     abstract fun postDao(): PostDao
     abstract fun eventDao(): EventDao
@@ -56,11 +58,18 @@ abstract class CheersDatabase : RoomDatabase() {
             instance ?: buildDatabase(context).also { instance = it }
         }
 
+        val MIGRATION_2_3 = object : Migration(1, 2){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `user_suggestion` (`id` STRING, `name` STRING, `username` STRING, `avatar` STRING, `verified` BOOLEAN, `followBack` BOOLEAN, PRIMARY KEY(`id`))")
+            }
+        }
+
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(
                 context.applicationContext,
                 CheersDatabase::class.java, "cheers.db"
             )
+                .addMigrations(MIGRATION_2_3)
                 .fallbackToDestructiveMigration()
                 .build()
     }

@@ -29,6 +29,8 @@ data class User(
     val darkMode: Boolean,
     val registrationTokens: List<String>,
     val followBack: Boolean,
+    @ColumnInfo(defaultValue = "false")
+    val hasStory: Boolean,
     val created: Long,
 ) : Serializable {
 
@@ -49,6 +51,7 @@ data class User(
         false,
         false,
         listOf(),
+        false,
         false,
         0,
     )
