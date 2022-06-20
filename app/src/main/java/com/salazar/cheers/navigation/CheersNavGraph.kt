@@ -92,6 +92,7 @@ fun CheersNavGraph(
                     Column {
 //                        DividerM3()
                         CheersNavigationBar(
+                            unreadChatCount = uiState.unreadChatCount,
                             profilePictureUrl = user?.profilePictureUrl ?: "",
                             currentRoute = currentRoute,
                             navigateToHome = navActions.navigateToHome,

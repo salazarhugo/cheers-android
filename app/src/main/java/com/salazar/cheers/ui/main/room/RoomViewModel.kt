@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.room
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.UserCard
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
@@ -23,7 +24,7 @@ sealed interface RoomUiState {
 
     data class HasRoom(
         val room: ChatChannel,
-        val members: List<User> = emptyList(),
+        val members: List<UserCard> = emptyList(),
         override val isLoading: Boolean,
         override val errorMessage: String,
     ) : RoomUiState
@@ -32,7 +33,7 @@ sealed interface RoomUiState {
 data class RoomViewModelState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val members: List<User> = emptyList(),
+    val members: List<UserCard> = emptyList(),
     val room: ChatChannel? = null,
 ) {
     fun toUiState(): RoomUiState =
@@ -59,6 +60,7 @@ class RoomViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RoomViewModelState(isLoading = true))
+    private lateinit var roomId: String
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -70,23 +72,28 @@ class RoomViewModel @Inject constructor(
 
     init {
         stateHandle.get<String>("roomId")?.let { roomId ->
-            viewModelScope.launch {
-                chatRepository.getChannel(channelId = roomId).collect { room ->
-                    onRoomChange(room = room)
-                    val members = userRepository.getUsersWithListOfIds(room.members)
-                    onMembersChange(members)
-                }
+            this.roomId = roomId
+        }
+
+        viewModelScope.launch {
+            chatRepository.getChannel(channelId = roomId).collect { room ->
+                onRoomChange(room = room)
             }
+        }
+
+        viewModelScope.launch {
+            val members = chatRepository.getRoomMembers(roomId = roomId)
+            onMembersChange(members= members)
         }
     }
 
     fun onLeaveRoom() {
         viewModelScope.launch {
-            chatRepository.leaveRoom(channelId = viewModelState.value.room?.id!!)
+            chatRepository.leaveRoom(roomId = roomId)
         }
     }
 
-    private fun onMembersChange(members: List<User>) {
+    private fun onMembersChange(members: List<UserCard>) {
         viewModelState.update {
             it.copy(members = members)
         }

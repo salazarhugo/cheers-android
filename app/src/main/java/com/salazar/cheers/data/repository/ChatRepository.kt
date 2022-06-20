@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.*
+import com.salazar.cheers.Room.newBuilder
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
@@ -39,16 +40,18 @@ class ChatRepository @Inject constructor(
 ) : Closeable {
 
     private val workManager = WorkManager.getInstance(application)
-    private lateinit var managedChannel: ManagedChannel
     private lateinit var client: ChatServiceGrpcKt.ChatServiceCoroutineStub
+    private lateinit var managedChannel: ManagedChannel
+    private var uid: String? = null
 
 
     private fun getClient(): ChatServiceGrpcKt.ChatServiceCoroutineStub? {
-        if (this::client.isInitialized)
+        if (this::client.isInitialized && uid == FirebaseAuth.getInstance().currentUser?.uid)
             return client
         return try {
             val user2 =
                 FirebaseAuth.getInstance().currentUser ?: throw Exception("User is not logged in.")
+            uid = user2.uid
             val task: Task<GetTokenResult> = user2.getIdToken(false)
             val tokenResult = Tasks.await(task)
             val idToken = tokenResult.token ?: throw Exception("idToken is null")
@@ -69,6 +72,10 @@ class ChatRepository @Inject constructor(
         }
     }
 
+    fun getUnreadChatCount(): Flow<Int> {
+        return chatDao.getUnreadChatCount()
+    }
+
     suspend fun getMessages(channelId: String): Flow<List<ChatMessage>> =
         withContext(Dispatchers.IO) {
             return@withContext chatDao.getMessages(channelId = channelId)
@@ -86,6 +93,12 @@ class ChatRepository @Inject constructor(
             Log.e("GRPC", e.toString())
         }
     }
+
+    suspend fun getRoomMembers(roomId: String): List<UserCard> {
+        val users = getClient()!!.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
+        return users.usersList
+    }
+
 
     fun getChannel(channelId: String): Flow<ChatChannel> {
         return chatDao.getChannelFlow(channelId = channelId)
@@ -105,12 +118,12 @@ class ChatRepository @Inject constructor(
         return@withContext room.id
     }
 
-    suspend fun leaveRoom(channelId: String) = withContext(Dispatchers.IO) {
+    suspend fun leaveRoom(roomId: String) = withContext(Dispatchers.IO) {
         val request = RoomId.newBuilder()
-            .setRoomId(channelId)
+            .setRoomId(roomId)
             .build()
 
-        chatDao.deleteChannel(channelId)
+        chatDao.deleteChannel(roomId)
         getClient()?.leaveRoom(request)
     }
 

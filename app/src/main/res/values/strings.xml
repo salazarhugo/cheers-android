@@ -21,6 +21,9 @@
     <string name="new_post_notification_channel_id" translatable="false">NEW_POST_CHANNEL</string>
     <string name="new_post_notification_channel_name" translatable="false">Posts</string>
 
+    <string name="chat_notification_channel_id" translatable="false">CHAT_CHANNEL</string>
+    <string name="chat_notification_channel_name" translatable="false">Chats</string>
+
     <string name="new_follower_notification_channel_id" translatable="false">NEW_FOLLOW_CHANNEL</string>
     <string name="new_follower_notification_channel_name" translatable="false">New followers</string>
 

@@ -116,14 +116,12 @@ private data class HomeViewModelState(
         }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val eventRepository: EventRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
-    private val dataStoreRepository: DataStoreRepository,
+//    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
@@ -148,11 +146,11 @@ class HomeViewModel @Inject constructor(
         refreshStoryFlow()
         refreshPostsFlow()
         viewModelScope.launch {
-            dataStoreRepository.readFromDataStore.collect { notificationCount ->
-                viewModelState.update {
-                    it.copy(notificationCount = notificationCount)
-                }
-            }
+//            dataStoreRepository.readFromDataStore.collect { notificationCount ->
+//                viewModelState.update {
+//                    it.copy(notificationCount = notificationCount)
+//                }
+//            }
         }
     }
 

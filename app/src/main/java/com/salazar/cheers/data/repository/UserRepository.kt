@@ -25,6 +25,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -63,10 +64,30 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteAccount() = withContext(Dispatchers.IO) {
-        FirebaseAuth.getInstance().currentUser!!.delete()
-            .addOnSuccessListener {  }
-            .addOnFailureListener { }
+    suspend fun insertRecent(username: String) = withContext(Dispatchers.IO) {
+        try {
+            val user = userDao.getUser(userIdOrUsername = username)
+            val recentUser = RecentUser(
+                id = user.id,
+                fullName = user.name,
+                username = user.username,
+                profilePictureUrl = user.profilePictureUrl,
+                verified = user.verified,
+                date = Instant.now().epochSecond
+            )
+            cheersDao.insertRecentUser(recentUser)
+        }catch (e: Exception) {
+            val user = userDao.getUserSuggestion(username = username) ?: return@withContext
+            val recentUser = RecentUser(
+                id = user.id,
+                fullName = user.name,
+                username = user.username,
+                profilePictureUrl = user.avatar,
+                verified = user.verified,
+                date = Instant.now().epochSecond
+            )
+            cheersDao.insertRecentUser(recentUser)
+        }
     }
 
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {
@@ -228,6 +249,17 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun toggleFollow(username: String) {
+        val user = userDao.getUserSuggestion(username) ?: return
+
+        val newUser = user.copy(followBack = !user.followBack)
+        userDao.update(newUser)
+
+        if (user.followBack)
+            unfollowUser(username = user.username)
+        else
+            followUser(username = user.username)
+    }
 
     suspend fun toggleFollow(user: User) {
         val newFollowersCount = if (user.followBack) user.followers - 1 else user.followers + 1
@@ -313,8 +345,11 @@ class UserRepository @Inject constructor(
         }
 
         suggestions?.let {
-            userDao.insertSuggestions(it)
+            val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+            userDao.clearSuggestions()
+            userDao.insertSuggestions(it.map { it.copy(accountId = uid) })
         }
+
         return@withContext userDao.getUserSuggestions()
     }
 

@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,24 +21,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.Toolbar
 import com.salazar.cheers.components.share.UserProfilePicture
+import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.Comment
-import com.salazar.cheers.internal.CommentWithAuthor
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.theme.GreySheet
@@ -67,7 +64,9 @@ fun CommentsScreen(
             )
         }
     ) {
-        Column(
+        SwipeToRefresh(
+            state = rememberSwipeToRefreshState(isRefreshing = false),
+            onRefresh = { Unit },
             modifier = Modifier.padding(it),
         ) {
             Comments(comments = uiState.comments, post = uiState.post, onDeleteComment = onDeleteComment)
@@ -81,7 +80,7 @@ fun Comments(
     post: Post?,
     onDeleteComment: (String) -> Unit,
 ) {
-    LazyColumn {
+    LazyColumn(modifier = Modifier.fillMaxHeight()) {
         item {
             GuidelinesBanner()
         }
@@ -110,11 +109,11 @@ fun Caption(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {  }
+            .clickable { }
             .padding(16.dp),
     ) {
         UserProfilePicture(
-            profilePictureUrl = post.profilePictureUrl,
+            avatar = post.profilePictureUrl,
             modifier = Modifier.size(36.dp),
         )
         Spacer(Modifier.width(8.dp))

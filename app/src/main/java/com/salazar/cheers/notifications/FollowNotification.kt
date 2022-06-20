@@ -22,6 +22,21 @@ fun Service.defaultNotification(
         .setAutoCancel(true)
 }
 
+fun Service.chatNotification(
+    title: String,
+    body: String,
+): NotificationCompat.Builder {
+    return NotificationCompat.Builder(this, getString(R.string.chat_notification_channel_id))
+        .setSmallIcon(R.drawable.ic_cheers_logo)
+        .setContentTitle(title)
+        .setColor(Purple200.toArgb())
+        .setGroup(getString(R.string.general_group_id))
+        .setContentText(body)
+        .setVibrate(longArrayOf(1000))
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+}
+
 fun Service.newPostNotification(
     title: String,
     body: String,

@@ -100,25 +100,24 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun insertRecentUser(user: User) {
+    fun toggleFollow(username: String) {
         viewModelScope.launch {
-            val recentUser = RecentUser(
-                id = user.id,
-                fullName = user.name,
-                username = user.username,
-                profilePictureUrl = user.profilePictureUrl,
-                verified = user.verified,
-                date = Instant.now().epochSecond
-            )
-            cheersDao.insertRecentUser(recentUser)
+            userRepository.toggleFollow(username = username)
+        }
+    }
+
+    fun insertRecentUser(username: String) {
+        viewModelScope.launch {
+            userRepository.insertRecent(username)
         }
     }
 
     private fun refreshUserRecommendations() {
         viewModelScope.launch {
-            viewModelState.update {
-                val suggestions = userRepository.getSuggestions()
-                it.copy(userRecommendations = suggestions)
+            userRepository.getSuggestions().collect { suggestions ->
+                viewModelState.update {
+                    it.copy(userRecommendations = suggestions)
+                }
             }
         }
     }

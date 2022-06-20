@@ -25,6 +25,7 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.share.UserProfilePicture
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.relativeTimeFormatter
 
@@ -56,28 +57,9 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFD41668),
-                    Color(0xFFF9B85D),
-                )
-            )
-
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .border(1.2.dp, brush, CircleShape)
-                    .size(33.dp)
-                    .padding(3.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
+            UserProfilePicture(
+                avatar = profilePictureUrl,
+                size = 33.dp,
             )
             Spacer(Modifier.width(8.dp))
             Column {

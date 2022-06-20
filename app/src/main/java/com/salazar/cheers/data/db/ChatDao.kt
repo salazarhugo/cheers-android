@@ -33,6 +33,9 @@ interface ChatDao {
     @Query("SELECT * FROM room WHERE accountId = :me ORDER BY recentMessageTime DESC")
     fun getChannels(me: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<ChatChannel>>
 
+    @Query("SELECT COUNT(id) FROM room WHERE status = :status AND accountId = :accountId")
+    fun getUnreadChatCount(status: RoomStatus = RoomStatus.NEW, accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<Int>
+
     @Transaction
     @Query("SELECT * FROM room WHERE id = :channelId")
     suspend fun getChannel(channelId: String): ChatChannel

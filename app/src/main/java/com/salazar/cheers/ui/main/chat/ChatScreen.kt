@@ -340,8 +340,8 @@ private fun AuthorNameTimestamp(msg: ChatMessage) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         val formatter = SimpleDateFormat("HH:mm")
-        val date = Date()
-        date.time = msg.time.seconds
+        val date = Date(msg.time.seconds * 1000)
+
         Text(
             text = formatter.format(date),
             style = MaterialTheme.typography.bodySmall,

@@ -21,10 +21,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
+import com.salazar.cheers.UserCard
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.Toolbar
 import com.salazar.cheers.components.share.UserProfilePicture
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.settings.RedButton
 import com.salazar.cheers.ui.theme.BlueCheers
 
@@ -71,7 +71,7 @@ fun RoomScreen(
             }
 
             items(uiState.members, key = { it.id }) { user ->
-                UserItem(
+                UserCardItem(
                     user = user,
                     isOwner = user.id == room.ownerId,
                     onUserClick = { onUserClick(user.username) },
@@ -150,8 +150,8 @@ fun HeaderButtons(
 }
 
 @Composable
-fun UserItem(
-    user: User,
+fun UserCardItem(
+    user: UserCard,
     isOwner: Boolean = false,
     onUserClick: (String) -> Unit,
 ) {
@@ -164,7 +164,7 @@ fun UserItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            UserProfilePicture(profilePictureUrl = user.profilePictureUrl)
+            UserProfilePicture(avatar = user.avatar)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (user.name.isNotBlank())

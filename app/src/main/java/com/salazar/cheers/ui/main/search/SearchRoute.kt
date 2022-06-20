@@ -24,9 +24,10 @@ fun SearchRoute(
         onDeleteRecentUser = { searchViewModel.deleteRecentUser(it) },
         onSwipeRefresh = searchViewModel::onSwipeRefresh,
         onUserClicked = {
-//            searchViewModel.insertRecentUser(it)
+            searchViewModel.insertRecentUser(it)
             navActions.navigateToOtherProfile(it)
         },
         onRecentUserClicked = { navActions.navigateToOtherProfile(it) },
+        onFollowToggle = searchViewModel::toggleFollow,
     )
 }

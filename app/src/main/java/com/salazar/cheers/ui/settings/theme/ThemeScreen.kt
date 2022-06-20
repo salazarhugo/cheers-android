@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.Theme
 import com.salazar.cheers.components.share.Toolbar
-import com.salazar.cheers.data.entities.Theme
 
 @Composable
 fun ThemeScreen(
@@ -23,8 +23,10 @@ fun ThemeScreen(
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Theme") },
     ) {
-        Column {
-            val radioOptions = listOf(Theme.LIGHT, Theme.DARK, Theme.SYSTEM)
+        Column(
+            modifier = Modifier.padding(it),
+        ) {
+            val radioOptions = listOf(Theme.LIGHT, Theme.DARK, Theme.SYSTEM_DEFAULT)
 
             Column(Modifier.selectableGroup()) {
                 radioOptions.forEach { text ->
@@ -42,8 +44,7 @@ fun ThemeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
-                            text = text.displayName,
-//                            style = MaterialTheme.typography.bodyMedium.merge(),
+                            text = text.name,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                         RadioButton(

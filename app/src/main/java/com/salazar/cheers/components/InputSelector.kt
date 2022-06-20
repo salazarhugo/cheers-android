@@ -216,10 +216,12 @@ private fun UserInputSelector(
 ) {
     Row(
         modifier = modifier
+            .fillMaxWidth()
             .height(72.dp)
             .wrapContentHeight()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.EMOJI) },
@@ -263,7 +265,7 @@ private fun UserInputSelector(
         } else {
             null
         }
-        Spacer(modifier = Modifier.weight(1f))
+//        Spacer(modifier = Modifier.weight(1f))
 
         val disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 
@@ -316,7 +318,7 @@ private fun InputSelectorButton(
         Icon(
             icon,
             tint = tint,
-            modifier = Modifier.padding(16.dp),
+//            modifier = Modifier.padding(16.dp),
             contentDescription = description
         )
     }
@@ -360,32 +362,44 @@ private fun UserInputText(
                     .align(Alignment.Bottom)
             ) {
                 var lastFocusState by remember { mutableStateOf(false) }
-                BasicTextField(
-                    value = textFieldValue,
-                    onValueChange = { onTextChanged(it) },
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 32.dp)
-                        .align(Alignment.CenterStart)
-                        .onFocusChanged { state ->
-                            if (lastFocusState != state.isFocused) {
-                                onTextFieldFocused(state.isFocused)
+                        .align(Alignment.CenterStart),
+                ) {
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = { onTextChanged(it) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .onFocusChanged { state ->
+                                if (lastFocusState != state.isFocused) {
+                                    onTextFieldFocused(state.isFocused)
+                                }
+                                lastFocusState = state.isFocused
+                            },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType,
+                            imeAction = ImeAction.Send
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onSend = {
+                                onKeyboardSend()
                             }
-                            lastFocusState = state.isFocused
-                        },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = keyboardType,
-                        imeAction = ImeAction.Send
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSend = {
-                            onKeyboardSend()
-                        }
-                    ),
-                    maxLines = 1,
-                    cursorBrush = SolidColor(LocalContentColor.current),
-                    textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current)
-                )
+                        ),
+                        maxLines = 1,
+                        cursorBrush = SolidColor(LocalContentColor.current),
+                        textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current)
+                    )
+                    Icon(
+                        Icons.Outlined.Mic,
+                        modifier = Modifier
+                            .padding(horizontal = 32.dp),
+                        contentDescription = null,
+                    )
+                }
 
                 val disableContentColor =
                     MaterialTheme.colorScheme.onSurfaceVariant

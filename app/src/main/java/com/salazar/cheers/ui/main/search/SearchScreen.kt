@@ -52,6 +52,7 @@ fun SearchScreen(
     onDeleteRecentUser: (RecentUser) -> Unit,
     onSwipeRefresh: () -> Unit,
     onRecentUserClicked: (String) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -72,6 +73,7 @@ fun SearchScreen(
                 onUserClicked = onUserClicked,
                 onDeleteRecentUser = onDeleteRecentUser,
                 onRecentUserClicked = onRecentUserClicked,
+                onFollowToggle = onFollowToggle,
             )
         }
     }
@@ -83,6 +85,7 @@ private fun SearchBody(
     onUserClicked: (String) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
     onRecentUserClicked: (String) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     Column {
         val users = uiState.users
@@ -97,6 +100,7 @@ private fun SearchBody(
                 onUserClicked = onUserClicked,
                 onDeleteRecentUser = onDeleteRecentUser,
                 onRecentUserClicked = onRecentUserClicked,
+                onFollowToggle = onFollowToggle,
             )
         else if (users.isNotEmpty())
             UserList(
@@ -149,6 +153,7 @@ fun RecentUserList(
     onUserClicked: (String) -> Unit,
     onDeleteRecentUser: (RecentUser) -> Unit,
     onRecentUserClicked: (String) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     LazyColumn {
         if (recent.isNotEmpty())
@@ -159,14 +164,14 @@ fun RecentUserList(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-        items(recent, key = { it.id }) { user ->
+        items(recent, key = { it.username }) { user ->
             RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
         }
         if (suggestions.isNotEmpty())
             item {
                 Text(
                     text = "Suggestions",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
                     modifier = Modifier.padding(16.dp),
                 )
             }
@@ -175,7 +180,7 @@ fun RecentUserList(
                 modifier = Modifier.animateItemPlacement(),
                 user = user,
                 onUserClicked = onUserClicked,
-                onFollowToggle = {},
+                onFollowToggle = onFollowToggle,
             )
         }
     }

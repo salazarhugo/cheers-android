@@ -9,23 +9,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.CheersViewModel
-import com.salazar.cheers.data.entities.Theme
+import com.salazar.cheers.Settings
+import com.salazar.cheers.Theme
 import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.ui.theme.CheersTheme
 
 @Composable
 fun CheersApp(
     showInterstitialAd: () -> Unit,
+    appSettings: Settings,
 ) {
     val cheersViewModel = hiltViewModel<CheersViewModel>()
     val uiState by cheersViewModel.uiState.collectAsState()
 
-    val preference = uiState.userPreference
-    val darkTheme = when (preference.theme) {
-        Theme.LIGHT -> false
-        Theme.DARK -> true
-        Theme.SYSTEM -> isSystemInDarkTheme()
-    }
+    val darkTheme = isDarkTheme(appSettings.theme, isSystemInDarkTheme())
 
     SetStatusBars(darkTheme = darkTheme)
 
@@ -39,9 +36,18 @@ fun CheersApp(
     }
 }
 
+fun isDarkTheme(theme: Theme, isSystemInDarkTheme: Boolean): Boolean {
+    return when(theme) {
+        Theme.DARK -> true
+        Theme.LIGHT -> false
+        Theme.SYSTEM_DEFAULT -> isSystemInDarkTheme
+        Theme.UNRECOGNIZED -> isSystemInDarkTheme
+    }
+}
+
 @Composable
 fun SetStatusBars(
-    darkTheme: Boolean
+    darkTheme: Boolean,
 ) {
     val systemUiController = rememberSystemUiController()
     val darkIcons = !darkTheme

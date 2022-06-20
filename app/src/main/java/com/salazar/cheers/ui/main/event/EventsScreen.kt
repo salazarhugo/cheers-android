@@ -216,13 +216,13 @@ fun EventMutualFriends(
             Box() {
                 if (profilePictureUrls.isNotEmpty())
                     UserProfilePicture(
-                        profilePictureUrl = profilePictureUrls[0],
+                        avatar = profilePictureUrls[0],
                         size = 26.dp,
                     )
                 if (profilePictureUrls.size > 1)
                     UserProfilePicture(
                         modifier = Modifier.offset(x = 13.dp),
-                        profilePictureUrl = profilePictureUrls[1],
+                        avatar = profilePictureUrls[1],
                         size = 26.dp,
                     )
             }

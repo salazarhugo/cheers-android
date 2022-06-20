@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Comment
+import com.salazar.cheers.internal.relativeTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,9 +40,8 @@ fun Comment(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-//            .background(MaterialTheme.colorScheme.surface)
             .clickable { onCommentClicked() }
-            .padding(14.dp, 11.dp),
+            .padding(16.dp, 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row {
@@ -61,7 +61,7 @@ fun Comment(
                 contentScale = ContentScale.Crop,
             )
             Spacer(Modifier.width(8.dp))
-            Column {
+            Column(modifier = Modifier.padding(top = 2.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -73,13 +73,11 @@ fun Comment(
                     Spacer(Modifier.width(8.dp))
                     Text(comment.text)
                 }
-                Spacer(Modifier.height(4.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val dateFormatter = SimpleDateFormat("HH:mm")
                     Text(
-                        text = dateFormatter.format(comment.created),
+                        text = relativeTimeFormatter(timestamp = comment.created.time/1000),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(Modifier.width(8.dp))
@@ -92,7 +90,6 @@ fun Comment(
             }
         }
         if (comment.authorId == FirebaseAuth.getInstance().currentUser?.uid)
-//        TODO("LIKE COMMENT")
             Icon(
                 Icons.Default.DeleteOutline,
                 tint = MaterialTheme.colorScheme.error,

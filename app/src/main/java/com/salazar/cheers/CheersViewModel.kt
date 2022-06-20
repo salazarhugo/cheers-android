@@ -35,7 +35,7 @@ data class CheersUiState(
     val searchInput: String = "",
     val user: User? = null,
     val userPreference: UserPreference = UserPreference(id = "", theme = Theme.SYSTEM),
-    val notificationCount: Int = 0,
+    val unreadChatCount: Int = 0,
 )
 
 @HiltViewModel
@@ -44,7 +44,7 @@ class CheersViewModel @Inject constructor(
     private val billingRepository: BillingRepository,
     private val chatRepository: ChatRepository,
     private val storeUserEmail: StoreUserEmail,
-    private val dataStoreRepository: DataStoreRepository,
+//    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CheersUiState(isLoading = true))
@@ -57,6 +57,14 @@ class CheersViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            chatRepository.getUnreadChatCount().collect { unreadChatCount ->
+                viewModelState.update {
+                    it.copy(unreadChatCount = unreadChatCount)
+                }
+            }
+        }
+
     }
 
     fun queryPurchases() {
@@ -78,7 +86,20 @@ class CheersViewModel @Inject constructor(
         viewModelState.update {
             it.copy(isLoading = true)
         }
+
         getAndSaveRegistrationToken()
+
+        viewModelScope.launch {
+            chatRepository.getUnreadChatCount().collect { unreadChatCount ->
+                viewModelState.update {
+                    it.copy(unreadChatCount = unreadChatCount)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            chatRepository.listenRooms()
+        }
 
         viewModelScope.launch {
             val user = userRepository.getCurrentUserNullable() ?: return@launch

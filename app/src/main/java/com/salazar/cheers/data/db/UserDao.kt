@@ -19,8 +19,11 @@ interface UserDao {
     @Query("SELECT * FROM activity WHERE accountId = :accountId")
     suspend fun getActivity(accountId: String = Firebase.auth.currentUser?.uid!!): List<Activity>
 
-    @Query("SELECT * FROM user_suggestion")
-    suspend fun getUserSuggestions(): List<UserSuggestion>
+    @Query("SELECT * FROM user_suggestion WHERE accountId = :accountId")
+    fun getUserSuggestions(accountId: String = Firebase.auth.currentUser?.uid!!): Flow<List<UserSuggestion>>
+
+    @Query("SELECT * FROM user_suggestion WHERE username = :username")
+    suspend fun getUserSuggestion(username: String): UserSuggestion?
 
     @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUser(userIdOrUsername: String): User
@@ -62,7 +65,13 @@ interface UserDao {
     suspend fun deleteWithId(userId: String)
 
     @Update
+    suspend fun update(user: UserSuggestion)
+
+    @Update
     suspend fun update(user: User)
+
+    @Query("DELETE FROM user_suggestion WHERE accountId = :accountId")
+    suspend fun clearSuggestions(accountId: String = Firebase.auth.currentUser?.uid!!)
 
     @Query("DELETE FROM activity WHERE accountId = :accountId")
     suspend fun clearActivity(accountId: String = Firebase.auth.currentUser?.uid!!)

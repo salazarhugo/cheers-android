@@ -3,17 +3,15 @@ package com.salazar.cheers.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.Theme
+import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.UserPreferenceDao
-import com.salazar.cheers.data.entities.Theme
 import com.salazar.cheers.data.entities.UserPreference
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Language
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +21,7 @@ data class SettingsUiState(
     val signedOut: Boolean = false,
     val errorMessage: String = "",
     val searchInput: String = "",
-    val theme: Theme = Theme.SYSTEM,
+    val theme: Theme = Theme.SYSTEM_DEFAULT,
     val language: Language = Language.English,
 )
 
@@ -32,6 +30,7 @@ class SettingsViewModel @Inject constructor(
     private var cheersDao: CheersDao,
     private var preferenceDao: UserPreferenceDao,
     private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SettingsUiState(isLoading = true))
@@ -44,6 +43,13 @@ class SettingsViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            dataStoreRepository.userPreferencesFlow.collect { appSettings ->
+                viewModelState.update {
+                    it.copy(theme = appSettings.theme)
+                }
+            }
+        }
     }
 
     fun onDeleteAccount() {
@@ -58,14 +64,9 @@ class SettingsViewModel @Inject constructor(
             }
     }
 
-    fun persistTheme(theme: Theme) {
-        viewModelState.update {
-            it.copy(theme = theme)
-        }
-
-        val preference = UserPreference(FirebaseAuth.getInstance().currentUser?.uid!!, theme)
+    fun updateTheme(theme: Theme) {
         viewModelScope.launch {
-            preferenceDao.insert(preference)
+            dataStoreRepository.updateTheme(theme)
         }
     }
 

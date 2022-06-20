@@ -180,7 +180,7 @@ fun UserItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            UserProfilePicture(profilePictureUrl = user.profilePictureUrl)
+            UserProfilePicture(avatar = user.profilePictureUrl)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (user.name.isNotBlank())

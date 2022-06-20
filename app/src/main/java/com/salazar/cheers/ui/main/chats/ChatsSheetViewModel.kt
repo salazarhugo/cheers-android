@@ -52,7 +52,7 @@ class ChatsSheetViewModel @Inject constructor(
 
     fun leaveChannel() {
         viewModelScope.launch {
-            chatRepository.leaveRoom(channelId = channelId)
+            chatRepository.leaveRoom(roomId = channelId)
         }
     }
 

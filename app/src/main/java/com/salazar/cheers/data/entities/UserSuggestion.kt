@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -13,4 +14,6 @@ data class UserSuggestion(
     val verified: Boolean,
     val avatar: String,
     val followBack: Boolean,
+    @ColumnInfo(defaultValue = "")
+    val accountId: String,
 )

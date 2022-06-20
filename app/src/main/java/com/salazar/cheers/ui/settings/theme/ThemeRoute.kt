@@ -22,7 +22,7 @@ fun ThemeRoute(
     ThemeScreen(
         onBackPressed = { navActions.navigateBack() },
         theme = uiState.theme,
-        onThemeChange = settingsViewModel::persistTheme,
+        onThemeChange = settingsViewModel::updateTheme,
     )
 }
 

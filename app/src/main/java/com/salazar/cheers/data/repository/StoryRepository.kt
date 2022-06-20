@@ -25,9 +25,9 @@ class StoryRepository @Inject constructor(
 
     private val storyDao = database.storyDao()
 
-    suspend fun getMyStories(): Flow<List<Story>> = storyDao.getStoriesByAuthor()
+    fun getMyStories(): Flow<List<Story>> = storyDao.getStoriesByAuthor()
 
-    suspend fun getStories(): Flow<PagingData<Story>> {
+    fun getStories(): Flow<PagingData<Story>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,

@@ -14,6 +14,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -36,9 +38,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.backend.CoreService
+import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.ui.CheersApp
+import com.salazar.cheers.util.Constants
 import com.snap.creativekit.SnapCreative
 import com.snap.creativekit.exceptions.SnapMediaSizeException
+import com.snap.creativekit.models.SnapPhotoContent
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.net.URLEncoder
@@ -60,12 +65,21 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @Inject
     lateinit var coreService: CoreService
 
+    @Inject
+    lateinit var dataStoreRepository: DataStoreRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
+
         setContent {
+            val appSettings by dataStoreRepository.userPreferencesFlow.collectAsState(
+                initial = Settings.getDefaultInstance(),
+            )
+
             CheersApp(
+                appSettings = appSettings,
                 showInterstitialAd = ::showInterstitialAd,
             )
         }
@@ -93,18 +107,18 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         val snapCreativeKitApi = SnapCreative.getApi(this)
         val snapMediaFactory = SnapCreative.getMediaFactory(this);
 
-//        val imagePath = File(filesDir, "images")
-//        imagePath.mkdir()
-//        val imageFile = File(imagePath.path, "test.jpg")
-        // Write data in your file
-//        val uri = FileProvider.getUriForFile(this, packageName, imageFile)
-
         try {
 //            val uri = Uri.parse("https://arrival-project.com/assets/galery/cover.jpg")
-//            val file = File(uri.path)
+
+//            val path = filesDir
+//            println(path)
+//            val file = File("/storage/emulated/0/Android/media/com.salazar.cheers/Cheers/2022-06-19-01-13-44-591.jpg")
 //            val photoFile = snapMediaFactory.getSnapPhotoFromFile(file)
-//            val snapPhotoContent = SnapPhotoContent(photoFile);
-//            snapCreativeKitApi.send(snapPhotoContent);
+//            val snapPhotoContent = SnapPhotoContent(photoFile)
+//            snapPhotoContent.attachmentUrl = Constants.URI
+//            snapPhotoContent.captionText = "Add me on Cheers"
+//
+//            snapCreativeKitApi.send(snapPhotoContent)
         } catch (e: SnapMediaSizeException) {
 //            handleError(e);
             return;

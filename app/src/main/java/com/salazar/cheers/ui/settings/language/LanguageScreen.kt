@@ -24,7 +24,9 @@ fun LanguageScreen(
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Language") },
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(it),
+        ) {
             LanguagesSection(
                 language = language,
                 onLanguageChange = onLanguageChange

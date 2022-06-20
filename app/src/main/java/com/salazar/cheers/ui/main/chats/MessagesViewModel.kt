@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.chats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Room
+import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
@@ -46,6 +47,7 @@ private data class MessagesViewModelState(
 class MessagesViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
+//    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState =
@@ -60,9 +62,6 @@ class MessagesViewModel @Inject constructor(
         )
 
     init {
-        viewModelScope.launch {
-            chatRepository.listenRooms()
-        }
         onSwipeRefresh()
     }
 

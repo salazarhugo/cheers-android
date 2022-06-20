@@ -11,6 +11,7 @@ service ChatService {
   rpc GetRooms(Empty) returns (stream Room) {}
   rpc GetRoomId(GetRoomIdReq) returns (RoomId) {}
   rpc CreateChat(CreateChatReq) returns (Room) {}
+  rpc GetRoomMembers(RoomId) returns (Users) {}
   rpc JoinRoom(RoomId) returns (stream Message) {}
   rpc LeaveRoom(RoomId) returns (Empty) {}
   rpc DeleteRoom(RoomId) returns (Empty) {}
@@ -19,6 +20,18 @@ service ChatService {
   rpc TypingEnd(TypingReq) returns (Empty) {}
   rpc AddToken(AddTokenReq) returns (Empty) {}
   rpc DeleteUser(UserIdReq) returns (Empty) {}
+}
+
+message UserCard {
+  string id = 1;
+  string name= 2;
+  string username= 3;
+  bool verified = 4;
+  string avatar = 5;
+}
+
+message Users {
+  repeated UserCard users = 1;
 }
 
 message UserIdReq {

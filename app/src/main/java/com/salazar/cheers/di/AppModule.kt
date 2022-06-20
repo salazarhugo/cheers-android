@@ -1,12 +1,18 @@
 package com.salazar.cheers.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.room.Room
+import com.salazar.cheers.Settings
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.backend.PublicService
+import com.salazar.cheers.data.datastore.dataStore
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.FirebaseUserIdTokenInterceptor
+import com.salazar.cheers.data.serializer.SettingsSerializer
+import com.salazar.cheers.data.serializer.settingsDataStore
 import com.salazar.cheers.internal.PrivacyAdapter
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -61,6 +67,12 @@ object AppModule {
             .build()
 
         return retrofit.create(PublicService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Settings> {
+        return context.settingsDataStore
     }
 
     @Singleton

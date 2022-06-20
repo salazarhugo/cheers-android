@@ -16,8 +16,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 32
-        versionCode 44
-        versionName "0.99.88"
+        versionCode 45
+        versionName "0.99.89"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -65,23 +65,23 @@ android {
         tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
             kotlinOptions {
                 freeCompilerArgs += [
-                        "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes",
-                        "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                        "-Xuse-experimental=kotlinx.coroutines.InternalCoroutinesApi",
-                        "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
-                        "-Xuse-experimental=androidx.compose.ExperimentalComposeApi",
-                        "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
-                        "-Xuse-experimental=androidx.compose.material3.ExperimentalMaterial3Api",
-                        "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
-                        "-Xuse-experimental=androidx.compose.runtime.ExperimentalComposeApi",
-                        "-Xuse-experimental=androidx.compose.ui.ExperimentalComposeUiApi",
-                        "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimation",
-                        "-Xuse-experimental=coil.annotation.ExperimentalCoilApi",
-                        "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
-                        "-Xuse-experimental=com.google.accompanist.pager.ExperimentalPagerApi",
-                        "-Xuse-experimental=com.google.accompanist.permissions.ExperimentalPermissionsApi",
-                        "-Xuse-experimental=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
-                        "-Xuse-experimental=androidx.paging.ExperimentalPagingApi",
+                        "-Xopt-in=kotlin.ExperimentalUnsignedTypes",
+                        "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                        "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
+                        "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi",
+                        "-Xopt-in=androidx.compose.ExperimentalComposeApi",
+                        "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
+                        "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+                        "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+                        "-Xopt-in=androidx.compose.runtime.ExperimentalComposeApi",
+                        "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+                        "-Xopt-in=androidx.compose.animation.ExperimentalAnimation",
+                        "-Xopt-in=coil.annotation.ExperimentalCoilApi",
+                        "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                        "-Xopt-in=com.google.accompanist.pager.ExperimentalPagerApi",
+                        "-Xopt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
+                        "-Xopt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
+                        "-Xopt-in=androidx.paging.ExperimentalPagingApi",
                         "-Xjvm-default=enable"
                 ]
             }

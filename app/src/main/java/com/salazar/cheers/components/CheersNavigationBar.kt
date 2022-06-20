@@ -24,10 +24,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.salazar.cheers.CheersViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Screen
@@ -35,6 +38,7 @@ import com.salazar.cheers.navigation.MainDestinations
 
 @Composable
 fun CheersNavigationBar(
+    unreadChatCount: Int,
     profilePictureUrl: String,
     currentRoute: String,
     navigateToHome: () -> Unit,
@@ -70,11 +74,42 @@ fun CheersNavigationBar(
         Screen(
             MainDestinations.MESSAGES_ROUTE,
             navigateToMessages,
-            { Icon( painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground ) },
-            { Icon( painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon), null, tint = MaterialTheme.colorScheme.onBackground ) },
+            icon = {
+                BadgedBox(badge = {
+                    if(unreadChatCount > 0)
+                    Badge {Text(
+                        text = unreadChatCount.toString(),
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    ) }
+                }
+                ) {
+                    Icon(
+                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                   },
+            selectedIcon = {
+                BadgedBox(badge = {
+                    if(unreadChatCount > 0)
+                        Badge {Text(
+                            text = unreadChatCount.toString(),
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        ) }
+                }
+                ) {
+                    Icon(
+                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                           },
             "Messages"
         ),
     )
+
     CompositionLocalProvider(
         LocalRippleTheme provides ClearRippleTheme
     ) {
@@ -88,13 +123,7 @@ fun CheersNavigationBar(
                     icon = {
                         val icon =
                             if (currentRoute == screen.route) screen.selectedIcon else screen.icon
-                        val unreadMessageCount = 0
-                        if (index == 3 && unreadMessageCount > 0)
-                            BadgedBox(badge = { Badge { Text(unreadMessageCount.toString()) } }) {
-                                icon()
-                            }
-                        else
-                            icon()
+                        icon()
                     },
                     selected = currentRoute == screen.route,
                     onClick = screen.onNavigate,

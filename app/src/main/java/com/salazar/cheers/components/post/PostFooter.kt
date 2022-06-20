@@ -18,6 +18,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.salazar.cheers.R
+import com.salazar.cheers.components.animations.Bounce
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 
@@ -79,11 +80,12 @@ fun PostFooterButtons(
                 likes = post.likes,
                 onToggle = { onLike(post) },
             )
-            Icon(
-                modifier = Modifier.clickable { navigateToComments(post.id) },
-                painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                contentDescription = null
-            )
+            Bounce(onClick = { navigateToComments(post.id) }) {
+                Icon(
+                    painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+                    contentDescription = null
+                )
+            }
             Icon(Icons.Outlined.Share, null)
         }
         if (post.drunkenness > 0)
