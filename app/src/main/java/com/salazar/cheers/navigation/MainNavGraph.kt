@@ -43,6 +43,7 @@ import com.salazar.cheers.ui.main.event.edit.EditEventRoute
 import com.salazar.cheers.ui.main.event.guestlist.GuestListRoute
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
+import com.salazar.cheers.ui.main.map.MapPostHistoryRoute
 import com.salazar.cheers.ui.main.map.MapRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
@@ -58,7 +59,7 @@ import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Constants.URI
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.copyToClipboard
-
+import com.salazar.cheers.util.Utils.shareToSnapchat
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class)
@@ -114,8 +115,8 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
-            route = "${MainDestinations.STORY_ROUTE}?userId={userId}",
-            arguments = listOf(navArgument("userId") { nullable = true }),
+            route = "${MainDestinations.STORY_ROUTE}?username={username}",
+            arguments = listOf(navArgument("username") { nullable = true }),
             enterTransition = { scaleIn(animationSpec = tween(500)) },
             exitTransition = { scaleOut(animationSpec = tween(500)) },
         ) {
@@ -163,6 +164,12 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(MainDestinations.MAP_ROUTE) {
             MapRoute(
+                navActions = navActions
+            )
+        }
+
+        composable(MainDestinations.MAP_POST_HISTORY_ROUTE) {
+            MapPostHistoryRoute(
                 navActions = navActions
             )
         }
@@ -438,6 +445,8 @@ fun NavGraphBuilder.mainNavGraph(
                             }
                         navActions.navigateBack()
                     }
+                    is ProfileSheetUIAction.OnAddSnapchatFriends -> context.shareToSnapchat(username)
+                    is ProfileSheetUIAction.OnPostHistoryClick -> navActions.navigateToPostHistory()
                 }
             },
         )

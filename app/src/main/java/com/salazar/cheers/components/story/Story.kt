@@ -22,6 +22,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
+import com.salazar.cheers.components.animations.Bounce
 
 @Composable
 fun YourStory(
@@ -62,7 +63,7 @@ fun Story(
     modifier: Modifier = Modifier,
     seen: Boolean,
     profilePictureUrl: String,
-    onStoryClick: () -> Unit,
+    onStoryClick: (String) -> Unit,
     username: String,
 ) {
     val border = if (seen)
@@ -78,35 +79,32 @@ fun Story(
             )
         )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.clickable(
-            indication = null,
-            interactionSource = remember { MutableInteractionSource() }
-        ) { onStoryClick() },
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
-                    .apply(block = fun ImageRequest.Builder.() {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    }).build()
-            ),
-            modifier = Modifier
-                .padding(horizontal = 6.dp)
-                .border(border, CircleShape)
-                .size(73.dp)
-                .padding(5.dp)
-                .clip(CircleShape),
-            contentDescription = null,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = username,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
+    Bounce(onBounce = { onStoryClick(username)}) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            transformations(CircleCropTransformation())
+                            error(R.drawable.default_profile_picture)
+                        }).build()
+                ),
+                modifier = Modifier
+                    .padding(horizontal = 6.dp)
+                    .border(border, CircleShape)
+                    .size(73.dp)
+                    .padding(5.dp)
+                    .clip(CircleShape),
+                contentDescription = null,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = username,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+        }
     }
-
 }

@@ -1,5 +1,6 @@
 package com.salazar.cheers.util
 
+import android.R.attr.bitmap
 import android.content.*
 import android.content.res.Configuration
 import android.graphics.*
@@ -8,6 +9,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
@@ -16,12 +18,35 @@ import androidx.camera.core.ImageCapture
 import androidx.compose.ui.Modifier
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.R
+import com.snap.creativekit.SnapCreative
+import com.snap.creativekit.exceptions.SnapMediaSizeException
+import com.snap.creativekit.models.SnapPhotoContent
+import kotlinx.coroutines.tasks.await
 import java.io.File
+import java.lang.Math.min
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 object Utils {
+
+    fun Context.shareToSnapchat(username: String) {
+        val snapCreativeKitApi = SnapCreative.getApi(this)
+        val snapMediaFactory = SnapCreative.getMediaFactory(this);
+
+        try {
+            val file = File("${filesDir}/snapchat-add-friend.jpg")
+            val photoFile = snapMediaFactory.getSnapPhotoFromFile(file)
+            val snapPhotoContent = SnapPhotoContent(photoFile)
+            FirebaseDynamicLinksUtil.createShortLink("u/$username").addOnSuccessListener {
+                snapPhotoContent.attachmentUrl = it.shortLink.toString()
+                snapCreativeKitApi.send(snapPhotoContent)
+            }
+        } catch (e: SnapMediaSizeException) {
+            Log.e("SNAP", e.toString())
+            return;
+        }
+    }
 
     fun isLowerCase(username: String): Boolean {
         return username == username.lowercase()
@@ -62,31 +87,25 @@ object Utils {
         else -> null
     }
 
-    fun Bitmap.getCircularBitmapWithWhiteBorder(borderWidth: Int): Bitmap? {
-        if (this.isRecycled) return null
-
-        val size = 0
-        val width = size + borderWidth
-        val height = size + borderWidth
-        val canvasBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val shader = BitmapShader(this, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+    fun Bitmap.getCircularBitmapWithWhiteBorder(): Bitmap {
+        val squareBitmapWidth = min(this.width, this.height)
+        val dstBitmap = Bitmap.createBitmap(
+            squareBitmapWidth,  // Width
+            squareBitmapWidth,  // Height
+            Bitmap.Config.ARGB_8888 // Config
+        )
+        val canvas = Canvas(dstBitmap)
         val paint = Paint()
         paint.isAntiAlias = true
-        paint.shader = shader
-        val canvas = Canvas(canvasBitmap)
-        val radius = if (width > height) height.toFloat() / 2f else width.toFloat() / 2f
-        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, paint)
-        paint.shader = null
-        paint.style = Paint.Style.STROKE
-        paint.color = Color.WHITE
-        paint.strokeWidth = borderWidth.toFloat()
-        canvas.drawCircle(
-            (width / 2).toFloat(),
-            (height / 2).toFloat(),
-            radius - borderWidth / 2,
-            paint
-        )
-        return canvasBitmap
+        val rect = Rect(0, 0, squareBitmapWidth, squareBitmapWidth)
+        val rectF = RectF(rect)
+        canvas.drawOval(rectF, paint)
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        val left = ((squareBitmapWidth - this.width) / 2).toFloat()
+        val top = ((squareBitmapWidth - this.height) / 2).toFloat()
+        canvas.drawBitmap(this, left, top, paint)
+        this.recycle()
+        return dstBitmap
     }
 
     fun String.isEmailValid(): Boolean {

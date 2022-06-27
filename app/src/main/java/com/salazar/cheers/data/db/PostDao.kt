@@ -35,8 +35,8 @@ interface PostDao {
     suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
-    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE users.username = :username AND type <> 'TEXT' ORDER BY posts.created DESC")
-    suspend fun getPostsWithUsername(username: String): List<Post>
+    @Query("SELECT * FROM posts WHERE authorId = :authorId ORDER BY posts.created DESC")
+    suspend fun getPosts(authorId: String = FirebaseAuth.getInstance().currentUser?.uid!!): List<Post>
 
 //    @Transaction
 //    @Query("SELECT users.id FROM users WHERE username = :username")

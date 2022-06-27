@@ -6,9 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,14 +16,16 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun StoryProgressBar(
-    modifier: Modifier = Modifier,
     steps: Int,
     currentStep: Int,
-    paused: Boolean,
+    modifier: Modifier = Modifier,
+    paused: Boolean = false,
     onFinished: () -> Unit
 ) {
     val percent = remember { Animatable(0f) }
-    LaunchedEffect(paused) {
+
+    LaunchedEffect(paused, currentStep) {
+        percent.snapTo(0f)
         if (paused) percent.stop()
         else {
             percent.animateTo(
@@ -36,14 +36,13 @@ fun StoryProgressBar(
                 )
             )
             onFinished()
-            percent.animateTo(targetValue = 0f)
         }
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        for (index in 1..steps) {
+        for (index in 0 until steps) {
             Row(
                 modifier = Modifier
                     .height(2.dp)
@@ -73,5 +72,5 @@ fun StoryProgressBar(
 @Preview
 @Composable
 fun StoryProgressBarPreview() {
-    StoryProgressBar(steps = 3, currentStep = 2, paused = false) { }
+    StoryProgressBar(steps = 3, paused = false, currentStep = 1) { }
 }

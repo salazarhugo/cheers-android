@@ -7,7 +7,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Comment
-import com.salazar.cheers.internal.CommentWithAuthor
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
@@ -92,12 +91,14 @@ class CommentsViewModel @Inject constructor(
         val comment = Comment(
             username = user.username,
             verified = user.verified,
-            profilePictureUrl = user.profilePictureUrl,
+            avatar = user.profilePictureUrl,
             postId = postId,
             authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
             text = text,
         )
-        FirestoreUtil.addComment(comment = comment)
+        viewModelScope.launch {
+            postRepository.commentPost(comment = comment)
+        }
         onInputChange("")
     }
 

@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
-import com.salazar.cheers.ChatCounter
 import com.salazar.cheers.Settings
 import com.salazar.cheers.Theme
 import kotlinx.coroutines.flow.Flow

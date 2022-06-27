@@ -50,8 +50,9 @@ fun HomeRoute(
         navigateToComments = { navActions.navigateToPostComments(it.id) },
         navigateToSearch = { navActions.navigateToSearch() },
         onEventClicked = { navActions.navigateToEventDetail(it) },
-        onStoryClick = { navActions.navigateToStory() },
+        onStoryClick = { navActions.navigateToStoryWithUserId(it) },
         onAddStoryClick = { navActions.navigateToCamera() },
-        onActivityClick = { navActions.navigateToActivity() }
+        onActivityClick = { navActions.navigateToActivity() },
+        onCommentClick = { navActions.navigateToPostComments(it) },
     )
 }

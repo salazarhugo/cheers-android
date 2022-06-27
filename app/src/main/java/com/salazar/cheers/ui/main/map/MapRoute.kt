@@ -35,6 +35,6 @@ fun MapRoute(
         onTogglePublic = mapViewModel::onTogglePublic,
         onAddPostClicked = { navActions.navigateToAddPostSheet() },
         onUserClick = { navActions.navigateToOtherProfile(it) },
-        onMapReady = mapViewModel::onMapReady,
+        onMapReady = mapViewModel.mapRepository::onMapReady,
     )
 }

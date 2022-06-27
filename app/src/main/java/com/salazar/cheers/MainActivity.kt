@@ -41,6 +41,7 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.ui.CheersApp
 import com.salazar.cheers.util.Constants
+import com.salazar.cheers.util.StorageUtil
 import com.snap.creativekit.SnapCreative
 import com.snap.creativekit.exceptions.SnapMediaSizeException
 import com.snap.creativekit.models.SnapPhotoContent
@@ -99,30 +100,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                 }
             }
         }
-        shareToSnapchat()
-    }
-
-    private fun shareToSnapchat() {
-
-        val snapCreativeKitApi = SnapCreative.getApi(this)
-        val snapMediaFactory = SnapCreative.getMediaFactory(this);
-
-        try {
-//            val uri = Uri.parse("https://arrival-project.com/assets/galery/cover.jpg")
-
-//            val path = filesDir
-//            println(path)
-//            val file = File("/storage/emulated/0/Android/media/com.salazar.cheers/Cheers/2022-06-19-01-13-44-591.jpg")
-//            val photoFile = snapMediaFactory.getSnapPhotoFromFile(file)
-//            val snapPhotoContent = SnapPhotoContent(photoFile)
-//            snapPhotoContent.attachmentUrl = Constants.URI
-//            snapPhotoContent.captionText = "Add me on Cheers"
-//
-//            snapCreativeKitApi.send(snapPhotoContent)
-        } catch (e: SnapMediaSizeException) {
-//            handleError(e);
-            return;
-        }
+        StorageUtil.getSnapchatBanner(this)
     }
 
     override fun onResume() {

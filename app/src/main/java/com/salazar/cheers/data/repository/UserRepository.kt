@@ -224,6 +224,7 @@ class UserRepository @Inject constructor(
         }
     }
 
+
     suspend fun followUser(username: String) {
         try {
             coreService.followUser(username = username)

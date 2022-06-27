@@ -25,7 +25,6 @@ import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.profile.Post
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -40,7 +39,8 @@ fun OtherProfileScreen(
     onWebsiteClick: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onGiftClick: () -> Unit,
-    onStoryClick: () -> Unit,
+    onStoryClick: (String) -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.postFlow.collectAsLazyPagingItems()
     val pagerState = rememberPagerState()
@@ -104,11 +104,12 @@ fun OtherProfileScreen(
                     when (page) {
                         0 -> posts.itemSnapshotList.forEach { postFeed ->
                             if (postFeed != null)
-                                Post(
-                                    postFeed,
-                                    onPostClicked,
+                                com.salazar.cheers.ui.main.profile.Post(
+                                    post = postFeed,
                                     onPostLike = onPostLike,
+                                    onPostClicked = onPostClicked,
                                     onPostMoreClicked = onPostMoreClicked,
+                                    onCommentClick = { onCommentClick(postFeed.id)},
                                 )
                         }
                         1 -> FunctionalityNotAvailablePanel()

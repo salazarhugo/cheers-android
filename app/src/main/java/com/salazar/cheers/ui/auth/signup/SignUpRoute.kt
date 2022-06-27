@@ -50,7 +50,7 @@ fun SignUpRoute(
         Scaffold(
             topBar = {
                 AppBar(
-                    title = "",
+                    title = "Sign Up",
                     center = true,
                     backNavigation = true,
                     onNavigateBack = { navActions.navigateBack() })

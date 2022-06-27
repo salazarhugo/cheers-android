@@ -63,7 +63,8 @@ fun ProfileScreen(
     navigateToProfileMoreSheet: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
-    onStoryClick: () -> Unit = {},
+    onStoryClick: (String) -> Unit = {},
+    onCommentClick: (String) -> Unit,
 ) {
     when (uiState) {
         is ProfileUiState.Loading -> LoadingScreen()
@@ -79,6 +80,7 @@ fun ProfileScreen(
             onPostLike = onPostLike,
             onPostMoreClicked = onPostMoreClicked,
             onStoryClick = onStoryClick,
+            onCommentClick = onCommentClick,
         )
     }
 }
@@ -95,7 +97,8 @@ fun Profile(
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: (String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
-    onStoryClick: () -> Unit = {},
+    onStoryClick: (String) -> Unit = {},
+    onCommentClick: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -175,6 +178,7 @@ fun Profile(
                                             onPostClicked,
                                             onPostLike = onPostLike,
                                             onPostMoreClicked = onPostMoreClicked,
+                                            onCommentClick = onCommentClick,
                                         )
                                 }
                                 1 -> uiState.events?.forEach {
@@ -243,6 +247,7 @@ fun Post(
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     val pagerState = rememberPagerState()
 
@@ -276,6 +281,7 @@ fun Post(
         onLike = onPostLike,
         navigateToComments = {},
         pagerState = pagerState,
+        onCommentClick = onCommentClick,
     )
 }
 

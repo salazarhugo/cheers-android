@@ -89,9 +89,12 @@ fun OtherProfileRoute(
                             url = "http://$url"
                         uriHandler.openUri(url)
                     },
-                    onStoryClick = {
-                        navActions.navigateToStory()
+                    onStoryClick = { username ->
+                        navActions.navigateToStoryWithUserId(username)
                     },
+                    onCommentClick = {
+                        navActions.navigateToPostComments(it)
+                    }
                 )
             }
         }

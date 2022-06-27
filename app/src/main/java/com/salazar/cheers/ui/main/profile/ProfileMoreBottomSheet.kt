@@ -21,6 +21,8 @@ sealed class ProfileSheetUIAction {
     object OnNfcClick : ProfileSheetUIAction()
     object OnCopyProfileClick : ProfileSheetUIAction()
     object OnSettingsClick : ProfileSheetUIAction()
+    object OnAddSnapchatFriends : ProfileSheetUIAction()
+    object OnPostHistoryClick : ProfileSheetUIAction()
 }
 
 @Composable
@@ -41,7 +43,16 @@ fun ProfileMoreBottomSheet(
             icon = Icons.Outlined.Settings,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnSettingsClick) }
         )
-        Item(text = "Archive", icon = Icons.Outlined.Archive)
+        Item(
+            text = "Add Snapchat Friends",
+            icon = Icons.Outlined.Archive,
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnAddSnapchatFriends) }
+        )
+        Item(
+            text = "Post History",
+            icon = Icons.Outlined.Archive,
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnPostHistoryClick) }
+        )
         Item(
             text = "Nfc",
             icon = Icons.Outlined.Contactless,

@@ -1,14 +1,23 @@
 package com.salazar.cheers.ui.main.chat
 
+import android.Manifest
+import android.content.ContentValues.TAG
+import android.media.MediaRecorder
+import android.os.Environment
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.components.utils.Permission
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.navigation.CheersNavigationActions
+import java.io.File
+import java.io.IOException
+
 
 /**
  * Stateful composable that displays the Navigation route for the Chat screen.
@@ -27,6 +36,26 @@ fun ChatRoute(
             if (it != null)
                 chatViewModel.sendImageMessage(listOf(it))
         }
+
+    val micInteractionSource = remember { MutableInteractionSource() }
+    val isPressed by micInteractionSource.collectIsPressedAsState()
+
+    val mediaRecorder = remember { MediaRecorder() }
+    if (isPressed) {
+        Permission(permission = Manifest.permission.RECORD_AUDIO) {
+            Permission(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                LaunchedEffect(Unit) {
+                        mediaRecorder.startRecording()
+                }
+                DisposableEffect(Unit) {
+                    onDispose {
+                        mediaRecorder.stopRecording()
+                    }
+                }
+            }
+        }
+    }
+
 
     when (uiState) {
         is ChatUiState.HasChannel -> {
@@ -50,10 +79,43 @@ fun ChatRoute(
                 onAuthorClick = { navActions.navigateToOtherProfile(it) },
                 onTextChanged = chatViewModel::onTextChanged,
                 onInfoClick = { navActions.navigateToRoomDetails(ui.channel.id) },
+                micInteractionSource = micInteractionSource,
             )
         }
         is ChatUiState.NoChannel -> {
             LoadingScreen()
         }
     }
+}
+
+private fun MediaRecorder.startRecording() {
+
+    var audiofile: File? = null
+
+    val dir = Environment.getExternalStorageDirectory()
+    try {
+        audiofile = File.createTempFile("sound", ".3gp", dir)
+    } catch (e: IOException) {
+        Log.e(TAG, e.toString())
+        return
+    }
+
+    setAudioSource(MediaRecorder.AudioSource.MIC)
+    setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+    setOutputFile(audiofile.absolutePath)
+
+    try {
+        prepare()
+    } catch (e: IOException) {
+            Log.e("TAG", e.toString())
+    }
+
+    start()
+}
+
+fun MediaRecorder.stopRecording() {
+    stop()
+    reset()
+    release()
 }

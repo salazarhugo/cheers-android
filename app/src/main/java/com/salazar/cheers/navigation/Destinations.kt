@@ -20,6 +20,7 @@ object MainDestinations {
     const val SEARCH_ROUTE = "search"
     const val ROOM_DETAILS = "roomDetails"
     const val MAP_ROUTE = "map"
+    const val MAP_POST_HISTORY_ROUTE = "posts/history"
     const val EVENTS_ROUTE = "events"
     const val EDIT_EVENT_ROUTE = "event/edit"
     const val EVENT_MORE_SHEET = "eventMoreSheet"
@@ -147,8 +148,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToStoryWithUserId: (userId: String) -> Unit = { userId ->
-        navController.navigate(route = "${MainDestinations.STORY_ROUTE}?userId=$userId") {
+    val navigateToStoryWithUserId: (username: String) -> Unit = { username ->
+        navController.navigate(route = "${MainDestinations.STORY_ROUTE}?username=$username") {
             launchSingleTop = true
         }
     }
@@ -288,6 +289,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateToHome: () -> Unit = {
         navController.navigate(MainDestinations.HOME_ROUTE) {
+            restoreState = true
+        }
+    }
+
+    val navigateToPostHistory: () -> Unit = {
+        navController.navigate(MainDestinations.MAP_POST_HISTORY_ROUTE) {
+            launchSingleTop = false
             restoreState = true
         }
     }

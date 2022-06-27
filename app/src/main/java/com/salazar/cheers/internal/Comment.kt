@@ -13,10 +13,9 @@ data class Comment(
     val id: String = "",
     val username: String = "",
     val verified: Boolean = false,
-    val profilePictureUrl: String = "",
+    val avatar: String = "",
     val postId: String = "",
     val authorId: String = "",
     val text: String = "",
-    @ServerTimestamp
-    val created: Date = Date(),
+    val created: Long = 0L,
 )

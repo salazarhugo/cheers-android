@@ -2,10 +2,7 @@ package com.salazar.cheers.backend
 
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.entities.UserSuggestion
-import com.salazar.cheers.internal.Activity
-import com.salazar.cheers.internal.Event
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.internal.*
 import okhttp3.ResponseBody
 import retrofit2.http.*
 
@@ -14,6 +11,11 @@ interface CoreService {
 
     @GET("users/suggestions")
     suspend fun suggestions(): List<UserSuggestion>
+
+    @POST("comment")
+    suspend fun postComment(
+        @Body comment: Comment,
+    )
 
     @GET("users/search/{query}")
     suspend fun searchUsers(
@@ -35,11 +37,19 @@ interface CoreService {
         @Query("pageSize") pageSize: Int,
     ): List<Event>
 
+    @GET("posts")
+    suspend fun getPosts(): List<Post>
+
     @GET("posts/feed")
     suspend fun postFeed(
         @Query("page") skip: Int,
         @Query("pageSize") pageSize: Int,
     ): List<Post>
+
+    @GET("stories/{username}")
+    suspend fun getUserStory(
+        @Path("username") username: String,
+    ): List<Story>
 
     @GET("stories/feed")
     suspend fun storyFeed(

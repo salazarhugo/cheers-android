@@ -32,6 +32,9 @@ fun EventsRoute(
         onGoingToggle = eventsViewModel::onGoingToggle,
         onMoreClick = {
             navActions.navigateToEventMoreSheet(it)
+        },
+        onCreateEventClick = {
+            navActions.navigateToAddEvent()
         }
     )
 }

@@ -97,12 +97,6 @@ object FirestoreUtil {
         }
     }
 
-    fun addComment(comment: Comment) {
-        val commentDoc = firestoreInstance.collection("comments")
-            .document()
-        commentDoc.set(comment.copy(id = commentDoc.id))
-    }
-
     fun listenSources() = callbackFlow<List<Source>> {
 
         val sourcesRef = stripeCustomerDocRef

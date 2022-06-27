@@ -26,6 +26,7 @@ import com.salazar.cheers.internal.PostType
 fun PostFooter(
     post: Post,
     onLike: (post: Post) -> Unit,
+    onCommentClick: (String) -> Unit,
     navigateToComments: (Post) -> Unit,
     pagerState: PagerState,
 ) {
@@ -54,9 +55,30 @@ fun PostFooter(
 //            if (post.tagUsers.isNotEmpty())
 //                TagUsers(postFeed.tagUsers)
         }
+//        PostComments(
+//            commentCount = 402,
+//            onCommentClick = { onCommentClick(post.id) },
+//        )
     }
     if (post.type != PostType.TEXT)
         Spacer(Modifier.height(12.dp))
+}
+
+@Composable
+fun PostComments(
+    commentCount: Int = 0,
+    onCommentClick: () -> Unit,
+) {
+    val text = if (commentCount > 1) "View all $commentCount comments" else "View 1 comment"
+
+    if (commentCount > 0)
+    Text(
+        text = text,
+        modifier = Modifier
+            .clickable { onCommentClick() }
+            .padding(horizontal = 8.dp),
+        style = MaterialTheme.typography.labelLarge,
+    )
 }
 
 @Composable
@@ -80,7 +102,7 @@ fun PostFooterButtons(
                 likes = post.likes,
                 onToggle = { onLike(post) },
             )
-            Bounce(onClick = { navigateToComments(post.id) }) {
+            Bounce(onBounce = { navigateToComments(post.id) }) {
                 Icon(
                     painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
                     contentDescription = null

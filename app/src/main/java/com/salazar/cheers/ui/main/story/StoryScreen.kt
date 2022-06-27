@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.story
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -62,23 +64,21 @@ fun StoryScreen(
     showInterstitialAd: () -> Unit,
 ) {
     val pagerState = rememberPagerState()
-    val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
+    val stories = uiState.stories
     val scope = rememberCoroutineScope()
 
     Column(
-        modifier = Modifier.background(Color.Black)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
     ) {
+        if (stories != null && stories.isNotEmpty())
         StoryCarousel(
-            stories = stories.itemSnapshotList.items,
+            stories = stories,
             pagerState = pagerState,
             onStoryOpen = onStoryOpen,
             onStoryFinish = {
-                if (pagerState.currentPage + 1 >= stories.itemCount)
-                    onNavigateBack()
-                else
-                    scope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
+                onNavigateBack()
             },
             onUserClick = onUserClick,
             value = value,
@@ -106,12 +106,13 @@ fun StoryCarousel(
     onSendReaction: (Story, String) -> Unit,
 ) {
     HorizontalPager(
-        count = stories.size,
+        count = 1,
         state = pagerState,
         verticalAlignment = Alignment.Top,
     ) { page ->
 
-        val story = stories[page]
+        val story = stories[0]
+
         var isPaused by remember { mutableStateOf(false) }
 
         LaunchedEffect(currentPage) {
@@ -121,8 +122,8 @@ fun StoryCarousel(
 
         if ((page - 1) % 3 == 0) {
             showInterstitialAd()
-//            onFocusChange(true)
         }
+
         Scaffold(
             bottomBar = {
                 StoryFooter(
@@ -131,7 +132,9 @@ fun StoryCarousel(
                     isUserMe = story.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
                     onInputChange = onInputChange,
                     onSendReaction = { onSendReaction(story, it) },
-                    onFocusChange = { isPaused = it },
+                    onFocusChange = {
+                        isPaused = it
+                                    },
                     onStoryUIAction = onStoryUIAction,
                 )
             },
@@ -154,8 +157,11 @@ fun StoryCarousel(
                     )
                 }
         ) {
+            val isPressed = remember { mutableStateOf(false) }
+            var currentStep by remember { mutableStateOf(0) }
+
             PrettyImage(
-                data = stories[page].photoUrl,
+                data = stories[currentStep].photoUrl,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
@@ -164,23 +170,45 @@ fun StoryCarousel(
                     .aspectRatio(9 / 16f)
                     .clip(RoundedCornerShape(16.dp))
                     .fillMaxWidth()
-                    .clickable {
-                        onStoryUIAction(StoryUIAction.OnTap, story.id)
+                    .pointerInput(Unit) {
+                        val maxWidth = this.size.width
+                        detectTapGestures(
+                            onPress = {
+                                val pressStartTime = System.currentTimeMillis()
+                                isPressed.value = true
+                                this.tryAwaitRelease()
+                                val pressEndTime = System.currentTimeMillis()
+                                val totalPressTime = pressEndTime - pressStartTime
+                                if (totalPressTime < 200) {
+                                    val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
+                                    if (isTapOnRightThreeQuarters) {
+                                        if(currentStep + 1 >= stories.size)
+                                            onStoryFinish()
+                                        else
+                                            currentStep++
+                                    }
+                                    else
+                                        currentStep = (currentStep - 1).coerceAtLeast(0)
+                                }
+                                isPressed.value = false
+                            },
+                        )
                     }
+//                    .clickable {
+//                        onStoryUIAction(StoryUIAction.OnTap, story.id)
+//                    }
             )
+
             StoryHeader(
-                currentPage = currentPage,
-                page = page,
-                username = story.username,
-                profilePictureUrl = story.profilePictureUrl,
-                verified = story.verified,
+                story = story,
+                count = stories.size,
                 onStoryFinish = {
-                    isPaused = false
-                    onStoryFinish()
+                    currentStep =
+                        (currentStep + 1).coerceAtMost(stories.size - 1)
                 },
                 onUserClick = onUserClick,
-                pause = isPaused,
-                created = story.created,
+                pause = false,
+                currentStep = currentStep,
             )
         }
     }
@@ -188,33 +216,30 @@ fun StoryCarousel(
 
 @Composable
 fun StoryHeader(
-    currentPage: Int,
-    page: Int,
-    username: String,
-    verified: Boolean,
-    profilePictureUrl: String,
-    created: Long,
+    story: Story,
+    count: Int,
+    currentStep: Int,
     onStoryFinish: () -> Unit,
     onUserClick: (String) -> Unit,
     pause: Boolean,
 ) {
     Column {
         StoryProgressBar(
-            steps = 1,
-            currentStep = 1,
-            paused = currentPage != page || pause,
+            steps = count,
+            currentStep = currentStep,
+            paused = pause,
             onFinished = onStoryFinish,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
         PostHeader(
-            username = username,
-            verified = verified,
-            created = created,
+            username = story.username,
+            verified = story.verified,
+            created = story.created,
             beverage = Beverage.NONE,
             darkMode = true,
             public = false,
             locationName = "",
-            profilePictureUrl = profilePictureUrl,
+            profilePictureUrl = story.profilePictureUrl,
             onHeaderClicked = onUserClick,
             onMoreClicked = {},
         )

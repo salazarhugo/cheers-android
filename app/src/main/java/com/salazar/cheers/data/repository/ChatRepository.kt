@@ -73,7 +73,11 @@ class ChatRepository @Inject constructor(
     }
 
     fun getUnreadChatCount(): Flow<Int> {
-        return chatDao.getUnreadChatCount()
+        return try {
+             chatDao.getUnreadChatCount()
+        } catch (e: Exception) {
+            flow { emit(0) }
+        }
     }
 
     suspend fun getMessages(channelId: String): Flow<List<ChatMessage>> =

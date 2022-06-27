@@ -3,12 +3,10 @@ package com.salazar.cheers.components.animations
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +17,7 @@ enum class BounceState { Pressed, Released }
 
 @Composable
 fun Bounce(
-    onClick: () -> Unit = {},
+    onBounce: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
     var currentState: BounceState by remember { mutableStateOf(BounceState.Released) }
@@ -44,7 +42,7 @@ fun Bounce(
                         currentState = BounceState.Pressed
                         tryAwaitRelease()
                         currentState = BounceState.Released
-                        onClick()
+                        onBounce()
                     })
                 }.graphicsLayer {
                     scaleX = scale

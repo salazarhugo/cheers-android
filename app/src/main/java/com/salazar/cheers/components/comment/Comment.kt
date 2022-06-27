@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -26,8 +24,6 @@ import com.salazar.cheers.R
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.relativeTimeFormatter
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
 fun Comment(
@@ -47,7 +43,7 @@ fun Comment(
         Row {
             Image(
                 painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = comment.profilePictureUrl)
+                    ImageRequest.Builder(LocalContext.current).data(data = comment.avatar)
                         .apply(block = fun ImageRequest.Builder.() {
                             transformations(CircleCropTransformation())
                             error(R.drawable.default_profile_picture)
@@ -77,7 +73,7 @@ fun Comment(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = relativeTimeFormatter(timestamp = comment.created.time/1000),
+                        text = relativeTimeFormatter(timestamp = comment.created),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(Modifier.width(8.dp))

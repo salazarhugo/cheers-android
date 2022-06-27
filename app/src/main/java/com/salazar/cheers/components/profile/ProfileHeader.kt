@@ -14,7 +14,7 @@ import com.salazar.cheers.ui.main.profile.ProfileStats
 fun ProfileHeader(
     user: User,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
-    onStoryClick: () -> Unit,
+    onStoryClick: (String) -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -24,7 +24,7 @@ fun ProfileHeader(
             .fillMaxWidth()
     ) {
 
-        Bounce {
+        Bounce(onBounce = { onStoryClick(user.username) }) {
             UserProfilePicture(
                 avatar = user.profilePictureUrl,
                 size = 80.dp,

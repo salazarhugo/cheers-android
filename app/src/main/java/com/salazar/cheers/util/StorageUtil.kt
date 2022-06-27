@@ -1,5 +1,6 @@
 package com.salazar.cheers.util
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toFile
@@ -9,6 +10,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.tasks.await
+import java.io.File
 import java.util.*
 
 
@@ -104,6 +106,16 @@ object StorageUtil {
             storageInstance.getReference(path)
         } catch (e: Exception) {
             null
+        }
+    }
+
+    fun getSnapchatBanner(context: Context) {
+        try {
+            val storageRef = storageInstance.reference
+            val pathReference = storageRef.child("snapchat/add-friend.jpg")
+            val file = File("${context.filesDir}/snapchat-add-friend.jpg")
+            pathReference.getFile(file)
+        } catch (e: Exception) {
         }
     }
 

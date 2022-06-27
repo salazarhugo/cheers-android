@@ -7,6 +7,7 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.PostRemoteMediator
+import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +64,14 @@ class PostRepository @Inject constructor(
         }
     }
 
+    suspend fun commentPost(comment: Comment) {
+        try {
+            coreService.postComment(comment = comment)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun addPost(post: Post) {
         try {
             coreService.createPost(post = post)
@@ -71,9 +80,14 @@ class PostRepository @Inject constructor(
         }
     }
 
-
-    suspend fun getPostsWithUsername(username: String): List<Post> {
-        return postDao.getPostsWithUsername(username = username)
+    suspend fun getUserPosts(): List<Post> {
+        try {
+            val posts = coreService.getPosts()
+            postDao.insertAll(posts)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return postDao.getPosts()
     }
 
     suspend fun getPostsWithAuthorId(authorId: String): List<Post> {

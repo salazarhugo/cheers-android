@@ -3,6 +3,7 @@ package com.salazar.cheers.service
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -85,22 +86,13 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             }
         }
 
+
+        val pending = setIntent("https://cheers-a275e.web.app".toUri())
+        builder.setContentIntent(pending)
+
         if (roomId != null) {
-            val taskDetailIntent = Intent(
-                Intent.ACTION_VIEW,
-                "https://cheers-a275e.web.app/chat/${roomId}".toUri(),
-                this,
-                MainActivity::class.java
-            )
-
-            val pending: PendingIntent? = TaskStackBuilder.create(this).run {
-                addNextIntentWithParentStack(taskDetailIntent)
-                getPendingIntent(
-                    0,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            }
-
+            val uri = "https://cheers-a275e.web.app/chat/${roomId}".toUri()
+            val pending = setIntent(uri)
             builder.setContentIntent(pending)
         }
 
@@ -124,6 +116,24 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         }
     }
 
+    private fun setIntent(url: Uri): PendingIntent? {
+        val taskDetailIntent = Intent(
+            Intent.ACTION_VIEW,
+            url,
+            this,
+            MainActivity::class.java
+        )
+
+        val pending: PendingIntent? = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(taskDetailIntent)
+            getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
+        return pending
+    }
     private fun incrementPreference(key: Preferences.Key<Int>) {
         GlobalScope.launch {
             dataStore.edit { preference ->

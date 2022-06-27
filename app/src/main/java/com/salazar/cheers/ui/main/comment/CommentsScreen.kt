@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -21,11 +21,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -84,7 +84,7 @@ fun Comments(
         item {
             GuidelinesBanner()
         }
-        if (post != null)
+        if (post != null && post.caption.isNotBlank())
         item {
             Caption(post = post)
             DividerM3()
@@ -118,16 +118,32 @@ fun Caption(
         )
         Spacer(Modifier.width(8.dp))
         Column() {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Username(username = post.username, verified = post.verified)
+            val annotatedString = buildAnnotatedString {
+                append(post.username)
+                if (post.verified) {
+                    append(" ")
+                    appendInlineContent(id = "imageId")
+                    append(" ")
+                }
+                append(post.caption)
+            }
+            val inlineContentMap = mapOf(
+                "imageId" to InlineTextContent(
+                    Placeholder(20.sp, 20.sp, PlaceholderVerticalAlign.TextCenter)
+                ) {
+                    Image(
+                        painterResource(R.drawable.ic_verified),
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
+            )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = post.caption,
+                    text = annotatedString,
                     style = MaterialTheme.typography.bodyMedium,
+                    inlineContent = inlineContentMap,
                 )
-            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {

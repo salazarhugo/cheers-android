@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.story
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -28,6 +29,8 @@ fun StoryRoute(
     val systemUiController = rememberSystemUiController()
     val darkIcons = !isSystemInDarkTheme()
 
+    val background = MaterialTheme.colorScheme.background
+
     DisposableEffect(lifecycleOwner) {
         systemUiController.setSystemBarsColor(
             color = Color.Black,
@@ -35,7 +38,7 @@ fun StoryRoute(
         )
         onDispose {
             systemUiController.setSystemBarsColor(
-                if (darkIcons) Color.White else Color.Black,
+                if (darkIcons) Color.White else background,
                 darkIcons = darkIcons
             )
         }

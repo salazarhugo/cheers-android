@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -52,10 +53,12 @@ fun SetStatusBars(
     val systemUiController = rememberSystemUiController()
     val darkIcons = !darkTheme
 
+    val background = MaterialTheme.colorScheme.background
+
     SideEffect {
         systemUiController.setSystemBarsColor(
-            if (darkIcons) Color.White else Color.Black,
-            darkIcons = darkIcons
+            if (darkIcons) Color.White else Color(0xFF101010),
+            darkIcons = darkIcons,
         )
     }
 }

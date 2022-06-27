@@ -19,6 +19,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.components.EmptyActivity
+import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.chat.EmptyChat
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
@@ -45,6 +46,9 @@ fun ActivityScreen(
             )
         }
     ) {
+        if (uiState.activities == null)
+            LoadingScreen()
+        else
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
@@ -53,7 +57,7 @@ fun ActivityScreen(
             Column {
                 val activities = uiState.activities
 
-                if (activities?.isEmpty() == true)
+                if (activities.isEmpty())
                     EmptyActivity()
                 else
                     ActivityList(

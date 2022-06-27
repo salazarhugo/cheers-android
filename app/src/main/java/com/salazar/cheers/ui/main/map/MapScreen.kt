@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.map
 import android.Manifest
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.media.ThumbnailUtils
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.border
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.scale
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -67,6 +69,8 @@ fun MapScreen(
     onUserClick: (String) -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val mapView = remember {
         MapView(
             context = context,
@@ -118,12 +122,17 @@ fun MapScreen(
 //                            features = uiState.users,
 //                            mapView = mapView,
 //                        )
-                        addPostsAnnotations(
-                            context = context,
-                            posts = uiState.posts,
-                            mapView = mapView,
-                            onSelectPost = onSelectPost,
-                        )
+                        scope.launch {
+                            uiState.posts?.forEach { post ->
+                                launch {
+                                    addPostsAnnotation(
+                                        post = post,
+                                        mapView = mapView,
+                                        onSelectPost = onSelectPost,
+                                    )
+                                }
+                            }
+                        }
                     }
                     UiLayer(
                         this,
@@ -140,7 +149,7 @@ fun MapScreen(
     }
 }
 
-private fun addUserAnnotations(
+fun addUserAnnotations(
     context: Context,
     features: List<Feature>,
     mapView: MapView,
@@ -157,30 +166,30 @@ private fun addUserAnnotations(
     }
 }
 
-private fun addPostsAnnotations(
-    context: Context,
-    posts: List<Post>?,
+suspend fun addPostsAnnotation(
+    post: Post,
     mapView: MapView,
     onSelectPost: (Post) -> Unit,
 ) {
+    if (post.photos.isEmpty())
+        return
+
     val annotationApi = mapView.annotations
-    posts?.forEach {
-        if (it.type == PostType.IMAGE) {
-            val pointAnnotationManager = annotationApi.createPointAnnotationManager()
-            val pointAnnotationOptions = PointAnnotationOptions()
-                .withPoint(Point.fromLngLat(it.longitude, it.latitude))
-                .withIconImage(bitmapFromDrawableRes(context, resourceId = R.drawable.ic_beer)!!)
-                .withIconSize(1.5)
-            pointAnnotationManager.create(pointAnnotationOptions)
-            pointAnnotationManager.addClickListener(
-                onPostAnnotationClick(
-                    it,
-                    onSelectPost = onSelectPost,
-                    mapView = mapView,
-                )
-            )
-        }
-    }
+    val btm = getBitmapFromUrl(post.photos[0])
+    val pointAnnotationManager = annotationApi.createPointAnnotationManager()
+    val pointAnnotationOptions = PointAnnotationOptions()
+        .withPoint(Point.fromLngLat(post.longitude, post.latitude))
+    if (btm != null)
+        pointAnnotationOptions.withIconImage(btm)
+//                .withIconImage(bitmapFromDrawableRes(context, resourceId = R.drawable.ic_beer)!!)
+    pointAnnotationManager.create(pointAnnotationOptions)
+    pointAnnotationManager.addClickListener(
+        onPostAnnotationClick(
+            post,
+            onSelectPost = onSelectPost,
+            mapView = mapView,
+        )
+    )
 }
 
 @Composable
@@ -226,19 +235,6 @@ fun UiLayer(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }
-//        Surface(
-//            shape = RoundedCornerShape(22.dp),
-//            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-//            modifier = Modifier
-//                .align(Alignment.TopCenter)
-//                .padding(8.dp),
-//        ) {
-//            Text(
-//                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-//                text = uiState.city,
-//                style = MaterialTheme.typography.titleMedium,
-//            )
-//        }
         Surface(
             shape = RoundedCornerShape(22.dp),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
@@ -254,19 +250,6 @@ fun UiLayer(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             )
         }
-//        Surface(
-//            shape = CircleShape,
-//            color = Color.White.copy(alpha = 0.5f),
-//            shadowElevation = 0.dp,
-//            modifier = Modifier
-//                .padding(bottom = 26.dp)
-//                .size(80.dp)
-//                .border(4.dp, Color.White, CircleShape)
-//                .clickable(
-//                    indication = null,
-//                    interactionSource = remember { MutableInteractionSource() }
-//                ) { onAddPostClicked() }
-//        ) {}
     }
 }
 
@@ -274,8 +257,11 @@ private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) 
     val urlObj = URL(url)
 
     return@withContext try {
-        BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
-            .getCircularBitmapWithWhiteBorder(180)
+
+        val bitmap =BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
+
+        ThumbnailUtils.extractThumbnail(bitmap, 100, 100, ThumbnailUtils.OPTIONS_RECYCLE_INPUT)
+            .getCircularBitmapWithWhiteBorder()
     } catch (e: IOException) {
         null
     }

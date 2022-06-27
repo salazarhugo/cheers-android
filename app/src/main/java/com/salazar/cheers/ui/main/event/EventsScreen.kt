@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.PinDrop
@@ -39,15 +41,28 @@ fun EventsScreen(
     onGoingToggle: (Event) -> Unit,
     onQueryChange: (String) -> Unit,
     onMoreClick: (String) -> Unit,
+    onCreateEventClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             Column() {
-                SearchBar(
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-                    searchInput = uiState.query,
-                    onSearchInputChanged = onQueryChange,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SearchBar(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 16.dp, top = 16.dp),
+                        searchInput = uiState.query,
+                        onSearchInputChanged = onQueryChange,
+                    )
+                    IconButton(
+                        onClick = onCreateEventClick,
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                    ) {
+                        Icon(Icons.Default.Create, contentDescription = null)
+                    }
+                }
                 ChipGroup(
                     users = listOf(
                         "For you",

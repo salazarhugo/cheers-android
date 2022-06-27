@@ -86,10 +86,11 @@ fun HomeScreen(
     navigateToComments: (Post) -> Unit,
     navigateToSearch: () -> Unit,
     onSelectTab: (Int) -> Unit,
-    onStoryClick: () -> Unit,
+    onStoryClick: (String) -> Unit,
     onActivityClick: () -> Unit,
     onAddStoryClick: () -> Unit,
     onLike: (post: Post) -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     val showDivider by remember {
         derivedStateOf {
@@ -158,6 +159,7 @@ fun HomeScreen(
                                 navigateToComments = navigateToComments,
                                 onStoryClick = onStoryClick,
                                 onAddStoryClick = onAddStoryClick,
+                                onCommentClick = onCommentClick,
                             )
                         }
                         else -> {}
@@ -178,7 +180,7 @@ fun HomeScreen(
 @Composable
 fun Stories(
     uiState: HomeUiState.HasPosts,
-    onStoryClick: () -> Unit,
+    onStoryClick: (String) -> Unit,
     onAddStoryClick: () -> Unit,
 ) {
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
@@ -462,8 +464,9 @@ fun PostList(
     onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onLike: (post: Post) -> Unit,
     navigateToComments: (Post) -> Unit,
-    onStoryClick: () -> Unit,
+    onStoryClick: (String) -> Unit,
     onAddStoryClick: () -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
 
@@ -492,6 +495,7 @@ fun PostList(
                     onUserClicked = onUserClicked,
                     onPostMoreClicked = onPostMoreClicked,
                     onLike = onLike,
+                    onCommentClick = onCommentClick,
                 )
         }
 
@@ -542,6 +546,7 @@ fun Post(
     onUserClicked: (username: String) -> Unit,
     onLike: (post: Post) -> Unit,
     navigateToComments: (Post) -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     val pagerState = rememberPagerState()
 
@@ -579,7 +584,8 @@ fun Post(
             post,
             onLike = onLike,
             navigateToComments = navigateToComments,
-            pagerState = pagerState
+            pagerState = pagerState,
+            onCommentClick = onCommentClick,
         )
     }
 }

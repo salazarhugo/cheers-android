@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.story
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -26,15 +27,17 @@ data class StoryUiState(
     val input: String = "",
     val interstitialAd: InterstitialAd? = null,
     val pause: Boolean = false,
-    val storiesFlow: Flow<PagingData<Story>>? = null,
+    val stories: List<Story>? = null,
 )
 
 @HiltViewModel
 class StoryViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
     private val storyRepository: StoryRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(StoryUiState(isLoading = true))
+    private lateinit var username: String
 
     val uiState = viewModelState
         .stateIn(
@@ -44,7 +47,15 @@ class StoryViewModel @Inject constructor(
         )
 
     init {
-        refreshStoryFlow()
+        stateHandle.get<String>("username")?.let {
+            username = it
+        }
+
+        viewModelScope.launch {
+            storyRepository.getUserStory(username = username).collect { stories ->
+                updateStories(stories = stories)
+            }
+        }
     }
 
     fun onPauseChange(pause: Boolean) {
@@ -85,13 +96,9 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    private fun refreshStoryFlow() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch() {
-            viewModelState.update {
-                it.copy(storiesFlow = storyRepository.getStories(), isLoading = false)
-            }
+    private fun updateStories(stories: List<Story>) {
+        viewModelState.update {
+            it.copy(stories = stories, isLoading = false)
         }
     }
 

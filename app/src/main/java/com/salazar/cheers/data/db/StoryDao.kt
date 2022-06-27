@@ -25,6 +25,10 @@ interface StoryDao {
     fun getStoriesByAuthor(authorId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Story>>
 
     @Transaction
+    @Query("SELECT * FROM story WHERE username = :username")
+    suspend fun getUserStory(username: String): List<Story>
+
+    @Transaction
     @Query("SELECT * FROM story WHERE storyId = :storyId")
     suspend fun getStory(storyId: String): Story
 

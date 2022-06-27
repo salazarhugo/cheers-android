@@ -7,6 +7,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -69,6 +70,7 @@ fun ChatScreen(
     onPoBackStack: () -> Unit,
     onTextChanged: () -> Unit,
     onInfoClick: () -> Unit,
+    micInteractionSource: MutableInteractionSource,
 ) {
     val scrollState = rememberLazyListState()
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(TopAppBarScrollState(0f, 0f, 0f )) }
@@ -110,6 +112,7 @@ fun ChatScreen(
                     },
                     modifier = Modifier.imePadding(),
                     onImageSelectorClick = onImageSelectorClick,
+                    micInteractionSource = micInteractionSource,
                 )
             }
             if (channel.type == RoomType.DIRECT)
