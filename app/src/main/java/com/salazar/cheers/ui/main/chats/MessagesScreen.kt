@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Inbox
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.Sms
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -57,6 +54,7 @@ fun MessagesScreen(
     onActivityIconClicked: () -> Unit,
     onSwipeRefresh: () -> Unit,
     onCameraClick: (String) -> Unit,
+    onSearchInputChange: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -83,6 +81,7 @@ fun MessagesScreen(
                     onFollowToggle = onFollowToggle,
                     onUserClick = onUserClick,
                     onCameraClick = onCameraClick,
+                    onSearchInputChange = onSearchInputChange,
                 )
             }
         }
@@ -97,6 +96,7 @@ fun Tabs(
     onFollowToggle: (User) -> Unit,
     onUserClick: (String) -> Unit,
     onCameraClick: (String) -> Unit,
+    onSearchInputChange: (String) -> Unit,
 ) {
     val suggestions = uiState.suggestions
 
@@ -106,6 +106,17 @@ fun Tabs(
 
         if (uiState.isLoading)
             LoadingScreen()
+
+        SearchBar(
+            searchInput = uiState.searchInput,
+            onSearchInputChanged = onSearchInputChange,
+            placeholder = {
+                Text("Search")
+            },
+            leadingIcon = {
+                Icon(Icons.Outlined.Search, contentDescription = null)
+            },
+        )
 
         if (uiState.channels != null)
             ConversationList(

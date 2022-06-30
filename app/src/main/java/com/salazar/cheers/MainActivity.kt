@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                 if (consentInformation.consentStatus === ConsentInformation.ConsentStatus.REQUIRED) {
                     consentForm.show(
                         this@MainActivity
-                    ) { // Handle dismissal by reloading form.
+                    ) {
                         loadForm(consentInformation)
                     }
                 }
@@ -183,27 +183,27 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    private fun startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-        fusedLocationClient.requestLocationUpdates(
-            LocationRequest.create()
-                .setInterval(60000)
-                .setFastestInterval(60000)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
-            locationCallback,
-            Looper.getMainLooper()
-        )
-    }
-
+//    private fun startLocationUpdates() {
+//        if (ActivityCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            return
+//        }
+//        fusedLocationClient.requestLocationUpdates(
+//            LocationRequest.create()
+//                .setInterval(60000)
+//                .setFastestInterval(60000)
+//                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
+//            locationCallback,
+//            Looper.getMainLooper()
+//        )
+//    }
+//
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }

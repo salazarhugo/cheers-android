@@ -22,5 +22,6 @@ fun StoryStatsRoute(
         uiState = uiState,
         onUserClick = { navActions.navigateToOtherProfile(it) },
         onDeleteStory = storyStatsViewModel::onDeleteStory,
+        onCloseClick = { navActions.navigateBack() },
     )
 }

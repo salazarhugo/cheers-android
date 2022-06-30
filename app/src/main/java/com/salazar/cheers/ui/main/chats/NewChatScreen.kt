@@ -62,7 +62,11 @@ fun NewChatScreen(
                 .padding(it)
                 .animateContentSize(),
         ) {
-            SearchBar(searchInput = uiState.query, onSearchInputChanged = onQueryChange)
+            SearchBar(
+                searchInput = uiState.query,
+                onSearchInputChanged = onQueryChange,
+                leadingIcon = { Text("To:") },
+            )
             ChipGroup(
                 users = uiState.selectedUsers.map { it.name.ifBlank { it.username } },
                 onSelectedChanged = { name -> },
@@ -253,7 +257,9 @@ fun NewGroupNameInput(
 @Composable
 fun SearchBar(
     searchInput: String,
-    onSearchInputChanged: (String) -> Unit
+    onSearchInputChanged: (String) -> Unit,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier.padding(15.dp),
@@ -272,7 +278,7 @@ fun SearchBar(
 
         TextField(
             value = searchInput,
-            leadingIcon = { Text("To:") },
+            leadingIcon = leadingIcon,
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
@@ -292,6 +298,7 @@ fun SearchBar(
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
             }),
+            placeholder = placeholder,
             trailingIcon = {
                 if (searchInput.isNotBlank())
                     Icon(Icons.Filled.Close, null,

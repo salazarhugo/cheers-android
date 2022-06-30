@@ -13,10 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.NotificationImportant
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -69,26 +66,21 @@ import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import java.util.*
 import kotlin.math.absoluteValue
+
 
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
     onSwipeRefresh: () -> Unit,
-    navActions: CheersNavigationActions,
     onPostClicked: (postId: String) -> Unit,
-    onEventClicked: (String) -> Unit,
     onPostMoreClicked: (postId: String, authorId: String) -> Unit,
     onUserClicked: (username: String) -> Unit,
-    navigateToAddEvent: () -> Unit,
-    navigateToAddPost: () -> Unit,
     navigateToComments: (Post) -> Unit,
     navigateToSearch: () -> Unit,
-    onSelectTab: (Int) -> Unit,
     onStoryClick: (String) -> Unit,
     onActivityClick: () -> Unit,
-    onAddStoryClick: () -> Unit,
+    onAddStoryClick: (Boolean) -> Unit,
     onLike: (post: Post) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
@@ -181,25 +173,32 @@ fun HomeScreen(
 fun Stories(
     uiState: HomeUiState.HasPosts,
     onStoryClick: (String) -> Unit,
-    onAddStoryClick: () -> Unit,
+    onAddStoryClick: (Boolean) -> Unit,
 ) {
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
     val profilePictureUrl = uiState.user?.profilePictureUrl
+    val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!)}
 
     LazyRow(
         modifier = Modifier.padding(bottom = 8.dp),
     ) {
         item {
-            YourStory(profilePictureUrl = profilePictureUrl, onAddStoryClick)
+            val meStory = stories.itemSnapshotList.items.find { it.authorId == FirebaseAuth.getInstance().currentUser?.uid!! }
+
+            YourStory(
+                profilePictureUrl = profilePictureUrl,
+                onStoryClick = { onAddStoryClick(meStory != null)},
+                hasStory = meStory != null,
+            )
         }
         items(items = stories, key = { it.id }) { story ->
-            if (story != null)
+            if (story != null && story.authorId != uid)
                 Story(
                     modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
                     username = story.username,
                     seen = story.seen,
                     profilePictureUrl = story.profilePictureUrl,
-                    onStoryClick = onStoryClick
+                    onStoryClick = onStoryClick,
                 )
         }
     }
@@ -465,7 +464,7 @@ fun PostList(
     onLike: (post: Post) -> Unit,
     navigateToComments: (Post) -> Unit,
     onStoryClick: (String) -> Unit,
-    onAddStoryClick: () -> Unit,
+    onAddStoryClick: (Boolean) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()

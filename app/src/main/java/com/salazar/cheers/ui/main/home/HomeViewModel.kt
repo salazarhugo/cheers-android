@@ -195,7 +195,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             viewModelState.update {
                 it.copy(
-                    postsFlow = postRepository.getPosts(),
 //                    eventsFlow = eventRepository.getEvents(),
                     storiesFlow = storyRepository.getStories(),
                     user = userRepository.getCurrentUser(),

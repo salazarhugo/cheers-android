@@ -12,12 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.components.buttons.CheersOutlinedButton
 
 @Composable
 fun FollowButton(
     isFollowing: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.height(34.dp),
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = null,
@@ -27,7 +28,7 @@ fun FollowButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 ) {
     if (isFollowing)
-        OutlinedButton(
+        CheersOutlinedButton(
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,
@@ -42,7 +43,7 @@ fun FollowButton(
         }
     else
         Button(
-            modifier = modifier,
+            modifier = modifier.height(34.dp),
             onClick = onClick
         ) {
             Text("Follow")

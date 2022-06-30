@@ -22,9 +22,8 @@ class PostRemoteMediator(
 ) : RemoteMediator<Int, Post>() {
 
     val postDao = database.postDao()
-    val userDao = database.userDao()
-    val remoteKeyDao = database.remoteKeyDao()
-    val initialPage = 0
+    private val remoteKeyDao = database.remoteKeyDao()
+    private val initialPage = 0
 
     override suspend fun load(
         loadType: LoadType,
@@ -38,59 +37,67 @@ class PostRemoteMediator(
                     remoteKeys?.nextKey?.minus(1) ?: initialPage
                 }
                 LoadType.PREPEND -> {
-                    return MediatorResult.Success(endOfPaginationReached = true)
+                    val remoteKeys = getRemoteKeyForFirstItem(state)
+                    val prevPage = remoteKeys?.prevKey
+                        ?: return MediatorResult.Success(
+                            endOfPaginationReached = remoteKeys != null
+                        )
+                    prevPage
                 }
                 LoadType.APPEND -> {
                     val remoteKeys = getRemoteKeyForLastItem(state)
-                        ?: return MediatorResult.Success(endOfPaginationReached = true)
-                    remoteKeys.nextKey ?: return MediatorResult.Success(true)
+                    val nextPage = remoteKeys?.nextKey
+                        ?: return MediatorResult.Success(
+                            endOfPaginationReached = remoteKeys != null
+                        )
+                    nextPage
                 }
             }
+
             val response = service.postFeed(page, NETWORK_PAGE_SIZE)
-
-            val endOfPaginationReached = response.size < state.config.pageSize
-
-            if (loadType == LoadType.REFRESH) {
-                remoteKeyDao.clear()
-            }
+            val endOfPaginationReached = response.isEmpty()
 
             val prevKey = if (page == initialPage) null else page - 1
             val nextKey = if (endOfPaginationReached) null else page + 1
-            val keys = response.map {
-                RemoteKey(postId = it.id, prevKey = prevKey, nextKey = nextKey)
+
+            database.withTransaction {
+                if (loadType == LoadType.REFRESH) {
+                    postDao.clearAll()
+                    remoteKeyDao.clear()
+                }
+                val keys = response.map { post ->
+                    RemoteKey(
+                        postId = post.id,
+                        prevKey = prevKey,
+                        nextKey = nextKey,
+                    )
+                }
+                remoteKeyDao.insertAll(remoteKeys = keys)
+                postDao.insertAll(response.map { it.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!) })
             }
-            remoteKeyDao.insertAll(keys)
-            postDao.insertAll(response.map { it.copy(accountId = FirebaseAuth.getInstance().currentUser?.uid!!) })
 
             MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
-        } catch (e: IOException) {
-            MediatorResult.Error(e)
         } catch (e: Exception) {
             MediatorResult.Error(e)
         }
     }
 
-//    override suspend fun initialize(): InitializeAction {
-//        val cacheTimeout = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
-//        return if (System.currentTimeMillis() - database.lastUpdated() >= cacheTimeout)
-//        {
-//            // Cached data is up-to-date, so there is no need to re-fetch
-//            // from the network.
-//            InitializeAction.SKIP_INITIAL_REFRESH
-//        } else {
-//            // Need to refresh cached data from network; returning
-//            // LAUNCH_INITIAL_REFRESH here will also block RemoteMediator's
-//            // APPEND and PREPEND from running until REFRESH succeeds.
-//            InitializeAction.LAUNCH_INITIAL_REFRESH
-//        }
-//    }
-
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, Post>): RemoteKey? {
-        return state.lastItemOrNull()?.let { postFeed ->
-            database.withTransaction {
-                remoteKeyDao.remoteKeyByPostId(postFeed.id)
+    private suspend fun getRemoteKeyForFirstItem(
+        state: PagingState<Int, Post>
+    ): RemoteKey? {
+        return state.pages.firstOrNull() { it.data.isNotEmpty() }?.data?.firstOrNull()
+            ?.let { post ->
+                remoteKeyDao.remoteKeyByPostId(postId = post.id)
             }
-        }
+    }
+
+    private suspend fun getRemoteKeyForLastItem(
+        state: PagingState<Int, Post>
+    ): RemoteKey? {
+        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
+            ?.let { post ->
+                remoteKeyDao.remoteKeyByPostId(postId = post.id)
+            }
     }
 
     private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, Post>): RemoteKey? {

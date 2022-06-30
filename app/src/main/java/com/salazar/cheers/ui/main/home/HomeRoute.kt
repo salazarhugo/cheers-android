@@ -30,7 +30,6 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        navActions = navActions,
         onSwipeRefresh = homeViewModel::onSwipeRefresh,
         onPostClicked = { navActions.navigateToPostDetail(it) },
         onPostMoreClicked = { postId, authorId ->
@@ -40,18 +39,16 @@ fun HomeRoute(
             )
         },
         onUserClicked = { navActions.navigateToOtherProfile(it) },
-        navigateToAddEvent = { navActions.navigateToAddEvent() },
-        navigateToAddPost = { navActions.navigateToAddPostSheet() },
-        onSelectTab = {
-            if (it == 1)
-                navActions.navigateToEvents()
-        },
         onLike = homeViewModel::toggleLike,
         navigateToComments = { navActions.navigateToPostComments(it.id) },
         navigateToSearch = { navActions.navigateToSearch() },
-        onEventClicked = { navActions.navigateToEventDetail(it) },
         onStoryClick = { navActions.navigateToStoryWithUserId(it) },
-        onAddStoryClick = { navActions.navigateToCamera() },
+        onAddStoryClick = { hasStory ->
+            if (hasStory)
+                navActions.navigateToStory()
+            else
+                navActions.navigateToCamera()
+        },
         onActivityClick = { navActions.navigateToActivity() },
         onCommentClick = { navActions.navigateToPostComments(it) },
     )

@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.story.stats
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.entities.StoryDetail
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -11,13 +12,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class StoryStatsViewModelUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val stories: List<StoryDetail>? = null,
+    val stories: List<Story>? = null,
 )
 
 @HiltViewModel
@@ -43,16 +45,10 @@ class StoryStatsViewModel @Inject constructor(
         }
         viewModelScope.launch {
             storyRepository.getMyStories().collect { stories ->
-                val storiesDetail = stories.map {
-//                    StoryDetail(
-//                        story = it.story,
-//                        author = it.author,
-//                        viewers = userRepository.getUsersWithListOfIds(it.story.seenBy)
-//                    )
+                val stories = stories
+                viewModelState.update {
+                    it.copy(stories = stories)
                 }
-//                viewModelState.update {
-//                    it.copy(stories = storiesDetail)
-//                }
             }
         }
     }

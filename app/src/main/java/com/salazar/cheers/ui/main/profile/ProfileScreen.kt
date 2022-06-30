@@ -129,7 +129,7 @@ fun Profile(
                     ) {
                         ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
                         ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(10.dp))
                         ProfileButtons(
                             onEditProfileClicked = onEditProfileClicked,
                             onDrinkingStatsClick = { onDrinkingStatsClick(uiState.user.username) },
@@ -228,10 +228,11 @@ fun ProfileButtons(
     Row(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        FilledTonalButton(
+        OutlinedButton(
             onClick = onEditProfileClicked,
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.weight(0.9f)
+                .height(34.dp)
         ) {
             Text("Edit Profile")
         }

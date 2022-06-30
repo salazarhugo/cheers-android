@@ -21,8 +21,10 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.buttons.CheersOutlinedButton
 import com.salazar.cheers.components.profile.ProfileHeader
 import com.salazar.cheers.components.profile.ProfileText
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
@@ -219,22 +221,13 @@ fun HeaderButtons(
     onGiftClick: () -> Unit,
 ) {
     Row {
-        if (isFollowed)
-            OutlinedButton(
-                modifier = Modifier.weight(1f),
-                onClick = onFollowToggle,
-            ) {
-                Text(text = "Following")
-            }
-        else
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onFollowToggle,
-            ) {
-                Text("Follow")
-            }
+        FollowButton(
+            isFollowing = isFollowed,
+            onClick = onFollowToggle,
+            modifier = Modifier.weight(1f),
+        )
         Spacer(modifier = Modifier.width(12.dp))
-        OutlinedButton(
+        CheersOutlinedButton(
             modifier = Modifier.weight(1f),
             onClick = onMessageClicked,
         ) {

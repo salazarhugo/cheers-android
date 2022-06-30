@@ -12,7 +12,7 @@ import com.salazar.cheers.data.entities.StoryRemoteKey
 interface RemoteKeyDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(remoteKey: List<RemoteKey>)
+    suspend fun insertAll(remoteKeys: List<RemoteKey>)
 
     @Query("SELECT * FROM remote_keys WHERE postId = :postId")
     suspend fun remoteKeyByPostId(postId: String): RemoteKey

@@ -359,7 +359,7 @@ private fun UserInputText(
                 contentDescription = a11ylabel
                 keyboardShownProperty = keyboardShown
             },
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.End,
     ) {
         Surface {
             Box(
@@ -369,11 +369,14 @@ private fun UserInputText(
                     .align(Alignment.Bottom)
             ) {
                 var lastFocusState by remember { mutableStateOf(false) }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 32.dp)
-                        .align(Alignment.CenterStart),
+                        .align(Alignment.CenterStart)
+                        .padding(start = 32.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     BasicTextField(
                         value = textFieldValue,
@@ -404,7 +407,7 @@ private fun UserInputText(
                         onClick = { /*TODO*/ },
                         interactionSource = micInteractionSource,
                         modifier = Modifier
-                                .padding(horizontal = 32.dp)
+                            .padding(start = 32.dp),
                     ) {
                         Icon(
                             Icons.Outlined.Mic,
@@ -520,7 +523,7 @@ fun ExtendedSelectorInnerButton(
         modifier = modifier
             .padding(8.dp)
             .height(36.dp),
-        enabled = selected,
+    enabled = selected,
         colors = colors,
         contentPadding = PaddingValues(0.dp)
     ) {

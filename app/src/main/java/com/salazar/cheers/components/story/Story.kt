@@ -21,40 +21,34 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.mapbox.maps.extension.style.expressions.dsl.generated.has
 import com.salazar.cheers.R
 import com.salazar.cheers.components.animations.Bounce
+import com.salazar.cheers.components.share.UserProfilePicture
 
 @Composable
 fun YourStory(
     profilePictureUrl: String?,
+    hasStory: Boolean,
     onStoryClick: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-
-        Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
-                    .apply(block = fun ImageRequest.Builder.() {
-                        transformations(CircleCropTransformation())
-                        error(R.drawable.default_profile_picture)
-                    }).build()
-            ),
-            modifier = Modifier
-                .padding(start = 8.dp, end = 4.dp)
-                .size(73.dp)
-                .padding(5.dp)
-                .clip(CircleShape)
-                .clickable { onStoryClick() },
-            contentDescription = null,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = "Your story",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
+    Bounce(onBounce = onStoryClick) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            UserProfilePicture(
+                avatar = profilePictureUrl ?: "",
+                hasStory = hasStory,
+                size = 73.dp,
+                modifier = Modifier.padding(start = 16.dp, end = 8.dp)
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Your story",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+        }
     }
 }
 

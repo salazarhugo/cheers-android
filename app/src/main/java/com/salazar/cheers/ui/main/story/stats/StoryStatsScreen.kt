@@ -2,21 +2,18 @@ package com.salazar.cheers.ui.main.story.stats
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +27,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.animations.AnimatedTextCounter
+import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.entities.StoryDetail
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.search.UserCard
@@ -40,6 +38,7 @@ fun StoryStatsScreen(
     uiState: StoryStatsViewModelUiState,
     onUserClick: (String) -> Unit,
     onDeleteStory: (String) -> Unit,
+    onCloseClick: () -> Unit,
 ) {
 
     val stories = uiState.stories
@@ -47,24 +46,61 @@ fun StoryStatsScreen(
 
     if (stories != null) {
         Column {
+            StoryStatsToolbar(onCloseClick = onCloseClick) {
+            }
             HorizontalPager(
                 count = stories.size,
                 state = pagerState,
-                contentPadding = PaddingValues(horizontal = 76.dp),
-                modifier = Modifier.weight(0.2f)
+                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 32.dp),
+                modifier = Modifier.weight(0.3f)
             ) { page ->
                 StoryCard(stories[page], this, page)
             }
             val story = stories[pagerState.currentPage]
             Views(
                 views = 999,//story.story.seenBy.size,
-                viewers = story.viewers,
+                modifier = Modifier.weight(0.7f),
+                viewers = listOf(
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                    User(),
+                ),
                 onUserClick = onUserClick,
-                onDeleteStory = { onDeleteStory(story.story.id) },
+                onDeleteStory = { onDeleteStory(story.id) },
             )
         }
     } else
         LoadingScreen()
+}
+
+@Composable
+fun StoryStatsToolbar(
+    onCloseClick: () -> Unit,
+    onStorySettingsClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        IconButton(onClick = onStorySettingsClick) {
+            Icon(Icons.Outlined.Settings, contentDescription = null)
+        }
+        IconButton(onClick = onCloseClick) {
+            Icon(Icons.Outlined.Close, contentDescription = null)
+        }
+    }
 }
 
 @Composable
@@ -107,34 +143,41 @@ fun ViewsHeader(
 fun Views(
     views: Int,
     viewers: List<User>,
+    modifier: Modifier = Modifier,
     onUserClick: (String) -> Unit,
     onDeleteStory: () -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.animateContentSize()
+    Column(
+        modifier = modifier.background(Color.Black),
     ) {
-        item {
-            ViewsHeader(views = views, onDeleteStory = onDeleteStory)
-            DividerM3()
-        }
+        ViewsHeader(
+            views = views,
+            onDeleteStory = onDeleteStory,
+        )
 
-        item {
-            Text(
-                text = "Viewers",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                modifier = Modifier.padding(16.dp),
-            )
-        }
+        DividerM3()
 
-        items(viewers, key = { it.id }) { user ->
-            UserCard(user = user, onUserClicked = {})
+        LazyColumn(
+            modifier = Modifier.animateContentSize()
+        ) {
+            item {
+                Text(
+                    text = "Viewers",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+
+            items(viewers) { user ->
+                UserCard(user = user, onUserClicked = {})
+            }
         }
     }
 }
 
 @Composable
 fun StoryCard(
-    suggestedUser: StoryDetail,
+    suggestedUser: Story,
     scope: PagerScope,
     page: Int
 ) {
@@ -171,7 +214,7 @@ fun StoryCard(
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        suggestedUser.story.photoUrl
+                        suggestedUser.photoUrl
                     ),
                     modifier = Modifier
                         .aspectRatio(9 / 16.0f),

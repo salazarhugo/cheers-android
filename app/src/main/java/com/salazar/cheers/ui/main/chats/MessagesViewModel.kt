@@ -86,6 +86,12 @@ class MessagesViewModel @Inject constructor(
 //        }
     }
 
+    fun onSearchInputChange(searchInput: String) {
+        viewModelState.update {
+            it.copy(searchInput = searchInput)
+        }
+    }
+
     fun onFollowToggle(user: User) {
         viewModelScope.launch {
             userRepository.toggleFollow(user = user)

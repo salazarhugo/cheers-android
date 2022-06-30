@@ -124,6 +124,7 @@ fun NavGraphBuilder.mainNavGraph(
                 StoryRoute(
                     navActions = navActions,
                     showInterstitialAd = showInterstitialAd,
+                    bottomSheetNavigator = bottomSheetNavigator,
                 )
             }
         }

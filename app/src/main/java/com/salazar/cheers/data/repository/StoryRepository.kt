@@ -1,9 +1,8 @@
 package com.salazar.cheers.data.repository
 
 import android.util.Log
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import androidx.paging.*
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.Resource
@@ -17,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
