@@ -51,9 +51,9 @@ fun Drinks(
 ) {
     LazyColumn {
         grouped.forEach { (initial, drinks) ->
-            stickyHeader {
-                CharacterHeader(initial)
-            }
+//            stickyHeader {
+//                CharacterHeader(initial)
+//            }
             items(drinks, key = { it.name }) { drink ->
                 Drink(drink = drink, onBeverageClick = onBeverageClick)
             }
@@ -100,7 +100,7 @@ fun Drink(
         Image(
             painter = rememberAsyncImagePainter(drink.icon),
             contentDescription = null,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(64.dp)
         )
         Spacer(Modifier.width(8.dp))
         Text(

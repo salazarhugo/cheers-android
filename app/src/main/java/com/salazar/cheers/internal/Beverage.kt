@@ -16,37 +16,47 @@ enum class Beverage(
     WATER(
         displayName = "Water",
         alcohol = 0f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.water,
     ),
     BEER(
         displayName = "Beer",
         alcohol = 5f,
-        icon = R.drawable.ic_beer,
+        icon = R.drawable.beer,
     ),
     RED_WINE(
         displayName = "Red Wine",
         alcohol = 5f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.redwine,
     ),
     WHITE_WINE(
         displayName = "White Wine",
         alcohol = 5f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.whitewine,
     ),
     ROSE_WINE(
         displayName = "Rose Wine",
         alcohol = 5f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.rosewine,
     ),
     CHAMPAGNE(
         displayName = "Champagne",
         alcohol = 5f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.champagne,
     ),
     PROSECCO(
         displayName = "Prosecco",
         alcohol = 5f,
         icon = R.drawable.ic_cocktail,
+    ),
+    SHOT(
+        displayName = "Shot",
+        alcohol = 5f,
+        icon = R.drawable.shot__2_
+    ),
+    MARTINI(
+        displayName = "Martini",
+        alcohol = 5f,
+        icon = R.drawable.martini,
     ),
     COCKTAIL(
         displayName = "Cocktail",
@@ -56,7 +66,7 @@ enum class Beverage(
     WHISKEY(
         displayName = "Whiskey",
         alcohol = 48f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.whiskey,
     ),
     LONG_DRINK(
         displayName = "Long drink",
@@ -76,7 +86,7 @@ enum class Beverage(
     VODKA(
         displayName = "Vodka",
         alcohol = 48f,
-        icon = R.drawable.ic_cocktail,
+        icon = R.drawable.vodka,
     );
 
     companion object {

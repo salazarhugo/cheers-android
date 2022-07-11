@@ -37,33 +37,25 @@ class PostRemoteMediator(
                     remoteKeys?.nextKey?.minus(1) ?: initialPage
                 }
                 LoadType.PREPEND -> {
-                    val remoteKeys = getRemoteKeyForFirstItem(state)
-                    val prevPage = remoteKeys?.prevKey
-                        ?: return MediatorResult.Success(
-                            endOfPaginationReached = remoteKeys != null
-                        )
-                    prevPage
+                    return MediatorResult.Success(endOfPaginationReached = true)
                 }
                 LoadType.APPEND -> {
                     val remoteKeys = getRemoteKeyForLastItem(state)
-                    val nextPage = remoteKeys?.nextKey
-                        ?: return MediatorResult.Success(
-                            endOfPaginationReached = remoteKeys != null
-                        )
-                    nextPage
+                        ?: return MediatorResult.Success(endOfPaginationReached = true)
+                    remoteKeys.nextKey ?: return MediatorResult.Success(true)
                 }
             }
 
             val response = service.postFeed(page, NETWORK_PAGE_SIZE)
-            val endOfPaginationReached = response.isEmpty()
+            val endOfPaginationReached = response.size < state.config.pageSize
 
             val prevKey = if (page == initialPage) null else page - 1
             val nextKey = if (endOfPaginationReached) null else page + 1
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    postDao.clearAll()
                     remoteKeyDao.clear()
+                    postDao.clearAll()
                 }
                 val keys = response.map { post ->
                     RemoteKey(
@@ -94,10 +86,8 @@ class PostRemoteMediator(
     private suspend fun getRemoteKeyForLastItem(
         state: PagingState<Int, Post>
     ): RemoteKey? {
-        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
-            ?.let { post ->
-                remoteKeyDao.remoteKeyByPostId(postId = post.id)
-            }
+        val lastPost = state.lastItemOrNull() ?: return null
+        return remoteKeyDao.remoteKeyByPostId(postId = lastPost.id)
     }
 
     private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, Post>): RemoteKey? {

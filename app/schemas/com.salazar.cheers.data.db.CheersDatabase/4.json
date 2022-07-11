@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "b9b31748bea89f7a75cc2b3d0bb38e21",
+    "identityHash": "7c1f63e866a6af3eb91d83017a587d36",
     "entities": [
       {
         "tableName": "recentUsers",
@@ -406,7 +406,7 @@
       },
       {
         "tableName": "users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `name` TEXT NOT NULL, `postCount` INTEGER NOT NULL, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `coins` INTEGER NOT NULL, `phoneNumber` TEXT NOT NULL, `verified` INTEGER NOT NULL, `email` TEXT NOT NULL, `bio` TEXT NOT NULL, `profilePictureUrl` TEXT NOT NULL, `website` TEXT NOT NULL, `online` INTEGER NOT NULL, `darkMode` INTEGER NOT NULL, `registrationTokens` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `hasStory` INTEGER NOT NULL DEFAULT false, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `name` TEXT NOT NULL, `postCount` INTEGER NOT NULL, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `coins` INTEGER NOT NULL, `phoneNumber` TEXT NOT NULL, `verified` INTEGER NOT NULL, `email` TEXT NOT NULL, `bio` TEXT NOT NULL, `profilePictureUrl` TEXT NOT NULL, `website` TEXT NOT NULL, `online` INTEGER NOT NULL, `darkMode` INTEGER NOT NULL, `registrationTokens` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `hasStory` INTEGER NOT NULL DEFAULT false, `seenStory` INTEGER NOT NULL DEFAULT false, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -513,6 +513,13 @@
           {
             "fieldPath": "hasStory",
             "columnName": "hasStory",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "false"
+          },
+          {
+            "fieldPath": "seenStory",
+            "columnName": "seenStory",
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "false"
@@ -1190,7 +1197,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b9b31748bea89f7a75cc2b3d0bb38e21')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c1f63e866a6af3eb91d83017a587d36')"
     ]
   }
 }

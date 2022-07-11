@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -27,18 +28,26 @@ fun UserProfilePicture(
     modifier: Modifier = Modifier,
     avatar: String,
     hasStory: Boolean = false,
+    seenStory: Boolean = false,
     @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,
 ) {
-    val border = BorderStroke(
-        2.dp,
-        Brush.verticalGradient(
-            colors = listOf(
-                Color(0xFFEC01FB),
-                Color(0xFF7f00ff),
+    val border =
+        if (seenStory)
+            BorderStroke(
+                2.dp,
+                color = Color.Gray
             )
-        )
-    )
+        else
+            BorderStroke(
+                2.dp,
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFEC01FB),
+                        Color(0xFF7f00ff),
+                    )
+                )
+            )
 
     Image(
         painter = rememberAsyncImagePainter(

@@ -1,9 +1,6 @@
 package com.salazar.cheers.components.profile
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,7 +17,9 @@ fun ProfileText(
     user: User,
     onWebsiteClicked: (String) -> Unit,
 ) {
-    Column {
+    Column(
+        modifier = Modifier.padding(top = 4.dp),
+    ) {
         Row {
             Text(
                 text = user.name,
@@ -47,7 +46,7 @@ fun ProfileText(
             ClickableText(
                 text = AnnotatedString(user.website),
                 style = TextStyle(
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Normal
                 ),
                 onClick = { offset ->

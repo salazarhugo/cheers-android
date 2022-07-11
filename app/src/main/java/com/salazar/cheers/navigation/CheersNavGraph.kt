@@ -1,6 +1,11 @@
 package com.salazar.cheers.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -90,22 +95,22 @@ fun CheersNavGraph(
                 }
             },
             bottomBar = {
-                if (!hide)
-                    Column {
-//                        DividerM3()
-                        CheersNavigationBar(
-                            unreadChatCount = uiState.unreadChatCount,
-                            profilePictureUrl = user?.profilePictureUrl ?: "",
-                            currentRoute = currentRoute,
-                            navigateToHome = navActions.navigateToHome,
-                            navigateToMap = navActions.navigateToMap,
-                            navigateToSearch = navActions.navigateToSearch,
-                            navigateToCamera = navActions.navigateToEvents,
-                            navigateToMessages = navActions.navigateToMessages,
-                            navigateToProfile = navActions.navigateToProfile,
-                        )
-                    }
-//                }
+                AnimatedVisibility(
+                    visible = !hide,
+//                    exit = shrinkOut(animationSpec = tween(2000))
+                ) {
+                    CheersNavigationBar(
+                        unreadChatCount = uiState.unreadChatCount,
+                        profilePictureUrl = user?.profilePictureUrl ?: "",
+                        currentRoute = currentRoute,
+                        navigateToHome = navActions.navigateToHome,
+                        navigateToMap = navActions.navigateToMap,
+                        navigateToSearch = navActions.navigateToSearch,
+                        navigateToCamera = navActions.navigateToEvents,
+                        navigateToMessages = navActions.navigateToMessages,
+                        navigateToProfile = navActions.navigateToProfile,
+                    )
+                }
             },
         ) { innerPadding ->
             AnimatedNavHost(

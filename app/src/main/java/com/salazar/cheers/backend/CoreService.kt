@@ -132,7 +132,7 @@ interface CoreService {
         @Path("postId") postId: String,
     )
 
-    @DELETE("stories/{storyId}")
+    @POST("stories/{storyId}")
     suspend fun deleteStory(
         @Path("storyId") storyId: String,
     )

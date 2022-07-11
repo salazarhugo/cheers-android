@@ -29,6 +29,7 @@ class PostRepository @Inject constructor(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
                 enablePlaceholders = true,
+                initialLoadSize = NETWORK_PAGE_SIZE * 1, // default: pageSize * 3
             ),
             remoteMediator = PostRemoteMediator(database = database, service = coreService),
         ) {

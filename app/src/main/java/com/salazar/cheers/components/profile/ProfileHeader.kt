@@ -20,8 +20,8 @@ fun ProfileHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .padding(bottom = 15.dp)
             .fillMaxWidth()
+            .padding(top = 8.dp)
     ) {
 
         Bounce(onBounce = { onStoryClick(user.username) }) {
@@ -29,6 +29,7 @@ fun ProfileHeader(
                 avatar = user.profilePictureUrl,
                 size = 80.dp,
                 hasStory = user.hasStory,
+                seenStory = user.seenStory,
             )
         }
         ProfileStats(user, onStatClicked)

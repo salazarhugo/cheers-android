@@ -55,11 +55,10 @@ fun OtherProfileScreen(
     LazyColumn {
         item {
             Column(
-                modifier = Modifier.padding(15.dp)
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
                 ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
-                Spacer(Modifier.height(8.dp))
                 val isFollowed = uiState.user.followBack
                 HeaderButtons(
                     isFollowed = isFollowed,
@@ -80,6 +79,7 @@ fun OtherProfileScreen(
                 },
                 backgroundColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(top = 16.dp)
             ) {
                 tabs.forEachIndexed { index, icon ->
                     androidx.compose.material.Tab(
@@ -220,26 +220,28 @@ fun HeaderButtons(
     onMessageClicked: () -> Unit,
     onGiftClick: () -> Unit,
 ) {
-    Row {
+    Row(
+        modifier = Modifier.padding(top = 16.dp)
+    ) {
         FollowButton(
             isFollowing = isFollowed,
             onClick = onFollowToggle,
             modifier = Modifier.weight(1f),
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(6.dp))
         CheersOutlinedButton(
             modifier = Modifier.weight(1f),
             onClick = onMessageClicked,
         ) {
             Text("Message")
         }
-        Spacer(modifier = Modifier.width(12.dp))
-        IconButton(onClick = onGiftClick) {
-            Icon(
-                Icons.Outlined.CardGiftcard,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
+//        Spacer(modifier = Modifier.width(12.dp))
+//        IconButton(onClick = onGiftClick) {
+//            Icon(
+//                Icons.Outlined.CardGiftcard,
+//                contentDescription = null,
+//                tint = MaterialTheme.colorScheme.primary
+//            )
+//        }
     }
 }

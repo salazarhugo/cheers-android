@@ -111,9 +111,11 @@ fun StoryCarousel(
         verticalAlignment = Alignment.Top,
     ) { page ->
 
-        val story = stories[0]
-
         var isPaused by remember { mutableStateOf(false) }
+        val isPressed = remember { mutableStateOf(false) }
+        var currentStep by remember { mutableStateOf(0) }
+        val story = stories[currentStep]
+
 
         LaunchedEffect(currentPage) {
             if (page == currentPage && !story.seen)
@@ -157,11 +159,8 @@ fun StoryCarousel(
                     )
                 }
         ) {
-            val isPressed = remember { mutableStateOf(false) }
-            var currentStep by remember { mutableStateOf(0) }
-
             PrettyImage(
-                data = stories[currentStep].photoUrl,
+                data = story.photoUrl,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
@@ -203,8 +202,10 @@ fun StoryCarousel(
                 story = story,
                 count = stories.size,
                 onStoryFinish = {
-                    currentStep =
-                        (currentStep + 1).coerceAtMost(stories.size - 1)
+                    if(currentStep + 1 >= stories.size)
+                        onStoryFinish()
+                    else
+                        currentStep++
                 },
                 onUserClick = onUserClick,
                 pause = false,

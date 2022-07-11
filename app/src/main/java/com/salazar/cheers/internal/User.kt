@@ -31,6 +31,8 @@ data class User(
     val followBack: Boolean,
     @ColumnInfo(defaultValue = "false")
     val hasStory: Boolean,
+    @ColumnInfo(defaultValue = "false")
+    val seenStory: Boolean,
     val created: Long,
 ) : Serializable {
 
@@ -51,6 +53,7 @@ data class User(
         false,
         false,
         listOf(),
+        false,
         false,
         false,
         0,

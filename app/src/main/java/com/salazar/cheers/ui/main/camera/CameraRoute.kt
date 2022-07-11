@@ -1,6 +1,8 @@
 package com.salazar.cheers.ui.main.camera
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.ImageCapture
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -43,6 +45,10 @@ fun CameraRoute(
             .setJpegQuality(75)
             .build()
     }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+            cameraViewModel.setImageUri(it)
+        }
 
     BackHandler(enabled = true) {
         cameraViewModel.setImageUri(null)
@@ -94,7 +100,9 @@ fun CameraRoute(
                             },
                             {})
                     }
-                    is CameraUIAction.OnGalleryViewClick -> {}
+                    is CameraUIAction.OnGalleryViewClick -> {
+                        launcher.launch("image/* video/*")
+                    }
                     is CameraUIAction.OnCloseClick -> navActions.navigateBack()
                     is CameraUIAction.OnBackClick -> {
                         cameraViewModel.setImageUri(null)

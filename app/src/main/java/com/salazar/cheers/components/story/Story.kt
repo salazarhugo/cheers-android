@@ -30,15 +30,17 @@ import com.salazar.cheers.components.share.UserProfilePicture
 fun YourStory(
     profilePictureUrl: String?,
     hasStory: Boolean,
-    onStoryClick: () -> Unit,
+    seenStory: Boolean,
+    onClick: () -> Unit,
 ) {
-    Bounce(onBounce = onStoryClick) {
+    Bounce(onBounce = onClick) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             UserProfilePicture(
                 avatar = profilePictureUrl ?: "",
                 hasStory = hasStory,
+                seenStory = seenStory,
                 size = 73.dp,
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp)
             )

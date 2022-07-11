@@ -64,6 +64,7 @@ fun NewChatScreen(
         ) {
             SearchBar(
                 searchInput = uiState.query,
+                modifier = Modifier.padding(16.dp),
                 onSearchInputChanged = onQueryChange,
                 leadingIcon = { Text("To:") },
             )
@@ -257,12 +258,13 @@ fun NewGroupNameInput(
 @Composable
 fun SearchBar(
     searchInput: String,
+    modifier: Modifier = Modifier,
     onSearchInputChanged: (String) -> Unit,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     Box(
-        modifier = Modifier.padding(15.dp),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         androidx.compose.material.Card(

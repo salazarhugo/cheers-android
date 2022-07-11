@@ -108,6 +108,7 @@ fun Tabs(
             LoadingScreen()
 
         SearchBar(
+            modifier = Modifier.padding(horizontal = 16.dp),
             searchInput = uiState.searchInput,
             onSearchInputChanged = onSearchInputChange,
             placeholder = {

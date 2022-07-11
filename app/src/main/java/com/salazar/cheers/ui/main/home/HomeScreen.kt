@@ -64,6 +64,7 @@ import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.main.chats.MyAppBar
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import kotlin.math.absoluteValue
@@ -80,7 +81,7 @@ fun HomeScreen(
     navigateToSearch: () -> Unit,
     onStoryClick: (String) -> Unit,
     onActivityClick: () -> Unit,
-    onAddStoryClick: (Boolean) -> Unit,
+    onAddStoryClick: () -> Unit,
     onLike: (post: Post) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
@@ -173,7 +174,7 @@ fun HomeScreen(
 fun Stories(
     uiState: HomeUiState.HasPosts,
     onStoryClick: (String) -> Unit,
-    onAddStoryClick: (Boolean) -> Unit,
+    onAddStoryClick: () -> Unit,
 ) {
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
     val profilePictureUrl = uiState.user?.profilePictureUrl
@@ -183,12 +184,18 @@ fun Stories(
         modifier = Modifier.padding(bottom = 8.dp),
     ) {
         item {
-            val meStory = stories.itemSnapshotList.items.find { it.authorId == FirebaseAuth.getInstance().currentUser?.uid!! }
-
+            val user = uiState.user
+            if (user != null)
             YourStory(
                 profilePictureUrl = profilePictureUrl,
-                onStoryClick = { onAddStoryClick(meStory != null)},
-                hasStory = meStory != null,
+                onClick = {
+                    if (user.hasStory)
+                        onStoryClick(user.username)
+                    else
+                        onAddStoryClick()
+                          },
+                hasStory = user.hasStory,
+                seenStory = user.seenStory,
             )
         }
         items(items = stories, key = { it.id }) { story ->
@@ -464,7 +471,7 @@ fun PostList(
     onLike: (post: Post) -> Unit,
     navigateToComments: (Post) -> Unit,
     onStoryClick: (String) -> Unit,
-    onAddStoryClick: (Boolean) -> Unit,
+    onAddStoryClick: () -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()

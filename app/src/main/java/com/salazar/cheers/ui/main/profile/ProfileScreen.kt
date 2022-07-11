@@ -125,11 +125,10 @@ fun Profile(
             ) {
                 item {
                     Column(
-                        modifier = Modifier.padding(15.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
                         ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
-                        Spacer(Modifier.height(10.dp))
                         ProfileButtons(
                             onEditProfileClicked = onEditProfileClicked,
                             onDrinkingStatsClick = { onDrinkingStatsClick(uiState.user.username) },
@@ -226,7 +225,9 @@ fun ProfileButtons(
     onDrinkingStatsClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
     ) {
         OutlinedButton(
             onClick = onEditProfileClicked,
