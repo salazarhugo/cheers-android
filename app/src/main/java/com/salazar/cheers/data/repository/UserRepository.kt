@@ -202,7 +202,11 @@ class UserRepository @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             val activity = userDao.getActivity()
-            emit(Resource.Success(activity))
+
+            if (activity.isNotEmpty()) {
+                emit(Resource.Success(activity))
+                emit(Resource.Loading(false))
+            }
 
             if (!fetchFromRemote) {
                 emit(Resource.Loading(false))
