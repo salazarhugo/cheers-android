@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.main.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Activity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,6 @@ data class ActivityUiState(
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
     private val userRepository: UserRepository,
-//    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ActivityUiState(isLoading = true))
@@ -40,11 +40,31 @@ class ActivityViewModel @Inject constructor(
 
     fun getActivity() {
         viewModelScope.launch {
-           userRepository.getActivity(fetchFromRemote = true).collect { activities ->
-               viewModelState.update {
-                   it.copy(activities = activities)
+           userRepository.getActivity(fetchFromRemote = true).collect { result ->
+               when(result) {
+                   is Resource.Loading -> updateIsLoading(result.isLoading)
+                   is Resource.Error -> updateMessage(result.message)
+                   is Resource.Success -> updateActivities(result.data)
                }
            }
+        }
+    }
+
+    private fun updateActivities(activities: List<Activity>?) {
+        viewModelState.update {
+            it.copy(activities = activities)
+        }
+    }
+
+    private fun updateMessage(errorMessage: String?) {
+        viewModelState.update {
+            it.copy(errorMessage = errorMessage ?: "")
+        }
+    }
+
+    private fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
         }
     }
 

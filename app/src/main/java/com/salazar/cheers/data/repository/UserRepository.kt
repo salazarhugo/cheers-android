@@ -198,13 +198,16 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getActivity(fetchFromRemote: Boolean = false): Flow<List<Activity>?> {
+    suspend fun getActivity(fetchFromRemote: Boolean = false): Flow<Resource<List<Activity>?>> {
         return flow {
+            emit(Resource.Loading(true))
             val activity = userDao.getActivity()
-            emit(activity)
+            emit(Resource.Success(activity))
 
-            if (!fetchFromRemote)
+            if (!fetchFromRemote) {
+                emit(Resource.Loading(false))
                 return@flow
+            }
 
             val remoteActivity = try {
                 coreService.getActivity()
@@ -219,8 +222,9 @@ class UserRepository @Inject constructor(
             remoteActivity?.let {
                 userDao.clearActivity()
                 userDao.insert(it.map { it.copy(accountId = Firebase.auth.currentUser?.uid!!) })
-                emit(userDao.getActivity())
+                emit(Resource.Success(userDao.getActivity()))
             }
+            emit(Resource.Loading(false))
         }
     }
 

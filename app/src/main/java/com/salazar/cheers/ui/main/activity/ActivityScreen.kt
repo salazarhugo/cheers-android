@@ -46,7 +46,7 @@ fun ActivityScreen(
             )
         }
     ) {
-        if (uiState.activities == null)
+        if (uiState.isLoading)
             LoadingScreen()
         else
         SwipeToRefresh(
@@ -57,7 +57,7 @@ fun ActivityScreen(
             Column {
                 val activities = uiState.activities
 
-                if (activities.isEmpty())
+                if (activities?.isEmpty() == true)
                     EmptyActivity()
                 else
                     ActivityList(
