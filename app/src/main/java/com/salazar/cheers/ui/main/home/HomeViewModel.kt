@@ -13,6 +13,7 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.repository.EventRepository
@@ -49,7 +50,6 @@ sealed interface HomeUiState {
 
     data class HasPosts(
         val postsFlow: Flow<PagingData<Post>>,
-        val eventsFlow: Flow<PagingData<EventUi>>?,
         val storiesFlow: Flow<PagingData<Story>>?,
         val stories: PagingData<Story>?,
         val listState: LazyListState = LazyListState(),
@@ -69,7 +69,6 @@ sealed interface HomeUiState {
 private data class HomeViewModelState(
     val user: User? = null,
     val postsFlow: Flow<PagingData<Post>>? = null,
-    val eventsFlow: Flow<PagingData<EventUi>>? = null,
     val storiesFlow: Flow<PagingData<Story>>? = null,
     val stories: PagingData<Story>? = null,
     val listState: LazyListState = LazyListState(),
@@ -100,7 +99,6 @@ private data class HomeViewModelState(
                 user = user,
                 nativeAd = nativeAd,
                 postsFlow = postsFlow,
-                eventsFlow = eventsFlow,
                 storiesFlow = storiesFlow,
                 notificationCount = notificationCount,
                 listState = listState,
@@ -121,7 +119,6 @@ class HomeViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
-//    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
@@ -142,29 +139,8 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
-        refreshEventsFlow()
         refreshStoryFlow()
         refreshPostsFlow()
-        viewModelScope.launch {
-//            dataStoreRepository.readFromDataStore.collect { notificationCount ->
-//                viewModelState.update {
-//                    it.copy(notificationCount = notificationCount)
-//                }
-//            }
-        }
-    }
-
-    fun selectTab(index: Int) {
-        viewModelState.update {
-            it.copy(selectedTab = index)
-        }
-    }
-
-    private fun refreshEventsFlow() {
-//        viewModelState.update {
-//            val events = eventRepository.getEvents()
-//            it.copy(eventsFlow = events)
-//        }
     }
 
     private fun refreshStoryFlow() {
@@ -193,28 +169,35 @@ class HomeViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            userRepository.getUserSignIn(userId = FirebaseAuth.getInstance().currentUser?.uid!!).collect {
+                if (it is Resource.Success)
+                    updateUser(user = it.data)
+            }
+        }
+
+        viewModelScope.launch {
             viewModelState.update {
                 it.copy(
-//                    eventsFlow = eventRepository.getEvents(),
                     storiesFlow = storyRepository.getStories(),
-                    user = userRepository.getCurrentUser(),
                     isLoading = false
                 )
             }
         }
-        refreshSuggestions()
     }
 
-    fun refreshSuggestions() {
-//        viewModelScope.launch {
-//            val result = Neo4jUtil.getSuggestions()
-//            viewModelState.update {
-//                when (result) {
-//                    is Result.Success -> it.copy(suggestions = result.data)
-//                    is Result.Error -> it.copy(errorMessages = listOf(result.exception.toString()))
-//                }
-//            }
-//        }
+    private fun updateError(errorMessages: List<String>) {
+    }
+
+    private fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
+        }
+    }
+
+    private fun updateUser(user: User?) {
+        viewModelState.update {
+            it.copy(user = user)
+        }
     }
 
     fun toggleLike(post: Post) {

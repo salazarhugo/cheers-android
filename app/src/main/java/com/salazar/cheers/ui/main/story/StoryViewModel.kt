@@ -26,8 +26,9 @@ data class StoryUiState(
     val errorMessage: String = "",
     val input: String = "",
     val interstitialAd: InterstitialAd? = null,
-    val pause: Boolean = false,
+    val isPaused: Boolean = false,
     val stories: List<Story>? = null,
+    val currentStep: Int = 0,
 )
 
 @HiltViewModel
@@ -58,15 +59,22 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun onPauseChange(pause: Boolean) {
+    fun onPauseChange(isPaused: Boolean) {
         viewModelState.update {
-            it.copy(pause = pause)
+            it.copy(isPaused = isPaused)
         }
     }
 
     private fun setNativeAd(interstitialAd: InterstitialAd?) {
         viewModelState.update {
             it.copy(interstitialAd = interstitialAd)
+        }
+    }
+
+    fun onCurrentStepChange(currentStep: Int) {
+        viewModelState.update {
+            val max = it.stories?.size ?: 0
+            it.copy(currentStep = currentStep.coerceIn((0..max)))
         }
     }
 
@@ -90,7 +98,7 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun onStoryOpen(storyId: String) {
+    fun onStorySeen(storyId: String) {
         viewModelScope.launch {
             storyRepository.seenStory(storyId)
         }

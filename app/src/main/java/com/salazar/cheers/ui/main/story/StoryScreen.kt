@@ -57,15 +57,14 @@ fun StoryScreen(
     onStoryOpen: (String) -> Unit,
     onNavigateBack: () -> Unit,
     onUserClick: (String) -> Unit,
-    value: String,
-    onFocusChange: (Boolean) -> Unit,
     onInputChange: (String) -> Unit,
     onSendReaction: (Story, String) -> Unit,
     showInterstitialAd: () -> Unit,
+    onPauseChange: (Boolean) -> Unit,
+    onCurrentStepChange: (Int) -> Unit,
 ) {
     val pagerState = rememberPagerState()
     val stories = uiState.stories
-    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -75,18 +74,20 @@ fun StoryScreen(
         if (stories != null && stories.isNotEmpty())
         StoryCarousel(
             stories = stories,
+            currentStep = uiState.currentStep,
             pagerState = pagerState,
             onStoryOpen = onStoryOpen,
             onStoryFinish = {
                 onNavigateBack()
             },
             onUserClick = onUserClick,
-            value = value,
+            value = uiState.input,
             onInputChange = onInputChange,
             onSendReaction = onSendReaction,
-            onFocusChange = onFocusChange,
             showInterstitialAd = showInterstitialAd,
             onStoryUIAction = onStoryUIAction,
+            onPauseChange = onPauseChange,
+            onCurrentStepChange = onCurrentStepChange,
         )
     }
 }
@@ -101,9 +102,11 @@ fun StoryCarousel(
     onStoryOpen: (String) -> Unit,
     onUserClick: (String) -> Unit,
     value: String,
-    onFocusChange: (Boolean) -> Unit,
+    currentStep: Int,
     onInputChange: (String) -> Unit,
     onSendReaction: (Story, String) -> Unit,
+    onPauseChange: (Boolean) -> Unit,
+    onCurrentStepChange: (Int) -> Unit,
 ) {
     HorizontalPager(
         count = 1,
@@ -111,14 +114,11 @@ fun StoryCarousel(
         verticalAlignment = Alignment.Top,
     ) { page ->
 
-        var isPaused by remember { mutableStateOf(false) }
         val isPressed = remember { mutableStateOf(false) }
-        var currentStep by remember { mutableStateOf(0) }
         val story = stories[currentStep]
 
-
-        LaunchedEffect(currentPage) {
-            if (page == currentPage && !story.seen)
+        LaunchedEffect(story) {
+            if (!story.seen)
                 onStoryOpen(story.id)
         }
 
@@ -130,13 +130,11 @@ fun StoryCarousel(
             bottomBar = {
                 StoryFooter(
                     story = story,
-                    value = value,
+                    messageInput = value,
                     isUserMe = story.authorId == FirebaseAuth.getInstance().currentUser?.uid!!,
                     onInputChange = onInputChange,
                     onSendReaction = { onSendReaction(story, it) },
-                    onFocusChange = {
-                        isPaused = it
-                                    },
+                    onFocusChange = { onPauseChange(it) },
                     onStoryUIAction = onStoryUIAction,
                 )
             },
@@ -158,14 +156,14 @@ fun StoryCarousel(
                         fraction = 1f - pageOffset.coerceIn(0f, 1f)
                     )
                 }
-        ) {
+        ) { padding ->
             PrettyImage(
                 data = story.photoUrl,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .padding(it)
+                    .padding(padding)
                     .aspectRatio(9 / 16f)
                     .clip(RoundedCornerShape(16.dp))
                     .fillMaxWidth()
@@ -181,13 +179,13 @@ fun StoryCarousel(
                                 if (totalPressTime < 200) {
                                     val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
                                     if (isTapOnRightThreeQuarters) {
-                                        if(currentStep + 1 >= stories.size)
+                                        if((currentStep + 1) >= stories.size)
                                             onStoryFinish()
                                         else
-                                            currentStep++
+                                            onCurrentStepChange(currentStep+1)
                                     }
                                     else
-                                        currentStep = (currentStep - 1).coerceAtLeast(0)
+                                        onCurrentStepChange(currentStep-1)
                                 }
                                 isPressed.value = false
                             },
@@ -205,7 +203,7 @@ fun StoryCarousel(
                     if(currentStep + 1 >= stories.size)
                         onStoryFinish()
                     else
-                        currentStep++
+                        onCurrentStepChange(currentStep+1)
                 },
                 onUserClick = onUserClick,
                 pause = false,
@@ -250,7 +248,7 @@ fun StoryHeader(
 @Composable
 fun StoryFooter(
     story: Story,
-    value: String,
+    messageInput: String,
     isUserMe: Boolean,
     onStoryUIAction: (StoryUIAction, String) -> Unit,
     onInputChange: (String) -> Unit,
@@ -270,7 +268,7 @@ fun StoryFooter(
                 .padding(16.dp)
         ) {
             StoryInputField(
-                value = value,
+                value = messageInput,
                 onInputChange = onInputChange,
                 onSendReaction = onSendReaction,
                 onFocusChange = onFocusChange
@@ -299,11 +297,13 @@ fun StoryMeFooter(
             Icon(
                 Icons.Outlined.AccountCircle,
                 contentDescription = null,
+                tint = Color.White,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "Activity",
                 style = MaterialTheme.typography.bodySmall,
+                color = Color.White,
             )
         }
         Column(
@@ -320,6 +320,7 @@ fun StoryMeFooter(
             Text(
                 text = "Delete",
                 style = MaterialTheme.typography.bodySmall,
+                color = Color.White,
             )
         }
     }

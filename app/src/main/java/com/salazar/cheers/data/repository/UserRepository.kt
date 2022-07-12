@@ -299,14 +299,16 @@ class UserRepository @Inject constructor(
             emit(Resource.Loading(true))
             val user = userDao.getUserNullable(userIdOrUsername = userId)
 
-            if (user != null)
+            if (user != null) {
                 emit(Resource.Success(user))
+                emit(Resource.Loading(false))
+            }
 
             val remoteUser = try {
                 coreService.getUser(userIdOrUsername = userId)
             } catch (e: NullPointerException) {
                 e.printStackTrace()
-                emit(Resource.Error(""))
+                emit(Resource.Error("User not found"))
                 null
             } catch (e: Exception) {
                 e.printStackTrace()
