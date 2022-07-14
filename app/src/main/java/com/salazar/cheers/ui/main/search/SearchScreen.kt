@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,37 +88,42 @@ private fun SearchBody(
     onRecentUserClicked: (String) -> Unit,
     onFollowToggle: (String) -> Unit,
 ) {
-    Column {
-        val users = uiState.users
-        val recommendation = uiState.userRecommendations
-//        if (users.isNullOrEmpty() && uiState.searchInput.isNotBlank()) {
-//            Text("No results")
-//            Spacer(Modifier.height(32.dp))
-        if (uiState.searchInput.isBlank())
-            RecentUserList(
-                recent = uiState.recentUsers,
-                suggestions = uiState.userRecommendations,
-                onUserClicked = onUserClicked,
-                onDeleteRecentUser = onDeleteRecentUser,
-                onRecentUserClicked = onRecentUserClicked,
-                onFollowToggle = onFollowToggle,
-            )
-        else if (users.isNotEmpty())
-            UserList(
-                users = users,
-                onUserClicked = onUserClicked,
-                isLoading = uiState.isLoading,
-            )
-    }
-}
-
-@Composable
-fun UserList(
-    users: List<User>,
-    isLoading: Boolean,
-    onUserClicked: (String) -> Unit,
-) {
     LazyColumn {
+
+        if (uiState.searchInput.isBlank()) {
+            if (uiState.recentUsers.isNotEmpty())
+                item {
+                    Text(
+                        text = "Recent",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+
+            items(uiState.recentUsers, key = { it.username }) { user ->
+                RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
+            }
+
+            if (uiState.userRecommendations.isNotEmpty())
+                item {
+                    Text(
+                        text = "Suggestions",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+
+            items(uiState.userRecommendations, key = { it.id }) { user ->
+                UserSuggestionCard(
+                    modifier = Modifier.animateItemPlacement(),
+                    user = user,
+                    onUserClicked = onUserClicked,
+                    onFollowToggle = onFollowToggle,
+                )
+            }
+
+        }
+
         item {
             Text(
                 text = "Result",
@@ -125,62 +131,25 @@ fun UserList(
                 modifier = Modifier.padding(16.dp),
             )
         }
-        if (isLoading)
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicatorM3()
-                }
+
+        if (uiState.isLoading)
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicatorM3()
             }
-        items(users, key = { it.id }) { user ->
+        }
+
+        if (uiState.users != null)
+        items(uiState.users, key = { it.id }) { user ->
             UserCard(
                 modifier = Modifier.animateItemPlacement(),
                 user = user,
                 onUserClicked = onUserClicked,
-            )
-        }
-    }
-}
-
-@Composable
-fun RecentUserList(
-    recent: List<RecentUser>,
-    suggestions: List<UserSuggestion>,
-    onUserClicked: (String) -> Unit,
-    onDeleteRecentUser: (RecentUser) -> Unit,
-    onRecentUserClicked: (String) -> Unit,
-    onFollowToggle: (String) -> Unit,
-) {
-    LazyColumn {
-        if (recent.isNotEmpty())
-            item {
-                Text(
-                    text = "Recent",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-        items(recent, key = { it.username }) { user ->
-            RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
-        }
-        if (suggestions.isNotEmpty())
-            item {
-                Text(
-                    text = "Suggestions",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-        items(suggestions, key = { it.id }) { user ->
-            UserSuggestionCard(
-                modifier = Modifier.animateItemPlacement(),
-                user = user,
-                onUserClicked = onUserClicked,
-                onFollowToggle = onFollowToggle,
             )
         }
     }

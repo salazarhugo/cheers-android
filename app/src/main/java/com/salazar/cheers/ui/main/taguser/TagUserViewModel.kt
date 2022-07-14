@@ -2,6 +2,8 @@ package com.salazar.cheers.ui.main.taguser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.Users
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
@@ -10,69 +12,52 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+data class AddPeopleUiState(
+    val isLoading: Boolean,
+    val users: List<User>? = null,
+    val selectedUsers: List<User> = emptyList(),
+    val errorMessages: List<String> = emptyList(),
+    val searchInput: String = "",
+)
+
 @HiltViewModel
 class AddPeopleViewModel @Inject constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(AddPeopleViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(AddPeopleUiState(isLoading = true))
 
     val uiState = viewModelState
-        .map { it.toUiState() }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
+            viewModelState.value
         )
 
     init {
-        refreshNewMessages()
+        refreshFriends()
     }
 
     fun onSearchInputChanged(query: String) {
         viewModelState.update {
             it.copy(searchInput = query)
         }
-        refreshNewMessages(query = query)
+        refreshFriends(query = query)
     }
 
-    private fun refreshNewMessages(query: String = "") {
-        viewModelState.update { it.copy(isLoading = true) }
-
+    private fun refreshFriends(query: String = "") {
         viewModelScope.launch {
-            userRepository.queryUsers(query = query, fetchFromRemote = false).collect { result ->
-                if (result is Resource.Success)
-                    viewModelState.update {
-                        it.copy(users = result.data, isLoading = false)
-                    }
+            userRepository.queryUsers(fetchFromRemote = true, query = query).collect {
+                if (it is Resource.Success)
+                    updateUsers(it.data)
             }
         }
     }
+
+    private fun updateUsers(users: List<User>?) {
+        viewModelState.update {
+            it.copy(users = users)
+        }
+    }
 }
-
-
-data class AddPeopleUiState(
-    val isLoading: Boolean,
-    val users: List<User>?,
-    val selectedUsers: List<User>,
-    val errorMessages: List<String>,
-    val searchInput: String
-)
-
-private data class AddPeopleViewModelState(
-    val users: List<User>? = null,
-    val selectedUsers: List<User> = mutableListOf(),
-    val isLoading: Boolean = false,
-    val errorMessages: List<String> = emptyList(),
-    val searchInput: String = "",
-) {
-    fun toUiState(): AddPeopleUiState =
-        AddPeopleUiState(
-            users = users,
-            selectedUsers = selectedUsers,
-            isLoading = isLoading,
-            errorMessages = errorMessages,
-            searchInput = searchInput
-        )
-}
-

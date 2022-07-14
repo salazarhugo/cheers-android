@@ -21,6 +21,16 @@ import java.time.Instant
 import javax.inject.Inject
 
 
+data class SearchUiState(
+    val name: String = "",
+    val users: List<User>? = null,
+    val userRecommendations: List<UserSuggestion> = emptyList(),
+    val recentUsers: List<RecentUser> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String = "",
+    val searchInput: String = "",
+)
+
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val userRepository: UserRepository,
@@ -40,6 +50,7 @@ class SearchViewModel @Inject constructor(
     init {
         refreshUserRecommendations()
         updateRecentUser()
+        queryUsers(fetchFromRemote = false)
     }
 
     private fun updateRecentUser() {
@@ -76,21 +87,23 @@ class SearchViewModel @Inject constructor(
                 .queryUsers(fetchFromRemote = fetchFromRemote, query = query)
                 .collect { result ->
                     when (result) {
-                        is Resource.Success -> {
-                            result.data?.let {
-                                viewModelState.update {
-                                    it.copy(users = result.data)
-                                }
-                            }
-                        }
+                        is Resource.Success -> updateUsers(users = result.data)
+                        is Resource.Loading -> updateIsLoading(result.isLoading)
                         is Resource.Error -> Unit
-                        is Resource.Loading -> {
-                            viewModelState.update {
-                                it.copy(isLoading = result.isLoading)
-                            }
-                        }
                     }
                 }
+        }
+    }
+
+    fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
+        }
+    }
+
+    private fun updateUsers(users: List<User>?) {
+        viewModelState.update {
+            it.copy(users = users)
         }
     }
 
@@ -122,14 +135,3 @@ class SearchViewModel @Inject constructor(
         }
     }
 }
-
-data class SearchUiState(
-    val name: String = "",
-    val users: List<User> = emptyList(),
-    val userRecommendations: List<UserSuggestion> = emptyList(),
-    val recentUsers: List<RecentUser> = emptyList(),
-    val isLoading: Boolean = false,
-    val errorMessage: String = "",
-    val searchInput: String = "",
-)
-

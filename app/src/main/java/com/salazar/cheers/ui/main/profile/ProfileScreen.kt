@@ -229,7 +229,7 @@ fun ProfileButtons(
             .fillMaxWidth()
             .padding(top = 16.dp),
     ) {
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onEditProfileClicked,
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.weight(0.9f)
@@ -375,7 +375,8 @@ fun ProfileStats(
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(26.dp)
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
         val items = listOf(
             Counter("Posts", user.postCount, null),
@@ -395,7 +396,8 @@ fun ProfileStats(
                 Text(
                     text = numberFormatter(value = item.value),
                     fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto
+                    fontFamily = Roboto,
+                    fontSize = 18.sp,
                 )
                 Text(text = item.name, fontSize = 14.sp, fontFamily = Roboto)
             }

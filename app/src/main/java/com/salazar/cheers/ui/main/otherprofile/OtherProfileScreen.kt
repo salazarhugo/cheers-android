@@ -79,7 +79,6 @@ fun OtherProfileScreen(
                 },
                 backgroundColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(top = 16.dp)
             ) {
                 tabs.forEachIndexed { index, icon ->
                     androidx.compose.material.Tab(
@@ -221,7 +220,7 @@ fun HeaderButtons(
     onGiftClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.padding(top = 16.dp)
+        modifier = Modifier.padding(vertical = 16.dp)
     ) {
         FollowButton(
             isFollowing = isFollowed,

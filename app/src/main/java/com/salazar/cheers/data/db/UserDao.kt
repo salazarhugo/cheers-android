@@ -31,6 +31,9 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUserNullable(userIdOrUsername: String): User?
 
+    @Query("SELECT * FROM users WHERE friend = 1")
+    suspend fun getFriends(): List<User>
+
     @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' ")
     suspend fun searchUser(query: String): List<User>
 

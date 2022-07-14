@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.add
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -19,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,10 +66,13 @@ fun AddPeopleScreen(
                 .fillMaxSize()
                 .animateContentSize()
         ) {
-            DividerM3()
+//            if(uiState.selectedUsers.isNotEmpty())
             ChipInput(
-                searchInput = uiState.searchInput,
                 selectedUsers = selectedUsers,
+            )
+            SearchTextInput(
+                searchInput = uiState.searchInput,
+                selectedUsers = uiState.selectedUsers,
                 onSearchInputChanged = viewModel::onSearchInputChanged,
             )
             if (uiState.users != null)
@@ -152,32 +158,39 @@ fun UserCard(
 }
 
 @Composable
-fun ChipInput(
+fun SearchTextInput(
     searchInput: String,
     selectedUsers: List<User>,
     onSearchInputChanged: (String) -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
-
-    ChipGroup(
-        users = selectedUsers.map { it.username },
-        onSelectedChanged = {
-        }
-    )
     TextField(
         value = searchInput,
         leadingIcon = { Icon(Icons.Filled.Search, "Search icon") },
         modifier = Modifier.fillMaxWidth(),
-        onValueChange = { onSearchInputChanged(it) },
+        onValueChange = onSearchInputChanged,
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Search
         ),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = MaterialTheme.colorScheme.background,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
         textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
         keyboardActions = KeyboardActions(onSearch = {
-            focusManager.clearFocus()
         }),
         placeholder = { Text("Search") }
+    )
+}
+
+@Composable
+fun ChipInput(
+    selectedUsers: List<User>,
+) {
+    ChipGroup(
+        users = selectedUsers.map { it.username },
+        onSelectedChanged = { }
     )
 }

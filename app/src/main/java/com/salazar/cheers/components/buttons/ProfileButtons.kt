@@ -20,14 +20,14 @@ fun CheersOutlinedButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = null,
+    elevation: ButtonElevation? = ButtonDefaults.filledTonalButtonElevation(),
     shape: Shape = RoundedCornerShape(8.dp),
-    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder,
-    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
-    OutlinedButton(
+    FilledTonalButton(
         onClick = onClick,
         shape = shape,
         modifier = modifier

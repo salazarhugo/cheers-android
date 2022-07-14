@@ -117,8 +117,8 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = "${MainDestinations.STORY_ROUTE}?username={username}",
             arguments = listOf(navArgument("username") { nullable = true }),
-//            enterTransition = { scaleIn(animationSpec = tween(200)) },
-//            exitTransition = { scaleOut(animationSpec = tween(200)) },
+            enterTransition = { scaleIn(animationSpec = tween(200)) },
+            exitTransition = { scaleOut(animationSpec = tween(200)) },
         ) {
             CheersTheme(darkTheme = true) {
                 StoryRoute(

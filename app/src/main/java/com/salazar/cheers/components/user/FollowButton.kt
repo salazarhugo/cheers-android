@@ -20,31 +20,22 @@ fun FollowButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = null,
     shape: Shape = RoundedCornerShape(8.dp),
-    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder,
-    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 ) {
     if (isFollowing)
         CheersOutlinedButton(
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,
-            interactionSource = interactionSource,
-            elevation = elevation,
             shape = shape,
-            border = border,
-            colors = colors,
-            contentPadding = contentPadding,
         ) {
             Text("Following")
         }
     else
         Button(
             modifier = modifier.height(34.dp),
-            onClick = onClick
+            onClick = onClick,
+            shape = shape,
         ) {
             Text("Follow")
         }

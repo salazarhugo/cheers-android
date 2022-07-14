@@ -43,7 +43,6 @@ fun StoryRoute(
         }
     }
 
-
     StoryScreen(
         uiState = uiState,
         onStoryUIAction = { action, storyId ->

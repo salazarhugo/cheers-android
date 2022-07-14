@@ -101,7 +101,9 @@ class UserRepository @Inject constructor(
 
     suspend fun getFollowers(userIdOrUsername: String) = withContext(Dispatchers.IO) {
         return@withContext try {
-            coreService.followersList(userIdOrUsername = userIdOrUsername)
+            val followers = coreService.followersList(userIdOrUsername = userIdOrUsername)
+            userDao.insertAll(followers.map { it.copy(friend = true) })
+            followers
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -139,6 +141,18 @@ class UserRepository @Inject constructor(
 
     fun getRecentUsers(): Flow<List<RecentUser>> {
         return cheersDao.getRecentUsers()
+    }
+
+    suspend fun queryFriends(
+        fetchFromRemote: Boolean,
+        query: String,
+    ): Flow<Resource<List<User>>> {
+        return flow {
+            emit(Resource.Loading(true))
+            val localUsers = userDao.getFriends()
+            emit(Resource.Success(data = localUsers))
+            emit(Resource.Loading(false))
+        }
     }
 
     suspend fun queryUsers(
@@ -179,13 +193,9 @@ class UserRepository @Inject constructor(
 
             remoteUsers?.let { users ->
                 userDao.insertAll(users)
-                emit(
-                    Resource.Success(
-                        data = users
-                    )
-                )
-                emit(Resource.Loading(false))
+                emit(Resource.Success( data = users ))
             }
+            emit(Resource.Loading(false))
         }
     }
 

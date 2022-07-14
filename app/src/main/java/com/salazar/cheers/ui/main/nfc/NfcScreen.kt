@@ -12,21 +12,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.util.Utils.getActivity
 
+
 fun createNdefMessage(): NdefMessage {
     val text = "Beam me up, Android!\n\n" +
             "Beam Time: " + System.currentTimeMillis()
     return NdefMessage(
         arrayOf(
-            createMime("application/vnd.com.salazar.cheers", text.toByteArray())
+            createMime("application/vdf.com.salazar.cheers", text.toByteArray())
         )
     )
 }
@@ -36,6 +35,7 @@ fun NfcScreen() {
 
     val context = LocalContext.current
     val nfc = remember { NfcAdapter.getDefaultAdapter(context.getActivity()) }
+    var tap by remember { mutableStateOf(false) }
 
     LaunchedEffect(nfc) {
         nfc?.setNdefPushMessage(createNdefMessage(), context.getActivity())
@@ -48,7 +48,9 @@ fun NfcScreen() {
     ) {
 
         Card(
-            onClick = {},
+            onClick = {
+                  tap = !tap
+            },
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary),
             modifier = Modifier

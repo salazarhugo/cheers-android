@@ -30,13 +30,9 @@ import java.util.*
         Activity::class,
         UserSuggestion::class,
     ],
-    version = 5,
+    version = 1,
     exportSchema = true,
-    autoMigrations = [
-        AutoMigration (from = 1, to = 2),
-        AutoMigration (from = 3, to = 4),
-        AutoMigration (from = 4, to = 5),
-    ]
+    autoMigrations = [ ]
 )
 abstract class CheersDatabase : RoomDatabase() {
     abstract fun cheersDao(): CheersDao
@@ -71,7 +67,6 @@ abstract class CheersDatabase : RoomDatabase() {
                 context.applicationContext,
                 CheersDatabase::class.java, "cheers.db"
             )
-                .addMigrations(MIGRATION_2_3)
                 .fallbackToDestructiveMigration()
                 .build()
     }
