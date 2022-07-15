@@ -107,7 +107,7 @@ fun Profile(
             ) { navigateToProfileMoreSheet(uiState.user.username) }
         }
     ) {
-        val posts = uiState.postFlow.collectAsLazyPagingItems()
+        val posts = uiState.posts
         val pagerState = rememberPagerState()
         val tabs = listOf(
             Icons.Outlined.ViewList,
@@ -170,15 +170,14 @@ fun Profile(
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             when (page) {
-                                0 -> posts.itemSnapshotList.forEach { postFeed ->
-                                    if (postFeed != null)
-                                        Post(
-                                            postFeed,
-                                            onPostClicked,
-                                            onPostLike = onPostLike,
-                                            onPostMoreClicked = onPostMoreClicked,
-                                            onCommentClick = onCommentClick,
-                                        )
+                                0 -> posts?.forEach { postFeed ->
+                                    Post(
+                                        postFeed,
+                                        onPostClicked,
+                                        onPostLike = onPostLike,
+                                        onPostMoreClicked = onPostMoreClicked,
+                                        onCommentClick = onCommentClick,
+                                    )
                                 }
                                 1 -> uiState.events?.forEach {
                                     Event(

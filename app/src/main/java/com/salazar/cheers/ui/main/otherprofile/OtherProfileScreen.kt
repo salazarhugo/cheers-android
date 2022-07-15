@@ -44,7 +44,7 @@ fun OtherProfileScreen(
     onStoryClick: (String) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
-    val posts = uiState.postFlow.collectAsLazyPagingItems()
+    val posts = uiState.posts
     val pagerState = rememberPagerState()
     val tabs = listOf(
         Icons.Outlined.ViewList,
@@ -103,15 +103,14 @@ fun OtherProfileScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     when (page) {
-                        0 -> posts.itemSnapshotList.forEach { postFeed ->
-                            if (postFeed != null)
-                                com.salazar.cheers.ui.main.profile.Post(
-                                    post = postFeed,
-                                    onPostLike = onPostLike,
-                                    onPostClicked = onPostClicked,
-                                    onPostMoreClicked = onPostMoreClicked,
-                                    onCommentClick = { onCommentClick(postFeed.id)},
-                                )
+                        0 -> posts?.forEach { postFeed ->
+                            com.salazar.cheers.ui.main.profile.Post(
+                                post = postFeed,
+                                onPostLike = onPostLike,
+                                onPostClicked = onPostClicked,
+                                onPostMoreClicked = onPostMoreClicked,
+                                onCommentClick = { onCommentClick(postFeed.id)},
+                            )
                         }
                         1 -> FunctionalityNotAvailablePanel()
                         2 -> FunctionalityNotAvailablePanel()

@@ -11,6 +11,7 @@ import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +27,7 @@ sealed interface OtherProfileUiState {
     ) : OtherProfileUiState
 
     data class HasUser(
-        val postFlow: Flow<PagingData<Post>> = emptyFlow(),
+        val posts: List<Post>? = null,
         val user: User,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -35,7 +36,7 @@ sealed interface OtherProfileUiState {
 
 private data class OtherProfileViewModelState(
     val user: User? = null,
-    val postFlow: Flow<PagingData<Post>> = emptyFlow(),
+    val posts: List<Post>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
@@ -44,7 +45,7 @@ private data class OtherProfileViewModelState(
         if (user != null) {
             OtherProfileUiState.HasUser(
                 user = user,
-                postFlow = postFlow,
+                posts = posts,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
@@ -129,11 +130,16 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
+    private fun updatePosts(posts: List<Post>) {
+        viewModelState.update {
+            it.copy(posts = posts)
+        }
+    }
+
     private fun refreshUserPosts() {
-        viewModelScope.launch {
-            val posts = postRepository.profilePost(userIdOrUsername = username)
-            viewModelState.update {
-                it.copy(postFlow = posts, isLoading = false)
+        viewModelScope.launch(Dispatchers.IO) {
+            postRepository.profilePost(userIdOrUsername = username).collect {
+                updatePosts(it)
             }
         }
     }

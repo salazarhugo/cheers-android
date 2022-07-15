@@ -17,8 +17,8 @@ interface PostDao {
     fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, Post>
 
     @Transaction
-    @Query("SELECT posts.* FROM posts JOIN users ON posts.authorId = users.id WHERE (authorId = :userIdOrUsername OR users.username = :userIdOrUsername) ORDER BY posts.created DESC")
-    fun profilePost(userIdOrUsername: String): PagingSource<Int, Post>
+    @Query("SELECT * FROM posts WHERE (authorId = :userIdOrUsername OR username = :userIdOrUsername) ORDER BY posts.created DESC")
+    fun getUserPosts(userIdOrUsername: String): List<Post>
 
 //    /**
 //     ** Get User posts and posts where they are tagged in. Only IMAGE, VIDEO posts.

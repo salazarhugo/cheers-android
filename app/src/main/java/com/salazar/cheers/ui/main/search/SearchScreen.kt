@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +41,6 @@ import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.data.entities.RecentUser
 import com.salazar.cheers.data.entities.UserSuggestion
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.home.likes.UserList
 import com.salazar.cheers.ui.theme.Typography
 
 @Composable
@@ -104,7 +102,7 @@ private fun SearchBody(
                 RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
             }
 
-            if (uiState.userRecommendations.isNotEmpty())
+            if (uiState.suggestions.isNotEmpty())
                 item {
                     Text(
                         text = "Suggestions",
@@ -113,7 +111,7 @@ private fun SearchBody(
                     )
                 }
 
-            items(uiState.userRecommendations, key = { it.id }) { user ->
+            items(uiState.suggestions) { user ->
                 UserSuggestionCard(
                     modifier = Modifier.animateItemPlacement(),
                     user = user,

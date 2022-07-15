@@ -2,7 +2,6 @@ package com.salazar.cheers.ui.main.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.entities.RecentUser
@@ -17,14 +16,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 
 data class SearchUiState(
     val name: String = "",
     val users: List<User>? = null,
-    val userRecommendations: List<UserSuggestion> = emptyList(),
+    val suggestions: List<UserSuggestion> = emptyList(),
     val recentUsers: List<RecentUser> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String = "",
@@ -48,7 +46,7 @@ class SearchViewModel @Inject constructor(
         )
 
     init {
-        refreshUserRecommendations()
+        refreshSuggestions()
         updateRecentUser()
         queryUsers(fetchFromRemote = false)
     }
@@ -65,6 +63,7 @@ class SearchViewModel @Inject constructor(
 
     fun onSwipeRefresh() {
         queryUsers(fetchFromRemote = true)
+        refreshSuggestions()
     }
 
     fun onSearchInputChanged(searchInput: String) {
@@ -125,11 +124,11 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun refreshUserRecommendations() {
+    private fun refreshSuggestions() {
         viewModelScope.launch {
             userRepository.getSuggestions().collect { suggestions ->
                 viewModelState.update {
-                    it.copy(userRecommendations = suggestions)
+                    it.copy(suggestions = suggestions)
                 }
             }
         }

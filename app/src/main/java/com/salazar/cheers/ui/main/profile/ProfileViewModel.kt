@@ -16,6 +16,7 @@ import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +35,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val postFlow: Flow<PagingData<Post>>,
+        val posts: List<Post>?,
         val events: List<Event>?,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
@@ -44,7 +45,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState(
     val user: User? = null,
-    val posts: Flow<PagingData<Post>> = emptyFlow(),
+    val posts: List<Post>? = null,
     val events: List<Event>? = null,
     val isLoading: Boolean = false,
     val errorMessages: String = "",
@@ -53,7 +54,7 @@ private data class ProfileViewModelState(
     fun toUiState(): ProfileUiState =
         if (user != null)
             ProfileUiState.HasUser(
-                postFlow = posts,
+                posts = posts,
                 user = user,
                 events = events,
                 isLoading = isLoading,
@@ -126,12 +127,17 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    private fun updatePosts(posts: List<Post>) {
+        viewModelState.update {
+            it.copy(posts = posts)
+        }
+    }
+
     private fun refreshUserPosts() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid!!
-        viewModelScope.launch {
-            val posts = postRepository.profilePost(userIdOrUsername = userId)
-            viewModelState.update {
-                it.copy(posts = posts, isLoading = false)
+        viewModelScope.launch(Dispatchers.IO) {
+            postRepository.profilePost(userIdOrUsername = userId).collect {
+                updatePosts(it)
             }
         }
     }

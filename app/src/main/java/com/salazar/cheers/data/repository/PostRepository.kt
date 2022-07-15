@@ -7,11 +7,13 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.PostRemoteMediator
+import com.salazar.cheers.data.repository.StoryRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,16 +39,24 @@ class PostRepository @Inject constructor(
         }.flow
     }
 
-    fun profilePost(userIdOrUsername: String): Flow<PagingData<Post>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = NETWORK_PAGE_SIZE,
-                enablePlaceholders = true,
-            ),
-            remoteMediator = PostRemoteMediator(database = database, service = coreService),
-        ) {
-            postDao.profilePost(userIdOrUsername = userIdOrUsername)
-        }.flow
+    suspend fun profilePost(userIdOrUsername: String): Flow<List<Post>>{
+        return flow {
+            val posts = postDao.getUserPosts(userIdOrUsername)
+
+            emit(posts)
+
+            val remoteUserPosts = try {
+                val response = coreService.getUserPosts(userIdOrUsername, 0, 20)
+                response
+            }catch (e: Exception) {
+                null
+            }
+
+            remoteUserPosts?.let {
+                postDao.insertAll(it)
+                emit(postDao.getUserPosts(userIdOrUsername))
+            }
+        }
     }
 
     suspend fun likePost(postId: String) {

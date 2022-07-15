@@ -40,6 +40,13 @@ interface CoreService {
     @GET("posts")
     suspend fun getPosts(): List<Post>
 
+    @GET("posts/{userId}")
+    suspend fun getUserPosts(
+        @Path("userId") userId: String,
+        @Query("page") skip: Int,
+        @Query("pageSize") pageSize: Int,
+    ): List<Post>
+
     @GET("posts/feed")
     suspend fun postFeed(
         @Query("page") skip: Int,
