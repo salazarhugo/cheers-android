@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3912a1367d81eee215c7ec6ddfaaf4ba",
+    "identityHash": "505bfe90f085df057251e8e173ac50ff",
     "entities": [
       {
         "tableName": "recentUsers",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "posts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postId` TEXT NOT NULL, `authorId` TEXT NOT NULL, `caption` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `profilePictureUrl` TEXT NOT NULL, `created` INTEGER NOT NULL, `relativeTime` TEXT NOT NULL, `likes` INTEGER NOT NULL, `liked` INTEGER NOT NULL, `beverage` TEXT NOT NULL, `comments` INTEGER NOT NULL, `shares` INTEGER NOT NULL, `privacy` TEXT NOT NULL, `photos` TEXT NOT NULL, `videoUrl` TEXT NOT NULL, `videoThumbnailUrl` TEXT NOT NULL, `drunkenness` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `locationName` TEXT NOT NULL, `allowJoin` INTEGER NOT NULL, `tagUsersId` TEXT NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, PRIMARY KEY(`postId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postId` TEXT NOT NULL, `authorId` TEXT NOT NULL, `caption` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `profilePictureUrl` TEXT NOT NULL, `created` INTEGER NOT NULL, `relativeTime` TEXT NOT NULL, `likes` INTEGER NOT NULL, `liked` INTEGER NOT NULL, `beverage` TEXT NOT NULL, `comments` INTEGER NOT NULL, `shares` INTEGER NOT NULL, `privacy` TEXT NOT NULL, `photos` TEXT NOT NULL, `videoUrl` TEXT NOT NULL, `videoThumbnailUrl` TEXT NOT NULL, `drunkenness` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `locationName` TEXT NOT NULL, `notify` INTEGER NOT NULL, `tagUsersId` TEXT NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, PRIMARY KEY(`postId`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -185,8 +185,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "allowJoin",
-            "columnName": "allowJoin",
+            "fieldPath": "notify",
+            "columnName": "notify",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -1204,7 +1204,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3912a1367d81eee215c7ec6ddfaaf4ba')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '505bfe90f085df057251e8e173ac50ff')"
     ]
   }
 }

@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.components.utils.BackPressHandler
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
 
@@ -56,7 +55,7 @@ fun AddPostRoute(
                 onSelectMedia = addPostViewModel::addPhoto,
                 onMediaSelectorClicked = { launcher.launch("image/* video/*") },
                 onSelectPrivacy = addPostViewModel::selectPrivacy,
-                onAllowJoinChange = addPostViewModel::toggleAllowJoin
+                onNotifyChange = addPostViewModel::toggleNotify
             )
         AddPostPage.ChooseOnMap ->
             ChooseOnMapScreen(

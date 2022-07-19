@@ -144,7 +144,7 @@ interface CoreService {
         @Path("storyId") storyId: String,
     )
 
-    @DELETE("events/{eventId}")
+    @POST("events/{eventId}")
     suspend fun deleteEvent(
         @Path("eventId") eventId: String,
     )

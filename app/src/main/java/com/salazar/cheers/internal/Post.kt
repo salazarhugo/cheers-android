@@ -48,7 +48,7 @@ data class Post(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val locationName: String = "",
-    val allowJoin: Boolean = true,
+    val notify: Boolean = true,
     val tagUsersId: List<String> = emptyList(),
     val type: String = PostType.TEXT,
     val accountId: String = "",

@@ -183,6 +183,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
+        refreshPostsFlow()
     }
 
     private fun updateError(errorMessages: List<String>) {

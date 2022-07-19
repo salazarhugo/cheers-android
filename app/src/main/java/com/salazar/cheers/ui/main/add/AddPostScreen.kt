@@ -81,7 +81,7 @@ fun AddPostScreen(
     onSelectLocation: (SearchResult) -> Unit,
     onSelectMedia: (Uri) -> Unit,
     onCaptionChanged: (String) -> Unit,
-    onAllowJoinChange: (Boolean) -> Unit,
+    onNotifyChange: (Boolean) -> Unit,
     unselectLocation: () -> Unit,
     updateLocationName: (String) -> Unit,
     updateLocationResults: (List<SearchResult>) -> Unit,
@@ -183,9 +183,9 @@ fun AddPostScreen(
                 )
                 DividerM3()
                 SwitchPreference(
-                    text = "Allow people to join",
-                    checked = uiState.allowJoin,
-                    onCheckedChange = onAllowJoinChange
+                    text = "Notify followers",
+                    checked = uiState.notify,
+                    onCheckedChange = onNotifyChange
                 )
                 ShareButton("Share", onClick = {
                     onUploadPost()

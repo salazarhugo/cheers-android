@@ -47,6 +47,7 @@ data class AddPostUiState(
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
     val privacy: Privacy = Privacy.FRIENDS,
     val allowJoin: Boolean = true,
+    val notify: Boolean = true,
     val page: AddPostPage = AddPostPage.AddPost,
     val profilePictureUrl: String = "",
 )
@@ -119,6 +120,12 @@ class AddPostViewModel @Inject constructor(
         }
     }
 
+    fun toggleNotify(notify: Boolean) {
+        viewModelState.update {
+            it.copy(notify = notify)
+        }
+    }
+
     fun toggleAllowJoin(allowJoin: Boolean) {
         viewModelState.update {
             it.copy(allowJoin = allowJoin)
@@ -188,13 +195,13 @@ class AddPostViewModel @Inject constructor(
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
                         "DRUNKENNESS" to uiState.drunkenness,
-                        "BEVERAGE" to uiState.beverage.name,
+                        "BEVERAGE" to uiState. beverage.name,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,
                         "LOCATION_LATITUDE" to uiState.locationPoint?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.locationPoint?.longitude(),
                         "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),
                         "PRIVACY" to uiState.privacy.name,
-                        "ALLOW_JOIN" to uiState.allowJoin,
+                        "NOTIFY" to uiState.notify,
                     )
                 )
             }

@@ -24,6 +24,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import makeStatusNotification
+import okhttp3.internal.notify
 import java.io.ByteArrayOutputStream
 
 @HiltWorker
@@ -71,8 +72,8 @@ class UploadPostWorker @AssistedInject constructor(
         val tagUserIds =
             inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
 
-        val allowJoin =
-            inputData.getBoolean("ALLOW_JOIN", true)
+        val notify =
+            inputData.getBoolean("NOTIFY", true)
 
         try {
             when (postType) {
@@ -164,8 +165,8 @@ class UploadPostWorker @AssistedInject constructor(
                         latitude = latitude,
                         longitude = longitude,
                         privacy = privacy,
-                        allowJoin = allowJoin,
-                        tagUsersId = tagUserIds.toList()
+                        tagUsersId = tagUserIds.toList(),
+                        notify = notify,
                     )
 
                     postRepository.addPost(post = post)
@@ -182,7 +183,7 @@ class UploadPostWorker @AssistedInject constructor(
                         latitude = latitude,
                         longitude = longitude,
                         privacy = privacy,
-                        allowJoin = allowJoin,
+                        notify = notify,
                         tagUsersId = tagUserIds.toList()
                     )
                     postRepository.addPost(post = post)
