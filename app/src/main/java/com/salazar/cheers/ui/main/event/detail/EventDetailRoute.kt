@@ -54,6 +54,9 @@ fun EventDetailRoute(
                 val eventId = (uiState as EventDetailUiState.HasEvent).event.id
                 navActions.navigateToGuestList(eventId)
             },
+            onTicketingClick = {
+                navActions.navigateToTicketing(it)
+            }
         )
     else
         LoadingScreen()

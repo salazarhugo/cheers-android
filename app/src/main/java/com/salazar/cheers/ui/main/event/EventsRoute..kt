@@ -35,6 +35,6 @@ fun EventsRoute(
         },
         onCreateEventClick = {
             navActions.navigateToAddEvent()
-        }
+        },
     )
 }

@@ -1,5 +1,6 @@
 package com.salazar.cheers.components.event
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -29,6 +30,7 @@ fun EventInfo(
     interestedCount: Int,
     goingCount: Int,
     locationName: String,
+    onTicketingClick: () -> Unit,
 ) {
     Column() {
         EventHeaderItem(
@@ -81,6 +83,7 @@ fun EventInfo(
             icon = Icons.Default.Paid,
             text = text,
             modifier = Modifier.padding(16.dp, vertical = 8.dp),
+            onClick = onTicketingClick,
         )
         EventHeaderItem(
             icon = Icons.Default.Public,
@@ -95,9 +98,12 @@ fun EventHeaderItem(
     modifier: Modifier = Modifier,
     icon: ImageVector,
     text: String,
+    onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, contentDescription = null)

@@ -42,6 +42,7 @@ fun EventDetailScreen(
     onGoingToggle: (Event) -> Unit,
     onGoingCountClick: () -> Unit,
     onInterestedCountClick: () -> Unit,
+    onTicketingClick: (String) -> Unit,
 ) {
     val state = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -79,6 +80,7 @@ fun EventDetailScreen(
                         onGoingToggle = onGoingToggle,
                         onGoingCountClick = onGoingCountClick,
                         onInterestedCountClick = onInterestedCountClick,
+                        onTicketingClick = onTicketingClick,
                     )
                     is EventDetailUiState.NoEvents -> {
                         Text("No event")
@@ -99,6 +101,7 @@ fun Event(
     onGoingToggle: (Event) -> Unit,
     onGoingCountClick: () -> Unit,
     onInterestedCountClick: () -> Unit,
+    onTicketingClick: (String) -> Unit,
 ) {
     val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
     val state = rememberLazyListState()
@@ -117,6 +120,7 @@ fun Event(
                 onManageClick = onManageClick,
                 onInterested = onInterestedToggle,
                 onGoing = onGoingToggle,
+                onTicketingClick = onTicketingClick,
             )
         }
 
@@ -174,7 +178,7 @@ fun EventResponses(
                 modifier = Modifier
                     .weight(1f)
                     .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
-                    .clickable { onInterestedCountClick() } ,
+                    .clickable { onInterestedCountClick() },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
@@ -216,6 +220,7 @@ fun EventHeader(
     onManageClick: () -> Unit,
     onGoing: (Event) -> Unit,
     onInterested: (Event) -> Unit,
+    onTicketingClick: (String) -> Unit,
 ) {
     AsyncImage(
         model = event.imageUrl,
@@ -251,6 +256,7 @@ fun EventHeader(
             startTimeSeconds = event.startDate,
             interestedCount = event.interestedCount,
             goingCount = event.goingCount,
+            onTicketingClick = { onTicketingClick(event.id) },
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
