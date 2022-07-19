@@ -152,6 +152,7 @@ dependencies {
     // Moshi
     implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
 
+
     // Material design icons
     implementation "androidx.compose.material:material-icons-core:1.1.1"
     implementation "androidx.compose.material:material-icons-extended:1.1.1"
@@ -173,7 +174,7 @@ dependencies {
     implementation 'androidx.camera:camera-lifecycle:1.2.0-alpha03'
 
     // Coil for Compose
-    implementation "io.coil-kt:coil-compose:2.0.0"
+    implementation "io.coil-kt:coil-compose:2.1.0"
 
     // Google Ads
     implementation 'com.google.android.gms:play-services-ads:21.0.0'

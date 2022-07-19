@@ -1,13 +1,9 @@
-package com.salazar.cheers
-
-import android.Manifest
+package com.salazar.cheers import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Looper
 import android.os.StrictMode
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -16,8 +12,6 @@ import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.core.app.ActivityCompat
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -29,7 +23,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
@@ -40,13 +33,8 @@ import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.ui.CheersApp
-import com.salazar.cheers.util.Constants
 import com.salazar.cheers.util.StorageUtil
-import com.snap.creativekit.SnapCreative
-import com.snap.creativekit.exceptions.SnapMediaSizeException
-import com.snap.creativekit.models.SnapPhotoContent
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
