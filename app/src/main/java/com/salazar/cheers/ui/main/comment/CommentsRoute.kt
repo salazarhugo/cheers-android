@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -18,7 +16,7 @@ fun CommentsRoute(
     commentsViewModel: CommentsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 
-) {
+    ) {
     val uiState by commentsViewModel.uiState.collectAsState()
 
     CommentsScreen(

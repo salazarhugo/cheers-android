@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.story
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
@@ -10,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.navigation.CheersNavigationActions
+import kotlinx.coroutines.launch
 
 /**
  * Stateful composable that displays the Navigation route for the Story screen.
@@ -27,6 +29,7 @@ fun StoryRoute(
     val uiState by storyViewModel.uiState.collectAsState()
     val systemUiController = rememberSystemUiController()
     val darkIcons = !isSystemInDarkTheme()
+    val scope = rememberCoroutineScope()
 
     val background = MaterialTheme.colorScheme.background
 
@@ -49,6 +52,11 @@ fun StoryRoute(
             when (action) {
                 is StoryUIAction.OnDelete -> storyViewModel.onDelete(storyId = storyId)
                 is StoryUIAction.OnActivity -> navActions.navigateToStoryStats(storyId)
+                is StoryUIAction.OnMore -> {
+                    scope.launch {
+                        uiState.sheetState.animateTo(ModalBottomSheetValue.Expanded)
+                    }
+                }
             }
         },
         onStoryOpen = storyViewModel::onStorySeen,

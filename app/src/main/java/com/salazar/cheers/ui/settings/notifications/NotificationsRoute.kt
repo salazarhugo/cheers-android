@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.settings.notifications
 
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue

@@ -68,7 +68,9 @@ fun SignInScreen(
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize().animateContentSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .animateContentSize(),
         ) {
             Column(
                 modifier = Modifier
@@ -93,7 +95,8 @@ fun SignInScreen(
                     Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.height(16.dp))
                 TextDivider(dayString = "OR")
-                val text = if (uiState.isPasswordless) "Sign in with password" else "Sign in with email link"
+                val text =
+                    if (uiState.isPasswordless) "Sign in with password" else "Sign in with email link"
                 TextButton(onClick = onPasswordLessChange) {
                     Text(text = text)
                 }

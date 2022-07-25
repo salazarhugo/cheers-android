@@ -6,10 +6,10 @@ import androidx.camera.core.ImageCapture
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.navigation.CheersNavigationActions
-import androidx.compose.ui.platform.LocalContext
 
 /**
  * Stateful composable that displays the Navigation route for the ChatCamera screen.

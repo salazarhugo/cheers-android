@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.io.Serializable
 
 @Entity(
     tableName = "users",
@@ -31,9 +30,15 @@ data class User(
     val followBack: Boolean = false,
     @ColumnInfo(defaultValue = "false")
     val friend: Boolean = false,
-    @ColumnInfo(defaultValue = "false")
-    val hasStory: Boolean = false,
+    @ColumnInfo(defaultValue = "EMPTY")
+    val storyState: StoryState = StoryState.EMPTY,
     @ColumnInfo(defaultValue = "false")
     val seenStory: Boolean = false,
     val created: Long = 0L,
 )
+
+enum class StoryState {
+    EMPTY,
+    NOT_SEEN,
+    SEEN,
+}

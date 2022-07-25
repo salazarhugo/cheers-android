@@ -1,6 +1,6 @@
 package com.salazar.cheers.data.repository
 
-import com.salazar.cheers.*
+import com.salazar.cheers.ChatServiceGrpcKt
 import io.grpc.ManagedChannel
 import java.io.Closeable
 import java.util.concurrent.TimeUnit

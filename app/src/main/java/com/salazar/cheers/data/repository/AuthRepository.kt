@@ -52,7 +52,7 @@ class AuthRepository @Inject constructor(
         return try {
             val user = service.getUser(userIdOrUsername = userId)
             Result.Success(user)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)
         }

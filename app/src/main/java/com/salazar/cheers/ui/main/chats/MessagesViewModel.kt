@@ -3,13 +3,11 @@ package com.salazar.cheers.ui.main.chats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Room
-import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,7 +64,7 @@ class MessagesViewModel @Inject constructor(
     }
 
     fun onSwipeRefresh() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             chatRepository.getChannels().collect { channels ->
                 viewModelState.update {
                     it.copy(channels = channels, isLoading = false)

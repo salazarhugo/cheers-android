@@ -35,7 +35,7 @@ enum class ActivityType {
 }
 
 fun ActivityType.toSentence(): String {
-    return when(this) {
+    return when (this) {
         NONE -> ""
         FOLLOW -> "started following you."
         POST_LIKE -> "liked your post."

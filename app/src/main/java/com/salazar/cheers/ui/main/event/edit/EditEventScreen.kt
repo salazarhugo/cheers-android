@@ -44,7 +44,7 @@ fun EditEventScreen(
             ) {
                 AsyncImage(
                     model = event.imageUrl,
-                    contentDescription =null,
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16 / 9f),

@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.home
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
@@ -14,13 +13,13 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.entities.Story
-import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.SuggestionUser
+import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -169,10 +168,11 @@ class HomeViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            userRepository.getUserSignIn(userId = FirebaseAuth.getInstance().currentUser?.uid!!).collect {
-                if (it is Resource.Success)
-                    updateUser(user = it.data)
-            }
+            userRepository.getUserSignIn(userId = FirebaseAuth.getInstance().currentUser?.uid!!)
+                .collect {
+                    if (it is Resource.Success)
+                        updateUser(user = it.data)
+                }
         }
 
         viewModelScope.launch {

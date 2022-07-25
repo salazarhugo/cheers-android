@@ -7,18 +7,17 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
-import com.mapbox.maps.extension.style.expressions.dsl.generated.get
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.repository.AuthRepository
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.service.MyFirebaseMessagingService
-import com.salazar.cheers.util.FirestoreUtil
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -206,7 +205,7 @@ class SignInViewModel @Inject constructor(
     private fun getUser(userId: String) {
         viewModelScope.launch {
             userRepository.getUserSignIn(userId = userId).collect { result ->
-                when(result) {
+                when (result) {
                     is Resource.Success -> updateIsSignedIn(true)
                     is Resource.Error -> {
                         updateErrorMessage(result.message)

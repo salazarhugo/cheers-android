@@ -45,7 +45,7 @@ fun ChatRoute(
         Permission(permission = Manifest.permission.RECORD_AUDIO) {
             Permission(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                 LaunchedEffect(Unit) {
-                        mediaRecorder.startRecording()
+                    mediaRecorder.startRecording()
                 }
                 DisposableEffect(Unit) {
                     onDispose {
@@ -108,7 +108,7 @@ private fun MediaRecorder.startRecording() {
     try {
         prepare()
     } catch (e: IOException) {
-            Log.e("TAG", e.toString())
+        Log.e("TAG", e.toString())
     }
 
     start()

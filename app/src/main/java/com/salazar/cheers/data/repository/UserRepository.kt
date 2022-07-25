@@ -7,7 +7,6 @@ import com.google.firebase.ktx.Firebase
 import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
@@ -21,7 +20,6 @@ import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -76,7 +74,7 @@ class UserRepository @Inject constructor(
                 date = Instant.now().epochSecond
             )
             cheersDao.insertRecentUser(recentUser)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             val user = userDao.getUserSuggestion(username = username) ?: return@withContext
             val recentUser = RecentUser(
                 id = user.id,
@@ -193,7 +191,7 @@ class UserRepository @Inject constructor(
 
             remoteUsers?.let { users ->
                 userDao.insertAll(users)
-                emit(Resource.Success( data = users ))
+                emit(Resource.Success(data = users))
             }
             emit(Resource.Loading(false))
         }

@@ -84,21 +84,15 @@ fun Post(
         item {
             UserItem(
                 user = User(),
-                isAuthor = true,
-                onUserClick = onUserClick,
+                onClick = onUserClick,
             )
         }
-//        if (postUsers.isNotEmpty())
-            item {
-                Text(
-                    text = "With",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-                )
-            }
-//        items(postUsers, key = { it.id }) { user ->
-//            UserItem(user = user, onUserClick = onUserClick)
-//        }
+        item {
+            Text(
+                text = "With",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+            )
+        }
     }
-
 }

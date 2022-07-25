@@ -1,6 +1,7 @@
 package com.salazar.cheers.components.event
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,7 +48,10 @@ fun EventDescription(
 
         ClickableText(
             text = styledDescription,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Light, color = MaterialTheme.colorScheme.onBackground),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Light,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
             modifier = Modifier.padding(vertical = 8.dp),
             onClick = {
                 styledDescription

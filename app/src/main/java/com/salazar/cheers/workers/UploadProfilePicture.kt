@@ -17,14 +17,10 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
 @HiltWorker

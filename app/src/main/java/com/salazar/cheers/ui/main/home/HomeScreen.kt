@@ -13,7 +13,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ContactPage
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -52,7 +53,9 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.components.*
+import com.salazar.cheers.components.CircularProgressIndicatorM3
+import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.components.MultiFabState
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
@@ -63,8 +66,6 @@ import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.main.chats.MyAppBar
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import kotlin.math.absoluteValue
@@ -178,7 +179,7 @@ fun Stories(
 ) {
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
     val profilePictureUrl = uiState.user?.profilePictureUrl
-    val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!)}
+    val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
 
     LazyRow(
         modifier = Modifier.padding(bottom = 8.dp),
@@ -186,24 +187,23 @@ fun Stories(
         item {
             val user = uiState.user
             if (user != null)
-            YourStory(
-                profilePictureUrl = profilePictureUrl,
-                onClick = {
-                    if (user.hasStory)
-                        onStoryClick(user.username)
-                    else
-                        onAddStoryClick()
-                          },
-                hasStory = user.hasStory,
-                seenStory = user.seenStory,
-            )
+                YourStory(
+                    profilePictureUrl = profilePictureUrl,
+                    onClick = {
+                        if (user.storyState == StoryState.SEEN || user.storyState == StoryState.NOT_SEEN)
+                            onStoryClick(user.username)
+                        else
+                            onAddStoryClick()
+                    },
+                    storyState = user.storyState,
+                )
         }
         items(items = stories, key = { it.id }) { story ->
             if (story != null && story.authorId != uid)
                 Story(
                     modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
                     username = story.username,
-                    seen = story.seen,
+                    seenStory = story.seen,
                     profilePictureUrl = story.profilePictureUrl,
                     onStoryClick = onStoryClick,
                 )
@@ -380,7 +380,8 @@ fun Suggestion(
                 Image(
                     painter = rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
-                            .data(data = suggestedUser.user.profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
+                            .data(data = suggestedUser.user.profilePictureUrl)
+                            .apply(block = fun ImageRequest.Builder.() {
                                 transformations(CircleCropTransformation())
                                 error(R.drawable.default_profile_picture)
                             }).build()
@@ -575,7 +576,7 @@ fun Post(
         PostText(
             caption = post.caption,
             onUserClicked = onUserClicked,
-            onPostClicked = { onPostClicked(post.id)},
+            onPostClicked = { onPostClicked(post.id) },
         )
         PostBody(
             post,
@@ -703,7 +704,7 @@ fun MyAppBar(
             IconButton(onClick = onActivityClick) {
                 BadgedBox(badge = {
                     if (notificationCount > 0)
-                    Badge { Text(text = notificationCount.toString())}
+                        Badge { Text(text = notificationCount.toString()) }
                 }) {
                     Icon(
                         Icons.Outlined.FavoriteBorder,

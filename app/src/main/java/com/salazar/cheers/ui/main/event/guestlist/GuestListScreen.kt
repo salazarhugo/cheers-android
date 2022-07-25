@@ -20,6 +20,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.event.add.TopAppBar
 import kotlinx.coroutines.launch
@@ -52,7 +53,8 @@ fun Tabs(
     uiState: GuestListUiState,
     onUserClick: (String) -> Unit,
 ) {
-    val interested = if (uiState.interested != null) "${uiState.interested.size} interested" else "Interested"
+    val interested =
+        if (uiState.interested != null) "${uiState.interested.size} interested" else "Interested"
     val going = if (uiState.going != null) "${uiState.going.size} going" else "Interested"
     val pages = listOf(interested, going, "Invited")
     val pagerState = rememberPagerState()
@@ -109,13 +111,14 @@ fun InterestedList(
     onUserClick: (String) -> Unit,
 ) {
     if (users != null) {
-        LazyColumn() {
+        LazyColumn {
             items(users) { user ->
                 UserItem(
                     user = user,
-                    followButton = true,
-                    onUserClick = { onUserClick(user.username) },
-                )
+                    onClick = { onUserClick(user.username) },
+                ) {
+                    FollowButton(isFollowing = user.followBack, onClick = {})
+                }
             }
         }
     }

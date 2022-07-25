@@ -28,8 +28,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.components.share.ErrorMessage
-import com.salazar.cheers.ui.auth.signup.SignUpUiState
 
 @Composable
 fun CreateAccountScreen(

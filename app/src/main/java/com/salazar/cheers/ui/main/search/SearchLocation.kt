@@ -8,14 +8,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.mapbox.api.geocoding.v5.models.CarmenFeature
-import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
-import com.salazar.cheers.components.CircularProgressIndicatorM3
 
 @Composable
 fun SearchLocation(
@@ -89,7 +85,7 @@ fun ResultItem(
             contentDescription = null,
         )
         Spacer(Modifier.width(16.dp))
-        Column() {
+        Column {
             if (name != null)
                 Text(
                     text = name,

@@ -28,7 +28,6 @@ import com.salazar.cheers.components.DividerM3
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.animations.AnimatedTextCounter
 import com.salazar.cheers.data.entities.Story
-import com.salazar.cheers.data.entities.StoryDetail
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.search.UserCard
 import kotlin.math.absoluteValue

@@ -4,20 +4,19 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Source
 import com.salazar.cheers.internal.User
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.launch
 
 
 object FirestoreUtil {
@@ -74,7 +73,7 @@ object FirestoreUtil {
             .delete()
     }
 
-    fun getComments(postId: String): Flow<List<Comment>> = callbackFlow{
+    fun getComments(postId: String): Flow<List<Comment>> = callbackFlow {
         val commentsDocument = firestoreInstance
             .collection("comments")
             .whereEqualTo("postId", postId)

@@ -44,7 +44,8 @@ fun Bounce(
                         currentState = BounceState.Released
                         onBounce()
                     })
-                }.graphicsLayer {
+                }
+                .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                 },

@@ -44,6 +44,7 @@ import com.salazar.cheers.components.post.LikeButton
 import com.salazar.cheers.components.post.PostBody
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
+import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
@@ -67,7 +68,8 @@ fun PostDetailScreen(
 ) {
     val post = uiState.postFeed
 //    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(TopAppBarScrollState(0f, 0f, 0f )) }
+    val scrollBehavior =
+        remember { TopAppBarDefaults.pinnedScrollBehavior(TopAppBarScrollState(0f, 0f, 0f)) }
 
     Scaffold(
         topBar = {
@@ -249,9 +251,10 @@ fun Post(
                 items(members, key = { it.id }) { user ->
                     UserItem(
                         user = user,
-                        followButton = true,
-                        onUserClick = { onUserClick(user.username) },
-                    )
+                        onClick = { onUserClick(user.username) },
+                    ) {
+                        FollowButton(isFollowing = user.followBack, onClick = {})
+                    }
                 }
             if (post.locationName.isNotBlank())
                 item {

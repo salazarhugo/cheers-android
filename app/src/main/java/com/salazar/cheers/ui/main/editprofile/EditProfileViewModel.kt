@@ -6,8 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
-import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadProfilePicture

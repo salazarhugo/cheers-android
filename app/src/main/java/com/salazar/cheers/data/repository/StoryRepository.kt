@@ -1,25 +1,20 @@
 package com.salazar.cheers.data.repository
 
-import android.util.Log
-import androidx.paging.*
-import com.google.firebase.auth.FirebaseAuth
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.paging.StoryRemoteMediator
-import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 

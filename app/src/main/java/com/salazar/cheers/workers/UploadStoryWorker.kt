@@ -18,14 +18,11 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import makeStatusNotification
 import java.io.ByteArrayOutputStream

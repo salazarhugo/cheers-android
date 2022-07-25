@@ -32,7 +32,7 @@ import java.util.*
     ],
     version = 1,
     exportSchema = true,
-    autoMigrations = [ ]
+    autoMigrations = []
 )
 abstract class CheersDatabase : RoomDatabase() {
     abstract fun cheersDao(): CheersDao
@@ -56,7 +56,7 @@ abstract class CheersDatabase : RoomDatabase() {
             instance ?: buildDatabase(context).also { instance = it }
         }
 
-        val MIGRATION_2_3 = object : Migration(1, 2){
+        val MIGRATION_2_3 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `user_suggestion` (`id` STRING, `name` STRING, `username` STRING, `avatar` STRING, `verified` BOOLEAN, `followBack` BOOLEAN, PRIMARY KEY(`id`))")
             }

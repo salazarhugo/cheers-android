@@ -1,37 +1,17 @@
 package com.salazar.cheers.ui.main.map
 
-import android.content.Context
 import android.util.Log
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapView
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.extension.style.layers.generated.circleLayer
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.animation.flyTo
-import com.mapbox.maps.plugin.attribution.attribution
-import com.mapbox.maps.plugin.gestures.OnMoveListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.plugin.locationcomponent.location2
-import com.mapbox.maps.plugin.scalebar.scalebar
-import com.mapbox.search.*
-import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.data.repository.MapRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.util.Utils.isDarkModeOn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -58,7 +38,7 @@ data class MapUiState(
 class MapViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
-    public val mapRepository: MapRepository,
+    val mapRepository: MapRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapUiState(isLoading = true))

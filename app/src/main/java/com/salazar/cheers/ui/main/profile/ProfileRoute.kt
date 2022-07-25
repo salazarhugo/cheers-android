@@ -1,10 +1,6 @@
 package com.salazar.cheers.ui.main.profile
 
 import android.widget.Toast
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.main.story.StoryRoute
 
 /**
  * Stateful composable that displays the Navigation route for the Profile screen.
@@ -35,39 +30,39 @@ fun ProfileRoute(
         }
     }
 
-        ProfileScreen(
-            uiState = uiState,
-            onSwipeRefresh = profileViewModel::onSwipeRefresh,
-            onPostMoreClicked = { postId, authorId ->
-                navActions.navigateToPostMoreSheet(
-                    postId,
-                    authorId
-                )
-            },
-            onStatClicked = { statName, username, verified ->
-                navActions.navigateToProfileStats(
-                    statName,
-                    username,
-                    verified,
-                )
-            },
-            onPostClicked = { navActions.navigateToPostDetail(it) },
-            onPostLike = profileViewModel::toggleLike,
-            onEditProfileClicked = { navActions.navigateToEditProfile() },
-            onDrinkingStatsClick = { navActions.navigateToDrinkingStats(it) },
-            navigateToProfileMoreSheet = { navActions.navigateToProfileMoreSheet(it) },
-            onStoryClick = { username ->
-                navActions.navigateToStoryWithUserId(username)
-           },
-            onWebsiteClicked = { website ->
-                var url = website
-                if (!url.startsWith("https://"))
-                    url = "https://$url"
-                uriHandler.openUri(url)
-            },
-            onCommentClick = {
-                navActions.navigateToPostComments(it)
-            }
-        )
+    ProfileScreen(
+        uiState = uiState,
+        onSwipeRefresh = profileViewModel::onSwipeRefresh,
+        onPostMoreClicked = { postId, authorId ->
+            navActions.navigateToPostMoreSheet(
+                postId,
+                authorId
+            )
+        },
+        onStatClicked = { statName, username, verified ->
+            navActions.navigateToProfileStats(
+                statName,
+                username,
+                verified,
+            )
+        },
+        onPostClicked = { navActions.navigateToPostDetail(it) },
+        onPostLike = profileViewModel::toggleLike,
+        onEditProfileClicked = { navActions.navigateToEditProfile() },
+        onDrinkingStatsClick = { navActions.navigateToDrinkingStats(it) },
+        navigateToProfileMoreSheet = { navActions.navigateToProfileMoreSheet(it) },
+        onStoryClick = { username ->
+            navActions.navigateToStoryWithUserId(username)
+        },
+        onWebsiteClicked = { website ->
+            var url = website
+            if (!url.startsWith("https://"))
+                url = "https://$url"
+            uriHandler.openUri(url)
+        },
+        onCommentClick = {
+            navActions.navigateToPostComments(it)
+        }
+    )
 
 }

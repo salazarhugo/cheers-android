@@ -25,7 +25,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.components.share.AppBar
 import com.salazar.cheers.components.share.ButtonWithLoading
-import com.salazar.cheers.ui.main.add.TopAppBar
 import com.salazar.cheers.util.Utils.validateUsername
 
 @Composable

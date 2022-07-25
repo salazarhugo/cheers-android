@@ -1,6 +1,5 @@
 package com.salazar.cheers.util
 
-import android.R.attr.bitmap
 import android.content.*
 import android.content.res.Configuration
 import android.graphics.*
@@ -21,7 +20,6 @@ import com.salazar.cheers.R
 import com.snap.creativekit.SnapCreative
 import com.snap.creativekit.exceptions.SnapMediaSizeException
 import com.snap.creativekit.models.SnapPhotoContent
-import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.lang.Math.min
 import java.text.SimpleDateFormat
@@ -32,7 +30,7 @@ object Utils {
 
     fun Context.shareToSnapchat(username: String) {
         val snapCreativeKitApi = SnapCreative.getApi(this)
-        val snapMediaFactory = SnapCreative.getMediaFactory(this);
+        val snapMediaFactory = SnapCreative.getMediaFactory(this)
 
         try {
             val file = File("${filesDir}/snapchat-add-friend.jpg")
@@ -44,7 +42,7 @@ object Utils {
             }
         } catch (e: SnapMediaSizeException) {
             Log.e("SNAP", e.toString())
-            return;
+            return
         }
     }
 
@@ -57,7 +55,10 @@ object Utils {
         return username.matches(regex)
     }
 
-    fun Modifier.conditional(condition : Boolean, modifier : Modifier.() -> Modifier) : Modifier {
+    fun Modifier.conditional(
+        condition: Boolean,
+        modifier: Modifier.() -> Modifier
+    ): Modifier {
         return if (condition) {
             modifier.invoke(this)
         } else {

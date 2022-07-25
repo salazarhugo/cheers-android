@@ -60,11 +60,31 @@ class CheersApplication : Application(), Configuration.Provider {
             importance
         )
 
-        val uploadsChannel = NotificationChannel(getString(R.string.upload_notification_channel_id), getString(R.string.upload_notification_channel_name), importance)
-        val cheersChannel = NotificationChannel(getString(R.string.cheers_notification_channel_id), getString(R.string.cheers_notification_channel_name), importance)
-        val newFollowChannel = NotificationChannel(getString(R.string.new_follower_notification_channel_id), getString(R.string.new_follower_notification_channel_name), importance)
-        val newPostChannel = NotificationChannel(getString(R.string.new_post_notification_channel_id), getString(R.string.new_post_notification_channel_name), importance)
-        val chatChannel = NotificationChannel(getString(R.string.chat_notification_channel_id), getString(R.string.chat_notification_channel_name), importance)
+        val uploadsChannel = NotificationChannel(
+            getString(R.string.upload_notification_channel_id),
+            getString(R.string.upload_notification_channel_name),
+            importance
+        )
+        val cheersChannel = NotificationChannel(
+            getString(R.string.cheers_notification_channel_id),
+            getString(R.string.cheers_notification_channel_name),
+            importance
+        )
+        val newFollowChannel = NotificationChannel(
+            getString(R.string.new_follower_notification_channel_id),
+            getString(R.string.new_follower_notification_channel_name),
+            importance
+        )
+        val newPostChannel = NotificationChannel(
+            getString(R.string.new_post_notification_channel_id),
+            getString(R.string.new_post_notification_channel_name),
+            importance
+        )
+        val chatChannel = NotificationChannel(
+            getString(R.string.chat_notification_channel_id),
+            getString(R.string.chat_notification_channel_name),
+            importance
+        )
 
         newFollowChannel.group = getString(R.string.general_group_id)
         cheersChannel.group = getString(R.string.general_group_id)
@@ -73,8 +93,14 @@ class CheersApplication : Application(), Configuration.Provider {
 
         notificationManager.createNotificationChannelGroups(
             listOf(
-                NotificationChannelGroup(getString(R.string.general_group_id), getString(R.string.general_group_name)),
-                NotificationChannelGroup(getString(R.string.messaging_group_id), getString(R.string.messaging_group_name)),
+                NotificationChannelGroup(
+                    getString(R.string.general_group_id),
+                    getString(R.string.general_group_name)
+                ),
+                NotificationChannelGroup(
+                    getString(R.string.messaging_group_id),
+                    getString(R.string.messaging_group_name)
+                ),
             )
         )
         notificationManager.createNotificationChannels(

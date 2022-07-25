@@ -1,12 +1,10 @@
 package com.salazar.cheers.ui.settings.security
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
@@ -24,7 +22,10 @@ fun SecurityRoute(
 ) {
     val uiState by securityViewModel.uiState.collectAsState()
     val authResultLauncher =
-        rememberLauncherForActivityResult(contract = AuthResultContract(), securityViewModel::onResult)
+        rememberLauncherForActivityResult(
+            contract = AuthResultContract(),
+            securityViewModel::onResult
+        )
 
     if (uiState.firebaseUser == null)
         LoadingScreen()
@@ -35,8 +36,8 @@ fun SecurityRoute(
             onUnlink = securityViewModel::onUnlink,
             onAddPassword = { navActions.navigateToPassword(it) },
             onLink = {
-                 if (it == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
-                     authResultLauncher.launch(1)
+                if (it == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
+                    authResultLauncher.launch(1)
             },
         )
 }

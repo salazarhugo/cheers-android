@@ -1,15 +1,14 @@
 package com.salazar.cheers.ui.main.camera
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.webkit.MimeTypeMap
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.Preview
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -230,7 +229,7 @@ fun ChatCameraFooter(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column() {
+        Column {
             Text(
                 text = name,
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
@@ -243,7 +242,7 @@ fun ChatCameraFooter(
             )
         }
         IconButton(
-            onClick = { cameraUIAction(CameraUIAction.OnSendClick)},
+            onClick = { cameraUIAction(CameraUIAction.OnSendClick) },
         ) {
             Icon(
                 Icons.Default.ChevronRight,

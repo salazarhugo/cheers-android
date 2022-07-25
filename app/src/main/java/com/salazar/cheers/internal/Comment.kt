@@ -1,8 +1,5 @@
 package com.salazar.cheers.internal
 
-import com.google.firebase.firestore.ServerTimestamp
-import java.util.*
-
 
 data class CommentWithAuthor(
     val author: User = User(),

@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material.icons.outlined.Celebration
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.*
@@ -15,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
@@ -57,7 +55,11 @@ fun OtherProfileScreen(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
+                ProfileHeader(
+                    user = uiState.user,
+                    onStatClicked = onStatClicked,
+                    onStoryClick = onStoryClick
+                )
                 ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
                 val isFollowed = uiState.user.followBack
                 HeaderButtons(
@@ -109,7 +111,7 @@ fun OtherProfileScreen(
                                 onPostLike = onPostLike,
                                 onPostClicked = onPostClicked,
                                 onPostMoreClicked = onPostMoreClicked,
-                                onCommentClick = { onCommentClick(postFeed.id)},
+                                onCommentClick = { onCommentClick(postFeed.id) },
                             )
                         }
                         1 -> FunctionalityNotAvailablePanel()

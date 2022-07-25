@@ -20,7 +20,6 @@ import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
-import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
 @HiltWorker

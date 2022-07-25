@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -45,7 +44,7 @@ fun EventsScreen(
 ) {
     Scaffold(
         topBar = {
-            Column() {
+            Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -228,7 +227,7 @@ fun EventMutualFriends(
                 .padding(start = 16.dp, end = 16.dp, top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box() {
+            Box {
                 if (profilePictureUrls.isNotEmpty())
                     UserProfilePicture(
                         avatar = profilePictureUrls[0],

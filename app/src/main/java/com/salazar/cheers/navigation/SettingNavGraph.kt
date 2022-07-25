@@ -13,7 +13,6 @@ import com.salazar.cheers.ui.settings.SettingsViewModel
 import com.salazar.cheers.ui.settings.language.LanguageRoute
 import com.salazar.cheers.ui.settings.notifications.NotificationsRoute
 import com.salazar.cheers.ui.settings.password.CreatePasswordRoute
-import com.salazar.cheers.ui.settings.payments.AddPaymentViewModel
 import com.salazar.cheers.ui.settings.payments.PaymentHistoryRoute
 import com.salazar.cheers.ui.settings.payments.RechargeRoute
 import com.salazar.cheers.ui.settings.security.SecurityRoute

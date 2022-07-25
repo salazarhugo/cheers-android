@@ -32,7 +32,7 @@ fun EventDetails(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column() {
+        Column {
             Text(
                 text = dateTimeFormatter(timestamp = startTimeSeconds),
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),

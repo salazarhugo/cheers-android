@@ -25,6 +25,7 @@ fun ProfileStatsRoute(
         onFollowToggle = profileStatsViewModel::toggleFollow,
         onUserClicked = { navActions.navigateToOtherProfile(it) },
         onBackPressed = navActions.navigateBack,
-        onSwipeRefresh = profileStatsViewModel::onSwipeRefresh
+        onSwipeRefresh = profileStatsViewModel::onSwipeRefresh,
+        onStoryClick = { navActions.navigateToStoryWithUserId(it) },
     )
 }

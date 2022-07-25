@@ -30,7 +30,7 @@ fun EventInfo(
     goingCount: Int,
     locationName: String,
 ) {
-    Column() {
+    Column {
         EventHeaderItem(
             icon = Icons.Default.Timer,
             text = relativeTimeFormatter(startTimeSeconds).toString(),
@@ -65,15 +65,15 @@ fun EventInfo(
         ) {
             Icon(Icons.Default.PinDrop, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Column() {
+            Column {
                 Text(
                     text = locationName,
                 )
                 if (address.isNotBlank())
-                Text(
-                    text = address,
-                    style = MaterialTheme.typography.labelMedium,
-                )
+                    Text(
+                        text = address,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
             }
         }
         val text = if (price <= 0) "Free" else "Price ${price / 100}"

@@ -72,13 +72,13 @@ fun PostComments(
     val text = if (commentCount > 1) "View all $commentCount comments" else "View 1 comment"
 
     if (commentCount > 0)
-    Text(
-        text = text,
-        modifier = Modifier
-            .clickable { onCommentClick() }
-            .padding(horizontal = 8.dp),
-        style = MaterialTheme.typography.labelLarge,
-    )
+        Text(
+            text = text,
+            modifier = Modifier
+                .clickable { onCommentClick() }
+                .padding(horizontal = 8.dp),
+            style = MaterialTheme.typography.labelLarge,
+        )
 }
 
 @Composable

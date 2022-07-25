@@ -75,7 +75,7 @@ fun SwipeToRefresh(
                 .offset(y = offset)
                 .fillMaxSize()
         ) {
-            Column() {
+            Column {
                 content()
             }
         }

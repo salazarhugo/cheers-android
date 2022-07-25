@@ -37,8 +37,11 @@ fun CheersApp(
     }
 }
 
-fun isDarkTheme(theme: Theme, isSystemInDarkTheme: Boolean): Boolean {
-    return when(theme) {
+fun isDarkTheme(
+    theme: Theme,
+    isSystemInDarkTheme: Boolean
+): Boolean {
+    return when (theme) {
         Theme.DARK -> true
         Theme.LIGHT -> false
         Theme.SYSTEM_DEFAULT -> isSystemInDarkTheme

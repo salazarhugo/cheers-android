@@ -1,18 +1,15 @@
 package com.salazar.cheers.ui.main.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Icon
@@ -28,23 +25,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.R
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.items.UserItem
@@ -53,7 +43,6 @@ import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,6 +52,7 @@ fun ProfileStatsScreen(
     verified: Boolean,
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
     onSwipeRefresh: () -> Unit,
 ) {
@@ -83,7 +73,9 @@ fun ProfileStatsScreen(
             Column {
                 Tabs(
                     uiState = uiState,
-                    onUserClicked = onUserClicked, onFollowToggle
+                    onUserClicked = onUserClicked,
+                    onFollowToggle = onFollowToggle,
+                    onStoryClick = onStoryClick,
                 )
             }
         }
@@ -94,6 +86,7 @@ fun ProfileStatsScreen(
 fun Tabs(
     uiState: ProfileStatsUiState,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
     val followersTitle =
@@ -138,8 +131,17 @@ fun Tabs(
     ) { page ->
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
-                0 -> Followers(followers = uiState.followers, onUserClicked)
-                1 -> Following(following = uiState.following, onUserClicked, onFollowToggle)
+                0 -> Followers(
+                    followers = uiState.followers,
+                    onUserClicked = onUserClicked,
+                    onStoryClick = onStoryClick,
+                )
+                1 -> Following(
+                    following = uiState.following,
+                    onUserClicked = onUserClicked,
+                    onStoryClick = onStoryClick,
+                    onFollowToggle = onFollowToggle,
+                )
             }
         }
     }
@@ -149,13 +151,26 @@ fun Tabs(
 fun Followers(
     followers: List<User>?,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
 ) {
     if (followers == null) {
         LoadingScreen()
     } else
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
-                FollowerCard(follower, onUserClicked)
+                UserItem(
+                    user = follower,
+                    onClick = onUserClicked,
+                    onStoryClick = onStoryClick,
+                ) {
+                    OutlinedButton(
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.height(34.dp),
+                        onClick = { /* TODO */ }
+                    ) {
+                        Text("Remove")
+                    }
+                }
             }
         }
 }
@@ -164,6 +179,7 @@ fun Followers(
 fun Following(
     following: List<User>?,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
     if (following == null) {
@@ -173,61 +189,13 @@ fun Following(
             items(following, key = { it.id }) { user ->
                 UserItem(
                     user = user,
-                    followButton = true,
-                    onUserClick = onUserClicked,
-                    onFollowToggle = { onFollowToggle(user) },
-                )
+                    onClick = onUserClicked,
+                    onStoryClick = onStoryClick,
+                ) {
+                    FollowButton(isFollowing = user.followBack, onClick = { onFollowToggle(user) })
+                }
             }
         }
-}
-
-@Composable
-fun FollowerCard(
-    user: User,
-    onUserClicked: (username: String) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onUserClicked(user.username) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = Typography.bodyMedium)
-                Username(
-                    username = user.username,
-                    verified = user.verified,
-                    textStyle = Typography.bodyMedium,
-                )
-            }
-        }
-        OutlinedButton(
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.height(34.dp),
-            onClick = { /* TODO */ }
-        ) {
-            Text("Remove")
-        }
-    }
 }
 
 @Composable

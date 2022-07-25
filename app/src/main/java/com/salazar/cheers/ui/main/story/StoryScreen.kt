@@ -12,20 +12,25 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -34,19 +39,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.components.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.components.story.StoryProgressBar
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.internal.Beverage
-import com.salazar.cheers.internal.User
-import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 
@@ -66,29 +69,37 @@ fun StoryScreen(
     val pagerState = rememberPagerState()
     val stories = uiState.stories
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
+    androidx.compose.material.ModalBottomSheetLayout(
+        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetState = uiState.sheetState,
+        sheetContent = {
+            StoryMoreBottomSheet(onStorySheetUIAction = {})
+        },
     ) {
-        if (stories != null && stories.isNotEmpty())
-        StoryCarousel(
-            stories = stories,
-            currentStep = uiState.currentStep,
-            pagerState = pagerState,
-            onStoryOpen = onStoryOpen,
-            onStoryFinish = {
-                onNavigateBack()
-            },
-            onUserClick = onUserClick,
-            value = uiState.input,
-            onInputChange = onInputChange,
-            onSendReaction = onSendReaction,
-            showInterstitialAd = showInterstitialAd,
-            onStoryUIAction = onStoryUIAction,
-            onPauseChange = onPauseChange,
-            onCurrentStepChange = onCurrentStepChange,
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            if (stories != null && stories.isNotEmpty())
+                StoryCarousel(
+                    stories = stories,
+                    currentStep = uiState.currentStep,
+                    pagerState = pagerState,
+                    onStoryOpen = onStoryOpen,
+                    onStoryFinish = {
+                        onNavigateBack()
+                    },
+                    onUserClick = onUserClick,
+                    value = uiState.input,
+                    onInputChange = onInputChange,
+                    onSendReaction = onSendReaction,
+                    showInterstitialAd = showInterstitialAd,
+                    onStoryUIAction = onStoryUIAction,
+                    onPauseChange = onPauseChange,
+                    onCurrentStepChange = onCurrentStepChange,
+                )
+        }
     }
 }
 
@@ -179,13 +190,12 @@ fun StoryCarousel(
                                 if (totalPressTime < 200) {
                                     val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
                                     if (isTapOnRightThreeQuarters) {
-                                        if((currentStep + 1) >= stories.size)
+                                        if ((currentStep + 1) >= stories.size)
                                             onStoryFinish()
                                         else
-                                            onCurrentStepChange(currentStep+1)
-                                    }
-                                    else
-                                        onCurrentStepChange(currentStep-1)
+                                            onCurrentStepChange(currentStep + 1)
+                                    } else
+                                        onCurrentStepChange(currentStep - 1)
                                 }
                                 isPressed.value = false
                             },
@@ -200,10 +210,10 @@ fun StoryCarousel(
                 story = story,
                 count = stories.size,
                 onStoryFinish = {
-                    if(currentStep + 1 >= stories.size)
+                    if (currentStep + 1 >= stories.size)
                         onStoryFinish()
                     else
-                        onCurrentStepChange(currentStep+1)
+                        onCurrentStepChange(currentStep + 1)
                 },
                 onUserClick = onUserClick,
                 pause = false,
@@ -288,41 +298,54 @@ fun StoryMeFooter(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable {
+        Item(
+            text = "Activity",
+            icon = Icons.Outlined.AccountCircle,
+            onClick = {
                 onStoryUIAction(StoryUIAction.OnActivity, story.id)
-            }
+            },
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Outlined.AccountCircle,
-                contentDescription = null,
-                tint = Color.White,
+            Item(
+                text = "Share",
+                icon = Icons.Default.Share,
+                onClick = {},
             )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "Activity",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White,
+            Item(
+                text = "More",
+                icon = Icons.Default.MoreVert,
+                onClick = {
+                    onStoryUIAction(StoryUIAction.OnMore, story.id)
+                },
             )
         }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable {
-                onStoryUIAction(StoryUIAction.OnDelete, story.id)
-            }
-        ) {
-            Icon(
-                Icons.Outlined.Delete,
-                contentDescription = null, tint = MaterialTheme.colorScheme.error
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "Delete",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White,
-            )
-        }
+    }
+}
+
+@Composable
+fun Item(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp),
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White,
+        )
     }
 }
 

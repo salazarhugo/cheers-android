@@ -7,7 +7,6 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.PostRemoteMediator
-import com.salazar.cheers.data.repository.StoryRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
@@ -39,7 +38,7 @@ class PostRepository @Inject constructor(
         }.flow
     }
 
-    suspend fun profilePost(userIdOrUsername: String): Flow<List<Post>>{
+    suspend fun profilePost(userIdOrUsername: String): Flow<List<Post>> {
         return flow {
             val posts = postDao.getUserPosts(userIdOrUsername)
 
@@ -48,7 +47,7 @@ class PostRepository @Inject constructor(
             val remoteUserPosts = try {
                 val response = coreService.getUserPosts(userIdOrUsername, 0, 20)
                 response
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 null
             }
 

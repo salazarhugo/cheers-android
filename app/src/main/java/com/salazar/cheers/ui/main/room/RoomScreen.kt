@@ -100,10 +100,11 @@ fun GroupDetailsHeader(
     ) {
         Image(
             painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = pictureUrl).apply(block = fun ImageRequest.Builder.() {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                }).build()
+                ImageRequest.Builder(LocalContext.current).data(data = pictureUrl)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }).build()
             ),
             modifier = Modifier
                 .size(100.dp)

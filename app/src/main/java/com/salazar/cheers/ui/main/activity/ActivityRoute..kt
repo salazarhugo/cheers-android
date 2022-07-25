@@ -25,7 +25,7 @@ fun ActivityRoute(
         onSwipeRefresh = activityViewModel::onSwipeRefresh,
         onActivityClick = {
             navActions.navigateToOtherProfile(it.userId)
-            when(it.type) {
+            when (it.type) {
                 ActivityType.FOLLOW -> navActions.navigateToOtherProfile(it.userId)
                 ActivityType.POST_LIKE -> navActions.navigateToOtherProfile(it.userId)
                 else -> {

@@ -1,18 +1,15 @@
 package com.salazar.cheers.ui.main.otherprofile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Icon
@@ -21,34 +18,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.R
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
-import com.salazar.cheers.components.user.FollowButton
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.main.profile.Following
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,6 +50,7 @@ fun OtherProfileStatsScreen(
     onSwipeRefresh: () -> Unit,
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
     Scaffold(
@@ -74,7 +68,12 @@ fun OtherProfileStatsScreen(
             modifier = Modifier.padding(it),
         ) {
             Column {
-                Tabs(uiState, onUserClicked = onUserClicked, onFollowToggle)
+                Tabs(
+                    uiState = uiState,
+                    onUserClicked = onUserClicked,
+                    onFollowToggle = onFollowToggle,
+                    onStoryClick = onStoryClick,
+                )
             }
         }
     }
@@ -84,10 +83,13 @@ fun OtherProfileStatsScreen(
 fun Tabs(
     uiState: OtherProfileStatsUiState,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
     onFollowToggle: (User) -> Unit,
 ) {
-    val followersTitle = if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
-    val followingTitle = if (uiState.following == null) "Following" else "${uiState.following.size} following"
+    val followersTitle =
+        if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
+    val followingTitle =
+        if (uiState.following == null) "Following" else "${uiState.following.size} following"
     val pages = listOf(followersTitle, followingTitle)
 
     val pagerState = rememberPagerState()
@@ -126,8 +128,17 @@ fun Tabs(
     ) { page ->
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
-                0 -> Followers(followers = uiState.followers, onUserClicked)
-                1 -> Following(following = uiState.following, onUserClicked, onFollowToggle)
+                0 -> Followers(
+                    followers = uiState.followers,
+                    onUserClicked = onUserClicked,
+                    onStoryClick = onStoryClick,
+                )
+                1 -> Following(
+                    following = uiState.following,
+                    onUserClicked = onUserClicked,
+                    onStoryClick = onStoryClick,
+                    onFollowToggle = onFollowToggle,
+                )
             }
         }
     }
@@ -137,131 +148,20 @@ fun Tabs(
 fun Followers(
     followers: List<User>?,
     onUserClicked: (username: String) -> Unit,
+    onStoryClick: (username: String) -> Unit,
 ) {
     if (followers == null)
         LoadingScreen()
     else
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
-                FollowerCard(follower, onUserClicked)
-            }
-        }
-}
-
-@Composable
-fun Following(
-    following: List<User>?,
-    onUserClicked: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
-) {
-    if (following == null)
-        LoadingScreen()
-    else
-        LazyColumn {
-        items(following, key = { it.id }) { following ->
-            FollowingCard(following, onUserClicked, onFollowToggle = onFollowToggle)
-        }
-    }
-}
-
-@Composable
-fun FollowerCard(
-    user: User,
-    onUserClicked: (username: String) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onUserClicked(user.username) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = Typography.bodyMedium)
-                Username(
-                    username = user.username,
-                    verified = user.verified,
-                    textStyle = Typography.bodyMedium,
+                UserItem(
+                    user = follower,
+                    onClick = onUserClicked,
+                    onStoryClick = onStoryClick,
                 )
             }
         }
-    }
-}
-
-@Composable
-fun FollowingCard(
-    user: User,
-    onUserClicked: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onUserClicked(user.username) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = Typography.bodyMedium)
-                Username(
-                    username = user.username,
-                    verified = user.verified,
-                    textStyle = Typography.bodyMedium,
-                )
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            var isFollowed by remember { mutableStateOf(user.followBack) }
-            FollowButton(
-                isFollowing = isFollowed,
-                onClick = {
-                    onFollowToggle(user)
-                    isFollowed = !isFollowed
-                }
-            )
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Default.MoreVert, null)
-            }
-        }
-    }
 }
 
 @Composable

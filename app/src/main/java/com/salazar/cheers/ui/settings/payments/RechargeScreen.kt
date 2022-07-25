@@ -33,7 +33,7 @@ fun RechargeScreen(
             modifier = Modifier
                 .padding(it)
                 .fillMaxWidth(),
-        ){
+        ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)

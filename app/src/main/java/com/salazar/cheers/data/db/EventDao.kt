@@ -42,10 +42,18 @@ interface EventDao {
     suspend fun update(event: Event)
 
     @Query("UPDATE events SET interested = :interested, interestedCount = :count WHERE eventId = :eventId")
-    suspend fun updateInterested(eventId: String, interested: Boolean, count: Int)
+    suspend fun updateInterested(
+        eventId: String,
+        interested: Boolean,
+        count: Int
+    )
 
     @Query("UPDATE events SET going = :going, goingCount = :count WHERE eventId = :eventId")
-    suspend fun updateGoing(eventId: String, going: Boolean, count: Int)
+    suspend fun updateGoing(
+        eventId: String,
+        going: Boolean,
+        count: Int
+    )
 
     @Transaction
     suspend fun toggleGoing(eventId: String) {

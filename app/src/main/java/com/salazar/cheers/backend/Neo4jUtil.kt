@@ -1,15 +1,8 @@
 package com.salazar.cheers.backend
 
 import com.google.firebase.functions.FirebaseFunctions
-import com.google.gson.Gson
 import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.entities.Story
-import com.salazar.cheers.internal.Event
-import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 
 object Neo4jUtil {

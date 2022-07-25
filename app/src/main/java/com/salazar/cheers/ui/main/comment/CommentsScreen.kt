@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -31,7 +29,6 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.Toolbar
 import com.salazar.cheers.components.share.UserProfilePicture
@@ -53,7 +50,7 @@ fun CommentsScreen(
 ) {
     Scaffold(
         topBar = {
-         Toolbar(title = "Comments", onBackPressed = onBackPressed)
+            Toolbar(title = "Comments", onBackPressed = onBackPressed)
         },
         bottomBar = {
             CommentBottomBar(
@@ -69,7 +66,11 @@ fun CommentsScreen(
             onRefresh = { Unit },
             modifier = Modifier.padding(it),
         ) {
-            Comments(comments = uiState.comments, post = uiState.post, onDeleteComment = onDeleteComment)
+            Comments(
+                comments = uiState.comments,
+                post = uiState.post,
+                onDeleteComment = onDeleteComment
+            )
         }
     }
 }
@@ -85,20 +86,20 @@ fun Comments(
             GuidelinesBanner()
         }
         if (post != null && post.caption.isNotBlank())
-        item {
-            Caption(post = post)
-            DividerM3()
-        }
+            item {
+                Caption(post = post)
+                DividerM3()
+            }
         if (comments != null)
-        items(comments) { comment ->
-            com.salazar.cheers.components.comment.Comment(
-                comment = comment,
-                onLike = {},
-                onReply = {},
-                onCommentClicked = {},
-                onDeleteComment = onDeleteComment,
-            )
-        }
+            items(comments) { comment ->
+                com.salazar.cheers.components.comment.Comment(
+                    comment = comment,
+                    onLike = {},
+                    onReply = {},
+                    onCommentClicked = {},
+                    onDeleteComment = onDeleteComment,
+                )
+            }
     }
 }
 
@@ -117,7 +118,7 @@ fun Caption(
             modifier = Modifier.size(36.dp),
         )
         Spacer(Modifier.width(8.dp))
-        Column() {
+        Column {
             val annotatedString = buildAnnotatedString {
                 append(post.username)
                 if (post.verified) {
@@ -138,17 +139,17 @@ fun Caption(
                     )
                 }
             )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = annotatedString,
-                    style = MaterialTheme.typography.bodyMedium,
-                    inlineContent = inlineContentMap,
-                )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = annotatedString,
+                style = MaterialTheme.typography.bodyMedium,
+                inlineContent = inlineContentMap,
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = relativeTimeFormatter(timestamp = post.created/1000),
+                    text = relativeTimeFormatter(timestamp = post.created / 1000),
                     style = MaterialTheme.typography.labelMedium,
                 )
             }

@@ -1,6 +1,5 @@
 package com.salazar.cheers.components.post
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
@@ -40,11 +39,11 @@ fun PostText(
                     if (annotation == null)
                         onPostClicked()
                     else
-                    when (annotation.tag) {
-                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-                        SymbolAnnotationType.PERSON.name -> onUserClicked(annotation.item)
-                        else -> Unit
-                    }
+                        when (annotation.tag) {
+                            SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                            SymbolAnnotationType.PERSON.name -> onUserClicked(annotation.item)
+                            else -> Unit
+                        }
                 }
         }
     )

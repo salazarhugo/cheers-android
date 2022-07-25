@@ -49,7 +49,7 @@ fun NfcScreen() {
 
         Card(
             onClick = {
-                  tap = !tap
+                tap = !tap
             },
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary),

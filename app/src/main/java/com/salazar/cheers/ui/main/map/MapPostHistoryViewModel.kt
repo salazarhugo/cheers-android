@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 data class MapPostHistoryUiState(
@@ -23,7 +22,7 @@ data class MapPostHistoryUiState(
 @HiltViewModel
 class MapPostHistoryViewModel @Inject constructor(
     postRepository: PostRepository,
-    public val mapRepository: MapRepository,
+    val mapRepository: MapRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapPostHistoryUiState(isLoading = true))

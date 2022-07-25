@@ -22,9 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.components.share.AppBar
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.auth.signin.CreateAccountScreen
-import com.salazar.cheers.ui.auth.signin.username.ChooseUsernameScreen
-import com.salazar.cheers.ui.sheets.SuccessSplashView
 import com.salazar.cheers.ui.theme.Green
 import com.salazar.cheers.ui.theme.GreenSurface
 import kotlinx.coroutines.delay

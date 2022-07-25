@@ -1,15 +1,9 @@
 package com.salazar.cheers.navigation
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.Transition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -80,19 +74,19 @@ fun CheersNavGraph(
             floatingActionButtonPosition = FabPosition.Center,
             floatingActionButton = {
                 if (!hide)
-                FloatingActionButton(
-                    onClick = {
-                        navActions.navigateToAddPostSheet()
-                    },
-                    modifier = Modifier.offset(y = (+58).dp),
-                    containerColor = MaterialTheme.colorScheme.secondary
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondary
-                    )
-                }
+                    FloatingActionButton(
+                        onClick = {
+                            navActions.navigateToAddPostSheet()
+                        },
+                        modifier = Modifier.offset(y = (+58).dp),
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
             },
             bottomBar = {
                 AnimatedVisibility(

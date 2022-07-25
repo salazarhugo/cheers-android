@@ -10,7 +10,6 @@ import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.entities.RemoteKey
 import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
 import com.salazar.cheers.internal.Post
-import java.io.IOException
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
@@ -77,7 +76,7 @@ class PostRemoteMediator(
     private suspend fun getRemoteKeyForFirstItem(
         state: PagingState<Int, Post>
     ): RemoteKey? {
-        return state.pages.firstOrNull() { it.data.isNotEmpty() }?.data?.firstOrNull()
+        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
             ?.let { post ->
                 remoteKeyDao.remoteKeyByPostId(postId = post.id)
             }

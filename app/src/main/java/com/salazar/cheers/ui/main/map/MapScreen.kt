@@ -6,17 +6,18 @@ import android.graphics.BitmapFactory
 import android.media.ThumbnailUtils
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.PublicOff
 import androidx.compose.material3.*
@@ -30,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.scale
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -47,7 +47,6 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.salazar.cheers.R
 import com.salazar.cheers.components.utils.Permission
 import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
 import com.salazar.cheers.util.Utils.getCircularBitmapWithWhiteBorder
@@ -100,16 +99,20 @@ fun MapScreen(
     ) {
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(onClick = {}) {
-                    Icon(Icons.Default.MyLocation, null)
+                FloatingActionButton(
+                    onClick = {},
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.background,
+                ) {
+                    Icon(Icons.Default.NearMe, null)
                 }
             }
         ) {
-                Box(
-                    contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.padding(it),
-                ) {
-                    Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+                modifier = Modifier.padding(it),
+            ) {
+                Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
                         factory = {
@@ -237,7 +240,7 @@ fun UiLayer(
             }
         Surface(
             shape = RoundedCornerShape(22.dp),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+            color = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
@@ -258,7 +261,7 @@ private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) 
 
     return@withContext try {
 
-        val bitmap =BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
+        val bitmap = BitmapFactory.decodeStream(urlObj.openConnection().getInputStream())
 
         ThumbnailUtils.extractThumbnail(bitmap, 100, 100, ThumbnailUtils.OPTIONS_RECYCLE_INPUT)
             .getCircularBitmapWithWhiteBorder()

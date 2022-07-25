@@ -4,16 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.filter
-import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.internal.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import okhttp3.internal.notify
-import java.time.Instant
 import javax.inject.Inject
 
 data class EventsUiState(

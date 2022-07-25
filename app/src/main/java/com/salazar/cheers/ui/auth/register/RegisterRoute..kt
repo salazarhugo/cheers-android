@@ -34,7 +34,7 @@ fun RegisterRoute(
     LaunchedEffect(uiState.isUsernameAvailable) {
         if (!uiState.isUsernameAvailable) return@LaunchedEffect
         scope.launch {
-            pagerState.animateScrollToPage(pagerState.currentPage+1)
+            pagerState.animateScrollToPage(pagerState.currentPage + 1)
         }
     }
 

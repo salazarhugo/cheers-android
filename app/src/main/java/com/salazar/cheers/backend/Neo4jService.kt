@@ -1,14 +1,8 @@
 package com.salazar.cheers.backend
 
-import android.util.Log
-import com.beust.klaxon.Klaxon
-import com.google.firebase.functions.FirebaseFunctions
-import com.google.gson.Gson
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.entities.UserStats
-import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 

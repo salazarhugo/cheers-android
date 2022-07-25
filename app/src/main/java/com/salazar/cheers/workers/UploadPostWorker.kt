@@ -24,7 +24,6 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import makeStatusNotification
-import okhttp3.internal.notify
 import java.io.ByteArrayOutputStream
 
 @HiltWorker

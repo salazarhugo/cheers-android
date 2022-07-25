@@ -2,12 +2,14 @@ package com.salazar.cheers.ui.main.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,9 +53,10 @@ class ProfileStatsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val following = userRepository.getFollowing(FirebaseAuth.getInstance().currentUser?.uid!!)
+            val following =
+                userRepository.getFollowing(FirebaseAuth.getInstance().currentUser?.uid!!)
             viewModelState.update {
-                it.copy(following = following,  isLoadingFollowing = false)
+                it.copy(following = following, isLoadingFollowing = false)
             }
         }
     }
@@ -64,7 +67,8 @@ class ProfileStatsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val followers = userRepository.getFollowers(FirebaseAuth.getInstance().currentUser?.uid!!)
+            val followers =
+                userRepository.getFollowers(FirebaseAuth.getInstance().currentUser?.uid!!)
             viewModelState.update {
                 it.copy(followers = followers, isLoadingFollowers = false)
             }

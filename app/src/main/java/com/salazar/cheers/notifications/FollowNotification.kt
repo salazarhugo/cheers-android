@@ -57,7 +57,10 @@ fun Service.newFollowerNotification(
     title: String,
     body: String,
 ): NotificationCompat.Builder {
-    return NotificationCompat.Builder(this, getString(R.string.new_follower_notification_channel_id))
+    return NotificationCompat.Builder(
+        this,
+        getString(R.string.new_follower_notification_channel_id)
+    )
         .setSmallIcon(R.drawable.ic_cheers_logo)
         .setContentTitle(title)
         .setColor(Purple200.toArgb())

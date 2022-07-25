@@ -35,6 +35,7 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.components.CircularProgressIndicatorM3
 import com.salazar.cheers.components.Username
+import com.salazar.cheers.components.items.UserItem
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.user.FollowButton
@@ -131,25 +132,25 @@ private fun SearchBody(
         }
 
         if (uiState.isLoading)
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicatorM3()
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicatorM3()
+                }
             }
-        }
 
         if (uiState.users != null)
-        items(uiState.users, key = { it.id }) { user ->
-            UserCard(
-                modifier = Modifier.animateItemPlacement(),
-                user = user,
-                onUserClicked = onUserClicked,
-            )
-        }
+            items(uiState.users, key = { it.id }) { user ->
+                UserItem(
+                    modifier = Modifier.animateItemPlacement(),
+                    user = user,
+                    onClick = onUserClicked,
+                )
+            }
     }
 }
 

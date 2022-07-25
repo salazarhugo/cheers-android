@@ -36,7 +36,7 @@ fun EventGoingButton(
             onClick = onGoingToggle,
             modifier = modifier,
         ) {
-            Row() {
+            Row {
                 Icon(iconGoing, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text("Going")

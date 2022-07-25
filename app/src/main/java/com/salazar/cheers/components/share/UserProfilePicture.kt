@@ -15,57 +15,62 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.firebase.perf.metrics.resource.ResourceType
 import com.salazar.cheers.R
-import com.salazar.cheers.util.Utils.conditional
+import com.salazar.cheers.components.animations.Bounce
+import com.salazar.cheers.internal.StoryState
 
 @Composable
 fun UserProfilePicture(
     modifier: Modifier = Modifier,
     avatar: String,
-    hasStory: Boolean = false,
-    seenStory: Boolean = false,
+    storyState: StoryState = StoryState.EMPTY,
     @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,
+    onClick: () -> Unit = {},
 ) {
     val border =
-        if (seenStory)
-            BorderStroke(
+        when (storyState) {
+            StoryState.EMPTY -> BorderStroke(
                 2.dp,
-                color = Color.Gray
+                color = Color.Transparent
             )
-        else
-            BorderStroke(
-                2.dp,
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFEC01FB),
-                        Color(0xFF7f00ff),
+            StoryState.SEEN ->
+                BorderStroke(
+                    1.dp,
+                    color = Color.Gray
+                )
+            StoryState.NOT_SEEN ->
+                BorderStroke(
+                    2.dp,
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFEC01FB),
+                            Color(0xFF7f00ff),
+                        )
                     )
                 )
-            )
+        }
 
-    Image(
-        painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = avatar).apply(block = fun ImageRequest.Builder.() {
-                transformations(CircleCropTransformation())
-                error(placeHolder)
-            }).build()
-        ),
-        contentDescription = "Profile picture",
-        modifier = modifier
-            .conditional(hasStory) {
-                border(border, CircleShape)
-            }
-            .size(size)
-            .conditional(hasStory) {
-                padding(5.dp)
-            }
-            .clip(CircleShape),
-        contentScale = ContentScale.Crop
-    )
+    Bounce(onBounce = onClick) {
+        Image(
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = avatar)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        transformations(CircleCropTransformation())
+                        error(placeHolder)
+                    }).build()
+            ),
+            contentDescription = "Profile picture",
+            modifier = modifier
+                .border(border, CircleShape)
+                .padding(5.dp)
+                .size(size)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+    }
 }

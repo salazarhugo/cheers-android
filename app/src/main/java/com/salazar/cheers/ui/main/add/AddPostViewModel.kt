@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -195,7 +194,7 @@ class AddPostViewModel @Inject constructor(
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
                         "DRUNKENNESS" to uiState.drunkenness,
-                        "BEVERAGE" to uiState. beverage.name,
+                        "BEVERAGE" to uiState.beverage.name,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,
                         "LOCATION_LATITUDE" to uiState.locationPoint?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.locationPoint?.longitude(),

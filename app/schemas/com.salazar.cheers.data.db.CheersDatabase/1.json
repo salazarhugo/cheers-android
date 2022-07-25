@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "505bfe90f085df057251e8e173ac50ff",
+    "identityHash": "964808e973e94223a874a9f16468f860",
     "entities": [
       {
         "tableName": "recentUsers",
@@ -406,7 +406,7 @@
       },
       {
         "tableName": "users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `name` TEXT NOT NULL, `postCount` INTEGER NOT NULL, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `coins` INTEGER NOT NULL, `phoneNumber` TEXT NOT NULL, `verified` INTEGER NOT NULL, `email` TEXT NOT NULL, `bio` TEXT NOT NULL, `profilePictureUrl` TEXT NOT NULL, `website` TEXT NOT NULL, `online` INTEGER NOT NULL, `darkMode` INTEGER NOT NULL, `registrationTokens` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `friend` INTEGER NOT NULL DEFAULT false, `hasStory` INTEGER NOT NULL DEFAULT false, `seenStory` INTEGER NOT NULL DEFAULT false, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `name` TEXT NOT NULL, `postCount` INTEGER NOT NULL, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `coins` INTEGER NOT NULL, `phoneNumber` TEXT NOT NULL, `verified` INTEGER NOT NULL, `email` TEXT NOT NULL, `bio` TEXT NOT NULL, `profilePictureUrl` TEXT NOT NULL, `website` TEXT NOT NULL, `online` INTEGER NOT NULL, `darkMode` INTEGER NOT NULL, `registrationTokens` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `friend` INTEGER NOT NULL DEFAULT false, `storyState` TEXT NOT NULL DEFAULT 'EMPTY', `seenStory` INTEGER NOT NULL DEFAULT false, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -518,11 +518,11 @@
             "defaultValue": "false"
           },
           {
-            "fieldPath": "hasStory",
-            "columnName": "hasStory",
-            "affinity": "INTEGER",
+            "fieldPath": "storyState",
+            "columnName": "storyState",
+            "affinity": "TEXT",
             "notNull": true,
-            "defaultValue": "false"
+            "defaultValue": "'EMPTY'"
           },
           {
             "fieldPath": "seenStory",
@@ -1204,7 +1204,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '505bfe90f085df057251e8e173ac50ff')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '964808e973e94223a874a9f16468f860')"
     ]
   }
 }

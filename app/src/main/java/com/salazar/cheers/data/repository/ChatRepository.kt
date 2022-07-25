@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.*
-import com.salazar.cheers.Room.newBuilder
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
@@ -74,7 +73,7 @@ class ChatRepository @Inject constructor(
 
     fun getUnreadChatCount(): Flow<Int> {
         return try {
-             chatDao.getUnreadChatCount()
+            chatDao.getUnreadChatCount()
         } catch (e: Exception) {
             flow { emit(0) }
         }

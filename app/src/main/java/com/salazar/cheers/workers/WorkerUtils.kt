@@ -28,7 +28,10 @@ fun makeStatusNotification(
     context: Context
 ) {
     // Create the notification
-    val builder = NotificationCompat.Builder(context, context.getString(R.string.upload_notification_channel_id))
+    val builder = NotificationCompat.Builder(
+        context,
+        context.getString(R.string.upload_notification_channel_id)
+    )
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle("Uploading...")
         .setContentText(message)

@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.otherprofile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import com.salazar.cheers.GetRoomIdReq
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.PostRepository

@@ -16,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.components.utils.BackPressHandler
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.ui.theme.Roboto
 

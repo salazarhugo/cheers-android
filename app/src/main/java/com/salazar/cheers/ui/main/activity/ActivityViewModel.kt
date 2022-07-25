@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 data class ActivityUiState(
@@ -40,13 +39,13 @@ class ActivityViewModel @Inject constructor(
 
     fun getActivity() {
         viewModelScope.launch {
-           userRepository.getActivity(fetchFromRemote = true).collect { result ->
-               when(result) {
-                   is Resource.Loading -> updateIsLoading(result.isLoading)
-                   is Resource.Error -> updateMessage(result.message)
-                   is Resource.Success -> updateActivities(result.data)
-               }
-           }
+            userRepository.getActivity(fetchFromRemote = true).collect { result ->
+                when (result) {
+                    is Resource.Loading -> updateIsLoading(result.isLoading)
+                    is Resource.Error -> updateMessage(result.message)
+                    is Resource.Success -> updateActivities(result.data)
+                }
+            }
         }
     }
 

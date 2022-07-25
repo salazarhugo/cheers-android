@@ -29,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
@@ -127,7 +126,11 @@ fun Profile(
                     Column(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
-                        ProfileHeader(user = uiState.user, onStatClicked = onStatClicked, onStoryClick = onStoryClick)
+                        ProfileHeader(
+                            user = uiState.user,
+                            onStatClicked = onStatClicked,
+                            onStoryClick = onStoryClick
+                        )
                         ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
                         ProfileButtons(
                             onEditProfileClicked = onEditProfileClicked,
@@ -231,7 +234,8 @@ fun ProfileButtons(
         FilledTonalButton(
             onClick = onEditProfileClicked,
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.weight(0.9f)
+            modifier = Modifier
+                .weight(0.9f)
                 .height(34.dp)
         ) {
             Text("Edit Profile")

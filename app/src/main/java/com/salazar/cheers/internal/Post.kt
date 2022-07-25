@@ -1,7 +1,9 @@
 package com.salazar.cheers.internal
 
-import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 object PostType {
     const val TEXT = "TEXT"
@@ -31,6 +33,7 @@ data class Post(
     val authorId: String = "",
     val caption: String = "",
     val username: String = "",
+    val storyState: StoryState = StoryState.EMPTY,
     val verified: Boolean = false,
     val profilePictureUrl: String = "",
     val created: Long = 0,

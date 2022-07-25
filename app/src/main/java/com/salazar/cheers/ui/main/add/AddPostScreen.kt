@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -22,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -350,7 +350,7 @@ fun TopAppBar(
     SmallTopAppBar(
         title = {
             Text("New post", fontWeight = FontWeight.Bold, fontFamily = Roboto)
-                },
+        },
         navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, "")
@@ -693,10 +693,11 @@ fun VideoPlayer(
 fun ProfilePicture(profilePictureUrl: String) {
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
-                transformations(CircleCropTransformation())
-                error(R.drawable.default_profile_picture)
-            }).build()
+            ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    transformations(CircleCropTransformation())
+                    error(R.drawable.default_profile_picture)
+                }).build()
         ),
         contentDescription = "Profile image",
         modifier = Modifier

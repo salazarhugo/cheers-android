@@ -1,22 +1,16 @@
 package com.salazar.cheers.data.repository
 
-import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.appcompat.content.res.AppCompatResources
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.layers.generated.circleLayer
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
-import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.attribution.attribution
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.R
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.locationcomponent.location2
 import com.mapbox.maps.plugin.scalebar.scalebar
@@ -165,30 +159,30 @@ class MapRepository @Inject constructor(
         locationComponentPlugin.puckBearingEnabled = false
 
         locationComponentPlugin.updateSettings {
-            pulsingEnabled = false
+            pulsingEnabled = true
             enabled = true
-            locationPuck = LocationPuck2D(
-                topImage = AppCompatResources.getDrawable(
-                    context,
-                    R.drawable.mapbox_user_icon
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    context,
-                    R.drawable.mapbox_user_icon_shadow
-                ),
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
+//            locationPuck = LocationPuck2D(
+//                topImage = AppCompatResources.getDrawable(
+//                    context,
+//                    R.drawable.mapbox_user_icon
+//                ),
+//                shadowImage = AppCompatResources.getDrawable(
+//                    context,
+//                    R.drawable.mapbox_user_icon_shadow
+//                ),
+//                scaleExpression = interpolate {
+//                    linear()
+//                    zoom()
+//                    stop {
+//                        literal(0.0)
+//                        literal(0.6)
+//                    }
+//                    stop {
+//                        literal(20.0)
+//                        literal(1.0)
+//                    }
+//                }.toJson()
+//            )
         }
         locationComponentPlugin.addOnIndicatorPositionChangedListener(
             onIndicatorPositionChangedListener

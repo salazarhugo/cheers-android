@@ -166,5 +166,5 @@ class EventRepository @Inject constructor(
         }
     }
 
-    companion object {}
+    companion object
 }

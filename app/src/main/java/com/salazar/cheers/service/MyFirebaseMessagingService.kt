@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.net.URL
 
 
-class MyFirebaseMessagingService: FirebaseMessagingService() {
+class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(newRegistrationToken: String) {
         super.onNewToken(newRegistrationToken)
@@ -47,7 +47,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
         if (notification != null) {
             makeNotification(
-                title =notification.title.toString(),
+                title = notification.title.toString(),
                 body = notification.body.toString(),
                 avatar = remoteMessage.data["avatar"],
                 channelId = "DEFAULT",
@@ -71,9 +71,12 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         channelId: String,
         roomId: String? = null,
     ) {
-        val builder = when(channelId) {
+        val builder = when (channelId) {
             getString(R.string.default_notification_channel_id) -> defaultNotification(title, body)
-            getString(R.string.new_follower_notification_channel_id) -> newFollowerNotification(title, body)
+            getString(R.string.new_follower_notification_channel_id) -> newFollowerNotification(
+                title,
+                body
+            )
             getString(R.string.new_post_notification_channel_id) -> newPostNotification(title, body)
             getString(R.string.chat_notification_channel_id) -> {
 //                if (!body.contains("is typing..."))
@@ -134,6 +137,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
         return pending
     }
+
     private fun incrementPreference(key: Preferences.Key<Int>) {
         GlobalScope.launch {
             dataStore.edit { preference ->

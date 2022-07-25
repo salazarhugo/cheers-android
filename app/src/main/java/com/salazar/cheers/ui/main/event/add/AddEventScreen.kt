@@ -538,7 +538,7 @@ fun CategorySection(
         ) {
             Icon(Icons.Outlined.Category, null)
             Spacer(modifier = Modifier.width(16.dp))
-            Column() {
+            Column {
                 Text(
                     text = "Category",
                     style = MaterialTheme.typography.titleMedium,
@@ -570,7 +570,7 @@ fun Description(
         Row {
             Icon(Icons.Outlined.Edit, null)
             Spacer(modifier = Modifier.width(16.dp))
-            Column() {
+            Column {
                 Text(
                     text = "Description",
                     style = MaterialTheme.typography.titleMedium,

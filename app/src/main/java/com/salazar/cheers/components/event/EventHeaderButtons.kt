@@ -3,8 +3,13 @@ package com.salazar.cheers.components.event
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Handyman
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -50,8 +55,7 @@ fun EventHeaderButtons(
                 Spacer(Modifier.width(4.dp))
                 Text("Invite")
             }
-        }
-        else {
+        } else {
             EventGoingButton(
                 going = going,
                 onGoingToggle = onGoingClick,
@@ -62,7 +66,7 @@ fun EventHeaderButtons(
             EventInterestButton(
                 interested = interested,
                 modifier = Modifier.weight(1f),
-                onInterestedToggle = { onInterestedClick()},
+                onInterestedToggle = { onInterestedClick() },
             )
         }
     }

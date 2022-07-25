@@ -96,10 +96,11 @@ fun EditProfileHeader(
 
         Image(
             painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = photo).apply(block = fun ImageRequest.Builder.() {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                }).build()
+                ImageRequest.Builder(LocalContext.current).data(data = photo)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        transformations(CircleCropTransformation())
+                        error(R.drawable.default_profile_picture)
+                    }).build()
             ),
             contentDescription = "Profile image",
             modifier = Modifier

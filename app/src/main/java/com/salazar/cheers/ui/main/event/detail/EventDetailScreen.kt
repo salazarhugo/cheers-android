@@ -174,7 +174,7 @@ fun EventResponses(
                 modifier = Modifier
                     .weight(1f)
                     .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
-                    .clickable { onInterestedCountClick() } ,
+                    .clickable { onInterestedCountClick() },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {

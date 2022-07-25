@@ -1,15 +1,13 @@
 package com.salazar.cheers.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Badge
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.FilterCenterFocus
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Home
@@ -26,11 +24,9 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.salazar.cheers.CheersViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ClearRippleTheme
 import com.salazar.cheers.internal.Screen
@@ -67,8 +63,8 @@ fun CheersNavigationBar(
         Screen(
             MainDestinations.EVENTS_ROUTE,
             navigateToCamera,
-            { Icon( Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground ) },
-            { Icon( Icons.Default.Event, null, tint = MaterialTheme.colorScheme.onBackground ) },
+            { Icon(Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
+            { Icon(Icons.Default.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
             "Camera"
         ),
         Screen(
@@ -76,11 +72,13 @@ fun CheersNavigationBar(
             navigateToMessages,
             icon = {
                 BadgedBox(badge = {
-                    if(unreadChatCount > 0)
-                    Badge {Text(
-                        text = unreadChatCount.toString(),
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    ) }
+                    if (unreadChatCount > 0)
+                        Badge {
+                            Text(
+                                text = unreadChatCount.toString(),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
                 }
                 ) {
                     Icon(
@@ -89,14 +87,16 @@ fun CheersNavigationBar(
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                   },
+            },
             selectedIcon = {
                 BadgedBox(badge = {
-                    if(unreadChatCount > 0)
-                        Badge {Text(
-                            text = unreadChatCount.toString(),
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        ) }
+                    if (unreadChatCount > 0)
+                        Badge {
+                            Text(
+                                text = unreadChatCount.toString(),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
                 }
                 ) {
                     Icon(
@@ -105,7 +105,7 @@ fun CheersNavigationBar(
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                           },
+            },
             "Messages"
         ),
     )
@@ -134,7 +134,8 @@ fun CheersNavigationBar(
                     Image(
                         painter = rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
-                                .data(data = profilePictureUrl).apply(block = fun ImageRequest.Builder.() {
+                                .data(data = profilePictureUrl)
+                                .apply(block = fun ImageRequest.Builder.() {
                                     transformations(CircleCropTransformation())
                                     error(R.drawable.default_profile_picture)
                                 }).build()

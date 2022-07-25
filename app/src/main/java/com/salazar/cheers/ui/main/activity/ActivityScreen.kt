@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.components.EmptyActivity
 import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.chat.EmptyChat
 import com.salazar.cheers.components.share.SwipeToRefresh
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.user.FollowButton
@@ -49,23 +48,23 @@ fun ActivityScreen(
         if (uiState.isLoading)
             LoadingScreen()
         else
-        SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
-            onRefresh = onSwipeRefresh,
-            modifier = Modifier.padding(it),
-        ) {
-            Column {
-                val activities = uiState.activities
+            SwipeToRefresh(
+                state = rememberSwipeToRefreshState(isRefreshing = false),
+                onRefresh = onSwipeRefresh,
+                modifier = Modifier.padding(it),
+            ) {
+                Column {
+                    val activities = uiState.activities
 
-                if (activities?.isEmpty() == true)
-                    EmptyActivity()
-                else
-                    ActivityList(
-                        activities = activities,
-                        onActivityClick = onActivityClick,
-                    )
+                    if (activities?.isEmpty() == true)
+                        EmptyActivity()
+                    else
+                        ActivityList(
+                            activities = activities,
+                            onActivityClick = onActivityClick,
+                        )
+                }
             }
-        }
     }
 }
 
@@ -75,7 +74,7 @@ fun ActivityList(
     activities: List<Activity>?,
     onActivityClick: (Activity) -> Unit,
 ) {
-    LazyColumn() {
+    LazyColumn {
         item {
             Text(
                 text = "This week",

@@ -7,7 +7,6 @@ import com.salazar.cheers.UserCard
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -83,7 +82,7 @@ class RoomViewModel @Inject constructor(
 
         viewModelScope.launch {
             val members = chatRepository.getRoomMembers(roomId = roomId)
-            onMembersChange(members= members)
+            onMembersChange(members = members)
         }
     }
 
