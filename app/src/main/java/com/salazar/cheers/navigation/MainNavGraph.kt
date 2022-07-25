@@ -53,6 +53,7 @@ import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
+import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Constants.URI
@@ -183,6 +184,12 @@ fun NavGraphBuilder.mainNavGraph(
         dialog(MainDestinations.CAMERA_ROUTE) {
             CameraRoute(
                 navActions = navActions
+            )
+        }
+
+        composable("${MainDestinations.TICKETING_ROUTE}/{eventId}") {
+            TicketingRoute(
+                navActions = navActions,
             )
         }
 

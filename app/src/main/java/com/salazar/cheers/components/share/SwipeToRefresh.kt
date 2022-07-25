@@ -39,20 +39,16 @@ fun SwipeToRefresh(
     val coroutineScope = rememberCoroutineScope()
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
 
-    // Our LaunchedEffect, which animates the indicator to its resting position
     LaunchedEffect(state.isSwipeInProgress) {
         if (!state.isSwipeInProgress) {
-            // If there's not a swipe in progress, rest the indicator at 0f
             state.animateOffsetTo(0f)
         }
     }
 
     val refreshTriggerPx = with(LocalDensity.current) { refreshTriggerDistance.toPx() }
 
-    // Our nested scroll connection, which updates our state.
     val nestedScrollConnection = remember(state, coroutineScope) {
         SwipeRefreshNestedScrollConnection(state, coroutineScope) {
-            // On refresh, re-dispatch to the update onRefresh block
             updatedOnRefresh.value.invoke()
         }
     }.apply {

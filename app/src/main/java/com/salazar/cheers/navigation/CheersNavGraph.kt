@@ -58,6 +58,7 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
                 || currentRoute.contains(MainDestinations.POST_COMMENTS)
+                || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
