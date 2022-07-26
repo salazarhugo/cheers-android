@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContactPage
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -61,6 +62,7 @@ import com.salazar.cheers.components.post.PostFooter
 import com.salazar.cheers.components.post.PostHeader
 import com.salazar.cheers.components.post.PostText
 import com.salazar.cheers.components.share.SwipeToRefresh
+import com.salazar.cheers.components.share.UserProfilePicture
 import com.salazar.cheers.components.share.rememberSwipeToRefreshState
 import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
@@ -488,6 +490,25 @@ fun PostList(
             )
             DividerM3()
         }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                UserProfilePicture(
+                    avatar = uiState.user?.profilePictureUrl ?: "",
+                )
+                OutlinedButton(onClick = {}) {
+                    Text("What's up party people?")
+                }
+                Icon(Icons.Outlined.Image, contentDescription = null)
+            }
+        }
+
         itemsIndexed(posts) { i, post ->
             if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
                 DividerM3()

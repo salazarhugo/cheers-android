@@ -1,11 +1,11 @@
 package com.salazar.cheers.ui.main.map
 
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.navigation.CheersNavigationActions
 import kotlinx.coroutines.launch
 
@@ -21,6 +21,15 @@ fun MapRoute(
 ) {
     val uiState by mapViewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
+
+    val systemUiController = rememberSystemUiController()
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = true,
+        )
+    }
 
     MapScreen(
         uiState = uiState,

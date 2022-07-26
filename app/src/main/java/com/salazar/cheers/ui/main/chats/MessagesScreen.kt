@@ -247,20 +247,9 @@ fun DirectConversation(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = channel.avatarUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+            UserProfilePicture(
+                avatar = channel.avatarUrl,
+                size = 50.dp,
             )
             Spacer(modifier = Modifier.width(14.dp))
             Column {
