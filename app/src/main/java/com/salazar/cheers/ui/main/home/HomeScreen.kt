@@ -85,6 +85,7 @@ fun HomeScreen(
     onStoryClick: (String) -> Unit,
     onActivityClick: () -> Unit,
     onAddStoryClick: () -> Unit,
+    onAddPostClick: () -> Unit,
     onLike: (post: Post) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
@@ -156,6 +157,7 @@ fun HomeScreen(
                                 onStoryClick = onStoryClick,
                                 onAddStoryClick = onAddStoryClick,
                                 onCommentClick = onCommentClick,
+                                onAddPostClick = onAddPostClick,
                             )
                         }
                         else -> {}
@@ -475,6 +477,7 @@ fun PostList(
     navigateToComments: (Post) -> Unit,
     onStoryClick: (String) -> Unit,
     onAddStoryClick: () -> Unit,
+    onAddPostClick: () -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
@@ -495,18 +498,26 @@ fun PostList(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+//                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 UserProfilePicture(
                     avatar = uiState.user?.profilePictureUrl ?: "",
+                    size = 36.dp,
                 )
-                OutlinedButton(onClick = {}) {
-                    Text("What's up party people?")
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "What's up party people?",
+                    modifier = Modifier.clickable {
+                        onAddPostClick()
+                    },
+                )
+                OutlinedButton(onClick = onAddPostClick) {
                 }
-                Icon(Icons.Outlined.Image, contentDescription = null)
+//                Icon(Icons.Outlined.Image, contentDescription = null)
             }
+            DividerM3()
         }
 
         itemsIndexed(posts) { i, post ->

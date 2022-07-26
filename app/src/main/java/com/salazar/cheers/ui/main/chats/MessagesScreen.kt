@@ -28,6 +28,7 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.RoomStatus
+import com.salazar.cheers.components.EmptyActivity
 import com.salazar.cheers.components.LoadingScreen
 import com.salazar.cheers.components.Username
 import com.salazar.cheers.components.chat.*
@@ -301,6 +302,7 @@ fun DirectConversation(
         val tint =
             if (channel.status == RoomStatus.NEW) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
 
+        EmptyActivity()
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {

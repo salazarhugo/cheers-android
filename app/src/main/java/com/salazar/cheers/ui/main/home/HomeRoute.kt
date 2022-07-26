@@ -46,5 +46,6 @@ fun HomeRoute(
         onAddStoryClick = { navActions.navigateToCamera() },
         onActivityClick = { navActions.navigateToActivity() },
         onCommentClick = { navActions.navigateToPostComments(it) },
+        onAddPostClick = { navActions.navigateToAddPostSheet() },
     )
 }

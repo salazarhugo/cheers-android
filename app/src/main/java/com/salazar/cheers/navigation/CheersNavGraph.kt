@@ -77,7 +77,7 @@ fun CheersNavGraph(
                 if (!hide)
                     FloatingActionButton(
                         onClick = {
-                            navActions.navigateToAddPostSheet()
+                            navActions.navigateToAddEvent()
                         },
                         modifier = Modifier.offset(y = (+58).dp),
                         containerColor = MaterialTheme.colorScheme.secondary
@@ -92,7 +92,6 @@ fun CheersNavGraph(
             bottomBar = {
                 AnimatedVisibility(
                     visible = !hide,
-//                    exit = shrinkOut(animationSpec = tween(2000))
                 ) {
                     CheersNavigationBar(
                         unreadChatCount = uiState.unreadChatCount,
