@@ -10,11 +10,16 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.salazar.cheers.components.share.UserProfilePicture
 import com.salazar.cheers.internal.StoryState
 import com.salazar.cheers.ui.theme.BlueCheers
@@ -25,13 +30,30 @@ fun YourStory(
     storyState: StoryState,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val workManager = WorkManager.getInstance(context)
+
+    val workInfos = workManager.getWorkInfosForUniqueWorkLiveData("upload_story")
+        .observeAsState()
+        .value
+
+    val uploadInfo = remember(key1 = workInfos) {
+        workInfos?.firstOrNull()
+    }
+
+    val storyState2 =
+        if (uploadInfo?.state == WorkInfo.State.RUNNING)
+            StoryState.LOADING
+        else
+            storyState
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
             UserProfilePicture(
                 avatar = profilePictureUrl ?: "",
-                storyState = storyState,
+                storyState = storyState2,
                 size = 64.dp,
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp),
                 onClick = onClick,

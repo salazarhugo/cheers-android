@@ -44,20 +44,24 @@ class CameraViewModel @Inject constructor(
     fun uploadStory() {
         val imageUri = viewModelState.value.imageUri ?: return
 
-        val uploadWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadStoryWorker>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(
+        val uploadWorkRequest =
+            OneTimeWorkRequestBuilder<UploadStoryWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(
                     workDataOf(
                         "PHOTO" to imageUri.toString(),
                         "STORY_TYPE" to "IMAGE",
                         "PRIVACY" to "FRIENDS",
                     )
                 )
-            }
                 .build()
 
-        workManager.enqueue(uploadWorkRequest)
+        workManager.enqueueUniqueWork(
+            "upload_story",
+            ExistingWorkPolicy.REPLACE,
+            uploadWorkRequest,
+        )
+
     }
 
     fun setImageUri(imageUri: Uri?) {

@@ -1,5 +1,7 @@
 package com.salazar.cheers.components.share
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -32,8 +35,22 @@ fun UserProfilePicture(
     size: Dp = 54.dp,
     onClick: () -> Unit = {},
 ) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val color by infiniteTransition.animateColor(
+        initialValue = Color(0xFFFFA500),
+        targetValue = Color.Transparent,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
     val border =
         when (storyState) {
+            StoryState.LOADING -> BorderStroke(
+                2.dp,
+                color = color
+            )
             StoryState.EMPTY -> BorderStroke(
                 2.dp,
                 color = Color.Transparent

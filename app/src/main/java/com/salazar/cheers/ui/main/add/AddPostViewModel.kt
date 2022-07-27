@@ -184,11 +184,10 @@ class AddPostViewModel @Inject constructor(
 
     fun uploadPost() {
         val uiState = viewModelState.value
-        Log.d("Cloud", uiState.photos.toString())
-        val uploadWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadPostWorker>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(
+        val uploadWorkRequest =
+            OneTimeWorkRequestBuilder<UploadPostWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(
                     workDataOf(
                         "PHOTOS" to uiState.photos.map { it.toString() }.toTypedArray(),
                         "POST_TYPE" to uiState.postType,
@@ -203,11 +202,16 @@ class AddPostViewModel @Inject constructor(
                         "NOTIFY" to uiState.notify,
                     )
                 )
-            }
                 .build()
 
         id.value = uploadWorkRequest.id
-        workManager.enqueue(uploadWorkRequest)
+
+        workManager.enqueueUniqueWork(
+            "post_upload",
+            ExistingWorkPolicy.REPLACE,
+            uploadWorkRequest,
+        )
+
         uploadWorkerState = workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).asFlow()
     }
 }

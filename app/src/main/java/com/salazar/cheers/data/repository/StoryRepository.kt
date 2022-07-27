@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.repository
 
+import android.app.Application
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -65,6 +66,7 @@ class StoryRepository @Inject constructor(
     suspend fun addStory(story: Story) = withContext(Dispatchers.IO) {
         try {
             coreService.createStory(story = story)
+            storyDao.insert(story)
         } catch (e: Exception) {
             e.printStackTrace()
         }

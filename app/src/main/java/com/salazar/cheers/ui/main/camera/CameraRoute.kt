@@ -80,7 +80,7 @@ fun CameraRoute(
             imageCapture = imageCapture,
             onStoryClick = {
                 cameraViewModel.uploadStory()
-                navActions.navigateBack()
+                navActions.navigateToHome()
             },
             onPostClicked = {
                 if (uiState.imageUri != null)

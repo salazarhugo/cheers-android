@@ -85,6 +85,7 @@ class PostRepository @Inject constructor(
     suspend fun addPost(post: Post) {
         try {
             coreService.createPost(post = post)
+            postDao.insert(post)
         } catch (e: Exception) {
             e.printStackTrace()
         }

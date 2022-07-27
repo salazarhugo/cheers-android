@@ -42,8 +42,6 @@ class UploadStoryWorker @AssistedInject constructor(
         val appContext = applicationContext
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
 
-        makeStatusNotification("Uploading", appContext)
-
         val photoUri =
             inputData.getString("PHOTO") ?: return Result.failure()
 
@@ -100,7 +98,6 @@ class UploadStoryWorker @AssistedInject constructor(
 
             storyRepository.addStory(story)
 
-            makeStatusNotification("Successfully uploaded", appContext)
             return Result.success()
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")
@@ -108,31 +105,31 @@ class UploadStoryWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat.Builder(
-            applicationContext,
-            applicationContext.getString(R.string.upload_notification_channel_id)
-        )
-            .setContentIntent(
-                PendingIntent.getActivity(
-                    applicationContext,
-                    2,
-                    Intent(applicationContext, MainActivity::class.java),
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-            )
-            .setOngoing(true)
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.cheers)
-            .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
-            .setLocalOnly(true)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
-            .setContentText("Updating widget")
-            .build()
-
-        return ForegroundInfo(42, notification)
-    }
+//    override suspend fun getForegroundInfo(): ForegroundInfo {
+//        val notification = NotificationCompat.Builder(
+//            applicationContext,
+//            applicationContext.getString(R.string.upload_notification_channel_id)
+//        )
+//            .setContentIntent(
+//                PendingIntent.getActivity(
+//                    applicationContext,
+//                    2,
+//                    Intent(applicationContext, MainActivity::class.java),
+//                    PendingIntent.FLAG_IMMUTABLE
+//                )
+//            )
+//            .setOngoing(true)
+//            .setAutoCancel(true)
+//            .setSmallIcon(R.drawable.cheers)
+//            .setOnlyAlertOnce(true)
+//            .setPriority(NotificationCompat.PRIORITY_MIN)
+//            .setLocalOnly(true)
+//            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+//            .setContentText("Updating widget")
+//            .build()
+//
+//        return ForegroundInfo(42, notification)
+//    }
 
     private fun extractImage(path: Uri): ByteArray {
         val source: ImageDecoder.Source =

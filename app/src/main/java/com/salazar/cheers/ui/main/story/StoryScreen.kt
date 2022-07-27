@@ -184,9 +184,10 @@ fun StoryCarousel(
                             onPress = {
                                 val pressStartTime = System.currentTimeMillis()
                                 isPressed.value = true
-                                this.tryAwaitRelease()
+                                tryAwaitRelease()
                                 val pressEndTime = System.currentTimeMillis()
                                 val totalPressTime = pressEndTime - pressStartTime
+
                                 if (totalPressTime < 200) {
                                     val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
                                     if (isTapOnRightThreeQuarters) {

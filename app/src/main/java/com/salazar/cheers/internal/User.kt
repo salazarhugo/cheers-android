@@ -41,4 +41,5 @@ enum class StoryState {
     EMPTY,
     NOT_SEEN,
     SEEN,
+    LOADING,
 }

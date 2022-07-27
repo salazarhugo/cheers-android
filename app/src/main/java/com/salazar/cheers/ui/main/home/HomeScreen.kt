@@ -13,11 +13,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ContactPage
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,6 +42,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -518,6 +522,33 @@ fun PostList(
 //                Icon(Icons.Outlined.Image, contentDescription = null)
             }
             DividerM3()
+        }
+
+        item {
+            val context = LocalContext.current
+            val workManager = WorkManager.getInstance(context)
+            val workInfos = workManager.getWorkInfosForUniqueWorkLiveData("post_upload")
+                .observeAsState()
+                .value
+
+            val uploadInfo = workInfos?.firstOrNull()
+
+            if (uploadInfo?.state == WorkInfo.State.RUNNING) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = uploadInfo.state.name,
+                    )
+//                    LinearProgressIndicator(progress = uploadInfo.progress.getFloat())
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Outlined.Close, contentDescription = null)
+                    }
+                }
+            }
         }
 
         itemsIndexed(posts) { i, post ->
