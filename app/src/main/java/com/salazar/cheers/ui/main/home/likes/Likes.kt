@@ -17,9 +17,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.Username
-import com.salazar.cheers.components.user.FollowButton
+import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.compose.Username
+import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography

@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.RoomType
-import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.compose.DividerM3
 
 @Composable
 fun ChatsMoreBottomSheet(

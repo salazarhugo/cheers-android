@@ -21,7 +21,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.CheersUiState
-import com.salazar.cheers.components.CheersNavigationBar
+import com.salazar.cheers.compose.CheersNavigationBar
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.GreySheet
 

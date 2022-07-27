@@ -18,9 +18,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
-import com.salazar.cheers.components.items.SettingTitle
-import com.salazar.cheers.components.share.ErrorMessage
-import com.salazar.cheers.components.share.Toolbar
+import com.salazar.cheers.compose.items.SettingTitle
+import com.salazar.cheers.compose.share.ErrorMessage
+import com.salazar.cheers.compose.share.Toolbar
 import com.salazar.cheers.ui.theme.GreenGoogle
 
 @Composable

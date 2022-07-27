@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.mapbox.maps.MapView
-import com.salazar.cheers.components.utils.Permission
+import com.salazar.cheers.compose.utils.Permission
 import kotlinx.coroutines.launch
 
 @Composable

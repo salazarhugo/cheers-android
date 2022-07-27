@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.BuildConfig
-import com.salazar.cheers.components.items.SettingItem
-import com.salazar.cheers.components.items.SettingTitle
-import com.salazar.cheers.components.share.ErrorMessage
-import com.salazar.cheers.components.share.Toolbar
+import com.salazar.cheers.compose.items.SettingItem
+import com.salazar.cheers.compose.items.SettingTitle
+import com.salazar.cheers.compose.share.ErrorMessage
+import com.salazar.cheers.compose.share.Toolbar
 
 @Composable
 fun SettingsScreen(

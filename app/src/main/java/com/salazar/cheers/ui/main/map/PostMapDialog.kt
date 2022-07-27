@@ -11,9 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.components.items.UserItem
-import com.salazar.cheers.components.post.PostBody
-import com.salazar.cheers.components.post.PostHeader
+import com.salazar.cheers.compose.items.UserItem
+import com.salazar.cheers.compose.post.PostBody
+import com.salazar.cheers.compose.post.PostHeader
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy

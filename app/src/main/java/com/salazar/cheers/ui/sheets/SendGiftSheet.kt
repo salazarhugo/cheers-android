@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.salazar.cheers.components.DividerM3
+import com.salazar.cheers.compose.DividerM3
 
 data class Sticker(
     val name: String,

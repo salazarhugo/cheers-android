@@ -22,9 +22,9 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.UserCard
-import com.salazar.cheers.components.Username
-import com.salazar.cheers.components.share.Toolbar
-import com.salazar.cheers.components.share.UserProfilePicture
+import com.salazar.cheers.compose.Username
+import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.settings.RedButton
 import com.salazar.cheers.ui.theme.BlueCheers
 

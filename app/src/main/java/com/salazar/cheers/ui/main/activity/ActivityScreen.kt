@@ -18,11 +18,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.components.EmptyActivity
-import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeToRefreshState
-import com.salazar.cheers.components.user.FollowButton
+import com.salazar.cheers.compose.EmptyActivity
+import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.ActivityType
 import com.salazar.cheers.internal.relativeTimeFormatter

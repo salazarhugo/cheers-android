@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.copyToClipboard

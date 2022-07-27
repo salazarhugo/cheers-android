@@ -55,21 +55,21 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.components.CircularProgressIndicatorM3
-import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.MultiFabState
-import com.salazar.cheers.components.post.PostBody
-import com.salazar.cheers.components.post.PostFooter
-import com.salazar.cheers.components.post.PostHeader
-import com.salazar.cheers.components.post.PostText
-import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.UserProfilePicture
-import com.salazar.cheers.components.share.rememberSwipeToRefreshState
-import com.salazar.cheers.components.story.Story
-import com.salazar.cheers.components.story.YourStory
-import com.salazar.cheers.components.utils.PrettyImage
+import com.salazar.cheers.compose.CircularProgressIndicatorM3
+import com.salazar.cheers.compose.DividerM3
+import com.salazar.cheers.compose.MultiFabState
+import com.salazar.cheers.compose.post.PostBody
+import com.salazar.cheers.compose.post.PostFooter
+import com.salazar.cheers.compose.post.PostHeader
+import com.salazar.cheers.compose.post.PostText
+import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.story.Story
+import com.salazar.cheers.compose.story.YourStory
+import com.salazar.cheers.compose.tabs.CustomTabs
+import com.salazar.cheers.compose.utils.PrettyImage
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.ui.main.chats.MyAppBar
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import kotlin.math.absoluteValue
@@ -111,32 +111,6 @@ fun HomeScreen(
                     DividerM3()
             }
         },
-//        floatingActionButton = {
-//            MultiFloatingActionButton(
-//                Icons.Default.Add,
-//                listOf(
-//                    MultiFabItem(
-//                        "event",
-//                        Icons.Outlined.Event,
-//                        "Party",
-//                    ),
-//                    MultiFabItem(
-//                        "post",
-//                        Icons.Outlined.PostAdd,
-//                        "Hangout",
-//                    )
-//                ), toState, true, { state ->
-//                    toState = state
-//                },
-//                onFabItemClicked = {
-//                    toState = MultiFabState.COLLAPSED
-//                    if (it.identifier == "event")
-//                        navigateToAddEvent()
-//                    else
-//                        navigateToAddPost()
-//                }
-//            )
-//        },
         content = {
             SwipeToRefresh(
                 state = rememberSwipeToRefreshState(isRefreshing = false),
@@ -791,6 +765,7 @@ fun MyAppBar(
         },
         title = {
             Text("Friends", fontWeight = FontWeight.Bold, fontFamily = Roboto)
+//            CustomTabs()
         },
         actions = {
             IconButton(onClick = onActivityClick) {

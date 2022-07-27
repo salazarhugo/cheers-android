@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.util.Utils.copyToClipboard

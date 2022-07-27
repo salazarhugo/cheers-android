@@ -28,11 +28,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.Toolbar
-import com.salazar.cheers.components.share.UserProfilePicture
-import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.DividerM3
+import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.relativeTimeFormatter
@@ -92,7 +92,7 @@ fun Comments(
             }
         if (comments != null)
             items(comments) { comment ->
-                com.salazar.cheers.components.comment.Comment(
+                com.salazar.cheers.compose.comment.Comment(
                     comment = comment,
                     onLike = {},
                     onReply = {},

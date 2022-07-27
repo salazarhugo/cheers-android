@@ -44,10 +44,10 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.components.post.PostHeader
-import com.salazar.cheers.components.sheets.StoryMoreBottomSheet
-import com.salazar.cheers.components.story.StoryProgressBar
-import com.salazar.cheers.components.utils.PrettyImage
+import com.salazar.cheers.compose.post.PostHeader
+import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
+import com.salazar.cheers.compose.story.StoryProgressBar
+import com.salazar.cheers.compose.utils.PrettyImage
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.internal.Beverage
 import kotlin.math.absoluteValue

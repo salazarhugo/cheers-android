@@ -27,10 +27,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.components.ChipGroup
-import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.Username
-import com.salazar.cheers.components.share.UserProfilePicture
+import com.salazar.cheers.compose.ChipGroup
+import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.compose.Username
+import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
 import com.salazar.cheers.ui.theme.Roboto

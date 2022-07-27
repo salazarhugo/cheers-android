@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.Username
-import com.salazar.cheers.components.items.UserItem
-import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.compose.Username
+import com.salazar.cheers.compose.items.UserItem
+import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.profile.Following
 import com.salazar.cheers.ui.theme.Roboto

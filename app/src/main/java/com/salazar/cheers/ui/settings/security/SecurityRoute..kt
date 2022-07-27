@@ -6,7 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.GoogleAuthProvider
-import com.salazar.cheers.components.LoadingScreen
+import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.auth.signin.AuthResultContract
 

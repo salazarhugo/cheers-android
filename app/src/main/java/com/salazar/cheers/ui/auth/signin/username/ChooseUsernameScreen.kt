@@ -23,8 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.components.share.AppBar
-import com.salazar.cheers.components.share.ButtonWithLoading
+import com.salazar.cheers.compose.share.AppBar
+import com.salazar.cheers.compose.share.ButtonWithLoading
 import com.salazar.cheers.util.Utils.validateUsername
 
 @Composable

@@ -33,7 +33,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
-import com.salazar.cheers.components.utils.Permission
+import com.salazar.cheers.compose.utils.Permission
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
 

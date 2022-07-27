@@ -13,16 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.components.DividerM3
-import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.shapes.TicketShape
-import com.salazar.cheers.components.share.SwipeToRefresh
-import com.salazar.cheers.components.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.DividerM3
+import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.Event
 import com.salazar.cheers.internal.dateTimeFormatter
 

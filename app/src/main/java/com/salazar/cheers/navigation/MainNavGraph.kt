@@ -18,8 +18,8 @@ import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.components.LoadingScreen
-import com.salazar.cheers.components.post.PostMoreBottomSheet
+import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.compose.post.PostMoreBottomSheet
 import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.AddPostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
