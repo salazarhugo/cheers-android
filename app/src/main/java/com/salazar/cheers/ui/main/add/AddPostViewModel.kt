@@ -184,6 +184,11 @@ class AddPostViewModel @Inject constructor(
 
     fun uploadPost() {
         val uiState = viewModelState.value
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         val uploadWorkRequest =
             OneTimeWorkRequestBuilder<UploadPostWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -202,6 +207,7 @@ class AddPostViewModel @Inject constructor(
                         "NOTIFY" to uiState.notify,
                     )
                 )
+                .setConstraints(constraints)
                 .build()
 
         id.value = uploadWorkRequest.id

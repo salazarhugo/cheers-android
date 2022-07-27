@@ -16,3 +16,6 @@ val GreySheet = Color(0xFF262626)
 
 val GreenSurface = Color(0xFFD7F7C2)
 val Green = Color(0xFF228402)
+
+val GreyInputDark = Color(0xFF3a3b3c)
+val GreyInputLight = Color(0xFFf0f2f5)

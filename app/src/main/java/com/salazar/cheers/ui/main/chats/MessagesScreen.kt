@@ -302,7 +302,6 @@ fun DirectConversation(
         val tint =
             if (channel.status == RoomStatus.NEW) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
 
-        EmptyActivity()
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {

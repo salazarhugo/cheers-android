@@ -13,10 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.ContactPage
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -72,6 +69,7 @@ import com.salazar.cheers.components.story.Story
 import com.salazar.cheers.components.story.YourStory
 import com.salazar.cheers.components.utils.PrettyImage
 import com.salazar.cheers.internal.*
+import com.salazar.cheers.ui.main.chats.MyAppBar
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 import kotlin.math.absoluteValue
@@ -485,6 +483,12 @@ fun PostList(
     onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.postsFlow.collectAsLazyPagingItems()
+    val context = LocalContext.current
+    val workManager = WorkManager.getInstance(context)
+    val workInfos = workManager.getWorkInfosForUniqueWorkLiveData("post_upload")
+        .observeAsState()
+        .value
+    val uploadInfo = workInfos?.firstOrNull()
 
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
@@ -499,56 +503,20 @@ fun PostList(
         }
 
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                UserProfilePicture(
-                    avatar = uiState.user?.profilePictureUrl ?: "",
-                    size = 36.dp,
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "What's up party people?",
-                    modifier = Modifier.clickable {
-                        onAddPostClick()
-                    },
-                )
-                OutlinedButton(onClick = onAddPostClick) {
-                }
-//                Icon(Icons.Outlined.Image, contentDescription = null)
-            }
+            WhatsUpSection(
+                avatar = uiState.user?.profilePictureUrl ?: "",
+                onClick = onAddPostClick,
+            )
             DividerM3()
         }
 
+        if (uploadInfo != null && !uploadInfo.state.isFinished)
         item {
-            val context = LocalContext.current
-            val workManager = WorkManager.getInstance(context)
-            val workInfos = workManager.getWorkInfosForUniqueWorkLiveData("post_upload")
-                .observeAsState()
-                .value
-
-            val uploadInfo = workInfos?.firstOrNull()
-
-            if (uploadInfo?.state == WorkInfo.State.RUNNING) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = uploadInfo.state.name,
-                    )
-//                    LinearProgressIndicator(progress = uploadInfo.progress.getFloat())
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.Close, contentDescription = null)
-                    }
-                }
-            }
+            UploadingSection(
+                uploadInfo = uploadInfo,
+                onCancelWork = { workManager.cancelUniqueWork("post_upload") },
+            )
+            DividerM3()
         }
 
         itemsIndexed(posts) { i, post ->
@@ -604,6 +572,67 @@ fun PostList(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun UploadingSection(
+    uploadInfo: WorkInfo,
+    onCancelWork: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (uploadInfo.state == WorkInfo.State.ENQUEUED)
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                text = "Will automatically post when possible",
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+            )
+        if (uploadInfo.state == WorkInfo.State.RUNNING)
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+        IconButton(onClick = onCancelWork) {
+            Icon(Icons.Outlined.Close, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+fun WhatsUpSection(
+    avatar: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        UserProfilePicture(
+            avatar = avatar,
+            size = 36.dp,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = "What's up party people?",
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable {
+                    onClick()
+                }
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        )
     }
 }
 
