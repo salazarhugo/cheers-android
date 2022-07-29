@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarViewMonth
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Category
@@ -26,7 +27,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +39,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.mapbox.search.result.SearchSuggestion
@@ -80,7 +79,7 @@ fun AddEventScreen(
             topBar = {
                 TopAppBar(
                     onDismiss = { onAddEventUIAction(AddEventUIAction.OnDismiss) },
-                    title = "New Event"
+                    title = "New Party"
                 )
             },
         ) {
@@ -103,10 +102,6 @@ fun AddEventScreen(
                     onQueryChange = onQueryChange,
                     onLocationClick = onLocationClick,
                     onShowGuestListToggle = onShowGuestListToggle,
-                )
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    modifier = Modifier.padding(16.dp),
                 )
                 ShareButton(
                     page = pagerState.currentPage,
@@ -353,58 +348,60 @@ fun StartDateInput(
         }, hourOfDay, minute, true
     )
 
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)),
+    Column(
+        modifier = Modifier.padding(16.dp),
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Icon(Icons.Default.Schedule, null, modifier = Modifier.offset(y = 12.dp))
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .clickable { startDatePicker.show() },
-                        text = startDateFormatter(timestamp = uiState.startTimeSeconds),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .clickable { startTimePicker.show() },
-                        text = timeFormatter(timestamp = uiState.startTimeSeconds),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (uiState.hasEndDate)
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .clickable { endDatePicker.show() },
-                            text = startDateFormatter(timestamp = uiState.endTimeSeconds),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .clickable { endTimePicker.show() },
-                            text = timeFormatter(timestamp = uiState.endTimeSeconds),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                TextButton(onClick = onHasEndDateToggle) {
-                    val text = if (uiState.hasEndDate) "Remove End Date" else "Add End Date"
-                    Text(text = text)
-                }
+        Text(
+            text = "Starts",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { startDatePicker.show() },
+                text = startDateFormatter(timestamp = uiState.startTimeSeconds),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                modifier = Modifier
+                    .clickable { startTimePicker.show() },
+                text = timeFormatter(timestamp = uiState.startTimeSeconds),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (uiState.hasEndDate) {
+            Text(
+                text = "Ends",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                        .clickable { endDatePicker.show() },
+                    text = startDateFormatter(timestamp = uiState.endTimeSeconds),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    modifier = Modifier
+                        .clickable { endTimePicker.show() },
+                    text = timeFormatter(timestamp = uiState.endTimeSeconds),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
+        }
+        TextButton(onClick = onHasEndDateToggle) {
+            val text = if (uiState.hasEndDate) "Remove End Date" else "Add End Date"
+            Text(text = text)
         }
     }
 }

@@ -17,6 +17,7 @@ enum class BounceState { Pressed, Released }
 
 @Composable
 fun Bounce(
+    modifier: Modifier = Modifier,
     onBounce: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -34,7 +35,10 @@ fun Bounce(
     }
 
     // Basic compose Box Layout
-    Box(contentAlignment = Alignment.Center) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
         Column(
             modifier = Modifier
                 .pointerInput(Unit) {
