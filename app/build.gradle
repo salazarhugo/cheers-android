@@ -16,8 +16,8 @@ android {
         applicationId "com.salazar.cheers"
         minSdk 28
         targetSdk 32
-        versionCode 50
-        versionName "0.99.931"
+        versionCode 51
+        versionName "0.99.941"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
