@@ -182,9 +182,9 @@ fun Profile(
                                         onCommentClick = onCommentClick,
                                     )
                                 }
-                                1 -> uiState.events?.forEach {
+                                1 -> uiState.parties?.forEach {
                                     Event(
-                                        event = it,
+                                        party = it,
                                         onEventClicked = {},
                                         onInterestedToggle = {},
                                         onGoingToggle = {},
@@ -203,13 +203,13 @@ fun Profile(
 
 @Composable
 fun EventList(
-    events: List<Event>?,
+    parties: List<Party>?,
 ) {
-    if (events != null)
+    if (parties != null)
         LazyColumn {
-            items(events, key = { it.id }) { event ->
+            items(parties, key = { it.id }) { event ->
                 Event(
-                    event = event,
+                    party = event,
                     onEventClicked = {},
                     onGoingToggle = {},
                     onInterestedToggle = {},

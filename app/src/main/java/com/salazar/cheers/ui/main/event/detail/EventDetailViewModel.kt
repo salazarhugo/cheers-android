@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.EventRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,26 +21,26 @@ sealed interface EventDetailUiState {
     ) : EventDetailUiState
 
     data class HasEvent(
-        val event: Event,
+        val party: Party,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : EventDetailUiState
 }
 
 private data class EventDetailViewModelState(
-    val event: Event? = null,
+    val party: Party? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
     fun toUiState(): EventDetailUiState =
-        if (event == null) {
+        if (party == null) {
             EventDetailUiState.NoEvents(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
         } else {
             EventDetailUiState.HasEvent(
-                event = event,
+                party = party,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
@@ -71,14 +71,14 @@ class EventDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             eventRepository.getEvent(eventId = eventId).collect { event ->
-                onEventChange(event = event)
+                onEventChange(party = event)
             }
         }
     }
 
-    private fun onEventChange(event: Event) {
+    private fun onEventChange(party: Party) {
         viewModelState.update {
-            it.copy(event = event)
+            it.copy(party = party)
         }
     }
 
@@ -88,15 +88,15 @@ class EventDetailViewModel @Inject constructor(
 //        }
     }
 
-    fun onGoingToggle(event: Event) {
+    fun onGoingToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleGoing(event = event)
+            eventRepository.toggleGoing(party = party)
         }
     }
 
-    fun onInterestedToggle(event: Event) {
+    fun onInterestedToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleInterested(event = event)
+            eventRepository.toggleInterested(party = party)
         }
     }
 

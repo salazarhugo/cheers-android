@@ -27,17 +27,17 @@ import com.salazar.cheers.compose.event.EventInterestButton
 import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.numberFormatter
 import com.salazar.cheers.ui.main.search.SearchBar
 
 @Composable
 fun EventsScreen(
     uiState: EventsUiState,
-    events: LazyPagingItems<Event>,
+    events: LazyPagingItems<Party>,
     onEventClicked: (String) -> Unit,
-    onInterestedToggle: (Event) -> Unit,
-    onGoingToggle: (Event) -> Unit,
+    onInterestedToggle: (Party) -> Unit,
+    onGoingToggle: (Party) -> Unit,
     onQueryChange: (String) -> Unit,
     onMoreClick: (String) -> Unit,
     onCreateEventClick: () -> Unit,
@@ -94,10 +94,10 @@ fun EventsScreen(
 
 @Composable
 fun EventList(
-    events: LazyPagingItems<Event>,
+    events: LazyPagingItems<Party>,
     onEventClicked: (String) -> Unit,
-    onInterestedToggle: (Event) -> Unit,
-    onGoingToggle: (Event) -> Unit,
+    onInterestedToggle: (Party) -> Unit,
+    onGoingToggle: (Party) -> Unit,
     onMoreClick: (String) -> Unit,
 ) {
     LazyColumn(
@@ -106,7 +106,7 @@ fun EventList(
         items(events, key = { it.id }) { event ->
             if (event != null) {
                 Event(
-                    event = event,
+                    party = event,
                     onEventClicked = onEventClicked,
                     onInterestedToggle = onInterestedToggle,
                     onMoreClick = onMoreClick,
@@ -119,17 +119,17 @@ fun EventList(
 
 @Composable
 fun Event(
-    event: Event,
+    party: Party,
     onEventClicked: (String) -> Unit,
-    onInterestedToggle: (Event) -> Unit,
-    onGoingToggle: (Event) -> Unit,
+    onInterestedToggle: (Party) -> Unit,
+    onGoingToggle: (Party) -> Unit,
     onMoreClick: (String) -> Unit,
     onShareClick: () -> Unit = {},
 ) {
     Column {
         Box(contentAlignment = Alignment.TopEnd) {
             AsyncImage(
-                model = event.imageUrl,
+                model = party.imageUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,20 +140,20 @@ fun Event(
                 alignment = Alignment.Center,
             )
             IconButton(
-                onClick = { onMoreClick(event.id) },
+                onClick = { onMoreClick(party.id) },
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(Icons.Default.MoreVert, contentDescription = null)
             }
         }
         EventDetails(
-            name = event.name,
-            privacy = event.privacy,
-            startTimeSeconds = event.startDate,
-            onEventDetailsClick = { onEventClicked(event.id) },
+            name = party.name,
+            privacy = party.privacy,
+            startTimeSeconds = party.startDate,
+            onEventDetailsClick = { onEventClicked(party.id) },
             showArrow = true,
         )
-        if (event.locationName.isNotBlank()) {
+        if (party.locationName.isNotBlank()) {
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -161,29 +161,29 @@ fun Event(
                 Icon(Icons.Outlined.PinDrop, null)
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = event.locationName,
+                    text = party.locationName,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
         Text(
-            text = "${numberFormatter(value = event.interestedCount)} interested - ${
+            text = "${numberFormatter(value = party.interestedCount)} interested - ${
                 numberFormatter(
-                    value = event.goingCount
+                    value = party.goingCount
                 )
             } going",
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
         )
 
         EventMutualFriends(
-            profilePictureUrls = event.mutualProfilePictureUrls,
-            usernames = event.mutualUsernames,
-            mutualCount = event.mutualCount,
+            profilePictureUrls = party.mutualProfilePictureUrls,
+            usernames = party.mutualUsernames,
+            mutualCount = party.mutualCount,
         )
 
         val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
 
-        if (event.hostId == uid)
+        if (party.hostId == uid)
             FilledTonalButton(
                 onClick = onShareClick,
                 modifier = Modifier
@@ -200,14 +200,14 @@ fun Event(
                 modifier = Modifier.padding(16.dp)
             ) {
                 EventInterestButton(
-                    interested = event.interested,
+                    interested = party.interested,
                     modifier = Modifier.weight(1f),
-                    onInterestedToggle = { onInterestedToggle(event) },
+                    onInterestedToggle = { onInterestedToggle(party) },
                 )
                 EventGoingButton(
-                    going = event.going,
+                    going = party.going,
                     modifier = Modifier.weight(1f),
-                    onGoingToggle = { onGoingToggle(event) },
+                    onGoingToggle = { onGoingToggle(party) },
                 )
             }
     }

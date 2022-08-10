@@ -17,7 +17,7 @@ import java.util.*
     entities = [
         RecentUser::class,
         Post::class,
-        Event::class,
+        Party::class,
         User::class,
         UserPreference::class,
         RemoteKey::class,

@@ -14,7 +14,7 @@ import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.data.repository.EventRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -194,7 +194,7 @@ class AddEventViewModel @Inject constructor(
 
         state.apply {
             eventRepository.createEvent(
-                Event().copy(
+                Party().copy(
                     name = name,
                     address = address,
                     description = description,

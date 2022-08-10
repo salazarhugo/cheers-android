@@ -19,7 +19,7 @@ import com.salazar.cheers.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
@@ -77,7 +77,7 @@ class UploadEventWorker @AssistedInject constructor(
 
         try {
             val user = userRepository.getCurrentUser()
-            val event = Event(
+            val party = Party(
                 id = UUID.randomUUID().toString(),
                 hostId = FirebaseAuth.getInstance().currentUser?.uid!!,
                 hostName = user.name,
@@ -94,14 +94,14 @@ class UploadEventWorker @AssistedInject constructor(
             )
 
             if (imageUri == null || imageUri == "null")
-                eventRepository.uploadEvent(event)
+                eventRepository.uploadEvent(party)
             else {
                 val photoBytes = extractImage(Uri.parse(imageUri))
 
                 val task: Task<Uri> = StorageUtil.uploadEventImage(photoBytes)
                 val downloadUrl = Tasks.await(task)
 
-                val event = event.copy(imageUrl = downloadUrl.toString())
+                val event = party.copy(imageUrl = downloadUrl.toString())
                 eventRepository.uploadEvent(event)
             }
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.salazar.cheers.data.repository.EventRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -55,15 +55,15 @@ class EventsViewModel @Inject constructor(
         }
     }
 
-    fun onGoingToggle(event: Event) {
+    fun onGoingToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleGoing(event = event)
+            eventRepository.toggleGoing(party = party)
         }
     }
 
-    fun onInterestedToggle(event: Event) {
+    fun onInterestedToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleInterested(event = event)
+            eventRepository.toggleInterested(party = party)
         }
     }
 

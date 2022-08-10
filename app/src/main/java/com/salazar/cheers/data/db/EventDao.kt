@@ -3,7 +3,7 @@ package com.salazar.cheers.data.db
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -11,25 +11,25 @@ interface EventDao {
 
     @Transaction
     @Query("SELECT * FROM events WHERE accountId = :accountId ORDER BY events.created DESC")
-    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, Event>
+    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, Party>
 
     @Query("SELECT * FROM events WHERE eventId = :eventId")
-    fun getEventT(eventId: String): Event
+    fun getEventT(eventId: String): Party
 
     @Query("SELECT * FROM events WHERE eventId = :eventId")
-    fun getEvent(eventId: String): Flow<Event>
+    fun getEvent(eventId: String): Flow<Party>
 
     @Query("SELECT * FROM events WHERE hostId = :accountId")
-    fun getEvents(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Event>>
+    fun getEvents(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Party>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(event: Event)
+    suspend fun insert(party: Party)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(events: List<Event>)
+    suspend fun insertAll(parties: List<Party>)
 
     @Delete
-    suspend fun delete(event: Event)
+    suspend fun delete(party: Party)
 
     @Transaction
     @Query("DELETE FROM events WHERE events.hostId = :authorId")
@@ -39,7 +39,7 @@ interface EventDao {
     suspend fun deleteWithId(eventId: String)
 
     @Update
-    suspend fun update(event: Event)
+    suspend fun update(party: Party)
 
     @Query("UPDATE events SET interested = :interested, interestedCount = :count WHERE eventId = :eventId")
     suspend fun updateInterested(

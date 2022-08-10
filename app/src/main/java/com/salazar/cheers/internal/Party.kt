@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "events")
-data class Event(
+data class Party(
     @PrimaryKey
     @ColumnInfo(name = "eventId")
     val id: String = "",
@@ -24,7 +24,7 @@ data class Event(
     val interestedCount: Int = 0,
     val going: Boolean = false,
     val goingCount: Int = 0,
-    val imageUrl: String = "",
+    val bannerUrl: String = "",
     val address: String = "",
     val mutualProfilePictureUrls: List<String> = emptyList(),
     val mutualUsernames: List<String> = emptyList(),
@@ -38,7 +38,7 @@ data class Event(
 )
 
 data class EventUi(
-    val event: Event,
+    val party: Party,
     val host: User,
     val participants: List<User>,
 )

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.EventRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +16,7 @@ import javax.inject.Inject
 data class EditEventUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val event: Event? = null,
+    val party: Party? = null,
 )
 
 @HiltViewModel
@@ -43,14 +43,14 @@ class EditEventViewModel @Inject constructor(
         viewModelScope.launch {
             eventRepository.getEvent(eventId).collect { event ->
                 viewModelState.update {
-                    it.copy(event = event)
+                    it.copy(party = event)
                 }
             }
         }
     }
 
     fun onSave() {
-        val event = uiState.value.event ?: return
+        val event = uiState.value.party ?: return
 
         viewModelScope.launch {
             eventRepository.updateEvent(event.copy(name = "[UPDATED] ${event.name}"))

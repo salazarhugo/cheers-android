@@ -27,7 +27,7 @@ fun EditEventScreen(
     onDismiss: () -> Unit,
     onSave: () -> Unit,
 ) {
-    val event = uiState.event
+    val event = uiState.party
 
     if (event == null)
         LoadingScreen()

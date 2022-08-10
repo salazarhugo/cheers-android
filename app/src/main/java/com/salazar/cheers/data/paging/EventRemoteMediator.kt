@@ -9,7 +9,7 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.entities.EventRemoteKey
 import com.salazar.cheers.data.repository.PostRepository.Companion.NETWORK_PAGE_SIZE
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import java.io.IOException
 
 private const val POST_STARTING_PAGE_INDEX = 0
@@ -17,7 +17,7 @@ private const val POST_STARTING_PAGE_INDEX = 0
 class EventRemoteMediator(
     private val database: CheersDatabase,
     private val service: CoreService,
-) : RemoteMediator<Int, Event>() {
+) : RemoteMediator<Int, Party>() {
 
     private val eventDao = database.eventDao()
     val userDao = database.userDao()
@@ -26,7 +26,7 @@ class EventRemoteMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, Event>
+        state: PagingState<Int, Party>
     ): MediatorResult {
 
         return try {
@@ -45,7 +45,7 @@ class EventRemoteMediator(
                 }
             }
 
-            val result = service.getEventFeed(page, NETWORK_PAGE_SIZE)
+            val result = service.getPartyFeed(page, NETWORK_PAGE_SIZE)
             val endOfPaginationReached = result.size < state.config.pageSize
 
             if (loadType == LoadType.REFRESH) {
@@ -74,7 +74,7 @@ class EventRemoteMediator(
         }
     }
 
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, Event>): EventRemoteKey? {
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, Party>): EventRemoteKey? {
         return state.lastItemOrNull()?.let { event ->
             database.withTransaction {
                 remoteKeyDao.remoteKeyByEventId(event.id)
@@ -82,7 +82,7 @@ class EventRemoteMediator(
         }
     }
 
-    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, Event>): EventRemoteKey? {
+    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, Party>): EventRemoteKey? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { id ->
                 database.withTransaction { remoteKeyDao.remoteKeyByEventId(id) }

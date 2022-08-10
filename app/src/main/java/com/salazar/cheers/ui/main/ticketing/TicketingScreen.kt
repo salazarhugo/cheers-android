@@ -21,7 +21,7 @@ import com.salazar.cheers.compose.DividerM3
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.dateTimeFormatter
 
 
@@ -42,11 +42,11 @@ fun TicketingScreen(
                 .padding(it)
                 .verticalScroll(rememberScrollState()),
         ) {
-            if (uiState.event == null)
+            if (uiState.party == null)
                 LoadingScreen()
             else
                 TicketingHeader(
-                    event = uiState.event,
+                    party = uiState.party,
                 )
             Tickets(
                 tickets = uiState.tickets.orEmpty(),
@@ -92,10 +92,10 @@ fun Tickets(
 
 @Composable
 fun TicketingHeader(
-    event: Event,
+    party: Party,
 ) {
     AsyncImage(
-        model = event.imageUrl,
+        model = party.imageUrl,
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
@@ -113,11 +113,11 @@ fun TicketingHeader(
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = "Ticketing ${event.name}",
+                text = "Ticketing ${party.name}",
                 style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
             )
             Text(
-                text = "by ${event.hostName}",
+                text = "by ${party.hostName}",
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(Modifier.height(8.dp))
@@ -128,7 +128,7 @@ fun TicketingHeader(
                 Icon(Icons.Default.Event, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = dateTimeFormatter(timestamp = event.startDate),
+                    text = dateTimeFormatter(timestamp = party.startDate),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }

@@ -31,7 +31,7 @@ fun EventDetailRoute(
             onInterestedToggle = eventDetailViewModel::onInterestedToggle,
             onGoingToggle = eventDetailViewModel::onGoingToggle,
             onCopyLink = {
-                val eventId = (uiState as EventDetailUiState.HasEvent).event.id
+                val eventId = (uiState as EventDetailUiState.HasEvent).party.id
                 FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
                     .addOnSuccessListener { shortLink ->
                         context.copyToClipboard(shortLink.shortLink.toString())
@@ -39,7 +39,7 @@ fun EventDetailRoute(
                 navActions.navigateBack()
             },
             onEditClick = {
-                val eventId = (uiState as EventDetailUiState.HasEvent).event.id
+                val eventId = (uiState as EventDetailUiState.HasEvent).party.id
                 navActions.navigateToEditEvent(eventId)
             },
             onDeleteClick = {
@@ -47,11 +47,11 @@ fun EventDetailRoute(
                 navActions.navigateBack()
             },
             onGoingCountClick = {
-                val eventId = (uiState as EventDetailUiState.HasEvent).event.id
+                val eventId = (uiState as EventDetailUiState.HasEvent).party.id
                 navActions.navigateToGuestList(eventId)
             },
             onInterestedCountClick = {
-                val eventId = (uiState as EventDetailUiState.HasEvent).event.id
+                val eventId = (uiState as EventDetailUiState.HasEvent).party.id
                 navActions.navigateToGuestList(eventId)
             },
             onTicketingClick = {

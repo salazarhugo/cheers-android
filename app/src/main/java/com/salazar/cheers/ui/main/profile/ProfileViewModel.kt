@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +32,7 @@ sealed interface ProfileUiState {
     data class HasUser(
         val user: User,
         val posts: List<Post>?,
-        val events: List<Event>?,
+        val parties: List<Party>?,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
         override val errorMessages: String,
@@ -42,7 +42,7 @@ sealed interface ProfileUiState {
 private data class ProfileViewModelState(
     val user: User? = null,
     val posts: List<Post>? = null,
-    val events: List<Event>? = null,
+    val parties: List<Party>? = null,
     val isLoading: Boolean = false,
     val errorMessages: String = "",
     val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
@@ -52,7 +52,7 @@ private data class ProfileViewModelState(
             ProfileUiState.HasUser(
                 posts = posts,
                 user = user,
-                events = events,
+                parties = parties,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 sheetState = sheetState,
@@ -142,7 +142,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             eventRepository.getEvents().collect { events ->
                 viewModelState.update {
-                    it.copy(events = events)
+                    it.copy(parties = events)
                 }
             }
         }

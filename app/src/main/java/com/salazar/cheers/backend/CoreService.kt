@@ -29,13 +29,13 @@ interface CoreService {
     suspend fun getEvents(
         @Query("page") skip: Int,
         @Query("pageSize") pageSize: Int,
-    ): List<Event>
+    ): List<Party>
 
-    @GET("event/feed")
-    suspend fun getEventFeed(
+    @GET("party/feed")
+    suspend fun getPartyFeed(
         @Query("page") skip: Int,
         @Query("pageSize") pageSize: Int,
-    ): List<Event>
+    ): List<Party>
 
     @GET("posts")
     suspend fun getPosts(): List<Post>
@@ -79,14 +79,14 @@ interface CoreService {
         @Body() user: User,
     ): User
 
-    @POST("event/create")
-    suspend fun createEvent(
-        @Body() event: Event,
+    @POST("party/create")
+    suspend fun createParty(
+        @Body() party: Party,
     )
 
     @POST("event/update")
     suspend fun updateEvent(
-        @Body() event: Event,
+        @Body() party: Party,
     )
 
     @POST("users/tokens/{token}")

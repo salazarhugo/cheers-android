@@ -12,7 +12,7 @@ import androidx.work.workDataOf
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.EventRemoteMediator
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.workers.UploadEventWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -32,11 +32,11 @@ class EventRepository @Inject constructor(
     private val workManager = WorkManager.getInstance(application)
     val eventDao = database.eventDao()
 
-    fun getEvent(eventId: String): Flow<Event> {
+    fun getEvent(eventId: String): Flow<Party> {
         return eventDao.getEvent(eventId = eventId)
     }
 
-    fun getEventFeed(): Flow<PagingData<Event>> {
+    fun getEventFeed(): Flow<PagingData<Party>> {
         return Pager(
             config = PagingConfig(
                 pageSize = PostRepository.NETWORK_PAGE_SIZE,
@@ -48,7 +48,7 @@ class EventRepository @Inject constructor(
         }.flow
     }
 
-    fun getEvents(): Flow<List<Event>> {
+    fun getEvents(): Flow<List<Party>> {
         return eventDao.getEvents()
     }
 
@@ -64,8 +64,8 @@ class EventRepository @Inject constructor(
         }
     }
 
-    suspend fun updateEvent(event: Event) = withContext(Dispatchers.IO) {
-        coreService.updateEvent(event = event)
+    suspend fun updateEvent(party: Party) = withContext(Dispatchers.IO) {
+        coreService.updateEvent(party = party)
     }
 
     private suspend fun goingEvent(eventId: String) {
@@ -93,8 +93,8 @@ class EventRepository @Inject constructor(
         coreService.deleteEvent(eventId = eventId)
     }
 
-    suspend fun uploadEvent(event: Event) {
-        coreService.createEvent(event = event)
+    suspend fun uploadEvent(party: Party) {
+        coreService.createParty(party = party)
     }
 
     suspend fun toggleGoing(eventId: String) {
@@ -123,26 +123,26 @@ class EventRepository @Inject constructor(
         eventDao.toggleInterested(eventId = eventId)
     }
 
-    suspend fun toggleGoing(event: Event) {
-        eventDao.update(event.copy(going = !event.going))
-        if (event.going)
-            ungoingEvent(event.id)
+    suspend fun toggleGoing(party: Party) {
+        eventDao.update(party.copy(going = !party.going))
+        if (party.going)
+            ungoingEvent(party.id)
         else
-            goingEvent(event.id)
+            goingEvent(party.id)
     }
 
-    suspend fun toggleInterested(event: Event) {
-        eventDao.update(event.copy(interested = !event.interested))
-        if (event.interested)
-            uninterestEvent(event.id)
+    suspend fun toggleInterested(party: Party) {
+        eventDao.update(party.copy(interested = !party.interested))
+        if (party.interested)
+            uninterestEvent(party.id)
         else
-            interestEvent(event.id)
+            interestEvent(party.id)
     }
 
     fun createEvent(
-        event: Event,
+        party: Party,
     ) {
-        event.apply {
+        party.apply {
             val uploadWorkRequest = OneTimeWorkRequestBuilder<UploadEventWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setInputData(

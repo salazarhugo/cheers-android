@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.EventRepository
-import com.salazar.cheers.internal.Event
+import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +22,7 @@ data class TicketingTicket(
 data class TicketingUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
-    val event: Event? = null,
+    val party: Party? = null,
     val tickets: List<TicketingTicket>? = null,
 )
 
@@ -76,14 +76,14 @@ class TicketingViewModel @Inject constructor(
     private fun refreshEvent() {
         viewModelScope.launch {
             eventRepository.getEvent(eventId = eventId).collect { event ->
-                updateEvent(event = event)
+                updateEvent(party = event)
             }
         }
     }
 
-    private fun updateEvent(event: Event) {
+    private fun updateEvent(party: Party) {
         viewModelState.update {
-            it.copy(event = event)
+            it.copy(party = party)
         }
     }
 
