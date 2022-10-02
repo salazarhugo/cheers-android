@@ -13,7 +13,7 @@ import com.mapbox.search.SearchOptions
 import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
-import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
@@ -67,7 +67,7 @@ data class AddEventUiState(
 
 @HiltViewModel
 class AddEventViewModel @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddEventUiState(isLoading = false))
@@ -193,7 +193,7 @@ class AddEventViewModel @Inject constructor(
         val state = viewModelState.value
 
         state.apply {
-            eventRepository.createEvent(
+            partyRepository.createParty(
                 Party().copy(
                     name = name,
                     address = address,

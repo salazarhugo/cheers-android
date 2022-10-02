@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.event.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -50,7 +50,7 @@ private data class EventDetailViewModelState(
 @HiltViewModel
 class EventDetailViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val eventRepository: EventRepository,
+    private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EventDetailViewModelState(isLoading = true))
@@ -70,7 +70,7 @@ class EventDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            eventRepository.getEvent(eventId = eventId).collect { event ->
+            partyRepository.getEvent(eventId = eventId).collect { event ->
                 onEventChange(party = event)
             }
         }
@@ -90,19 +90,19 @@ class EventDetailViewModel @Inject constructor(
 
     fun onGoingToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleGoing(party = party)
+            partyRepository.toggleGoing(party = party)
         }
     }
 
     fun onInterestedToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleInterested(party = party)
+            partyRepository.toggleInterested(party = party)
         }
     }
 
     fun deleteEvent() {
         viewModelScope.launch {
-            eventRepository.deleteEvent(eventId = eventId)
+            partyRepository.deleteEvent(eventId = eventId)
         }
     }
 

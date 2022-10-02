@@ -17,7 +17,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Privacy
@@ -29,10 +29,10 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 
 @HiltWorker
-class UploadEventWorker @AssistedInject constructor(
+class CreatePartyWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val eventRepository: EventRepository,
+    private val partyRepository: PartyRepository,
     private val userRepository: UserRepository,
 ) : CoroutineWorker(appContext, params) {
 
@@ -94,7 +94,7 @@ class UploadEventWorker @AssistedInject constructor(
             )
 
             if (imageUri == null || imageUri == "null")
-                eventRepository.uploadEvent(party)
+                partyRepository.uploadEvent(party)
             else {
                 val photoBytes = extractImage(Uri.parse(imageUri))
 
@@ -102,7 +102,7 @@ class UploadEventWorker @AssistedInject constructor(
                 val downloadUrl = Tasks.await(task)
 
                 val event = party.copy(bannerUrl = downloadUrl.toString())
-                eventRepository.uploadEvent(event)
+                partyRepository.uploadEvent(event)
             }
 
             return Result.success()

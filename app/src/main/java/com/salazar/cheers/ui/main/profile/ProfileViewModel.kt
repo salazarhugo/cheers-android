@@ -5,7 +5,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Party
@@ -69,7 +69,7 @@ private data class ProfileViewModelState(
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
-    private val eventRepository: EventRepository,
+    private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
@@ -97,7 +97,7 @@ class ProfileViewModel @Inject constructor(
         refreshUser()
         refreshUserPosts()
         viewModelScope.launch {
-            eventRepository.refreshMyEvents()
+            partyRepository.refreshMyEvents()
         }
     }
 
@@ -140,7 +140,7 @@ class ProfileViewModel @Inject constructor(
 
     private fun getUserEvents() {
         viewModelScope.launch {
-            eventRepository.getEvents().collect { events ->
+            partyRepository.getEvents().collect { events ->
                 viewModelState.update {
                     it.copy(parties = events)
                 }

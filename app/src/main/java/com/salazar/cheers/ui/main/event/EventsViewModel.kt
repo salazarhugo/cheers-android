@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.filter
-import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -20,7 +20,7 @@ data class EventsUiState(
 
 @HiltViewModel
 class EventsViewModel @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EventsUiState(isLoading = true))
@@ -36,7 +36,7 @@ class EventsViewModel @Inject constructor(
     init {
     }
 
-    val events = eventRepository.getEventFeed()
+    val events = partyRepository.getEventFeed()
         .cachedIn(viewModelScope)
 
     fun onQueryChange(query: String) {
@@ -57,13 +57,13 @@ class EventsViewModel @Inject constructor(
 
     fun onGoingToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleGoing(party = party)
+            partyRepository.toggleGoing(party = party)
         }
     }
 
     fun onInterestedToggle(party: Party) {
         viewModelScope.launch {
-            eventRepository.toggleInterested(party = party)
+            partyRepository.toggleInterested(party = party)
         }
     }
 

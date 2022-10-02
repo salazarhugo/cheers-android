@@ -13,7 +13,7 @@ import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.EventRemoteMediator
 import com.salazar.cheers.internal.Party
-import com.salazar.cheers.workers.UploadEventWorker
+import com.salazar.cheers.workers.CreatePartyWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -23,7 +23,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class EventRepository @Inject constructor(
+class PartyRepository @Inject constructor(
     application: Application,
     private val coreService: CoreService,
     private val database: CheersDatabase,
@@ -34,6 +34,33 @@ class EventRepository @Inject constructor(
 
     fun getEvent(eventId: String): Flow<Party> {
         return eventDao.getEvent(eventId = eventId)
+    }
+
+    fun createParty(
+        party: Party,
+    ) {
+        party.apply {
+            val uploadWorkRequest = OneTimeWorkRequestBuilder<CreatePartyWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(
+                    workDataOf(
+                        "NAME" to name,
+                        "ADDRESS" to address,
+                        "DESCRIPTION" to description,
+                        "EVENT_PRIVACY" to privacy.name,
+                        "IMAGE_URI" to bannerUrl,
+                        "START_DATETIME" to startDate,
+                        "END_DATETIME" to endDate,
+                        "LOCATION_NAME" to locationName,
+                        "LATITUDE" to latitude,
+                        "SHOW_GUEST_LIST" to showGuestList,
+                        "LONGITUDE" to longitude,
+                    )
+                )
+                .build()
+
+            workManager.enqueue(uploadWorkRequest)
+        }
     }
 
     fun getEventFeed(): Flow<PagingData<Party>> {
@@ -138,33 +165,4 @@ class EventRepository @Inject constructor(
         else
             interestEvent(party.id)
     }
-
-    fun createEvent(
-        party: Party,
-    ) {
-        party.apply {
-            val uploadWorkRequest = OneTimeWorkRequestBuilder<UploadEventWorker>()
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .setInputData(
-                    workDataOf(
-                        "NAME" to name,
-                        "ADDRESS" to address,
-                        "DESCRIPTION" to description,
-                        "EVENT_PRIVACY" to privacy.name,
-                        "IMAGE_URI" to bannerUrl,
-                        "START_DATETIME" to startDate,
-                        "END_DATETIME" to endDate,
-                        "LOCATION_NAME" to locationName,
-                        "LATITUDE" to latitude,
-                        "SHOW_GUEST_LIST" to showGuestList,
-                        "LONGITUDE" to longitude,
-                    )
-                )
-                .build()
-
-            workManager.enqueue(uploadWorkRequest)
-        }
-    }
-
-    companion object
 }

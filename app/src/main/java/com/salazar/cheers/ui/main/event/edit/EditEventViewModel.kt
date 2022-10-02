@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.event.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.EventRepository
+import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ data class EditEventUiState(
 @HiltViewModel
 class EditEventViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val eventRepository: EventRepository,
+    private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EditEventUiState(isLoading = true))
@@ -41,7 +41,7 @@ class EditEventViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            eventRepository.getEvent(eventId).collect { event ->
+            partyRepository.getEvent(eventId).collect { event ->
                 viewModelState.update {
                     it.copy(party = event)
                 }
@@ -53,7 +53,7 @@ class EditEventViewModel @Inject constructor(
         val event = uiState.value.party ?: return
 
         viewModelScope.launch {
-            eventRepository.updateEvent(event.copy(name = "[UPDATED] ${event.name}"))
+            partyRepository.updateEvent(event.copy(name = "[UPDATED] ${event.name}"))
         }
     }
 }
