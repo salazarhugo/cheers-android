@@ -148,7 +148,7 @@ class SignInViewModel @Inject constructor(
                 viewModelScope.launch { storeUserEmail.saveEmail(email) }
             }
             .addOnFailureListener {
-                updateErrorMessage(it.message)
+                updateErrorMessage("Failed to send email")
             }
     }
 

@@ -367,23 +367,6 @@ fun CameraPreview(
                 else -> false
             }
         }
-
-        previewView.setOnClickListener(object: GestureDetector.OnDoubleTapListener, View.OnClickListener {
-            override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return true }
-
-            override fun onDoubleTap(p0: MotionEvent?): Boolean {
-                onCameraUIAction(CameraUIAction.OnSwitchCameraClick)
-                return true
-            }
-
-            override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
-                onCameraUIAction(CameraUIAction.OnSwitchCameraClick)
-                return true
-            }
-
-            override fun onClick(p0: View?) { }
-        })
-
     }
 
     Box(

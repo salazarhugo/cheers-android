@@ -95,7 +95,7 @@ fun TicketingHeader(
     party: Party,
 ) {
     AsyncImage(
-        model = party.imageUrl,
+        model = party.bannerUrl,
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()

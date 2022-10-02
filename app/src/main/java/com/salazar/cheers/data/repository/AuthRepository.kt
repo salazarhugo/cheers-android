@@ -1,6 +1,5 @@
 package com.salazar.cheers.data.repository
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
@@ -23,7 +22,6 @@ class AuthRepository @Inject constructor(
     private val userDao: UserDao,
     private val auth: FirebaseAuth,
 ) {
-
 
     fun isUserAuthenticatedInFirebase() = auth.currentUser != null
 
@@ -58,7 +56,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    fun sendSignInLink(email: String): Task<Void> {
+    fun sendSignInLink(email: String): com.google.android.gms.tasks.Task<Void> {
         val actionCodeSettings = actionCodeSettings {
             url = "https://cheers-a275e.web.app/signIn"
             handleCodeInApp = true

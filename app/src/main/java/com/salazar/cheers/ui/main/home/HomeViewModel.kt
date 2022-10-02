@@ -131,6 +131,7 @@ class HomeViewModel @Inject constructor(
         )
 
     init {
+        Log.d( "HOME", "HOME VIEW MODEL INIT")
         viewModelScope.launch {
             userRepository.getCurrentUserFlow().collect { user ->
                 viewModelState.update {

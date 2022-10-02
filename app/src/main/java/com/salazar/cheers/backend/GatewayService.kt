@@ -7,7 +7,7 @@ import okhttp3.ResponseBody
 import retrofit2.http.*
 
 
-interface CoreService {
+interface GatewayService {
 
     @GET("users/suggestions")
     suspend fun suggestions(): List<UserSuggestion>
@@ -206,6 +206,6 @@ interface CoreService {
     )
 
     companion object {
-        const val BASE_URL = "https://rest-api-r3a2dr4u4a-nw.a.run.app"
+        const val GATEWAY_URL = "https://waf-clzdlli7.nw.gateway.dev"
     }
 }

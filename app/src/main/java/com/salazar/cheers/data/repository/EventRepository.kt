@@ -76,12 +76,12 @@ class EventRepository @Inject constructor(
         coreService.ungoingEvent(eventId = eventId)
     }
 
-    private suspend fun uninterestEvent(eventId: String) {
-        coreService.uninterestEvent(eventId = eventId)
+    private suspend fun uninterestEvent(partyId: String) {
+        coreService.uninterestEvent(partyId = partyId)
     }
 
-    private suspend fun interestEvent(eventId: String) {
-        coreService.interestEvent(eventId = eventId)
+    private suspend fun interestEvent(partyId: String) {
+        coreService.interestEvent(partyId = partyId)
     }
 
     suspend fun hideEvent(eventId: String) = withContext(Dispatchers.IO) {
@@ -151,7 +151,7 @@ class EventRepository @Inject constructor(
                         "ADDRESS" to address,
                         "DESCRIPTION" to description,
                         "EVENT_PRIVACY" to privacy.name,
-                        "IMAGE_URI" to imageUrl,
+                        "IMAGE_URI" to bannerUrl,
                         "START_DATETIME" to startDate,
                         "END_DATETIME" to endDate,
                         "LOCATION_NAME" to locationName,

@@ -1,30 +1,23 @@
 package com.salazar.cheers.workers
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.content.ContentValues.TAG
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.salazar.cheers.MainActivity
-import com.salazar.cheers.R
 import com.salazar.cheers.data.entities.Story
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
-import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
 

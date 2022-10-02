@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "01a1be2cf27998c48d1ce322fab577e0",
+    "identityHash": "96c823f9fd5147a1f2830783f25d6a54",
     "entities": [
       {
         "tableName": "recentUsers",
@@ -236,7 +236,7 @@
       },
       {
         "tableName": "events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER NOT NULL, `created` INTEGER NOT NULL, `hostId` TEXT NOT NULL, `hostName` TEXT NOT NULL, `price` INTEGER NOT NULL, `participants` TEXT NOT NULL, `showGuestList` INTEGER NOT NULL, `showOnMap` INTEGER NOT NULL, `interested` INTEGER NOT NULL, `interestedCount` INTEGER NOT NULL, `going` INTEGER NOT NULL, `goingCount` INTEGER NOT NULL, `imageUrl` TEXT NOT NULL, `address` TEXT NOT NULL, `mutualProfilePictureUrls` TEXT NOT NULL, `mutualUsernames` TEXT NOT NULL, `mutualCount` INTEGER NOT NULL, `locationName` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `privacy` TEXT NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, PRIMARY KEY(`eventId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER NOT NULL, `created` INTEGER NOT NULL, `hostId` TEXT NOT NULL, `hostName` TEXT NOT NULL, `price` INTEGER NOT NULL, `participants` TEXT NOT NULL, `showGuestList` INTEGER NOT NULL, `showOnMap` INTEGER NOT NULL, `interested` INTEGER NOT NULL, `interestedCount` INTEGER NOT NULL, `going` INTEGER NOT NULL, `goingCount` INTEGER NOT NULL, `bannerUrl` TEXT NOT NULL, `address` TEXT NOT NULL, `mutualProfilePictureUrls` TEXT NOT NULL, `mutualUsernames` TEXT NOT NULL, `mutualCount` INTEGER NOT NULL, `locationName` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `privacy` TEXT NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, PRIMARY KEY(`eventId`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -335,8 +335,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "imageUrl",
-            "columnName": "imageUrl",
+            "fieldPath": "bannerUrl",
+            "columnName": "bannerUrl",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1210,7 +1210,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '01a1be2cf27998c48d1ce322fab577e0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96c823f9fd5147a1f2830783f25d6a54')"
     ]
   }
 }

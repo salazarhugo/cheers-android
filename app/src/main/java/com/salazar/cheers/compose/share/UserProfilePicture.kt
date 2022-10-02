@@ -58,7 +58,7 @@ fun UserProfilePicture(
             StoryState.SEEN ->
                 BorderStroke(
                     1.dp,
-                    color = Color.Gray
+                    color = Color.LightGray
                 )
             StoryState.NOT_SEEN ->
                 BorderStroke(

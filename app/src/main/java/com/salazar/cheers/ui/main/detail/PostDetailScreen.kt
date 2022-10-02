@@ -67,9 +67,7 @@ fun PostDetailScreen(
     onUserClick: (String) -> Unit,
 ) {
     val post = uiState.postFeed
-//    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
-    val scrollBehavior =
-        remember { TopAppBarDefaults.pinnedScrollBehavior(TopAppBarScrollState(0f, 0f, 0f)) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         topBar = {
@@ -382,16 +380,18 @@ fun Toolbar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
-    val backgroundColor = backgroundColors.containerColor(
-        scrollFraction = scrollBehavior?.scrollFraction ?: 0f
-    ).value
+//    val backgroundColor = backgroundColors.containerColor(
+//        scrollFraction = scrollBehavior?.scrollFraction ?: 0f
+//    ).value
 
     val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
         containerColor = Color.Transparent,
         scrolledContainerColor = Color.Transparent
     )
 
-    Box(modifier = Modifier.background(backgroundColor)) {
+    Box(
+//        modifier = Modifier.background(backgroundColor)
+    ) {
         CenterAlignedTopAppBar(
             scrollBehavior = scrollBehavior,
             colors = foregroundColors,

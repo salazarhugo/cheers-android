@@ -129,7 +129,7 @@ fun Event(
     Column {
         Box(contentAlignment = Alignment.TopEnd) {
             AsyncImage(
-                model = party.imageUrl,
+                model = party.bannerUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -5,8 +5,10 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
@@ -64,6 +66,7 @@ import com.salazar.cheers.util.Utils.shareToSnapchat
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.mainNavGraph(
+    navController: NavController,
     navActions: CheersNavigationActions,
     showInterstitialAd: () -> Unit,
     bottomSheetNavigator: BottomSheetNavigator,
@@ -157,9 +160,14 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = MainDestinations.HOME_ROUTE,
-        ) {
+        ) { back ->
+            val parentEntry = remember(back) {
+                navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
+            }
+            val homeViewModel = hiltViewModel<HomeViewModel>(parentEntry)
             HomeRoute(
                 navActions = navActions,
+                homeViewModel = homeViewModel,
             )
         }
 

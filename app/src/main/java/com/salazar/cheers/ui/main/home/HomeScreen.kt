@@ -67,7 +67,6 @@ import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.story.Story
 import com.salazar.cheers.compose.story.YourStory
-import com.salazar.cheers.compose.tabs.CustomTabs
 import com.salazar.cheers.compose.utils.PrettyImage
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.theme.Roboto
@@ -465,6 +464,7 @@ fun PostList(
     val uploadInfo = workInfos?.firstOrNull()
 
     LazyColumn(
+        state = uiState.listState,
         modifier = Modifier.fillMaxHeight(),
     ) {
         item {
@@ -750,7 +750,7 @@ fun MyAppBar(
     val icon =
         if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
     CenterAlignedTopAppBar(
-        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState()),
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
         colors = TopAppBarDefaults.smallTopAppBarColors(
 //            containerColor = Purple200
         ),

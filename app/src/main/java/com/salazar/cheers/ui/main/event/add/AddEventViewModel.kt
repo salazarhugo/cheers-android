@@ -202,7 +202,7 @@ class AddEventViewModel @Inject constructor(
                     privacy = privacy,
                     startDate = startTimeSeconds,
                     endDate = endTimeSeconds,
-                    imageUrl = photo.toString(),
+                    bannerUrl = photo.toString(),
                     locationName = locationName,
                     latitude = latitude,
                     longitude = longitude,

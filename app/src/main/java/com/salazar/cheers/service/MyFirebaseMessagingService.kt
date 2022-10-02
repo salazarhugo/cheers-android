@@ -13,7 +13,7 @@ import androidx.datastore.preferences.core.edit
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.salazar.cheers.MainActivity
+import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.datastore.dataStore
 import com.salazar.cheers.notifications.chatNotification

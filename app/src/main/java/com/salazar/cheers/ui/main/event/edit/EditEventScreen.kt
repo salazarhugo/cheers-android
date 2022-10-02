@@ -43,7 +43,7 @@ fun EditEventScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 AsyncImage(
-                    model = event.imageUrl,
+                    model = event.bannerUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()

@@ -13,7 +13,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.salazar.cheers.MainActivity
+import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.util.StorageUtil

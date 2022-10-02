@@ -15,7 +15,7 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.MainActivity
+import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.EventRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -101,7 +101,7 @@ class UploadEventWorker @AssistedInject constructor(
                 val task: Task<Uri> = StorageUtil.uploadEventImage(photoBytes)
                 val downloadUrl = Tasks.await(task)
 
-                val event = party.copy(imageUrl = downloadUrl.toString())
+                val event = party.copy(bannerUrl = downloadUrl.toString())
                 eventRepository.uploadEvent(event)
             }
 

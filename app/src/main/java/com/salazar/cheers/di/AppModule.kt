@@ -2,9 +2,10 @@ package com.salazar.cheers.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.Settings
 import com.salazar.cheers.backend.CoreService
+import com.salazar.cheers.backend.GatewayService
 import com.salazar.cheers.backend.Neo4jService
 import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.db.*
@@ -74,6 +75,27 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideGatewayService(): GatewayService {
+        val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
+
+        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+            .addInterceptor(FirebaseUserIdTokenInterceptor())
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
+
+        val retrofit = retrofit2.Retrofit.Builder()
+            .baseUrl(GatewayService.GATEWAY_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(okHttpClient)
+            .build()
+
+        return retrofit.create(GatewayService::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideGoApi(): CoreService {
 
         val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
@@ -97,7 +119,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideDb(@ApplicationContext context: Context): CheersDatabase {
-        return Room
+        return androidx.room.Room
             .databaseBuilder(context.applicationContext, CheersDatabase::class.java, "cheers.db")
             .fallbackToDestructiveMigration()
             .build()

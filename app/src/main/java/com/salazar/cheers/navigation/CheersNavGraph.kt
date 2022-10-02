@@ -23,32 +23,28 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.CheersUiState
 import com.salazar.cheers.compose.CheersNavigationBar
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.theme.GreySheet
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+
 @Composable
 fun CheersNavGraph(
     uiState: CheersUiState,
     darkTheme: Boolean,
     showInterstitialAd: () -> Unit,
     user: User?,
+    appState: CheersAppState,
 ) {
     val startDestination = CheersDestinations.AUTH_ROUTE
-    val bottomSheetNavigator = rememberBottomSheetNavigator()
-    val navController = rememberAnimatedNavController(bottomSheetNavigator)
-    val snackBarHostState = remember { SnackbarHostState() }
 
-    val navActions = remember(navController) {
-        CheersNavigationActions(navController)
-    }
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
     val currentRoute =
         navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
+    val navActions = appState.navActions
 
     LaunchedEffect(uiState.errorMessage) {
         if (uiState.errorMessage.isNotBlank())
-            snackBarHostState.showSnackbar(uiState.errorMessage)
+            appState.snackBarHostState.showSnackbar(uiState.errorMessage)
     }
 
     val hide =
@@ -61,7 +57,7 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
 
     ModalBottomSheetLayout(
-        bottomSheetNavigator = bottomSheetNavigator,
+        bottomSheetNavigator = appState.bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetBackgroundColor = if (darkTheme) GreySheet else MaterialTheme.colorScheme.background,
         sheetElevation = 0.dp,
@@ -71,7 +67,7 @@ fun CheersNavGraph(
             .navigationBarsPadding(),
     ) {
         Scaffold(
-            snackbarHost = { SnackbarHost(snackBarHostState) },
+            snackbarHost = { SnackbarHost(appState.snackBarHostState) },
             floatingActionButtonPosition = FabPosition.Center,
             floatingActionButton = {
                 if (!hide)
@@ -109,17 +105,17 @@ fun CheersNavGraph(
         ) { innerPadding ->
             AnimatedNavHost(
                 route = CheersDestinations.ROOT_ROUTE,
-                navController = navController,
+                navController = appState.navController,
                 startDestination = startDestination,
-                modifier = Modifier.padding(innerPadding)
             ) {
                 settingNavGraph(
                     navActions = navActions,
                 )
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
+                    navController = appState.navController,
                     navActions = navActions,
-                    bottomSheetNavigator = bottomSheetNavigator,
+                    bottomSheetNavigator = appState.bottomSheetNavigator,
                     showInterstitialAd = showInterstitialAd,
                 )
             }

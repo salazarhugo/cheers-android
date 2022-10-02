@@ -1,4 +1,4 @@
-package com.salazar.cheers
+package com.salazar.cheers.ui
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -31,9 +31,10 @@ import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.CheersViewModel
+import com.salazar.cheers.Settings
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.datastore.DataStoreRepository
-import com.salazar.cheers.ui.CheersApp
 import com.salazar.cheers.util.StorageUtil
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
 

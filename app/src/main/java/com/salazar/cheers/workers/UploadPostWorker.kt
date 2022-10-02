@@ -13,7 +13,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.salazar.cheers.MainActivity
+import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post

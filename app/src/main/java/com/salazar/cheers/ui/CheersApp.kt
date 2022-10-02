@@ -19,6 +19,7 @@ import com.salazar.cheers.ui.theme.CheersTheme
 fun CheersApp(
     showInterstitialAd: () -> Unit,
     appSettings: Settings,
+    appState: CheersAppState = rememberCheersAppState()
 ) {
     val cheersViewModel = hiltViewModel<CheersViewModel>()
     val uiState by cheersViewModel.uiState.collectAsState()
@@ -33,6 +34,7 @@ fun CheersApp(
             darkTheme = darkTheme,
             user = uiState.user,
             showInterstitialAd = showInterstitialAd,
+            appState = appState,
         )
     }
 }
