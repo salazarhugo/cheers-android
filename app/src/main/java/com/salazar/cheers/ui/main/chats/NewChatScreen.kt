@@ -176,7 +176,7 @@ fun UserCard(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = user.profilePictureUrl)
+                    ImageRequest.Builder(LocalContext.current).data(data = user.picture)
                         .apply(block = fun ImageRequest.Builder.() {
                             transformations(CircleCropTransformation())
                             error(R.drawable.default_profile_picture)

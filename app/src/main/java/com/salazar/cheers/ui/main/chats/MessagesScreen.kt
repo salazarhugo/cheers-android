@@ -188,7 +188,7 @@ fun UserItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            UserProfilePicture(avatar = user.profilePictureUrl)
+            UserProfilePicture(avatar = user.picture)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (user.name.isNotBlank())

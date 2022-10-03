@@ -2,7 +2,6 @@ package com.salazar.cheers.ui.main.add
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +47,7 @@ data class AddPostUiState(
     val allowJoin: Boolean = true,
     val notify: Boolean = true,
     val page: AddPostPage = AddPostPage.AddPost,
-    val profilePictureUrl: String = "",
+    val profilePictureUrl: String? = null,
 )
 
 @HiltViewModel
@@ -74,7 +73,7 @@ class AddPostViewModel @Inject constructor(
         viewModelScope.launch {
             val user = userRepository.getCurrentUser()
             viewModelState.update {
-                it.copy(profilePictureUrl = user.profilePictureUrl)
+                it.copy(profilePictureUrl = user.picture)
             }
         }
     }

@@ -89,7 +89,7 @@ fun Item(
         Spacer(Modifier.width(22.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
     }

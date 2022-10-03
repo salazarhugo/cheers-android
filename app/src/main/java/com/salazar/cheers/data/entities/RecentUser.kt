@@ -11,6 +11,6 @@ data class RecentUser(
     var fullName: String,
     var username: String,
     val verified: Boolean,
-    val profilePictureUrl: String,
+    val profilePictureUrl: String?,
     val date: Long,
 )

@@ -59,6 +59,7 @@ import com.salazar.cheers.compose.ChipGroup
 import com.salazar.cheers.compose.DividerM3
 import com.salazar.cheers.compose.post.MultipleAnnotation
 import com.salazar.cheers.compose.share.ErrorMessage
+import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.event.add.Item
@@ -70,7 +71,7 @@ import java.util.*
 @Composable
 fun AddPostScreen(
     uiState: AddPostUiState,
-    profilePictureUrl: String,
+    profilePictureUrl: String?,
     onDismiss: () -> Unit,
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
@@ -556,7 +557,7 @@ fun AddPeople(
 
 @Composable
 fun CaptionSection(
-    profilePictureUrl: String,
+    profilePictureUrl: String?,
     photos: List<Uri>,
     postType: String,
     caption: String,
@@ -568,19 +569,10 @@ fun CaptionSection(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val videoUri = photos
-
-//        if (videoUri.isNotEmpty() && postType == PostType.VIDEO)
-//            VideoPlayer(
-//                uri = videoUri,
-//                modifier = Modifier
-//                    .padding(bottom = 8.dp)
-//                    .clip(RoundedCornerShape(8.dp))
-//                    .height(120.dp)
-//                    .aspectRatio(9f / 16f)
-//            )
-//        else
-        ProfilePicture(profilePictureUrl = profilePictureUrl)
+        UserProfilePicture(
+            avatar = profilePictureUrl,
+            size = 40.dp,
+        )
 
         TextField(
             value = caption,
@@ -687,24 +679,6 @@ fun VideoPlayer(
             player.release()
         }
     }
-}
-
-@Composable
-fun ProfilePicture(profilePictureUrl: String) {
-    Image(
-        painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    transformations(CircleCropTransformation())
-                    error(R.drawable.default_profile_picture)
-                }).build()
-        ),
-        contentDescription = "Profile image",
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(40.dp),
-        contentScale = ContentScale.Crop,
-    )
 }
 
 @Composable

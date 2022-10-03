@@ -10,7 +10,7 @@ data class Comment(
     val id: String = "",
     val username: String = "",
     val verified: Boolean = false,
-    val avatar: String = "",
+    val avatar: String? = null,
     val postId: String = "",
     val authorId: String = "",
     val text: String = "",

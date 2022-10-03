@@ -29,7 +29,7 @@ import com.salazar.cheers.internal.StoryState
 @Composable
 fun UserProfilePicture(
     modifier: Modifier = Modifier,
-    avatar: String,
+    avatar: String?,
     storyState: StoryState = StoryState.EMPTY,
     @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,

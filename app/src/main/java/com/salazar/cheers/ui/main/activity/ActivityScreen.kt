@@ -21,14 +21,16 @@ import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.compose.EmptyActivity
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.compose.text.MyText
 import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.ActivityType
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.internal.toSentence
-import com.salazar.cheers.ui.main.add.ProfilePicture
 import com.salazar.cheers.ui.main.event.add.TopAppBar
+
 
 @Composable
 fun ActivityScreen(
@@ -76,7 +78,7 @@ fun ActivityList(
 ) {
     LazyColumn {
         item {
-            Text(
+            MyText(
                 text = "This week",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(16.dp),
@@ -106,16 +108,27 @@ fun ActivityItem(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ProfilePicture(profilePictureUrl = activity.avatar)
+            UserProfilePicture(
+                avatar = activity.avatar,
+                size = 40.dp,
+            )
             Spacer(modifier = Modifier.width(16.dp))
             val annotatedString = buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                     append(activity.username)
                 }
                 append(" ")
-                append(activity.type.toSentence())
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+                    append(activity.type.toSentence())
+                }
                 append(" ")
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.outline)) {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.onBackground.copy(
+                            alpha = 0.8f
+                        ), fontWeight = FontWeight.Normal
+                    )
+                ) {
                     append(relativeTimeFormatter(timestamp = activity.time))
                 }
             }
@@ -127,6 +140,7 @@ fun ActivityItem(
         }
         if (activity.type == ActivityType.FOLLOW)
             FollowButton(
+                modifier = Modifier.padding(start = 16.dp),
                 isFollowing = true,
                 onClick = {},
             )

@@ -12,7 +12,7 @@ data class UserSuggestion(
     val name: String,
     val username: String,
     val verified: Boolean,
-    val avatar: String,
+    val picture: String?,
     val followBack: Boolean,
     @ColumnInfo(defaultValue = "")
     val accountId: String,

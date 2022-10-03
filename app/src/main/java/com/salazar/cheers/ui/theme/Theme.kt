@@ -18,7 +18,7 @@ private val DarkColorPalette = darkColorScheme(
 private val LightColorPalette = lightColorScheme(
     background = Color(0xFFFFFFFF),
     surface = Color(0xFFFFFFFF),
-    outline = Color(0xFFDBDBDB)
+    outline = Color(0xFFDBDBDB),
 )
 
 @Composable

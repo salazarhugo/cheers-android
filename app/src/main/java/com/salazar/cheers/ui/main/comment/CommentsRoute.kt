@@ -22,7 +22,7 @@ fun CommentsRoute(
     CommentsScreen(
         uiState = uiState,
         onComment = commentsViewModel::onComment,
-        profilePictureUrl = uiState.user?.profilePictureUrl ?: "",
+        profilePictureUrl = uiState.user?.picture ?: "",
         onInputChange = commentsViewModel::onInputChange,
         onBackPressed = { navActions.navigateBack() },
         onDeleteComment = commentsViewModel::deleteComment,

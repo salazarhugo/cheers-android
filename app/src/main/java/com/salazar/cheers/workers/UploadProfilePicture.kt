@@ -43,7 +43,7 @@ class UploadProfilePicture @AssistedInject constructor(
             val downloadUrl = Tasks.await(task)
 
             val user = userRepository.getCurrentUser()
-            userRepository.updateUser(user.copy(profilePictureUrl = downloadUrl.toString()))
+            userRepository.updateUser(user.copy(picture = downloadUrl.toString()))
 
             return Result.success()
         } catch (throwable: Throwable) {

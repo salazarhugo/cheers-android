@@ -92,7 +92,7 @@ fun EditProfileHeader(
         modifier = Modifier.fillMaxWidth(),
     ) {
 
-        val photo = photoUri ?: user.profilePictureUrl
+        val photo = photoUri ?: user.picture
 
         Image(
             painter = rememberAsyncImagePainter(

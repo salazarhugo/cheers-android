@@ -157,7 +157,7 @@ fun Stories(
     onAddStoryClick: () -> Unit,
 ) {
     val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
-    val profilePictureUrl = uiState.user?.profilePictureUrl
+    val profilePictureUrl = uiState.user?.picture
     val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
 
     LazyRow(
@@ -359,7 +359,7 @@ fun Suggestion(
                 Image(
                     painter = rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
-                            .data(data = suggestedUser.user.profilePictureUrl)
+                            .data(data = suggestedUser.user.picture)
                             .apply(block = fun ImageRequest.Builder.() {
                                 transformations(CircleCropTransformation())
                                 error(R.drawable.default_profile_picture)
@@ -478,7 +478,7 @@ fun PostList(
 
         item {
             WhatsUpSection(
-                avatar = uiState.user?.profilePictureUrl ?: "",
+                avatar = uiState.user?.picture ?: "",
                 onClick = onAddPostClick,
             )
             DividerM3()
@@ -712,7 +712,7 @@ fun TagUsers(tagUsers: List<User>) {
             val u = tagUsers[i]
             Image(
                 painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = u.profilePictureUrl)
+                    ImageRequest.Builder(LocalContext.current).data(data = u.picture)
                         .apply(block = fun ImageRequest.Builder.() {
                             transformations(CircleCropTransformation())
                             error(R.drawable.default_profile_picture)

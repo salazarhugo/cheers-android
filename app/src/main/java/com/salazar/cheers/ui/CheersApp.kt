@@ -15,6 +15,7 @@ import com.salazar.cheers.Theme
 import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.ui.theme.CheersTheme
 
+
 @Composable
 fun CheersApp(
     showInterstitialAd: () -> Unit,

@@ -3,9 +3,6 @@ syntax = "proto3";
 option java_package = "com.salazar.cheers";
 option java_multiple_files = true;
 
-import "google/protobuf/timestamp.proto";
-
-
 enum Theme {
   SYSTEM_DEFAULT = 0;
   DARK = 1;

@@ -22,7 +22,7 @@ data class User(
     val verified: Boolean = false,
     val email: String = "",
     val bio: String = "",
-    val profilePictureUrl: String = "",
+    val picture: String? = null,
     val website: String = "",
     val online: Boolean = false,
     val darkMode: Boolean = false,

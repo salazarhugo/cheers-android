@@ -69,7 +69,7 @@ class UserRepository @Inject constructor(
                 id = user.id,
                 fullName = user.name,
                 username = user.username,
-                profilePictureUrl = user.profilePictureUrl,
+                profilePictureUrl = user.picture,
                 verified = user.verified,
                 date = Instant.now().epochSecond
             )
@@ -80,7 +80,7 @@ class UserRepository @Inject constructor(
                 id = user.id,
                 fullName = user.name,
                 username = user.username,
-                profilePictureUrl = user.avatar,
+                profilePictureUrl = user.picture,
                 verified = user.verified,
                 date = Instant.now().epochSecond
             )

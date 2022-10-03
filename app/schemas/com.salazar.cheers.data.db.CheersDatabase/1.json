@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "96c823f9fd5147a1f2830783f25d6a54",
+    "identityHash": "9059969cd9152d1e2e0898aa1cab2ffc",
     "entities": [
       {
         "tableName": "recentUsers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fullName` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `profilePictureUrl` TEXT NOT NULL, `date` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fullName` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `profilePictureUrl` TEXT, `date` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -36,7 +36,7 @@
             "fieldPath": "profilePictureUrl",
             "columnName": "profilePictureUrl",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "date",
@@ -412,7 +412,7 @@
       },
       {
         "tableName": "users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `name` TEXT NOT NULL, `postCount` INTEGER NOT NULL, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `coins` INTEGER NOT NULL, `phoneNumber` TEXT NOT NULL, `verified` INTEGER NOT NULL, `email` TEXT NOT NULL, `bio` TEXT NOT NULL, `profilePictureUrl` TEXT NOT NULL, `website` TEXT NOT NULL, `online` INTEGER NOT NULL, `darkMode` INTEGER NOT NULL, `registrationTokens` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `friend` INTEGER NOT NULL DEFAULT false, `storyState` TEXT NOT NULL DEFAULT 'EMPTY', `seenStory` INTEGER NOT NULL DEFAULT false, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `name` TEXT NOT NULL, `postCount` INTEGER NOT NULL, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `coins` INTEGER NOT NULL, `phoneNumber` TEXT NOT NULL, `verified` INTEGER NOT NULL, `email` TEXT NOT NULL, `bio` TEXT NOT NULL, `picture` TEXT, `website` TEXT NOT NULL, `online` INTEGER NOT NULL, `darkMode` INTEGER NOT NULL, `registrationTokens` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `friend` INTEGER NOT NULL DEFAULT false, `storyState` TEXT NOT NULL DEFAULT 'EMPTY', `seenStory` INTEGER NOT NULL DEFAULT false, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -481,10 +481,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "profilePictureUrl",
-            "columnName": "profilePictureUrl",
+            "fieldPath": "picture",
+            "columnName": "picture",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "website",
@@ -1151,7 +1151,7 @@
       },
       {
         "tableName": "user_suggestion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `avatar` TEXT NOT NULL, `followBack` INTEGER NOT NULL, `accountId` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `picture` TEXT, `followBack` INTEGER NOT NULL, `accountId` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -1178,10 +1178,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "avatar",
-            "columnName": "avatar",
+            "fieldPath": "picture",
+            "columnName": "picture",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "followBack",
@@ -1210,7 +1210,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96c823f9fd5147a1f2830783f25d6a54')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9059969cd9152d1e2e0898aa1cab2ffc')"
     ]
   }
 }

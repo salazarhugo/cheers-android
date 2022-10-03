@@ -23,7 +23,7 @@ fun ProfileHeader(
             .padding(top = 8.dp)
     ) {
         UserProfilePicture(
-            avatar = user.profilePictureUrl,
+            avatar = user.picture,
             size = 80.dp,
             storyState = user.storyState,
             onClick = { onStoryClick(user.username) }

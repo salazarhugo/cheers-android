@@ -91,7 +91,7 @@ fun CheersNavGraph(
                 ) {
                     CheersNavigationBar(
                         unreadChatCount = uiState.unreadChatCount,
-                        profilePictureUrl = user?.profilePictureUrl ?: "",
+                        profilePictureUrl = user?.picture ?: "",
                         currentRoute = currentRoute,
                         navigateToHome = navActions.navigateToHome,
                         navigateToMap = navActions.navigateToMap,

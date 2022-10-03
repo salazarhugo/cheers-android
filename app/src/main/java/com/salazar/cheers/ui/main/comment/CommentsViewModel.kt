@@ -94,7 +94,7 @@ class CommentsViewModel @Inject constructor(
         val comment = Comment(
             username = user.username,
             verified = user.verified,
-            avatar = user.profilePictureUrl,
+            avatar = user.picture,
             postId = postId,
             authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
             text = text,

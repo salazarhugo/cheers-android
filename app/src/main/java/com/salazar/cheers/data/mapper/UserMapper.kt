@@ -8,7 +8,7 @@ fun RecentUser.toUser(): User {
         id = id,
         name = fullName,
         username = username,
-        profilePictureUrl = profilePictureUrl,
+        picture = profilePictureUrl,
         verified = verified,
     )
 }
