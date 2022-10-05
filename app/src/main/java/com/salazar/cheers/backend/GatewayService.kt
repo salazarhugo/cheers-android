@@ -79,9 +79,9 @@ interface GatewayService {
         @Body() user: User,
     ): User
 
-    @POST("party/create")
+    @POST("parties")
     suspend fun createParty(
-        @Body() party: Party,
+        @Body() party: CreatePartyRequest,
     )
 
     @POST("event/update")
@@ -206,6 +206,6 @@ interface GatewayService {
     )
 
     companion object {
-        const val GATEWAY_URL = "https://waf-clzdlli7.nw.gateway.dev"
+        const val GATEWAY_URL = "https://android-gateway-clzdlli7.nw.gateway.dev"
     }
 }

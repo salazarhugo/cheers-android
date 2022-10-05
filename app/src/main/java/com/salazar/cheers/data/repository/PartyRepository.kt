@@ -9,14 +9,21 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.salazar.cheers.backend.CoreService
+import com.salazar.cheers.backend.GatewayService
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.paging.EventRemoteMediator
+import com.salazar.cheers.internal.A
+import com.salazar.cheers.internal.CreatePartyRequest
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.workers.CreatePartyWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,6 +33,7 @@ import javax.inject.Singleton
 class PartyRepository @Inject constructor(
     application: Application,
     private val coreService: CoreService,
+    private val gatewayService: GatewayService,
     private val database: CheersDatabase,
 ) {
 
@@ -36,9 +44,14 @@ class PartyRepository @Inject constructor(
         return eventDao.getEvent(eventId = eventId)
     }
 
-    fun createParty(
+    suspend fun createParty(
         party: Party,
     ) {
+        try {
+            gatewayService.createParty(CreatePartyRequest(A("cheers-mobile")))
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
         party.apply {
             val uploadWorkRequest = OneTimeWorkRequestBuilder<CreatePartyWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

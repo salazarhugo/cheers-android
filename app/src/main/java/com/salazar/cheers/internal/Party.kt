@@ -43,3 +43,23 @@ data class EventUi(
     val participants: List<User>,
 )
 
+data class CreatePartyRequest(
+    val party: A
+)
+
+data class A(
+    val name: String = "mobile-cheers",
+    val latlng: LatLng = LatLng(),
+    val startDate: Timestamp = Timestamp(),
+    val endDate: Timestamp = Timestamp(),
+)
+
+data class Timestamp(
+    val seconds: Int = 0,
+    val nanos: Int = 0,
+)
+
+data class LatLng(
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+)

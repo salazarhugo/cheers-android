@@ -192,22 +192,24 @@ class AddEventViewModel @Inject constructor(
     fun uploadEvent() {
         val state = viewModelState.value
 
-        state.apply {
-            partyRepository.createParty(
-                Party().copy(
-                    name = name,
-                    address = address,
-                    description = description,
-                    showGuestList = showGuestList,
-                    privacy = privacy,
-                    startDate = startTimeSeconds,
-                    endDate = endTimeSeconds,
-                    bannerUrl = photo.toString(),
-                    locationName = locationName,
-                    latitude = latitude,
-                    longitude = longitude,
-                ),
-            )
+        viewModelScope.launch {
+            state.apply {
+                partyRepository.createParty(
+                    Party().copy(
+                        name = name,
+                        address = address,
+                        description = description,
+                        showGuestList = showGuestList,
+                        privacy = privacy,
+                        startDate = startTimeSeconds,
+                        endDate = endTimeSeconds,
+                        bannerUrl = photo.toString(),
+                        locationName = locationName,
+                        latitude = latitude,
+                        longitude = longitude,
+                    ),
+                )
+            }
         }
     }
 

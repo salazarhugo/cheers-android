@@ -88,6 +88,9 @@ class ProfileViewModel @Inject constructor(
                 updateUser(user)
             }
         }
+        viewModelScope.launch {
+                partyRepository.createParty( Party() )
+        }
         refreshUser()
         getUserEvents()
         refreshUserPosts()
