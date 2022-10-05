@@ -342,7 +342,7 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToPostComments: (postId: String) -> Unit = { postId ->
+    val navigateToComments: (postId: String) -> Unit = { postId ->
         navController.navigate("${MainDestinations.POST_COMMENTS}/$postId") {
             launchSingleTop = true
             restoreState = true

@@ -30,22 +30,22 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        onSwipeRefresh = homeViewModel::onSwipeRefresh,
-        onPostClicked = { navActions.navigateToPostDetail(it) },
-        onPostMoreClicked = { postId, authorId ->
-            navActions.navigateToPostMoreSheet(
-                postId,
-                authorId
-            )
-        },
-        onUserClicked = { navActions.navigateToOtherProfile(it) },
-        onLike = homeViewModel::toggleLike,
-        navigateToComments = { navActions.navigateToPostComments(it.id) },
-        navigateToSearch = { navActions.navigateToSearch() },
-        onStoryClick = { navActions.navigateToStoryWithUserId(it) },
-        onAddStoryClick = { navActions.navigateToCamera() },
-        onActivityClick = { navActions.navigateToActivity() },
-        onCommentClick = { navActions.navigateToPostComments(it) },
-        onAddPostClick = { navActions.navigateToAddPostSheet() },
+        navigateToComments = { navActions.navigateToComments(it.id) },
+        onHomeUIAction = { action ->
+            when(action) {
+                is HomeUIAction.OnActivityClick -> navActions.navigateToActivity()
+                is HomeUIAction.OnLikeClick -> homeViewModel.toggleLike(action.post)
+                is HomeUIAction.OnCommentClick -> navActions.navigateToComments(action.postID)
+                is HomeUIAction.OnSearchClick -> navActions.navigateToSearch()
+                is HomeUIAction.OnStoryClick -> navActions.navigateToStoryWithUserId(action.userID)
+                is HomeUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userID)
+                is HomeUIAction.OnPostClick -> navActions.navigateToPostDetail(action.postID)
+                is HomeUIAction.OnSwipeRefresh -> homeViewModel.onSwipeRefresh()
+                is HomeUIAction.OnAddPostClick -> navActions.navigateToAddPostSheet()
+                is HomeUIAction.OnAddStoryClick -> navActions.navigateToCamera()
+                is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID, action.authorID)
+            }
+
+        }
     )
 }

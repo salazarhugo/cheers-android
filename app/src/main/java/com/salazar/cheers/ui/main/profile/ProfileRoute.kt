@@ -61,7 +61,7 @@ fun ProfileRoute(
             uriHandler.openUri(url)
         },
         onCommentClick = {
-            navActions.navigateToPostComments(it)
+            navActions.navigateToComments(it)
         }
     )
 

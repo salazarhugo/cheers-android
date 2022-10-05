@@ -19,7 +19,7 @@ class EventRemoteMediator(
     private val service: CoreService,
 ) : RemoteMediator<Int, Party>() {
 
-    private val eventDao = database.eventDao()
+    private val eventDao = database.partyDao()
     val userDao = database.userDao()
     private val remoteKeyDao = database.eventRemoteKeyDao()
     private val initialPage = 0

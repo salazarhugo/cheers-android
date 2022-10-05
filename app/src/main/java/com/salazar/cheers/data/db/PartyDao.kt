@@ -7,7 +7,7 @@ import com.salazar.cheers.internal.Party
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface EventDao {
+interface PartyDao{
 
     @Transaction
     @Query("SELECT * FROM events WHERE accountId = :accountId ORDER BY events.created DESC")

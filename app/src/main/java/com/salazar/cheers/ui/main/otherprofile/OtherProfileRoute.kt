@@ -93,7 +93,7 @@ fun OtherProfileRoute(
                         navActions.navigateToStoryWithUserId(username)
                     },
                     onCommentClick = {
-                        navActions.navigateToPostComments(it)
+                        navActions.navigateToComments(it)
                     }
                 )
             }

@@ -20,6 +20,7 @@ import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.main.event.add.AddEventUIAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -250,5 +251,19 @@ class HomeViewModel @Inject constructor(
 
         adLoader.loadAd(AdRequest.Builder().build())
     }
+}
 
+sealed class HomeUIAction {
+    object OnActivityClick : HomeUIAction()
+    object OnSearchClick : HomeUIAction()
+    object OnSwipeRefresh : HomeUIAction()
+    object OnAddStoryClick : HomeUIAction()
+    object OnAddPostClick : HomeUIAction()
+    data class OnCommentClick(val postID: String) : HomeUIAction()
+    data class OnLikeClick(val post: Post) : HomeUIAction()
+    data class OnStoryClick(val userID: String) : HomeUIAction()
+    data class OnUserClick(val userID: String) : HomeUIAction()
+    data class OnPostClick(val postID: String) : HomeUIAction()
+    data class OnPostMoreClick(val postID: String, val authorID: String) : HomeUIAction()
+//    data class On(val postID: String) : HomeUIAction()
 }

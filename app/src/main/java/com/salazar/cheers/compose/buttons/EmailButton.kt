@@ -1,4 +1,4 @@
-package com.salazar.cheers.compose
+package com.salazar.cheers.compose.buttons
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing

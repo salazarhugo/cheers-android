@@ -7,9 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import com.salazar.cheers.compose.video.VideoPlayer
 import com.salazar.cheers.internal.Post
-import com.salazar.cheers.ui.main.home.PhotoCarousel
-import com.salazar.cheers.ui.main.home.VideoPlayer
 
 @Composable
 fun PostBody(

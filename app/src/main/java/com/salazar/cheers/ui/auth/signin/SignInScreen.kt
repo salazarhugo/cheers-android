@@ -35,7 +35,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.GoogleButton
+import com.salazar.cheers.compose.buttons.GoogleButton
 import com.salazar.cheers.compose.animations.AnimatedLogo
 import com.salazar.cheers.ui.theme.Typography
 

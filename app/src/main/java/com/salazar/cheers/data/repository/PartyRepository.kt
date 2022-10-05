@@ -9,8 +9,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.backend.GatewayService
 import com.salazar.cheers.data.db.CheersDatabase
@@ -22,8 +20,6 @@ import com.salazar.cheers.workers.CreatePartyWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,10 +34,10 @@ class PartyRepository @Inject constructor(
 ) {
 
     private val workManager = WorkManager.getInstance(application)
-    val eventDao = database.eventDao()
+    val partyDao = database.partyDao()
 
     fun getEvent(eventId: String): Flow<Party> {
-        return eventDao.getEvent(eventId = eventId)
+        return partyDao.getEvent(eventId = eventId)
     }
 
     suspend fun createParty(
@@ -84,19 +80,19 @@ class PartyRepository @Inject constructor(
             ),
             remoteMediator = EventRemoteMediator(database = database, service = coreService),
         ) {
-            eventDao.pagingSourceFeed()
+            partyDao.pagingSourceFeed()
         }.flow
     }
 
     fun getEvents(): Flow<List<Party>> {
-        return eventDao.getEvents()
+        return partyDao.getEvents()
     }
 
     suspend fun refreshMyEvents() = withContext(Dispatchers.IO) {
         try {
             val myEvents = coreService.getEvents(0, 10)
             Log.d("DORA", myEvents.toString())
-            eventDao.insertAll(myEvents)
+            partyDao.insertAll(myEvents)
         } catch (e: IOException) {
             e.printStackTrace()
         } catch (e: Exception) {
@@ -125,20 +121,16 @@ class PartyRepository @Inject constructor(
     }
 
     suspend fun hideEvent(eventId: String) = withContext(Dispatchers.IO) {
-        eventDao.deleteWithId(eventId = eventId)
+        partyDao.deleteWithId(eventId = eventId)
     }
 
     suspend fun deleteEvent(eventId: String) = withContext(Dispatchers.IO) {
-        eventDao.deleteWithId(eventId = eventId)
+        partyDao.deleteWithId(eventId = eventId)
         coreService.deleteEvent(eventId = eventId)
     }
 
     suspend fun uploadEvent(party: Party) {
         coreService.createParty(party = party)
-    }
-
-    suspend fun toggleGoing(eventId: String) {
-        eventDao.toggleGoing(eventId = eventId)
     }
 
     suspend fun interestedList(eventId: String) = withContext(Dispatchers.IO) {
@@ -159,12 +151,8 @@ class PartyRepository @Inject constructor(
         }
     }
 
-    suspend fun toggleInterested(eventId: String) {
-        eventDao.toggleInterested(eventId = eventId)
-    }
-
     suspend fun toggleGoing(party: Party) {
-        eventDao.update(party.copy(going = !party.going))
+        partyDao.update(party.copy(going = !party.going))
         if (party.going)
             ungoingEvent(party.id)
         else
@@ -172,7 +160,7 @@ class PartyRepository @Inject constructor(
     }
 
     suspend fun toggleInterested(party: Party) {
-        eventDao.update(party.copy(interested = !party.interested))
+        partyDao.update(party.copy(interested = !party.interested))
         if (party.interested)
             uninterestEvent(party.id)
         else

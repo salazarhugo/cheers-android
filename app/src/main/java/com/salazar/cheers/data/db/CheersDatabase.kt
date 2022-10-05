@@ -37,7 +37,7 @@ import java.util.*
 abstract class CheersDatabase : RoomDatabase() {
     abstract fun cheersDao(): CheersDao
     abstract fun postDao(): PostDao
-    abstract fun eventDao(): EventDao
+    abstract fun partyDao(): PartyDao
     abstract fun storyDao(): StoryDao
     abstract fun userDao(): UserDao
     abstract fun userStatsDao(): UserStatsDao
