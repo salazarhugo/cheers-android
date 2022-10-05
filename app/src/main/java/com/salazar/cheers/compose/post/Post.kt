@@ -12,17 +12,13 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.ui.main.home.HomeUIAction
 
 @Composable
 fun PostView(
     post: Post,
     modifier: Modifier = Modifier,
-    onPostClicked: (postId: String) -> Unit,
-    onPostMoreClicked: (postId: String, authorId: String) -> Unit,
-    onUserClicked: (username: String) -> Unit,
-    onLike: (post: Post) -> Unit,
-    navigateToComments: (Post) -> Unit,
-    onCommentClick: (String) -> Unit,
+    onHomeUIAction: (HomeUIAction) -> Unit,
 ) {
     val pagerState = rememberPagerState()
 
@@ -37,31 +33,35 @@ fun PostView(
             created = post.created,
             profilePictureUrl = post.profilePictureUrl,
             locationName = post.locationName,
-            onHeaderClicked = onUserClicked,
+            onHeaderClicked = { onHomeUIAction(HomeUIAction.OnUserClick(it)) },
             onMoreClicked = {
-                onPostMoreClicked(post.id, post.authorId)
+                onHomeUIAction(
+                    HomeUIAction.OnPostMoreClick(
+                        post.id,
+                        post.authorId,
+                    )
+                )
             },
         )
         PostText(
             caption = post.caption,
-            onUserClicked = onUserClicked,
-            onPostClicked = { onPostClicked(post.id) },
+            onUserClicked = { onHomeUIAction(HomeUIAction.OnUserClick(it)) },
+            onPostClicked = { onHomeUIAction(HomeUIAction.OnPostClick(post.id)) },
         )
         PostBody(
             post,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp)),
-            onPostClicked = onPostClicked,
-            onLike = onLike,
+            onPostClicked = { onHomeUIAction(HomeUIAction.OnPostClick(post.id)) },
+            onLike = { onHomeUIAction(HomeUIAction.OnLikeClick(it)) },
             pagerState = pagerState
         )
         PostFooter(
-            post,
-            onLike = onLike,
-            navigateToComments = navigateToComments,
+            post = post,
             pagerState = pagerState,
-            onCommentClick = onCommentClick,
+            onLike = { onHomeUIAction(HomeUIAction.OnLikeClick(it)) },
+            onCommentClick = { onHomeUIAction(HomeUIAction.OnCommentClick(it)) },
         )
     }
 }

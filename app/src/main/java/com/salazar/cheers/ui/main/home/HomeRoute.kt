@@ -30,7 +30,6 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        navigateToComments = { navActions.navigateToComments(it.id) },
         onHomeUIAction = { action ->
             when(action) {
                 is HomeUIAction.OnActivityClick -> navActions.navigateToActivity()
@@ -45,7 +44,6 @@ fun HomeRoute(
                 is HomeUIAction.OnAddStoryClick -> navActions.navigateToCamera()
                 is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID, action.authorID)
             }
-
         }
     )
 }

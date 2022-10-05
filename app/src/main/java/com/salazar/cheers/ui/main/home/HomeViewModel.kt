@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -21,98 +22,29 @@ import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.event.add.AddEventUIAction
+import com.salazar.cheers.ui.settings.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface HomeUiState {
 
-    val isLoading: Boolean
-    val errorMessages: List<String>
-    val searchInput: String
-    val suggestions: List<SuggestionUser>?
-    val postSheetState: ModalBottomSheetState
-    val nativeAd: NativeAd?
-    val selectedTab: Int
-    val notificationCount: Int
-
-    data class NoPosts(
-        override val suggestions: List<SuggestionUser>?,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String,
-        override val postSheetState: ModalBottomSheetState,
-        override val nativeAd: NativeAd?,
-        override val selectedTab: Int,
-        override val notificationCount: Int,
-    ) : HomeUiState
-
-    data class HasPosts(
-        val postsFlow: Flow<PagingData<Post>>,
-        val storiesFlow: Flow<PagingData<Story>>?,
-        val stories: PagingData<Story>?,
-        val listState: LazyListState = LazyListState(),
-        val likes: Set<String>,
-        val user: User? = null,
-        override val postSheetState: ModalBottomSheetState,
-        override val suggestions: List<SuggestionUser>?,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val searchInput: String,
-        override val nativeAd: NativeAd?,
-        override val selectedTab: Int,
-        override val notificationCount: Int,
-    ) : HomeUiState
-}
-
-private data class HomeViewModelState(
-    val user: User? = null,
-    val postsFlow: Flow<PagingData<Post>>? = null,
+data class HomeUiState(
+    val postsFlow: Flow<PagingData<Post>> = emptyFlow(),
     val storiesFlow: Flow<PagingData<Story>>? = null,
     val stories: PagingData<Story>? = null,
     val listState: LazyListState = LazyListState(),
-    val suggestions: List<SuggestionUser>? = null,
     val likes: Set<String> = emptySet(),
+    val user: User? = null,
+    val postSheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+    val suggestions: List<SuggestionUser>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
-    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     val nativeAd: NativeAd? = null,
     val selectedTab: Int = 0,
     val notificationCount: Int = 0,
-) {
-    fun toUiState(): HomeUiState =
-        if (postsFlow == null) {
-            HomeUiState.NoPosts(
-                nativeAd = nativeAd,
-                postSheetState = sheetState,
-                isLoading = isLoading,
-                notificationCount = notificationCount,
-                errorMessages = errorMessages,
-                searchInput = searchInput,
-                suggestions = suggestions,
-                selectedTab = selectedTab,
-            )
-        } else {
-            HomeUiState.HasPosts(
-                user = user,
-                nativeAd = nativeAd,
-                postsFlow = postsFlow,
-                storiesFlow = storiesFlow,
-                notificationCount = notificationCount,
-                listState = listState,
-                postSheetState = sheetState,
-                likes = likes,
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-                searchInput = searchInput,
-                suggestions = suggestions,
-                selectedTab = selectedTab,
-                stories = stories,
-            )
-        }
-}
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -121,14 +53,13 @@ class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(HomeUiState())
 
     val uiState = viewModelState
-        .map { it.toUiState() }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
+            viewModelState.value
         )
 
     init {
@@ -265,5 +196,4 @@ sealed class HomeUIAction {
     data class OnUserClick(val userID: String) : HomeUIAction()
     data class OnPostClick(val postID: String) : HomeUIAction()
     data class OnPostMoreClick(val postID: String, val authorID: String) : HomeUIAction()
-//    data class On(val postID: String) : HomeUIAction()
 }

@@ -27,7 +27,6 @@ fun PostFooter(
     post: Post,
     onLike: (post: Post) -> Unit,
     onCommentClick: (String) -> Unit,
-    navigateToComments: (Post) -> Unit,
     pagerState: PagerState,
 ) {
     Column(
@@ -48,7 +47,7 @@ fun PostFooter(
         PostFooterButtons(
             post,
             onLike = onLike,
-            navigateToComments = { navigateToComments(post) },
+            onCommentClick = onCommentClick,
         )
         if (post.type != PostType.TEXT) {
 //            LikedBy(post = postFeed.post)
@@ -85,7 +84,7 @@ fun PostComments(
 fun PostFooterButtons(
     post: Post,
     onLike: (post: Post) -> Unit,
-    navigateToComments: (String) -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -102,7 +101,7 @@ fun PostFooterButtons(
                 likes = post.likes,
                 onToggle = { onLike(post) },
             )
-            Bounce(onBounce = { navigateToComments(post.id) }) {
+            Bounce(onBounce = { onCommentClick(post.id) }) {
                 Icon(
                     painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
                     contentDescription = null

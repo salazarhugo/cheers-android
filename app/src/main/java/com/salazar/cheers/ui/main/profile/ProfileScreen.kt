@@ -286,7 +286,6 @@ fun Post(
         onLike = onPostLike,
         navigateToComments = {},
         pagerState = pagerState,
-        onCommentClick = onCommentClick,
     )
 }
 
