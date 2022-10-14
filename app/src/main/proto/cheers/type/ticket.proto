@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/proto/genproto";
+
+message Ticket {
+  bool validated = 1;
+  int64 price = 2;
+  string id = 3;
+  string name = 4;
+  string description = 5;
+  string partyId = 6;
+  string paymentIntentId = 7;
+  string userId = 8;
+}

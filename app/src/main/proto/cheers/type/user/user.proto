@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/type/user;user";
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  bool verified = 4;
+  string username = 5;
+  string picture = 6;
+  string bio = 7;
+  string website = 8;
+  string birthday = 12;
+  Gender gender = 13;
+  string phone_number = 9;
+  float created = 10;
+  repeated string registration_tokens = 11;
+}
+
+enum Gender {
+  MALE = 0;
+  FEMALE = 1;
+}

@@ -1,0 +1,18 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "user_proto",
+    srcs = ["user.proto"],
+)
+
+proto_library(
+    name = "party_proto",
+    srcs = ["party.proto"],
+)
+
+proto_library(
+    name = "ticket_proto",
+    srcs = ["ticket.proto"],
+)

@@ -59,6 +59,7 @@ fun ChatCameraRoute(
                 is CameraUIAction.OnFlashClick -> {
                     chatCameraViewModel.onSwitchFlash()
                 }
+                else -> {}
             }
         },
     )

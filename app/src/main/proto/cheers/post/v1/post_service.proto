@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package cheers.post.v1;
+
+import "cheers/type/post/post.proto";
+import "cheers/type/user/user.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/post/v1;post";
+
+service PostService {
+  rpc CreatePost (CreatePostRequest) returns (cheers.type.Post);
+  rpc ListPost (ListPostRequest) returns (ListPostResponse);
+// TODO  rpc GetPostFeed () returns ();
+// TODO  rpc GetUserPost () returns ();
+// TODO  rpc GetPost () returns ();
+  rpc UpdatePost (UpdatePostRequest) returns (cheers.type.Post);
+  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty);
+}
+
+message CreatePostRequest {
+  cheers.type.Post post = 1;
+}
+
+message UpdatePostRequest {
+  cheers.type.Post post = 1;
+}
+
+message DeletePostRequest {
+  string id = 1;
+}
+
+message ListPostRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListPostResponse {
+  repeated PostResponse posts = 1;
+  string next_page_token = 2;
+}
+
+message PostResponse {
+  cheers.type.Post post = 1;
+  cheers.type.User user = 2;
+  int64 like_count = 3;
+  int64 comment_count = 4;
+  bool has_liked = 5;
+  bool comments_enabled = 6;
+  bool reshare_enabled = 8;
+  int64 media_count = 7;
+}

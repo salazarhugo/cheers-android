@@ -51,6 +51,7 @@ fun AddEventRoute(
                 AddEventUIAction.OnEventDetailsClick -> {
                 }
                 AddEventUIAction.OnHasEndDateToggle -> addEventViewModel.hasEndDateToggle()
+                else -> {}
             }
         },
     )

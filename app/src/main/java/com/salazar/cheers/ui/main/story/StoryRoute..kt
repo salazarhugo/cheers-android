@@ -57,6 +57,7 @@ fun StoryRoute(
                         uiState.sheetState.animateTo(ModalBottomSheetValue.Expanded)
                     }
                 }
+                else -> {}
             }
         },
         onStoryOpen = storyViewModel::onStorySeen,

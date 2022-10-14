@@ -195,6 +195,7 @@ fun Tabs(
                                 scope.launch {
                                     pagerState.animateScrollToPage(2)
                                 }
+                            else -> {}
                         }
                         onAddEventUIAction(it)
                     },

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package cheers.party.v1;
+
+import "cheers/type/party/party.proto";
+import "cheers/type/user/user.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/party/v1;party";
+
+service PartyService {
+  rpc CreateParty (CreatePartyRequest) returns (cheers.type.Party);
+  rpc GetParty (GetPartyRequest) returns (PartyResponse);
+  rpc UpdateParty (UpdatePartyRequest) returns (cheers.type.Party);
+  rpc DeleteParty (DeletePartyRequest) returns (google.protobuf.Empty);
+
+  rpc FeedParty (FeedPartyRequest) returns (FeedPartyResponse);
+}
+
+message CreatePartyRequest {
+  cheers.type.Party party = 1;
+}
+
+message GetPartyRequest {
+  string id = 1;
+}
+
+message UpdatePartyRequest {
+  cheers.type.Party party = 1;
+}
+
+message DeletePartyRequest {
+  string id = 1;
+}
+
+message FeedPartyRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message FeedPartyResponse {
+  repeated PartyResponse parties = 1;
+  string next_page_token = 2;
+}
+
+message PartyResponse {
+  cheers.type.Party party = 1;
+  cheers.type.User creator = 2;
+  int64 going_count = 3;
+  int64 interested_count = 4;
+  int64 invited_count = 5;
+  bool is_going = 6;
+  bool is_interested = 7;
+  bool is_creator = 8;
+  PartyUserResponse user_response = 9;
+}
+
+enum PartyUserResponse {
+  GOING = 0;
+  INTERESTED = 1;
+  NOT_INTERESTED = 2;
+}

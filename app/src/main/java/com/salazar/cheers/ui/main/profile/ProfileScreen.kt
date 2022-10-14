@@ -284,7 +284,7 @@ fun Post(
     PostFooter(
         post,
         onLike = onPostLike,
-        navigateToComments = {},
+        onCommentClick = {},
         pagerState = pagerState,
     )
 }

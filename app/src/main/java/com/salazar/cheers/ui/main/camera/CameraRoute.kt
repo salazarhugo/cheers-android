@@ -115,6 +115,7 @@ fun CameraRoute(
                             sheetState.animateTo(ModalBottomSheetValue.Expanded)
                         }
                     }
+                    else -> {}
                 }
             },
         )
