@@ -36,9 +36,6 @@ class EventsViewModel @Inject constructor(
     init {
     }
 
-    val events = partyRepository.getEventFeed()
-        .cachedIn(viewModelScope)
-
     fun onQueryChange(query: String) {
         viewModelState.update {
             it.copy(query = query)
@@ -50,20 +47,15 @@ class EventsViewModel @Inject constructor(
         query: String = uiState.value.query.lowercase(),
         fetchFromRemote: Boolean = true,
     ) {
-        events.map {
-            it.filter { it.name.contains(query) }
-        }
     }
 
     fun onGoingToggle(party: Party) {
         viewModelScope.launch {
-            partyRepository.toggleGoing(party = party)
         }
     }
 
     fun onInterestedToggle(party: Party) {
         viewModelScope.launch {
-            partyRepository.toggleInterested(party = party)
         }
     }
 

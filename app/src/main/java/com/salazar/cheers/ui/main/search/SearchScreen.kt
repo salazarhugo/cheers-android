@@ -39,8 +39,8 @@ import com.salazar.cheers.compose.items.UserItem
 import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.user.FollowButton
-import com.salazar.cheers.data.entities.RecentUser
-import com.salazar.cheers.data.entities.UserSuggestion
+import com.salazar.cheers.data.db.entities.RecentUser
+import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Typography
 
@@ -88,7 +88,6 @@ private fun SearchBody(
     onFollowToggle: (String) -> Unit,
 ) {
     LazyColumn {
-
         if (uiState.searchInput.isBlank()) {
             if (uiState.recentUsers.isNotEmpty())
                 item {
@@ -143,14 +142,23 @@ private fun SearchBody(
                 }
             }
 
-        if (uiState.users != null)
-            items(uiState.users, key = { it.id }) { user ->
-                UserItem(
-                    modifier = Modifier.animateItemPlacement(),
-                    user = user,
-                    onClick = onUserClicked,
-                )
-            }
+        if (uiState.users != null) {
+            if (uiState.users.isEmpty() && !uiState.isLoading)
+                item() {
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = "No results for this query"
+                    )
+                }
+            else
+                items(uiState.users, key = { it.id }) { user ->
+                    UserItem(
+                        modifier = Modifier.animateItemPlacement(),
+                        userItem = user,
+                        onClick = onUserClicked,
+                    )
+                }
+        }
     }
 }
 

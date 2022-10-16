@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.event.guestlist
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +17,8 @@ import javax.inject.Inject
 data class GuestListUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val interested: List<User>? = null,
-    val going: List<User>? = null,
+    val interested: List<UserItem>? = null,
+    val going: List<UserItem>? = null,
 )
 
 @HiltViewModel
@@ -46,25 +47,25 @@ class GuestListViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-            partyRepository.interestedList(eventId = eventId)?.let {
-                updateInterested(users = it)
-            }
+//            partyRepository.interestedList(eventId = eventId)?.let {
+//                updateInterested(users = it)
+//            }
         }
 
         viewModelScope.launch {
-            partyRepository.goingList(eventId = eventId)?.let {
-                updateGoing(users = it)
-            }
+//            partyRepository.goingList(eventId = eventId)?.let {
+//                updateGoing(users = it)
+//            }
         }
     }
 
-    private fun updateInterested(users: List<User>) {
+    private fun updateInterested(users: List<UserItem>) {
         viewModelState.update {
             it.copy(interested = users)
         }
     }
 
-    private fun updateGoing(users: List<User>) {
+    private fun updateGoing(users: List<UserItem>) {
         viewModelState.update {
             it.copy(going = users)
         }

@@ -4,10 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.backend.Neo4jService
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,7 +24,7 @@ sealed interface PostDetailUiState {
 
     data class HasPost(
         val postFeed: Post,
-        val members: List<User>?,
+        val members: List<UserItem>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : PostDetailUiState
@@ -33,7 +32,7 @@ sealed interface PostDetailUiState {
 
 private data class PostDetailViewModelState(
     val postFeed: Post? = null,
-    val members: List<User>? = null,
+    val members: List<UserItem>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
@@ -56,7 +55,6 @@ private data class PostDetailViewModelState(
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val service: Neo4jService,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -79,7 +77,7 @@ class PostDetailViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val members = postRepository.getPostMembers(postId = postId)
-            updateMembers(members)
+//            updateMembers(members)
         }
         viewModelScope.launch {
             postRepository.postFlow(postId = postId).collect { post ->
@@ -95,7 +93,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updateMembers(members: List<User>?) {
+    private fun updateMembers(members: List<UserItem>?) {
         viewModelState.update {
             it.copy(members = members)
         }

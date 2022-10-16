@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.stats
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.entities.UserStats
+import com.salazar.cheers.data.db.entities.UserStats
 import com.salazar.cheers.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

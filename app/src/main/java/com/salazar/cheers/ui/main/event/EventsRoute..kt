@@ -18,22 +18,22 @@ fun EventsRoute(
     navActions: CheersNavigationActions,
 ) {
     val uiState by eventsViewModel.uiState.collectAsState()
-    val events = eventsViewModel.events.collectAsLazyPagingItems()
+//    val events = eventsViewModel.events.collectAsLazyPagingItems()
 
-    EventsScreen(
-        uiState = uiState,
-        events = events,
-        onEventClicked = {
-            navActions.navigateToEventDetail(it)
-        },
-        onQueryChange = eventsViewModel::onQueryChange,
-        onInterestedToggle = eventsViewModel::onInterestedToggle,
-        onGoingToggle = eventsViewModel::onGoingToggle,
-        onMoreClick = {
-            navActions.navigateToEventMoreSheet(it)
-        },
-        onCreateEventClick = {
-            navActions.navigateToAddEvent()
-        },
-    )
+//    EventsScreen(
+//        uiState = uiState,
+//        events = events,
+//        onEventClicked = {
+//            navActions.navigateToEventDetail(it)
+//        },
+//        onQueryChange = eventsViewModel::onQueryChange,
+//        onInterestedToggle = eventsViewModel::onInterestedToggle,
+//        onGoingToggle = eventsViewModel::onGoingToggle,
+//        onMoreClick = {
+//            navActions.navigateToEventMoreSheet(it)
+//        },
+//        onCreateEventClick = {
+//            navActions.navigateToAddEvent()
+//        },
+//    )
 }

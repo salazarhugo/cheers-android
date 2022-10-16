@@ -1,4 +1,4 @@
-package com.salazar.cheers.data.entities
+package com.salazar.cheers.data.db.entities
 
 import androidx.room.Entity
 import androidx.room.Index

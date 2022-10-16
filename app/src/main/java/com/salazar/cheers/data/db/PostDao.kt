@@ -11,21 +11,9 @@ import java.util.*
 
 @Dao
 interface PostDao {
-
-    @Transaction
-    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
-    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, Post>
-
     @Transaction
     @Query("SELECT * FROM posts WHERE (authorId = :userIdOrUsername OR username = :userIdOrUsername) ORDER BY posts.created DESC")
     fun getUserPosts(userIdOrUsername: String): List<Post>
-
-//    /**
-//     ** Get User posts and posts where they are tagged in. Only IMAGE, VIDEO posts.
-//     **/
-//    @Transaction
-//    @Query("SELECT * FROM posts WHERE (authorId = :authorId OR tagUsersId LIKE '%' || :authorId || '%') AND type <> 'TEXT' ORDER BY posts.createdTime DESC")
-//    suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     /**
      ** Get User posts. Only IMAGE, VIDEO posts.
@@ -35,12 +23,11 @@ interface PostDao {
     suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
-    @Query("SELECT * FROM posts WHERE authorId = :authorId ORDER BY posts.created DESC")
-    suspend fun getPosts(authorId: String = FirebaseAuth.getInstance().currentUser?.uid!!): List<Post>
+    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
+    suspend fun getPosts(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): List<Post>
 
-//    @Transaction
-//    @Query("SELECT users.id FROM users WHERE username = :username")
-//    suspend fun getPostsWithAuthorId(authorId: String): List<Post>
+    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
+    fun getPostFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Post>>
 
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
     fun postFlow(postId: String): Flow<Post>
@@ -54,9 +41,6 @@ interface PostDao {
         privacy: Privacy,
         yesterday: Long = Date().time - 24 * 60 * 60 * 1000
     ): List<Post>
-
-    @Query("SELECT * FROM users WHERE id IN (:tagUsersId)")
-    suspend fun getPostUsers(tagUsersId: List<String>): List<User>
 
     @Query("SELECT * FROM posts ORDER BY created DESC")
     fun pagingSource(): PagingSource<Int, Post>

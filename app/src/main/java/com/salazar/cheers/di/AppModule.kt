@@ -2,26 +2,21 @@ package com.salazar.cheers.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import com.google.firebase.auth.FirebaseAuth
+import cheers.party.v1.PartyServiceGrpcKt
+import cheers.post.v1.PostServiceGrpcKt
+import cheers.user.v1.UserServiceGrpcKt
 import com.salazar.cheers.Settings
-import com.salazar.cheers.backend.CoreService
-import com.salazar.cheers.backend.GatewayService
-import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.db.*
-import com.salazar.cheers.data.remote.FirebaseUserIdTokenInterceptor
+import com.salazar.cheers.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.data.serializer.settingsDataStore
-import com.salazar.cheers.internal.PrivacyAdapter
-import com.squareup.moshi.Moshi
+import com.salazar.cheers.util.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.converter.moshi.MoshiConverterFactory
+import io.grpc.ManagedChannel
+import io.grpc.ManagedChannelBuilder
 import javax.inject.Singleton
 
 
@@ -29,91 +24,59 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideChatServiceCoroutineStub(): ChatServiceGrpcKt.ChatServiceCoroutineStub {
-//
-//        //192.168.1.35
-//        val managedChannel = ManagedChannelBuilder
-//            .forAddress("chat-r3a2dr4u4a-nw.a.run.app", 443)
-//            .build()
-//
-//        val client = ChatServiceGrpcKt
-//            .ChatServiceCoroutineStub(managedChannel)
-//            .withInterceptors(ErrorHandleInterceptor(""))
-////            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(header))
-//
-//        return client
-//    }
-
-    @Singleton
     @Provides
-    fun providePublicService(): PublicService {
+    @Singleton
+    fun provideErrorHandlerInterceptor(): ErrorHandleInterceptor =
+        ErrorHandleInterceptor()
 
-        val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
-
-        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
+    @Provides
+    @Singleton
+    fun provideManagedChannel(): ManagedChannel {
+        return ManagedChannelBuilder
+            .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
+    }
 
-        val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl(PublicService.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(okHttpClient)
-            .build()
+    @Provides
+    @Singleton
+    fun provideUserServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): UserServiceGrpcKt.UserServiceCoroutineStub {
+        return UserServiceGrpcKt
+            .UserServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
+    }
 
-        return retrofit.create(PublicService::class.java)
+    @Provides
+    @Singleton
+    fun providePartyServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): PartyServiceGrpcKt.PartyServiceCoroutineStub {
+        return PartyServiceGrpcKt
+            .PartyServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
+    }
+
+    @Provides
+    @Singleton
+    fun providePostServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): PostServiceGrpcKt.PostServiceCoroutineStub {
+        return PostServiceGrpcKt
+            .PostServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
     }
 
     @Singleton
     @Provides
     fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Settings> {
         return context.settingsDataStore
-    }
-
-    @Singleton
-    @Provides
-    fun provideGatewayService(): GatewayService {
-        val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
-
-        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-            .addInterceptor(FirebaseUserIdTokenInterceptor())
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-            .build()
-
-        val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl(GatewayService.GATEWAY_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(okHttpClient)
-            .build()
-
-        return retrofit.create(GatewayService::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideGoApi(): CoreService {
-
-        val moshi = Moshi.Builder().add(PrivacyAdapter()).build()
-
-        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-            .addInterceptor(FirebaseUserIdTokenInterceptor())
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-            .build()
-
-        val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl(CoreService.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(okHttpClient)
-            .build()
-
-        return retrofit.create(CoreService::class.java)
     }
 
     @Singleton
@@ -145,6 +108,12 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideUserItemDao(@ApplicationContext appContext: Context): UserItemDao {
+        return CheersDatabase.invoke(appContext).userItemDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideChatDao(@ApplicationContext appContext: Context): ChatDao {
         return CheersDatabase.invoke(appContext).chatDao()
     }
@@ -166,14 +135,4 @@ object AppModule {
     fun provideCheersDao(@ApplicationContext appContext: Context): CheersDao {
         return CheersDatabase.invoke(appContext).cheersDao()
     }
-
-    @Singleton
-    @Provides
-    fun provideNeo4jService(): Neo4jService {
-        return Neo4jService()
-    }
 }
-
-@Module
-@InstallIn(ViewComponent::class)
-object ChatModule

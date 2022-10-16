@@ -13,6 +13,8 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import cheers.type.PostOuterClass
+import cheers.type.PrivacyOuterClass
 import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.PostRepository
@@ -36,8 +38,6 @@ class UploadPostWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val appContext = applicationContext
-
-        makeStatusNotification("Uploading", appContext)
 
         val photos =
             inputData.getStringArray("PHOTOS") ?: emptyArray()
@@ -154,38 +154,29 @@ class UploadPostWorker @AssistedInject constructor(
                     }
 
 
-                    val post = Post(
-                        type = postType,
-                        caption = photoCaption,
-                        photos = downloadUrls,
-                        drunkenness = drunkenness,
-                        beverage = beverage,
-                        locationName = locationName,
-                        latitude = latitude,
-                        longitude = longitude,
-                        privacy = privacy,
-                        tagUsersId = tagUserIds.toList(),
-                        notify = notify,
-                    )
+                    val post = PostOuterClass.Post.newBuilder()
+                        .setType(PostOuterClass.PostType.IMAGE)
+                        .setCaption(photoCaption)
+                        .addAllPhotos(downloadUrls)
+                        .setDrunkenness(drunkenness.toLong())
+                        .setDrink(beverage)
+                        .setLocationName(locationName)
+                        .build()
 
-                    postRepository.addPost(post = post)
+                    postRepository.createPost(post = post)
                     makeStatusNotification("Successfully uploaded", appContext)
 
                 }
                 PostType.TEXT -> {
-                    val post = Post(
-                        type = postType,
-                        caption = photoCaption,
-                        drunkenness = drunkenness,
-                        beverage = beverage,
-                        locationName = locationName,
-                        latitude = latitude,
-                        longitude = longitude,
-                        privacy = privacy,
-                        notify = notify,
-                        tagUsersId = tagUserIds.toList()
-                    )
-                    postRepository.addPost(post = post)
+                    val post = PostOuterClass.Post.newBuilder()
+                        .setType(PostOuterClass.PostType.TEXT)
+                        .setCaption(photoCaption)
+                        .setDrunkenness(drunkenness.toLong())
+                        .setDrink(beverage)
+                        .setLocationName(locationName)
+                        .build()
+
+                    postRepository.createPost(post = post)
                     makeStatusNotification("Successfully uploaded", appContext)
                 }
             }
@@ -229,13 +220,6 @@ class UploadPostWorker @AssistedInject constructor(
 
         val outputStream = ByteArrayOutputStream()
         selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-
-        return outputStream.toByteArray()
-    }
-
-    private fun extractBitmap(bitmap: Bitmap): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
 
         return outputStream.toByteArray()
     }

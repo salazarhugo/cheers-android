@@ -4,9 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.salazar.cheers.data.entities.EventRemoteKey
-import com.salazar.cheers.data.entities.RemoteKey
-import com.salazar.cheers.data.entities.StoryRemoteKey
+import com.salazar.cheers.data.db.entities.EventRemoteKey
+import com.salazar.cheers.data.db.entities.RemoteKey
+import com.salazar.cheers.data.db.entities.StoryRemoteKey
 
 @Dao
 interface RemoteKeyDao {

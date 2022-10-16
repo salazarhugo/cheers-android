@@ -1,16 +1,13 @@
 package com.salazar.cheers.data.db
 
 import android.content.Context
-import androidx.room.*
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.google.protobuf.Timestamp
-import com.salazar.cheers.data.entities.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.salazar.cheers.data.db.entities.*
 import com.salazar.cheers.internal.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.util.*
+
 
 @TypeConverters(Converters::class)
 @Database(
@@ -18,6 +15,7 @@ import java.util.*
         RecentUser::class,
         Post::class,
         Party::class,
+        UserItem::class,
         User::class,
         UserPreference::class,
         RemoteKey::class,
@@ -40,6 +38,7 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun partyDao(): PartyDao
     abstract fun storyDao(): StoryDao
     abstract fun userDao(): UserDao
+    abstract fun userItemDao(): UserItemDao
     abstract fun userStatsDao(): UserStatsDao
     abstract fun chatDao(): ChatDao
     abstract fun userPreferenceDao(): UserPreferenceDao
@@ -56,12 +55,6 @@ abstract class CheersDatabase : RoomDatabase() {
             instance ?: buildDatabase(context).also { instance = it }
         }
 
-        val MIGRATION_2_3 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `user_suggestion` (`id` STRING, `name` STRING, `username` STRING, `avatar` STRING, `verified` BOOLEAN, `followBack` BOOLEAN, PRIMARY KEY(`id`))")
-            }
-        }
-
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(
                 context.applicationContext,
@@ -69,71 +62,5 @@ abstract class CheersDatabase : RoomDatabase() {
             )
                 .fallbackToDestructiveMigration()
                 .build()
-    }
-}
-
-class Converters {
-    @TypeConverter
-    fun fromActivityType(value: ActivityType) = value.name
-
-    @TypeConverter
-    fun toActivityType(name: String) =
-        ActivityType.values()
-            .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: ActivityType.NONE
-
-    @TypeConverter
-    fun fromMessageType(value: com.salazar.cheers.MessageType) = value.name
-
-    @TypeConverter
-    fun toMessageType(name: String) =
-        com.salazar.cheers.MessageType.values()
-            .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: com.salazar.cheers.MessageType.UNRECOGNIZED
-
-    @TypeConverter
-    fun fromRoomType(value: com.salazar.cheers.RoomType) = value.name
-
-    @TypeConverter
-    fun toRoomType(name: String) =
-        com.salazar.cheers.RoomType.values()
-            .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: com.salazar.cheers.RoomType.UNRECOGNIZED
-
-    @TypeConverter
-    fun fromRoomStatus(value: com.salazar.cheers.RoomStatus) = value.name
-
-    @TypeConverter
-    fun toRoomStatus(name: String) =
-        com.salazar.cheers.RoomStatus.values()
-            .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: com.salazar.cheers.RoomStatus.UNRECOGNIZED
-
-    @TypeConverter
-    fun fromBeverage(value: Beverage) = value.name
-
-    @TypeConverter
-    fun toBeverage(name: String) = Beverage.fromName(name)
-
-    @TypeConverter
-    fun fromTimestamp(value: Timestamp) = value.seconds
-
-    @TypeConverter
-    fun toTimestamp(value: Long): Timestamp = Timestamp.newBuilder().setSeconds(value).build()
-
-    @TypeConverter
-    fun fromList(value: List<String>) = Json.encodeToString(value)
-
-    @TypeConverter
-    fun toList(value: String) = Json.decodeFromString<List<String>>(value)
-
-    @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
-        return value?.let { Date(it) }
-    }
-
-    @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
     }
 }

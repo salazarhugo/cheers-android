@@ -14,7 +14,6 @@ service PartyService {
   rpc GetParty (GetPartyRequest) returns (PartyResponse);
   rpc UpdateParty (UpdatePartyRequest) returns (cheers.type.Party);
   rpc DeleteParty (DeletePartyRequest) returns (google.protobuf.Empty);
-
   rpc FeedParty (FeedPartyRequest) returns (FeedPartyResponse);
 }
 

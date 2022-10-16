@@ -92,7 +92,7 @@ class MessagesViewModel @Inject constructor(
 
     fun onFollowToggle(user: User) {
         viewModelScope.launch {
-            userRepository.toggleFollow(user = user)
+            userRepository.toggleFollow(user.id)
         }
     }
 }

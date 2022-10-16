@@ -42,7 +42,8 @@ fun HomeRoute(
                 is HomeUIAction.OnSwipeRefresh -> homeViewModel.onSwipeRefresh()
                 is HomeUIAction.OnAddPostClick -> navActions.navigateToAddPostSheet()
                 is HomeUIAction.OnAddStoryClick -> navActions.navigateToCamera()
-                is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID, action.authorID)
+                is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID)
+                is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextItems()
             }
         }
     )

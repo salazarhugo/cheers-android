@@ -272,8 +272,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToPostMoreSheet: (postId: String, authorId: String) -> Unit = { postId, authorId ->
-        navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postId/$authorId") {
+    val navigateToPostMoreSheet: (postId: String) -> Unit = { postId  ->
+        navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postId") {
             launchSingleTop = true
             restoreState = true
         }

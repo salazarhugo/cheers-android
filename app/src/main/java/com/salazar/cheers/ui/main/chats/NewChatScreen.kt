@@ -104,12 +104,12 @@ fun NewChatScreen(
                                     )
                                 }
                             else
-                                uiState.users.forEach { user ->
-                                    UserCard(
-                                        user = user,
-                                        selected = uiState.selectedUsers.contains(user),
-                                        onUserCheckedChange = onUserCheckedChange,
-                                    )
+                                uiState.users?.forEach { user ->
+//                                    UserCard(
+//                                        user = user,
+//                                        selected = uiState.selectedUsers.contains(user),
+//                                        onUserCheckedChange = onUserCheckedChange,
+//                                    )
                                 }
                         }
                     }

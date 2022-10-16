@@ -1,4 +1,4 @@
-package com.salazar.cheers.data.entities
+package com.salazar.cheers.data.db.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

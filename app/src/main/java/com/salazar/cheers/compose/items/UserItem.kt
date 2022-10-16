@@ -8,16 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cheers.type.UserOuterClass
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.share.UserProfilePicture
-import com.salazar.cheers.internal.StoryState
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.data.db.entities.UserItem
 
 
 @Composable
 fun UserItem(
+    userItem: UserItem,
     modifier: Modifier = Modifier,
-    user: User,
     onClick: (String) -> Unit,
     onStoryClick: (String) -> Unit = {},
     content: @Composable () -> Unit = {},
@@ -25,29 +25,29 @@ fun UserItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick(user.username) }
+            .clickable { onClick(userItem.username) }
             .padding(horizontal = 16.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             UserProfilePicture(
-                avatar = user.picture,
-                storyState = user.storyState,
+                avatar = userItem.picture,
+                storyState = userItem.story_state,
                 onClick = {
-                    if (user.storyState == StoryState.EMPTY)
-                        onClick(user.username)
+                    if (userItem.story_state == UserOuterClass.StoryState.EMPTY)
+                        onClick(userItem.username)
                     else
-                        onStoryClick(user.username)
+                        onStoryClick(userItem.username)
                 }
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = MaterialTheme.typography.bodyMedium)
+                if (userItem.name.isNotBlank())
+                    Text(text = userItem.name, style = MaterialTheme.typography.bodyMedium)
                 Username(
-                    username = user.username,
-                    verified = user.verified,
+                    username = userItem.username,
+                    verified = userItem.verified,
                     textStyle = MaterialTheme.typography.bodyMedium
                 )
             }

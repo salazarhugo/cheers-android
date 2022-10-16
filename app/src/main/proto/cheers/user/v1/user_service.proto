@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package cheers.user.v1;
+
+import "cheers/type/user/user.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/user/v1;user";
+
+service UserService {
+  rpc CreateUser (CreateUserRequest) returns (cheers.type.User);
+  rpc GetUser (GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUser (UpdateUserRequest) returns (cheers.type.User);
+  rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty);
+
+  rpc SearchUser (SearchUserRequest) returns (SearchUserResponse);
+  rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty);
+  rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty);
+  rpc BlockUser (BlockUserRequest) returns (google.protobuf.Empty);
+  rpc UnblockUser (UnblockUserRequest) returns (google.protobuf.Empty);
+  rpc ListFollowers (ListFollowersRequest) returns (ListFollowersResponse);
+  rpc ListFollowing (ListFollowingRequest) returns (ListFollowingResponse);
+}
+
+message ListFollowersRequest {
+  string user_id = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListFollowingRequest {
+  string user_id = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListFollowersResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message ListFollowingResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message GetUserResponse {
+  cheers.type.User user = 1;
+  int32 post_count = 2;
+  int32 followers_count = 3;
+  int32 following_count = 4;
+  bool has_followed = 5;
+  cheers.type.StoryState story_state = 6;
+}
+
+message BlockUserRequest {
+  string id = 1;
+}
+
+message UnblockUserRequest {
+  string id = 1;
+}
+
+message UnfollowUserRequest {
+  string id = 1;
+}
+
+message FollowUserRequest {
+  string id = 1;
+}
+
+message SearchUserRequest {
+  string query = 1;
+}
+
+message SearchUserResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message CreateUserRequest {
+  cheers.type.User user = 1;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message UpdateUserRequest {
+  string name = 1;
+  string picture = 2;
+  string bio = 3;
+  string website = 4;
+  string birthday = 5;
+  string phone_number = 6;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}

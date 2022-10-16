@@ -48,13 +48,6 @@ class ChatRepository @Inject constructor(
         if (this::client.isInitialized && uid == FirebaseAuth.getInstance().currentUser?.uid)
             return client
         return try {
-            val user2 =
-                FirebaseAuth.getInstance().currentUser ?: throw Exception("User is not logged in.")
-            uid = user2.uid
-            val task: Task<GetTokenResult> = user2.getIdToken(false)
-            val tokenResult = Tasks.await(task)
-            val idToken = tokenResult.token ?: throw Exception("idToken is null")
-
             managedChannel = ManagedChannelBuilder
                 .forAddress("chat-service-r3a2dr4u4a-nw.a.run.app", 443)
                 .useTransportSecurity()
@@ -62,7 +55,7 @@ class ChatRepository @Inject constructor(
 
             client = ChatServiceGrpcKt
                 .ChatServiceCoroutineStub(managedChannel)
-                .withInterceptors(ErrorHandleInterceptor(idToken = idToken))
+                .withInterceptors(ErrorHandleInterceptor())
 
             client
         } catch (e: Exception) {

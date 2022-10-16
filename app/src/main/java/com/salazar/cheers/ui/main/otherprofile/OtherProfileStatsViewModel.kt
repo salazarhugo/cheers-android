@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.otherprofile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,8 +20,8 @@ data class OtherProfileStatsUiState(
     val isFollowers: Boolean = true,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
-    val followers: List<User>? = null,
-    val following: List<User>? = null,
+    val followers: List<UserItem>? = null,
+    val following: List<UserItem>? = null,
     val username: String = "",
     val verified: Boolean = false,
 )
@@ -86,9 +87,9 @@ class OtherProfileStatsViewModel @Inject constructor(
         }
     }
 
-    fun toggleFollow(user: User) {
+    fun toggleFollow(userID: String) {
         viewModelScope.launch {
-            userRepository.toggleFollow(user = user)
+            userRepository.toggleFollow(userID)
         }
     }
 }

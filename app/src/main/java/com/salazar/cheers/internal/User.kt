@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import cheers.type.UserOuterClass
 
 @Entity(
     tableName = "users",
@@ -31,15 +32,8 @@ data class User(
     @ColumnInfo(defaultValue = "false")
     val friend: Boolean = false,
     @ColumnInfo(defaultValue = "EMPTY")
-    val storyState: StoryState = StoryState.EMPTY,
+    val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     @ColumnInfo(defaultValue = "false")
     val seenStory: Boolean = false,
     val created: Long = 0L,
 )
-
-enum class StoryState {
-    EMPTY,
-    NOT_SEEN,
-    SEEN,
-    LOADING,
-}

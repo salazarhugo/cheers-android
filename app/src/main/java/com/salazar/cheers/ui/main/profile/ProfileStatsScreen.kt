@@ -41,6 +41,7 @@ import com.salazar.cheers.compose.items.UserItem
 import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.user.FollowButton
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ fun ProfileStatsScreen(
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
+    onFollowToggle: (String) -> Unit,
     onSwipeRefresh: () -> Unit,
 ) {
     Scaffold(
@@ -87,7 +88,7 @@ fun Tabs(
     uiState: ProfileStatsUiState,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     val followersTitle =
         if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
@@ -149,7 +150,7 @@ fun Tabs(
 
 @Composable
 fun Followers(
-    followers: List<User>?,
+    followers: List<UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
 ) {
@@ -159,7 +160,7 @@ fun Followers(
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
                 UserItem(
-                    user = follower,
+                    userItem = follower,
                     onClick = onUserClicked,
                     onStoryClick = onStoryClick,
                 ) {
@@ -177,10 +178,10 @@ fun Followers(
 
 @Composable
 fun Following(
-    following: List<User>?,
+    following: List<UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     if (following == null) {
         LoadingScreen()
@@ -188,11 +189,11 @@ fun Following(
         LazyColumn {
             items(following, key = { it.id }) { user ->
                 UserItem(
-                    user = user,
+                    userItem = user,
                     onClick = onUserClicked,
                     onStoryClick = onStoryClick,
                 ) {
-                    FollowButton(isFollowing = user.followBack, onClick = { onFollowToggle(user) })
+                    FollowButton(isFollowing = user.has_followed, onClick = { onFollowToggle(user.id)})
                 }
             }
         }

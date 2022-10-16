@@ -7,6 +7,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cheers.type.PrivacyOuterClass
 import com.mapbox.search.MapboxSearchSdk
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchOptions
@@ -61,7 +62,7 @@ data class AddEventUiState(
     val locationQuery: String = "",
     val locationResults: List<SearchSuggestion> = emptyList(),
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val privacy: Privacy = Privacy.FRIENDS
+    val privacy: Privacy = Privacy.PUBLIC
 )
 
 
@@ -200,7 +201,7 @@ class AddEventViewModel @Inject constructor(
                         address = address,
                         description = description,
                         showGuestList = showGuestList,
-                        privacy = privacy,
+                        privacy = Privacy.PUBLIC,
                         startDate = startTimeSeconds,
                         endDate = endTimeSeconds,
                         bannerUrl = photo.toString(),

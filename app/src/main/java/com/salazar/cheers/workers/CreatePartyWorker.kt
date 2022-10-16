@@ -93,17 +93,17 @@ class CreatePartyWorker @AssistedInject constructor(
                 longitude = longitude,
             )
 
-            if (imageUri == null || imageUri == "null")
-                partyRepository.uploadEvent(party)
-            else {
-                val photoBytes = extractImage(Uri.parse(imageUri))
-
-                val task: Task<Uri> = StorageUtil.uploadEventImage(photoBytes)
-                val downloadUrl = Tasks.await(task)
-
-                val event = party.copy(bannerUrl = downloadUrl.toString())
-                partyRepository.uploadEvent(event)
-            }
+//            if (imageUri == null || imageUri == "null")
+//                partyRepository.uploadEvent(party)
+//            else {
+//                val photoBytes = extractImage(Uri.parse(imageUri))
+//
+//                val task: Task<Uri> = StorageUtil.uploadEventImage(photoBytes)
+//                val downloadUrl = Tasks.await(task)
+//
+//                val event = party.copy(bannerUrl = downloadUrl.toString())
+//                partyRepository.uploadEvent(event)
+//            }
 
             return Result.success()
         } catch (throwable: Throwable) {

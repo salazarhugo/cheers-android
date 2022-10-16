@@ -1,14 +1,15 @@
 package com.salazar.cheers.data.remote
 
+import com.google.firebase.auth.FirebaseAuth
 import io.grpc.*
 import io.grpc.ClientInterceptors.CheckedForwardingClientCall
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import okhttp3.internal.format
 
 
-class ErrorHandleInterceptor(
-    private val idToken: String,
-) : ClientInterceptor {
+class ErrorHandleInterceptor : ClientInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         method: MethodDescriptor<ReqT, RespT>,
         callOptions: CallOptions,
@@ -20,10 +21,15 @@ class ErrorHandleInterceptor(
                 responseListener: Listener<RespT>?,
                 headers: Metadata
             ) {
-                headers.put(
-                    Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER),
-                    format("Bearer %s", idToken)
-                )
+                runBlocking {
+                    val result = FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()
+                    result?.token?.let { token ->
+                        headers.put(
+                            Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER),
+                            format("Bearer %s", token)
+                        )
+                    }
+                }
 
                 delegate().start(responseListener, headers)
             }

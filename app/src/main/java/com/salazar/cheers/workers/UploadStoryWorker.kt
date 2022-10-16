@@ -12,7 +12,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted

@@ -104,6 +104,7 @@ fun CheersNavGraph(
             },
         ) { innerPadding ->
             AnimatedNavHost(
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                 route = CheersDestinations.ROOT_ROUTE,
                 navController = appState.navController,
                 startDestination = startDestination,

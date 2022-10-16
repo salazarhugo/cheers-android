@@ -39,9 +39,9 @@ class EventMoreSheetViewModel @Inject constructor(
     }
 
     fun onHide() {
-        viewModelScope.launch {
-            partyRepository.hideEvent(eventId)
-        }
+//        viewModelScope.launch {
+//            partyRepository.hideEvent(eventId)
+//        }
     }
 }
 

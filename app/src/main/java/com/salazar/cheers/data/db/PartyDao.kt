@@ -8,11 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PartyDao{
-
-    @Transaction
-    @Query("SELECT * FROM events WHERE accountId = :accountId ORDER BY events.created DESC")
-    fun pagingSourceFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): PagingSource<Int, Party>
-
     @Query("SELECT * FROM events WHERE eventId = :eventId")
     fun getEventT(eventId: String): Party
 

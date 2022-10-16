@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.CheersDao
-import com.salazar.cheers.data.entities.RecentUser
-import com.salazar.cheers.data.entities.UserSuggestion
+import com.salazar.cheers.data.db.entities.RecentUser
+import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 data class SearchUiState(
     val name: String = "",
-    val users: List<User>? = null,
+    val users: List<UserItem>? = null,
     val suggestions: List<UserSuggestion> = emptyList(),
     val recentUsers: List<RecentUser> = emptyList(),
     val isLoading: Boolean = false,
@@ -100,7 +100,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun updateUsers(users: List<User>?) {
+    private fun updateUsers(users: List<UserItem>?) {
         viewModelState.update {
             it.copy(users = users)
         }
@@ -114,7 +114,7 @@ class SearchViewModel @Inject constructor(
 
     fun toggleFollow(username: String) {
         viewModelScope.launch {
-            userRepository.toggleFollow(username = username)
+            userRepository.toggleFollow(username)
         }
     }
 

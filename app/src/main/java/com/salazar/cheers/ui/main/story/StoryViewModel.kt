@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.repository.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -680,10 +680,10 @@ fun EventDetailsPage(
         onHasEndDateToggle = onHasEndDateToggle,
     )
     DividerM3()
-    Privacy(
-        privacyState = uiState.privacyState,
-        privacy = uiState.privacy,
-    )
+//    Privacy(
+//        privacyState = uiState.privacyState,
+//        privacy = uiState.privacy,
+//    )
     DividerM3()
     SwitchPreference(
         checked = uiState.showGuestList,

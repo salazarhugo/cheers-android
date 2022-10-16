@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.data.StoreUserEmail
-import com.salazar.cheers.data.entities.Theme
-import com.salazar.cheers.data.entities.UserPreference
+import com.salazar.cheers.data.db.entities.Theme
+import com.salazar.cheers.data.db.entities.UserPreference
 import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository

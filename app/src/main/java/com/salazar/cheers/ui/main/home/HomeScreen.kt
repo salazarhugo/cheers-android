@@ -9,6 +9,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -32,6 +33,7 @@ import androidx.paging.compose.items
 import androidx.paging.compose.itemsIndexed
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
@@ -48,7 +50,6 @@ import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.story.Story
 import com.salazar.cheers.compose.story.YourStory
 import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.StoryState
 import com.salazar.cheers.ui.theme.Roboto
 
 
@@ -100,8 +101,6 @@ fun PostList(
     uiState: HomeUiState,
     onHomeUIAction: (HomeUIAction) -> Unit,
 ) {
-    val lazyPagingItems = uiState.postsFlow.collectAsLazyPagingItems()
-
     LazyColumn(
         state = uiState.listState,
         modifier = Modifier.fillMaxHeight(),
@@ -125,32 +124,53 @@ fun PostList(
 
         item {
             UploadingSection()
-            DividerM3()
         }
 
-        itemsIndexed(
-            items = lazyPagingItems,
-            key = { _, post -> post.id },
-        ) { i, post ->
-
-            if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
-                DividerM3()
-                NativeAdPost(ad = uiState.nativeAd)
+        items(uiState.posts.size) { i->
+            val post = uiState.posts[i]
+            if (i >= uiState.posts.size - 1 && !uiState.endReached && !uiState.isLoading) {
+                LaunchedEffect(Unit) {
+                    onHomeUIAction(HomeUIAction.OnLoadNextItems)
+                }
             }
-            if (post != null)
-                PostView(
-                    post = post,
-                    onHomeUIAction = onHomeUIAction,
-                    modifier = Modifier.animateItemPlacement(),
-                )
-            else
-                PostPlaceholder()
+            PostView(
+                post = post,
+                onHomeUIAction = onHomeUIAction,
+                modifier = Modifier.animateItemPlacement(),
+            )
         }
+
+//        itemsIndexed(
+//            items = uiState.posts,
+//            key = { _, post -> post.id },
+//        ) { i, post ->
+//
+//            if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
+//                DividerM3()
+//                NativeAdPost(ad = uiState.nativeAd)
+//            }
+//
+//            if (post != null)
+//                PostView(
+//                    post = post,
+//                    onHomeUIAction = onHomeUIAction,
+//                    modifier = Modifier.animateItemPlacement(),
+//                )
+//            else
+//                PostPlaceholder()
+//        }
 
         item {
-            HomeLazyPagingListState(
-                lazyPagingItems = lazyPagingItems,
-            )
+            if (uiState.isLoading) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
@@ -198,29 +218,34 @@ fun UploadingSection() {
         .value
     val uploadInfo = workInfos?.firstOrNull()
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (uploadInfo?.state == WorkInfo.State.ENQUEUED)
-            Text(
+    if (uploadInfo?.state?.isFinished == false)
+        Column() {
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                text = "Will automatically post when possible",
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            )
-        if (uploadInfo?.state == WorkInfo.State.RUNNING)
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-            )
-        IconButton(onClick = { workManager.cancelUniqueWork("post_upload") }) {
-            Icon(Icons.Outlined.Close, contentDescription = null)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (uploadInfo?.state == WorkInfo.State.ENQUEUED)
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        text = "Will automatically post when possible",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    )
+                if (uploadInfo?.state == WorkInfo.State.RUNNING)
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                    )
+                IconButton(onClick = { workManager.cancelUniqueWork("post_upload") }) {
+                    Icon(Icons.Outlined.Close, contentDescription = null)
+                }
+            }
+
+            DividerM3()
         }
-    }
 }
 
 @Composable
@@ -267,9 +292,6 @@ fun HomeTopBar(
     }
 
     Column {
-        if (showDivider)
-            DividerM3()
-
         val icon =
             if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
         CenterAlignedTopAppBar(
@@ -308,6 +330,8 @@ fun HomeTopBar(
                 }
             },
         )
+        if (showDivider)
+            DividerM3()
     }
 }
 
@@ -330,7 +354,7 @@ fun Stories(
                 YourStory(
                     profilePictureUrl = profilePictureUrl,
                     onClick = {
-                        if (user.storyState == StoryState.SEEN || user.storyState == StoryState.NOT_SEEN)
+                        if (user.storyState == UserOuterClass.StoryState.SEEN || user.storyState == UserOuterClass.StoryState.NOT_SEEN)
                             onStoryClick(user.username)
                         else
                             onAddStoryClick()

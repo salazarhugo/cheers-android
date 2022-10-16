@@ -18,19 +18,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.firebase.perf.metrics.resource.ResourceType
 import com.salazar.cheers.R
 import com.salazar.cheers.compose.animations.Bounce
-import com.salazar.cheers.internal.StoryState
+
 
 @Composable
 fun UserProfilePicture(
     modifier: Modifier = Modifier,
     avatar: String?,
-    storyState: StoryState = StoryState.EMPTY,
+    storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,
     onClick: () -> Unit = {},
@@ -47,20 +48,20 @@ fun UserProfilePicture(
 
     val border =
         when (storyState) {
-            StoryState.LOADING -> BorderStroke(
+            UserOuterClass.StoryState.LOADING -> BorderStroke(
                 2.dp,
                 color = color
             )
-            StoryState.EMPTY -> BorderStroke(
+            UserOuterClass.StoryState.EMPTY -> BorderStroke(
                 2.dp,
                 color = Color.Transparent
             )
-            StoryState.SEEN ->
+            UserOuterClass.StoryState.SEEN ->
                 BorderStroke(
                     1.dp,
                     color = Color.LightGray
                 )
-            StoryState.NOT_SEEN ->
+            UserOuterClass.StoryState.NOT_SEEN ->
                 BorderStroke(
                     2.dp,
                     Brush.verticalGradient(
@@ -70,6 +71,7 @@ fun UserProfilePicture(
                         )
                     )
                 )
+            UserOuterClass.StoryState.UNRECOGNIZED -> TODO()
         }
 
     Bounce(onBounce = onClick) {

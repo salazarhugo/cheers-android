@@ -141,7 +141,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        dialog(
+        bottomSheet(
             route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
@@ -361,16 +361,14 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         bottomSheet(
-            route = "${MainDestinations.POST_MORE_SHEET}/{postId}/{authorId}",
+            route = "${MainDestinations.POST_MORE_SHEET}/{postID}",
             arguments = listOf(
-                navArgument("authorId") { nullable = false },
-                navArgument("postId") { nullable = false },
+                navArgument("postID") { nullable = false },
             )
         ) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
-            val postId = it.arguments?.getString("postId")!!
-            val authorId = it.arguments?.getString("authorId")!!
-            val isAuthor = authorId == FirebaseAuth.getInstance().currentUser?.uid!!
+            val postId = it.arguments?.getString("postID")!!
+            val isAuthor = true
             val context = LocalContext.current
 
             PostMoreBottomSheet(
@@ -393,7 +391,7 @@ fun NavGraphBuilder.mainNavGraph(
                     navActions.navigateBack()
                 },
                 onBlock = {
-                    homeViewModel.blockUser(authorId)
+//                    homeViewModel.blockUser(authorId)
                     navActions.navigateBack()
                 },
                 onLinkClick = {

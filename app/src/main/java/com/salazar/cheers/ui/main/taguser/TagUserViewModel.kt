@@ -50,8 +50,8 @@ class AddPeopleViewModel @Inject constructor(
     private fun refreshFriends(query: String = "") {
         viewModelScope.launch {
             userRepository.queryUsers(fetchFromRemote = true, query = query).collect {
-                if (it is Resource.Success)
-                    updateUsers(it.data)
+//                if (it is Resource.Success)
+//                    updateUsers(it.data)
             }
         }
     }

@@ -3,7 +3,8 @@ package com.salazar.cheers.ui.main.chats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.db.entities.RecentUser
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -25,7 +26,7 @@ data class NewChatUiState(
     val isGroup: Boolean = false,
     val selectedUsers: Set<User> = emptySet(),
     val recentUsers: List<User> = emptyList(),
-    val users: List<User> = emptyList(),
+    val users: List<UserItem>? = emptyList(),
 )
 
 @HiltViewModel

@@ -39,6 +39,7 @@ import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.items.UserItem
 import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.profile.Following
 import com.salazar.cheers.ui.theme.Roboto
@@ -51,7 +52,7 @@ fun OtherProfileStatsScreen(
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -84,7 +85,7 @@ fun Tabs(
     uiState: OtherProfileStatsUiState,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
-    onFollowToggle: (User) -> Unit,
+    onFollowToggle: (String) -> Unit,
 ) {
     val followersTitle =
         if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
@@ -146,7 +147,7 @@ fun Tabs(
 
 @Composable
 fun Followers(
-    followers: List<User>?,
+    followers: List<UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
 ) {
@@ -156,7 +157,7 @@ fun Followers(
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
                 UserItem(
-                    user = follower,
+                    userItem = follower,
                     onClick = onUserClicked,
                     onStoryClick = onStoryClick,
                 )

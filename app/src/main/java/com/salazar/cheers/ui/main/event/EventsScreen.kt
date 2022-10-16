@@ -14,12 +14,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.R
 import com.salazar.cheers.compose.ChipGroup
 import com.salazar.cheers.compose.event.EventDetails
 import com.salazar.cheers.compose.event.EventGoingButton
@@ -138,6 +143,9 @@ fun Event(
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.Center,
+                placeholder = ColorPainter(Color.LightGray),
+                error = ColorPainter(Color.LightGray),
+                fallback = ColorPainter(Color.LightGray),
             )
             IconButton(
                 onClick = { onMoreClick(party.id) },
@@ -167,9 +175,9 @@ fun Event(
             }
         }
         Text(
-            text = "${numberFormatter(value = party.interestedCount)} interested - ${
+            text = "${numberFormatter(value = party.interestedCount.toInt())} interested - ${
                 numberFormatter(
-                    value = party.goingCount
+                    value = party.goingCount.toInt()
                 )
             } going",
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),

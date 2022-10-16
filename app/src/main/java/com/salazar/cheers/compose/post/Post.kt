@@ -34,14 +34,7 @@ fun PostView(
             profilePictureUrl = post.profilePictureUrl,
             locationName = post.locationName,
             onHeaderClicked = { onHomeUIAction(HomeUIAction.OnUserClick(it)) },
-            onMoreClicked = {
-                onHomeUIAction(
-                    HomeUIAction.OnPostMoreClick(
-                        post.id,
-                        post.authorId,
-                    )
-                )
-            },
+            onMoreClicked = { onHomeUIAction(HomeUIAction.OnPostMoreClick(post.id)) },
         )
         PostText(
             caption = post.caption,

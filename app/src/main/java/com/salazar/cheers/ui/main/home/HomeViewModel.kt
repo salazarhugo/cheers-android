@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -14,15 +14,14 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.data.paging.DefaultPaginator
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.event.add.AddEventUIAction
-import com.salazar.cheers.ui.settings.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,7 +29,7 @@ import javax.inject.Inject
 
 
 data class HomeUiState(
-    val postsFlow: Flow<PagingData<Post>> = emptyFlow(),
+    val posts: List<Post> = emptyList(),
     val storiesFlow: Flow<PagingData<Story>>? = null,
     val stories: PagingData<Story>? = null,
     val listState: LazyListState = LazyListState(),
@@ -44,17 +43,19 @@ data class HomeUiState(
     val nativeAd: NativeAd? = null,
     val selectedTab: Int = 0,
     val notificationCount: Int = 0,
+    val endReached: Boolean = false,
+    val page: Int = 0,
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeUiState())
-
     val uiState = viewModelState
         .stateIn(
             viewModelScope,
@@ -62,7 +63,38 @@ class HomeViewModel @Inject constructor(
             viewModelState.value
         )
 
+    private val paginator = DefaultPaginator(
+        initialKey = 0,
+        onLoadUpdated = {
+            updateIsLoading(isLoading = it)
+        },
+        onRequest = { nextPage ->
+            postRepository.getPostFeed(nextPage, 1)
+        },
+        getNextKey = {
+            uiState.value.page + 1
+        },
+        onError = {
+            updateError(it?.localizedMessage)
+        },
+        onSuccess = { items, newKey ->
+            Log.d("ITEMS", items.toString())
+            viewModelState.update {
+                it.copy(
+                    page = newKey,
+                    endReached = items.isEmpty()
+                )
+            }
+        }
+    )
+
+    lateinit var postID: String
+
     init {
+        stateHandle.get<String>("postID")?.let {
+            postID = it
+        }
+        loadNextItems()
         viewModelScope.launch {
             userRepository.getCurrentUserFlow().collect { user ->
                 viewModelState.update {
@@ -70,8 +102,20 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            postRepository.getPostFeedFlow().collect { posts ->
+                viewModelState.update {
+                    it.copy(posts = posts)
+                }
+            }
+        }
         refreshStoryFlow()
-        refreshPostsFlow()
+    }
+
+    fun loadNextItems() {
+        viewModelScope.launch {
+            paginator.loadNextItems()
+        }
     }
 
     private fun refreshStoryFlow() {
@@ -85,14 +129,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun refreshPostsFlow() {
-        viewModelState.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val posts = postRepository.getPosts()
-            viewModelState.update {
-                it.copy(postsFlow = posts, isLoading = false)
-            }
+    private fun updatePosts(posts: List<Post>) {
+        viewModelState.update {
+            it.copy(posts = posts)
         }
     }
 
@@ -115,10 +154,16 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
-        refreshPostsFlow()
+        paginator.reset()
     }
 
-    private fun updateError(errorMessages: List<String>) {
+    private fun updateError(errorMessages: String?) {
+    }
+
+    private fun incrementPage() {
+        viewModelState.update {
+            it.copy(page = it.page + 1)
+        }
     }
 
     private fun updateIsLoading(isLoading: Boolean) {
@@ -190,10 +235,11 @@ sealed class HomeUIAction {
     object OnSwipeRefresh : HomeUIAction()
     object OnAddStoryClick : HomeUIAction()
     object OnAddPostClick : HomeUIAction()
+    object OnLoadNextItems : HomeUIAction()
     data class OnCommentClick(val postID: String) : HomeUIAction()
     data class OnLikeClick(val post: Post) : HomeUIAction()
     data class OnStoryClick(val userID: String) : HomeUIAction()
     data class OnUserClick(val userID: String) : HomeUIAction()
     data class OnPostClick(val postID: String) : HomeUIAction()
-    data class OnPostMoreClick(val postID: String, val authorID: String) : HomeUIAction()
+    data class OnPostMoreClick(val postID: String) : HomeUIAction()
 }

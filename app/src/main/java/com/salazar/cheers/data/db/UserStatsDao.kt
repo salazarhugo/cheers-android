@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
-import com.salazar.cheers.data.entities.UserStats
+import com.salazar.cheers.data.db.entities.UserStats
 
 @Dao
 interface UserStatsDao {

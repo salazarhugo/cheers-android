@@ -33,7 +33,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.CheersViewModel
 import com.salazar.cheers.Settings
-import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.datastore.DataStoreRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,9 +51,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
-
-    @Inject
-    lateinit var coreService: CoreService
 
     @Inject
     lateinit var dataStoreRepository: DataStoreRepository
@@ -174,27 +170,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    //    private fun startLocationUpdates() {
-//        if (ActivityCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            return
-//        }
-//        fusedLocationClient.requestLocationUpdates(
-//            LocationRequest.create()
-//                .setInterval(60000)
-//                .setFastestInterval(60000)
-//                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
-//            locationCallback,
-//            Looper.getMainLooper()
-//        )
-//    }
-//
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }

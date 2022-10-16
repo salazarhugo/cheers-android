@@ -70,12 +70,12 @@ class AddPostViewModel @Inject constructor(
         stateHandle.get<String>("photoUri")?.let {
             addPhoto(Uri.parse(it))
         }
-        viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            viewModelState.update {
-                it.copy(profilePictureUrl = user.picture)
-            }
-        }
+//        viewModelScope.launch {
+//            val user = userRepository.getCurrentUser()
+//            viewModelState.update {
+//                it.copy(profilePictureUrl = user.picture)
+//            }
+//        }
     }
 
     private val workManager = WorkManager.getInstance(application)

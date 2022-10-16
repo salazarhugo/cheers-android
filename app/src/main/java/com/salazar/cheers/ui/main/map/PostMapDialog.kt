@@ -82,12 +82,6 @@ fun Post(
             )
         }
         item {
-            UserItem(
-                user = User(),
-                onClick = onUserClick,
-            )
-        }
-        item {
             Text(
                 text = "With",
                 style = MaterialTheme.typography.titleMedium,

@@ -1,20 +1,18 @@
 package com.salazar.cheers.data.repository
 
 import android.util.Log
+import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.mapbox.geojson.FeatureCollection
-import com.salazar.cheers.backend.CoreService
-import com.salazar.cheers.backend.Neo4jService
-import com.salazar.cheers.backend.PublicService
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.db.CheersDao
-import com.salazar.cheers.data.db.PostDao
-import com.salazar.cheers.data.db.UserDao
-import com.salazar.cheers.data.db.UserStatsDao
-import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.db.*
+import com.salazar.cheers.data.db.entities.RecentUser
+import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.data.mapper.toUser
+import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
@@ -29,13 +27,12 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor(
-    private val coreService: CoreService,
-    private val publicService: PublicService,
-    private val service: Neo4jService,
     private val userDao: UserDao,
     private val userStatsDao: UserStatsDao,
     private val postDao: PostDao,
     private val cheersDao: CheersDao,
+    private val userItemDao: UserItemDao,
+    private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
 ) {
 
     suspend fun createUser(
@@ -44,17 +41,24 @@ class UserRepository @Inject constructor(
     ): User? {
         try {
             val authUser = FirebaseAuth.getInstance().currentUser!!
-            val user = coreService.createUser(
-                User().copy(
-                    username = username,
-                    email = authUser.email ?: email,
-                    name = authUser.displayName ?: "",
-                    phoneNumber = authUser.phoneNumber ?: "",
-                )
-            )
-            userDao.insert(user)
-            Log.d("YES", "Created User")
-            return user
+
+            val user = cheers.type.UserOuterClass.User.newBuilder()
+                .setUsername(username)
+                .setEmail(authUser.email ?: email)
+                .setName(authUser.displayName ?: "")
+                .setPhoneNumber(authUser.phoneNumber ?: "")
+                .build()
+
+            val request = CreateUserRequest.newBuilder()
+                .setUser(user)
+                .build()
+
+            val response = userService.createUser(request = request)
+            val createdUser = response.toUser()
+
+            userDao.insert(createdUser)
+
+            return createdUser
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e("YES", e.toString())
@@ -91,7 +95,11 @@ class UserRepository @Inject constructor(
     suspend fun blockUser(userId: String) = withContext(Dispatchers.IO) {
         try {
             postDao.deleteWithAuthorId(authorId = userId)
-            coreService.blockUser(userId = userId)
+            val request = BlockUserRequest.newBuilder()
+                .setId(userId)
+                .build()
+
+            userService.blockUser(request)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -99,9 +107,14 @@ class UserRepository @Inject constructor(
 
     suspend fun getFollowers(userIdOrUsername: String) = withContext(Dispatchers.IO) {
         return@withContext try {
-            val followers = coreService.followersList(userIdOrUsername = userIdOrUsername)
-            userDao.insertAll(followers.map { it.copy(friend = true) })
-            followers
+            val request = ListFollowersRequest.newBuilder()
+                .setUserId(userIdOrUsername)
+                .build()
+
+            val followers = userService.listFollowers(request).usersList
+            val userItems = followers.map { it.toUserItem() }
+            userItemDao.insertAll(userItems)
+            userItems
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -110,7 +123,14 @@ class UserRepository @Inject constructor(
 
     suspend fun getFollowing(userIdOrUsername: String) = withContext(Dispatchers.IO) {
         return@withContext try {
-            coreService.followingList(userIdOrUsername = userIdOrUsername)
+            val request = ListFollowingRequest.newBuilder()
+                .setUserId(userIdOrUsername)
+                .build()
+
+            val followers = userService.listFollowing(request).usersList
+            val userItems = followers.map { it.toUserItem() }
+            userItemDao.insertAll(userItems)
+            userItems
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -120,8 +140,8 @@ class UserRepository @Inject constructor(
     suspend fun getLocations(): FeatureCollection {
         return withContext(Dispatchers.IO) {
             try {
-                val json = coreService.getLocations().string()
-                return@withContext FeatureCollection.fromJson(json)
+//                val json = coreService.getLocations().string()
+//                return@withContext FeatureCollection.fromJson(json)
             } catch (e: HttpException) {
                 Log.e("User Repository", e.toString())
             }
@@ -129,11 +149,11 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {
-        when (val result = service.getUserStats(username = username)) {
-            is Result.Success -> userStatsDao.insert(userStats = result.data)
-            is Result.Error -> {}
-
-        }
+//        when (val result = service.getUserStats(username = username)) {
+//            is Result.Success -> userStatsDao.insert(userStats = result.data)
+//            is Result.Error -> {}
+//
+//        }
         return@withContext userStatsDao.getUserStats(username)
     }
 
@@ -141,25 +161,13 @@ class UserRepository @Inject constructor(
         return cheersDao.getRecentUsers()
     }
 
-    suspend fun queryFriends(
-        fetchFromRemote: Boolean,
-        query: String,
-    ): Flow<Resource<List<User>>> {
-        return flow {
-            emit(Resource.Loading(true))
-            val localUsers = userDao.getFriends()
-            emit(Resource.Success(data = localUsers))
-            emit(Resource.Loading(false))
-        }
-    }
-
     suspend fun queryUsers(
         fetchFromRemote: Boolean,
         query: String,
-    ): Flow<Resource<List<User>>> {
+    ): Flow<Resource<List<UserItem>>> {
         return flow {
             emit(Resource.Loading(true))
-            val localUsers = userDao.searchUser(query = query)
+            val localUsers = userItemDao.searchUser(query = query)
             emit(
                 Resource.Success(
                     data = localUsers
@@ -173,8 +181,12 @@ class UserRepository @Inject constructor(
                 return@flow
             }
 
+            val request = SearchUserRequest.newBuilder()
+                .setQuery(query)
+                .build()
+
             val remoteUsers = try {
-                coreService.searchUsers(query = query)
+                userService.searchUser(request).usersList
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load data"))
@@ -189,8 +201,9 @@ class UserRepository @Inject constructor(
                 null
             }
 
-            remoteUsers?.let { users ->
-                userDao.insertAll(users)
+            remoteUsers?.let { it ->
+                val users = it.map { it.toUserItem() }
+                userItemDao.insertAll(users)
                 emit(Resource.Success(data = users))
             }
             emit(Resource.Loading(false))
@@ -200,7 +213,16 @@ class UserRepository @Inject constructor(
     suspend fun updateUser(user: User) = withContext(Dispatchers.IO) {
         try {
             userDao.update(user)
-            coreService.updateUser(user)
+
+            val request = UpdateUserRequest.newBuilder()
+                .setPicture(user.picture)
+                .setBio(user.bio)
+                .setName(user.name)
+                .setWebsite(user.website)
+                .build()
+
+            val response = userService.updateUser(request)
+            userDao.insert(response.toUser())
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -222,7 +244,7 @@ class UserRepository @Inject constructor(
             }
 
             val remoteActivity = try {
-                coreService.getActivity()
+//                coreService.getActivity()
             } catch (e: IOException) {
                 e.printStackTrace()
                 null
@@ -233,7 +255,7 @@ class UserRepository @Inject constructor(
 
             remoteActivity?.let {
                 userDao.clearActivity()
-                userDao.insert(it.map { it.copy(accountId = Firebase.auth.currentUser?.uid!!) })
+//                userDao.insert(it.map { it.copy(accountId = Firebase.auth.currentUser?.uid!!) })
                 emit(Resource.Success(userDao.getActivity()))
             }
             emit(Resource.Loading(false))
@@ -241,17 +263,25 @@ class UserRepository @Inject constructor(
     }
 
 
-    suspend fun followUser(username: String) {
+    suspend fun followUser(userID: String) {
         try {
-            coreService.followUser(username = username)
+            val request = FollowUserRequest.newBuilder()
+                .setId(userID)
+                .build()
+
+            userService.followUser(request)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    suspend fun unfollowUser(username: String) {
+    suspend fun unfollowUser(userID: String) {
         try {
-            coreService.unfollowUser(username = username)
+            val request = UnfollowUserRequest.newBuilder()
+                .setId(userID)
+                .build()
+
+            userService.unfollowUser(request)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -259,35 +289,26 @@ class UserRepository @Inject constructor(
 
     suspend fun isUsernameAvailable(username: String): Boolean {
         return try {
-            publicService.isUsernameAvailable(username = username)
+//            publicService.isUsernameAvailable(username = username)
+            true
         } catch (e: Exception) {
             e.printStackTrace()
             false
         }
     }
 
-    suspend fun toggleFollow(username: String) {
-        val user = userDao.getUserSuggestion(username) ?: return
+    suspend fun toggleFollow(userID: String) {
+        val user = userDao.getUser(userID)
 
-        val newUser = user.copy(followBack = !user.followBack)
-        userDao.update(newUser)
-
-        if (user.followBack)
-            unfollowUser(username = user.username)
-        else
-            followUser(username = user.username)
-    }
-
-    suspend fun toggleFollow(user: User) {
         val newFollowersCount = if (user.followBack) user.followers - 1 else user.followers + 1
         val newUser = user.copy(followBack = !user.followBack, followers = newFollowersCount)
 
         userDao.update(newUser)
 
         if (user.followBack)
-            unfollowUser(username = user.username)
+            unfollowUser(userID = user.id)
         else
-            followUser(username = user.username)
+            followUser(userID = user.id)
     }
 
     suspend fun getUsersWithListOfIds(ids: List<String>): List<User> = withContext(Dispatchers.IO) {
@@ -313,7 +334,7 @@ class UserRepository @Inject constructor(
             }
 
             val remoteUser = try {
-                coreService.getUser(userIdOrUsername = userId)
+//                coreService.getUser(userIdOrUsername = userId)
             } catch (e: NullPointerException) {
                 e.printStackTrace()
                 emit(Resource.Error("User not found"))
@@ -324,7 +345,7 @@ class UserRepository @Inject constructor(
             }
 
             remoteUser?.let { safeRemoteUser ->
-                userDao.insert(safeRemoteUser)
+//                userDao.insert(safeRemoteUser)
                 emit(Resource.Success(userDao.getUser(userId)))
             }
             emit(Resource.Loading(false))
@@ -340,10 +361,14 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun fetchUser(
-        userIdOrUsername: String,
+        userIDorUsername: String,
     ) {
+        val request = GetUserRequest.newBuilder()
+            .setId(userIDorUsername)
+            .build()
+
         val remoteUser = try {
-            coreService.getUser(userIdOrUsername = userIdOrUsername)
+            userService.getUser(request).toUser()
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -355,9 +380,8 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getSuggestions() = withContext(Dispatchers.IO) {
-
         val suggestions = try {
-            coreService.suggestions()
+//            coreService.suggestions()
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -366,7 +390,7 @@ class UserRepository @Inject constructor(
         suggestions?.let {
             val uid = FirebaseAuth.getInstance().currentUser?.uid!!
             userDao.clearSuggestions()
-            userDao.insertSuggestions(it.map { it.copy(accountId = uid) })
+//            userDao.insertSuggestions(it.map { it.copy(accountId = uid) })
         }
 
         return@withContext userDao.getUserSuggestions()
@@ -377,7 +401,7 @@ class UserRepository @Inject constructor(
             throw NullPointerException("FCM token is null.")
 
         try {
-            coreService.addRegistrationToken(newRegistrationToken)
+//            coreService.addRegistrationToken(newRegistrationToken)
         } catch (e: HttpException) {
             e.printStackTrace()
         }

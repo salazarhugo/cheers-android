@@ -21,6 +21,7 @@ import com.salazar.cheers.compose.items.UserItem
 import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.user.FollowButton
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.event.add.TopAppBar
 import kotlinx.coroutines.launch
@@ -107,17 +108,17 @@ fun Tabs(
 
 @Composable
 fun InterestedList(
-    users: List<User>?,
+    users: List<UserItem>?,
     onUserClick: (String) -> Unit,
 ) {
     if (users != null) {
         LazyColumn {
             items(users) { user ->
                 UserItem(
-                    user = user,
+                    userItem = user,
                     onClick = { onUserClick(user.username) },
                 ) {
-                    FollowButton(isFollowing = user.followBack, onClick = {})
+                    FollowButton(isFollowing = user.has_followed, onClick = {})
                 }
             }
         }

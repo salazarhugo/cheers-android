@@ -3,6 +3,7 @@ package com.salazar.cheers.internal
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cheers.type.PrivacyOuterClass
 
 @Entity(tableName = "events")
 data class Party(

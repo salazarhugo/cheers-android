@@ -53,7 +53,7 @@ class EditEventViewModel @Inject constructor(
         val event = uiState.value.party ?: return
 
         viewModelScope.launch {
-            partyRepository.updateEvent(event.copy(name = "[UPDATED] ${event.name}"))
+//            partyRepository.updateEvent(event.copy(name = "[UPDATED] ${event.name}"))
         }
     }
 }

@@ -1,9 +1,12 @@
 package com.salazar.cheers.ui.main.profile
 
+import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cheers.party.v1.FeedPartyRequest
+import cheers.party.v1.PartyServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.data.repository.PostRepository
@@ -70,6 +73,7 @@ class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
     private val partyRepository: PartyRepository,
+    private val partyStub: PartyServiceGrpcKt.PartyServiceCoroutineStub,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
@@ -84,24 +88,21 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            val response = partyStub.feedParty(FeedPartyRequest.newBuilder().setPageSize(20).build())
+            Log.d("GRPC", response.toString())
+        }
+        viewModelScope.launch {
             userRepository.getCurrentUserFlow().collect { user ->
                 updateUser(user)
             }
         }
-        viewModelScope.launch {
-                partyRepository.createParty( Party() )
-        }
         refreshUser()
-        getUserEvents()
         refreshUserPosts()
     }
 
     fun onSwipeRefresh() {
         refreshUser()
         refreshUserPosts()
-        viewModelScope.launch {
-            partyRepository.refreshMyEvents()
-        }
     }
 
     private fun updateUser(user: User) {
@@ -140,15 +141,4 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
-
-    private fun getUserEvents() {
-        viewModelScope.launch {
-            partyRepository.getEvents().collect { events ->
-                viewModelState.update {
-                    it.copy(parties = events)
-                }
-            }
-        }
-    }
-
 }

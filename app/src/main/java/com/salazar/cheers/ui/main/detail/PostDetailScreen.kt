@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.main.detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -46,6 +45,7 @@ import com.salazar.cheers.compose.post.PostHeader
 import com.salazar.cheers.compose.post.PostText
 import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.compose.utils.PrettyImage
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
@@ -194,7 +194,7 @@ fun PostDetails(
 @Composable
 fun Post(
     post: Post,
-    members: List<User>?,
+    members: List<UserItem>?,
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
     onDelete: () -> Unit,
@@ -248,10 +248,10 @@ fun Post(
             if (members != null)
                 items(members, key = { it.id }) { user ->
                     UserItem(
-                        user = user,
+                        userItem = user,
                         onClick = { onUserClick(user.username) },
                     ) {
-                        FollowButton(isFollowing = user.followBack, onClick = {})
+                        FollowButton(isFollowing = user.has_followed, onClick = {})
                     }
                 }
             if (post.locationName.isNotBlank())

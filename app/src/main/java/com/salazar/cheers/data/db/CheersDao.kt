@@ -1,12 +1,11 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
-import com.salazar.cheers.data.entities.RecentUser
+import com.salazar.cheers.data.db.entities.RecentUser
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CheersDao {
-
     @Transaction
     @Query("SELECT * FROM recentUsers ORDER BY date DESC")
     fun getRecentUsers(): Flow<List<RecentUser>>

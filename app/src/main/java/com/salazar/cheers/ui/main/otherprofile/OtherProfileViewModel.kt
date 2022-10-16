@@ -90,7 +90,7 @@ class OtherProfileViewModel @Inject constructor(
 
     private fun refreshUser() {
         viewModelScope.launch {
-            userRepository.fetchUser(userIdOrUsername = username)
+            userRepository.fetchUser(username)
         }
     }
 
@@ -113,7 +113,7 @@ class OtherProfileViewModel @Inject constructor(
 
     fun toggleFollow(user: User) {
         viewModelScope.launch {
-            userRepository.toggleFollow(user = user)
+            userRepository.toggleFollow(user.id)
         }
     }
 

@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.home.likes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.internal.User
 import dagger.assisted.Assisted
@@ -36,16 +35,16 @@ class LikesViewModel @AssistedInject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            viewModelState.update {
-                val result = Neo4jUtil.getPostLikes(channelId)
-                when (result) {
-                    is Result.Success -> it.copy(users = result.data, isLoading = false)
-                    is Result.Error -> it.copy(
-                        isLoading = false,
-                        errorMessages = listOf(result.exception.toString())
-                    )
-                }
-            }
+//            viewModelState.update {
+//                val result = Neo4jUtil.getPostLikes(channelId)
+//                when (result) {
+//                    is Result.Success -> it.copy(users = result.data, isLoading = false)
+//                    is Result.Error -> it.copy(
+//                        isLoading = false,
+//                        errorMessages = listOf(result.exception.toString())
+//                    )
+//                }
+//            }
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import cheers.type.UserOuterClass
 
 object PostType {
     const val TEXT = "TEXT"
@@ -33,7 +34,7 @@ data class Post(
     val authorId: String = "",
     val caption: String = "",
     val username: String = "",
-    val storyState: StoryState = StoryState.EMPTY,
+    val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     val verified: Boolean = false,
     val profilePictureUrl: String = "",
     val created: Long = 0,

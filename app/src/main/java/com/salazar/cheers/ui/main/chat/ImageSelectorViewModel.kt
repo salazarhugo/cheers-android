@@ -2,7 +2,6 @@ package com.salazar.cheers.ui.main.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.backend.Neo4jUtil
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -51,11 +50,11 @@ class ImageSelectorViewModel @Inject constructor() : ViewModel() {
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            viewModelState.update {
-                val result = Neo4jUtil.queryFriends(query)
+//            viewModelState.update {
+//                val result = Neo4jUtil.queryFriends(query)
 //                when(result)
-                it.copy(users = result, isLoading = false)
-            }
+//                it.copy(users = result, isLoading = false)
+//            }
         }
     }
 

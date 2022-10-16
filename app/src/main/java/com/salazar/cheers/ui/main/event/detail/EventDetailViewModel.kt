@@ -90,19 +90,19 @@ class EventDetailViewModel @Inject constructor(
 
     fun onGoingToggle(party: Party) {
         viewModelScope.launch {
-            partyRepository.toggleGoing(party = party)
+//            partyRepository.toggleGoing(party = party)
         }
     }
 
     fun onInterestedToggle(party: Party) {
         viewModelScope.launch {
-            partyRepository.toggleInterested(party = party)
+//            partyRepository.toggleInterested(party = party)
         }
     }
 
     fun deleteEvent() {
         viewModelScope.launch {
-            partyRepository.deleteEvent(eventId = eventId)
+//            partyRepository.deleteEvent(eventId = eventId)
         }
     }
 

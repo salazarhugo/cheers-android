@@ -1,26 +1,18 @@
 package com.salazar.cheers.data.repository
 
 import android.app.Application
-import android.util.Log
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.salazar.cheers.backend.CoreService
-import com.salazar.cheers.backend.GatewayService
+import cheers.party.v1.FeedPartyRequest
+import cheers.party.v1.PartyServiceGrpcKt
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.paging.EventRemoteMediator
-import com.salazar.cheers.internal.A
-import com.salazar.cheers.internal.CreatePartyRequest
+import com.salazar.cheers.data.mapper.toParty
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.workers.CreatePartyWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,12 +20,12 @@ import javax.inject.Singleton
 @Singleton
 class PartyRepository @Inject constructor(
     application: Application,
-    private val coreService: CoreService,
-    private val gatewayService: GatewayService,
+    private val partyService: PartyServiceGrpcKt.PartyServiceCoroutineStub,
     private val database: CheersDatabase,
 ) {
 
     private val workManager = WorkManager.getInstance(application)
+
     val partyDao = database.partyDao()
 
     fun getEvent(eventId: String): Flow<Party> {
@@ -43,11 +35,6 @@ class PartyRepository @Inject constructor(
     suspend fun createParty(
         party: Party,
     ) {
-        try {
-            gatewayService.createParty(CreatePartyRequest(A("cheers-mobile")))
-        }catch (e: Exception) {
-            e.printStackTrace()
-        }
         party.apply {
             val uploadWorkRequest = OneTimeWorkRequestBuilder<CreatePartyWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -72,98 +59,20 @@ class PartyRepository @Inject constructor(
         }
     }
 
-    fun getEventFeed(): Flow<PagingData<Party>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = PostRepository.NETWORK_PAGE_SIZE,
-                enablePlaceholders = true,
-            ),
-            remoteMediator = EventRemoteMediator(database = database, service = coreService),
-        ) {
-            partyDao.pagingSourceFeed()
-        }.flow
-    }
+    suspend fun getPartyFeed(page: Int, pageSize: Int): Result<List<Party>> {
+        val request = FeedPartyRequest.newBuilder()
+            .setPageSize(pageSize)
+            .setPageToken(page.toString())
+            .build()
 
-    fun getEvents(): Flow<List<Party>> {
-        return partyDao.getEvents()
-    }
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+        val response = partyService.feedParty(request)
 
-    suspend fun refreshMyEvents() = withContext(Dispatchers.IO) {
-        try {
-            val myEvents = coreService.getEvents(0, 10)
-            Log.d("DORA", myEvents.toString())
-            partyDao.insertAll(myEvents)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val parties = response.partiesList.map {
+            it.toParty(uid)
         }
-    }
 
-    suspend fun updateEvent(party: Party) = withContext(Dispatchers.IO) {
-        coreService.updateEvent(party = party)
-    }
-
-    private suspend fun goingEvent(eventId: String) {
-        coreService.goingEvent(eventId = eventId)
-    }
-
-    private suspend fun ungoingEvent(eventId: String) {
-        coreService.ungoingEvent(eventId = eventId)
-    }
-
-    private suspend fun uninterestEvent(partyId: String) {
-        coreService.uninterestEvent(partyId = partyId)
-    }
-
-    private suspend fun interestEvent(partyId: String) {
-        coreService.interestEvent(partyId = partyId)
-    }
-
-    suspend fun hideEvent(eventId: String) = withContext(Dispatchers.IO) {
-        partyDao.deleteWithId(eventId = eventId)
-    }
-
-    suspend fun deleteEvent(eventId: String) = withContext(Dispatchers.IO) {
-        partyDao.deleteWithId(eventId = eventId)
-        coreService.deleteEvent(eventId = eventId)
-    }
-
-    suspend fun uploadEvent(party: Party) {
-        coreService.createParty(party = party)
-    }
-
-    suspend fun interestedList(eventId: String) = withContext(Dispatchers.IO) {
-        return@withContext try {
-            coreService.interestedList(eventId = eventId)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    suspend fun goingList(eventId: String) = withContext(Dispatchers.IO) {
-        return@withContext try {
-            coreService.goingList(eventId = eventId)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    suspend fun toggleGoing(party: Party) {
-        partyDao.update(party.copy(going = !party.going))
-        if (party.going)
-            ungoingEvent(party.id)
-        else
-            goingEvent(party.id)
-    }
-
-    suspend fun toggleInterested(party: Party) {
-        partyDao.update(party.copy(interested = !party.interested))
-        if (party.interested)
-            uninterestEvent(party.id)
-        else
-            interestEvent(party.id)
+        return Result.success(parties)
     }
 }
+

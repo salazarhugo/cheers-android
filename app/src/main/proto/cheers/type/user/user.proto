@@ -20,6 +20,23 @@ message User {
   repeated string registration_tokens = 11;
 }
 
+message UserItem {
+  string id = 1;
+  string name = 2;
+  string username = 3;
+  bool verified = 4;
+  string picture = 5;
+  bool has_followed = 6;
+  StoryState story_state = 7;
+}
+
+enum StoryState {
+  EMPTY = 0;
+  SEEN = 1;
+  NOT_SEEN = 2;
+  LOADING = 3;
+}
+
 enum Gender {
   MALE = 0;
   FEMALE = 1;

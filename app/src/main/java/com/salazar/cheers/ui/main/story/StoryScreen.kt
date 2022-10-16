@@ -48,7 +48,7 @@ import com.salazar.cheers.compose.post.PostHeader
 import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.compose.story.StoryProgressBar
 import com.salazar.cheers.compose.utils.PrettyImage
-import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.internal.Beverage
 import kotlin.math.absoluteValue
 

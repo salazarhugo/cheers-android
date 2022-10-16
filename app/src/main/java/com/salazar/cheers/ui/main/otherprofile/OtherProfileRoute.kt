@@ -60,10 +60,7 @@ fun OtherProfileRoute(
                     onPostLike = otherProfileViewModel::toggleLike,
                     onFollowToggle = otherProfileViewModel::toggleFollow,
                     onPostMoreClicked = { postId, authorId ->
-                        navActions.navigateToPostMoreSheet(
-                            postId,
-                            authorId
-                        )
+                        navActions.navigateToPostMoreSheet(postId)
                     },
                     onGiftClick = {
                         val receiverId = uiState.user.id

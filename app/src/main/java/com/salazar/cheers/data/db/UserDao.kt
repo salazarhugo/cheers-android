@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.entities.UserSuggestion
+import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.flow.Flow
@@ -33,9 +33,6 @@ interface UserDao {
 
     @Query("SELECT * FROM users WHERE friend = 1")
     suspend fun getFriends(): List<User>
-
-    @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' ")
-    suspend fun searchUser(query: String): List<User>
 
     @Query("SELECT * FROM users WHERE id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUserWithUsername(userIdOrUsername: String): User

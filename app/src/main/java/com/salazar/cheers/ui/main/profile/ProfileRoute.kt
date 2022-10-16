@@ -34,10 +34,7 @@ fun ProfileRoute(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::onSwipeRefresh,
         onPostMoreClicked = { postId, authorId ->
-            navActions.navigateToPostMoreSheet(
-                postId,
-                authorId
-            )
+            navActions.navigateToPostMoreSheet(postId)
         },
         onStatClicked = { statName, username, verified ->
             navActions.navigateToProfileStats(

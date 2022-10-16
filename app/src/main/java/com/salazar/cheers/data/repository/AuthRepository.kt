@@ -1,12 +1,15 @@
 package com.salazar.cheers.data.repository
 
+import cheers.post.v1.PostServiceGrpcKt
+import cheers.user.v1.GetUserRequest
+import cheers.user.v1.UserServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.backend.CoreService
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.UserDao
+import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -18,9 +21,9 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val service: CoreService,
     private val userDao: UserDao,
     private val auth: FirebaseAuth,
+    private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
 ) {
 
     fun isUserAuthenticatedInFirebase() = auth.currentUser != null
@@ -47,8 +50,12 @@ class AuthRepository @Inject constructor(
         if (user != null)
             return Result.Success(user)
 
+        val request = GetUserRequest.newBuilder()
+            .setId(userId)
+            .build()
+
         return try {
-            val user = service.getUser(userIdOrUsername = userId)
+            val user = userService.getUser(request).user.toUser()
             Result.Success(user)
         } catch (e: Exception) {
             e.printStackTrace()

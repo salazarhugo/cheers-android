@@ -3,7 +3,7 @@ package com.salazar.cheers.data.db
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.entities.Story
+import com.salazar.cheers.data.db.entities.Story
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
