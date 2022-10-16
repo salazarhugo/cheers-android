@@ -89,8 +89,7 @@ fun PostFooterButtons(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp),
+            .fillMaxWidth(),
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),

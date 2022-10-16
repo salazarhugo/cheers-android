@@ -132,6 +132,7 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun deletePost(postId: String) {
+        postDao.deleteWithId(postId)
         try {
             val request = DeletePostRequest.newBuilder()
                 .setId(postId)

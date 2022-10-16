@@ -3,10 +3,12 @@ package com.salazar.cheers.navigation
 import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -56,6 +58,7 @@ import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
+import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Constants.URI
@@ -141,7 +144,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        bottomSheet(
+        composable(
             route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
@@ -155,6 +158,14 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
             EventsRoute(
                 navActions = navActions,
+            )
+        }
+
+        dialog(
+            route = "${MainDestinations.DIALOG_DELETE_POST}/{postID}",
+        ) {
+            DeletePostDialog(
+                navActions
             )
         }
 
@@ -374,7 +385,9 @@ fun NavGraphBuilder.mainNavGraph(
             PostMoreBottomSheet(
                 isAuthor = isAuthor,
                 onDetails = { navActions.navigateToPostDetail(postId) },
-                onDelete = { homeViewModel.deletePost(postId); navActions.navigateBack() },
+                onDelete = {
+                    navActions.navigateToDeletePostDialog(postId)
+                           },
                 onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
                 onShare = {

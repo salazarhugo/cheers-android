@@ -22,6 +22,7 @@ object MainDestinations {
     const val MAP_ROUTE = "map"
     const val MAP_POST_HISTORY_ROUTE = "posts/history"
     const val EVENTS_ROUTE = "events"
+    const val DIALOG_DELETE_POST = "dialogDeletePost"
     const val EDIT_EVENT_ROUTE = "event/edit"
     const val EVENT_MORE_SHEET = "eventMoreSheet"
     const val MESSAGES_ROUTE = "messages"
@@ -366,6 +367,13 @@ class CheersNavigationActions(private val navController: NavHostController) {
 
     val navigateToStoryStats: (storyId: String) -> Unit = { storyId ->
         navController.navigate("${MainDestinations.STORY_STATS_ROUTE}/$storyId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToDeletePostDialog: (postId: String) -> Unit = { postId ->
+        navController.navigate("${MainDestinations.DIALOG_DELETE_POST}/$postId") {
             launchSingleTop = true
             restoreState = true
         }

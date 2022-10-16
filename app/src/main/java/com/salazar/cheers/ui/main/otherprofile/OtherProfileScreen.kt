@@ -131,17 +131,17 @@ fun Toolbar(
     onCopyUrl: () -> Unit,
 ) {
     val openDialog = remember { mutableStateOf(false) }
-    SmallTopAppBar(
-        title = {
-            Username(
-                username = username,
-                verified = verified,
-                textStyle = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto
-                ),
-            )
-        },
+    //                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
+    TopAppBar(title = {
+        Username(
+            username = username,
+            verified = verified,
+            textStyle = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontFamily = Roboto
+            ),
+        )
+    },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(Icons.Default.ArrowBack, "")
@@ -149,13 +149,12 @@ fun Toolbar(
         },
         actions = {
             IconButton(onClick = {
-//                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
+                //                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
                 openDialog.value = true
             }) {
                 Icon(Icons.Default.MoreVert, "")
             }
-        },
-    )
+        })
     if (openDialog.value)
         MoreDialog(openDialog = openDialog, onCopyUrl = onCopyUrl)
 }

@@ -190,17 +190,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun deletePost(postId: String) {
-        viewModelScope.launch {
-            postRepository.postDao.deleteWithId(postId)
-            try {
-                postRepository.deletePost(postId = postId)
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", e.toString())
-            }
-        }
-    }
-
     private fun setNativeAd(nativeAd: NativeAd) {
         viewModelState.update {
             it.copy(nativeAd = nativeAd)
