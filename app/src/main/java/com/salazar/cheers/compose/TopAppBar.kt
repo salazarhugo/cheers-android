@@ -22,7 +22,7 @@ fun MyTopAppBar(
             IconButton(onClick = {
                 onSave()
             }) {
-                Icon(Icons.Default.Check, "", tint = MaterialTheme.colorScheme.secondary)
+                Icon(Icons.Default.Check, "", tint = MaterialTheme.colorScheme.primary)
             }
         },
         navigationIcon = {

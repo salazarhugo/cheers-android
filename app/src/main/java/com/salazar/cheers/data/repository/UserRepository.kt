@@ -263,28 +263,22 @@ class UserRepository @Inject constructor(
     }
 
 
+    @Throws(Exception::class)
     suspend fun followUser(userID: String) {
-        try {
-            val request = FollowUserRequest.newBuilder()
-                .setId(userID)
-                .build()
+        val request = FollowUserRequest.newBuilder()
+            .setId(userID)
+            .build()
 
-            userService.followUser(request)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        userService.followUser(request)
     }
 
+    @Throws(Exception::class)
     suspend fun unfollowUser(userID: String) {
-        try {
-            val request = UnfollowUserRequest.newBuilder()
-                .setId(userID)
-                .build()
+        val request = UnfollowUserRequest.newBuilder()
+            .setId(userID)
+            .build()
 
-            userService.unfollowUser(request)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        userService.unfollowUser(request)
     }
 
     suspend fun isUsernameAvailable(username: String): Boolean {
@@ -298,17 +292,21 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun toggleFollow(userID: String) {
-        val user = userDao.getUser(userID)
+        try {
+            val user = userDao.getUser(userID)
 
-        val newFollowersCount = if (user.followBack) user.followers - 1 else user.followers + 1
-        val newUser = user.copy(followBack = !user.followBack, followers = newFollowersCount)
+            val newFollowersCount = if (user.followBack) user.followers - 1 else user.followers + 1
+            val newUser = user.copy(followBack = !user.followBack, followers = newFollowersCount)
 
-        userDao.update(newUser)
+            userDao.update(newUser)
 
-        if (user.followBack)
-            unfollowUser(userID = user.id)
-        else
-            followUser(userID = user.id)
+            if (user.followBack)
+                unfollowUser(userID = user.id)
+            else
+                followUser(userID = user.id)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     suspend fun getUsersWithListOfIds(ids: List<String>): List<User> = withContext(Dispatchers.IO) {
@@ -362,20 +360,18 @@ class UserRepository @Inject constructor(
 
     suspend fun fetchUser(
         userIDorUsername: String,
-    ) {
+    ): Resource<Unit> {
         val request = GetUserRequest.newBuilder()
             .setId(userIDorUsername)
             .build()
 
-        val remoteUser = try {
-            userService.getUser(request).toUser()
+        return try {
+            val remoteUser = userService.getUser(request).toUser()
+            userDao.insert(remoteUser)
+            Resource.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            null
-        }
-
-        remoteUser?.let { user ->
-            userDao.insert(user)
+            Resource.Error("Oups, something went wrong. Please try again later.")
         }
     }
 

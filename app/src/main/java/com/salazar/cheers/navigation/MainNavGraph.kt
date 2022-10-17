@@ -24,6 +24,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.post.PostMoreBottomSheet
+import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.AddPostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
@@ -67,12 +68,9 @@ import com.salazar.cheers.util.Utils.copyToClipboard
 import com.salazar.cheers.util.Utils.shareToSnapchat
 
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.mainNavGraph(
-    navController: NavController,
-    navActions: CheersNavigationActions,
+    appState: CheersAppState,
     showInterstitialAd: () -> Unit,
-    bottomSheetNavigator: BottomSheetNavigator,
 ) {
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
@@ -82,22 +80,22 @@ fun NavGraphBuilder.mainNavGraph(
             route = MainDestinations.NFC_ROUTE,
         ) {
             NfcRoute(
-                navActions = navActions
+                navActions = appState.navActions
             )
         }
 
         composable(
             route = MainDestinations.ACTIVITY_ROUTE,
         ) {
-            ActivityRoute(navActions = navActions)
+            ActivityRoute(navActions = appState.navActions)
         }
 
         composable(
-            route = "${MainDestinations.CHAT_ROUTE}/{channelId}",
+            route = "${MainDestinations.CHAT_ROUTE}?channelId={channelId}&userId={userID}",
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" })
         ) {
             ChatRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -105,8 +103,8 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.SEND_GIFT_SHEET}/{receiverId}",
         ) {
             SendGiftRoute(
-                navActions = navActions,
-                bottomSheetNavigator = bottomSheetNavigator,
+                navActions = appState.navActions,
+                bottomSheetNavigator = appState.bottomSheetNavigator,
             )
         }
 
@@ -116,7 +114,7 @@ fun NavGraphBuilder.mainNavGraph(
             exitTransition = { scaleOut(animationSpec = tween(500)) },
         ) {
             RoomRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -128,9 +126,9 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
             CheersTheme(darkTheme = true) {
                 StoryRoute(
-                    navActions = navActions,
+                    navActions = appState.navActions,
                     showInterstitialAd = showInterstitialAd,
-                    bottomSheetNavigator = bottomSheetNavigator,
+                    bottomSheetNavigator = appState.bottomSheetNavigator,
                 )
             }
         }
@@ -140,7 +138,7 @@ fun NavGraphBuilder.mainNavGraph(
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
             AddEventRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -149,7 +147,7 @@ fun NavGraphBuilder.mainNavGraph(
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
             AddPostRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -157,7 +155,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = MainDestinations.EVENTS_ROUTE,
         ) {
             EventsRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -165,7 +163,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.DIALOG_DELETE_POST}/{postID}",
         ) {
             DeletePostDialog(
-                navActions
+                navActions = appState.navActions
             )
         }
 
@@ -173,48 +171,48 @@ fun NavGraphBuilder.mainNavGraph(
             route = MainDestinations.HOME_ROUTE,
         ) { back ->
             val parentEntry = remember(back) {
-                navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
+                appState.navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
             }
             val homeViewModel = hiltViewModel<HomeViewModel>(parentEntry)
             HomeRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
                 homeViewModel = homeViewModel,
             )
         }
 
         composable(MainDestinations.MAP_ROUTE) {
             MapRoute(
-                navActions = navActions
+                navActions = appState.navActions
             )
         }
 
         composable(MainDestinations.MAP_POST_HISTORY_ROUTE) {
             MapPostHistoryRoute(
-                navActions = navActions
+                navActions = appState.navActions
             )
         }
 
         bottomSheet("${MainDestinations.CHAT_CAMERA_ROUTE}/{roomId}") {
             ChatCameraRoute(
-                navActions = navActions
+                navActions = appState.navActions
             )
         }
 
         dialog(MainDestinations.CAMERA_ROUTE) {
             CameraRoute(
-                navActions = navActions
+                navActions = appState.navActions
             )
         }
 
         composable("${MainDestinations.TICKETING_ROUTE}/{eventId}") {
             TicketingRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
         composable(MainDestinations.SEARCH_ROUTE) {
             SearchRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -225,7 +223,7 @@ fun NavGraphBuilder.mainNavGraph(
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             CommentsRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -234,7 +232,7 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/stats/{username}" })
         ) {
             DrinkingStatsRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -246,7 +244,7 @@ fun NavGraphBuilder.mainNavGraph(
             val username = it.arguments?.getString("username")!!
 
             OtherProfileRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
                 username = username,
             )
         }
@@ -256,7 +254,7 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/{eventId}" })
         ) {
             GuestListRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -265,7 +263,7 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/{eventId}" })
         ) {
             EventDetailRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -274,7 +272,7 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/edit/{eventId}" })
         ) {
             EditEventRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -283,7 +281,7 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/p/{storyId}" })
         ) {
             StoryStatsRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -292,7 +290,7 @@ fun NavGraphBuilder.mainNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/p/{postId}" })
         ) {
             PostDetailRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -304,7 +302,7 @@ fun NavGraphBuilder.mainNavGraph(
             ),
         ) {
             OtherProfileStatsRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -322,7 +320,7 @@ fun NavGraphBuilder.mainNavGraph(
 
             ProfileStatsRoute(
                 profileStatsViewModel = profileStatsViewModel,
-                navActions = navActions,
+                navActions = appState.navActions,
                 username = username,
                 verified = verified,
             )
@@ -334,7 +332,7 @@ fun NavGraphBuilder.mainNavGraph(
             exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
         ) {
             MessagesRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -342,17 +340,17 @@ fun NavGraphBuilder.mainNavGraph(
             route = MainDestinations.NEW_CHAT_ROUTE,
         ) {
             NewChatRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
-        dialog(
+        composable(
             route = MainDestinations.EDIT_PROFILE_ROUTE,
         ) {
             val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
             EditProfileRoute(
                 editProfileViewModel = editProfileViewModel,
-                navActions = navActions,
+                navActions = appState.navActions,
             )
         }
 
@@ -367,7 +365,9 @@ fun NavGraphBuilder.mainNavGraph(
             }
         ) {
             ProfileRoute(
-                navActions = navActions,
+                navActions = appState.navActions,
+                showSnackBar = appState::showSnackBar,
+                appState = appState,
             )
         }
 
@@ -384,9 +384,9 @@ fun NavGraphBuilder.mainNavGraph(
 
             PostMoreBottomSheet(
                 isAuthor = isAuthor,
-                onDetails = { navActions.navigateToPostDetail(postId) },
+                onDetails = { appState.navActions.navigateToPostDetail(postId) },
                 onDelete = {
-                    navActions.navigateToDeletePostDialog(postId)
+                    appState.navActions.navigateToDeletePostDialog(postId)
                            },
                 onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
                 onReport = {},
@@ -401,18 +401,17 @@ fun NavGraphBuilder.mainNavGraph(
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             context.startActivity(shareIntent)
                         }
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
                 onBlock = {
-//                    homeViewModel.blockUser(authorId)
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
                 onLinkClick = {
                     FirebaseDynamicLinksUtil.createShortLink("p/$postId")
                         .addOnSuccessListener { shortLink ->
                             context.copyToClipboard(shortLink.shortLink.toString())
                         }
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 }
             )
         }
@@ -424,7 +423,7 @@ fun NavGraphBuilder.mainNavGraph(
 
             EventMoreBottomSheet(
                 isAuthor = false,
-                onDetails = { navActions.navigateToEventDetail(eventId) },
+                onDetails = { appState.navActions.navigateToEventDetail(eventId) },
                 onDelete = { },
                 onReport = { /*TODO*/ },
                 onShare = {
@@ -438,18 +437,18 @@ fun NavGraphBuilder.mainNavGraph(
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             context.startActivity(shareIntent)
                         }
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
                 onLinkClick = {
                     FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
                         .addOnSuccessListener { shortLink ->
                             context.copyToClipboard(shortLink.shortLink.toString())
                         }
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
                 onHide = {
                     viewModel.onHide()
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
             )
         }
@@ -462,17 +461,17 @@ fun NavGraphBuilder.mainNavGraph(
         ProfileMoreBottomSheet(
             onProfileSheetUIAction = { action ->
                 when (action) {
-                    is ProfileSheetUIAction.OnNfcClick -> navActions.navigateToNfc()
-                    is ProfileSheetUIAction.OnSettingsClick -> navActions.navigateToSettings()
+                    is ProfileSheetUIAction.OnNfcClick -> appState.navActions.navigateToNfc()
+                    is ProfileSheetUIAction.OnSettingsClick -> appState.navActions.navigateToSettings()
                     is ProfileSheetUIAction.OnCopyProfileClick -> {
                         FirebaseDynamicLinksUtil.createShortLink("u/$username")
                             .addOnSuccessListener { shortLink ->
                                 context.copyToClipboard(shortLink.shortLink.toString())
                             }
-                        navActions.navigateBack()
+                        appState.navActions.navigateBack()
                     }
                     is ProfileSheetUIAction.OnAddSnapchatFriends -> context.shareToSnapchat(username)
-                    is ProfileSheetUIAction.OnPostHistoryClick -> navActions.navigateToPostHistory()
+                    is ProfileSheetUIAction.OnPostHistoryClick -> appState.navActions.navigateToPostHistory()
                 }
             },
         )
@@ -493,15 +492,15 @@ fun NavGraphBuilder.mainNavGraph(
                 roomType = room.type,
                 onDeleteClick = {
                     chatsSheetViewModel.deleteChannel()
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
                 onLeaveClick = {
                     chatsSheetViewModel.leaveChannel()
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 },
                 onDeleteChats = {
                     chatsSheetViewModel.deleteChats()
-                    navActions.navigateBack()
+                    appState.navActions.navigateBack()
                 }
             )
         else

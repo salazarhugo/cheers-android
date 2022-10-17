@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.CheersAppState
 
 /**
  * Stateful composable that displays the Navigation route for the Profile screen.
@@ -19,14 +20,15 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 fun ProfileRoute(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
+    showSnackBar: (String) -> Unit,
+    appState: CheersAppState,
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
 
     if (uiState.errorMessages.isNotBlank()) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, uiState.errorMessages, Toast.LENGTH_SHORT).show()
+        LaunchedEffect(appState.snackBarHostState) {
+            showSnackBar(uiState.errorMessages)
         }
     }
 

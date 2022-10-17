@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import cheers.party.v1.FeedPartyRequest
 import cheers.party.v1.PartyServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.PartyRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -88,10 +89,6 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val response = partyStub.feedParty(FeedPartyRequest.newBuilder().setPageSize(20).build())
-            Log.d("GRPC", response.toString())
-        }
-        viewModelScope.launch {
             userRepository.getCurrentUserFlow().collect { user ->
                 updateUser(user)
             }
@@ -123,7 +120,11 @@ class ProfileViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            userRepository.fetchUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+            val result = userRepository.fetchUser(FirebaseAuth.getInstance().currentUser?.uid!!)
+            when(result) {
+                is Resource.Error -> updateError(result.message)
+                else -> {}
+            }
         }
     }
 
@@ -139,6 +140,14 @@ class ProfileViewModel @Inject constructor(
             postRepository.profilePost(userIdOrUsername = userId).collect {
                 updatePosts(it)
             }
+        }
+    }
+
+    private fun updateError(message: String?) {
+        if (message == null)
+            return
+        viewModelState.update {
+            it.copy(errorMessages = message)
         }
     }
 }

@@ -154,6 +154,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
+        viewModelState.update { it.copy(endReached = false) }
         paginator.reset()
     }
 

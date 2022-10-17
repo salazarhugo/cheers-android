@@ -32,8 +32,6 @@ fun CheersApp(
     CheersTheme(darkTheme = darkTheme) {
         CheersNavGraph(
             uiState = uiState,
-            darkTheme = darkTheme,
-            user = uiState.user,
             showInterstitialAd = showInterstitialAd,
             appState = appState,
         )

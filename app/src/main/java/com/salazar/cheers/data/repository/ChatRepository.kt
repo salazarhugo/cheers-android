@@ -10,7 +10,8 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.*
+import cheers.chat.v1.*
+//import cheers.type.PostOuterClass
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
@@ -35,34 +36,12 @@ import javax.inject.Singleton
 class ChatRepository @Inject constructor(
     application: Application,
     private val chatDao: ChatDao,
-    private val userRepository: UserRepository
-) : Closeable {
+    private val userRepository: UserRepository,
+    private val chatService: ChatServiceGrpcKt.ChatServiceCoroutineStub,
+) {
 
     private val workManager = WorkManager.getInstance(application)
-    private lateinit var client: ChatServiceGrpcKt.ChatServiceCoroutineStub
-    private lateinit var managedChannel: ManagedChannel
     private var uid: String? = null
-
-
-    private fun getClient(): ChatServiceGrpcKt.ChatServiceCoroutineStub? {
-        if (this::client.isInitialized && uid == FirebaseAuth.getInstance().currentUser?.uid)
-            return client
-        return try {
-            managedChannel = ManagedChannelBuilder
-                .forAddress("chat-service-r3a2dr4u4a-nw.a.run.app", 443)
-                .useTransportSecurity()
-                .build()
-
-            client = ChatServiceGrpcKt
-                .ChatServiceCoroutineStub(managedChannel)
-                .withInterceptors(ErrorHandleInterceptor())
-
-            client
-        } catch (e: Exception) {
-            Log.e("Chat Repository", e.toString())
-            null
-        }
-    }
 
     fun getUnreadChatCount(): Flow<Int> {
         return try {
@@ -82,7 +61,7 @@ class ChatRepository @Inject constructor(
             launch {
                 chatDao.seenChannel(channelId)
             }
-            getClient()?.joinRoom(RoomId.newBuilder().setRoomId(channelId).build())?.collect {
+            chatService.joinRoom(RoomId.newBuilder().setRoomId(channelId).build())?.collect {
                 chatDao.insertMessage(it.toTextMessage().copy(acknowledged = true))
             }
         } catch (e: Exception) {
@@ -91,7 +70,7 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun getRoomMembers(roomId: String): List<UserCard> {
-        val users = getClient()!!.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
+        val users = chatService.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
         return users.usersList
     }
 
@@ -109,7 +88,7 @@ class ChatRepository @Inject constructor(
             .addAllUserIds(UUIDs)
             .build()
 
-        val room = getClient()!!.createChat(request)
+        val room = chatService.createChat(request)
         chatDao.insert(room.toChatChannel())
         return@withContext room.id
     }
@@ -120,7 +99,7 @@ class ChatRepository @Inject constructor(
             .build()
 
         chatDao.deleteChannel(roomId)
-        getClient()?.leaveRoom(request)
+        chatService.leaveRoom(request)
     }
 
     suspend fun deleteChats(channelId: String) = chatDao.deleteChannel(channelId)
@@ -131,17 +110,17 @@ class ChatRepository @Inject constructor(
             .build()
 
         chatDao.deleteChannel(channelId)
-        getClient()?.deleteRoom(request)
+        chatService.deleteRoom(request)
     }
 
     suspend fun getRoomId(request: GetRoomIdReq) = withContext(Dispatchers.IO) {
-        return@withContext getClient()!!.getRoomId(request = request)
+        return@withContext chatService.getRoomId(request = request)
     }
 
     suspend fun startTyping(channelId: String) = withContext(Dispatchers.IO) {
         try {
             val user = userRepository.getCurrentUser()
-            getClient()?.typingStart(
+            chatService.typingStart(
                 TypingReq.newBuilder()
                     .setRoomId(channelId)
                     .setUsername(user.name)
@@ -200,7 +179,7 @@ class ChatRepository @Inject constructor(
             emit(msg)
         }
 
-        val acknowledge = getClient()?.sendMessage(message)
+        val acknowledge = chatService.sendMessage(message)
 
         if (acknowledge?.status == "SENT")
             chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
@@ -234,7 +213,7 @@ class ChatRepository @Inject constructor(
             emit(msg)
         }
 
-        val acknowledge = getClient()!!.sendMessage(message)
+        val acknowledge = chatService.sendMessage(message)
 
         if (acknowledge.status == "SENT")
             chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
@@ -248,7 +227,7 @@ class ChatRepository @Inject constructor(
                 .setToken(token)
                 .build()
 
-            getClient()!!.addToken(request = request)
+            chatService.addToken(request = request)
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())
         }
@@ -256,7 +235,7 @@ class ChatRepository @Inject constructor(
 
     suspend fun listenRooms() = withContext(Dispatchers.IO) {
         try {
-            getClient()!!.getRooms(request = Empty.getDefaultInstance()).collect {
+            chatService.getRooms(request = Empty.getDefaultInstance()).collect {
                 chatDao.insert(it.toChatChannel())
             }
         } catch (e: Exception) {
@@ -267,10 +246,4 @@ class ChatRepository @Inject constructor(
     fun getChannels(): Flow<List<ChatChannel>> {
         return chatDao.getChannels()
     }
-
-    override fun close() {
-        if (this::managedChannel.isInitialized)
-            managedChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
-    }
-
 }

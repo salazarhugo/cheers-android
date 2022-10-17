@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.ChatRepository
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,10 +59,12 @@ private data class ChatViewModelState(
 class ChatViewModel @Inject constructor(
     statsHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ChatViewModelState(isLoading = false))
     private var channelId = ""
     private var typingJob: Job? = null
+    lateinit var userID: String
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -72,9 +75,18 @@ class ChatViewModel @Inject constructor(
         )
 
     init {
-        statsHandle.get<String>("channelId")?.let {
-            channelId = it
+        statsHandle.get<String>("userID")?.let {
+            userID = it
+            viewModelScope.launch {
+                userRepository.getUserFlow(userID).first()
+            }
         }
+        val channelID = statsHandle.get<String>("channelId")
+        if (channelID == null) {
+//            chatRepository.createGroupChat()
+        }
+        else
+            channelId = channelID
 
         viewModelScope.launch {
             chatRepository.joinChannel(channelId = channelId)

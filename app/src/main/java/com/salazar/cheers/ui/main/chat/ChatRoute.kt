@@ -83,7 +83,7 @@ fun ChatRoute(
             )
         }
         is ChatUiState.NoChannel -> {
-            LoadingScreen()
+//            LoadingScreen()
         }
     }
 }

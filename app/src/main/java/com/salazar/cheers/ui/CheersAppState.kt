@@ -9,6 +9,8 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.navigation.CheersNavigationActions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -17,9 +19,17 @@ fun rememberCheersAppState(
     bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(),
     navController: NavHostController = rememberAnimatedNavController(bottomSheetNavigator),
     cheersNavigationActions: CheersNavigationActions = CheersNavigationActions(navController),
-    context: Context = LocalContext.current
-) = remember(snackBarHostState, bottomSheetNavigator, navController, context) {
-    CheersAppState(snackBarHostState, bottomSheetNavigator, navController, cheersNavigationActions, context)
+    snackbarScope: CoroutineScope = rememberCoroutineScope(),
+    context: Context = LocalContext.current,
+) = remember(snackBarHostState, bottomSheetNavigator, navController, snackbarScope, context) {
+    CheersAppState(
+        snackBarHostState,
+        bottomSheetNavigator,
+        navController,
+        cheersNavigationActions,
+        snackbarScope,
+        context,
+    )
 }
 
 class CheersAppState(
@@ -27,9 +37,19 @@ class CheersAppState(
     val bottomSheetNavigator: BottomSheetNavigator,
     val navController: NavHostController,
     val navActions: CheersNavigationActions,
+    val snackbarScope: CoroutineScope,
     private val context: Context
 ) {
     fun navigateBack() {
         navController.popBackStack()
+    }
+
+    fun showSnackBar(message: String) {
+        snackbarScope.launch {
+            snackBarHostState.showSnackbar(
+                message = message,
+                withDismissAction = true,
+            )
+        }
     }
 }

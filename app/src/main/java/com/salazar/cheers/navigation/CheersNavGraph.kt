@@ -1,6 +1,7 @@
 package com.salazar.cheers.navigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -30,9 +31,7 @@ import com.salazar.cheers.ui.theme.GreySheet
 @Composable
 fun CheersNavGraph(
     uiState: CheersUiState,
-    darkTheme: Boolean,
     showInterstitialAd: () -> Unit,
-    user: User?,
     appState: CheersAppState,
 ) {
     val startDestination = CheersDestinations.AUTH_ROUTE
@@ -55,16 +54,17 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
                 || currentRoute.contains(MainDestinations.POST_COMMENTS)
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
+                || currentRoute.contains(MainDestinations.ADD_POST_SHEET)
+                || currentRoute.contains(MainDestinations.EDIT_PROFILE_ROUTE)
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = appState.bottomSheetNavigator,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-        sheetBackgroundColor = if (darkTheme) GreySheet else MaterialTheme.colorScheme.background,
+        sheetBackgroundColor = if (isSystemInDarkTheme()) GreySheet else MaterialTheme.colorScheme.background,
         sheetElevation = 0.dp,
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+            .systemBarsPadding(),
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(appState.snackBarHostState) },
@@ -91,7 +91,7 @@ fun CheersNavGraph(
                 ) {
                     CheersNavigationBar(
                         unreadChatCount = uiState.unreadChatCount,
-                        profilePictureUrl = user?.picture ?: "",
+                        profilePictureUrl = "",
                         currentRoute = currentRoute,
                         navigateToHome = navActions.navigateToHome,
                         navigateToMap = navActions.navigateToMap,
@@ -114,9 +114,7 @@ fun CheersNavGraph(
                 )
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
-                    navController = appState.navController,
-                    navActions = navActions,
-                    bottomSheetNavigator = appState.bottomSheetNavigator,
+                    appState = appState,
                     showInterstitialAd = showInterstitialAd,
                 )
             }

@@ -164,7 +164,6 @@ class UploadPostWorker @AssistedInject constructor(
                         .build()
 
                     postRepository.createPost(post = post)
-                    makeStatusNotification("Successfully uploaded", appContext)
 
                 }
                 PostType.TEXT -> {
@@ -177,12 +176,11 @@ class UploadPostWorker @AssistedInject constructor(
                         .build()
 
                     postRepository.createPost(post = post)
-                    makeStatusNotification("Successfully uploaded", appContext)
                 }
             }
             return Result.success()
         } catch (throwable: Throwable) {
-            Log.e(TAG, "Error applying blur")
+            Log.e(TAG, "Error uploading post")
             return Result.failure()
         }
     }

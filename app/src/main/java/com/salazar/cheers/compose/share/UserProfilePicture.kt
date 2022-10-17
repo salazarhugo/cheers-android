@@ -53,7 +53,7 @@ fun UserProfilePicture(
                 color = color
             )
             UserOuterClass.StoryState.EMPTY -> BorderStroke(
-                2.dp,
+                0.dp,
                 color = Color.Transparent
             )
             UserOuterClass.StoryState.SEEN ->

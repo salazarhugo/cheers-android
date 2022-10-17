@@ -106,7 +106,7 @@ fun EditProfileHeader(
             modifier = Modifier
                 .size(96.dp)
                 .clip(CircleShape)
-                .border(BorderStroke(2.dp, Color.LightGray), CircleShape)
+                .border(BorderStroke(1.dp, Color.LightGray), CircleShape)
                 .clickable { launcher.launch("image/*") },
         )
         Spacer(Modifier.height(8.dp))
@@ -147,7 +147,7 @@ fun EditProfileBody(
         modifier = Modifier.padding(16.dp)
     ) {
 
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -156,10 +156,6 @@ fun EditProfileBody(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                textColor = MaterialTheme.colorScheme.onBackground,
-            ),
             value = user.name,
             onValueChange = {
                 if (it.length <= NAME_MAX_CHAR)
@@ -167,7 +163,7 @@ fun EditProfileBody(
             },
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -176,16 +172,12 @@ fun EditProfileBody(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                textColor = MaterialTheme.colorScheme.onBackground,
-            ),
             value = user.username,
             onValueChange = { onUsernameChange(it) },
             enabled = true,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -194,16 +186,12 @@ fun EditProfileBody(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                textColor = MaterialTheme.colorScheme.onBackground,
-            ),
             value = user.email,
             onValueChange = {},
             enabled = false,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -212,10 +200,6 @@ fun EditProfileBody(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                textColor = MaterialTheme.colorScheme.onBackground,
-            ),
             value = user.website,
             onValueChange = {
                 if (it.length <= 500)
@@ -223,13 +207,13 @@ fun EditProfileBody(
             },
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Bio", style = MaterialTheme.typography.labelMedium) },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                textColor = MaterialTheme.colorScheme.onBackground,
-            ),
+//            colors = OutlinedTextFieldDefaults.textFieldColors(
+//                backgroundColor = Color.Transparent,
+//                textColor = MaterialTheme.colorScheme.onBackground,
+//            ),
             value = user.bio,
             onValueChange = {
                 if (it.length <= BIO_MAX_CHAR)

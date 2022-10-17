@@ -374,7 +374,8 @@ fun ShareButton(
             onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp)
+                .height(48.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
             Text(text = text)
@@ -421,9 +422,9 @@ fun AddPhotoOrVideo(
     {
         FilledTonalButton(
             onClick = onMediaSelectorClicked,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
-            Icon(Icons.Outlined.PhotoAlbum, "")
+            Icon(Icons.Outlined.PhotoAlbum, null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Gallery")
         }

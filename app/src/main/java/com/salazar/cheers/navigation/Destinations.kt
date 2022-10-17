@@ -414,11 +414,11 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToChat: (
-        channelId: String,
-    ) -> Unit = { channelId ->
-//        val encodedUrl = URLEncoder.encode(profilePictureUrl, StandardCharsets.UTF_8.toString())
-        navController.navigate("${MainDestinations.CHAT_ROUTE}/$channelId") {
+    fun navigateToChat(
+        channelId: String? = null,
+        userID: String? = null,
+    ) {
+        navController.navigate("${MainDestinations.CHAT_ROUTE}?channelId=$channelId&userId=$userID") {
             launchSingleTop = true
             restoreState = true
         }

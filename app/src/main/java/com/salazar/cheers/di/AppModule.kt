@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
+import cheers.chat.v1.ChatServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
@@ -35,6 +36,18 @@ object AppModule {
         return ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): ChatServiceGrpcKt.ChatServiceCoroutineStub {
+        return ChatServiceGrpcKt
+            .ChatServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
     }
 
     @Provides
