@@ -1,8 +1,8 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
+import cheers.chat.v1.RoomStatus
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.RoomStatus
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
 import kotlinx.coroutines.flow.Flow

@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.protobuf.Timestamp
 import cheers.chat.v1.*
+import com.salazar.cheers.data.Resource
 //import cheers.type.PostOuterClass
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.mapper.toChatChannel
@@ -21,6 +22,7 @@ import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -83,14 +85,27 @@ class ChatRepository @Inject constructor(
         groupName: String,
         UUIDs: List<String>
     ): String = withContext(Dispatchers.IO) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val request = CreateChatReq.newBuilder()
             .setGroupName(groupName)
             .addAllUserIds(UUIDs)
             .build()
 
-        val room = chatService.createChat(request)
-        chatDao.insert(room.toChatChannel())
-        return@withContext room.id
+        val chatChannel = try {
+            chatService.createChat(request).toChatChannel(uid)
+        } catch (e: StatusException) {
+            e.printStackTrace()
+            ChatChannel(
+                id = groupName,
+                name = groupName,
+                accountId = uid,
+                type = RoomType.DIRECT,
+            )
+        }
+
+        chatDao.insert(chatChannel)
+
+        return@withContext chatChannel.id
     }
 
     suspend fun leaveRoom(roomId: String) = withContext(Dispatchers.IO) {
@@ -136,7 +151,7 @@ class ChatRepository @Inject constructor(
         channelId: String,
         images: List<Uri>
     ): LiveData<WorkInfo> {
-        chatDao.setStatus(channelId, RoomStatus.SENDING)
+        chatDao.setStatus(channelId, RoomStatus.SENT)
         val uploadWork =
             OneTimeWorkRequestBuilder<UploadImageMessage>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -165,7 +180,7 @@ class ChatRepository @Inject constructor(
             .setSender(FirebaseAuth.getInstance().currentUser?.uid)
             .setSenderName(user.name)
             .setSenderUsername(user.username)
-            .setSenderProfilePictureUrl(user.picture)
+            .setSenderpicture(user.picture)
             .setRoom(Room.newBuilder().setId(channelId).build())
             .setPhotoUrl(photoUrl)
             .setType(MessageType.IMAGE)
@@ -190,35 +205,42 @@ class ChatRepository @Inject constructor(
     suspend fun sendMessage(
         channelId: String,
         text: String
-    ) = withContext(Dispatchers.IO) {
-        val user = userRepository.getCurrentUser()
+    ): Resource<MessageAck> {
+        return withContext(Dispatchers.IO) {
+            val user = userRepository.getCurrentUser()
 
-        val msg = Message.newBuilder()
-            .setId(UUID.randomUUID().toString())
-            .setCreated(Timestamp.newBuilder().setSeconds(Date().time / 1000).build())
-            .setSender(FirebaseAuth.getInstance().currentUser?.uid)
-            .setSenderName(user.name)
-            .setSenderUsername(user.username)
-            .setSenderProfilePictureUrl(user.picture)
-            .setRoom(Room.newBuilder().setId(channelId).build())
-            .setMessage(text)
-            .setType(MessageType.TEXT)
-            .build()
+            val msg = Message.newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCreated(Timestamp.newBuilder().setSeconds(Date().time / 1000).build())
+                .setSender(FirebaseAuth.getInstance().currentUser?.uid)
+                .setSenderName(user.name)
+                .setSenderUsername(user.username)
+                .setSenderpicture(user.picture)
+                .setRoom(Room.newBuilder().setId(channelId).build())
+                .setMessage(text)
+                .setType(MessageType.TEXT)
+                .build()
 
-        launch {
-            chatDao.insertMessage(msg.toTextMessage())
+            launch {
+                chatDao.insertMessage(msg.toTextMessage())
+            }
+
+            val message = flow<Message> {
+                emit(msg)
+            }
+
+            try {
+                val acknowledge = chatService.sendMessage(message)
+
+                if (acknowledge.status == "SENT")
+                    chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
+
+                return@withContext Resource.Success(acknowledge)
+            } catch (e: StatusException) {
+                e.printStackTrace()
+                return@withContext Resource.Error(e.localizedMessage)
+            }
         }
-
-        val message = flow<Message> {
-            emit(msg)
-        }
-
-        val acknowledge = chatService.sendMessage(message)
-
-        if (acknowledge.status == "SENT")
-            chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
-
-        return@withContext acknowledge
     }
 
     suspend fun addToken(token: String) = withContext(Dispatchers.IO) {
@@ -234,9 +256,10 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun listenRooms() = withContext(Dispatchers.IO) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         try {
             chatService.getRooms(request = Empty.getDefaultInstance()).collect {
-                chatDao.insert(it.toChatChannel())
+                chatDao.insert(it.toChatChannel(uid))
             }
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())

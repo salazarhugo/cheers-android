@@ -28,6 +28,7 @@ import java.io.IOException
 fun ChatRoute(
     chatViewModel: ChatViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
+    showSnackBar: (String) -> Unit,
 ) {
     val uiState by chatViewModel.uiState.collectAsState()
 
@@ -36,6 +37,12 @@ fun ChatRoute(
             if (it != null)
                 chatViewModel.sendImageMessage(listOf(it))
         }
+
+    if (!uiState.errorMessage.isNullOrBlank()) {
+        LaunchedEffect(Unit) {
+            showSnackBar(uiState.errorMessage!!)
+        }
+    }
 
     val micInteractionSource = remember { MutableInteractionSource() }
     val isPressed by micInteractionSource.collectIsPressedAsState()
@@ -56,36 +63,21 @@ fun ChatRoute(
         }
     }
 
-
-    when (uiState) {
-        is ChatUiState.HasChannel -> {
-            val ui = (uiState as ChatUiState.HasChannel)
-            val otherUser = User()
-
-            ChatScreen(
-                uiState = uiState as ChatUiState.HasChannel,
-                onTitleClick = { navActions.navigateToOtherProfile(it) },
-                onPoBackStack = { navActions.navigateBack() },
-                onUnlike = chatViewModel::unlikeMessage,
-                onLike = chatViewModel::likeMessage,
-                onUnsendMessage = chatViewModel::unsendMessage,
-                onMessageSent = chatViewModel::sendTextMessage,
-                onImageSelectorClick = { launcher.launch("image/*") },
-                onCopyText = {},
-                username = ui.channel.username,
-                verified = ui.channel.verified,
-                name = ui.channel.name,
-                profilePicturePath = ui.channel.avatarUrl,
-                onAuthorClick = { navActions.navigateToOtherProfile(it) },
-                onTextChanged = chatViewModel::onTextChanged,
-                onInfoClick = { navActions.navigateToRoomDetails(ui.channel.id) },
-                micInteractionSource = micInteractionSource,
-            )
-        }
-        is ChatUiState.NoChannel -> {
-//            LoadingScreen()
-        }
-    }
+    ChatScreen(
+        uiState = uiState,
+        onTitleClick = { navActions.navigateToOtherProfile(it) },
+        onPoBackStack = { navActions.navigateBack() },
+        onUnlike = chatViewModel::unlikeMessage,
+        onLike = chatViewModel::likeMessage,
+        onUnsendMessage = chatViewModel::unsendMessage,
+        onMessageSent = chatViewModel::sendTextMessage,
+        onImageSelectorClick = { launcher.launch("image/*") },
+        onCopyText = {},
+        onAuthorClick = { navActions.navigateToOtherProfile(it) },
+        onTextChanged = chatViewModel::onTextChanged,
+        onInfoClick = { navActions.navigateToRoomDetails(it) },
+        micInteractionSource = micInteractionSource,
+    )
 }
 
 private fun MediaRecorder.startRecording() {

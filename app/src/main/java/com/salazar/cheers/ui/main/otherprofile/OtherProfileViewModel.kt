@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.otherprofile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.GetRoomIdReq
+import cheers.chat.v1.GetRoomIdReq
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository

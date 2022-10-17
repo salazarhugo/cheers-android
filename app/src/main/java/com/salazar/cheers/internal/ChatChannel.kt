@@ -2,10 +2,10 @@ package com.salazar.cheers.internal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cheers.chat.v1.MessageType
+import cheers.chat.v1.RoomStatus
+import cheers.chat.v1.RoomType
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.MessageType
-import com.salazar.cheers.RoomStatus
-import com.salazar.cheers.RoomType
 
 @Entity(tableName = "room")
 data class ChatChannel(

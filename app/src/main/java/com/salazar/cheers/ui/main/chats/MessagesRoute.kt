@@ -24,7 +24,7 @@ fun MessagesRoute(
         onActivityIconClicked = {
         },
         onChannelClicked = { channelId ->
-            navActions.navigateToChat(channelId)
+            navActions.navigateToChatWithChannelId(channelId)
         },
         onLongPress = { channelId ->
             if (channelId.isNotBlank())

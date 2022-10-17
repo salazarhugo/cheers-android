@@ -2,8 +2,8 @@ package com.salazar.cheers.internal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cheers.chat.v1.MessageType
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.MessageType
 
 
 @Entity(tableName = "message")

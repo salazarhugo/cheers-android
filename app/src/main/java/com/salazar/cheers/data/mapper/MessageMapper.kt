@@ -1,6 +1,6 @@
 package com.salazar.cheers.data.mapper
 
-import com.salazar.cheers.Message
+import cheers.chat.v1.Message
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.internal.ImageMessage
 
@@ -11,7 +11,7 @@ fun Message.toTextMessage(): ChatMessage {
         senderName = senderName,
         senderId = sender,
         senderUsername = senderUsername,
-        senderProfilePictureUrl = senderProfilePictureUrl,
+        senderProfilePictureUrl = senderpicture,
         time = created,
         chatChannelId = room.id,
         photoUrl = photoUrl,
@@ -25,7 +25,7 @@ fun Message.toImageMessage(): ImageMessage {
         senderName = senderName,
         senderId = sender,
         senderUsername = senderUsername,
-        senderProfilePictureUrl = senderProfilePictureUrl,
+        senderProfilePictureUrl = senderpicture,
         time = created,
         chatChannelId = room.id,
         imagesDownloadUrl = listOf(photoUrl)

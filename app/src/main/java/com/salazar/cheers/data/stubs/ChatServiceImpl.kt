@@ -1,4 +1,4 @@
-package com.salazar.cheers.backend
+package com.salazar.cheers.data.stubs
 
 import com.salazar.cheers.*
 import kotlinx.coroutines.flow.Flow

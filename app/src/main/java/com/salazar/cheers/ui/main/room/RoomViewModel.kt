@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.room
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.UserCard
+import cheers.chat.v1.UserCard
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
@@ -53,8 +53,8 @@ data class RoomViewModelState(
 
 @HiltViewModel
 class RoomViewModel @Inject constructor(
+    stateHandle: SavedStateHandle,
     val userRepository: UserRepository,
-    private val stateHandle: SavedStateHandle,
     val chatRepository: ChatRepository,
 ) : ViewModel() {
 
@@ -104,4 +104,3 @@ class RoomViewModel @Inject constructor(
         }
     }
 }
-

@@ -4,56 +4,28 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cheers.chat.v1.Message
+import cheers.chat.v1.RoomType
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-sealed interface ChatUiState {
-
-    val isLoading: Boolean
-    val errorMessages: List<String>
-
-    data class NoChannel(
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-    ) : ChatUiState
-
-    data class HasChannel(
-        val channel: ChatChannel,
-        val messages: List<ChatMessage>,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-    ) : ChatUiState
-}
-
-private data class ChatViewModelState(
-    val channel: ChatChannel? = null,
+data class ChatUiState(
     val isLoading: Boolean = false,
-    val errorMessages: List<String> = emptyList(),
+    val errorMessage: String? = null,
+    val channel: ChatChannel? = null,
     val messages: List<ChatMessage> = emptyList(),
-) {
-    fun toUiState(): ChatUiState =
-        if (channel != null) {
-            ChatUiState.HasChannel(
-                channel = channel,
-                messages = messages,
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-            )
-        } else {
-            ChatUiState.NoChannel(
-                isLoading = isLoading,
-                errorMessages = errorMessages,
-            )
-        }
-}
+)
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -61,32 +33,35 @@ class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(ChatViewModelState(isLoading = false))
-    private var channelId = ""
-    private var typingJob: Job? = null
+
+    lateinit var channelId: String
     lateinit var userID: String
 
+    private var typingJob: Job? = null
+
+    private val viewModelState = MutableStateFlow(ChatUiState(isLoading = false))
+
     val uiState = viewModelState
-        .map { it.toUiState() }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
+            viewModelState.value
         )
 
     init {
-        statsHandle.get<String>("userID")?.let {
-            userID = it
-            viewModelScope.launch {
-                userRepository.getUserFlow(userID).first()
+        val channelID = statsHandle.get<String>("channelId")
+
+        if (channelID == null) {
+            val userID = statsHandle.get<String>("userID")!!
+            runBlocking {
+                val user = userRepository.getUserFlow(userID).first()
+                val channelID = chatRepository.createGroupChat(user.username, listOf())
+                channelId = channelID
             }
         }
-        val channelID = statsHandle.get<String>("channelId")
-        if (channelID == null) {
-//            chatRepository.createGroupChat()
-        }
-        else
+        else {
             channelId = channelID
+        }
 
         viewModelScope.launch {
             chatRepository.joinChannel(channelId = channelId)
@@ -117,7 +92,17 @@ class ChatViewModel @Inject constructor(
 
     fun sendTextMessage(text: String) {
         viewModelScope.launch {
-            chatRepository.sendMessage(channelId = channelId, text)
+            val result = chatRepository.sendMessage(channelId = channelId, text)
+            when(result) {
+                is Resource.Error -> updateErrorMessage(result.message)
+                else -> {}
+            }
+        }
+    }
+
+    private fun updateErrorMessage(message: String?) {
+        viewModelState.update {
+            it.copy(errorMessage = message)
         }
     }
 
@@ -152,4 +137,9 @@ class ChatViewModel @Inject constructor(
 //            FirestoreChat.unlikeMessage(channelId = channelId, messageId = messageId)
         }
     }
+}
+
+sealed class ChatUIAction {
+    object OnSwipeRefresh : ChatUIAction()
+    data class OnLikeClick(val message: Message) : ChatUIAction()
 }

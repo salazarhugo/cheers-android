@@ -1,10 +1,10 @@
 package com.salazar.cheers.data.mapper
 
+import cheers.chat.v1.Room
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.Room
 import com.salazar.cheers.internal.ChatChannel
 
-fun Room.toChatChannel(): ChatChannel {
+fun Room.toChatChannel(accountId: String): ChatChannel {
     return ChatChannel(
         id = id,
         name = name,
@@ -15,7 +15,7 @@ fun Room.toChatChannel(): ChatChannel {
         recentMessage = lastMessageText,
         recentMessageTime = lastMessageTime,
         recentMessageType = lastMessageType,
-        accountId = FirebaseAuth.getInstance().currentUser?.uid!!,
+        accountId = accountId,
         status = status,
         members = membersList,
         type = type,

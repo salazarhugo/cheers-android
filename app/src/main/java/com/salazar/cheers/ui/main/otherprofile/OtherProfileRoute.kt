@@ -74,7 +74,7 @@ fun OtherProfileRoute(
                         )
                     },
                     onMessageClicked = {
-                        navActions.navigateToChat(uiState.user.id)
+                        navActions.navigateToChatWithUserId(uiState.user.id)
                     },
                     onWebsiteClick = { website ->
                         var url = website

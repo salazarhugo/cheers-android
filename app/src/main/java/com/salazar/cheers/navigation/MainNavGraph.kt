@@ -96,6 +96,7 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
             ChatRoute(
                 navActions = appState.navActions,
+                showSnackBar = appState::showSnackBar,
             )
         }
 

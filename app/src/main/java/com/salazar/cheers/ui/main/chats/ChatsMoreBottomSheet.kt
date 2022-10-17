@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import cheers.chat.v1.RoomType
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.RoomType
 import com.salazar.cheers.compose.DividerM3
 
 @Composable

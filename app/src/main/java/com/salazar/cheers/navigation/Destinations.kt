@@ -414,11 +414,15 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToChat(
-        channelId: String? = null,
-        userID: String? = null,
-    ) {
-        navController.navigate("${MainDestinations.CHAT_ROUTE}?channelId=$channelId&userId=$userID") {
+    val navigateToChatWithUserId: (String) -> Unit = { userID ->
+        navController.navigate("${MainDestinations.CHAT_ROUTE}?userId=$userID") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToChatWithChannelId: (String) -> Unit = { channelID ->
+        navController.navigate("${MainDestinations.CHAT_ROUTE}?channelId=$channelID") {
             launchSingleTop = true
             restoreState = true
         }

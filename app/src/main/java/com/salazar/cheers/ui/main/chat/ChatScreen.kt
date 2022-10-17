@@ -32,12 +32,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import cheers.chat.v1.MessageType
+import cheers.chat.v1.RoomStatus
+import cheers.chat.v1.RoomType
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.MessageType
-import com.salazar.cheers.RoomStatus
-import com.salazar.cheers.RoomType
+import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.UserInput
 import com.salazar.cheers.compose.animations.AnimateHeart
 import com.salazar.cheers.compose.chat.DirectChatBar
@@ -54,11 +55,7 @@ const val ConversationTestTag = "ConversationTestTag"
 
 @Composable
 fun ChatScreen(
-    uiState: ChatUiState.HasChannel,
-    name: String,
-    username: String,
-    verified: Boolean,
-    profilePicturePath: String,
+    uiState: ChatUiState,
     onMessageSent: (msg: String) -> Unit,
     onUnsendMessage: (msgId: String) -> Unit,
     onLike: (msgId: String) -> Unit,
@@ -69,7 +66,7 @@ fun ChatScreen(
     onImageSelectorClick: () -> Unit,
     onPoBackStack: () -> Unit,
     onTextChanged: () -> Unit,
-    onInfoClick: () -> Unit,
+    onInfoClick: (String) -> Unit,
     micInteractionSource: MutableInteractionSource,
 ) {
     val scrollState = rememberLazyListState()
@@ -78,8 +75,11 @@ fun ChatScreen(
     val openDialog = remember { mutableStateOf(false) }
     val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }
     val channel = uiState.channel
-    val sending = uiState.channel.status == RoomStatus.SENDING
+    val sending = uiState.channel?.status == RoomStatus.SENT
 
+    if (channel == null)
+        LoadingScreen()
+    else
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -117,23 +117,23 @@ fun ChatScreen(
             }
             if (channel.type == RoomType.DIRECT)
                 DirectChatBar(
-                    name = name,
-                    username = username,
-                    verified = verified,
-                    profilePictureUrl = profilePicturePath,
+                    name = channel.name,
+                    username = channel.username,
+                    verified = channel.verified,
+                    profilePictureUrl = channel.avatarUrl,
                     onNavIconPressed = { onPoBackStack() },
                     onTitleClick = onTitleClick,
                     scrollBehavior = scrollBehavior,
-                    onInfoClick = onInfoClick,
+                    onInfoClick = { onInfoClick(channel.id)},
                 )
             else if (channel.type == RoomType.GROUP)
                 GroupChatBar(
                     name = channel.name,
                     members = channel.members.size,
-                    profilePictureUrl = profilePicturePath,
+                    profilePictureUrl = channel.avatarUrl,
                     onNavIconPressed = { onPoBackStack() },
                     onTitleClick = {},
-                    onInfoClick = onInfoClick,
+                    onInfoClick = { onInfoClick(channel.id)},
                     scrollBehavior = scrollBehavior,
                 )
         }

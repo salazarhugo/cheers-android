@@ -26,7 +26,7 @@ fun NewChatRoute(
         onGroupNameChange = newChatViewModel::onGroupNameChange,
         onFabClick = {
             newChatViewModel.onFabClick {
-                navActions.navigateToChat(it)
+                navActions.navigateToChatWithChannelId(it)
             }
         },
     )

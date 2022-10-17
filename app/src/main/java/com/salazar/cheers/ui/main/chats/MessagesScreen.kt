@@ -21,9 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cheers.chat.v1.RoomStatus
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.RoomStatus
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.chat.*
@@ -280,7 +280,7 @@ fun DirectConversation(
                             RoomStatus.OPENED -> OpenedChat()
                             RoomStatus.SENT -> DeliveredChat(this)
                             RoomStatus.RECEIVED -> ReceivedChat(this)
-                            RoomStatus.SENDING -> SendingChat()
+//                            RoomStatus.SENDING -> SendingChat()
                             RoomStatus.UNRECOGNIZED -> {}
                         }
                     }
