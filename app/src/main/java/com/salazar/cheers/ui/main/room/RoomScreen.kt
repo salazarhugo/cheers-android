@@ -47,7 +47,7 @@ fun RoomScreen(
             item {
                 GroupDetailsHeader(
                     roomName = room.name,
-                    pictureUrl = room.avatarUrl,
+                    picture = room.picture,
                 )
                 HeaderButtons(onAddMembers = { /*TODO*/ }) { }
             }
@@ -90,7 +90,7 @@ fun RoomScreen(
 @Composable
 fun GroupDetailsHeader(
     roomName: String,
-    pictureUrl: String,
+    picture: String?,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -98,7 +98,7 @@ fun GroupDetailsHeader(
     ) {
         Image(
             painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = pictureUrl)
+                ImageRequest.Builder(LocalContext.current).data(data = picture)
                     .apply(block = fun ImageRequest.Builder.() {
                         transformations(CircleCropTransformation())
                         error(R.drawable.default_profile_picture)

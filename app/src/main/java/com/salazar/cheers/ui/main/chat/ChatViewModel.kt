@@ -55,7 +55,7 @@ class ChatViewModel @Inject constructor(
             val userID = statsHandle.get<String>("userID")!!
             runBlocking {
                 val user = userRepository.getUserFlow(userID).first()
-                val channelID = chatRepository.createGroupChat(user.username, listOf())
+                val channelID = chatRepository.createGroupChat(user.username, listOf(), user)
                 channelId = channelID
             }
         }

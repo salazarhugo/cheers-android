@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "613ccbdc456e552b2196db1fb8036b28",
+    "identityHash": "e0b054f036227967191b6e9425e4e8c2",
     "entities": [
       {
         "tableName": "recentUsers",
@@ -869,7 +869,7 @@
       },
       {
         "tableName": "room",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `members` TEXT NOT NULL, `otherUserId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `createdBy` TEXT NOT NULL, `avatarUrl` TEXT NOT NULL, `recentMessage` TEXT NOT NULL, `status` TEXT NOT NULL, `recentMessageTime` INTEGER NOT NULL, `recentMessageType` TEXT NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, `ownerId` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `verified` INTEGER NOT NULL, `members` TEXT NOT NULL, `otherUserId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `createdBy` TEXT NOT NULL, `picture` TEXT, `recentMessage` TEXT NOT NULL, `status` TEXT NOT NULL, `recentMessageTime` INTEGER NOT NULL, `recentMessageType` TEXT NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, `ownerId` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -880,12 +880,6 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "username",
-            "columnName": "username",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -920,10 +914,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "avatarUrl",
-            "columnName": "avatarUrl",
+            "fieldPath": "picture",
+            "columnName": "picture",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "recentMessage",
@@ -1276,7 +1270,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '613ccbdc456e552b2196db1fb8036b28')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e0b054f036227967191b6e9425e4e8c2')"
     ]
   }
 }

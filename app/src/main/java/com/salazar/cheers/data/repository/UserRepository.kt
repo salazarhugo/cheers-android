@@ -137,15 +137,17 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getLocations(): FeatureCollection {
+    suspend fun getLocations(): FeatureCollection? {
         return withContext(Dispatchers.IO) {
             try {
 //                val json = coreService.getLocations().string()
 //                return@withContext FeatureCollection.fromJson(json)
+                null
             } catch (e: HttpException) {
                 Log.e("User Repository", e.toString())
+                null
             }
-        } as FeatureCollection
+        }
     }
 
     suspend fun getUserStats(username: String) = withContext(Dispatchers.IO) {

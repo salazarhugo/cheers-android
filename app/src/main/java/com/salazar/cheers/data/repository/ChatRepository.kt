@@ -19,6 +19,7 @@ import com.salazar.cheers.data.mapper.toTextMessage
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
@@ -72,8 +73,13 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun getRoomMembers(roomId: String): List<UserCard> {
-        val users = chatService.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
-        return users.usersList
+        try {
+            val users = chatService.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
+            return users.usersList
+        }catch (e: Exception) {
+            e.printStackTrace()
+            return emptyList()
+        }
     }
 
 
@@ -83,7 +89,8 @@ class ChatRepository @Inject constructor(
 
     suspend fun createGroupChat(
         groupName: String,
-        UUIDs: List<String>
+        UUIDs: List<String>,
+        user: User = User(),
     ): String = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val request = CreateChatReq.newBuilder()
@@ -97,8 +104,10 @@ class ChatRepository @Inject constructor(
             e.printStackTrace()
             ChatChannel(
                 id = groupName,
-                name = groupName,
+                name = user.username,
                 accountId = uid,
+                picture = user.picture,
+                verified = user.verified,
                 type = RoomType.DIRECT,
             )
         }
@@ -113,8 +122,12 @@ class ChatRepository @Inject constructor(
             .setRoomId(roomId)
             .build()
 
-        chatDao.deleteChannel(roomId)
-        chatService.leaveRoom(request)
+        try {
+            chatDao.deleteChannel(roomId)
+            chatService.leaveRoom(request)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     suspend fun deleteChats(channelId: String) = chatDao.deleteChannel(channelId)

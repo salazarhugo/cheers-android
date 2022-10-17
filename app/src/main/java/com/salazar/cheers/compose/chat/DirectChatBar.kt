@@ -27,9 +27,8 @@ import com.salazar.cheers.compose.Username
 @Composable
 fun DirectChatBar(
     name: String,
-    username: String,
     verified: Boolean,
-    profilePictureUrl: String,
+    picture: String?,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavIconPressed: () -> Unit,
@@ -50,12 +49,12 @@ fun DirectChatBar(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable {
-                    onTitleClick(username)
+                    onTitleClick(name)
                 }
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                        ImageRequest.Builder(LocalContext.current).data(data = picture)
                             .apply(block = fun ImageRequest.Builder.() {
                                 transformations(CircleCropTransformation())
                                 error(R.drawable.default_profile_picture)
@@ -71,21 +70,9 @@ fun DirectChatBar(
                 Spacer(Modifier.width(8.dp))
                 Column {
                     if (name.isNotBlank())
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    else
                         Username(
-                            username = username,
+                            username = name,
                             verified = verified,
-                        )
-                    if (name.isNotBlank())
-                        Username(
-                            username = username,
-                            verified = verified,
-                            textStyle = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                 }
             }

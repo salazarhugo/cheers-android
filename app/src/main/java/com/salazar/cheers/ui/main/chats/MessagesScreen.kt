@@ -244,7 +244,7 @@ fun DirectConversation(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserProfilePicture(
-                avatar = channel.avatarUrl,
+                avatar = channel.picture,
                 size = 50.dp,
             )
             Spacer(modifier = Modifier.width(14.dp))

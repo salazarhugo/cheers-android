@@ -118,9 +118,8 @@ fun ChatScreen(
             if (channel.type == RoomType.DIRECT)
                 DirectChatBar(
                     name = channel.name,
-                    username = channel.username,
                     verified = channel.verified,
-                    profilePictureUrl = channel.avatarUrl,
+                    picture = channel.picture,
                     onNavIconPressed = { onPoBackStack() },
                     onTitleClick = onTitleClick,
                     scrollBehavior = scrollBehavior,
@@ -130,7 +129,7 @@ fun ChatScreen(
                 GroupChatBar(
                     name = channel.name,
                     members = channel.members.size,
-                    profilePictureUrl = channel.avatarUrl,
+                    picture = channel.picture,
                     onNavIconPressed = { onPoBackStack() },
                     onTitleClick = {},
                     onInfoClick = { onInfoClick(channel.id)},

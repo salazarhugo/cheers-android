@@ -54,7 +54,7 @@ class MapViewModel @Inject constructor(
         refreshPosts()
         viewModelScope.launch {
             val geojson = userRepository.getLocations()
-            if (geojson.features() != null)
+            if (geojson?.features() != null)
                 viewModelState.update { it.copy(users = geojson.features()!!.toList()) }
             Log.d("HAHA", uiState.value.geojson?.features()?.size.toString())
         }

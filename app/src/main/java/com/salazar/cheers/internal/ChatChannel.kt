@@ -6,19 +6,19 @@ import cheers.chat.v1.MessageType
 import cheers.chat.v1.RoomStatus
 import cheers.chat.v1.RoomType
 import com.google.protobuf.Timestamp
+import java.util.*
 
 @Entity(tableName = "room")
 data class ChatChannel(
     @PrimaryKey
     val id: String = "",
     val name: String = "",
-    val username: String = "",
     val verified: Boolean = false,
     val members: List<String> = emptyList(),
     val otherUserId: String = "",
-    val createdAt: Timestamp = Timestamp.getDefaultInstance(),
+    val createdAt: Timestamp = Timestamp.newBuilder().setSeconds(Date().time/1000).build(),
     val createdBy: String = "",
-    val avatarUrl: String = "",
+    val picture: String? = null,
     val recentMessage: String = "",
     val status: RoomStatus = RoomStatus.UNRECOGNIZED,
     val recentMessageTime: Timestamp = Timestamp.getDefaultInstance(),

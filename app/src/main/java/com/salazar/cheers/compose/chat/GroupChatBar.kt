@@ -27,7 +27,7 @@ import com.salazar.cheers.compose.CheersAppBar
 fun GroupChatBar(
     name: String,
     members: Int,
-    profilePictureUrl: String,
+    picture: String?,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavIconPressed: () -> Unit = { },
@@ -53,7 +53,7 @@ fun GroupChatBar(
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current).data(data = profilePictureUrl)
+                        ImageRequest.Builder(LocalContext.current).data(data = picture)
                             .apply(block = fun ImageRequest.Builder.() {
                                 transformations(CircleCropTransformation())
                                 error(R.drawable.default_group_picture)
