@@ -17,7 +17,7 @@ service ChatService {
   rpc LeaveRoom(RoomId) returns (Empty) {}
   rpc DeleteRoom(RoomId) returns (Empty) {}
 
-  rpc SendMessage(stream Message) returns (MessageAck) {}
+  rpc SendMessage(stream Message) returns (SendMessageResponse) {}
   rpc LikeMessage(LikeMessageReq) returns (Empty) {}
   rpc UnlikeMessage(LikeMessageReq) returns (Empty) {}
 
@@ -127,8 +127,18 @@ message Message {
   string photo_url = 9;
   MessageType type = 10;
   int32 like_count = 11;
+
+  enum Status {
+    EMPTY = 0;
+    SENT = 1;
+    DELIVERED = 2;
+    READ = 3;
+    FAILED = 4;
+  }
+  Status status = 12;
 }
 
-message MessageAck {
-  string status = 1;
+
+message SendMessageResponse {
+  Message.Status status = 1;
 }

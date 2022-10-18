@@ -4,11 +4,9 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.protobuf'
     id 'dagger.hilt.android.plugin'
-    id 'com.google.dagger.hilt.android'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.firebase-perf'
     id 'com.google.firebase.crashlytics'
-    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -84,14 +82,6 @@ android {
                         "-Xjvm-default=enable"
                 ]
             }
-        }
-    }
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/proto'
         }
     }
 }

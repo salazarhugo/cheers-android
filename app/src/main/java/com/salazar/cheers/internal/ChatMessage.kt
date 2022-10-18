@@ -2,6 +2,7 @@ package com.salazar.cheers.internal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cheers.chat.v1.Message.*
 import cheers.chat.v1.MessageType
 import com.google.protobuf.Timestamp
 
@@ -20,6 +21,6 @@ data class ChatMessage(
     val senderProfilePictureUrl: String,
     val likedBy: List<String> = emptyList(),
     val seenBy: List<String> = emptyList(),
-    val acknowledged: Boolean = false,
     val type: MessageType = MessageType.TEXT,
+    val status: Status = Status.UNRECOGNIZED,
 )

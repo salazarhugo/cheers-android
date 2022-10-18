@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.TypeConverter
+import cheers.chat.v1.Message
 import cheers.type.UserOuterClass
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.internal.ActivityType
@@ -12,6 +13,14 @@ import kotlinx.serialization.json.Json.Default.decodeFromString
 import java.util.*
 
 class Converters {
+    @TypeConverter
+    fun fromMessageStatus(value: Message.Status) = value.name
+
+    @TypeConverter
+    fun toMessageStatus(name: String) = Message.Status.values()
+        .firstOrNull { it.name.equals(name, ignoreCase = true) }
+        ?: Message.Status.UNRECOGNIZED
+
     @TypeConverter
     fun fromStoryState(value: UserOuterClass.StoryState) = value.name
 

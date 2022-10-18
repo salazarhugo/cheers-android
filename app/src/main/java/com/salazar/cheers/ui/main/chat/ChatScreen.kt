@@ -17,6 +17,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.SmsFailed
+import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +38,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import cheers.chat.v1.Message
 import cheers.chat.v1.MessageType
 import cheers.chat.v1.RoomStatus
 import cheers.chat.v1.RoomType
@@ -448,6 +455,7 @@ fun ChatItemBubble(
                 authorClicked = authorClicked
             )
         }
+        MessageStatus(status = message.status)
         if (isUserMe && seen)
             Text(
                 text = "\uD83D\uDC40",
@@ -484,6 +492,28 @@ fun ChatItemBubble(
 }
 
 @Composable
+fun MessageStatus(
+    status: Message.Status,
+) {
+    when(status) {
+        Message.Status.EMPTY -> {}
+        Message.Status.SENT -> {
+            Icon(Icons.Default.Done, contentDescription = null)
+        }
+        Message.Status.DELIVERED -> {
+            Icon(Icons.Default.DoneAll, contentDescription = null)
+        }
+        Message.Status.READ -> {
+            Icon(Icons.Default.DoneAll, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        }
+        Message.Status.FAILED -> {
+            Icon(Icons.Outlined.Error, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+        }
+        Message.Status.UNRECOGNIZED -> {}
+    }
+}
+
+@Composable
 fun ClickableMessage(
     message: ChatMessage,
     isUserMe: Boolean,
@@ -502,7 +532,7 @@ fun ClickableMessage(
         primary = isUserMe
     )
 
-    val color = if (!message.acknowledged)
+    val color = if (message.status == Message.Status.FAILED)
         MaterialTheme.colorScheme.onError
     else if (isUserMe)
         MaterialTheme.colorScheme.onPrimary

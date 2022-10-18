@@ -16,6 +16,7 @@ fun Message.toTextMessage(): ChatMessage {
         chatChannelId = room.id,
         photoUrl = photoUrl,
         type = type,
+        status = status,
     )
 }
 

@@ -57,10 +57,13 @@ class ChatRepository @Inject constructor(
             launch {
                 chatDao.seenChannel(channelId)
             }
-            chatService.joinRoom(JoinRoomRequest.newBuilder().setRoomId(channelId).build())
-                ?.collect {
-                    chatDao.insertMessage(it.toTextMessage().copy(acknowledged = true))
-                }
+            val request = JoinRoomRequest.newBuilder()
+                .setRoomId(channelId)
+                .build()
+
+            chatService.joinRoom(request).collect {
+                chatDao.insertMessage(it.toTextMessage())
+            }
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())
         }
@@ -68,7 +71,11 @@ class ChatRepository @Inject constructor(
 
     suspend fun getRoomMembers(roomId: String): List<UserCard> {
         try {
-            val users = chatService.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
+            val request = RoomId.newBuilder()
+                .setRoomId(roomId)
+                .build()
+
+            val users = chatService.getRoomMembers(request)
             return users.usersList
         } catch (e: Exception) {
             e.printStackTrace()
@@ -192,7 +199,7 @@ class ChatRepository @Inject constructor(
     suspend fun sendImageMessage(
         channelId: String,
         photoUrl: String
-    ): MessageAck? = withContext(Dispatchers.IO) {
+    ): SendMessageResponse = withContext(Dispatchers.IO) {
         val user = userRepository.getCurrentUser()
 
         val msg = Message.newBuilder()
@@ -216,9 +223,7 @@ class ChatRepository @Inject constructor(
         }
 
         val acknowledge = chatService.sendMessage(message)
-
-        if (acknowledge?.status == "SENT")
-            chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
+        chatDao.insertMessage(msg.toTextMessage())
 
         return@withContext acknowledge
     }
@@ -226,7 +231,7 @@ class ChatRepository @Inject constructor(
     suspend fun sendMessage(
         channelId: String,
         text: String
-    ): Resource<MessageAck> {
+    ): Resource<SendMessageResponse> {
         return withContext(Dispatchers.IO) {
             val user = userRepository.getCurrentUser()
 
@@ -240,6 +245,7 @@ class ChatRepository @Inject constructor(
                 .setRoom(Room.newBuilder().setId(channelId).build())
                 .setMessage(text)
                 .setType(MessageType.TEXT)
+                .setStatus(Message.Status.EMPTY)
                 .build()
 
             launch {
@@ -253,12 +259,10 @@ class ChatRepository @Inject constructor(
             }
 
             try {
-                val acknowledge = chatService.sendMessage(message)
+                val response = chatService.sendMessage(message)
+                chatDao.insertMessage(msg.toTextMessage().copy(status = response.status))
 
-                if (acknowledge.status == "SENT")
-                    chatDao.insertMessage(msg.toTextMessage().copy(acknowledged = true))
-
-                return@withContext Resource.Success(acknowledge)
+                return@withContext Resource.Success(response)
             } catch (e: StatusException) {
                 e.printStackTrace()
                 return@withContext Resource.Error(e.localizedMessage)
