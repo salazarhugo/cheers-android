@@ -1,37 +1,30 @@
 package com.salazar.cheers.data.repository
 
+//import cheers.type.PostOuterClass
 import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GetTokenResult
-import com.google.protobuf.Timestamp
 import cheers.chat.v1.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.protobuf.Timestamp
 import com.salazar.cheers.data.Resource
-//import cheers.type.PostOuterClass
 import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
-import com.salazar.cheers.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadImageMessage
-import io.grpc.ManagedChannel
-import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.Closeable
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -64,9 +57,10 @@ class ChatRepository @Inject constructor(
             launch {
                 chatDao.seenChannel(channelId)
             }
-            chatService.joinRoom(RoomId.newBuilder().setRoomId(channelId).build())?.collect {
-                chatDao.insertMessage(it.toTextMessage().copy(acknowledged = true))
-            }
+            chatService.joinRoom(JoinRoomRequest.newBuilder().setRoomId(channelId).build())
+                ?.collect {
+                    chatDao.insertMessage(it.toTextMessage().copy(acknowledged = true))
+                }
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())
         }
@@ -76,7 +70,7 @@ class ChatRepository @Inject constructor(
         try {
             val users = chatService.getRoomMembers(RoomId.newBuilder().setRoomId(roomId).build())
             return users.usersList
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return emptyList()
         }
@@ -85,6 +79,19 @@ class ChatRepository @Inject constructor(
 
     fun getChannel(channelId: String): Flow<ChatChannel> {
         return chatDao.getChannelFlow(channelId = channelId)
+    }
+
+    suspend fun getChatWithUser(userId: String): ChatChannel  = withContext(Dispatchers.IO) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+        val user = userRepository.getUserFlow(userId).first()
+        return@withContext chatDao.getChatWithUser(userId = userId) ?: ChatChannel(
+            id = "temp",
+            name = user.username,
+            accountId = uid,
+            picture = user.picture,
+            verified = user.verified,
+            type = RoomType.DIRECT,
+        )
     }
 
     suspend fun createGroupChat(
@@ -109,6 +116,7 @@ class ChatRepository @Inject constructor(
                 picture = user.picture,
                 verified = user.verified,
                 type = RoomType.DIRECT,
+                members = UUIDs,
             )
         }
 
@@ -235,7 +243,9 @@ class ChatRepository @Inject constructor(
                 .build()
 
             launch {
-                chatDao.insertMessage(msg.toTextMessage())
+                val message = msg.toTextMessage()
+                chatDao.insertMessage(message)
+                chatDao.updateLastMessage(channelId, message.text, message.time, message.type)
             }
 
             val message = flow<Message> {

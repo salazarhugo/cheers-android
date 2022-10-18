@@ -2,11 +2,13 @@ package com.salazar.cheers.data.db
 
 import androidx.room.*
 import cheers.chat.v1.RoomStatus
+import cheers.chat.v1.RoomType
 import com.google.firebase.auth.FirebaseAuth
+import com.google.protobuf.Timestamp
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
 import kotlinx.coroutines.flow.Flow
-
+import cheers.chat.v1.MessageType
 
 @Dao
 interface ChatDao {
@@ -26,11 +28,15 @@ interface ChatDao {
     suspend fun deleteChannels()
 
     @Transaction
+    @Query("UPDATE room SET lastMessage = :message, lastMessageTime = :time, lastMessageType = :type WHERE id = :channelId")
+    fun updateLastMessage(channelId: String, message: String, time: Timestamp, type: MessageType)
+
+    @Transaction
     @Query("SELECT * FROM message WHERE chatChannelId = :channelId ORDER BY time DESC")
     fun getMessages(channelId: String): Flow<List<ChatMessage>>
 
     @Transaction
-    @Query("SELECT * FROM room WHERE accountId = :me ORDER BY recentMessageTime DESC")
+    @Query("SELECT * FROM room WHERE accountId = :me ORDER BY lastMessageTime DESC")
     fun getChannels(me: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<ChatChannel>>
 
     @Query("SELECT COUNT(id) FROM room WHERE status = :status AND accountId = :accountId")
@@ -46,6 +52,10 @@ interface ChatDao {
     @Transaction
     @Query("SELECT * FROM room WHERE id = :channelId")
     fun getChannelFlow(channelId: String): Flow<ChatChannel>
+
+    @Transaction
+    @Query("SELECT * FROM room WHERE type = :direct AND members  LIKE '%' || :userId || '%' LIMIT 1")
+    fun getChatWithUser(userId: String, direct: RoomType = RoomType.DIRECT): ChatChannel?
 
     @Query("UPDATE room SET status = :status WHERE id = :channelId")
     suspend fun setStatus(

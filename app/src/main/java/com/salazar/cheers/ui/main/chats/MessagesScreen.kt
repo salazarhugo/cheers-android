@@ -252,10 +252,11 @@ fun DirectConversation(
                 val title = channel.name
 
                 val subtitle = buildAnnotatedString {
+                    append(channel.lastMessage)
                     append("  •  ")
                     append(
                         relativeTimeFormatter(
-                            timestamp = channel.recentMessageTime.seconds
+                            timestamp = channel.lastMessageTime.seconds
                         )
                     )
                 }
@@ -273,7 +274,7 @@ fun DirectConversation(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    with(channel.recentMessageType) {
+                    with(channel.lastMessageType) {
                         when (channel.status) {
                             RoomStatus.NEW -> NewChat(this)
                             RoomStatus.EMPTY -> EmptyChat()

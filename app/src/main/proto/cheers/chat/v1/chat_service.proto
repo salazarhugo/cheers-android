@@ -3,8 +3,6 @@ syntax = "proto3";
 package cheers.chat.v1;
 
 import "google/protobuf/timestamp.proto";
-import "cheers/type/user/user.proto";
-import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/party/v1;party";
@@ -14,7 +12,7 @@ service ChatService {
   rpc GetRooms(Empty) returns (stream Room) {}
   rpc GetRoomId(GetRoomIdReq) returns (RoomId) {}
   rpc CreateChat(CreateChatReq) returns (Room) {}
-  rpc JoinRoom(RoomId) returns (stream Message) {}
+  rpc JoinRoom(JoinRoomRequest) returns (stream Message) {}
   rpc GetRoomMembers(RoomId) returns (Users) {}
   rpc LeaveRoom(RoomId) returns (Empty) {}
   rpc DeleteRoom(RoomId) returns (Empty) {}
@@ -64,6 +62,10 @@ message TypingReq {
   string avatar_url = 3;
 }
 
+message JoinRoomRequest {
+  string room_id = 1;
+}
+
 message RoomId {
   string room_id = 1;
 }
@@ -88,16 +90,15 @@ enum RoomType {
 message Room {
   string id = 1;
   string name = 2;
-  bool typing = 3;
   bool verified = 4;
+  bool typing = 3;
   string owner = 5;
   RoomType type = 6;
-  string username = 7;
   RoomStatus status = 8;
   repeated string admins = 9;
   repeated string members = 10;
   string last_message_text = 11;
-  string profile_picture_url = 12;
+  string picture = 12;
   MessageType last_message_type = 13;
   google.protobuf.Timestamp created = 14;
   google.protobuf.Timestamp last_message_time = 15;

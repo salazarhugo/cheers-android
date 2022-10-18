@@ -146,7 +146,7 @@ fun EditProfileBody(
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
-
+        Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
