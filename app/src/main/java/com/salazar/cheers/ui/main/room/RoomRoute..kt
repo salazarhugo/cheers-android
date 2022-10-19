@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.room
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,8 +17,15 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 fun RoomRoute(
     roomViewModel: RoomViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
+    showSnackBar: (String) -> Unit,
 ) {
     val uiState by roomViewModel.uiState.collectAsState()
+
+//    if (uiState.) {
+//        LaunchedEffect(Unit) {
+//            showSnackBar(uiState.lxx!!)
+//        }
+//    }
 
     when (uiState) {
         is RoomUiState.NoRoom -> LoadingScreen()

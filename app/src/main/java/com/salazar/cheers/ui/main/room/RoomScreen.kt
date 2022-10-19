@@ -24,6 +24,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.share.Toolbar
 import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.ui.settings.RedButton
 import com.salazar.cheers.ui.theme.BlueCheers
 
@@ -46,6 +47,7 @@ fun RoomScreen(
         ) {
             item {
                 GroupDetailsHeader(
+                    roomId = room.id,
                     roomName = room.name,
                     picture = room.picture,
                 )
@@ -89,6 +91,7 @@ fun RoomScreen(
 
 @Composable
 fun GroupDetailsHeader(
+    roomId: String,
     roomName: String,
     picture: String?,
 ) {
@@ -113,6 +116,11 @@ fun GroupDetailsHeader(
             text = roomName,
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(16.dp)
+        )
+        Text(
+            text = roomId,
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(8.dp)
         )
     }
 }
@@ -150,7 +158,7 @@ fun HeaderButtons(
 
 @Composable
 fun UserCardItem(
-    user: cheers.chat.v1.UserCard,
+    user: UserItem,
     isOwner: Boolean = false,
     onUserClick: (String) -> Unit,
 ) {
@@ -163,7 +171,7 @@ fun UserCardItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            UserProfilePicture(avatar = user.avatar)
+            UserProfilePicture(avatar = user.picture)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (user.name.isNotBlank())

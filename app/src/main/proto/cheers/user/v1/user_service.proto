@@ -14,6 +14,7 @@ service UserService {
   rpc UpdateUser (UpdateUserRequest) returns (cheers.type.User);
   rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty);
 
+  rpc GetUserItemsIn (GetUserItemsInRequest) returns (GetUserItemsInResponse);
   rpc SearchUser (SearchUserRequest) returns (SearchUserResponse);
   rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty);
   rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty);
@@ -21,6 +22,18 @@ service UserService {
   rpc UnblockUser (UnblockUserRequest) returns (google.protobuf.Empty);
   rpc ListFollowers (ListFollowersRequest) returns (ListFollowersResponse);
   rpc ListFollowing (ListFollowingRequest) returns (ListFollowingResponse);
+}
+
+message GetUserItemsInRequest {
+  repeated string user_ids = 1;
+}
+
+message GetUserItemsInResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message SearchUserResponse {
+  repeated cheers.type.UserItem users = 1;
 }
 
 message ListFollowersRequest {
@@ -70,10 +83,6 @@ message FollowUserRequest {
 
 message SearchUserRequest {
   string query = 1;
-}
-
-message SearchUserResponse {
-  repeated cheers.type.UserItem users = 1;
 }
 
 message CreateUserRequest {

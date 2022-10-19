@@ -24,6 +24,9 @@ interface ChatDao {
     @Query("DELETE FROM room WHERE id = :channelId")
     suspend fun deleteChannel(channelId: String)
 
+    @Query("DELETE FROM message WHERE chatChannelId = :channelId")
+    suspend fun deleteChannelMessages(channelId: String)
+
     @Query("DELETE FROM room")
     suspend fun deleteChannels()
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.chat.v1.UserCard
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
@@ -23,7 +24,7 @@ sealed interface RoomUiState {
 
     data class HasRoom(
         val room: ChatChannel,
-        val members: List<UserCard> = emptyList(),
+        val members: List<UserItem> = emptyList(),
         override val isLoading: Boolean,
         override val errorMessage: String,
     ) : RoomUiState
@@ -32,7 +33,7 @@ sealed interface RoomUiState {
 data class RoomViewModelState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val members: List<UserCard> = emptyList(),
+    val members: List<UserItem> = emptyList(),
     val room: ChatChannel? = null,
 ) {
     fun toUiState(): RoomUiState =
@@ -81,8 +82,17 @@ class RoomViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val members = chatRepository.getRoomMembers(roomId = roomId)
-            onMembersChange(members = members)
+            val result = chatRepository.getRoomMembers(roomId = roomId)
+            when(result) {
+                is com.salazar.cheers.data.Result.Success -> onMembersChange(members = result.data)
+                is com.salazar.cheers.data.Result.Error -> updateError(message = result.message)
+            }
+        }
+    }
+
+    fun updateError(message: String) {
+        viewModelState.update {
+            it.copy(errorMessage = message)
         }
     }
 
@@ -92,7 +102,7 @@ class RoomViewModel @Inject constructor(
         }
     }
 
-    private fun onMembersChange(members: List<UserCard>) {
+    private fun onMembersChange(members: List<UserItem>) {
         viewModelState.update {
             it.copy(members = members)
         }

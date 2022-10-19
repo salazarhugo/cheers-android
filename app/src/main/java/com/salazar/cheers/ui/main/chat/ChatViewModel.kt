@@ -5,9 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.chat.v1.Message
-import cheers.chat.v1.RoomType
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
+import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
@@ -94,15 +93,27 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    suspend fun createGroupChat(): Result<String> {
+        val user = userRepository.getUserFlow(userID).first()
+        return chatRepository.createGroupChat(user.username, listOf(userID))
+    }
+
     fun sendTextMessage(text: String) {
         viewModelScope.launch {
             var channelId = uiState.value.channel?.id!!
             if (!hasChannel) {
-                val user = userRepository.getUserFlow(userID).first()
-                val roomId = chatRepository.createGroupChat(user.username, listOf(userID), user)
-                channelId = roomId
-                loadChannel(roomId)
+                val result = createGroupChat()
+                when(result) {
+                    is Result.Success -> {
+                        channelId = result.data
+                        loadChannel(result.data)
+                    }
+                    is Result.Error -> {
+                        updateErrorMessage(result.message)
+                    }
+                }
             }
+
             val result = chatRepository.sendMessage(channelId = channelId, text)
             when (result) {
                 is Resource.Error -> updateErrorMessage(result.message)

@@ -10,12 +10,14 @@ import cheers.chat.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.data.Resource
+import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.ChatDao
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
+import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
@@ -62,24 +64,26 @@ class ChatRepository @Inject constructor(
                 .build()
 
             chatService.joinRoom(request).collect {
+                Log.d("GRPC", it.toString())
                 chatDao.insertMessage(it.toTextMessage())
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Log.e("GRPC", e.toString())
         }
     }
 
-    suspend fun getRoomMembers(roomId: String): List<UserCard> {
+    suspend fun getRoomMembers(roomId: String): Result<List<UserItem>> {
         try {
-            val request = RoomId.newBuilder()
+            val request = ListMembersRequest.newBuilder()
                 .setRoomId(roomId)
                 .build()
 
-            val users = chatService.getRoomMembers(request)
-            return users.usersList
+            val users = chatService.listMembers(request)
+            return Result.Success(users.usersList.map { it.toUserItem() })
         } catch (e: Exception) {
             e.printStackTrace()
-            return emptyList()
+            return Result.Error("Failed to get room memebers")
         }
     }
 
@@ -88,7 +92,7 @@ class ChatRepository @Inject constructor(
         return chatDao.getChannelFlow(channelId = channelId)
     }
 
-    suspend fun getChatWithUser(userId: String): ChatChannel  = withContext(Dispatchers.IO) {
+    suspend fun getChatWithUser(userId: String): ChatChannel = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val user = userRepository.getUserFlow(userId).first()
         return@withContext chatDao.getChatWithUser(userId = userId) ?: ChatChannel(
@@ -104,32 +108,21 @@ class ChatRepository @Inject constructor(
     suspend fun createGroupChat(
         groupName: String,
         UUIDs: List<String>,
-        user: User = User(),
-    ): String = withContext(Dispatchers.IO) {
+    ): Result<String> = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val request = CreateChatReq.newBuilder()
             .setGroupName(groupName)
             .addAllUserIds(UUIDs)
             .build()
 
-        val chatChannel = try {
-            chatService.createChat(request).toChatChannel(uid)
-        } catch (e: StatusException) {
+        try {
+            val chatChannel = chatService.createChat(request).toChatChannel(uid)
+            chatDao.insert(chatChannel)
+            return@withContext Result.Success(chatChannel.id)
+        } catch (e: Exception) {
             e.printStackTrace()
-            ChatChannel(
-                id = groupName,
-                name = user.username,
-                accountId = uid,
-                picture = user.picture,
-                verified = user.verified,
-                type = RoomType.DIRECT,
-                members = UUIDs,
-            )
+            return@withContext Result.Error("Failed to create group chat")
         }
-
-        chatDao.insert(chatChannel)
-
-        return@withContext chatChannel.id
     }
 
     suspend fun leaveRoom(roomId: String) = withContext(Dispatchers.IO) {
@@ -145,7 +138,10 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteChats(channelId: String) = chatDao.deleteChannel(channelId)
+    suspend fun deleteChats(channelId: String) {
+        chatDao.deleteChannel(channelId)
+        chatDao.deleteChannelMessages(channelId)
+    }
 
     suspend fun deleteRoom(channelId: String) = withContext(Dispatchers.IO) {
         val request = RoomId.newBuilder()
@@ -153,6 +149,7 @@ class ChatRepository @Inject constructor(
             .build()
 
         chatDao.deleteChannel(channelId)
+        chatDao.deleteChannelMessages(channelId)
         chatService.deleteRoom(request)
     }
 
@@ -285,7 +282,9 @@ class ChatRepository @Inject constructor(
     suspend fun listenRooms() = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         try {
-            chatService.getRooms(request = Empty.getDefaultInstance()).collect {
+            val request = ListRoomRequest.newBuilder()
+                .build()
+            chatService.listRoom(request = request).collect {
                 chatDao.insert(it.toChatChannel(uid))
             }
         } catch (e: Exception) {

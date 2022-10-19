@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.chats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
+import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toUser
@@ -67,10 +68,14 @@ class NewChatViewModel @Inject constructor(
             onErrorMessageChange(errorMessage = "Group name can't be blank")
         else
             viewModelScope.launch {
-                val roomId = chatRepository.createGroupChat(
+                val result = chatRepository.createGroupChat(
                     state.groupName,
-                    state.selectedUsers.map { it.id })
-                onSuccess(roomId)
+                    state.selectedUsers.map { it.id },
+                )
+                when (result) {
+                    is Result.Success -> onSuccess(result.data)
+                    is Result.Error -> onErrorMessageChange(result.message)
+                }
             }
     }
 

@@ -4,9 +4,8 @@ package com.salazar.cheers.data
  * A generic class that holds a value or an exception
  */
 sealed class Result<out R> {
-    //    object Loading: Result<Nothing>()
     data class Success<out T>(val data: T) : Result<T>()
-    data class Error(val exception: Exception) : Result<Nothing>()
+    data class Error(val message: String) : Result<Nothing>()
 }
 
 fun <T> Result<T>.successOr(fallback: T): T {

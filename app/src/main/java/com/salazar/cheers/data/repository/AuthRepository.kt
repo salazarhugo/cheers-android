@@ -26,21 +26,6 @@ class AuthRepository @Inject constructor(
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
 ) {
 
-    fun isUserAuthenticatedInFirebase() = auth.currentUser != null
-
-    suspend fun signInWithEmailAndPassword(
-        email: String,
-        password: String
-    ): Flow<Result<Boolean>> = flow {
-        try {
-//            emit(Result.Loading)
-            auth.signInWithEmailAndPassword(email, password).await()
-            emit(Result.Success(true))
-        } catch (e: Exception) {
-            emit(Result.Error(e))
-        }
-    }
-
     suspend fun getUser(): Result<User?> {
         if (auth.currentUser == null)
             return Result.Success(null)
@@ -59,7 +44,7 @@ class AuthRepository @Inject constructor(
             Result.Success(user)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e)
+            Result.Error("Failed to get user")
         }
     }
 

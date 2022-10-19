@@ -252,7 +252,6 @@ fun DirectConversation(
                 val title = channel.name
 
                 val subtitle = buildAnnotatedString {
-                    append(channel.lastMessage)
                     append("  •  ")
                     append(
                         relativeTimeFormatter(

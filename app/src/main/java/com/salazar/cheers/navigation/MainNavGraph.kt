@@ -116,6 +116,7 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
             RoomRoute(
                 navActions = appState.navActions,
+                showSnackBar = appState::showSnackBar,
             )
         }
 
