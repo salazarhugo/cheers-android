@@ -23,6 +23,7 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.compose.CheersAppBar
 import com.salazar.cheers.compose.Username
+import com.salazar.cheers.compose.extensions.noRippleClickable
 
 @Composable
 fun DirectChatBar(
@@ -48,9 +49,10 @@ fun DirectChatBar(
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    onTitleClick(name)
-                }
+                modifier = Modifier
+                    .noRippleClickable {
+                        onTitleClick(name)
+                    }
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(

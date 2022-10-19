@@ -1,5 +1,6 @@
 package com.salazar.cheers.compose
 
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.salazar.cheers.ui.theme.CheersTheme
+import androidx.compose.ui.graphics.lerp
 
 @Composable
 fun CheersAppBar(
@@ -22,15 +24,18 @@ fun CheersAppBar(
     navigationIcon: @Composable () -> Unit = {}
 ) {
     val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
-//    val backgroundColor = backgroundColors.containerColor(
-//        scrollFraction = scrollBehavior?.scrollFraction ?: 0f
-//    ).value
+    val containerColor = MaterialTheme.colorScheme.surface
+//    val backgroundColor = lerp(
+//        containerColor.value,
+//        containerColor.value,
+//        FastOutLinearInEasing.transform(scrollBehavior?.state?.overlappedFraction ?: 0f)
+//    )
     val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-        containerColor = Color.Transparent,
-        scrolledContainerColor = Color.Transparent
+//        containerColor = Color.Transparent,
+//        scrolledContainerColor = Color.Transparent
     )
     Box(
-//        modifier = Modifier.background(backgroundColor)
+        modifier = Modifier.background(backgroundColor)
     ) {
         if (center)
             CenterAlignedTopAppBar(
@@ -42,13 +47,13 @@ fun CheersAppBar(
                 navigationIcon = navigationIcon,
             )
         else
-            SmallTopAppBar(
-                modifier = modifier,
-                actions = actions,
+            TopAppBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
-                colors = foregroundColors,
+                modifier = modifier,
                 navigationIcon = navigationIcon,
+                actions = actions,
+                colors = foregroundColors,
+                scrollBehavior = scrollBehavior
             )
     }
 }
