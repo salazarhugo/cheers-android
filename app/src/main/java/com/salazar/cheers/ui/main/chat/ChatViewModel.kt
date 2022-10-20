@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.main.chat
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,6 +26,8 @@ data class ChatUiState(
     val errorMessage: String? = null,
     val channel: ChatChannel? = null,
     val messages: List<ChatMessage> = emptyList(),
+    val textState: TextFieldValue = TextFieldValue(),
+    val replyMessage: ChatMessage? = null,
 )
 
 @HiltViewModel
@@ -100,6 +103,9 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendTextMessage(text: String) {
+        // Reset Reply Message
+        onReplyMessage(null)
+
         viewModelScope.launch {
             var channelId = uiState.value.channel?.id!!
             if (!hasChannel) {
@@ -141,17 +147,18 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun onTextChanged() {
-        return
-        val channel = uiState.value.channel
+    fun onTextChanged(textState: TextFieldValue) {
+        viewModelState.update {
+            it.copy(textState = textState)
+        }
 
+        val channel = uiState.value.channel
         if (typingJob?.isCompleted == false) {
             typingJob = viewModelScope.launch {
                 delay(2000L)
             }
             return
         }
-
 
 //        typingJob = viewModelScope.launch {
 //            chatRepository.startTyping(channelId = channelId)
@@ -170,9 +177,18 @@ class ChatViewModel @Inject constructor(
 //            FirestoreChat.unlikeMessage(channelId = channelId, messageId = messageId)
         }
     }
+
+    fun onReplyMessage(message: ChatMessage?) {
+        viewModelState.update {
+            it.copy(replyMessage = message)
+        }
+        // Jump to bottom
+        // Open keyboard
+    }
 }
 
 sealed class ChatUIAction {
     object OnSwipeRefresh : ChatUIAction()
     data class OnLikeClick(val message: Message) : ChatUIAction()
+    data class OnReplyMessage(val message: ChatMessage?) : ChatUIAction()
 }

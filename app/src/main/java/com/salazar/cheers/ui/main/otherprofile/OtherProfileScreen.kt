@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.compose.FunctionalityNotAvailablePanel
+import com.salazar.cheers.compose.chat.FunctionalityNotAvailablePanel
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.buttons.CheersOutlinedButton
 import com.salazar.cheers.compose.profile.ProfileHeader

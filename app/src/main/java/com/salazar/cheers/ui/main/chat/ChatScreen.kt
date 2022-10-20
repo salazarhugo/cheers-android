@@ -15,14 +15,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.DismissValue
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.SmsFailed
 import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cheers.chat.v1.Message
@@ -45,16 +46,14 @@ import cheers.chat.v1.RoomType
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.UserInput
+import com.salazar.cheers.compose.chat.ChatBottomBar
 import com.salazar.cheers.compose.animations.AnimateHeart
-import com.salazar.cheers.compose.chat.DirectChatBar
-import com.salazar.cheers.compose.chat.GroupChatBar
-import com.salazar.cheers.compose.chat.JumpToBottom
-import com.salazar.cheers.compose.chat.SendingChat
+import com.salazar.cheers.compose.chat.*
+import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -62,7 +61,10 @@ const val ConversationTestTag = "ConversationTestTag"
 
 @Composable
 fun ChatScreen(
-    uiState: ChatUiState,
+    replyMessage: ChatMessage?,
+    channel: ChatChannel,
+    textState: TextFieldValue,
+    messages: List<ChatMessage>,
     onMessageSent: (msg: String) -> Unit,
     onUnsendMessage: (msgId: String) -> Unit,
     onLike: (msgId: String) -> Unit,
@@ -72,8 +74,9 @@ fun ChatScreen(
     onAuthorClick: (String) -> Unit,
     onImageSelectorClick: () -> Unit,
     onPoBackStack: () -> Unit,
-    onTextChanged: () -> Unit,
+    onTextChanged: (TextFieldValue) -> Unit,
     onInfoClick: (String) -> Unit,
+    onChatUIAction: (ChatUIAction) -> Unit,
     micInteractionSource: MutableInteractionSource,
 ) {
     val scrollState = rememberLazyListState()
@@ -81,12 +84,7 @@ fun ChatScreen(
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
     val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }
-    val channel = uiState.channel
-    val sending = uiState.channel?.status == RoomStatus.SENT
 
-    if (channel == null)
-        LoadingScreen()
-    else
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -95,9 +93,8 @@ fun ChatScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 Messages(
-                    seen = uiState.channel.status == RoomStatus.OPENED,
-                    sending = sending,
-                    messages = uiState.messages,
+                    seen = channel.status == RoomStatus.OPENED,
+                    messages = messages,
                     navigateToProfile = onAuthorClick,
                     modifier = Modifier.weight(1f),
                     scrollState = scrollState,
@@ -105,9 +102,12 @@ fun ChatScreen(
                         openDialog.value = true
 //                        selectedMessage.value = it
                     },
-                    onDoubleTapMessage = onLike
+                    onDoubleTapMessage = onLike,
+                    onChatUIAction = onChatUIAction,
                 )
-                UserInput(
+                ChatBottomBar(
+                    textState = textState,
+                    replyMessage = replyMessage,
                     onMessageSent = {
                         onMessageSent(it)
                     },
@@ -120,6 +120,7 @@ fun ChatScreen(
                     modifier = Modifier.imePadding(),
                     onImageSelectorClick = onImageSelectorClick,
                     micInteractionSource = micInteractionSource,
+                    onChatUIAction = onChatUIAction,
                 )
             }
             if (channel.type == RoomType.DIRECT)
@@ -162,10 +163,10 @@ fun ChatScreen(
 fun Messages(
     messages: List<ChatMessage>,
     seen: Boolean,
-    sending: Boolean,
     navigateToProfile: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
+    onChatUIAction: (ChatUIAction) -> Unit,
     scrollState: LazyListState,
     modifier: Modifier = Modifier
 ) {
@@ -198,23 +199,30 @@ fun Messages(
                 }
 
                 item {
-                    Message(
-//                        modifier = Modifier.animateItemPlacement(),
-                        onAuthorClick = { name -> navigateToProfile(name) },
-                        onLongClickMessage = onLongClickMessage,
-                        onDoubleTapMessage = onDoubleTapMessage,
-                        message = message,
-                        isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
-                        seen = index == 0 && seen,
-                        isFirstMessageByAuthor = isFirstMessageByAuthor,
-                        isLastMessageByAuthor = isLastMessageByAuthor,
+                    val dismissState = rememberDismissState(
+                        confirmStateChange = {
+                            if (it == DismissValue.DismissedToStart) {
+                                onChatUIAction(ChatUIAction.OnReplyMessage(message))
+                                return@rememberDismissState false
+                            }
+                            true
+                        }
                     )
+                    SwipeableMessage(dismissState = dismissState) {
+                        Message(
+//                        modifier = Modifier.animateItemPlacement(),
+                            onAuthorClick = { name -> navigateToProfile(name) },
+                            onLongClickMessage = onLongClickMessage,
+                            onDoubleTapMessage = onDoubleTapMessage,
+                            message = message,
+                            isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                            seen = index == 0 && seen,
+                            isFirstMessageByAuthor = isFirstMessageByAuthor,
+                            isLastMessageByAuthor = isLastMessageByAuthor,
+                        )
+                    }
                 }
             }
-            if (sending)
-                item {
-                    SendingChat()
-                }
         }
 
         val jumpThreshold = with(LocalDensity.current) {

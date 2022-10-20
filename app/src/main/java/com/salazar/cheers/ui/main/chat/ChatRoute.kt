@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.utils.Permission
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.navigation.CheersNavigationActions
 import java.io.File
 import java.io.IOException
@@ -63,21 +62,35 @@ fun ChatRoute(
         }
     }
 
-    ChatScreen(
-        uiState = uiState,
-        onTitleClick = { navActions.navigateToOtherProfile(it) },
-        onPoBackStack = { navActions.navigateBack() },
-        onUnlike = chatViewModel::unlikeMessage,
-        onLike = chatViewModel::likeMessage,
-        onUnsendMessage = chatViewModel::unsendMessage,
-        onMessageSent = chatViewModel::sendTextMessage,
-        onImageSelectorClick = { launcher.launch("image/*") },
-        onCopyText = {},
-        onAuthorClick = { navActions.navigateToOtherProfile(it) },
-        onTextChanged = chatViewModel::onTextChanged,
-        onInfoClick = { navActions.navigateToRoomDetails(it) },
-        micInteractionSource = micInteractionSource,
-    )
+    val channel = uiState.channel
+    if (channel == null)
+        LoadingScreen()
+    else
+        ChatScreen(
+            textState = uiState.textState,
+            channel = channel,
+            replyMessage = uiState.replyMessage,
+            messages = uiState.messages,
+            onTitleClick = { navActions.navigateToOtherProfile(it) },
+            onPoBackStack = { navActions.navigateBack() },
+            onUnlike = chatViewModel::unlikeMessage,
+            onLike = chatViewModel::likeMessage,
+            onUnsendMessage = chatViewModel::unsendMessage,
+            onMessageSent = chatViewModel::sendTextMessage,
+            onImageSelectorClick = { launcher.launch("image/*") },
+            onCopyText = {},
+            onAuthorClick = { navActions.navigateToOtherProfile(it) },
+            onTextChanged = chatViewModel::onTextChanged,
+            onInfoClick = { navActions.navigateToRoomDetails(it) },
+            micInteractionSource = micInteractionSource,
+            onChatUIAction = { chatAction ->
+                when (chatAction) {
+                    is ChatUIAction.OnReplyMessage -> chatViewModel.onReplyMessage(chatAction.message)
+                    is ChatUIAction.OnLikeClick -> TODO()
+                    is ChatUIAction.OnSwipeRefresh -> TODO()
+                }
+            },
+        )
 }
 
 private fun MediaRecorder.startRecording() {

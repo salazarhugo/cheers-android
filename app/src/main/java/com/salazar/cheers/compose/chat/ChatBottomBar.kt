@@ -1,7 +1,9 @@
-package com.salazar.cheers.compose
+package com.salazar.cheers.compose.chat
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -13,6 +15,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,12 +31,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -41,6 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.R
+import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.ui.main.chat.ChatUIAction
 
 
 enum class InputSelector {
@@ -60,16 +69,23 @@ enum class EmojiStickerSelector {
 @Preview
 @Composable
 fun UserInputPreview() {
-    UserInput(onMessageSent = {}, onImageSelectorClick = {})
+    ChatBottomBar(
+        onMessageSent = {},
+        onImageSelectorClick = {},
+        onChatUIAction = {},
+    )
 }
 
 @Composable
-fun UserInput(
+fun ChatBottomBar(
+    textState: TextFieldValue = TextFieldValue(),
+    replyMessage: ChatMessage? = null,
     onMessageSent: (String) -> Unit,
     onImageSelectorClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onTextChanged: () -> Unit = {},
+    onTextChanged: (TextFieldValue) -> Unit = {},
     resetScroll: () -> Unit = {},
+    onChatUIAction: (ChatUIAction) -> Unit,
     micInteractionSource: MutableInteractionSource = MutableInteractionSource(),
 ) {
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
@@ -80,26 +96,27 @@ fun UserInput(
 //        BackPressHandler(onBackPressed = dismissKeyboard)
     }
 
-    var textState by remember { mutableStateOf(TextFieldValue()) }
-
     // Used to decide if the keyboard should be shown
     var textFieldFocusState by remember { mutableStateOf(false) }
 
     Surface(tonalElevation = 2.dp) {
         Column(modifier = modifier) {
+            ReplyMessage(
+                message = replyMessage,
+                onChatUIAction = onChatUIAction,
+            )
             UserInputText(
                 onKeyboardSend = {
                     onMessageSent(textState.text)
                     // Reset text field and close keyboard
-                    textState = TextFieldValue()
+                    onTextChanged(TextFieldValue())
                     // Move scroll to bottom
                     resetScroll()
                     dismissKeyboard()
                 },
                 textFieldValue = textState,
                 onTextChanged = {
-                    textState = it
-                    onTextChanged()
+                    onTextChanged(it)
                 },
                 // Only show the keyboard if there's no input selector and text field has focus
                 keyboardShown = currentInputSelector == InputSelector.NONE && textFieldFocusState,
@@ -120,7 +137,7 @@ fun UserInput(
                 onMessageSent = {
                     onMessageSent(textState.text)
                     // Reset text field and close keyboard
-                    textState = TextFieldValue()
+                    onTextChanged(TextFieldValue())
                     // Move scroll to bottom
                     resetScroll()
                     dismissKeyboard()
@@ -130,7 +147,7 @@ fun UserInput(
             )
             SelectorExpanded(
                 onCloseRequested = dismissKeyboard,
-                onTextAdded = { textState = textState.addText(it) },
+                onTextAdded = { onTextChanged(textState.addText(it)) },
                 currentSelector = currentInputSelector,
             )
         }
@@ -149,6 +166,68 @@ private fun TextFieldValue.addText(newString: String): TextFieldValue {
     )
 
     return this.copy(text = newText, selection = newSelection)
+}
+
+@Composable
+fun ReplyMessage(
+    message: ChatMessage?,
+    onChatUIAction: (ChatUIAction) -> Unit,
+) {
+    val ref = remember {
+        Ref<ChatMessage>()
+    }
+
+    ref.value = message ?: ref.value
+
+    AnimatedVisibility(
+        visible = message != null,
+//        enter = slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+//        exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight })
+    ) {
+        ref.value?.let { message ->
+            Surface(tonalElevation = 8.dp) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Filled.Reply,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = message.senderName,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = TextStyle(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
+                                text = message.text,
+                            )
+                        }
+                    }
+                    IconButton(
+                        onClick = {
+                            onChatUIAction(ChatUIAction.OnReplyMessage(null))
+                        },
+                        modifier = Modifier
+                            .padding(start = 32.dp),
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -404,7 +483,7 @@ private fun UserInputText(
                         onClick = { /*TODO*/ },
                         interactionSource = micInteractionSource,
                         modifier = Modifier
-                            .padding(start = 32.dp),
+                            .padding(start = 32.dp, end = 4.dp),
                     ) {
                         Icon(
                             Icons.Outlined.Mic,
