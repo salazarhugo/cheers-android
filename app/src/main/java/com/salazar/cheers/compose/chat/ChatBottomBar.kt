@@ -2,8 +2,6 @@ package com.salazar.cheers.compose.chat
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -23,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
@@ -30,6 +29,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.res.stringResource
@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.ui.main.chat.ChatUIAction
@@ -200,6 +201,18 @@ fun ReplyMessage(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
+                        if (message.photoUrl.isNotBlank())
+                            AsyncImage(
+                                model = message.photoUrl,
+                                alignment = Alignment.Center,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .size(36.dp),
+                                contentDescription = null,
+                            )
                         Spacer(Modifier.width(8.dp))
                         Column {
                             Text(
@@ -208,7 +221,7 @@ fun ReplyMessage(
                                 style = TextStyle(fontWeight = FontWeight.Bold)
                             )
                             Text(
-                                text = message.text,
+                                text = message.text.ifBlank { "Photo" },
                             )
                         }
                     }

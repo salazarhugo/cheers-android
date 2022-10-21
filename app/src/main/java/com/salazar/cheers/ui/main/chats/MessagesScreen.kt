@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -145,13 +146,15 @@ fun ConversationList(
         modifier = Modifier.fillMaxHeight()
     ) {
         items(channels, key = { it.id }) { channel ->
-            DirectConversation(
-                modifier = Modifier.animateItemPlacement(),
-                channel = channel,
-                onChannelClicked,
-                onLongPress,
-                onCameraClick = onCameraClick,
-            )
+            SwipeableChatItem(dismissState = rememberDismissState()) {
+                DirectConversation(
+                    modifier = Modifier.animateItemPlacement(),
+                    channel = channel,
+                    onChannelClicked,
+                    onLongPress,
+                    onCameraClick = onCameraClick,
+                )
+            }
         }
         if (suggestions != null && suggestions.isNotEmpty())
             item {

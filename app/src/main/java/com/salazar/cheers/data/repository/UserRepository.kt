@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
@@ -334,7 +336,10 @@ class UserRepository @Inject constructor(
             }
 
             val remoteUser = try {
-//                coreService.getUser(userIdOrUsername = userId)
+                val request = GetUserRequest.newBuilder()
+                    .setId(userId)
+                    .build()
+                userService.getUser(request)
             } catch (e: NullPointerException) {
                 e.printStackTrace()
                 emit(Resource.Error("User not found"))
@@ -345,7 +350,7 @@ class UserRepository @Inject constructor(
             }
 
             remoteUser?.let { safeRemoteUser ->
-//                userDao.insert(safeRemoteUser)
+                userDao.insert(safeRemoteUser.toUser())
                 emit(Resource.Success(userDao.getUser(userId)))
             }
             emit(Resource.Loading(false))
@@ -403,5 +408,34 @@ class UserRepository @Inject constructor(
         } catch (e: HttpException) {
             e.printStackTrace()
         }
+    }
+
+    suspend fun saveUserPicture(
+        picture: String,
+    ) {
+//        val file = File(context.cacheDir, picture)
+//        if (file.ex)
+//
+//        try {
+//            val response = service.downloadSeafarerProfilePicture(
+//                sourceId = seafarerId,
+//                attachmentId = attachmentId,
+//            )
+//
+//            response.body()?.let { body ->
+//                withContext(Dispatchers.IO) {
+//                    val outputStream = FileOutputStream(file)
+//                    outputStream.use { stream ->
+//                        try {
+//                            stream.write(body.bytes())
+//                        } catch (e: IOException) {
+//                        }
+//                    }
+//                    file.absolutePath
+//                }
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 }
