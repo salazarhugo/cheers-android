@@ -6,9 +6,12 @@ import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
+import cheers.story.v1.StoryServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
+import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.serializer.settingsDataStore
 import com.salazar.cheers.util.Constants
 import dagger.Module
@@ -36,6 +39,26 @@ object AppModule {
         return ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideStoryRepository(
+        storyRepositoryImpl: StoryRepositoryImpl,
+    ): StoryRepository {
+        return storyRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideStoryServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): StoryServiceGrpcKt.StoryServiceCoroutineStub {
+        return StoryServiceGrpcKt
+            .StoryServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
     }
 
     @Provides

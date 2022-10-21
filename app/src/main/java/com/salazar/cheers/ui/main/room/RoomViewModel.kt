@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.room
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.chat.v1.UserCard
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository

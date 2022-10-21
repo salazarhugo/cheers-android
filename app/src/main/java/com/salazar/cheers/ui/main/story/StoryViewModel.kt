@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.repository.StoryRepository
+import com.salazar.cheers.data.repository.story.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -91,7 +91,7 @@ class StoryViewModel @Inject constructor(
 
     fun onDelete(storyId: String) {
         viewModelScope.launch {
-            storyRepository.delete(storyId = storyId)
+            storyRepository.deleteStory(storyId = storyId)
         }
     }
 
@@ -111,7 +111,7 @@ class StoryViewModel @Inject constructor(
 
     fun onStorySeen(storyId: String) {
         viewModelScope.launch {
-            storyRepository.seenStory(storyId)
+            storyRepository.viewStory(storyId)
         }
     }
 

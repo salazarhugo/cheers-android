@@ -1,25 +1,29 @@
 package com.salazar.cheers.data.stubs
 
-import com.salazar.cheers.*
+import cheers.chat.v1.*
 import kotlinx.coroutines.flow.Flow
 
 
 class ChatService : ChatServiceGrpcKt.ChatServiceCoroutineImplBase() {
 
-    override fun joinRoom(request: RoomId): Flow<Message> {
-        return joinRoom(request)
+    override fun joinRoom(request: JoinRoomRequest): Flow<Message> {
+        return super.joinRoom(request)
     }
 
-    override suspend fun sendMessage(requests: Flow<Message>): MessageAck {
-        return sendMessage(requests = requests)
+    override suspend fun listMembers(request: ListMembersRequest): ListMembersResponse {
+        return super.listMembers(request)
+    }
+
+    override suspend fun sendMessage(requests: Flow<Message>): SendMessageResponse {
+        return super.sendMessage(requests)
     }
 
     override suspend fun getRoomId(request: GetRoomIdReq): RoomId {
         return getRoomId(request = request)
     }
 
-    override fun getRooms(request: Empty): Flow<Room> {
-        return getRooms(request = request)
+    override fun listRoom(request: ListRoomRequest): Flow<Room> {
+        return super.listRoom(request)
     }
 
     override suspend fun typingStart(request: TypingReq): Empty {

@@ -2,6 +2,9 @@ package com.salazar.cheers.data.db
 
 import androidx.room.TypeConverter
 import cheers.chat.v1.Message
+import cheers.chat.v1.MessageType
+import cheers.chat.v1.RoomStatus
+import cheers.chat.v1.RoomType
 import cheers.type.UserOuterClass
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.internal.ActivityType
@@ -9,7 +12,6 @@ import com.salazar.cheers.internal.Beverage
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.Json.Default.decodeFromString
 import java.util.*
 
 class Converters {
@@ -38,31 +40,31 @@ class Converters {
             ?: ActivityType.NONE
 
     @TypeConverter
-    fun fromMessageType(value: com.salazar.cheers.MessageType) = value.name
+    fun fromMessageType(value: MessageType) = value.name
 
     @TypeConverter
     fun toMessageType(name: String) =
-        com.salazar.cheers.MessageType.values()
+        MessageType.values()
             .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: com.salazar.cheers.MessageType.UNRECOGNIZED
+            ?: MessageType.UNRECOGNIZED
 
     @TypeConverter
-    fun fromRoomType(value: com.salazar.cheers.RoomType) = value.name
+    fun fromRoomType(value: RoomType) = value.name
 
     @TypeConverter
     fun toRoomType(name: String) =
-        com.salazar.cheers.RoomType.values()
+        RoomType.values()
             .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: com.salazar.cheers.RoomType.UNRECOGNIZED
+            ?: RoomType.UNRECOGNIZED
 
     @TypeConverter
-    fun fromRoomStatus(value: com.salazar.cheers.RoomStatus) = value.name
+    fun fromRoomStatus(value: RoomStatus) = value.name
 
     @TypeConverter
     fun toRoomStatus(name: String) =
-        com.salazar.cheers.RoomStatus.values()
+        RoomStatus.values()
             .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: com.salazar.cheers.RoomStatus.UNRECOGNIZED
+            ?: RoomStatus.UNRECOGNIZED
 
     @TypeConverter
     fun fromBeverage(value: Beverage) = value.name

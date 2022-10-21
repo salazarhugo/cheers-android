@@ -10,10 +10,13 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import cheers.type.PrivacyOuterClass
+import cheers.type.StoryOuterClass
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.repository.StoryRepository
+import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.Result.*
+import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -78,51 +81,24 @@ class UploadStoryWorker @AssistedInject constructor(
                 Log.e("Location", "Couldn't get last location")
             }
 
-            val story = Story(
-                type = storyType,
-                photoUrl = downloadUrl,
-                locationName = locationName,
-                latitude = latitude,
-                longitude = longitude,
-                altitude = altitude,
-                privacy = privacy,
-                tagUsersId = tagUserIds.toList()
-            )
+            val story = StoryOuterClass.Story.newBuilder()
+                .setType(StoryOuterClass.Story.StoryType.IMAGE)
+                .setPhoto(downloadUrl)
+                .setLocationName(locationName)
+                .setPrivacy(PrivacyOuterClass.Privacy.FRIENDS)
+                .build()
 
-            storyRepository.addStory(story)
+            val result = storyRepository.createStory(story)
 
-            return Result.success()
+            return when (result) {
+                is Success -> Result.success()
+                is Error -> Result.failure()
+            }
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")
             return Result.failure()
         }
     }
-
-//    override suspend fun getForegroundInfo(): ForegroundInfo {
-//        val notification = NotificationCompat.Builder(
-//            applicationContext,
-//            applicationContext.getString(R.string.upload_notification_channel_id)
-//        )
-//            .setContentIntent(
-//                PendingIntent.getActivity(
-//                    applicationContext,
-//                    2,
-//                    Intent(applicationContext, MainActivity::class.java),
-//                    PendingIntent.FLAG_IMMUTABLE
-//                )
-//            )
-//            .setOngoing(true)
-//            .setAutoCancel(true)
-//            .setSmallIcon(R.drawable.cheers)
-//            .setOnlyAlertOnce(true)
-//            .setPriority(NotificationCompat.PRIORITY_MIN)
-//            .setLocalOnly(true)
-//            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
-//            .setContentText("Updating widget")
-//            .build()
-//
-//        return ForegroundInfo(42, notification)
-//    }
 
     private fun extractImage(path: Uri): ByteArray {
         val source: ImageDecoder.Source =
@@ -131,13 +107,6 @@ class UploadStoryWorker @AssistedInject constructor(
 
         val outputStream = ByteArrayOutputStream()
         selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-
-        return outputStream.toByteArray()
-    }
-
-    private fun extractBitmap(bitmap: Bitmap): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
 
         return outputStream.toByteArray()
     }

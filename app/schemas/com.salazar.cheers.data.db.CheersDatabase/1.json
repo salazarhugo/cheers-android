@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5b750a5edecabd69f5cd8a319cfcf033",
+    "identityHash": "b459c147a5e8a1530c1d1ced47768bcf",
     "entities": [
       {
         "tableName": "recentUsers",
@@ -753,7 +753,7 @@
       },
       {
         "tableName": "story",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storyId` TEXT NOT NULL, `authorId` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `profilePictureUrl` TEXT NOT NULL, `seen` INTEGER NOT NULL, `created` INTEGER NOT NULL, `relativeTime` TEXT NOT NULL, `privacy` TEXT NOT NULL, `photoUrl` TEXT NOT NULL, `videoUrl` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `altitude` REAL, `locationName` TEXT NOT NULL, `tagUsersId` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`storyId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storyId` TEXT NOT NULL, `authorId` TEXT NOT NULL, `username` TEXT NOT NULL, `verified` INTEGER NOT NULL, `profilePictureUrl` TEXT NOT NULL, `viewed` INTEGER NOT NULL, `created` INTEGER NOT NULL, `relativeTime` TEXT NOT NULL, `privacy` TEXT NOT NULL, `photo` TEXT NOT NULL, `videoUrl` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `altitude` REAL, `locationName` TEXT NOT NULL, `tagUsersId` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`storyId`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -786,8 +786,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "seen",
-            "columnName": "seen",
+            "fieldPath": "viewed",
+            "columnName": "viewed",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -810,8 +810,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "photoUrl",
-            "columnName": "photoUrl",
+            "fieldPath": "photo",
+            "columnName": "photo",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1270,7 +1270,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b750a5edecabd69f5cd8a319cfcf033')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b459c147a5e8a1530c1d1ced47768bcf')"
     ]
   }
 }

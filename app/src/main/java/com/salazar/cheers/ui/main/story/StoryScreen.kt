@@ -129,7 +129,7 @@ fun StoryCarousel(
         val story = stories[currentStep]
 
         LaunchedEffect(story) {
-            if (!story.seen)
+            if (!story.viewed)
                 onStoryOpen(story.id)
         }
 
@@ -169,7 +169,7 @@ fun StoryCarousel(
                 }
         ) { padding ->
             PrettyImage(
-                data = story.photoUrl,
+                data = story.photo,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,

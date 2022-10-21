@@ -213,7 +213,7 @@ fun StoryCard(
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        suggestedUser.photoUrl
+                        suggestedUser.photo
                     ),
                     modifier = Modifier
                         .aspectRatio(9 / 16.0f),

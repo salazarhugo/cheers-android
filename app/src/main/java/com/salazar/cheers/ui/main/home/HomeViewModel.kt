@@ -17,7 +17,7 @@ import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.paging.DefaultPaginator
 import com.salazar.cheers.data.repository.PostRepository
-import com.salazar.cheers.data.repository.StoryRepository
+import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
@@ -122,9 +122,9 @@ class HomeViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val stories = storyRepository.getStories()
+//            val stories = storyRepository.getMyStories()
             viewModelState.update {
-                it.copy(storiesFlow = stories, isLoading = false)
+                it.copy(storiesFlow = emptyFlow(), isLoading = false)
             }
         }
     }
@@ -149,7 +149,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             viewModelState.update {
                 it.copy(
-                    storiesFlow = storyRepository.getStories(),
+//                    storiesFlow = storyRepository.getStories(),
                     isLoading = false
                 )
             }

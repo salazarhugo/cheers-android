@@ -374,7 +374,7 @@ fun Stories(
                 Story(
                     modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
                     username = story.username,
-                    seenStory = story.seen,
+                    seenStory = story.viewed,
                     profilePictureUrl = story.profilePictureUrl,
                     onStoryClick = onStoryClick,
                 )

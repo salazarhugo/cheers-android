@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.repository.StoryRepository
+import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,7 +53,7 @@ class StoryStatsViewModel @Inject constructor(
 
     fun onDeleteStory(storyId: String) {
         viewModelScope.launch {
-            storyRepository.delete(storyId = storyId)
+            storyRepository.deleteStory(storyId = storyId)
         }
     }
 }
