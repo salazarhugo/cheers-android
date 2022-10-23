@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -191,7 +192,7 @@ fun UserItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            UserProfilePicture(avatar = user.picture)
+            UserProfilePicture(picture = user.picture)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (user.name.isNotBlank())
@@ -234,6 +235,7 @@ fun DirectConversation(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .combinedClickable(
                 onClick = { onChannelClicked(channel.id) },
                 onLongClick = {
@@ -247,7 +249,7 @@ fun DirectConversation(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserProfilePicture(
-                avatar = channel.picture,
+                picture = channel.picture,
                 size = 50.dp,
             )
             Spacer(modifier = Modifier.width(14.dp))
@@ -297,8 +299,7 @@ fun DirectConversation(
                 }
             }
         }
-        val tint =
-            if (channel.status == RoomStatus.NEW) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
+        val tint = MaterialTheme.colorScheme.outline
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -314,7 +315,10 @@ fun DirectConversation(
             }
 
             val icon =
-                if (channel.status == RoomStatus.NEW) Icons.Outlined.Sms else Icons.Outlined.PhotoCamera
+                if (channel.status == RoomStatus.NEW)
+                    Icons.Outlined.Sms
+                else
+                    Icons.Outlined.PhotoCamera
 
             IconButton(onClick = { onCameraClick(channel.id) }) {
                 Icon(

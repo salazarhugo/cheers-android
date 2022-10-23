@@ -4,12 +4,11 @@ import cheers.story.v1.StoryResponse
 import com.salazar.cheers.data.db.entities.Story
 
 
-fun StoryResponse.toStory(accountId: String = ""): Story {
+fun StoryResponse.toStory(authorId: String): Story {
  return Story().copy(
      id = story.id,
-     username  = user.username,
-     verified = user.verified,
-     profilePictureUrl  = user.picture,
+     authorId = authorId,
+     viewed = hasViewed,
      photo = story.photo,
      created = story.createTime.seconds * 1000,
      locationName = story.locationName,

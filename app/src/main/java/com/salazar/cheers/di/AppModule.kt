@@ -64,11 +64,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideChatServiceCoroutineStub(
-        managedChannel: ManagedChannel,
         errorHandleInterceptor: ErrorHandleInterceptor,
     ): ChatServiceGrpcKt.ChatServiceCoroutineStub {
+        val a =  ManagedChannelBuilder
+            .forAddress(Constants.GATEWAY_HOST, 443)
+            .build()
         return ChatServiceGrpcKt
-            .ChatServiceCoroutineStub(managedChannel)
+            .ChatServiceCoroutineStub(a)
             .withInterceptors(errorHandleInterceptor)
             .withInterceptors()
     }

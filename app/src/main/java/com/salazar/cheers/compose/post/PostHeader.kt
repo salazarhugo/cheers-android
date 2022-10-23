@@ -28,7 +28,7 @@ fun PostHeader(
     public: Boolean,
     created: Long,
     locationName: String,
-    profilePictureUrl: String,
+    picture: String?,
     darkMode: Boolean = false,
     onHeaderClicked: (username: String) -> Unit = {},
     onMoreClicked: () -> Unit = {},
@@ -49,7 +49,7 @@ fun PostHeader(
         ) {
 
             UserProfilePicture(
-                avatar = profilePictureUrl,
+                picture = picture,
                 size = 33.dp,
             )
             Spacer(Modifier.width(8.dp))

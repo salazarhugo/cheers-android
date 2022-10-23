@@ -14,8 +14,6 @@ import cheers.type.PrivacyOuterClass
 import cheers.type.StoryOuterClass
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.Result.*
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
@@ -90,9 +88,9 @@ class UploadStoryWorker @AssistedInject constructor(
 
             val result = storyRepository.createStory(story)
 
-            return when (result) {
-                is Success -> Result.success()
-                is Error -> Result.failure()
+            return when (result.isSuccess) {
+                true  -> Result.success()
+                false -> Result.failure()
             }
         } catch (throwable: Throwable) {
             Log.e(TAG, "Error applying blur")

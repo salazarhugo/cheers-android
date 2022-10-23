@@ -217,7 +217,7 @@ fun Post(
                     beverage = Beverage.fromName(post.beverage),
                     public = post.privacy == Privacy.PUBLIC.name,
                     created = post.created,
-                    profilePictureUrl = post.profilePictureUrl,
+                    picture = post.profilePictureUrl,
                     locationName = post.locationName,
                 )
                 PostText(

@@ -114,7 +114,7 @@ fun Caption(
             .padding(16.dp),
     ) {
         UserProfilePicture(
-            avatar = post.profilePictureUrl,
+            picture = post.profilePictureUrl,
             modifier = Modifier.size(36.dp),
         )
         Spacer(Modifier.width(8.dp))

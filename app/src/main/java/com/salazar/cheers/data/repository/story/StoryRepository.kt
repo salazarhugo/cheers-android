@@ -2,9 +2,9 @@ package com.salazar.cheers.data.repository.story
 
 import androidx.paging.PagingData
 import cheers.type.StoryOuterClass
+import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
 import kotlinx.coroutines.flow.Flow
-import com.salazar.cheers.data.Result
 
 /**
  * Interface to the Story data layer.
@@ -24,7 +24,7 @@ interface StoryRepository {
     /**
      * Get story feed.
      */
-    fun feedStory(): Flow<PagingData<Story>>
+    suspend fun feedStory(page: Int, pageSize: Int): Result<List<UserWithStories>>
 
     /**
      * Get current user stories.
@@ -44,7 +44,7 @@ interface StoryRepository {
     /**
      * Mark a specific Cheers story as viewed.
      */
-    suspend fun viewStory(storyId: String)
+    suspend fun viewStory(storyId: String): Result<Unit>
 
     /**
      * Like a specific Cheers story.

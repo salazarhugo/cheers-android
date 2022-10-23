@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.salazar.cheers.internal.User
+import java.util.*
+import kotlin.collections.ArrayList
 
 object StoryType {
     const val TEXT = "TEXT"
@@ -21,7 +23,7 @@ data class Story(
     val verified: Boolean = false,
     val profilePictureUrl: String = "",
     val viewed: Boolean = false,
-    val created: Long = 0L,
+    val created: Long = Date().time,
     val relativeTime: String = "",
     val privacy: String = "",
     val photo: String = "",

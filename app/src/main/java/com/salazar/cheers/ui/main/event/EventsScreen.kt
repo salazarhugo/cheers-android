@@ -16,15 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.R
 import com.salazar.cheers.compose.ChipGroup
 import com.salazar.cheers.compose.event.EventDetails
 import com.salazar.cheers.compose.event.EventGoingButton
@@ -238,13 +235,13 @@ fun EventMutualFriends(
             Box {
                 if (profilePictureUrls.isNotEmpty())
                     UserProfilePicture(
-                        avatar = profilePictureUrls[0],
+                        picture = profilePictureUrls[0],
                         size = 26.dp,
                     )
                 if (profilePictureUrls.size > 1)
                     UserProfilePicture(
                         modifier = Modifier.offset(x = 13.dp),
-                        avatar = profilePictureUrls[1],
+                        picture = profilePictureUrls[1],
                         size = 26.dp,
                     )
             }

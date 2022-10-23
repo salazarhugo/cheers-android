@@ -30,7 +30,7 @@ import com.salazar.cheers.compose.animations.Bounce
 @Composable
 fun UserProfilePicture(
     modifier: Modifier = Modifier,
-    avatar: String?,
+    picture: String?,
     storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,
@@ -77,7 +77,7 @@ fun UserProfilePicture(
     Bounce(onBounce = onClick) {
         Image(
             painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = avatar)
+                ImageRequest.Builder(LocalContext.current).data(data = picture)
                     .apply(block = fun ImageRequest.Builder.() {
                         transformations(CircleCropTransformation())
                         error(placeHolder)

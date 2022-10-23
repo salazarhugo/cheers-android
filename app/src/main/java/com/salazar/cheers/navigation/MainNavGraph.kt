@@ -10,12 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
-import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.BottomSheetNavigator
@@ -57,6 +54,7 @@ import com.salazar.cheers.ui.main.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
+import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.sheets.DeletePostDialog
@@ -118,6 +116,20 @@ fun NavGraphBuilder.mainNavGraph(
                 navActions = appState.navActions,
                 showSnackBar = appState::showSnackBar,
             )
+        }
+
+        composable(
+            route = "${MainDestinations.STORY_FEED_ROUTE}/{page}",
+            arguments = listOf(navArgument("page") { type = NavType.IntType }),
+            enterTransition = { scaleIn(animationSpec = tween(200)) },
+            exitTransition = { scaleOut(animationSpec = tween(200)) },
+        ) {
+            CheersTheme(darkTheme = true) {
+                StoryFeedRoute(
+                    appState = appState,
+                    navActions = appState.navActions,
+                )
+            }
         }
 
         composable(

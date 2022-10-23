@@ -9,6 +9,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -26,8 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import cheers.type.UserOuterClass
@@ -44,6 +44,7 @@ import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.story.Story
 import com.salazar.cheers.compose.story.YourStory
+import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.internal.Post
 
 
@@ -63,31 +64,30 @@ fun HomeScreen(
                 onActivityClick = { onHomeUIAction(HomeUIAction.OnActivityClick) },
             )
         },
-        content = {
-            SwipeToRefresh(
-                state = rememberSwipeToRefreshState(isRefreshing = false),
-                onRefresh = { onHomeUIAction(HomeUIAction.OnSwipeRefresh) },
-                modifier = Modifier.padding(it),
+    ) {
+        SwipeToRefresh(
+            state = rememberSwipeToRefreshState(isRefreshing = false),
+            onRefresh = { onHomeUIAction(HomeUIAction.OnSwipeRefresh) },
+            modifier = Modifier.padding(it),
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background),
             ) {
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background),
-                ) {
-                    PostList(
-                        uiState = uiState,
-                        onHomeUIAction = onHomeUIAction,
-                    )
-                }
-                val alpha = if (fabState == MultiFabState.EXPANDED) 0.92f else 0f
-                Box(
-                    modifier = Modifier
-                        .alpha(animateFloatAsState(alpha).value)
-                        .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
-                        .fillMaxSize()
+                PostList(
+                    uiState = uiState,
+                    onHomeUIAction = onHomeUIAction,
                 )
             }
+            val alpha = if (fabState == MultiFabState.EXPANDED) 0.92f else 0f
+            Box(
+                modifier = Modifier
+                    .alpha(animateFloatAsState(alpha).value)
+                    .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
+                    .fillMaxSize()
+            )
         }
-    )
+    }
 }
 
 @Composable
@@ -102,7 +102,7 @@ fun PostList(
         item {
             Stories(
                 uiState = uiState,
-                onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryClick(it)) },
+                onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryFeedClick(it)) },
                 onAddStoryClick = { onHomeUIAction(HomeUIAction.OnAddStoryClick) },
             )
             DividerM3()
@@ -258,7 +258,7 @@ fun WhatsUpSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         UserProfilePicture(
-            avatar = avatar,
+            picture = avatar,
             size = 36.dp,
         )
         Spacer(Modifier.width(8.dp))
@@ -345,38 +345,47 @@ fun HomeTopBar(
 @Composable
 fun Stories(
     uiState: HomeUiState,
-    onStoryClick: (String) -> Unit,
+    onStoryClick: (Int) -> Unit,
     onAddStoryClick: () -> Unit,
 ) {
-    val stories = uiState.storiesFlow?.collectAsLazyPagingItems() ?: return
+    val userWithStoriesList = uiState.userWithStoriesList
     val profilePictureUrl = uiState.user?.picture
     val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
 
     LazyRow(
+        state = rememberLazyListState(),
         modifier = Modifier.padding(bottom = 8.dp),
     ) {
-        item {
-            val user = uiState.user
-            if (user != null)
+        val user = uiState.user
+        if (user != null)
+            item {
                 YourStory(
                     profilePictureUrl = profilePictureUrl,
                     onClick = {
                         if (user.storyState == UserOuterClass.StoryState.SEEN || user.storyState == UserOuterClass.StoryState.NOT_SEEN)
-                            onStoryClick(user.username)
+                            onStoryClick(0)
                         else
                             onAddStoryClick()
                     },
                     storyState = user.storyState,
                 )
         }
-        items(items = stories, key = { it.id }) { story ->
-            if (story != null && story.authorId != uid)
+
+        itemsIndexed(
+            items = userWithStoriesList,
+            key = { i, userWithStories: UserWithStories -> userWithStories.user.id },
+        ) { i, userWithStories ->
+            val user = userWithStories.user
+            val stories = userWithStories.stories
+            val viewed = remember { stories.all { it.viewed } }
+
+//            if (userWithStories.user.id != uid)
                 Story(
                     modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
-                    username = story.username,
-                    seenStory = story.viewed,
-                    profilePictureUrl = story.profilePictureUrl,
-                    onStoryClick = onStoryClick,
+                    username = user.username,
+                    viewed = viewed,
+                    picture = user.picture,
+                    onStoryClick = { onStoryClick(i)},
                 )
         }
     }

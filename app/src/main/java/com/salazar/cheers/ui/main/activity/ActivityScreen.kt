@@ -109,7 +109,7 @@ fun ActivityItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserProfilePicture(
-                avatar = activity.avatar,
+                picture = activity.avatar,
                 size = 40.dp,
             )
             Spacer(modifier = Modifier.width(16.dp))

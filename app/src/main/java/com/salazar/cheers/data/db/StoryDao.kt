@@ -4,15 +4,12 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.internal.User
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
 interface StoryDao {
-
-    @Transaction
-    @Query("SELECT * FROM story WHERE created > :yesterday GROUP BY story.authorId ORDER BY story.created DESC")
-    fun pagingSource(yesterday: Long = Date().time - 24 * 60 * 60 * 1000): PagingSource<Int, Story>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(story: Story)
@@ -28,9 +25,14 @@ interface StoryDao {
     @Query("SELECT * FROM story WHERE username = :username ORDER BY story.created")
     suspend fun getUserStory(username: String): List<Story>
 
-    @Transaction
+    @Query("SELECT * FROM users")
+    suspend fun feedStory(): List<UserWithStories>
+
     @Query("SELECT * FROM story WHERE storyId = :storyId")
     suspend fun getStory(storyId: String): Story
+
+    @Query("UPDATE story SET viewed = 1  WHERE storyId = :storyId")
+    suspend fun viewStory(storyId: String)
 
     @Query("DELETE FROM story WHERE story.storyId = :storyId")
     suspend fun deleteWithId(storyId: String)
@@ -45,3 +47,11 @@ interface StoryDao {
     suspend fun clearAll()
 }
 
+data class UserWithStories(
+    @Embedded val user: User,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "authorId",
+    )
+    val stories: List<Story>
+)

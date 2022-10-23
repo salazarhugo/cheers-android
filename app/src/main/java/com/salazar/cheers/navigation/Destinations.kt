@@ -49,6 +49,7 @@ object MainDestinations {
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
     const val STORY_ROUTE = "story"
+    const val STORY_FEED_ROUTE = "storyFeed"
     const val SEND_GIFT_SHEET = "giftSheet"
     const val DRINKING_STATS = "drinkingStats"
     const val NFC_ROUTE = "nfc"
@@ -162,8 +163,8 @@ class CheersNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    val navigateToStory: () -> Unit = {
-        navController.navigate(route = MainDestinations.STORY_ROUTE) {
+    val navigateToStoryFeed: (page: Int) -> Unit = { page ->
+        navController.navigate(route = "${MainDestinations.STORY_FEED_ROUTE}/$page") {
             launchSingleTop = true
         }
     }

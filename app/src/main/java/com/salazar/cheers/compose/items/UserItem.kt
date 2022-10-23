@@ -32,7 +32,7 @@ fun UserItem(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             UserProfilePicture(
-                avatar = userItem.picture,
+                picture = userItem.picture,
                 storyState = userItem.story_state,
                 onClick = {
                     if (userItem.story_state == UserOuterClass.StoryState.EMPTY)

@@ -52,7 +52,7 @@ fun YourStory(
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
             UserProfilePicture(
-                avatar = profilePictureUrl ?: "",
+                picture = profilePictureUrl ?: "",
                 storyState = storyState2,
                 size = 64.dp,
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp),
@@ -87,19 +87,22 @@ fun YourStory(
 @Composable
 fun Story(
     modifier: Modifier = Modifier,
-    seenStory: Boolean,
-    profilePictureUrl: String,
-    onStoryClick: (String) -> Unit,
+    viewed: Boolean,
+    picture: String?,
     username: String,
+    onStoryClick: (String) -> Unit,
 ) {
-    val state = if (seenStory) UserOuterClass.StoryState.SEEN else UserOuterClass.StoryState.NOT_SEEN
+    val state = if (viewed)
+        UserOuterClass.StoryState.SEEN
+    else
+        UserOuterClass.StoryState.NOT_SEEN
 
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         UserProfilePicture(
-            avatar = profilePictureUrl,
+            picture = picture,
             storyState = state,
             size = 64.dp,
             modifier = Modifier.padding(horizontal = 8.dp),

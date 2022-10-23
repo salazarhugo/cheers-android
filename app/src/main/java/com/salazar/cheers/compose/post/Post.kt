@@ -31,7 +31,7 @@ fun PostView(
             beverage = Beverage.fromName(post.beverage),
             public = post.privacy == Privacy.PUBLIC.name,
             created = post.created,
-            profilePictureUrl = post.profilePictureUrl,
+            picture = post.profilePictureUrl,
             locationName = post.locationName,
             onHeaderClicked = { onHomeUIAction(HomeUIAction.OnUserClick(it)) },
             onMoreClicked = { onHomeUIAction(HomeUIAction.OnPostMoreClick(post.id)) },

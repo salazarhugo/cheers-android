@@ -22,13 +22,13 @@ fun StoryProgressBar(
     currentStep: Int,
     modifier: Modifier = Modifier,
     paused: Boolean = false,
-    onFinished: () -> Unit
+    onStepFinish: (last: Boolean) -> Unit
 ) {
     val percent = remember { Animatable(0f) }
 
-    LaunchedEffect(paused, currentStep) {
-        percent.snapTo(0f)
-        if (paused) percent.stop()
+    LaunchedEffect(paused) {
+        if (paused)
+            percent.stop()
         else {
             percent.animateTo(
                 targetValue = 1f,
@@ -37,9 +37,22 @@ fun StoryProgressBar(
                     easing = LinearEasing
                 )
             )
-            onFinished()
+            onStepFinish(currentStep == steps - 1)
         }
     }
+
+    LaunchedEffect(currentStep) {
+        percent.snapTo(0f)
+        percent.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = (10000 * (1f - percent.value)).toInt(),
+                easing = LinearEasing
+            )
+        )
+        onStepFinish(currentStep == steps - 1)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,

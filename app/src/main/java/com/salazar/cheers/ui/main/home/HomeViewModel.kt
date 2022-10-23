@@ -1,20 +1,18 @@
 package com.salazar.cheers.ui.main.home
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.paging.DefaultPaginator
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
@@ -30,21 +28,22 @@ import javax.inject.Inject
 
 data class HomeUiState(
     val posts: List<Post> = emptyList(),
-    val storiesFlow: Flow<PagingData<Story>>? = null,
-    val stories: PagingData<Story>? = null,
+    val userWithStoriesList: List<UserWithStories> = emptyList(),
     val listState: LazyListState = LazyListState(),
     val likes: Set<String> = emptySet(),
     val user: User? = null,
     val postSheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     val suggestions: List<SuggestionUser>? = null,
     val isLoading: Boolean = false,
-    val errorMessages: List<String> = emptyList(),
+    val errorMessage: String? = null,
     val searchInput: String = "",
     val nativeAd: NativeAd? = null,
     val selectedTab: Int = 0,
     val notificationCount: Int = 0,
     val endReached: Boolean = false,
     val page: Int = 0,
+    val storyPage: Int = 0,
+    val storyEndReached: Boolean = false,
 )
 
 @HiltViewModel
@@ -63,13 +62,38 @@ class HomeViewModel @Inject constructor(
             viewModelState.value
         )
 
+    private val storyPaginator = DefaultPaginator(
+        initialKey = 0,
+        onLoadUpdated = {
+            updateIsLoading(isLoading = it)
+        },
+        onRequest = { nextPage ->
+            storyRepository.feedStory(nextPage, 10)
+        },
+        getNextKey = {
+            uiState.value.storyPage + 1
+        },
+        onError = {
+            updateError(it?.localizedMessage)
+        },
+        onSuccess = { items, newKey ->
+            viewModelState.update {
+                it.copy(
+                    storyPage = newKey,
+                    storyEndReached = items.isEmpty(),
+                    userWithStoriesList =  items,
+                )
+            }
+        }
+    )
+
     private val paginator = DefaultPaginator(
         initialKey = 0,
         onLoadUpdated = {
             updateIsLoading(isLoading = it)
         },
         onRequest = { nextPage ->
-            postRepository.getPostFeed(nextPage, 1)
+            postRepository.getPostFeed(nextPage, 5)
         },
         getNextKey = {
             uiState.value.page + 1
@@ -78,11 +102,11 @@ class HomeViewModel @Inject constructor(
             updateError(it?.localizedMessage)
         },
         onSuccess = { items, newKey ->
-            Log.d("ITEMS", items.toString())
             viewModelState.update {
                 it.copy(
                     page = newKey,
-                    endReached = items.isEmpty()
+                    endReached = items.isEmpty(),
+                    posts =  it.posts + items,
                 )
             }
         }
@@ -94,7 +118,9 @@ class HomeViewModel @Inject constructor(
         stateHandle.get<String>("postID")?.let {
             postID = it
         }
-        loadNextItems()
+        loadNextPosts()
+        loadNextStories()
+
         viewModelScope.launch {
             userRepository.getCurrentUserFlow().collect { user ->
                 viewModelState.update {
@@ -109,23 +135,17 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
-        refreshStoryFlow()
     }
 
-    fun loadNextItems() {
+    fun loadNextStories() {
         viewModelScope.launch {
-            paginator.loadNextItems()
+            storyPaginator.loadNextItems()
         }
     }
 
-    private fun refreshStoryFlow() {
-        viewModelState.update { it.copy(isLoading = true) }
-
+    fun loadNextPosts() {
         viewModelScope.launch {
-//            val stories = storyRepository.getMyStories()
-            viewModelState.update {
-                it.copy(storiesFlow = emptyFlow(), isLoading = false)
-            }
+            paginator.loadNextItems()
         }
     }
 
@@ -147,23 +167,14 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            viewModelState.update {
-                it.copy(
-//                    storiesFlow = storyRepository.getStories(),
-                    isLoading = false
-                )
-            }
+            storyPaginator.reset()
+            storyPaginator.loadNextItems()
         }
-        viewModelState.update { it.copy(endReached = false) }
-        paginator.reset()
     }
 
-    private fun updateError(errorMessages: String?) {
-    }
-
-    private fun incrementPage() {
+    private fun updateError(message: String?) {
         viewModelState.update {
-            it.copy(page = it.page + 1)
+            it.copy(errorMessage = message)
         }
     }
 
@@ -228,6 +239,7 @@ sealed class HomeUIAction {
     object OnLoadNextItems : HomeUIAction()
     data class OnCommentClick(val postID: String) : HomeUIAction()
     data class OnLikeClick(val post: Post) : HomeUIAction()
+    data class OnStoryFeedClick(val page: Int) : HomeUIAction()
     data class OnStoryClick(val userID: String) : HomeUIAction()
     data class OnUserClick(val userID: String) : HomeUIAction()
     data class OnPostClick(val postID: String) : HomeUIAction()

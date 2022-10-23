@@ -16,10 +16,25 @@ service StoryService {
   rpc DeleteStory (DeleteStoryRequest) returns (google.protobuf.Empty);
 
   rpc FeedStory (FeedStoryRequest) returns (FeedStoryResponse);
+  /*
+    Return stories of a specific user
+   */
+  rpc ListUserStory (ListUserStoryRequest) returns (ListUserStoryResponse);
+
+  rpc ViewStory (ViewStoryRequest) returns (ViewStoryResponse);
   rpc LikeStory (LikeStoryRequest) returns (LikeStoryResponse);
   rpc UnlikeStory (UnlikeStoryRequest) returns (UnlikeStoryResponse);
   rpc SaveStory (SaveStoryRequest) returns (SaveStoryResponse);
   rpc UnsaveStory (UnsaveStoryRequest) returns (UnsaveStoryResponse);
+}
+
+message ListUserStoryRequest {
+  string user_id = 1;
+}
+
+message ListUserStoryResponse {
+  cheers.type.User user = 1;
+  repeated StoryResponse stories = 2;
 }
 
 message CreateStoryRequest {
@@ -45,8 +60,16 @@ message FeedStoryRequest {
 }
 
 message FeedStoryResponse {
-  repeated StoryResponse stories = 1;
+  repeated UserWithStories items = 1;
   string next_page_token = 2;
+}
+
+message ViewStoryRequest {
+  string id = 1;
+}
+
+message ViewStoryResponse {
+  bool success = 1;
 }
 
 message LikeStoryRequest {
@@ -81,13 +104,18 @@ message UnsaveStoryResponse {
   bool success = 1;
 }
 
+message ListStoryResponse {
+  cheers.type.User user = 1;
+  repeated UserWithStories items = 2;
+}
+
+message UserWithStories {
+  cheers.type.User user = 1;
+  repeated StoryResponse stories = 2;
+}
+
 message StoryResponse {
-  cheers.type.Story story = 1;
-  cheers.type.User user = 2;
-  int64 like_count = 3;
-  int64 comment_count = 4;
+  cheers.type.Story story = 2;
   bool has_liked = 5;
-  bool comments_enabled = 6;
-  bool reshare_enabled = 8;
-  int64 media_count = 7;
+  bool has_viewed = 6;
 }

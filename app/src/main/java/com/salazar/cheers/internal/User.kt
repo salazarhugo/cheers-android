@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import cheers.type.UserOuterClass
+import java.util.*
 
 @Entity(
     tableName = "users",
@@ -12,7 +13,7 @@ import cheers.type.UserOuterClass
 )
 data class User(
     @PrimaryKey
-    val id: String = "",
+    val id: String = UUID.randomUUID().toString(),
     val username: String = "",
     val name: String = "",
     val postCount: Int = 0,
@@ -35,5 +36,5 @@ data class User(
     val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     @ColumnInfo(defaultValue = "false")
     val seenStory: Boolean = false,
-    val created: Long = 0L,
+    val created: Long = Date().time,
 )

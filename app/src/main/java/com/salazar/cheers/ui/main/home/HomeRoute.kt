@@ -37,13 +37,14 @@ fun HomeRoute(
                 is HomeUIAction.OnCommentClick -> navActions.navigateToComments(action.postID)
                 is HomeUIAction.OnSearchClick -> navActions.navigateToSearch()
                 is HomeUIAction.OnStoryClick -> navActions.navigateToStoryWithUserId(action.userID)
+                is HomeUIAction.OnStoryFeedClick -> navActions.navigateToStoryFeed(action.page)
                 is HomeUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userID)
                 is HomeUIAction.OnPostClick -> navActions.navigateToPostDetail(action.postID)
                 is HomeUIAction.OnSwipeRefresh -> homeViewModel.onSwipeRefresh()
                 is HomeUIAction.OnAddPostClick -> navActions.navigateToAddPostSheet()
                 is HomeUIAction.OnAddStoryClick -> navActions.navigateToCamera()
                 is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID)
-                is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextItems()
+                is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextPosts()
             }
         }
     )

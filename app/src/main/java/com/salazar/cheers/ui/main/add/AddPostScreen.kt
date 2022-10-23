@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -41,8 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -54,7 +51,6 @@ import com.mapbox.search.ResponseInfo
 import com.mapbox.search.ReverseGeoOptions
 import com.mapbox.search.SearchCallback
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.R
 import com.salazar.cheers.compose.ChipGroup
 import com.salazar.cheers.compose.DividerM3
 import com.salazar.cheers.compose.post.MultipleAnnotation
@@ -571,7 +567,7 @@ fun CaptionSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         UserProfilePicture(
-            avatar = profilePictureUrl,
+            picture = profilePictureUrl,
             size = 40.dp,
         )
 

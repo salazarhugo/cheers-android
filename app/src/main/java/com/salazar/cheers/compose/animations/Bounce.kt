@@ -44,8 +44,9 @@ fun Bounce(
                 .pointerInput(Unit) {
                     detectTapGestures(onPress = {
                         currentState = BounceState.Pressed
-                        tryAwaitRelease()
+                        val wasConsumedByOtherGesture =  !tryAwaitRelease()
                         currentState = BounceState.Released
+                        if (wasConsumedByOtherGesture) return@detectTapGestures
                         onBounce()
                     })
                 }

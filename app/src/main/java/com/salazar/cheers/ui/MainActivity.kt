@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-
         setContent {
             val appSettings by dataStoreRepository.userPreferencesFlow.collectAsState(
                 initial = Settings.getDefaultInstance(),

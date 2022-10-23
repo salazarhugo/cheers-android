@@ -1,5 +1,6 @@
 package com.salazar.cheers.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.theme.GreySheet
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CheersNavGraph(
     uiState: CheersUiState,
@@ -104,7 +106,7 @@ fun CheersNavGraph(
             },
         ) { innerPadding ->
             AnimatedNavHost(
-                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+                modifier = Modifier,
                 route = CheersDestinations.ROOT_ROUTE,
                 navController = appState.navController,
                 startDestination = startDestination,

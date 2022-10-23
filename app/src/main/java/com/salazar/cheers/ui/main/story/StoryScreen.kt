@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -50,6 +48,7 @@ import com.salazar.cheers.compose.story.StoryProgressBar
 import com.salazar.cheers.compose.utils.PrettyImage
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.internal.Beverage
+import com.salazar.cheers.ui.carousel
 import kotlin.math.absoluteValue
 
 
@@ -137,6 +136,7 @@ fun StoryCarousel(
             showInterstitialAd()
         }
 
+        val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
         Scaffold(
             bottomBar = {
                 StoryFooter(
@@ -150,23 +150,7 @@ fun StoryCarousel(
                 )
             },
             containerColor = Color.Black,
-            modifier = Modifier
-                .graphicsLayer {
-                    val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
-                    lerp(
-                        start = 0.85f,
-                        stop = 1f,
-                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                    ).also { scale ->
-                        scaleX = scale
-                        scaleY = scale
-                    }
-                    alpha = lerp(
-                        start = 0.5f,
-                        stop = 1f,
-                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                    )
-                }
+            modifier = Modifier.carousel(pageOffset)
         ) { padding ->
             PrettyImage(
                 data = story.photo,
@@ -210,8 +194,8 @@ fun StoryCarousel(
             StoryHeader(
                 story = story,
                 count = stories.size,
-                onStoryFinish = {
-                    if (currentStep + 1 >= stories.size)
+                onStoryFinish = { last ->
+                    if (last)
                         onStoryFinish()
                     else
                         onCurrentStepChange(currentStep + 1)
@@ -229,7 +213,7 @@ fun StoryHeader(
     story: Story,
     count: Int,
     currentStep: Int,
-    onStoryFinish: () -> Unit,
+    onStoryFinish: (Boolean) -> Unit,
     onUserClick: (String) -> Unit,
     pause: Boolean,
 ) {
@@ -238,7 +222,7 @@ fun StoryHeader(
             steps = count,
             currentStep = currentStep,
             paused = pause,
-            onFinished = onStoryFinish,
+            onStepFinish = onStoryFinish,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
         PostHeader(
@@ -249,7 +233,7 @@ fun StoryHeader(
             darkMode = true,
             public = false,
             locationName = "",
-            profilePictureUrl = story.profilePictureUrl,
+            picture = story.profilePictureUrl,
             onHeaderClicked = onUserClick,
             onMoreClicked = {},
         )

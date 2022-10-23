@@ -59,7 +59,7 @@ fun Post(
                 beverage = Beverage.fromName(post.beverage),
                 public = post.privacy == Privacy.PUBLIC.name,
                 locationName = post.locationName,
-                profilePictureUrl = post.profilePictureUrl,
+                picture = post.profilePictureUrl,
                 onHeaderClicked = { onUserClick(post.username) },
                 onMoreClicked = {},
                 created = post.created,
