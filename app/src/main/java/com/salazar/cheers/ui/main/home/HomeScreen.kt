@@ -377,7 +377,7 @@ fun Stories(
         ) { i, userWithStories ->
             val user = userWithStories.user
             val stories = userWithStories.stories
-            val viewed = remember { stories.all { it.viewed } }
+            val viewed = remember(userWithStories.stories) { stories.all { it.viewed } }
 
 //            if (userWithStories.user.id != uid)
                 Story(

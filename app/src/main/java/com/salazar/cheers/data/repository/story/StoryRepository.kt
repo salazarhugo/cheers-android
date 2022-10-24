@@ -1,6 +1,5 @@
 package com.salazar.cheers.data.repository.story
 
-import androidx.paging.PagingData
 import cheers.type.StoryOuterClass
 import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
@@ -22,9 +21,14 @@ interface StoryRepository {
     suspend fun getStory(storyId: String?): Result<Story>
 
     /**
-     * Get story feed.
+     * Get story feed from local database.
      */
-    suspend fun feedStory(page: Int, pageSize: Int): Result<List<UserWithStories>>
+    suspend fun feedStory(page: Int, pageSize: Int): Flow<List<UserWithStories>>
+
+    /**
+     * Fetch story feed from backend.
+     */
+    suspend fun fetchFeedStory(page: Int, pageSize: Int): Result<List<UserWithStories>>
 
     /**
      * Get current user stories.
@@ -39,7 +43,7 @@ interface StoryRepository {
     /**
      * Delete a specific Cheers story.
      */
-    suspend fun deleteStory(storyId: String)
+    suspend fun deleteStory(storyId: String): Result<Unit>
 
     /**
      * Mark a specific Cheers story as viewed.
@@ -49,10 +53,10 @@ interface StoryRepository {
     /**
      * Like a specific Cheers story.
      */
-    suspend fun likeStory(storyId: String)
+    suspend fun likeStory(storyId: String): Result<Unit>
 
     /**
      * Unlike a specific Cheers story.
      */
-    suspend fun unlikeStory(storyId: String)
+    suspend fun unlikeStory(storyId: String): Result<Unit>
 }

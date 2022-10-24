@@ -23,6 +23,7 @@ data class Story(
     val verified: Boolean = false,
     val profilePictureUrl: String = "",
     val viewed: Boolean = false,
+    val liked: Boolean = false,
     val created: Long = Date().time,
     val relativeTime: String = "",
     val privacy: String = "",
@@ -34,6 +35,7 @@ data class Story(
     val locationName: String = "",
     val tagUsersId: List<String> = emptyList(),
     val type: String = StoryType.TEXT,
+    val accountId: String = "",
 )
 
 data class StoryDetail(

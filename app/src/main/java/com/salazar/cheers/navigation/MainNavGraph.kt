@@ -21,6 +21,8 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.post.PostMoreBottomSheet
+import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
+import com.salazar.cheers.compose.sheets.StorySheetUIAction
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.AddPostRoute
@@ -54,10 +56,12 @@ import com.salazar.cheers.ui.main.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
+import com.salazar.cheers.ui.main.story.feed.SetStoryStatusBars
 import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.sheets.DeletePostDialog
+import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Constants.URI
@@ -124,12 +128,10 @@ fun NavGraphBuilder.mainNavGraph(
             enterTransition = { scaleIn(animationSpec = tween(200)) },
             exitTransition = { scaleOut(animationSpec = tween(200)) },
         ) {
-            CheersTheme(darkTheme = true) {
                 StoryFeedRoute(
                     appState = appState,
                     navActions = appState.navActions,
                 )
-            }
         }
 
         composable(
@@ -174,6 +176,15 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         dialog(
+            route = "${MainDestinations.DIALOG_DELETE_STORY}/{storyID}",
+        ) {
+            DeleteStoryDialog(
+                appState = appState,
+                navActions = appState.navActions
+            )
+        }
+
+        dialog(
             route = "${MainDestinations.DIALOG_DELETE_POST}/{postID}",
         ) {
             DeletePostDialog(
@@ -213,6 +224,7 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         dialog(MainDestinations.CAMERA_ROUTE) {
+            SetStoryStatusBars()
             CameraRoute(
                 navActions = appState.navActions
             )
@@ -386,12 +398,30 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         bottomSheet(
+            route = "${MainDestinations.STORY_MORE_SHEET}/{storyID}",
+        ) {
+            val storyID = it.arguments?.getString("storyID")!!
+
+            StoryMoreBottomSheet(onStorySheetUIAction = { action ->
+                when(action) {
+                    StorySheetUIAction.OnAddSnapchatFriends -> {}
+                    StorySheetUIAction.OnCopyStoryClick -> {}
+                    StorySheetUIAction.OnNfcClick -> {}
+                    StorySheetUIAction.OnPostHistoryClick -> {}
+                    StorySheetUIAction.OnSettingsClick -> {}
+                    StorySheetUIAction.OnDeleteClick -> {
+                        appState.navActions.navigateToDeleteStoryDialog(storyID)
+                    }
+                }
+            })
+        }
+
+        bottomSheet(
             route = "${MainDestinations.POST_MORE_SHEET}/{postID}",
             arguments = listOf(
                 navArgument("postID") { nullable = false },
             )
         ) {
-            val homeViewModel = hiltViewModel<HomeViewModel>()
             val postId = it.arguments?.getString("postID")!!
             val isAuthor = true
             val context = LocalContext.current

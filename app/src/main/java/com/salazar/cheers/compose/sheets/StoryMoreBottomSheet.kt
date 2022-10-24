@@ -1,25 +1,23 @@
 package com.salazar.cheers.compose.sheets
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.ui.main.profile.SheetItem
 
 sealed class StorySheetUIAction {
     object OnNfcClick : StorySheetUIAction()
     object OnCopyStoryClick : StorySheetUIAction()
     object OnSettingsClick : StorySheetUIAction()
+    object OnDeleteClick : StorySheetUIAction()
     object OnAddSnapchatFriends : StorySheetUIAction()
     object OnPostHistoryClick : StorySheetUIAction()
 }
@@ -37,64 +35,37 @@ fun StoryMoreBottomSheet(
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.outline)
         )
-        Item(
+        SheetItem(
             text = "Delete",
             icon = Icons.Outlined.Delete,
-            onClick = { onStorySheetUIAction(StorySheetUIAction.OnSettingsClick) }
+            onClick = { onStorySheetUIAction(StorySheetUIAction.OnDeleteClick) },
         )
-        Item(
+        SheetItem(
             text = "Save video",
             icon = Icons.Outlined.Archive,
             onClick = { onStorySheetUIAction(StorySheetUIAction.OnAddSnapchatFriends) }
         )
-        Item(
+        SheetItem(
             text = "Send to...",
             icon = Icons.Outlined.Archive,
             onClick = { onStorySheetUIAction(StorySheetUIAction.OnPostHistoryClick) }
         )
-        Item(
+        SheetItem(
             text = "Share as post...",
             icon = Icons.Outlined.Contactless,
             onClick = { onStorySheetUIAction(StorySheetUIAction.OnNfcClick) }
         )
-        Item(text = "Copy link", icon = Icons.Outlined.QrCode)
-        Item(text = "Saved", icon = Icons.Outlined.BookmarkBorder)
-        Item(
+        SheetItem(text = "Copy link", icon = Icons.Outlined.QrCode)
+        SheetItem(text = "Saved", icon = Icons.Outlined.BookmarkBorder)
+        SheetItem(
             text = "Share to...",
             icon = Icons.Outlined.ContentCopy,
             onClick = { onStorySheetUIAction(StorySheetUIAction.OnCopyStoryClick) }
         )
-        Item(
+        SheetItem(
             text = "Story settings",
             icon = Icons.Outlined.ContentCopy,
             onClick = { onStorySheetUIAction(StorySheetUIAction.OnCopyStoryClick) }
-        )
-    }
-}
-
-@Composable
-fun Item(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit = {}
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
-        )
-        Spacer(Modifier.width(22.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

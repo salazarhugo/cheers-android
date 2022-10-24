@@ -3,23 +3,23 @@ package com.salazar.cheers.ui.main.story.feed
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,16 +29,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.post.PostHeader
 import com.salazar.cheers.compose.story.StoryProgressBar
@@ -48,8 +51,10 @@ import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.carousel
+import com.salazar.cheers.ui.theme.StrongRed
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -80,6 +85,7 @@ fun StoryFeedCarousel(
     val currentPage = pagerState.currentPage
 
     HorizontalPager(
+        modifier = Modifier,
         count = usersWithStories.size,
         state = pagerState,
         verticalAlignment = Alignment.Top,
@@ -115,7 +121,8 @@ fun StoryFeedCarousel(
 }
 
 suspend fun PagerState.nextPage() {
-    animateScrollToPage(currentPage + 1)
+    val nextPage = (currentPage + 1).coerceIn(0, this.pageCount - 1)
+    animateScrollToPage(nextPage)
 }
 
 suspend fun PagerState.previousPage() {
@@ -131,11 +138,15 @@ fun UserWithStories(
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
 ) {
+    val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
     val stories = userWithStories.stories
     val scope = rememberCoroutineScope()
     val stepperState = rememberPagerState()
     val currentStep = stepperState.currentPage
     var paused by remember { mutableStateOf(false) }
+
+    if (currentStep >= stories.size)
+        return
 
     Scaffold(
         modifier = modifier,
@@ -152,15 +163,17 @@ fun UserWithStories(
                             stepperState.nextPage()
                         }
                 },
-                onUserClick = { onStoryFeedUIAction(StoryFeedUIAction.OnUserClick(userWithStories.user.id))},
+                onUserClick = { onStoryFeedUIAction(StoryFeedUIAction.OnUserClick(userWithStories.user.id)) },
                 pause = !isCurrentPage || paused,
                 currentStep = currentStep,
             )
         },
         bottomBar = {
             StoryFeedFooter(
+                storyId = stories[currentStep].id,
                 messageInput = "",
-                isUserMe = false,
+                hasLiked = stories[currentStep].liked,
+                isUserMe = userWithStories.user.id == uid,
                 onStoryFeedUIAction = onStoryFeedUIAction,
             )
         },
@@ -288,12 +301,17 @@ fun StoryFeedHeader(
 
 @Composable
 fun StoryFeedFooter(
+    storyId: String,
     messageInput: String,
     isUserMe: Boolean,
+    hasLiked: Boolean = false,
     onStoryFeedUIAction: (StoryFeedUIAction) -> Unit,
 ) {
+    var hasLiked by remember { mutableStateOf(hasLiked) }
+
     if (isUserMe)
         StoryFeedMeFooter(
+            storyId = storyId,
             onStoryFeedUIAction = onStoryFeedUIAction,
         )
     else
@@ -304,47 +322,73 @@ fun StoryFeedFooter(
                 .padding(16.dp)
         ) {
             StoryFeedInputField(
+                modifier = Modifier.weight(1f),
                 value = messageInput,
                 onInputChange = {},
                 onSendReaction = {},
                 onFocusChange = {},
             )
+            val icon = if (hasLiked)
+                Icons.Default.Favorite
+            else
+                Icons.Default.FavoriteBorder
+
+            val tint = when (hasLiked) {
+                true -> StrongRed
+                false -> Color.White
+            }
+
+            IconButton(onClick = {
+                hasLiked = !hasLiked
+                onStoryFeedUIAction(StoryFeedUIAction.OnToggleLike(storyId, hasLiked))
+            }) {
+                Icon(icon, contentDescription = null, tint = tint)
+            }
+            IconButton(onClick = {}) {
+                Icon(Icons.Outlined.Send, contentDescription = null, tint = Color.White)
+            }
         }
 }
 
 @Composable
 fun StoryFeedMeFooter(
+    storyId: String,
     onStoryFeedUIAction: (StoryFeedUIAction) -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top,
+    Surface(
+        color = Color.Black,
+        contentColor = Color.White,
     ) {
-        Item(
-            text = "Activity",
-            icon = Icons.Outlined.AccountCircle,
-            onClick = {
-                onStoryFeedUIAction(StoryFeedUIAction.OnActivity)
-            },
-        )
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
         ) {
             Item(
-                text = "Share",
-                icon = Icons.Default.Share,
-                onClick = {},
-            )
-            Item(
-                text = "More",
-                icon = Icons.Default.MoreVert,
+                text = "Activity",
+                icon = Icons.Outlined.AccountCircle,
                 onClick = {
-                    onStoryFeedUIAction(StoryFeedUIAction.OnMore)
+                    onStoryFeedUIAction(StoryFeedUIAction.OnActivity)
                 },
             )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Item(
+                    text = "Share",
+                    icon = Icons.Default.Share,
+                    onClick = {},
+                )
+                Item(
+                    text = "More",
+                    icon = Icons.Default.MoreVert,
+                    onClick = {
+                        onStoryFeedUIAction(StoryFeedUIAction.OnMoreClick(storyId = storyId))
+                    },
+                )
+            }
         }
     }
 }
@@ -376,6 +420,7 @@ fun Item(
 
 @Composable
 fun StoryFeedInputField(
+    modifier: Modifier = Modifier,
     value: String,
     onInputChange: (String) -> Unit,
     onSendReaction: (String) -> Unit,
@@ -390,9 +435,10 @@ fun StoryFeedInputField(
             unfocusedIndicatorColor = Color.Transparent,
             cursorColor = Color.White,
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .height(46.dp)
             .border(1.dp, Color.White, CircleShape)
             .onFocusChanged {
                 onFocusChange(it.hasFocus)

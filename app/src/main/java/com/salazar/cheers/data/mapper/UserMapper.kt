@@ -34,6 +34,7 @@ fun cheers.type.UserOuterClass.User.toUser(): User {
         email = email,
         bio = bio,
         website = website,
+//        storyState = storyState,
         registrationTokens = registrationTokensList,
         created = created.toLong(),
     )

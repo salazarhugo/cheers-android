@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.home
 
 import android.content.Context
+import android.provider.SyncStateContract.Helpers.update
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -68,7 +69,7 @@ class HomeViewModel @Inject constructor(
             updateIsLoading(isLoading = it)
         },
         onRequest = { nextPage ->
-            storyRepository.feedStory(nextPage, 10)
+            storyRepository.fetchFeedStory(nextPage, 10)
         },
         getNextKey = {
             uiState.value.storyPage + 1
@@ -134,6 +135,18 @@ class HomeViewModel @Inject constructor(
                     it.copy(posts = posts)
                 }
             }
+        }
+
+        viewModelScope.launch {
+            storyRepository.feedStory(1, 10).collect {
+                updateStories(userWithStoriesList = it)
+            }
+        }
+    }
+
+    fun updateStories(userWithStoriesList: List<UserWithStories>) {
+        viewModelState.update {
+            it.copy(userWithStoriesList = userWithStoriesList)
         }
     }
 

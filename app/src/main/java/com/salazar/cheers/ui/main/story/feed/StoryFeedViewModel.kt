@@ -9,10 +9,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.repository.story.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,8 +17,9 @@ sealed class StoryFeedUIAction {
     object OnBackPressed : StoryFeedUIAction()
     object OnDelete : StoryFeedUIAction()
     object OnActivity : StoryFeedUIAction()
-    object OnMore : StoryFeedUIAction()
+    data class OnMoreClick(val storyId: String) : StoryFeedUIAction()
     data class OnViewed(val storyId: String) : StoryFeedUIAction()
+    data class OnToggleLike(val storyId: String, val liked: Boolean) : StoryFeedUIAction()
     data class OnUserClick(val userId: String) : StoryFeedUIAction()
 }
 
@@ -58,10 +56,8 @@ class StoryFeedViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val result = storyRepository.feedStory(1, 10)
-            when(result.isSuccess) {
-                true -> updateUsersWithStories(usersWithStories = result.getOrNull())
-                false -> updateError(result.exceptionOrNull()?.message)
+            storyRepository.feedStory(1, 10).collect {
+                updateUsersWithStories(usersWithStories = it)
             }
         }
     }
@@ -75,6 +71,20 @@ class StoryFeedViewModel @Inject constructor(
     fun onViewed(storyId: String) {
         viewModelScope.launch {
             val result = storyRepository.viewStory(storyId = storyId)
+            when(result.isSuccess) {
+                true -> Unit
+                false -> updateError(result.exceptionOrNull()?.localizedMessage)
+            }
+        }
+    }
+
+    fun onToggleLike(storyId: String, liked: Boolean) {
+        viewModelScope.launch {
+            val result =
+                if (liked)
+                    storyRepository.likeStory(storyId = storyId)
+                else
+                    storyRepository.unlikeStory(storyId = storyId)
             when(result.isSuccess) {
                 true -> Unit
                 false -> updateError(result.exceptionOrNull()?.localizedMessage)

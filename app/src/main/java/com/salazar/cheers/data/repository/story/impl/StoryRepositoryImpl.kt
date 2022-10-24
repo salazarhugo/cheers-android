@@ -22,7 +22,9 @@ import com.salazar.cheers.data.mapper.toStory
 import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.story.fakeUsersWIthStories
+import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -42,7 +44,7 @@ class StoryRepositoryImpl @Inject constructor(
 
         return try {
             val response = service.createStory(request)
-            storyDao.insert(response.toStory(uid))
+            storyDao.insert(response.toStory(uid, uid))
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -57,29 +59,45 @@ class StoryRepositoryImpl @Inject constructor(
     override suspend fun feedStory(
         page: Int,
         pageSize: Int
-    ): Result<List<UserWithStories>> = withContext(Dispatchers.IO) {
+    ): Flow<List<UserWithStories>>  {
+        val skip = pageSize * (page - 1)
+        return storyDao.feedStory(skip, pageSize)
+            .map {  userWithStories ->
+                userWithStories
+                    // Remove users with no stories
+                    .filter { it.stories.isNotEmpty() }
+                    // Sort by un-viewed story first
+                    .sortedBy { it.stories.all { it.viewed } }
+            }
+    }
+
+    override suspend fun fetchFeedStory(page: Int, pageSize: Int): Result<List<UserWithStories>> {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+
         val request = FeedStoryRequest.newBuilder()
             .setPageSize(pageSize)
             .setPage(page)
             .build()
 
-        val response = service.feedStory(request)
-        val remoteUserWithStoriesList = response.itemsList
+        try {
+            val response = service.feedStory(request)
+            val remoteUserWithStoriesList = response.itemsList
+            val userWithStoriesList = remoteUserWithStoriesList.map {  userWithStories ->
+                UserWithStories(userWithStories.user.toUser(), stories = userWithStories.storiesList.map { it.toStory(userWithStories.user.id, uid) })
+            }
 
-        Log.d("GRPC", remoteUserWithStoriesList.toString())
-        remoteUserWithStoriesList.forEach { userWithStories ->
-            val user = userWithStories.user.toUser()
-            val stories = userWithStories.storiesList.map { it.toStory(user.id) }
+            remoteUserWithStoriesList.forEach { userWithStories ->
+                val user = userWithStories.user.toUser()
+                val stories = userWithStories.storiesList.map { it.toStory(authorId = user.id, accountId = uid) }
 
-//            database.withTransaction {
                 userDao.insert(user)
                 storyDao.insertAll(stories)
-//            }
+            }
+
+            return Result.success(userWithStoriesList)
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
-
-        val userWithStoriesList = storyDao.feedStory()
-
-        return@withContext Result.success(userWithStoriesList)
     }
 
     override fun getMyStories(): Flow<List<Story>> {
@@ -90,8 +108,18 @@ class StoryRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteStory(storyId: String) {
-        TODO("Not yet implemented")
+    override suspend fun deleteStory(storyId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val request = DeleteStoryRequest.newBuilder()
+            .setId(storyId)
+            .build()
+
+        return@withContext try {
+            service.deleteStory(request)
+            storyDao.deleteWithId(storyId = storyId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun viewStory(storyId: String): Result<Unit> {
@@ -103,17 +131,37 @@ class StoryRepositoryImpl @Inject constructor(
         return try {
             service.viewStory(request)
             Result.success(Unit)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun likeStory(storyId: String) {
-        TODO("Not yet implemented")
+    override suspend fun likeStory(storyId: String): Result<Unit> {
+        storyDao.likeStory(storyId = storyId)
+        val request = LikeStoryRequest.newBuilder()
+            .setId(storyId)
+            .build()
+
+        return try {
+            service.likeStory(request)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    override suspend fun unlikeStory(storyId: String) {
-        TODO("Not yet implemented")
+    override suspend fun unlikeStory(storyId: String): Result<Unit> {
+        storyDao.unlikeStory(storyId = storyId)
+        val request = UnlikeStoryRequest.newBuilder()
+            .setId(storyId)
+            .build()
+
+        return try {
+            service.unlikeStory(request)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     fun getStories(): Flow<PagingData<Story>> {

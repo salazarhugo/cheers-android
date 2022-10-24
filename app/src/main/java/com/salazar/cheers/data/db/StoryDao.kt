@@ -25,8 +25,8 @@ interface StoryDao {
     @Query("SELECT * FROM story WHERE username = :username ORDER BY story.created")
     suspend fun getUserStory(username: String): List<Story>
 
-    @Query("SELECT * FROM users")
-    suspend fun feedStory(): List<UserWithStories>
+    @Query("SELECT * FROM users LIMIT :pageSize OFFSET :skip")
+    fun feedStory(skip: Int, pageSize: Int): Flow<List<UserWithStories>>
 
     @Query("SELECT * FROM story WHERE storyId = :storyId")
     suspend fun getStory(storyId: String): Story
@@ -34,7 +34,13 @@ interface StoryDao {
     @Query("UPDATE story SET viewed = 1  WHERE storyId = :storyId")
     suspend fun viewStory(storyId: String)
 
-    @Query("DELETE FROM story WHERE story.storyId = :storyId")
+    @Query("UPDATE story SET liked = 1  WHERE storyId = :storyId")
+    suspend fun likeStory(storyId: String)
+
+    @Query("UPDATE story SET liked = 0  WHERE storyId = :storyId")
+    suspend fun unlikeStory(storyId: String)
+
+    @Query("DELETE FROM story WHERE storyId = :storyId")
     suspend fun deleteWithId(storyId: String)
 
     @Delete

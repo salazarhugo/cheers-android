@@ -10,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.main.story.StoryScreen
@@ -48,11 +49,8 @@ fun StoryFeedRoute(
                 is StoryFeedUIAction.OnDelete -> {}
                 is StoryFeedUIAction.OnActivity -> {}
                 is StoryFeedUIAction.OnViewed -> storyFeedViewModel.onViewed(action.storyId)
-                is StoryFeedUIAction.OnMore -> {
-                    scope.launch {
-                        uiState.sheetState.animateTo(ModalBottomSheetValue.Expanded)
-                    }
-                }
+                is StoryFeedUIAction.OnToggleLike -> storyFeedViewModel.onToggleLike(action.storyId, action.liked)
+                is StoryFeedUIAction.OnMoreClick -> navActions.navigateToStoryMoreSheet(action.storyId)
                 else -> {}
             }
         },

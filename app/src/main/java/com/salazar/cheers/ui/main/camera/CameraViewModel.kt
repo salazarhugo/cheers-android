@@ -61,7 +61,6 @@ class CameraViewModel @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             uploadWorkRequest,
         )
-
     }
 
     fun setImageUri(imageUri: Uri?) {

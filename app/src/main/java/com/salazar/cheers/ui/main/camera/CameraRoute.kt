@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.compose.chat.FunctionalityNotAvailablePanel
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.main.story.feed.SetStoryStatusBars
 import kotlinx.coroutines.launch
 
 /**
@@ -73,7 +74,7 @@ fun CameraRoute(
             0x55FFFFFF
         ),
         sheetElevation = 0.dp,
-        scrimColor = Color.Transparent
+        scrimColor = Color.Transparent,
     ) {
         CameraScreen(
             uiState = uiState,

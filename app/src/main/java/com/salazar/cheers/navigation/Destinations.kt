@@ -23,6 +23,7 @@ object MainDestinations {
     const val MAP_POST_HISTORY_ROUTE = "posts/history"
     const val EVENTS_ROUTE = "events"
     const val DIALOG_DELETE_POST = "dialogDeletePost"
+    const val DIALOG_DELETE_STORY = "dialogDeleteStory"
     const val EDIT_EVENT_ROUTE = "event/edit"
     const val EVENT_MORE_SHEET = "eventMoreSheet"
     const val MESSAGES_ROUTE = "messages"
@@ -48,6 +49,7 @@ object MainDestinations {
     const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
+    const val STORY_MORE_SHEET = "storyMoreSheet"
     const val STORY_ROUTE = "story"
     const val STORY_FEED_ROUTE = "storyFeed"
     const val SEND_GIFT_SHEET = "giftSheet"
@@ -366,8 +368,22 @@ class CheersNavigationActions(private val navController: NavHostController) {
             }
     }
 
+    val navigateToStoryMoreSheet: (storyId: String) -> Unit = { storyId ->
+        navController.navigate("${MainDestinations.STORY_MORE_SHEET}/$storyId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToStoryStats: (storyId: String) -> Unit = { storyId ->
         navController.navigate("${MainDestinations.STORY_STATS_ROUTE}/$storyId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToDeleteStoryDialog: (storyId: String) -> Unit = { storyId ->
+        navController.navigate("${MainDestinations.DIALOG_DELETE_STORY}/$storyId") {
             launchSingleTop = true
             restoreState = true
         }

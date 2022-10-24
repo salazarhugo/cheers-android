@@ -1,10 +1,12 @@
 package com.salazar.cheers.compose.utils
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
@@ -36,10 +38,12 @@ fun PrettyImage(
             }
         },
         error = {
-            Text(
-                text = "Error while loading image",
-                modifier = Modifier.align(Alignment.Center),
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Couldn't load image. Tap to retry.",
+                    color = Color.White,
+                )
+            }
         },
     )
 }

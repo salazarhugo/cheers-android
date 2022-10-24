@@ -38,29 +38,29 @@ fun ProfileMoreBottomSheet(
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.outline)
         )
-        Item(
+        SheetItem(
             text = "Settings",
             icon = Icons.Outlined.Settings,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnSettingsClick) }
         )
-        Item(
+        SheetItem(
             text = "Add Snapchat Friends",
             icon = Icons.Outlined.Archive,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnAddSnapchatFriends) }
         )
-        Item(
+        SheetItem(
             text = "Post History",
             icon = Icons.Outlined.Archive,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnPostHistoryClick) }
         )
-        Item(
+        SheetItem(
             text = "Nfc",
             icon = Icons.Outlined.Contactless,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnNfcClick) }
         )
-        Item(text = "QR code", icon = Icons.Outlined.QrCode)
-        Item(text = "Saved", icon = Icons.Outlined.BookmarkBorder)
-        Item(
+        SheetItem(text = "QR code", icon = Icons.Outlined.QrCode)
+        SheetItem(text = "Saved", icon = Icons.Outlined.BookmarkBorder)
+        SheetItem(
             text = "Copy Profile URL",
             icon = Icons.Outlined.ContentCopy,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnCopyProfileClick) }
@@ -69,7 +69,7 @@ fun ProfileMoreBottomSheet(
 }
 
 @Composable
-fun Item(
+fun SheetItem(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit = {}

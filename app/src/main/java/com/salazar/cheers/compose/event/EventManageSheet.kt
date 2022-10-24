@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.main.profile.Item
+import com.salazar.cheers.ui.main.profile.SheetItem
 
 
 @Composable
@@ -32,22 +32,22 @@ fun EventManageSheet(
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.outline)
         )
-        Item(
+        SheetItem(
             text = "Edit",
             icon = Icons.Outlined.Edit,
             onClick = onEditClick,
         )
-        Item(
+        SheetItem(
             text = "Delete",
             icon = Icons.Outlined.Delete,
             onClick = onDeleteClick,
         )
-        Item(
+        SheetItem(
             text = "Copy link",
             icon = Icons.Outlined.Link,
             onClick = onCopyLink,
         )
-        Item(
+        SheetItem(
             text = "Save",
             icon = Icons.Outlined.Save,
             onClick = {}
