@@ -75,7 +75,7 @@ class HomeViewModel @Inject constructor(
             uiState.value.storyPage + 1
         },
         onError = {
-            updateError(it?.localizedMessage)
+            updateError("Couldn't load stories")
         },
         onSuccess = { items, newKey ->
             viewModelState.update {
@@ -100,7 +100,7 @@ class HomeViewModel @Inject constructor(
             uiState.value.page + 1
         },
         onError = {
-            updateError(it?.localizedMessage)
+            updateError("Couldn't refresh feed")
         },
         onSuccess = { items, newKey ->
             viewModelState.update {

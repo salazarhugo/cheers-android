@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.CheersAppState
 
 /**
  * Stateful composable that displays the Navigation route for the Interests screen.
@@ -16,16 +17,25 @@ import com.salazar.cheers.navigation.CheersNavigationActions
  */
 @Composable
 fun HomeRoute(
+    appState: CheersAppState,
     homeViewModel: HomeViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
+    val errorMessage = uiState.errorMessage
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     focusManager.clearFocus()
 
     LaunchedEffect(Unit) {
         homeViewModel.initNativeAdd(context = context)
+    }
+
+
+    if (errorMessage != null) {
+        LaunchedEffect(appState.snackBarHostState) {
+            appState.showSnackBar(errorMessage)
+        }
     }
 
     HomeScreen(

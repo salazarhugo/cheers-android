@@ -86,7 +86,7 @@ fun CameraScreen(
     ) {
         Permission(Manifest.permission.CAMERA) {
             CameraPreview(
-                modifier = Modifier.padding(it),
+//                modifier = Modifier.padding(it),
                 imageCapture = imageCapture,
                 lensFacing = uiState.lensFacing,
                 onCameraUIAction = onCameraUIAction,

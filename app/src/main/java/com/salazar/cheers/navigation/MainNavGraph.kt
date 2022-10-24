@@ -200,6 +200,7 @@ fun NavGraphBuilder.mainNavGraph(
             }
             val homeViewModel = hiltViewModel<HomeViewModel>(parentEntry)
             HomeRoute(
+                appState = appState,
                 navActions = appState.navActions,
                 homeViewModel = homeViewModel,
             )
@@ -223,7 +224,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        dialog(MainDestinations.CAMERA_ROUTE) {
+        composable(MainDestinations.CAMERA_ROUTE) {
             SetStoryStatusBars()
             CameraRoute(
                 navActions = appState.navActions
