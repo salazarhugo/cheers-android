@@ -315,7 +315,12 @@ fun HomeTopBar(
                 )
             },
             title = {
-//                Text("Friends", fontWeight = FontWeight.Bold, fontFamily = Roboto)
+                Image(
+                    painter = painterResource(R.drawable.cheers_logo),
+                    modifier = Modifier
+                        .height(34.dp),
+                    contentDescription = null,
+                )
             },
             actions = {
                 IconButton(onClick = onActivityClick) {

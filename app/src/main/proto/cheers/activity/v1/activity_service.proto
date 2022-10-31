@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package cheers.activity.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/activity/v1;activity";
+
+service ActivityService {
+  rpc ListActivity (ListActivityRequest) returns (ListActivityResponse);
+}
+
+message ListActivityRequest {
+  string user_id = 1;
+}
+
+message ListActivityResponse {
+  repeated Activity activities = 1;
+}
+
+message Activity {
+  string id = 8;
+  enum ActivityType {
+    LIKE_POST = 0;
+    LIKE_STORY = 1;
+    FOLLOW = 2;
+    COMMENT_POST = 3;
+    MENTION_POST = 4;
+  }
+  ActivityType type = 1;
+  string text = 2;
+  string picture = 3;
+  string user_id  = 4;
+  google.protobuf.Timestamp timestamp  = 5;
+  string media_picture = 6;
+  string media_id = 7;
+}

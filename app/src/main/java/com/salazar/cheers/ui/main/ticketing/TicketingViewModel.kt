@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.PartyRepository
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +75,7 @@ class TicketingViewModel @Inject constructor(
 
     private fun refreshEvent() {
         viewModelScope.launch {
-            partyRepository.getEvent(eventId = eventId).collect { event ->
+            partyRepository.getParty(partyId = eventId).collect { event ->
                 updateEvent(party = event)
             }
         }

@@ -49,7 +49,7 @@ fun SendGiftRoute(
                 .padding(vertical = 10.dp)
                 .width(36.dp)
                 .height(4.dp)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.outline)
         )
         when (success) {
@@ -123,7 +123,7 @@ fun ConfirmTransactionScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Text(
 //                text = "Send $coins ${if (coins > 1) "coins" else "coin"} to $username"
@@ -175,7 +175,7 @@ fun FailureSplashView(
                     modifier = Modifier.padding(8.dp),
                 )
                 Button(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.medium,
                     onClick = onRechargeClick,
                 ) {
                     Text("Recharge")

@@ -28,9 +28,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.compose.share.ErrorMessage
 
 @Composable
 fun CreateAccountScreen(
+    errorMessage: String?,
     username: String,
     acceptTerms: Boolean,
     isLoading: Boolean,
@@ -62,6 +64,7 @@ fun CreateAccountScreen(
                     uriHandler.openUri(it)
                 })
             Spacer(Modifier.height(32.dp))
+            ErrorMessage(errorMessage = errorMessage, paddingValues = PaddingValues(vertical = 16.dp))
             SignUpButton(
                 acceptTerms = acceptTerms,
                 isLoading = isLoading,
@@ -147,12 +150,12 @@ fun SignUpButton(
     onSignUp: () -> Unit,
 ) {
     Button(
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.medium,
         onClick = { onSignUp() },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = acceptTerms,
+        enabled = acceptTerms && !isLoading,
     ) {
         if (isLoading)
             CircularProgressIndicator(
@@ -182,7 +185,7 @@ fun PasswordTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(MaterialTheme.shapes.medium),
         onValueChange = {
             onPasswordChanged(it)
         },
@@ -224,7 +227,7 @@ fun EmailTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(MaterialTheme.shapes.medium),
         onValueChange = { onEmailChanged(it) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(

@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.guestlist
+package com.salazar.cheers.ui.main.party.guestlist
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

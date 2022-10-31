@@ -14,22 +14,19 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import cheers.type.PostOuterClass
-import cheers.type.PrivacyOuterClass
 import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.PostRepository
-import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import makeStatusNotification
 import java.io.ByteArrayOutputStream
 
 @HiltWorker
-class UploadPostWorker @AssistedInject constructor(
+class CreatePostWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val postRepository: PostRepository,

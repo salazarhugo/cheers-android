@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Party
+import com.salazar.cheers.internal.Post
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,6 +17,9 @@ interface PartyDao{
 
     @Query("SELECT * FROM events WHERE hostId = :accountId")
     fun getEvents(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Party>>
+
+    @Query("SELECT * FROM events WHERE accountId = :accountId ORDER BY events.startDate DESC")
+    fun feedParty(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Party>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(party: Party)

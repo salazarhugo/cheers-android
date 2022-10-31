@@ -78,7 +78,7 @@ fun ShareButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
         ) {
             Text(text = text)
         }

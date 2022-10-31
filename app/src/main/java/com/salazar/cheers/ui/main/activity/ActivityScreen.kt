@@ -29,7 +29,7 @@ import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.ActivityType
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.internal.toSentence
-import com.salazar.cheers.ui.main.event.add.TopAppBar
+import com.salazar.cheers.ui.main.party.create.TopAppBar
 
 
 @Composable

@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.add
+package com.salazar.cheers.ui.main.party.create
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -16,9 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarViewMonth
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Edit
@@ -58,9 +56,9 @@ import java.util.*
 
 
 @Composable
-fun AddEventScreen(
-    uiState: AddEventUiState,
-    onAddEventUIAction: (AddEventUIAction) -> Unit,
+fun CreatePartyScreen(
+    uiState: CreatePartyUiState,
+    onCreatePartyUIAction: (CreatePartyUIAction) -> Unit,
     onPrivacyChange: (Privacy) -> Unit,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
@@ -78,7 +76,7 @@ fun AddEventScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    onDismiss = { onAddEventUIAction(AddEventUIAction.OnDismiss) },
+                    onDismiss = { onCreatePartyUIAction(CreatePartyUIAction.OnDismiss) },
                     title = "New Party"
                 )
             },
@@ -94,7 +92,7 @@ fun AddEventScreen(
                     uiState = uiState,
                     modifier = Modifier.weight(1f),
                     pagerState = pagerState,
-                    onAddEventUIAction = onAddEventUIAction,
+                    onCreatePartyUIAction = onCreatePartyUIAction,
                     onNameChange = onNameChange,
                     onDescriptionChange = onDescriptionChange,
                     onStartTimeSecondsChange = onStartTimeSecondsChange,
@@ -108,7 +106,7 @@ fun AddEventScreen(
                     uiState = uiState,
                     onClick = {
                         if (pagerState.currentPage == 3)
-                            onAddEventUIAction(AddEventUIAction.OnUploadEvent)
+                            onCreatePartyUIAction(CreatePartyUIAction.OnUploadParty)
                         else
                             scope.launch {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
@@ -137,10 +135,10 @@ fun TopAppBar(
 
 @Composable
 fun Tabs(
-    uiState: AddEventUiState,
+    uiState: CreatePartyUiState,
     pagerState: PagerState,
     modifier: Modifier,
-    onAddEventUIAction: (AddEventUIAction) -> Unit,
+    onCreatePartyUIAction: (CreatePartyUIAction) -> Unit,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onStartTimeSecondsChange: (Long) -> Unit,
@@ -165,7 +163,7 @@ fun Tabs(
                     onEventNameChange = onNameChange,
                     onStartDateChanged = onStartTimeSecondsChange,
                     onEndTimeSecondsChange = onEndTimeSecondsChange,
-                    onHasEndDateToggle = { onAddEventUIAction(AddEventUIAction.OnHasEndDateToggle) },
+                    onHasEndDateToggle = { onCreatePartyUIAction(CreatePartyUIAction.OnHasEndDateToggle) },
                     onShowGuestListToggle = onShowGuestListToggle,
                 )
                 1 -> DescriptionPage(
@@ -181,23 +179,23 @@ fun Tabs(
                 )
                 3 -> FirstScreen(
                     uiState = uiState,
-                    onAddEventUIAction = {
+                    onCreatePartyUIAction = {
                         when (it) {
-                            AddEventUIAction.OnEventDetailsClick ->
+                            CreatePartyUIAction.OnPartyDetailsClick ->
                                 scope.launch {
                                     pagerState.animateScrollToPage(0)
                                 }
-                            AddEventUIAction.OnDescriptionClick ->
+                            CreatePartyUIAction.OnDescriptionClick ->
                                 scope.launch {
                                     pagerState.animateScrollToPage(1)
                                 }
-                            AddEventUIAction.OnLocationClick ->
+                            CreatePartyUIAction.OnLocationClick ->
                                 scope.launch {
                                     pagerState.animateScrollToPage(2)
                                 }
                             else -> {}
                         }
-                        onAddEventUIAction(it)
+                        onCreatePartyUIAction(it)
                     },
                 )
             }
@@ -207,24 +205,24 @@ fun Tabs(
 
 @Composable
 fun FirstScreen(
-    uiState: AddEventUiState,
-    onAddEventUIAction: (AddEventUIAction) -> Unit,
+    uiState: CreatePartyUiState,
+    onCreatePartyUIAction: (CreatePartyUIAction) -> Unit,
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         AddPhoto(
             photo = uiState.photo,
-            onAddPhotoClick = { onAddEventUIAction(AddEventUIAction.OnAddPhoto) },
+            onAddPhotoClick = { onCreatePartyUIAction(CreatePartyUIAction.OnAddPhoto) },
         )
         EventDetails(
             name = uiState.name,
             privacy = uiState.privacy,
             startTimeSeconds = uiState.startTimeSeconds,
-            onEventDetailsClick = { onAddEventUIAction(AddEventUIAction.OnEventDetailsClick) }
+            onEventDetailsClick = { onCreatePartyUIAction(CreatePartyUIAction.OnPartyDetailsClick) }
         )
         DividerM3()
         Description(
             description = uiState.description,
-            onDescriptionClick = { onAddEventUIAction(AddEventUIAction.OnDescriptionClick) }
+            onDescriptionClick = { onCreatePartyUIAction(CreatePartyUIAction.OnDescriptionClick) }
         )
         DividerM3()
         CategorySection(
@@ -295,7 +293,7 @@ fun Item(
 
 @Composable
 fun StartDateInput(
-    uiState: AddEventUiState,
+    uiState: CreatePartyUiState,
     onStartDateChanged: (Long) -> Unit,
     onEndDateChanged: (Long) -> Unit,
     onHasEndDateToggle: () -> Unit,
@@ -418,7 +416,7 @@ fun DescriptionInput(
         modifier = Modifier
             .fillMaxWidth(),
         onValueChange = { onDescriptionChanged(it) },
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.medium,
         singleLine = false,
 //        keyboardOptions = KeyboardOptions(
 //            keyboardType = KeyboardType.Text,
@@ -444,7 +442,7 @@ fun NameTextField(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.medium,
         onValueChange = { onEventNameChanged(it) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
@@ -463,7 +461,7 @@ fun NameTextField(
 fun ShareButton(
     modifier: Modifier = Modifier,
     page: Int,
-    uiState: AddEventUiState,
+    uiState: CreatePartyUiState,
     onClick: () -> Unit,
 ) {
     val text = if (page == 3) "Create Event" else "Next"
@@ -477,7 +475,7 @@ fun ShareButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
             enabled = uiState.name.isNotBlank()
         ) {
             Text(text = text)
@@ -662,7 +660,7 @@ fun DescriptionPage(
 
 @Composable
 fun EventDetailsPage(
-    uiState: AddEventUiState,
+    uiState: CreatePartyUiState,
     onEventNameChange: (String) -> Unit,
     onStartDateChanged: (Long) -> Unit,
     onEndTimeSecondsChange: (Long) -> Unit,

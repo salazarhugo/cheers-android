@@ -1,5 +1,6 @@
-package com.salazar.cheers.ui.main.event.add
+package com.salazar.cheers.ui.main.party.create
 
+import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
@@ -7,17 +8,20 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.type.PrivacyOuterClass
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.mapbox.search.MapboxSearchSdk
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchOptions
 import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
-import com.salazar.cheers.data.repository.PartyRepository
-import com.salazar.cheers.internal.Party
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.workers.CreatePartyWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -30,19 +34,19 @@ import java.util.*
 import javax.inject.Inject
 
 
-sealed class AddEventUIAction {
-    object OnShowMapChange : AddEventUIAction()
-    object OnDismiss : AddEventUIAction()
-    object OnAddPhoto : AddEventUIAction()
-    object OnEventDetailsClick : AddEventUIAction()
-    object OnDescriptionClick : AddEventUIAction()
-    object OnLocationClick : AddEventUIAction()
-    object OnUploadEvent : AddEventUIAction()
-    object OnAddPeopleClick : AddEventUIAction()
-    object OnHasEndDateToggle : AddEventUIAction()
+sealed class CreatePartyUIAction {
+    object OnShowMapChange : CreatePartyUIAction()
+    object OnDismiss : CreatePartyUIAction()
+    object OnAddPhoto : CreatePartyUIAction()
+    object OnPartyDetailsClick : CreatePartyUIAction()
+    object OnDescriptionClick : CreatePartyUIAction()
+    object OnLocationClick : CreatePartyUIAction()
+    object OnUploadParty : CreatePartyUIAction()
+    object OnAddPeopleClick : CreatePartyUIAction()
+    object OnHasEndDateToggle : CreatePartyUIAction()
 }
 
-data class AddEventUiState(
+data class CreatePartyUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val name: String = "",
@@ -67,11 +71,13 @@ data class AddEventUiState(
 
 
 @HiltViewModel
-class AddEventViewModel @Inject constructor(
+class CreatePartyViewModel @Inject constructor(
+    application: Application,
     private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(AddEventUiState(isLoading = false))
+    private val viewModelState = MutableStateFlow(CreatePartyUiState(isLoading = false))
+    private val workManager = WorkManager.getInstance(application)
     private var searchJob: Job? = null
 
     val uiState = viewModelState
@@ -190,26 +196,31 @@ class AddEventViewModel @Inject constructor(
 
     val id = mutableStateOf<UUID?>(null)
 
-    fun uploadEvent() {
+    fun createParty() {
         val state = viewModelState.value
 
         viewModelScope.launch {
             state.apply {
-                partyRepository.createParty(
-                    Party().copy(
-                        name = name,
-                        address = address,
-                        description = description,
-                        showGuestList = showGuestList,
-                        privacy = Privacy.PUBLIC,
-                        startDate = startTimeSeconds,
-                        endDate = endTimeSeconds,
-                        bannerUrl = photo.toString(),
-                        locationName = locationName,
-                        latitude = latitude,
-                        longitude = longitude,
-                    ),
-                )
+                val uploadWorkRequest = OneTimeWorkRequestBuilder<CreatePartyWorker>()
+                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    .setInputData(
+                        workDataOf(
+                            "NAME" to name,
+                            "ADDRESS" to address,
+                            "DESCRIPTION" to description,
+                            "EVENT_PRIVACY" to privacy.name,
+                            "IMAGE_URI" to photo.toString(),
+                            "START_DATETIME" to startTimeSeconds,
+                            "END_DATETIME" to endDate,
+                            "LOCATION_NAME" to locationName,
+                            "LATITUDE" to latitude,
+                            "SHOW_GUEST_LIST" to showGuestList,
+                            "LONGITUDE" to longitude,
+                        )
+                    )
+                    .build()
+
+                workManager.enqueue(uploadWorkRequest)
             }
         }
     }

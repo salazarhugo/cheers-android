@@ -1,9 +1,9 @@
-package com.salazar.cheers.ui.main.event.detail
+package com.salazar.cheers.ui.main.party.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.PartyRepository
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -70,7 +70,7 @@ class EventDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            partyRepository.getEvent(eventId = eventId).collect { event ->
+            partyRepository.getParty(partyId = eventId).collect { event ->
                 onEventChange(party = event)
             }
         }

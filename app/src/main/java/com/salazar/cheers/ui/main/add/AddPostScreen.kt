@@ -58,7 +58,7 @@ import com.salazar.cheers.compose.share.ErrorMessage
 import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.event.add.Item
+import com.salazar.cheers.ui.main.party.create.Item
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
@@ -372,7 +372,7 @@ fun ShareButton(
                 .fillMaxWidth()
                 .padding(16.dp)
                 .height(48.dp),
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
         ) {
             Text(text = text)
         }
@@ -702,7 +702,7 @@ fun PrivacyBottomSheet(
                         .padding(top = 10.dp)
                         .width(36.dp)
                         .height(4.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.outline)
                 )
                 Text(
@@ -736,7 +736,7 @@ fun PrivacyBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                shape = RoundedCornerShape(8.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Done")
             }

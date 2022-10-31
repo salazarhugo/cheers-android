@@ -31,7 +31,7 @@ fun EmailButton(
 //        border = BorderStroke(width = 1.dp, color = borderColor),
         color = Color(0xFF800000),
         elevation = 0.dp,
-        shape = RoundedCornerShape(4.dp),
+        shape = MaterialTheme.shapes.small,
     ) {
         Row(
             modifier = Modifier

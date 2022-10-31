@@ -10,6 +10,7 @@ fun RegisterScreen(
     onAcceptTermsChange: (Boolean) -> Unit,
 ) {
     CreateAccountScreen(
+        errorMessage = uiState.errorMessage,
         username = uiState.username,
         isLoading = uiState.isLoading,
         acceptTerms = uiState.termsAccepted,

@@ -17,10 +17,9 @@ import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.workers.UploadPostWorker
+import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -58,6 +57,7 @@ class AddPostViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPostUiState(isLoading = true))
+    private val workManager = WorkManager.getInstance(application)
 
     val uiState = viewModelState
         .stateIn(
@@ -78,7 +78,6 @@ class AddPostViewModel @Inject constructor(
 //        }
     }
 
-    private val workManager = WorkManager.getInstance(application)
 
     fun selectPrivacy(privacy: Privacy) {
         viewModelState.update {
@@ -189,7 +188,7 @@ class AddPostViewModel @Inject constructor(
             .build()
 
         val uploadWorkRequest =
-            OneTimeWorkRequestBuilder<UploadPostWorker>()
+            OneTimeWorkRequestBuilder<CreatePostWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setInputData(
                     workDataOf(

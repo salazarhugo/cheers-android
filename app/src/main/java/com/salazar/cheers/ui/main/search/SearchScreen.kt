@@ -308,7 +308,7 @@ fun SearchBar(
     ) {
         Card(
             elevation = 0.dp,
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(46.dp),

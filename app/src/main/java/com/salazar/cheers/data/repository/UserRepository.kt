@@ -7,7 +7,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserItem
@@ -20,8 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
@@ -40,7 +37,7 @@ class UserRepository @Inject constructor(
     suspend fun createUser(
         username: String,
         email: String,
-    ): User? {
+    ): Result<User> {
         try {
             val authUser = FirebaseAuth.getInstance().currentUser!!
 
@@ -60,11 +57,10 @@ class UserRepository @Inject constructor(
 
             userDao.insert(createdUser)
 
-            return createdUser
+            return Result.success(createdUser)
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("YES", e.toString())
-            return null
+            return Result.failure(e)
         }
     }
 

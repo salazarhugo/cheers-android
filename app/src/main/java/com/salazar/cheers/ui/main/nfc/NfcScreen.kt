@@ -51,7 +51,7 @@ fun NfcScreen() {
             onClick = {
                 tap = !tap
             },
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
             border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .fillMaxWidth()

@@ -54,7 +54,7 @@ fun TicketingScreen(
             Button(
                 modifier = Modifier.padding(16.dp),
                 onClick = { /*TODO*/ },
-                shape = RoundedCornerShape(8.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text(
                     text = "Next",

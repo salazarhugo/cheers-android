@@ -6,10 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Handyman
-import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -37,7 +34,7 @@ fun EventHeaderButtons(
         if (uid == hostId) {
             Button(
                 onClick = onManageClick,
-                shape = RoundedCornerShape(4.dp),
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier.weight(1f),
             ) {
                 Icon(Icons.Default.Handyman, null)
@@ -48,7 +45,7 @@ fun EventHeaderButtons(
             Spacer(Modifier.width(8.dp))
             FilledTonalButton(
                 onClick = onInviteClick,
-                shape = RoundedCornerShape(4.dp),
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier.weight(1f),
             ) {
                 Icon(Icons.Default.Email, null)
@@ -59,7 +56,7 @@ fun EventHeaderButtons(
             EventGoingButton(
                 going = going,
                 onGoingToggle = onGoingClick,
-//                shape = RoundedCornerShape(4.dp),
+//                shape = MaterialTheme.shapes.small,
                 modifier = Modifier.weight(1f),
             )
             Spacer(Modifier.width(8.dp))

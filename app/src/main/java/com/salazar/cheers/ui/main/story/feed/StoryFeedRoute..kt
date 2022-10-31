@@ -1,22 +1,14 @@
 package com.salazar.cheers.ui.main.story.feed
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LifecycleOwner
-import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
-import com.salazar.cheers.ui.main.story.StoryScreen
-import com.salazar.cheers.ui.main.story.StoryUIAction
-import com.salazar.cheers.ui.main.story.StoryViewModel
-import kotlinx.coroutines.launch
 
 /**
  * Stateful composable that displays the Navigation route for the StoryFeed screen.

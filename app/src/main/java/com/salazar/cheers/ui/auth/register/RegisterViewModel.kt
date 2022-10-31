@@ -10,16 +10,13 @@ import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.util.Utils.validateUsername
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RegisterUiState(
     val isLoading: Boolean = false,
-    val errorMessage: String = "",
+    val errorMessage: String? = null,
     val username: String = "",
     val termsAccepted: Boolean = false,
     val success: Boolean = false,
@@ -74,7 +71,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun updateErrorMessage(errorMessage: String) {
+    private fun updateErrorMessage(errorMessage: String?) {
         viewModelState.update {
             it.copy(errorMessage = errorMessage)
         }
@@ -121,12 +118,14 @@ class RegisterViewModel @Inject constructor(
         username: String,
     ) {
         viewModelScope.launch {
-            val user = userRepository.createUser(
+            val result = userRepository.createUser(
                 username = username,
                 email = email,
             )
-            if (user != null)
+            if (result.isSuccess)
                 viewModelState.update { it.copy(success = true) }
+            else
+                updateErrorMessage(result.exceptionOrNull()?.localizedMessage)
         }
     }
 
@@ -143,31 +142,30 @@ class RegisterViewModel @Inject constructor(
             }
         }
 
-        if (!auth.isSignInWithEmailLink(emailLink))
+        if (!auth.isSignInWithEmailLink(emailLink)) {
+            updateErrorMessage("Invalid link")
             return
+        }
 
         updateIsLoading(true)
 
         viewModelScope.launch {
-            storeUserEmail.getEmail.collect { email ->
+            val email = storeUserEmail.getEmail.firstOrNull() ?: return@launch
 
-                if (email == null) return@collect
-
-                auth.signInWithEmailLink(email, emailLink).addOnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Log.e("YES", "Error signing in with email link", task.exception)
-                        return@addOnCompleteListener
-                    }
-
-                    Log.d("YES", "Successfully signed in with email link!")
-                    createUser(
-                        email = email,
-                        username = username,
-                    )
+            auth.signInWithEmailLink(email, emailLink).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    updateErrorMessage("Couldn't sign in with email link")
+                    updateIsLoading(false)
+                    return@addOnCompleteListener
                 }
+
+                createUser(
+                    email = email,
+                    username = username,
+                )
+                updateIsLoading(false)
             }
         }
     }
-
 }
 

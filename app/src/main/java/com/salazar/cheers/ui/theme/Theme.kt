@@ -30,6 +30,7 @@ fun CheersTheme(
 
     MaterialTheme(
         colorScheme = colors,
+        shapes = Shapes,
         typography = Typography,
         content = content
     )

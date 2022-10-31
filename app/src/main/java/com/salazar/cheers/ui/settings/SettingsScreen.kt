@@ -144,7 +144,7 @@ fun RedButton(
 ) {
     TextButton(
         onClick = onClick,
-        shape = RoundedCornerShape(4.dp),
+        shape = MaterialTheme.shapes.small,
     ) {
         Text(
             text = text,
@@ -161,7 +161,7 @@ fun RedButton(
 fun SignOutButton(onSignOut: () -> Unit) {
     TextButton(
         onClick = onSignOut,
-        shape = RoundedCornerShape(4.dp),
+        shape = MaterialTheme.shapes.small,
     ) {
         Text(
             text = "Log Out",

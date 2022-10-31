@@ -209,7 +209,7 @@ fun ReplyMessage(
                                 modifier = Modifier
                                     .padding(start = 8.dp)
                                     .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(MaterialTheme.shapes.medium)
                                     .size(36.dp),
                                 contentDescription = null,
                             )

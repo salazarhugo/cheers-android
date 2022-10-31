@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.detail
+package com.salazar.cheers.ui.main.party.detail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

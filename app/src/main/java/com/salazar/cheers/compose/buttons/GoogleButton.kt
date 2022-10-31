@@ -38,9 +38,9 @@ fun GoogleButton(
                 clicked = !clicked
                 onClicked()
             },
-        color = Color.White,//Color(0xFF4285F4),
+        color = Color.White,
         shadowElevation = 2.dp,
-        shape = RoundedCornerShape(2.dp)
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             modifier = Modifier

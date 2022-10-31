@@ -46,7 +46,7 @@ import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.utils.PrettyImage
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.ui.main.event.Event
+import com.salazar.cheers.ui.main.party.Event
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -233,7 +233,7 @@ fun ProfileButtons(
     ) {
         FilledTonalButton(
             onClick = onEditProfileClicked,
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .weight(0.9f)
                 .height(34.dp)

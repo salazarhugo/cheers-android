@@ -40,7 +40,7 @@ fun EventVenue(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
                 .aspectRatio(2f)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(MaterialTheme.shapes.medium),
         )
         EventHeaderItem(
             icon = Icons.Default.Directions,

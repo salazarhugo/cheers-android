@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.detail
+package com.salazar.cheers.ui.main.party.detail
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -177,7 +177,7 @@ fun EventResponses(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                    .border(2.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium)
                     .clickable { onInterestedCountClick() },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -195,7 +195,7 @@ fun EventResponses(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                    .border(2.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium)
                     .clickable { onGoingCountClick() },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,

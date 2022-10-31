@@ -45,6 +45,7 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun remoteKeyDao(): RemoteKeyDao
     abstract fun storyRemoteKeyDao(): StoryRemoteKeyDao
     abstract fun eventRemoteKeyDao(): EventRemoteKeyDao
+    abstract fun activityDao(): ActivityDao
 
     companion object {
         @Volatile
