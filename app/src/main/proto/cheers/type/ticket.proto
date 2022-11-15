@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheers.type;
 
-option go_package = "github.com/salazarhugo/cheers1/proto/genproto";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/type";
 
 message Ticket {
   bool validated = 1;

@@ -4,33 +4,88 @@ package cheers.party.v1;
 
 import "cheers/type/party/party.proto";
 import "cheers/type/user/user.proto";
-import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 option java_multiple_files = true;
-option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/party/v1;party";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/party/v1;party";
 
 service PartyService {
-  rpc CreateParty (CreatePartyRequest) returns (cheers.type.Party);
-  rpc GetParty (GetPartyRequest) returns (PartyResponse);
-  rpc UpdateParty (UpdatePartyRequest) returns (cheers.type.Party);
-  rpc DeleteParty (DeletePartyRequest) returns (google.protobuf.Empty);
-  rpc FeedParty (FeedPartyRequest) returns (FeedPartyResponse);
+  rpc CreateParty (CreatePartyRequest) returns (CreatePartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties"
+      body: "*"
+    };
+  }
+
+  rpc GetParty (GetPartyRequest) returns (GetPartyResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}"
+    };
+  }
+
+  rpc UpdateParty (UpdatePartyRequest) returns (UpdatePartyResponse) {
+    option (google.api.http) = {
+      patch: "/v1/parties"
+      body: "*"
+    };
+  }
+
+  rpc DeleteParty (DeletePartyRequest) returns (DeletePartyResponse) {
+    option (google.api.http) = {
+      delete: "/v1/parties/{party_id}"
+    };
+  }
+
+  rpc GetPartyItem (GetPartyItemRequest) returns (GetPartyItemResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}/item"
+    };
+  }
+
+  rpc FeedParty (FeedPartyRequest) returns (FeedPartyResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/feed"
+    };
+  }
 }
 
 message CreatePartyRequest {
   cheers.type.Party party = 1;
 }
 
+message CreatePartyResponse {
+  cheers.type.Party party = 1;
+}
+
 message GetPartyRequest {
-  string id = 1;
+  string party_id = 1;
+}
+
+message GetPartyResponse {
+  cheers.type.Party party = 1;
+}
+
+message GetPartyItemRequest {
+  string party_id = 1;
+}
+
+message GetPartyItemResponse {
+  PartyItem item = 1;
 }
 
 message UpdatePartyRequest {
   cheers.type.Party party = 1;
 }
 
+message UpdatePartyResponse {
+  cheers.type.Party party = 1;
+}
+
 message DeletePartyRequest {
-  string id = 1;
+  string party_id = 1;
+}
+
+message DeletePartyResponse {
 }
 
 message FeedPartyRequest {
@@ -40,18 +95,16 @@ message FeedPartyRequest {
 }
 
 message FeedPartyResponse {
-  repeated PartyResponse parties = 1;
+  repeated PartyItem items = 1;
   string next_page_token = 2;
 }
 
-message PartyResponse {
+message PartyItem {
   cheers.type.Party party = 1;
-  cheers.type.User creator = 2;
+  cheers.type.User user = 2;
   int64 going_count = 3;
   int64 interested_count = 4;
   int64 invited_count = 5;
-  bool is_going = 6;
-  bool is_interested = 7;
   bool is_creator = 8;
   PartyUserResponse user_response = 9;
 }

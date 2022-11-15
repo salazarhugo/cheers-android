@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package cheers.type;
 
-option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/type/user;user";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/user;user";
+
+import "google/protobuf/timestamp.proto";
 
 message User {
   string id = 1;
@@ -16,7 +18,7 @@ message User {
   string birthday = 12;
   Gender gender = 13;
   string phone_number = 9;
-  float created = 10;
+  google.protobuf.Timestamp create_time = 10;
   repeated string registration_tokens = 11;
 }
 

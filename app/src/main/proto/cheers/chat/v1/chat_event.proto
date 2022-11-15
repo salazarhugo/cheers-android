@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package cheers.chat.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/chat/v1;chat";
+
+message ChatEvent {
+  string sender_id = 1;
+  string room_id = 2;
+}

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package cheers.type;
 
+option go_package = "github.com/salazarhugo/cheers1/gen/go/type";
+
 enum UserEventType {
   FOLLOW = 0;
   STORY_LIKE = 1;

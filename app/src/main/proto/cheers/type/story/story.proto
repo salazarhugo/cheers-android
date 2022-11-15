@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheers.type;
 
-option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/type/story;storypb";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/story;storypb";
 
 import "google/protobuf/timestamp.proto";
 import "cheers/type/privacy/privacy.proto";

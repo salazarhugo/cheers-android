@@ -7,7 +7,7 @@ import "cheers/type/user/user.proto";
 import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
-option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/story/v1;story";
+option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/story/v1;story";
 
 service StoryService {
   rpc CreateStory (CreateStoryRequest) returns (StoryResponse);

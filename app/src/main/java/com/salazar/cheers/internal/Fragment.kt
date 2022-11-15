@@ -9,10 +9,3 @@ data class Screen(
     val selectedIcon: @Composable () -> Unit,
     val label: String? = null,
 )
-
-data class Fragment(
-    val navigationId: Int,
-    val icon: @Composable () -> Unit,
-    val selectedIcon: @Composable () -> Unit,
-    val label: String? = null,
-)

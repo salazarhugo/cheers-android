@@ -68,7 +68,7 @@ class PartyRepository @Inject constructor(
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val response = partyService.feedParty(request)
 
-        val parties = response.partiesList.map {
+        val parties = response.itemsList.map {
             it.toParty(uid)
         }
 

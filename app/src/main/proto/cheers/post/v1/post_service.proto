@@ -5,17 +5,35 @@ package cheers.post.v1;
 import "cheers/type/post/post.proto";
 import "cheers/type/user/user.proto";
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/post/v1;post";
 
 service PostService {
-  rpc CreatePost (CreatePostRequest) returns (PostResponse);
-  rpc GetParty (GetPostRequest) returns (PostResponse);
-  rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
-  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty);
+  /*
+    Create a new post
+   */
+  rpc CreatePost (CreatePostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts"
+      body: "*"
+    };
+  };
 
-  rpc FeedPost (FeedPostRequest) returns (FeedPostResponse);
+  rpc GetPost (GetPostRequest) returns (PostResponse);
+  rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
+  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/posts"
+    };
+  }
+
+  rpc FeedPost (FeedPostRequest) returns (FeedPostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/feed"
+    };
+  };
   rpc LikePost (LikePostRequest) returns (LikePostResponse);
   rpc UnlikePost (UnlikePostRequest) returns (UnlikePostResponse);
   rpc SavePost (SavePostRequest) returns (SavePostResponse);

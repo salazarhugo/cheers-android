@@ -8,25 +8,27 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.data.datastore.dataStore
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.notifications.chatNotification
 import com.salazar.cheers.notifications.defaultNotification
 import com.salazar.cheers.notifications.newFollowerNotification
 import com.salazar.cheers.notifications.newPostNotification
+import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.util.Utils.getCircledBitmap
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import java.net.URL
+import javax.inject.Inject
 
 
-class MyFirebaseMessagingService : FirebaseMessagingService() {
+@AndroidEntryPoint
+class MyFirebaseMessagingService @Inject constructor(
+    private val userRepository: UserRepository,
+) : FirebaseMessagingService() {
 
     override fun onNewToken(newRegistrationToken: String) {
         super.onNewToken(newRegistrationToken)
@@ -34,9 +36,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (FirebaseAuth.getInstance().currentUser == null)
             return
 
-//        GlobalScope.launch {
-//            userRepository.addTokenToNeo4j(newRegistrationToken)
-//        }
+        runBlocking {
+            userRepository.addTokenToNeo4j(newRegistrationToken)
+        }
     }
 
 
@@ -137,14 +139,4 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         return pending
     }
-
-    private fun incrementPreference(key: Preferences.Key<Int>) {
-        GlobalScope.launch {
-            dataStore.edit { preference ->
-                val current = preference[key] ?: 0
-                preference[key] = current + 1
-            }
-        }
-    }
-
 }

@@ -33,11 +33,11 @@ class UserService : UserServiceGrpcKt.UserServiceCoroutineImplBase() {
         return super.unfollowUser(request)
     }
 
-    override suspend fun blockUser(request: BlockUserRequest): Empty {
+    override suspend fun blockUser(request: BlockUserRequest): BlockUserResponse {
         return super.blockUser(request)
     }
 
-    override suspend fun unblockUser(request: UnblockUserRequest): Empty {
+    override suspend fun unblockUser(request: UnblockUserRequest): UnblockUserResponse {
         return super.unblockUser(request)
     }
 }

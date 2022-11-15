@@ -1,6 +1,8 @@
 package com.salazar.cheers.data.repository
 
 import android.util.Log
+import cheers.notification.v1.CreateRegistrationTokenRequest
+import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -35,6 +37,7 @@ class UserRepository @Inject constructor(
     private val cheersDao: CheersDao,
     private val userItemDao: UserItemDao,
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
+    private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
 ) {
 
     suspend fun createUser(
@@ -403,10 +406,16 @@ class UserRepository @Inject constructor(
         if (newRegistrationToken == null)
             throw NullPointerException("FCM token is null.")
 
+        Log.e("GRPC", "ADDING TOKEN")
         try {
-//            coreService.addRegistrationToken(newRegistrationToken)
-        } catch (e: HttpException) {
+            val request = CreateRegistrationTokenRequest.newBuilder()
+                .setToken(newRegistrationToken)
+                .build()
+
+            notificationService.createRegistrationToken(request = request)
+        } catch (e: Exception) {
             e.printStackTrace()
+            Log.e("GRPC", e.toString())
         }
     }
 

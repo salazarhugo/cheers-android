@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheers.type;
 
-option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/type/privacy;privacy";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/privacy;privacy";
 
 enum Privacy {
   FRIENDS = 0;

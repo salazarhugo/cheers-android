@@ -6,6 +6,7 @@ import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
+import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.story.v1.StoryServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
@@ -71,6 +72,18 @@ object AppModule {
             .build()
         return ChatServiceGrpcKt
             .ChatServiceCoroutineStub(a)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): NotificationServiceGrpcKt.NotificationServiceCoroutineStub {
+        return NotificationServiceGrpcKt
+            .NotificationServiceCoroutineStub(managedChannel)
             .withInterceptors(errorHandleInterceptor)
             .withInterceptors()
     }

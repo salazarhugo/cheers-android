@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package cheers.post.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/post/v1;post";
+
+import "cheers/type/post/post.proto";
+
+message PostEvent {
+  string user_id = 1;
+  cheers.type.Post post = 2;
+  enum EventType  {
+    CREATE = 0;
+    UPDATE = 1;
+    DELETE = 2;
+    LIKE = 3;
+    COMMENT = 4;
+  }
+  EventType type = 3;
+}
