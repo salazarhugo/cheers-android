@@ -32,7 +32,7 @@ fun FacebookButton(
 //        border = BorderStroke(width = 1.dp, color = borderColor),
         color = Color(0xFF0091ea),
         elevation = 0.dp,
-        shape = RoundedCornerShape(4.dp)
+        shape = MaterialTheme.shapes.small
     ) {
         Row(
             modifier = Modifier

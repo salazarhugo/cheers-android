@@ -3,12 +3,13 @@ package com.salazar.cheers.internal
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.salazar.cheers.internal.ActivityType.*
+import java.util.*
 
 
 @Entity(tableName = "activity")
 data class Activity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val id: String = UUID.randomUUID().toString(),
     val type: ActivityType = NONE,
     val userId: String = "",
     val eventId: String = "",

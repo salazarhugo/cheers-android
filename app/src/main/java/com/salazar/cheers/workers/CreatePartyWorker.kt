@@ -12,16 +12,18 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
+import cheers.type.PartyOuterClass
+import cheers.type.PostOuterClass
+import cheers.type.PrivacyOuterClass
 import com.google.firebase.auth.FirebaseAuth
+import com.google.protobuf.Timestamp
+import com.google.type.LatLng
 import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.PartyRepository
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import makeStatusNotification
@@ -77,33 +79,20 @@ class CreatePartyWorker @AssistedInject constructor(
 
         try {
             val user = userRepository.getCurrentUser()
-            val party = Party(
-                id = UUID.randomUUID().toString(),
-                hostId = FirebaseAuth.getInstance().currentUser?.uid!!,
-                hostName = user.name,
-                name = name,
-                address = address,
-                showGuestList = showGuestList,
-                description = description,
-                privacy = Privacy.valueOf(eventPrivacy),
-                startDate = startDateTime,
-                endDate = endDateTime,
-                locationName = locationName,
-                latitude = latitude,
-                longitude = longitude,
-            )
+            val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 
-//            if (imageUri == null || imageUri == "null")
-//                partyRepository.uploadEvent(party)
-//            else {
-//                val photoBytes = extractImage(Uri.parse(imageUri))
-//
-//                val task: Task<Uri> = StorageUtil.uploadEventImage(photoBytes)
-//                val downloadUrl = Tasks.await(task)
-//
-//                val event = party.copy(bannerUrl = downloadUrl.toString())
-//                partyRepository.uploadEvent(event)
-//            }
+            val party = PartyOuterClass.Party.newBuilder()
+                .setName(name)
+                .setDescription(description)
+                .setAddress(address)
+                .setStartDate(Timestamp.newBuilder().setSeconds(startDateTime/1000))
+                .setEndDate(Timestamp.newBuilder().setSeconds(startDateTime/1000))
+                .setLocationName(locationName)
+                .setLatlng(LatLng.newBuilder().setLatitude(latitude).setLongitude(longitude).build())
+                .setPrivacy(PrivacyOuterClass.Privacy.PUBLIC)
+                .build()
+
+            partyRepository.createParty(party = party)
 
             return Result.success()
         } catch (throwable: Throwable) {
@@ -132,16 +121,5 @@ class CreatePartyWorker @AssistedInject constructor(
             .setContentText("Updating widget")
             .build()
         return ForegroundInfo(13, notification)
-    }
-
-    private fun extractImage(path: Uri): ByteArray {
-        val source: ImageDecoder.Source =
-            ImageDecoder.createSource(applicationContext.contentResolver, path)
-        val selectedImageBmp: Bitmap = ImageDecoder.decodeBitmap(source)
-
-        val outputStream = ByteArrayOutputStream()
-        selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-
-        return outputStream.toByteArray()
     }
 }

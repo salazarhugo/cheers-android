@@ -39,15 +39,21 @@ fun RegisterRoute(
     }
 
     HorizontalPager(
-        count = 2,
+        count = 3,
         state = pagerState,
         userScrollEnabled = false,
     ) { page ->
 
         Column(modifier = Modifier.fillMaxHeight()) {
             when (page) {
-                0 ->
-                    ChooseUsernameScreen(
+                0 -> WelcomeScreen(
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        }
+                    )
+                1 -> ChooseUsernameScreen(
                         username = uiState.username,
                         errorMessage = uiState.errorMessage,
                         isLoading = uiState.isLoading,
@@ -61,8 +67,7 @@ fun RegisterRoute(
                             navActions.navigateToSignIn()
                         }
                     )
-                1 ->
-                    RegisterScreen(
+                2 -> RegisterScreen(
                         uiState = uiState,
                         onRegisterClick = registerViewModel::registerUser,
                         onAcceptTermsChange = registerViewModel::onAcceptTermsChange,

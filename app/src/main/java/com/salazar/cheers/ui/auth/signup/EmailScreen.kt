@@ -77,7 +77,7 @@ fun EmailTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(MaterialTheme.shapes.medium)
             .focusRequester(focusRequester = focusRequester),
         onValueChange = { onEmailChanged(it) },
         singleLine = true,

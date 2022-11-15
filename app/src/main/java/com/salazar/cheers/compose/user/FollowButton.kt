@@ -3,6 +3,7 @@ package com.salazar.cheers.compose.user
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,7 +18,7 @@ fun FollowButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = RoundedCornerShape(8.dp),
+    shape: Shape = MaterialTheme.shapes.medium,
 ) {
     if (isFollowing)
         CheersOutlinedButton(

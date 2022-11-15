@@ -1,15 +1,13 @@
 package com.salazar.cheers.ui.main.profile
 
-import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.party.v1.FeedPartyRequest
 import cheers.party.v1.PartyServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.repository.PartyRepository
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Party

@@ -67,7 +67,7 @@ fun PasswordTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(MaterialTheme.shapes.medium),
         onValueChange = {
             onPasswordChanged(it)
         },

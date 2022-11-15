@@ -123,6 +123,11 @@ class StoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun viewStory(storyId: String): Result<Unit> {
+        val story = storyDao.getStory(storyId)
+
+        if (story?.viewed == true)
+            return Result.success(Unit)
+
         storyDao.viewStory(storyId = storyId)
         val request = ViewStoryRequest.newBuilder()
             .setId(storyId)

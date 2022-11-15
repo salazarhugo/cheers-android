@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.guestlist
+package com.salazar.cheers.ui.main.party.guestlist
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +22,7 @@ import com.salazar.cheers.compose.share.SwipeToRefresh
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.event.add.TopAppBar
+import com.salazar.cheers.ui.main.party.create.TopAppBar
 import kotlinx.coroutines.launch
 
 @Composable

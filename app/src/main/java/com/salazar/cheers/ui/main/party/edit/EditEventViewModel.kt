@@ -1,9 +1,9 @@
-package com.salazar.cheers.ui.main.event.edit
+package com.salazar.cheers.ui.main.party.edit
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.PartyRepository
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +41,7 @@ class EditEventViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            partyRepository.getEvent(eventId).collect { event ->
+            partyRepository.getParty(eventId).collect { event ->
                 viewModelState.update {
                     it.copy(party = event)
                 }

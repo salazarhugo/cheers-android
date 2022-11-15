@@ -1,10 +1,8 @@
-package com.salazar.cheers.ui.main.event
+package com.salazar.cheers.ui.main.party
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
-import androidx.paging.filter
-import com.salazar.cheers.data.repository.PartyRepository
+import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -16,6 +14,7 @@ data class EventsUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
     val query: String = "",
+    val parties: List<Party>? = null,
 )
 
 @HiltViewModel
@@ -34,6 +33,30 @@ class EventsViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            partyRepository.feedParty(1, 10).collect {
+                updateParties(it)
+            }
+        }
+        viewModelScope.launch {
+            val result = partyRepository.fetchFeedParty(1, 10)
+            when(result.isSuccess) {
+                true -> updateParties(result.getOrNull())
+                false -> updateError("Couldn't refresh party feed")
+            }
+        }
+    }
+
+    private fun updateError(message: String) {
+        viewModelState.update {
+            it.copy(errorMessage = message)
+        }
+    }
+
+    private fun updateParties(parties: List<Party>?) {
+        viewModelState.update {
+            it.copy(parties = parties)
+        }
     }
 
     fun onQueryChange(query: String) {

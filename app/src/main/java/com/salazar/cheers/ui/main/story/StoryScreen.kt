@@ -352,7 +352,7 @@ fun StoryInputField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(MaterialTheme.shapes.medium)
             .border(1.dp, Color.White, CircleShape)
             .onFocusChanged {
                 onFocusChange(it.hasFocus)

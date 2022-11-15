@@ -20,7 +20,7 @@ fun ButtonWithLoading(
     onClick: () -> Unit,
 ) {
     Button(
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.medium,
         onClick = onClick,
         modifier = modifier,
         enabled = !isLoading && valid,

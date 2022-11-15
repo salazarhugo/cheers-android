@@ -33,7 +33,7 @@ fun PostMapScreen(
                 .width(36.dp)
                 .height(4.dp)
                 .align(Alignment.TopCenter)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.outline)
         )
         Column {

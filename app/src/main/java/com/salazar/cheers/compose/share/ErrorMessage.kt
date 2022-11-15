@@ -20,7 +20,7 @@ fun ErrorMessage(
     Surface(
         modifier = Modifier.padding(paddingValues = paddingValues),
         color = MaterialTheme.colorScheme.errorContainer,
-        shape = RoundedCornerShape(8.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
         Text(
             modifier = Modifier.padding(16.dp),

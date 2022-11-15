@@ -29,7 +29,7 @@ fun EventManageSheet(
                 .padding(vertical = 10.dp)
                 .width(36.dp)
                 .height(4.dp)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.outline)
         )
         SheetItem(

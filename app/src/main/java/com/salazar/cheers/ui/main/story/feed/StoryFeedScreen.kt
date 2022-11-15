@@ -437,7 +437,7 @@ fun StoryFeedInputField(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(MaterialTheme.shapes.medium)
             .height(46.dp)
             .border(1.dp, Color.White, CircleShape)
             .onFocusChanged {

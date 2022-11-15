@@ -1,7 +1,8 @@
-package com.salazar.cheers.ui.main.event
+package com.salazar.cheers.ui.main.party
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
@@ -23,6 +24,7 @@ import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.ChipGroup
+import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.event.EventDetails
 import com.salazar.cheers.compose.event.EventGoingButton
 import com.salazar.cheers.compose.event.EventInterestButton
@@ -36,7 +38,6 @@ import com.salazar.cheers.ui.main.search.SearchBar
 @Composable
 fun EventsScreen(
     uiState: EventsUiState,
-    events: LazyPagingItems<Party>,
     onEventClicked: (String) -> Unit,
     onInterestedToggle: (Party) -> Unit,
     onGoingToggle: (Party) -> Unit,
@@ -57,12 +58,6 @@ fun EventsScreen(
                         searchInput = uiState.query,
                         onSearchInputChanged = onQueryChange,
                     )
-                    IconButton(
-                        onClick = onCreateEventClick,
-                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
-                    ) {
-                        Icon(Icons.Default.Create, contentDescription = null)
-                    }
                 }
                 ChipGroup(
                     users = listOf(
@@ -78,25 +73,30 @@ fun EventsScreen(
             }
         },
     ) {
-        SwipeToRefresh(
-            onRefresh = { events.refresh() },
-            state = rememberSwipeToRefreshState(isRefreshing = false),
-            modifier = Modifier.padding(it),
-        ) {
-            EventList(
-                events = events,
-                onEventClicked = onEventClicked,
-                onInterestedToggle = onInterestedToggle,
-                onMoreClick = onMoreClick,
-                onGoingToggle = onGoingToggle,
-            )
-        }
+        val parties = uiState.parties
+
+        if (parties == null)
+            LoadingScreen()
+        else
+            SwipeToRefresh(
+                onRefresh = {},
+                state = rememberSwipeToRefreshState(isRefreshing = false),
+                modifier = Modifier.padding(it),
+            ) {
+                EventList(
+                    events = parties,
+                    onEventClicked = onEventClicked,
+                    onInterestedToggle = onInterestedToggle,
+                    onMoreClick = onMoreClick,
+                    onGoingToggle = onGoingToggle,
+                )
+            }
     }
 }
 
 @Composable
 fun EventList(
-    events: LazyPagingItems<Party>,
+    events: List<Party>,
     onEventClicked: (String) -> Unit,
     onInterestedToggle: (Party) -> Unit,
     onGoingToggle: (Party) -> Unit,
@@ -137,7 +137,7 @@ fun Event(
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, top = 16.dp)
                     .aspectRatio(16 / 9f)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.Center,
                 placeholder = ColorPainter(Color.LightGray),

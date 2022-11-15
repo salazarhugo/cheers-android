@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.edit
+package com.salazar.cheers.ui.main.party.edit
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,9 +17,9 @@ import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.event.EventDetails
 import com.salazar.cheers.ui.main.add.LocationSection
 import com.salazar.cheers.ui.main.add.ShareButton
-import com.salazar.cheers.ui.main.event.add.CategorySection
-import com.salazar.cheers.ui.main.event.add.Description
-import com.salazar.cheers.ui.main.event.add.TopAppBar
+import com.salazar.cheers.ui.main.party.create.CategorySection
+import com.salazar.cheers.ui.main.party.create.Description
+import com.salazar.cheers.ui.main.party.create.TopAppBar
 
 @Composable
 fun EditEventScreen(

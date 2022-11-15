@@ -84,7 +84,7 @@ fun RechargeItem(
         }
         Button(
             onClick = { onRecharge(recharge) },
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier.width(100.dp)
         ) {
             Text(text = recharge.price)

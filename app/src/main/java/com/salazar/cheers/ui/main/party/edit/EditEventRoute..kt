@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.main.event.edit
+package com.salazar.cheers.ui.main.party.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

@@ -29,7 +29,7 @@ interface StoryDao {
     fun feedStory(skip: Int, pageSize: Int): Flow<List<UserWithStories>>
 
     @Query("SELECT * FROM story WHERE storyId = :storyId")
-    suspend fun getStory(storyId: String): Story
+    suspend fun getStory(storyId: String): Story?
 
     @Query("UPDATE story SET viewed = 1  WHERE storyId = :storyId")
     suspend fun viewStory(storyId: String)

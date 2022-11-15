@@ -2,6 +2,7 @@ package com.salazar.cheers.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import cheers.activity.v1.ActivityServiceGrpcKt
 import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
@@ -11,6 +12,10 @@ import cheers.story.v1.StoryServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
+import com.salazar.cheers.data.repository.activity.ActivityRepository
+import com.salazar.cheers.data.repository.activity.impl.ActivityRepositoryImpl
+import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.data.repository.party.impl.PartyRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.serializer.settingsDataStore
@@ -44,6 +49,22 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providePartyRepository(
+        partyRepositoryImpl: PartyRepositoryImpl,
+    ): PartyRepository {
+        return partyRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideActivityRepository(
+        activityRepositoryImpl: ActivityRepositoryImpl,
+    ): ActivityRepository {
+        return activityRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
     fun provideStoryRepository(
         storyRepositoryImpl: StoryRepositoryImpl,
     ): StoryRepository {
@@ -58,6 +79,20 @@ object AppModule {
     ): StoryServiceGrpcKt.StoryServiceCoroutineStub {
         return StoryServiceGrpcKt
             .StoryServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
+    }
+
+    @Provides
+    @Singleton
+    fun provideActivityServiceCoroutineStub(
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): ActivityServiceGrpcKt.ActivityServiceCoroutineStub {
+        val a =  ManagedChannelBuilder
+            .forAddress(Constants.GATEWAY_HOST, 443)
+            .build()
+        return ActivityServiceGrpcKt
+            .ActivityServiceCoroutineStub(a)
             .withInterceptors(errorHandleInterceptor)
             .withInterceptors()
     }
@@ -141,49 +176,81 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideUserStatsDao(@ApplicationContext appContext: Context): UserStatsDao {
-        return CheersDatabase.invoke(appContext).userStatsDao()
+    fun providePartyDao(
+        cheersDatabase: CheersDatabase,
+    ): PartyDao {
+        return cheersDatabase.partyDao()
     }
 
     @Singleton
     @Provides
-    fun provideStoryDao(@ApplicationContext appContext: Context): StoryDao {
-        return CheersDatabase.invoke(appContext).storyDao()
+    fun provideActivityDao(
+        cheersDatabase: CheersDatabase,
+    ): ActivityDao {
+        return cheersDatabase.activityDao()
     }
 
     @Singleton
     @Provides
-    fun provideUserDao(@ApplicationContext appContext: Context): UserDao {
-        return CheersDatabase.invoke(appContext).userDao()
+    fun provideUserStatsDao(
+        cheersDatabase: CheersDatabase,
+    ): UserStatsDao {
+        return cheersDatabase.userStatsDao()
     }
 
     @Singleton
     @Provides
-    fun provideUserItemDao(@ApplicationContext appContext: Context): UserItemDao {
-        return CheersDatabase.invoke(appContext).userItemDao()
+    fun provideStoryDao(
+        cheersDatabase: CheersDatabase,
+    ): StoryDao {
+        return cheersDatabase.storyDao()
     }
 
     @Singleton
     @Provides
-    fun provideChatDao(@ApplicationContext appContext: Context): ChatDao {
-        return CheersDatabase.invoke(appContext).chatDao()
+    fun provideUserDao(
+        cheersDatabase: CheersDatabase,
+    ): UserDao {
+        return cheersDatabase.userDao()
     }
 
     @Singleton
     @Provides
-    fun provideUserPreferenceDao(@ApplicationContext appContext: Context): UserPreferenceDao {
-        return CheersDatabase.invoke(appContext).userPreferenceDao()
+    fun provideUserItemDao(
+        cheersDatabase: CheersDatabase,
+    ): UserItemDao {
+        return cheersDatabase.userItemDao()
     }
 
     @Singleton
     @Provides
-    fun providePostDao(@ApplicationContext appContext: Context): PostDao {
-        return CheersDatabase.invoke(appContext).postDao()
+    fun provideChatDao(
+        cheersDatabase: CheersDatabase,
+    ): ChatDao {
+        return cheersDatabase.chatDao()
     }
 
     @Singleton
     @Provides
-    fun provideCheersDao(@ApplicationContext appContext: Context): CheersDao {
-        return CheersDatabase.invoke(appContext).cheersDao()
+    fun provideUserPreferenceDao(
+        cheersDatabase: CheersDatabase,
+    ): UserPreferenceDao {
+        return cheersDatabase.userPreferenceDao()
+    }
+
+    @Singleton
+    @Provides
+    fun providePostDao(
+        cheersDatabase: CheersDatabase,
+    ): PostDao {
+        return cheersDatabase.postDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCheersDao(
+        cheersDatabase: CheersDatabase,
+    ): CheersDao {
+        return cheersDatabase.cheersDao()
     }
 }

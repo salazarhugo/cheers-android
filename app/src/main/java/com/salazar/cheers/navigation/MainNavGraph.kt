@@ -3,22 +3,15 @@ package com.salazar.cheers.navigation
 import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.dialog
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.post.PostMoreBottomSheet
 import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
@@ -37,13 +30,13 @@ import com.salazar.cheers.ui.main.comment.CommentsRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
-import com.salazar.cheers.ui.main.event.EventMoreBottomSheet
-import com.salazar.cheers.ui.main.event.EventMoreSheetViewModel
-import com.salazar.cheers.ui.main.event.EventsRoute
-import com.salazar.cheers.ui.main.event.add.AddEventRoute
-import com.salazar.cheers.ui.main.event.detail.EventDetailRoute
-import com.salazar.cheers.ui.main.event.edit.EditEventRoute
-import com.salazar.cheers.ui.main.event.guestlist.GuestListRoute
+import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
+import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
+import com.salazar.cheers.ui.main.party.EventsRoute
+import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
+import com.salazar.cheers.ui.main.party.detail.EventDetailRoute
+import com.salazar.cheers.ui.main.party.edit.EditEventRoute
+import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapPostHistoryRoute
@@ -89,7 +82,10 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = MainDestinations.ACTIVITY_ROUTE,
         ) {
-            ActivityRoute(navActions = appState.navActions)
+            ActivityRoute(
+                appState = appState,
+                navActions = appState.navActions,
+            )
         }
 
         composable(
@@ -153,7 +149,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.ADD_EVENT_SHEET}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
-            AddEventRoute(
+            CreatePartyRoute(
                 navActions = appState.navActions,
             )
         }
@@ -412,6 +408,7 @@ fun NavGraphBuilder.mainNavGraph(
                     StorySheetUIAction.OnSettingsClick -> {}
                     StorySheetUIAction.OnDeleteClick -> {
                         appState.navActions.navigateToDeleteStoryDialog(storyID)
+                        appState.navActions.navigateBack()
                     }
                 }
             })

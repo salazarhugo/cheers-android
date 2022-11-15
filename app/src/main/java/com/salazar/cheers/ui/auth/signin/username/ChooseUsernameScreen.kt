@@ -102,7 +102,7 @@ fun UsernameTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(MaterialTheme.shapes.medium)
             .focusRequester(focusRequester = focusRequester),
         onValueChange = { onUsernameChanged(it) },
         singleLine = true,

@@ -92,7 +92,7 @@ fun NewChatScreen(
                     Surface(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         tonalElevation = 8.dp,
-                        shape = RoundedCornerShape(8.dp)
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Column {
                             if (uiState.query.isBlank())
@@ -126,7 +126,7 @@ fun NewGroupButton(
     Surface(
         modifier = Modifier.padding(16.dp),
         tonalElevation = 8.dp,
-        shape = RoundedCornerShape(8.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
         Row(
             modifier = Modifier
@@ -269,7 +269,7 @@ fun SearchBar(
     ) {
         androidx.compose.material.Card(
             elevation = 0.dp,
-            shape = RoundedCornerShape(8.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(46.dp),

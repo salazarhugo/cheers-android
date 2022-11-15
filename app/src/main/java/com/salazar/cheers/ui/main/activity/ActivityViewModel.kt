@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.repository.activity.ActivityRepository
 import com.salazar.cheers.internal.Activity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,13 +16,13 @@ import javax.inject.Inject
 
 data class ActivityUiState(
     val isLoading: Boolean = false,
-    val errorMessage: String = "",
+    val errorMessage: String? = null,
     val activities: List<Activity>? = null,
 )
 
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val activityRepository: ActivityRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ActivityUiState(isLoading = true))
@@ -39,7 +40,7 @@ class ActivityViewModel @Inject constructor(
 
     fun getActivity() {
         viewModelScope.launch {
-            userRepository.getActivity(fetchFromRemote = true).collect { result ->
+            activityRepository.listActivity().collect { result ->
                 when (result) {
                     is Resource.Loading -> updateIsLoading(result.isLoading)
                     is Resource.Error -> updateMessage(result.message)
@@ -57,7 +58,7 @@ class ActivityViewModel @Inject constructor(
 
     private fun updateMessage(errorMessage: String?) {
         viewModelState.update {
-            it.copy(errorMessage = errorMessage ?: "")
+            it.copy(errorMessage = errorMessage)
         }
     }
 

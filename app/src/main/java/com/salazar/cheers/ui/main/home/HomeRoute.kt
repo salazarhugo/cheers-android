@@ -31,7 +31,6 @@ fun HomeRoute(
         homeViewModel.initNativeAdd(context = context)
     }
 
-
     if (errorMessage != null) {
         LaunchedEffect(appState.snackBarHostState) {
             appState.showSnackBar(errorMessage)
