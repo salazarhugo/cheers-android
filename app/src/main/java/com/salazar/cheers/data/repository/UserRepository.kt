@@ -402,7 +402,7 @@ class UserRepository @Inject constructor(
         if (newRegistrationToken == null)
             throw NullPointerException("FCM token is null.")
 
-        Log.e("GRPC", "ADDING TOKEN")
+        Log.e("GRPC", "ADDING TOKEN $newRegistrationToken")
         try {
             val request = CreateRegistrationTokenRequest.newBuilder()
                 .setToken(newRegistrationToken)
