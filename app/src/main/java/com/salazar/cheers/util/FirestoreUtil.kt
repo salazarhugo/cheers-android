@@ -77,7 +77,7 @@ object FirestoreUtil {
         val commentsDocument = firestoreInstance
             .collection("comments")
             .whereEqualTo("postId", postId)
-            .orderBy("created", Query.Direction.DESCENDING)
+            .orderBy("createTime", Query.Direction.DESCENDING)
 
         val subscription = commentsDocument.addSnapshotListener { snapshot, e ->
             if (e != null) {

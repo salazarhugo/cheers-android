@@ -2,16 +2,35 @@ syntax = "proto3";
 
 package cheers.chat.v1;
 
-import "google/protobuf/timestamp.proto";
+
 import "cheers/type/user/user.proto";
+import "google/api/annotations.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/chat/v1;chat";
 
 service ChatService {
-  rpc CreateChat(CreateChatReq) returns (Room) {}
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse) {
+    option (google.api.http) = {
+      post: "/v1/chats"
+      body: "*"
+    };
+  }
+
   rpc JoinRoom(JoinRoomRequest) returns (stream Message) {}
-  rpc ListRoom(ListRoomRequest) returns (stream Room) {}
+
+  rpc ListRoom(ListRoomRequest) returns (ListRoomResponse) {
+    option (google.api.http) = {
+      get: "/v1/chats"
+    };
+  }
+
+  rpc ListRoomMessages(ListRoomMessagesRequest) returns (ListRoomMessagesResponse) {
+    option (google.api.http) = {
+      get: "/v1/chats/{room_id}/messages"
+    };
+  }
+
   rpc DeleteRoom(RoomId) returns (Empty) {}
 
   rpc GetRoomId(GetRoomIdReq) returns (RoomId) {}
@@ -41,9 +60,32 @@ message TypingEvent {
   Type type = 3;
 }
 
+message CreateRoomRequest {
+  string group_name = 1;
+  repeated string recipient_users = 2;
+}
+
+message CreateRoomResponse {
+  Room room = 1;
+}
+
+message ListRoomMessagesRequest {
+  string room_id = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListRoomMessagesResponse {
+  repeated MessageItem messages = 1;
+}
+
 message ListRoomRequest {
   int32 page_size = 2;
   int32 page = 3;
+}
+
+message ListRoomResponse {
+  repeated Room rooms = 1;
 }
 
 message ListMembersRequest {
@@ -65,11 +107,6 @@ message Empty {
 
 message AddTokenReq {
   string token = 1;
-}
-
-message CreateChatReq {
-  repeated string user_ids = 1;
-  string group_name = 2;
 }
 
 message TypingReq {
@@ -116,8 +153,10 @@ message Room {
   string last_message_text = 11;
   string picture = 12;
   MessageType last_message_type = 13;
-  google.protobuf.Timestamp created = 14;
-  google.protobuf.Timestamp last_message_time = 15;
+  int64 create_time = 14;
+  int64 last_message_time = 15;
+  bool last_message_seen = 17;
+  bool archived = 16;
 }
 
 enum MessageType {
@@ -133,17 +172,15 @@ message LikeMessageReq {
 
 message Message {
   string id = 1;
-  string sender = 2;
-  Room room = 3;
-  string message = 4;
-  string senderpicture = 5;
-  string senderName = 6;
-  string senderUsername = 7;
-  google.protobuf.Timestamp created = 8;
-  string photo_url = 9;
+  string room_id = 2;
+  string text = 3;
+  string picture = 4;
+  string sender_id = 5;
+  string sender_picture = 6;
+  string sender_name = 7;
+  string sender_username = 8;
+  int32 like_count = 9;
   MessageType type = 10;
-  int32 like_count = 11;
-
   enum Status {
     EMPTY = 0;
     SENT = 1;
@@ -151,7 +188,14 @@ message Message {
     READ = 3;
     FAILED = 4;
   }
-  Status status = 12;
+  Status status = 11;
+  int64 create_time = 12;
+}
+
+message MessageItem {
+  Message message = 1;
+  bool sender = 2;
+  bool liked = 3;
 }
 
 

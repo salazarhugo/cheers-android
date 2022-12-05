@@ -29,15 +29,44 @@ service PostService {
     };
   }
 
+  /*
+    List posts of a specific user
+   */
+  rpc ListPost (ListPostRequest) returns (ListPostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/list"
+    };
+  };
+
   rpc FeedPost (FeedPostRequest) returns (FeedPostResponse) {
     option (google.api.http) = {
       get: "/v1/posts/feed"
     };
   };
-  rpc LikePost (LikePostRequest) returns (LikePostResponse);
-  rpc UnlikePost (UnlikePostRequest) returns (UnlikePostResponse);
-  rpc SavePost (SavePostRequest) returns (SavePostResponse);
-  rpc UnsavePost (UnsavePostRequest) returns (UnsavePostResponse);
+
+  rpc LikePost (LikePostRequest) returns (LikePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/like"
+    };
+  };
+
+  rpc UnlikePost (UnlikePostRequest) returns (UnlikePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/unlike"
+    };
+  };
+
+  rpc SavePost (SavePostRequest) returns (SavePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/save"
+    };
+  };
+
+  rpc UnsavePost (UnsavePostRequest) returns (UnsavePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/unsave"
+    };
+  };
 }
 
 
@@ -57,6 +86,17 @@ message DeletePostRequest {
   string id = 1;
 }
 
+message ListPostRequest {
+  string username = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListPostResponse {
+  repeated PostResponse posts = 1;
+  string next_page_token = 2;
+}
+
 message FeedPostRequest {
   string parent = 1;
   int32 page_size = 2;
@@ -69,7 +109,7 @@ message FeedPostResponse {
 }
 
 message LikePostRequest {
-  string id = 1;
+  string post_id = 1;
 }
 
 message LikePostResponse {
@@ -77,7 +117,7 @@ message LikePostResponse {
 }
 
 message UnlikePostRequest {
-  string id = 1;
+  string post_id = 1;
 }
 
 message UnlikePostResponse {
@@ -85,7 +125,7 @@ message UnlikePostResponse {
 }
 
 message SavePostRequest {
-  string id = 1;
+  string post_id = 1;
 }
 
 message SavePostResponse {
@@ -93,7 +133,7 @@ message SavePostResponse {
 }
 
 message UnsavePostRequest {
-  string id = 1;
+  string post_id = 1;
 }
 
 message UnsavePostResponse {
@@ -106,7 +146,5 @@ message PostResponse {
   int64 like_count = 3;
   int64 comment_count = 4;
   bool has_liked = 5;
-  bool comments_enabled = 6;
-  bool reshare_enabled = 8;
-  int64 media_count = 7;
+  bool is_creator = 6;
 }

@@ -26,9 +26,10 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MyFirebaseMessagingService @Inject constructor(
-    private val userRepository: UserRepository,
-) : FirebaseMessagingService() {
+class MyFirebaseMessagingService: FirebaseMessagingService() {
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     override fun onNewToken(newRegistrationToken: String) {
         super.onNewToken(newRegistrationToken)

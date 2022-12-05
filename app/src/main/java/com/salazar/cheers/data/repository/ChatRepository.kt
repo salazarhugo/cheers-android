@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import cheers.chat.v1.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.protobuf.Timestamp
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.ChatDao
@@ -110,13 +109,13 @@ class ChatRepository @Inject constructor(
         UUIDs: List<String>,
     ): Result<String> = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-        val request = CreateChatReq.newBuilder()
+        val request = CreateRoomRequest.newBuilder()
             .setGroupName(groupName)
-            .addAllUserIds(UUIDs)
+            .addAllRecipientUsers(UUIDs)
             .build()
 
         try {
-            val chatChannel = chatService.createChat(request).toChatChannel(uid)
+            val chatChannel = chatService.createRoom(request).room.toChatChannel(uid)
             chatDao.insert(chatChannel)
             return@withContext Result.Success(chatChannel.id)
         } catch (e: Exception) {
@@ -201,13 +200,12 @@ class ChatRepository @Inject constructor(
 
         val msg = Message.newBuilder()
             .setId(UUID.randomUUID().toString())
-            .setCreated(Timestamp.newBuilder().setSeconds(Date().time / 1000).build())
-            .setSender(FirebaseAuth.getInstance().currentUser?.uid)
+            .setSenderId(FirebaseAuth.getInstance().currentUser?.uid)
             .setSenderName(user.name)
             .setSenderUsername(user.username)
-            .setSenderpicture(user.picture)
-            .setRoom(Room.newBuilder().setId(channelId).build())
-            .setPhotoUrl(photoUrl)
+            .setSenderPicture(user.picture)
+            .setRoomId(channelId)
+            .setPicture(photoUrl)
             .setType(MessageType.IMAGE)
             .build()
 
@@ -234,13 +232,12 @@ class ChatRepository @Inject constructor(
 
             val msg = Message.newBuilder()
                 .setId(UUID.randomUUID().toString())
-                .setCreated(Timestamp.newBuilder().setSeconds(Date().time / 1000).build())
-                .setSender(FirebaseAuth.getInstance().currentUser?.uid)
+                .setSenderId(FirebaseAuth.getInstance().currentUser?.uid)
                 .setSenderName(user.name)
                 .setSenderUsername(user.username)
-                .setSenderpicture(user.picture)
-                .setRoom(Room.newBuilder().setId(channelId).build())
-                .setMessage(text)
+                .setSenderPicture(user.picture)
+                .setRoomId(channelId)
+                .setText(text)
                 .setType(MessageType.TEXT)
                 .setStatus(Message.Status.EMPTY)
                 .build()
@@ -248,7 +245,7 @@ class ChatRepository @Inject constructor(
             launch {
                 val message = msg.toTextMessage()
                 chatDao.insertMessage(message)
-                chatDao.updateLastMessage(channelId, message.text, message.time, message.type)
+                chatDao.updateLastMessage(channelId, message.text, message.createTime, message.type)
             }
 
             val message = flow<Message> {
@@ -284,9 +281,8 @@ class ChatRepository @Inject constructor(
         try {
             val request = ListRoomRequest.newBuilder()
                 .build()
-            chatService.listRoom(request = request).collect {
-                chatDao.insert(it.toChatChannel(uid))
-            }
+            val rooms = chatService.listRoom(request = request)
+            chatDao.insert(rooms.roomsList.map { it.toChatChannel(uid)} )
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())
         }

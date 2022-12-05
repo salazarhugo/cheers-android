@@ -42,26 +42,5 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun userStatsDao(): UserStatsDao
     abstract fun chatDao(): ChatDao
     abstract fun userPreferenceDao(): UserPreferenceDao
-    abstract fun remoteKeyDao(): RemoteKeyDao
-    abstract fun storyRemoteKeyDao(): StoryRemoteKeyDao
-    abstract fun eventRemoteKeyDao(): EventRemoteKeyDao
     abstract fun activityDao(): ActivityDao
-
-    companion object {
-        @Volatile
-        private var instance: CheersDatabase? = null
-        private val LOCK = Any()
-
-        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
-            instance ?: buildDatabase(context).also { instance = it }
-        }
-
-        private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(
-                context.applicationContext,
-                CheersDatabase::class.java, "cheers.db"
-            )
-                .fallbackToDestructiveMigration()
-                .build()
-    }
 }

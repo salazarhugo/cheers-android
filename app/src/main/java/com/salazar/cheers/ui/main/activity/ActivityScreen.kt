@@ -129,7 +129,7 @@ fun ActivityItem(
                         ), fontWeight = FontWeight.Normal
                     )
                 ) {
-                    append(relativeTimeFormatter(timestamp = activity.time))
+                    append(relativeTimeFormatter(epoch = activity.createTime))
                 }
             }
             Text(

@@ -3,12 +3,12 @@ package com.salazar.cheers.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import cheers.activity.v1.ActivityServiceGrpcKt
-import cheers.party.v1.PartyServiceGrpcKt
-import cheers.post.v1.PostServiceGrpcKt
-import cheers.user.v1.UserServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
 import cheers.notification.v1.NotificationServiceGrpcKt
+import cheers.party.v1.PartyServiceGrpcKt
+import cheers.post.v1.PostServiceGrpcKt
 import cheers.story.v1.StoryServiceGrpcKt
+import cheers.user.v1.UserServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
@@ -88,7 +88,7 @@ object AppModule {
     fun provideActivityServiceCoroutineStub(
         errorHandleInterceptor: ErrorHandleInterceptor,
     ): ActivityServiceGrpcKt.ActivityServiceCoroutineStub {
-        val a =  ManagedChannelBuilder
+        val a = ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
         return ActivityServiceGrpcKt
@@ -102,7 +102,7 @@ object AppModule {
     fun provideChatServiceCoroutineStub(
         errorHandleInterceptor: ErrorHandleInterceptor,
     ): ChatServiceGrpcKt.ChatServiceCoroutineStub {
-        val a =  ManagedChannelBuilder
+        val a = ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
         return ChatServiceGrpcKt

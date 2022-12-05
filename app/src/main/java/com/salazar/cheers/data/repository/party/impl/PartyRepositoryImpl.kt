@@ -1,27 +1,16 @@
 package com.salazar.cheers.data.repository.party.impl
 
 import android.app.Application
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import cheers.party.v1.CreatePartyRequest
 import cheers.party.v1.FeedPartyRequest
 import cheers.party.v1.PartyServiceGrpcKt
-import cheers.story.v1.CreateStoryRequest
-import cheers.story.v1.FeedStoryRequest
 import cheers.type.PartyOuterClass
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.PartyDao
-import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.mapper.toParty
-import com.salazar.cheers.data.mapper.toStory
-import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.Party
-import com.salazar.cheers.workers.CreatePartyWorker
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,10 +18,9 @@ import javax.inject.Singleton
 
 @Singleton
 class PartyRepositoryImpl @Inject constructor(
-    application: Application,
     private val service: PartyServiceGrpcKt.PartyServiceCoroutineStub,
     private val partyDao: PartyDao,
-): PartyRepository {
+) : PartyRepository {
 
     suspend fun getPartyFeed(page: Int, pageSize: Int): Result<List<Party>> {
         val request = FeedPartyRequest.newBuilder()
@@ -43,7 +31,7 @@ class PartyRepositoryImpl @Inject constructor(
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val response = service.feedParty(request)
 
-        val parties = response.partiesList.map {
+        val parties = response.itemsList.map {
             it.toParty(uid)
         }
 
@@ -91,7 +79,7 @@ class PartyRepositoryImpl @Inject constructor(
 
         return try {
             val response = service.feedParty(request)
-            val parties = response.partiesList.map {
+            val parties = response.itemsList.map {
                 it.toParty(uid)
             }
             partyDao.insertAll(parties)

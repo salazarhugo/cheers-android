@@ -9,17 +9,17 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /*
- *  timestamp in seconds
+ *  epoch in seconds
  */
 @Composable
 fun relativeTimeFormatter(
-    timestamp: Long,
+    epoch: Long,
 ): AnnotatedString {
 
     return buildAnnotatedString {
 
         val today = Date()
-        var diff: Long = today.time / 1000 - timestamp
+        var diff: Long = today.time / 1000 - epoch
 
         if (diff < 0)
             diff *= -1

@@ -15,6 +15,9 @@ interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(channel: ChatChannel)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(channel: List<ChatChannel>)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMessages(messages: List<ChatMessage>)
 
@@ -32,10 +35,10 @@ interface ChatDao {
 
     @Transaction
     @Query("UPDATE room SET lastMessage = :message, lastMessageTime = :time, lastMessageType = :type WHERE id = :channelId")
-    fun updateLastMessage(channelId: String, message: String, time: Timestamp, type: MessageType)
+    fun updateLastMessage(channelId: String, message: String, time: Long, type: MessageType)
 
     @Transaction
-    @Query("SELECT * FROM message WHERE chatChannelId = :channelId ORDER BY time DESC")
+    @Query("SELECT * FROM message WHERE chatChannelId = :channelId ORDER BY createTime DESC")
     fun getMessages(channelId: String): Flow<List<ChatMessage>>
 
     @Transaction

@@ -7,14 +7,14 @@ import com.salazar.cheers.internal.ImageMessage
 fun Message.toTextMessage(): ChatMessage {
     return ChatMessage(
         id = id,
-        text = message,
+        text = text,
         senderName = senderName,
-        senderId = sender,
+        senderId = senderId,
         senderUsername = senderUsername,
-        senderProfilePictureUrl = senderpicture,
-        time = created,
-        chatChannelId = room.id,
-        photoUrl = photoUrl,
+        senderProfilePictureUrl = senderPicture,
+        createTime = createTime,
+        chatChannelId = roomId,
+        photoUrl = picture,
         type = type,
         status = status,
     )
@@ -24,11 +24,11 @@ fun Message.toImageMessage(): ImageMessage {
     return ImageMessage().copy(
         id = id,
         senderName = senderName,
-        senderId = sender,
+        senderId = senderId,
         senderUsername = senderUsername,
-        senderProfilePictureUrl = senderpicture,
-        time = created,
-        chatChannelId = room.id,
-        imagesDownloadUrl = listOf(photoUrl)
+        senderProfilePictureUrl = senderPicture,
+        time = 0,
+        chatChannelId = roomId,
+        imagesDownloadUrl = listOf(picture)
     )
 }

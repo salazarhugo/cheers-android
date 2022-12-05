@@ -35,7 +35,7 @@ fun EventDetails(
     ) {
         Column {
             Text(
-                text = dateTimeFormatter(timestamp = startTimeSeconds),
+                text = dateTimeFormatter(timestamp = startTimeSeconds.toLong()),
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
                 color = MaterialTheme.colorScheme.error,
             )

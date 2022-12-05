@@ -11,6 +11,6 @@ fun cheers.activity.v1.Activity.toActivity(accountId: String): Activity {
      avatar = picture,
      photoUrl = mediaPicture,
      userId = userId,
-     time = timestamp.seconds,
+     createTime = timestamp,
     )
 }

@@ -73,7 +73,7 @@ fun Comment(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = relativeTimeFormatter(timestamp = comment.created),
+                        text = relativeTimeFormatter(epoch = comment.createTime),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(Modifier.width(8.dp))

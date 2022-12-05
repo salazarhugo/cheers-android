@@ -287,7 +287,7 @@ fun StoryFeedHeader(
         PostHeader(
             username = user.username,
             verified = user.verified,
-            created = story.created,
+            createTime = story.createTime,
             beverage = Beverage.NONE,
             darkMode = true,
             public = false,

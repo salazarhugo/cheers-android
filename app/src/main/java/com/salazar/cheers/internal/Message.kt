@@ -1,12 +1,10 @@
 package com.salazar.cheers.internal
 
-import com.google.protobuf.Timestamp
-
 
 interface Message {
     var id: String
     var chatChannelId: String
-    val time: Timestamp
+    val time: Int
     val senderId: String
     val acknowledged: Boolean
     val senderName: String

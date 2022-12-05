@@ -261,7 +261,7 @@ fun Post(
         verified = post.verified,
         beverage = Beverage.fromName(post.beverage),
         public = post.privacy == Privacy.PUBLIC.name,
-        created = post.created,
+        createTime = post.createTime,
         picture = post.profilePictureUrl,
         locationName = post.locationName,
         onHeaderClicked = {},

@@ -149,7 +149,7 @@ fun Caption(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = relativeTimeFormatter(timestamp = post.created / 1000),
+                    text = relativeTimeFormatter(epoch = post.createTime),
                     style = MaterialTheme.typography.labelMedium,
                 )
             }

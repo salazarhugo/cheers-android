@@ -56,11 +56,11 @@ class UserRepository @Inject constructor(
                 .build()
 
             val response = userService.createUser(request = request)
-            val createdUser = response.toUser()
+            val createTimeUser = response.toUser()
 
-            userDao.insert(createdUser)
+            userDao.insert(createTimeUser)
 
-            return Result.success(createdUser)
+            return Result.success(createTimeUser)
         } catch (e: Exception) {
             e.printStackTrace()
             return Result.failure(e)

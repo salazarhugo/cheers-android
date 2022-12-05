@@ -26,7 +26,7 @@ fun PostHeader(
     verified: Boolean,
     beverage: Beverage,
     public: Boolean,
-    created: Long,
+    createTime: Long,
     locationName: String,
     picture: String?,
     darkMode: Boolean = false,
@@ -93,7 +93,7 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = relativeTimeFormatter(timestamp = created / 1000),
+                text = relativeTimeFormatter(epoch = createTime / 1000),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
                 color = color,

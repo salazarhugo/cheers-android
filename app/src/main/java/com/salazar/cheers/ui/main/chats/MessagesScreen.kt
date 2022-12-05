@@ -258,11 +258,7 @@ fun DirectConversation(
 
                 val subtitle = buildAnnotatedString {
                     append("  •  ")
-                    append(
-                        relativeTimeFormatter(
-                            timestamp = channel.lastMessageTime.seconds
-                        )
-                    )
+                    append(relativeTimeFormatter(epoch = channel.lastMessageTime))
                 }
 
                 val fontWeight =

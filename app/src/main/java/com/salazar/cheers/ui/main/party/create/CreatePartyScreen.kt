@@ -310,7 +310,7 @@ fun StartDateInput(
     val startDatePicker = DatePickerDialog(
         context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds * 1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000L)
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -320,7 +320,7 @@ fun StartDateInput(
     val endDatePicker = DatePickerDialog(
         context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds * 1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000L)
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -330,7 +330,7 @@ fun StartDateInput(
     val startTimePicker = TimePickerDialog(
         context, { _: TimePicker, hourOfDay: Int, minute: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds * 1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000L)
             calendar.set(Calendar.MINUTE, minute)
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
             onStartDateChanged(calendar.time.time / 1000)
@@ -340,7 +340,7 @@ fun StartDateInput(
     val endTimePicker = TimePickerDialog(
         context, { _: TimePicker, hourOfDay: Int, minute: Int ->
             val calendar = Calendar.getInstance()
-            calendar.time = Date(uiState.startTimeSeconds * 1000)
+            calendar.time = Date(uiState.startTimeSeconds * 1000L)
             calendar.set(Calendar.MINUTE, minute)
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
             onEndDateChanged(calendar.time.time / 1000)
@@ -363,13 +363,13 @@ fun StartDateInput(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clickable { startDatePicker.show() },
-                text = startDateFormatter(timestamp = uiState.startTimeSeconds),
+                text = startDateFormatter(timestamp = uiState.startTimeSeconds.toLong()),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 modifier = Modifier
                     .clickable { startTimePicker.show() },
-                text = timeFormatter(timestamp = uiState.startTimeSeconds),
+                text = timeFormatter(timestamp = uiState.startTimeSeconds.toLong()),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -387,13 +387,13 @@ fun StartDateInput(
                     modifier = Modifier
                         .padding(vertical = 16.dp)
                         .clickable { endDatePicker.show() },
-                    text = startDateFormatter(timestamp = uiState.endTimeSeconds),
+                    text = startDateFormatter(timestamp = uiState.endTimeSeconds.toLong()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     modifier = Modifier
                         .clickable { endTimePicker.show() },
-                    text = timeFormatter(timestamp = uiState.endTimeSeconds),
+                    text = timeFormatter(timestamp = uiState.endTimeSeconds.toLong()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

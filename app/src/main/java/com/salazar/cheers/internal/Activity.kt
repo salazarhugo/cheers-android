@@ -19,7 +19,7 @@ data class Activity(
     val verified: Boolean = false,
     val followBack: Boolean = false,
     val acknowledged: Boolean = false,
-    val time: Long = 0L,
+    val createTime: Long = 0,
     val accountId: String = "",
 )
 
@@ -43,7 +43,7 @@ fun ActivityType.toSentence(): String {
         STORY_LIKE -> "liked your story."
         COMMENT -> "commented on your post."
         MENTION -> "mentioned you."
-        CREATE_POST -> "created a post"
+        CREATE_POST -> "createTime a post"
         CREATE_EVENT -> TODO()
         CREATE_STORY -> TODO()
     }

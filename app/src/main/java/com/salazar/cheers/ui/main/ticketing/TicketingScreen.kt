@@ -128,7 +128,7 @@ fun TicketingHeader(
                 Icon(Icons.Default.Event, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = dateTimeFormatter(timestamp = party.startDate),
+                    text = dateTimeFormatter(timestamp = party.startDate.toLong()),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }

@@ -68,7 +68,7 @@ class PostRepository @Inject constructor(
 
     suspend fun likePost(postId: String) {
         val request = LikePostRequest.newBuilder()
-            .setId(postId)
+            .setPostId(postId)
             .build()
 
         try {
@@ -80,7 +80,7 @@ class PostRepository @Inject constructor(
 
     suspend fun unlikePost(postId: String) {
         val request = UnlikePostRequest.newBuilder()
-            .setId(postId)
+            .setPostId(postId)
             .build()
 
         try {

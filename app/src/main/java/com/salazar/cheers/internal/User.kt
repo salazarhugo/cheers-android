@@ -36,5 +36,5 @@ data class User(
     val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     @ColumnInfo(defaultValue = "false")
     val seenStory: Boolean = false,
-    val created: Long = Date().time,
+    val createTime: Long = 0L,
 )

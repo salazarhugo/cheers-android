@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheers.account.v1;
 
-import "google/protobuf/timestamp.proto";
+
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
@@ -45,10 +45,8 @@ service AccountService {
 
 message Account {
   string id = 1;
-  string name = 2;
-  string email = 3;
-  int32 balance = 4;
-  google.protobuf.Timestamp create_time = 5;
+  int32 balance = 2;
+  int32 ticket_sold = 3;
 }
 
 message CreateAccountRequest {

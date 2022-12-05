@@ -4,7 +4,7 @@ package cheers.type;
 
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/story;storypb";
 
-import "google/protobuf/timestamp.proto";
+
 import "cheers/type/privacy/privacy.proto";
 
 message Story {
@@ -19,6 +19,6 @@ message Story {
     VIDEO = 1;
   }
   StoryType type = 11;
-  google.protobuf.Timestamp create_time = 12;
+  int64 create_time = 12;
   bool share_enabled = 14;
 }

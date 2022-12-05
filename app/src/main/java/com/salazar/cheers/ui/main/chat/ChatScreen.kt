@@ -51,9 +51,7 @@ import com.salazar.cheers.compose.animations.AnimateHeart
 import com.salazar.cheers.compose.chat.*
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
-import com.salazar.cheers.util.Utils.isToday
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -191,12 +189,11 @@ fun Messages(
                 val isFirstMessageByAuthor = prevAuthor != message.senderId
                 val isLastMessageByAuthor = nextAuthor != message.senderId
 
-                // Hardcode day dividers for simplicity
-                if (!message.time.isToday() && prevMessage?.time?.isToday() == true) {
-                    item {
-                        DayHeader("Today")
-                    }
-                }
+//                if (!message.time.isToday() && prevMessage?.time?.isToday() == true) {
+//                    item {
+//                        DayHeader("Today")
+//                    }
+//                }
 
                 item {
                     val dismissState = rememberDismissState(
@@ -357,7 +354,7 @@ private fun AuthorNameTimestamp(msg: ChatMessage) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         val formatter = SimpleDateFormat("HH:mm")
-        val date = Date(msg.time.seconds * 1000)
+        val date = Date(msg.createTime.toLong() * 1000)
 
         Text(
             text = formatter.format(date),

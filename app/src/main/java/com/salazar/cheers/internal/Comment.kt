@@ -14,5 +14,5 @@ data class Comment(
     val postId: String = "",
     val authorId: String = "",
     val text: String = "",
-    val created: Long = 0L,
+    val createTime: Long = 0L,
 )

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheers.activity.v1;
 
-import "google/protobuf/timestamp.proto";
+
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/activity/v1;activity";
@@ -32,7 +32,7 @@ message Activity {
   string text = 2;
   string picture = 3;
   string user_id  = 4;
-  google.protobuf.Timestamp timestamp  = 5;
+  int64 timestamp  = 5;
   string media_picture = 6;
   string media_id = 7;
 }

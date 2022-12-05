@@ -12,21 +12,21 @@ import java.util.*
 @Dao
 interface PostDao {
     @Transaction
-    @Query("SELECT * FROM posts WHERE (authorId = :userIdOrUsername OR username = :userIdOrUsername) ORDER BY posts.created DESC")
+    @Query("SELECT * FROM posts WHERE (authorId = :userIdOrUsername OR username = :userIdOrUsername) ORDER BY posts.createTime DESC")
     fun getUserPosts(userIdOrUsername: String): List<Post>
 
     /**
      ** Get User posts. Only IMAGE, VIDEO posts.
      **/
     @Transaction
-    @Query("SELECT * FROM posts WHERE authorId = :authorId AND type <> 'TEXT' ORDER BY posts.created DESC")
+    @Query("SELECT * FROM posts WHERE authorId = :authorId AND type <> 'TEXT' ORDER BY posts.createTime DESC")
     suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
-    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
+    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.createTime DESC")
     suspend fun getPosts(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): List<Post>
 
-    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.created DESC")
+    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.createTime DESC")
     fun getPostFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Post>>
 
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
@@ -36,13 +36,13 @@ interface PostDao {
     suspend fun getPost(postId: String): Post
 
     @Transaction
-    @Query("SELECT * FROM posts WHERE privacy = :privacy AND created > :yesterday")
+    @Query("SELECT * FROM posts WHERE privacy = :privacy AND createTime > :yesterday")
     suspend fun getMapPosts(
         privacy: Privacy,
         yesterday: Long = Date().time - 24 * 60 * 60 * 1000
     ): List<Post>
 
-    @Query("SELECT * FROM posts ORDER BY created DESC")
+    @Query("SELECT * FROM posts ORDER BY createTime DESC")
     fun pagingSource(): PagingSource<Int, Post>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

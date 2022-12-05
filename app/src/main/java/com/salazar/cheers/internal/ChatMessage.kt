@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cheers.chat.v1.Message.*
 import cheers.chat.v1.MessageType
-import com.google.protobuf.Timestamp
 
 
 @Entity(tableName = "message")
@@ -14,7 +13,7 @@ data class ChatMessage(
     val chatChannelId: String,
     val text: String,
     val photoUrl: String,
-    val time: Timestamp,
+    val createTime: Long,
     val senderId: String,
     val senderName: String,
     val senderUsername: String,

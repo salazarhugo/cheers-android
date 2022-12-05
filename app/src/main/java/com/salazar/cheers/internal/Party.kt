@@ -3,7 +3,6 @@ package com.salazar.cheers.internal
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cheers.type.PrivacyOuterClass
 
 @Entity(tableName = "events")
 data class Party(
@@ -12,9 +11,9 @@ data class Party(
     val id: String = "",
     val name: String = "",
     val description: String = "",
-    val startDate: Long = 0L,
-    val endDate: Long = 0L,
-    val created: Long = 0L,
+    val startDate: Long = 0,
+    val endDate: Long = 0,
+    val createTime: Long = 0,
     val hostId: String = "",
     val hostName: String = "",
     val price: Int = 0,

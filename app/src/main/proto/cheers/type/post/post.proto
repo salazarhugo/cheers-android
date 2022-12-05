@@ -4,23 +4,23 @@ package cheers.type;
 
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/post;postpb";
 
-import "google/protobuf/timestamp.proto";
+
 import "cheers/type/privacy/privacy.proto";
 
 message Post {
   string id = 1;
+  string creator_id = 2;
   string caption = 3;
   string address = 4;
   Privacy privacy = 5;
   repeated string photos = 6;
-  bool is_comment_enabled = 7;
   string location_name = 8;
   string drink = 9;
   int64 drunkenness = 10;
   PostType type = 11;
-  google.protobuf.Timestamp create_time = 12;
-  bool comments_enabled = 13;
-  bool share_enabled = 14;
+  int64 create_time = 12;
+  bool can_comment = 13;
+  bool can_share = 14;
   PostRatio ratio = 15;
 }
 

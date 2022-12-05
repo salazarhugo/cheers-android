@@ -4,38 +4,66 @@ package cheers.user.v1;
 
 import "cheers/type/user/user.proto";
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/user/v1;user";
 
 service UserService {
   rpc CreateUser (CreateUserRequest) returns (cheers.type.User);
-  rpc GetUser (GetUserRequest) returns (GetUserResponse);
-  rpc UpdateUser (UpdateUserRequest) returns (cheers.type.User);
+
+  rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{id}"
+    };
+  };
+
+  rpc UpdateUser (UpdateUserRequest) returns (cheers.type.User) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  };
+
   rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty);
 
+  rpc GetUsersIn (GetUsersInRequest) returns (GetUsersInResponse);
   rpc GetUserItemsIn (GetUserItemsInRequest) returns (GetUserItemsInResponse);
   rpc SearchUser (SearchUserRequest) returns (SearchUserResponse);
   rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty);
   rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty);
   rpc BlockUser (BlockUserRequest) returns (BlockUserResponse);
   rpc UnblockUser (UnblockUserRequest) returns (UnblockUserResponse);
-  rpc ListFollowers (ListFollowersRequest) returns (ListFollowersResponse);
-  rpc ListFollowing (ListFollowingRequest) returns (ListFollowingResponse);
+
+  rpc ListFollowers (ListFollowersRequest) returns (ListFollowersResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/followers"
+    };
+  };
+
+  rpc ListFollowing (ListFollowingRequest) returns (ListFollowingResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/following"
+    };
+  };
 }
 
 message CreateUserRequest {
   cheers.type.User user = 1;
 }
 
-//message CreateUserResponse {
-//  cheers.type.User user = 1;
-//}
-
 message BlockUserResponse {
 }
 
 message UnblockUserResponse {
+}
+
+message GetUsersInRequest {
+  repeated string user_ids = 1;
+}
+
+message GetUsersInResponse {
+  repeated cheers.type.User users = 1;
 }
 
 message GetUserItemsInRequest {

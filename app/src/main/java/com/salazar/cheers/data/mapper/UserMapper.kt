@@ -35,6 +35,6 @@ fun cheers.type.UserOuterClass.User.toUser(): User {
         bio = bio,
         website = website,
         registrationTokens = registrationTokensList,
-        created = createTime.seconds,
+        createTime = createTime,
     )
 }

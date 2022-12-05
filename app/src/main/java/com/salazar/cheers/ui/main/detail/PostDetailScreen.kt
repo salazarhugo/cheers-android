@@ -49,7 +49,6 @@ import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.util.Utils.isDarkModeOn
 import java.util.*
@@ -75,7 +74,6 @@ fun PostDetailScreen(
                 onBackPressed = onBackPressed,
                 name = post.locationName,
                 scrollBehavior = scrollBehavior,
-                created = post.created
             )
         }
     ) {
@@ -158,7 +156,7 @@ fun StaticMap(
 @Composable
 fun PostDetails(
     privacy: Privacy,
-    created: Long,
+    createTime: Long,
     drunkenness: Int,
 ) {
     Row(
@@ -180,7 +178,7 @@ fun PostDetails(
             }
             Spacer(Modifier.height(32.dp))
             Text(
-                text = Date(created).toString(),
+                text = Date(createTime.toLong()).toString(),
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
@@ -216,7 +214,7 @@ fun Post(
                     verified = post.verified,
                     beverage = Beverage.fromName(post.beverage),
                     public = post.privacy == Privacy.PUBLIC.name,
-                    created = post.created,
+                    createTime = post.createTime,
                     picture = post.profilePictureUrl,
                     locationName = post.locationName,
                 )
@@ -292,7 +290,7 @@ fun Post(
             item {
                 PostDetails(
                     privacy = Privacy.valueOf(post.privacy),
-                    created = post.created,
+                    createTime = post.createTime,
                     drunkenness = post.drunkenness,
                 )
             }
@@ -375,7 +373,6 @@ fun PostFooter(
 @Composable
 fun Toolbar(
     name: String,
-    created: Long,
     onBackPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {

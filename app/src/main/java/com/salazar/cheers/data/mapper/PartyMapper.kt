@@ -1,7 +1,6 @@
 package com.salazar.cheers.data.mapper
 
 import cheers.party.v1.PartyItem
-import cheers.party.v1.PartyResponse
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Privacy
 
@@ -10,9 +9,9 @@ fun PartyItem.toParty(accountId: String): Party {
      id = party.id,
      name = party.name,
      description = party.description,
-     startDate  = party.startDate.seconds * 1000,
-     endDate = party.endDate.seconds * 1000,
-     created = party.createTime.seconds * 1000,
+     startDate  = party.startDate,
+     endDate = party.endDate,
+     createTime = party.createTime,
      hostId = party.hostId,
      hostName = user.name,
      price = 0,

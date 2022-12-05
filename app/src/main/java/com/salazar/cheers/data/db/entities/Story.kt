@@ -24,7 +24,7 @@ data class Story(
     val profilePictureUrl: String = "",
     val viewed: Boolean = false,
     val liked: Boolean = false,
-    val created: Long = Date().time,
+    val createTime: Long = 0,
     val relativeTime: String = "",
     val privacy: String = "",
     val photo: String = "",

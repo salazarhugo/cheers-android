@@ -3,9 +3,6 @@ package com.salazar.cheers.workers
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -13,22 +10,15 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import cheers.type.PartyOuterClass
-import cheers.type.PostOuterClass
 import cheers.type.PrivacyOuterClass
 import com.google.firebase.auth.FirebaseAuth
-import com.google.protobuf.Timestamp
-import com.google.type.LatLng
-import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import makeStatusNotification
-import java.io.ByteArrayOutputStream
-import java.util.*
 
 @HiltWorker
 class CreatePartyWorker @AssistedInject constructor(
@@ -85,10 +75,11 @@ class CreatePartyWorker @AssistedInject constructor(
                 .setName(name)
                 .setDescription(description)
                 .setAddress(address)
-                .setStartDate(Timestamp.newBuilder().setSeconds(startDateTime/1000))
-                .setEndDate(Timestamp.newBuilder().setSeconds(startDateTime/1000))
+                .setEndDate(startDateTime / 1000)
+                .setStartDate(startDateTime / 1000)
                 .setLocationName(locationName)
-                .setLatlng(LatLng.newBuilder().setLatitude(latitude).setLongitude(longitude).build())
+                .setLatitude(latitude)
+                .setLongitude(longitude)
                 .setPrivacy(PrivacyOuterClass.Privacy.PUBLIC)
                 .build()
 

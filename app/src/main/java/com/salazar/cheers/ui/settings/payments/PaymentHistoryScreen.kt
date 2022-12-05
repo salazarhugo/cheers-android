@@ -37,9 +37,9 @@ package com.salazar.cheers.ui.settings.payments
 //            style = MaterialTheme.typography.bodyMedium
 //        )
 //        val dateFormatter = SimpleDateFormat("dd/MM HH:mm")
-//        val created = Date(payment.created * 1000)
+//        val createTime = Date(payment.createTime * 1000)
 //        Text(
-//            text = dateFormatter.format(created),
+//            text = dateFormatter.format(createTime),
 //            style = MaterialTheme.typography.bodyMedium
 //        )
 //    }

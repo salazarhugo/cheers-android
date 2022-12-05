@@ -22,7 +22,7 @@ class ChatService : ChatServiceGrpcKt.ChatServiceCoroutineImplBase() {
         return getRoomId(request = request)
     }
 
-    override fun listRoom(request: ListRoomRequest): Flow<Room> {
+    override suspend fun listRoom(request: ListRoomRequest): ListRoomResponse {
         return super.listRoom(request)
     }
 
@@ -36,10 +36,6 @@ class ChatService : ChatServiceGrpcKt.ChatServiceCoroutineImplBase() {
 
     override suspend fun addToken(request: AddTokenReq): Empty {
         return addToken(request)
-    }
-
-    override suspend fun createChat(request: CreateChatReq): Room {
-        return createChat(request)
     }
 
     override suspend fun deleteRoom(request: RoomId): Empty {

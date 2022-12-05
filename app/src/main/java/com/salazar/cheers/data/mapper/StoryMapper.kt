@@ -11,7 +11,7 @@ fun StoryResponse.toStory(authorId: String, accountId: String): Story {
      viewed = hasViewed,
      liked = hasLiked,
      photo = story.photo,
-     created = story.createTime.seconds * 1000,
+     createTime = story.createTime,
      locationName = story.locationName,
      latitude= 0.0,
      longitude= 0.0,

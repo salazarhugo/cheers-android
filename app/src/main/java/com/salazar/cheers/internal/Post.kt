@@ -37,7 +37,7 @@ data class Post(
     val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     val verified: Boolean = false,
     val profilePictureUrl: String = "",
-    val created: Long = 0,
+    val createTime: Long = 0,
     val relativeTime: String = "",
     val likes: Int = 0,
     val liked: Boolean = false,

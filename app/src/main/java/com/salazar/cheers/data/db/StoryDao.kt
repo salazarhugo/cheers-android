@@ -22,7 +22,7 @@ interface StoryDao {
     fun getStoriesByAuthor(authorId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Story>>
 
     @Transaction
-    @Query("SELECT * FROM story WHERE username = :username ORDER BY story.created")
+    @Query("SELECT * FROM story WHERE username = :username ORDER BY story.createTime")
     suspend fun getUserStory(username: String): List<Story>
 
     @Query("SELECT * FROM users LIMIT :pageSize OFFSET :skip")
