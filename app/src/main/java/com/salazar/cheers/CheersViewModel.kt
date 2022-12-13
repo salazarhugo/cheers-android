@@ -90,7 +90,7 @@ class CheersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            chatRepository.listenRooms()
+            chatRepository.listRooms()
         }
 
         viewModelScope.launch {

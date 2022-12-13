@@ -12,6 +12,7 @@ import androidx.navigation.compose.dialog
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.post.PostMoreBottomSheet
 import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
@@ -527,10 +528,12 @@ fun NavGraphBuilder.mainNavGraph(
         val uiState by chatsSheetViewModel.uiState.collectAsState()
         val room = uiState.room
 
+        val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
+
         if (room != null)
             ChatsMoreBottomSheet(
                 name = room.name,
-                ownerId = room.ownerId,
+                isAdmin = room.admins.contains(uid),
                 roomType = room.type,
                 onDeleteClick = {
                     chatsSheetViewModel.deleteChannel()

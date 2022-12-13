@@ -38,10 +38,6 @@ class ChatService : ChatServiceGrpcKt.ChatServiceCoroutineImplBase() {
         return addToken(request)
     }
 
-    override suspend fun deleteRoom(request: RoomId): Empty {
-        return deleteRoom(request)
-    }
-
     override suspend fun leaveRoom(request: RoomId): Empty {
         return leaveRoom(request)
     }

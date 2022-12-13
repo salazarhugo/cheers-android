@@ -13,6 +13,7 @@ data class ChatChannel(
     val name: String = "",
     val verified: Boolean = false,
     val members: List<String> = emptyList(),
+    val admins: List<String> = emptyList(),
     val otherUserId: String = "",
     val createTime: Long = 0,
     val createTimeBy: String = "",

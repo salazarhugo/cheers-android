@@ -27,7 +27,7 @@ import com.salazar.cheers.compose.DividerM3
 @Composable
 fun ChatsMoreBottomSheet(
     name: String,
-    ownerId: String,
+    isAdmin: Boolean,
     roomType: RoomType,
     onDeleteClick: () -> Unit,
     onDeleteChats: () -> Unit,
@@ -51,23 +51,20 @@ fun ChatsMoreBottomSheet(
             color = MaterialTheme.colorScheme.onBackground,
         )
         DividerM3()
-        if (roomType == RoomType.GROUP) {
+        if (roomType == RoomType.GROUP)
             Item(
                 text = "Leave",
                 icon = Icons.Outlined.ExitToApp,
                 red = true,
                 onClick = onLeaveClick,
             )
-            val UUID by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
-
-            if (UUID == ownerId)
-                Item(
-                    text = "Delete Group",
-                    icon = Icons.Outlined.Delete,
-                    red = true,
-                    onClick = onDeleteClick,
-                )
-        }
+        if (isAdmin)
+            Item(
+                text = "Delete Group",
+                icon = Icons.Outlined.Delete,
+                red = true,
+                onClick = onDeleteClick,
+            )
         Item(
             text = "Delete Chats",
             icon = Icons.Outlined.Delete,

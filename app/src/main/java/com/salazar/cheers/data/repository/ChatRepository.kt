@@ -143,7 +143,7 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun deleteRoom(channelId: String) = withContext(Dispatchers.IO) {
-        val request = RoomId.newBuilder()
+        val request = DeleteRoomRequest.newBuilder()
             .setRoomId(channelId)
             .build()
 
@@ -276,7 +276,7 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun listenRooms() = withContext(Dispatchers.IO) {
+    suspend fun listRooms() = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         try {
             val request = ListRoomRequest.newBuilder()

@@ -9,6 +9,7 @@ fun Room.toChatChannel(accountId: String): ChatChannel {
         name = name,
         verified = verified,
         picture = picture,
+        admins = adminsList,
         createTime = createTime,
         lastMessage = lastMessageText,
         lastMessageTime = lastMessageTime,

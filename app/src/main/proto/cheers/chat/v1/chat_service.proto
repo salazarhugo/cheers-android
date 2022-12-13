@@ -31,7 +31,11 @@ service ChatService {
     };
   }
 
-  rpc DeleteRoom(RoomId) returns (Empty) {}
+  rpc DeleteRoom(DeleteRoomRequest) returns (DeleteRoomResponse) {
+    option (google.api.http) = {
+      delete: "/v1/chats/{room_id}"
+    };
+  }
 
   rpc GetRoomId(GetRoomIdReq) returns (RoomId) {}
   rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {}
@@ -48,6 +52,13 @@ service ChatService {
 
   rpc AddToken(AddTokenReq) returns (Empty) {}
   rpc DeleteUser(UserIdReq) returns (Empty) {}
+}
+
+message DeleteRoomRequest {
+  string room_id = 1;
+}
+
+message DeleteRoomResponse {
 }
 
 message TypingEvent {
