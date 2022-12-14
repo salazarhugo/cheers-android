@@ -48,6 +48,20 @@ class ChatRepository @Inject constructor(
         }
     }
 
+    suspend fun getMessagesFromRemote(channelId: String) {
+        try {
+            val request = ListRoomMessagesRequest.newBuilder()
+                .setRoomId(channelId)
+                .build()
+
+            val response = chatService.listRoomMessages(request)
+            val messages = response.messagesList.map { it.message.toTextMessage() }
+            chatDao.insertMessages(messages)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun getMessages(channelId: String): Flow<List<ChatMessage>> =
         withContext(Dispatchers.IO) {
             return@withContext chatDao.getMessages(channelId = channelId)
@@ -63,12 +77,10 @@ class ChatRepository @Inject constructor(
                 .build()
 
             chatService.joinRoom(request).collect {
-                Log.d("GRPC", it.toString())
                 chatDao.insertMessage(it.toTextMessage())
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("GRPC", e.toString())
         }
     }
 
@@ -85,7 +97,6 @@ class ChatRepository @Inject constructor(
             return Result.Error("Failed to get room memebers")
         }
     }
-
 
     fun getChannel(channelId: String): Flow<ChatChannel> {
         return chatDao.getChannelFlow(channelId = channelId)
@@ -276,13 +287,18 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun listRooms() = withContext(Dispatchers.IO) {
+    suspend fun getInbox() = withContext(Dispatchers.IO) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         try {
-            val request = ListRoomRequest.newBuilder()
+            val request = GetInboxRequest.newBuilder()
                 .build()
-            val rooms = chatService.listRoom(request = request)
-            chatDao.insert(rooms.roomsList.map { it.toChatChannel(uid)} )
+            val response = chatService.getInbox(request = request)
+            response.inboxList.forEach { roomWithMessages ->
+                val chatChannel = roomWithMessages.room.toChatChannel(uid)
+                val messages = roomWithMessages.messagesList.map { it.toTextMessage() }
+                chatDao.insert(chatChannel)
+                chatDao.insertMessages(messages)
+            }
         } catch (e: Exception) {
             Log.e("GRPC", e.toString())
         }

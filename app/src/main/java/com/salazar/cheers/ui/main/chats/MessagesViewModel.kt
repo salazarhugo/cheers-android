@@ -45,7 +45,6 @@ private data class MessagesViewModelState(
 class MessagesViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
-//    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState =
@@ -60,10 +59,6 @@ class MessagesViewModel @Inject constructor(
         )
 
     init {
-        onSwipeRefresh()
-    }
-
-    fun onSwipeRefresh() {
         viewModelScope.launch {
             chatRepository.getChannels().collect { channels ->
                 viewModelState.update {
@@ -73,15 +68,10 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
-    private fun refreshSuggestions() {
-//        viewModelState.update { it.copy(isLoading = true, isRefreshing = true) }
-//
-//        viewModelScope.launch {
-//            val suggestions = userRepository.getSuggestions()
-//            viewModelState.update {
-//                it.copy(suggestions = suggestions, isLoading = false, isRefreshing = false)
-//            }
-//        }
+    fun onSwipeRefresh() {
+        viewModelScope.launch {
+            chatRepository.getInbox()
+        }
     }
 
     fun onSearchInputChange(searchInput: String) {

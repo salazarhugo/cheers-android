@@ -19,9 +19,9 @@ service ChatService {
 
   rpc JoinRoom(JoinRoomRequest) returns (stream Message) {}
 
-  rpc ListRoom(ListRoomRequest) returns (ListRoomResponse) {
+  rpc GetInbox(GetInboxRequest) returns (GetInboxResponse) {
     option (google.api.http) = {
-      get: "/v1/chats"
+      get: "/v1/chats/inbox"
     };
   }
 
@@ -52,6 +52,15 @@ service ChatService {
 
   rpc AddToken(AddTokenReq) returns (Empty) {}
   rpc DeleteUser(UserIdReq) returns (Empty) {}
+}
+
+message GetInboxRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message GetInboxResponse {
+  repeated RoomWithMessages inbox = 1;
 }
 
 message DeleteRoomRequest {
@@ -149,6 +158,11 @@ enum RoomStatus {
 enum RoomType {
   DIRECT = 0;
   GROUP = 1;
+}
+
+message RoomWithMessages {
+  Room room = 1;
+  repeated Message messages = 2;
 }
 
 message Room {

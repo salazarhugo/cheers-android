@@ -123,6 +123,9 @@ dependencies {
     implementation("io.grpc:grpc-netty-shaded:1.20.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
+    // Protobuf Java Format
+    implementation 'com.google.protobuf:protobuf-java-util:3.19.2'
+
     // Klaxon
     implementation 'com.beust:klaxon:5.5'
 

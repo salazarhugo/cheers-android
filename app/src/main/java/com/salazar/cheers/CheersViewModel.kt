@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.WebSocket
 import javax.inject.Inject
 
 data class CheersUiState(
@@ -32,6 +33,7 @@ data class CheersUiState(
 
 @HiltViewModel
 class CheersViewModel @Inject constructor(
+    private val webSocket: WebSocket,
     private val userRepository: UserRepository,
     private val billingRepository: BillingRepository,
     private val chatRepository: ChatRepository,
@@ -56,7 +58,7 @@ class CheersViewModel @Inject constructor(
                 }
             }
         }
-
+        webSocket.send("Hello")
     }
 
     fun queryPurchases() {
@@ -90,7 +92,7 @@ class CheersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            chatRepository.listRooms()
+            chatRepository.getInbox()
         }
 
         viewModelScope.launch {

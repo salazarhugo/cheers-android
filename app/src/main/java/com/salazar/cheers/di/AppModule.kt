@@ -12,6 +12,7 @@ import cheers.user.v1.UserServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.remote.ErrorHandleInterceptor
+import com.salazar.cheers.data.remote.websocket.ChatWebSocketListener
 import com.salazar.cheers.data.repository.activity.ActivityRepository
 import com.salazar.cheers.data.repository.activity.impl.ActivityRepositoryImpl
 import com.salazar.cheers.data.repository.party.PartyRepository
@@ -27,12 +28,28 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
 import javax.inject.Singleton
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideWebSocket(
+        chatWebSocketListener: ChatWebSocketListener,
+    ): WebSocket {
+        val request = Request.Builder()
+            .url(Constants.WEBSOCKET_URL)
+            .addHeader("Sec-Websocket-Protocol", "4DT7cD1vHmbTbTDTa8PVZj85QvA355FEvHawinQCa9jgH7ZdWESR3ri2")
+            .build()
+        val client = OkHttpClient()
+        return client.newWebSocket(request, chatWebSocketListener)
+    }
 
     @Provides
     @Singleton
