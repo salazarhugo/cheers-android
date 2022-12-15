@@ -45,7 +45,7 @@ object AppModule {
     ): WebSocket {
         val request = Request.Builder()
             .url(Constants.WEBSOCKET_URL)
-            .addHeader("Sec-Websocket-Protocol", "4DT7cD1vHmbTbTDTa8PVZj85QvA355FEvHawinQCa9jgH7ZdWESR3ri2")
+            .addHeader("Sec-Websocket-Protocol", "55FEvHawinQCa9jgH7ZdWESR3ri2")
             .build()
         val client = OkHttpClient()
         return client.newWebSocket(request, chatWebSocketListener)

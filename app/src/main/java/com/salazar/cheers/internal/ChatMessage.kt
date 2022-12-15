@@ -24,6 +24,7 @@ data class ChatMessage(
 
 enum class ChatMessageStatus {
     EMPTY,
+    SCHEDULED,
     SENT,
     DELIVERED,
     READ,

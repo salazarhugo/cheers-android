@@ -244,33 +244,32 @@ class ChatRepository @Inject constructor(
         return withContext(Dispatchers.IO) {
             val user = userRepository.getCurrentUser()
 
-            val msg = Message.newBuilder()
-                .setId(UUID.randomUUID().toString())
-                .setSenderId(FirebaseAuth.getInstance().currentUser?.uid)
-                .setSenderName(user.name)
-                .setSenderUsername(user.username)
-                .setSenderPicture(user.picture)
-                .setRoomId(channelId)
-                .setText(text)
-                .setType(MessageType.TEXT)
-                .setStatus(Message.Status.EMPTY)
-                .build()
+            val message = ChatMessage(
+                id = UUID.randomUUID().toString(),
+                senderId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                senderName= user.name,
+                senderUsername = user.username,
+                senderProfilePictureUrl = user.picture ?: "",
+                roomId = channelId,
+                text = text,
+                type = com.salazar.cheers.internal.MessageType.TEXT,
+                status = ChatMessageStatus.SCHEDULED,
+                photoUrl = "",
+                seenBy = emptyList(),
+                likedBy = emptyList(),
+                createTime = Date().time / 1000,
+            )
 
             launch {
-                val message = msg.toTextMessage()
                 chatDao.insertMessage(message)
                 chatDao.updateLastMessage(channelId, message.text, message.createTime, message.type)
             }
 
-            val message = flow<Message> {
-                emit(msg)
-            }
-
             try {
-                val response = chatService.sendMessage(message)
-                chatDao.insertMessage(msg.toTextMessage().copy(status = ChatMessageStatus.READ))
+//                val response = chatService.sendMessage(message)
+//                chatDao.insertMessage(msg.toTextMessage().copy(status = ChatMessageStatus.READ))
 
-                return@withContext Resource.Success(response)
+                return@withContext Resource.Error("Not implemented")
             } catch (e: StatusException) {
                 e.printStackTrace()
                 return@withContext Resource.Error(e.localizedMessage)

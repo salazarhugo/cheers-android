@@ -18,8 +18,19 @@ fun Message.toTextMessage(): ChatMessage {
         roomId = roomId,
         photoUrl = picture,
         type = MessageType.TEXT,
-        status = ChatMessageStatus.READ,
+        status = status.toChatMessageStatus(),
     )
+}
+
+fun Message.Status.toChatMessageStatus(): ChatMessageStatus {
+    return when(this) {
+        Message.Status.DELIVERED -> ChatMessageStatus.DELIVERED
+        Message.Status.EMPTY -> ChatMessageStatus.EMPTY
+        Message.Status.SENT -> ChatMessageStatus.SENT
+        Message.Status.READ -> ChatMessageStatus.READ
+        Message.Status.FAILED -> ChatMessageStatus.FAILED
+        Message.Status.UNRECOGNIZED -> ChatMessageStatus.UNRECOGNIZED
+    }
 }
 
 fun Message.toImageMessage(): ImageMessage {

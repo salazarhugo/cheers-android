@@ -21,6 +21,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
@@ -42,11 +43,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.chat.ChatBottomBar
 import com.salazar.cheers.compose.animations.AnimateHeart
 import com.salazar.cheers.compose.chat.*
 import com.salazar.cheers.internal.*
-import com.salazar.cheers.ui.main.chat.Message
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -125,7 +124,7 @@ fun ChatScreen(
                     onNavIconPressed = { onPoBackStack() },
                     onTitleClick = onTitleClick,
                     scrollBehavior = scrollBehavior,
-                    onInfoClick = { onInfoClick(channel.id)},
+                    onInfoClick = { onInfoClick(channel.id) },
                 )
             else if (channel.type == RoomType.GROUP)
                 GroupChatBar(
@@ -134,7 +133,7 @@ fun ChatScreen(
                     picture = channel.picture,
                     onNavIconPressed = { onPoBackStack() },
                     onTitleClick = {},
-                    onInfoClick = { onInfoClick(channel.id)},
+                    onInfoClick = { onInfoClick(channel.id) },
                     scrollBehavior = scrollBehavior,
                 )
         }
@@ -181,7 +180,6 @@ fun Messages(
                 val message = messages[index]
                 val isFirstMessageByAuthor = prevAuthor != message.senderId
                 val isLastMessageByAuthor = nextAuthor != message.senderId
-
 //                if (!message.time.isToday() && prevMessage?.time?.isToday() == true) {
 //                    item {
 //                        DayHeader("Today")
@@ -456,7 +454,8 @@ fun ChatItemBubble(
                     authorClicked = authorClicked
                 )
                 MessageStatus(
-                    modifier = Modifier.padding(bottom = 8.dp, end = 12.dp, top = 8.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp, end = 12.dp, top = 8.dp)
                         .size(14.dp),
                     status = message.status,
                 )
@@ -502,8 +501,15 @@ fun MessageStatus(
     modifier: Modifier = Modifier,
     status: ChatMessageStatus,
 ) {
-    when(status) {
+    when (status) {
         ChatMessageStatus.EMPTY -> {}
+        ChatMessageStatus.SCHEDULED -> {
+            Icon(
+                modifier = modifier,
+                imageVector = Icons.Default.Schedule,
+                contentDescription = null,
+            )
+        }
         ChatMessageStatus.SENT -> {
             Icon(
                 modifier = modifier,
