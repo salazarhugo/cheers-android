@@ -169,10 +169,7 @@ fun Messages(
         LazyColumn(
             reverseLayout = true,
             state = scrollState,
-            contentPadding = WindowInsets.statusBars.asPaddingValues(),
-//                insets = LocalWindowInsets.current.statusBars,
-//                additionalTop = 56.dp
-//            ),
+            contentPadding = PaddingValues(top = 56.dp),
             modifier = Modifier
                 .testTag(ConversationTestTag)
                 .fillMaxSize()
