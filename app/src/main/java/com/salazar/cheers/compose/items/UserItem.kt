@@ -8,10 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cheers.type.UserOuterClass
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.data.enums.StoryState
 
 
 @Composable
@@ -35,7 +35,7 @@ fun UserItem(
                 picture = userItem.picture,
                 storyState = userItem.story_state,
                 onClick = {
-                    if (userItem.story_state == UserOuterClass.StoryState.EMPTY)
+                    if (userItem.story_state == StoryState.EMPTY)
                         onClick(userItem.username)
                     else
                         onStoryClick(userItem.username)

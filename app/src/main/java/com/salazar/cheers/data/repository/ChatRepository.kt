@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import cheers.chat.v1.*
+import cheers.chat.v1.Message
+import cheers.chat.v1.MessageType
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
@@ -15,8 +17,9 @@ import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
 import com.salazar.cheers.data.mapper.toUserItem
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.*
+import com.salazar.cheers.internal.RoomStatus
+import com.salazar.cheers.internal.RoomType
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
@@ -265,7 +268,7 @@ class ChatRepository @Inject constructor(
 
             try {
                 val response = chatService.sendMessage(message)
-                chatDao.insertMessage(msg.toTextMessage().copy(status = response.status))
+                chatDao.insertMessage(msg.toTextMessage().copy(status = ChatMessageStatus.READ))
 
                 return@withContext Resource.Success(response)
             } catch (e: StatusException) {

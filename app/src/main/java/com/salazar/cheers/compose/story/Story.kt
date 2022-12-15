@@ -22,12 +22,13 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import cheers.type.UserOuterClass
 import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.ui.theme.BlueCheers
 
 @Composable
 fun YourStory(
     profilePictureUrl: String?,
-    storyState: UserOuterClass.StoryState,
+    storyState: StoryState,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -43,7 +44,7 @@ fun YourStory(
 
     val storyState2 =
         if (uploadInfo?.state == WorkInfo.State.RUNNING)
-            UserOuterClass.StoryState.LOADING
+            StoryState.LOADING
         else
             storyState
 
@@ -58,7 +59,7 @@ fun YourStory(
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp),
                 onClick = onClick,
             )
-            if (storyState == UserOuterClass.StoryState.EMPTY)
+            if (storyState == StoryState.EMPTY)
                 Box(
                     modifier = Modifier
                         .offset(x = (-6).dp, y = (-6).dp)
@@ -93,9 +94,9 @@ fun Story(
     onStoryClick: (String) -> Unit,
 ) {
     val state = if (viewed)
-        UserOuterClass.StoryState.SEEN
+        StoryState.SEEN
     else
-        UserOuterClass.StoryState.NOT_SEEN
+        StoryState.NOT_SEEN
 
     Column(
         modifier = modifier,

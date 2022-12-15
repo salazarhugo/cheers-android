@@ -2,6 +2,9 @@ package com.salazar.cheers.data.mapper
 
 import cheers.chat.v1.Room
 import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.internal.MessageType
+import com.salazar.cheers.internal.RoomStatus
+import com.salazar.cheers.internal.RoomType
 
 fun Room.toChatChannel(accountId: String): ChatChannel {
     return ChatChannel(
@@ -13,11 +16,11 @@ fun Room.toChatChannel(accountId: String): ChatChannel {
         createTime = createTime,
         lastMessage = lastMessageText,
         lastMessageTime = lastMessageTime,
-        lastMessageType= lastMessageType,
+        lastMessageType= MessageType.TEXT,
         accountId = accountId,
-        status = status,
+        status = RoomStatus.SENT,
         members = membersList,
-        type = type,
+        type = RoomType.DIRECT,
         ownerId = owner,
     )
 }

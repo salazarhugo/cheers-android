@@ -28,7 +28,7 @@ import com.salazar.cheers.internal.*
         Activity::class,
         UserSuggestion::class,
     ],
-    version = 1,
+    version = 3,
     exportSchema = true,
     autoMigrations = []
 )

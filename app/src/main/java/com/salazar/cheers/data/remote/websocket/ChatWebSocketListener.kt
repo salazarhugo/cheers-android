@@ -1,11 +1,13 @@
 package com.salazar.cheers.data.remote.websocket
 
 import android.util.Log
-import cheers.chat.v1.Message
-import com.google.protobuf.util.JsonFormat
-import com.salazar.cheers.data.ProtoJsonUtil
+import com.google.gson.Gson
 import com.salazar.cheers.data.db.ChatDao
-import com.salazar.cheers.data.mapper.toTextMessage
+import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.ChatMessageStatus
+import com.salazar.cheers.internal.MessageType
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -24,13 +26,23 @@ class ChatWebSocketListener @Inject constructor(
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         Log.d(TAG, text)
-        val message = ProtoJsonUtil.fromJson(text, Message::class.java)
+
+        val message = Gson().fromJson(text, ChatMessage::class.java)
+        Log.d(TAG, message.toString())
 
         message?.let {
-            Log.d(TAG, message.roomId)
-            Log.d(TAG, message.text)
             runBlocking {
-                chatDao.insertMessage(message.toTextMessage())
+                chatDao.insertMessage(
+                    message.copy(
+                        likedBy = emptyList(),
+                        seenBy = emptyList(),
+                        photoUrl = "",
+                        senderUsername = "",
+                        senderProfilePictureUrl = "",
+                        type = MessageType.TEXT,
+                        status = ChatMessageStatus.EMPTY,
+                    )
+                )
             }
         }
     }

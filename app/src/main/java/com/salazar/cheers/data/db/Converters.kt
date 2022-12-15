@@ -1,14 +1,9 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.TypeConverter
-import cheers.chat.v1.Message
-import cheers.chat.v1.MessageType
-import cheers.chat.v1.RoomStatus
-import cheers.chat.v1.RoomType
-import cheers.type.UserOuterClass
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.internal.ActivityType
-import com.salazar.cheers.internal.Beverage
+import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.internal.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -16,20 +11,12 @@ import java.util.*
 
 class Converters {
     @TypeConverter
-    fun fromMessageStatus(value: Message.Status) = value.name
+    fun fromStoryState(value: StoryState) = value.name
 
     @TypeConverter
-    fun toMessageStatus(name: String) = Message.Status.values()
+    fun toStoryState(name: String) = StoryState.values()
         .firstOrNull { it.name.equals(name, ignoreCase = true) }
-        ?: Message.Status.UNRECOGNIZED
-
-    @TypeConverter
-    fun fromStoryState(value: UserOuterClass.StoryState) = value.name
-
-    @TypeConverter
-    fun toStoryState(name: String) = UserOuterClass.StoryState.values()
-        .firstOrNull { it.name.equals(name, ignoreCase = true) }
-        ?: UserOuterClass.StoryState.UNRECOGNIZED
+        ?: StoryState.UNKNOWN
 
     @TypeConverter
     fun fromActivityType(value: ActivityType) = value.name
@@ -46,7 +33,7 @@ class Converters {
     fun toMessageType(name: String) =
         MessageType.values()
             .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: MessageType.UNRECOGNIZED
+            ?: MessageType.TEXT
 
     @TypeConverter
     fun fromRoomType(value: RoomType) = value.name

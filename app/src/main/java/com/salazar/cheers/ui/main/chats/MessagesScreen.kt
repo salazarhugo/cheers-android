@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import cheers.chat.v1.RoomStatus
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 import com.salazar.cheers.compose.LoadingScreen
@@ -34,6 +33,7 @@ import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.internal.RoomStatus
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.theme.BlueCheers

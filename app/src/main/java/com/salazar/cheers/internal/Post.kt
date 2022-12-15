@@ -34,7 +34,7 @@ data class Post(
     val authorId: String = "",
     val caption: String = "",
     val username: String = "",
-    val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
+//    val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
     val verified: Boolean = false,
     val profilePictureUrl: String = "",
     val createTime: Long = 0,

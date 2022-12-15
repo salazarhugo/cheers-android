@@ -2,7 +2,9 @@ package com.salazar.cheers.data.mapper
 
 import cheers.chat.v1.Message
 import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.ChatMessageStatus
 import com.salazar.cheers.internal.ImageMessage
+import com.salazar.cheers.internal.MessageType
 
 fun Message.toTextMessage(): ChatMessage {
     return ChatMessage(
@@ -13,10 +15,10 @@ fun Message.toTextMessage(): ChatMessage {
         senderUsername = senderUsername,
         senderProfilePictureUrl = senderPicture,
         createTime = createTime,
-        chatChannelId = roomId,
+        roomId = roomId,
         photoUrl = picture,
-        type = type,
-        status = status,
+        type = MessageType.TEXT,
+        status = ChatMessageStatus.READ,
     )
 }
 

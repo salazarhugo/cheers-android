@@ -19,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import cheers.chat.v1.MessageType
 import com.salazar.cheers.compose.CircularProgressIndicatorM3
+import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.ui.theme.BlueCheers
 
 @Preview
@@ -72,7 +72,7 @@ fun OpenedChat() {
 @Composable
 fun DeliveredChat(
     @PreviewParameter(MessageTypeProvider::class)
-    messageType: cheers.chat.v1.MessageType
+    messageType: MessageType
 ) {
     val color = messageType.toColor()
 
@@ -112,7 +112,7 @@ fun DeliveredChat(
 @Composable
 fun ReceivedChat(
     @PreviewParameter(MessageTypeProvider::class)
-    messageType: cheers.chat.v1.MessageType
+    messageType: MessageType
 ) {
     val color = messageType.toColor()
 

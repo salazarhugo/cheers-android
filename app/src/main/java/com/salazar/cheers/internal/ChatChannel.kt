@@ -2,9 +2,6 @@ package com.salazar.cheers.internal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cheers.chat.v1.MessageType
-import cheers.chat.v1.RoomStatus
-import cheers.chat.v1.RoomType
 
 @Entity(tableName = "room")
 data class ChatChannel(
@@ -26,3 +23,22 @@ data class ChatChannel(
     val accountId: String = "",
     val ownerId: String = "",
 )
+
+enum class RoomStatus {
+    EMPTY,
+    OPENED,
+    SENT,
+    RECEIVED,
+    NEW,
+    UNRECOGNIZED,
+}
+
+enum class MessageType {
+    TEXT, IMAGE, VIDEO
+}
+
+enum class RoomType {
+    DIRECT,
+    GROUP,
+    UNRECOGNIZED,
+}

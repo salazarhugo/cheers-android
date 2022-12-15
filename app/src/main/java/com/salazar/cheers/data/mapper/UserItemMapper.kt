@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.mapper
 
 import cheers.type.UserOuterClass.UserItem
+import com.salazar.cheers.data.enums.StoryState
 
 
 fun UserItem.toUserItem(): com.salazar.cheers.data.db.entities.UserItem {
@@ -11,6 +12,6 @@ fun UserItem.toUserItem(): com.salazar.cheers.data.db.entities.UserItem {
         has_followed = hasFollowed,
         username = username,
         verified = verified,
-        story_state = storyState,
+        story_state = StoryState.EMPTY,
     )
 }

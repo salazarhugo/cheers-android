@@ -3,7 +3,7 @@ package com.salazar.cheers.data.db.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import cheers.type.UserOuterClass.StoryState
+import com.salazar.cheers.data.enums.StoryState
 
 @Entity(
     tableName = "user_item",

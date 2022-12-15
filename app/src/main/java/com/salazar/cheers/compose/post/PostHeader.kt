@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.relativeTimeFormatter
 
@@ -50,6 +51,7 @@ fun PostHeader(
 
             UserProfilePicture(
                 picture = picture,
+                storyState = StoryState.EMPTY,
                 size = 33.dp,
             )
             Spacer(Modifier.width(8.dp))

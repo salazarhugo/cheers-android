@@ -39,18 +39,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import cheers.chat.v1.Message
-import cheers.chat.v1.MessageType
-import cheers.chat.v1.RoomStatus
-import cheers.chat.v1.RoomType
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.compose.chat.ChatBottomBar
 import com.salazar.cheers.compose.animations.AnimateHeart
 import com.salazar.cheers.compose.chat.*
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.*
+import com.salazar.cheers.ui.main.chat.Message
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -454,13 +450,21 @@ fun ChatItemBubble(
                 )
             }
         ) {
-            ClickableMessage(
-                message = message,
-                isUserMe = isUserMe,
-                authorClicked = authorClicked
-            )
+            Row(
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                ClickableMessage(
+                    message = message,
+                    isUserMe = isUserMe,
+                    authorClicked = authorClicked
+                )
+                MessageStatus(
+                    modifier = Modifier.padding(bottom = 8.dp, end = 12.dp, top = 8.dp)
+                        .size(14.dp),
+                    status = message.status,
+                )
+            }
         }
-        MessageStatus(status = message.status)
         if (isUserMe && seen)
             Text(
                 text = "\uD83D\uDC40",
@@ -498,23 +502,42 @@ fun ChatItemBubble(
 
 @Composable
 fun MessageStatus(
-    status: Message.Status,
+    modifier: Modifier = Modifier,
+    status: ChatMessageStatus,
 ) {
     when(status) {
-        Message.Status.EMPTY -> {}
-        Message.Status.SENT -> {
-            Icon(Icons.Default.Done, contentDescription = null)
+        ChatMessageStatus.EMPTY -> {}
+        ChatMessageStatus.SENT -> {
+            Icon(
+                modifier = modifier,
+                imageVector = Icons.Default.Done,
+                contentDescription = null,
+            )
         }
-        Message.Status.DELIVERED -> {
-            Icon(Icons.Default.DoneAll, contentDescription = null)
+        ChatMessageStatus.DELIVERED -> {
+            Icon(
+                modifier = modifier,
+                imageVector = Icons.Default.DoneAll,
+                contentDescription = null
+            )
         }
-        Message.Status.READ -> {
-            Icon(Icons.Default.DoneAll, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        ChatMessageStatus.READ -> {
+            Icon(
+                modifier = modifier,
+                imageVector = Icons.Default.DoneAll,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
         }
-        Message.Status.FAILED -> {
-            Icon(Icons.Outlined.Error, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+        ChatMessageStatus.FAILED -> {
+            Icon(
+                modifier = modifier,
+                imageVector = Icons.Outlined.Error,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+            )
         }
-        Message.Status.UNRECOGNIZED -> {}
+        ChatMessageStatus.UNRECOGNIZED -> {}
     }
 }
 
@@ -537,7 +560,7 @@ fun ClickableMessage(
         primary = isUserMe
     )
 
-    val color = if (message.status == Message.Status.FAILED)
+    val color = if (message.status == ChatMessageStatus.FAILED)
         MaterialTheme.colorScheme.onError
     else if (isUserMe)
         MaterialTheme.colorScheme.onPrimary

@@ -1,14 +1,10 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
-import cheers.chat.v1.RoomStatus
-import cheers.chat.v1.RoomType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.*
 import kotlinx.coroutines.flow.Flow
-import cheers.chat.v1.MessageType
 
 @Dao
 interface ChatDao {
@@ -27,7 +23,7 @@ interface ChatDao {
     @Query("DELETE FROM room WHERE id = :channelId")
     suspend fun deleteChannel(channelId: String)
 
-    @Query("DELETE FROM message WHERE chatChannelId = :channelId")
+    @Query("DELETE FROM message WHERE roomId = :channelId")
     suspend fun deleteChannelMessages(channelId: String)
 
     @Query("DELETE FROM room")
@@ -38,7 +34,7 @@ interface ChatDao {
     fun updateLastMessage(channelId: String, message: String, time: Long, type: MessageType)
 
     @Transaction
-    @Query("SELECT * FROM message WHERE chatChannelId = :channelId ORDER BY createTime DESC")
+    @Query("SELECT * FROM message WHERE roomId = :channelId ORDER BY createTime DESC")
     fun getMessages(channelId: String): Flow<List<ChatMessage>>
 
     @Transaction

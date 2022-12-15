@@ -45,6 +45,7 @@ import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.story.Story
 import com.salazar.cheers.compose.story.YourStory
 import com.salazar.cheers.data.db.UserWithStories
+import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.internal.Post
 
 
@@ -367,7 +368,7 @@ fun Stories(
                 YourStory(
                     profilePictureUrl = profilePictureUrl,
                     onClick = {
-                        if (user.storyState == UserOuterClass.StoryState.SEEN || user.storyState == UserOuterClass.StoryState.NOT_SEEN)
+                        if (user.storyState == StoryState.SEEN || user.storyState == StoryState.NOT_SEEN)
                             onStoryClick(0)
                         else
                             onAddStoryClick()

@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import cheers.type.UserOuterClass
+import com.salazar.cheers.data.enums.StoryState
 import java.util.*
 
 @Entity(
@@ -33,7 +34,7 @@ data class User(
     @ColumnInfo(defaultValue = "false")
     val friend: Boolean = false,
     @ColumnInfo(defaultValue = "EMPTY")
-    val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,
+    val storyState: StoryState = StoryState.EMPTY,
     @ColumnInfo(defaultValue = "false")
     val seenStory: Boolean = false,
     val createTime: Long = 0L,
