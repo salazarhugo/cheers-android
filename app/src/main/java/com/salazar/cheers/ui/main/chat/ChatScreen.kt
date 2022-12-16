@@ -87,6 +87,7 @@ fun ChatScreen(
             ) {
                 Messages(
                     seen = channel.status == RoomStatus.OPENED,
+                    isGroup = channel.type == RoomType.GROUP,
                     messages = messages,
                     navigateToProfile = onAuthorClick,
                     modifier = Modifier.weight(1f),
@@ -156,6 +157,7 @@ fun ChatScreen(
 fun Messages(
     messages: List<ChatMessage>,
     seen: Boolean,
+    isGroup: Boolean,
     navigateToProfile: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
@@ -204,6 +206,7 @@ fun Messages(
                             onDoubleTapMessage = onDoubleTapMessage,
                             message = message,
                             isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                            isGroup = isGroup,
                             seen = index == 0 && seen,
                             isFirstMessageByAuthor = isFirstMessageByAuthor,
                             isLastMessageByAuthor = isLastMessageByAuthor,
@@ -246,6 +249,7 @@ fun Message(
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
     isUserMe: Boolean,
+    isGroup: Boolean,
     seen: Boolean,
     message: ChatMessage,
     isFirstMessageByAuthor: Boolean,
@@ -257,7 +261,7 @@ fun Message(
         modifier = spaceBetweenAuthors.fillMaxWidth(),
         horizontalArrangement = horizontalAlignment
     ) {
-        if (isLastMessageByAuthor && !isUserMe) {
+        if (isLastMessageByAuthor && !isUserMe && isGroup) {
             // Avatar
             Image(
                 painter = rememberAsyncImagePainter(model = message.senderProfilePictureUrl),
@@ -273,9 +277,10 @@ fun Message(
             )
         } else {
             // Space under avatar
-            Spacer(modifier = Modifier.width(74.dp))
+//            Spacer(modifier = Modifier.width(74.dp))
         }
         AuthorAndTextMessage(
+            modifier = Modifier.padding(horizontal = 16.dp),
             msg = message,
             isUserMe = isUserMe,
             seen = seen,
@@ -284,8 +289,6 @@ fun Message(
             authorClicked = onAuthorClick,
             onLongClickMessage = onLongClickMessage,
             onDoubleTapMessage = onDoubleTapMessage,
-            modifier = Modifier
-                .padding(end = 16.dp)
         )
     }
 }

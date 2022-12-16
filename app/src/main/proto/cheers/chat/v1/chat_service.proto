@@ -41,7 +41,7 @@ service ChatService {
   rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {}
   rpc LeaveRoom(RoomId) returns (Empty) {}
 
-  rpc SendMessage(stream Message) returns (SendMessageResponse) {}
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {}
   rpc LikeMessage(LikeMessageReq) returns (Empty) {}
   rpc UnlikeMessage(LikeMessageReq) returns (Empty) {}
 
@@ -52,6 +52,12 @@ service ChatService {
 
   rpc AddToken(AddTokenReq) returns (Empty) {}
   rpc DeleteUser(UserIdReq) returns (Empty) {}
+}
+
+message SendMessageRequest {
+  string text = 1;
+  string room_id = 2;
+  string reply_to = 3;
 }
 
 message GetInboxRequest {
@@ -223,7 +229,6 @@ message MessageItem {
   bool liked = 3;
 }
 
-
 message SendMessageResponse {
-  Message.Status status = 1;
+  Message message = 1;
 }

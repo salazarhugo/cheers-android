@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatDao {
+    @Query("DELETE FROM room")
+    suspend fun clearRooms()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(channel: ChatChannel)
 

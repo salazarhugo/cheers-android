@@ -212,27 +212,16 @@ class ChatRepository @Inject constructor(
     ): SendMessageResponse = withContext(Dispatchers.IO) {
         val user = userRepository.getCurrentUser()
 
-        val msg = Message.newBuilder()
-            .setId(UUID.randomUUID().toString())
-            .setSenderId(FirebaseAuth.getInstance().currentUser?.uid)
-            .setSenderName(user.name)
-            .setSenderUsername(user.username)
-            .setSenderPicture(user.picture)
+        val msg = SendMessageRequest.newBuilder()
             .setRoomId(channelId)
-            .setPicture(photoUrl)
-            .setType(MessageType.IMAGE)
             .build()
 
         launch {
-            chatDao.insertMessage(msg.toTextMessage())
+//            chatDao.insertMessage(msg.toTextMessage())
         }
 
-        val message = flow<Message> {
-            emit(msg)
-        }
-
-        val acknowledge = chatService.sendMessage(message)
-        chatDao.insertMessage(msg.toTextMessage())
+        val acknowledge = chatService.sendMessage(msg)
+//        chatDao.insertMessage(msg.toTextMessage())
 
         return@withContext acknowledge
     }
@@ -243,6 +232,11 @@ class ChatRepository @Inject constructor(
     ): Resource<SendMessageResponse> {
         return withContext(Dispatchers.IO) {
             val user = userRepository.getCurrentUser()
+
+            val msg = SendMessageRequest.newBuilder()
+                .setRoomId(channelId)
+                .setText(text)
+                .build()
 
             val message = ChatMessage(
                 id = UUID.randomUUID().toString(),
@@ -266,8 +260,8 @@ class ChatRepository @Inject constructor(
             }
 
             try {
-//                val response = chatService.sendMessage(message)
-//                chatDao.insertMessage(msg.toTextMessage().copy(status = ChatMessageStatus.READ))
+                val response = chatService.sendMessage(msg)
+                chatDao.insertMessage(response.message.toTextMessage())
 
                 return@withContext Resource.Error("Not implemented")
             } catch (e: StatusException) {
@@ -295,6 +289,7 @@ class ChatRepository @Inject constructor(
             val request = GetInboxRequest.newBuilder()
                 .build()
             val response = chatService.getInbox(request = request)
+            chatDao.clearRooms()
             response.inboxList.forEach { roomWithMessages ->
                 val chatChannel = roomWithMessages.room.toChatChannel(uid)
                 val messages = roomWithMessages.messagesList.map { it.toTextMessage() }
