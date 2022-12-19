@@ -56,7 +56,7 @@ fun EventDetailRoute(
             },
             onTicketingClick = {
                 navActions.navigateToTicketing(it)
-            }
+            },
         )
     else
         LoadingScreen()

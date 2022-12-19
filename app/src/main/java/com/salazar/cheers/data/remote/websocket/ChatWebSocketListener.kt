@@ -54,6 +54,13 @@ class ChatWebSocketListener @Inject constructor(
         Log.d(TAG, reason)
     }
 
+    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        super.onFailure(webSocket, t, response)
+
+        Log.d(TAG, "onFailure")
+        Log.d(TAG, response?.message ?: "")
+    }
+
     companion object {
         const val TAG = "WEBSOCKET"
     }
