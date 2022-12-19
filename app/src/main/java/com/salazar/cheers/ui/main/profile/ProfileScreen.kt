@@ -349,7 +349,7 @@ fun Toolbar(
 ) {
     val otherUser = uiState.user
 
-    SmallTopAppBar(
+    TopAppBar(
         title = {
             Username(
                 username = otherUser.username,
@@ -367,7 +367,7 @@ fun Toolbar(
             IconButton(onClick = navigateToProfileMoreSheet) {
                 Icon(painter = painterResource(id = R.drawable.ic_more_vert_icon), "")
             }
-        },
+        }
     )
 }
 

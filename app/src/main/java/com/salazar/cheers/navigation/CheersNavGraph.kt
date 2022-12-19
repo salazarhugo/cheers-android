@@ -47,7 +47,9 @@ fun CheersNavGraph(
         navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
                 || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
                 || currentRoute.contains(MainDestinations.STORY_ROUTE)
+                || currentRoute.contains(MainDestinations.MESSAGES_ROUTE)
                 || currentRoute.contains(MainDestinations.CHAT_ROUTE)
+                || currentRoute.contains(MainDestinations.NEW_CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
                 || currentRoute.contains(MainDestinations.POST_COMMENTS)
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)

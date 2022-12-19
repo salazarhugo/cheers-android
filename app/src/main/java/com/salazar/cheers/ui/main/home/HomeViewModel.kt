@@ -244,6 +244,7 @@ class HomeViewModel @Inject constructor(
 }
 
 sealed class HomeUIAction {
+    object OnChatClick : HomeUIAction()
     object OnActivityClick : HomeUIAction()
     object OnSearchClick : HomeUIAction()
     object OnSwipeRefresh : HomeUIAction()

@@ -369,7 +369,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        bottomSheet(
+        composable(
             route = MainDestinations.NEW_CHAT_ROUTE,
         ) {
             NewChatRoute(

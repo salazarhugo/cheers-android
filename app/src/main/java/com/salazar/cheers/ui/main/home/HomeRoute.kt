@@ -54,6 +54,7 @@ fun HomeRoute(
                 is HomeUIAction.OnAddStoryClick -> navActions.navigateToCamera()
                 is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID)
                 is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextPosts()
+                is HomeUIAction.OnChatClick -> navActions.navigateToMessages()
             }
         }
     )

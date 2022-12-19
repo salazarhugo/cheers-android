@@ -63,6 +63,7 @@ fun HomeScreen(
                 onSearchClick = { onHomeUIAction(HomeUIAction.OnSearchClick) },
                 notificationCount = uiState.notificationCount,
                 onActivityClick = { onHomeUIAction(HomeUIAction.OnActivityClick) },
+                onChatClick = { onHomeUIAction(HomeUIAction.OnChatClick) },
             )
         },
     ) {
@@ -292,6 +293,7 @@ fun HomeTopBar(
     notificationCount: Int,
     onSearchClick: () -> Unit,
     onActivityClick: () -> Unit,
+    onChatClick: () -> Unit,
 ) {
     val showDivider by remember {
         derivedStateOf {
@@ -302,10 +304,9 @@ fun HomeTopBar(
     Column {
         val icon =
             if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
-        CenterAlignedTopAppBar(
+        TopAppBar(
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-            colors = TopAppBarDefaults.smallTopAppBarColors(
-            ),
+            colors = TopAppBarDefaults.topAppBarColors(),
             navigationIcon = {
                 Image(
                     painter = painterResource(icon),
@@ -339,6 +340,12 @@ fun HomeTopBar(
                     Icon(
                         painter = rememberAsyncImagePainter(model = R.drawable.ic_search_icon),
                         contentDescription = "Search icon"
+                    )
+                }
+                IconButton(onClick = onChatClick) {
+                    Icon(
+                        Icons.Outlined.Send,
+                        contentDescription = "Send icon"
                     )
                 }
             },

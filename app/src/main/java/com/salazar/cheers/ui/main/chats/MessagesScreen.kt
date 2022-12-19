@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.rememberDismissState
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
+import com.salazar.cheers.compose.CheersAppBar
 import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.chat.*
@@ -56,15 +59,23 @@ fun MessagesScreen(
 ) {
     Scaffold(
         topBar = {
-            Column {
-                MyAppBar({}, onActivityIconClicked)
-            }
+            CheersAppBar(
+                navigationIcon = {
+                     Icon(Icons.Default.ArrowBack, null)
+                },
+                title = {
+                    Text(
+                        text = "Chat",
+                    )
+                },
+                actions = {
+                    IconButton(onClick = onNewChatClicked) {
+                        Icon(Icons.Default.Add, null)
+                    }
+                },
+                center = false,
+            )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onNewChatClicked) {
-                Icon(Icons.Default.Edit, "")
-            }
-        }
     ) {
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
