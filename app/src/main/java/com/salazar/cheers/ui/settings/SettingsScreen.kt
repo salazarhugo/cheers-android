@@ -49,7 +49,6 @@ fun SettingsScreen(
             VersionSection()
         }
     }
-
 }
 
 @Composable

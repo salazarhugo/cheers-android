@@ -13,6 +13,7 @@ import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.internal.RoomStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -69,23 +70,19 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun loadChannel(channelID: String) {
+    private fun loadChannel(channelID: String) {
         viewModelScope.launch {
             chatRepository.getChannel(channelId = channelID).collect { channel ->
                 updateChatChannel(channel)
+                chatRepository.seenRoom(channelID)
             }
         }
-
         viewModelScope.launch {
             chatRepository.getMessages(channelId = channelID).collect { messages ->
                 viewModelState.update {
                     it.copy(messages = messages, isLoading = false)
                 }
             }
-        }
-
-        viewModelScope.launch {
-            chatRepository.joinChannel(channelId = channelID)
         }
     }
 

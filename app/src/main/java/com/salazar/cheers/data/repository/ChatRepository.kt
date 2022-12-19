@@ -24,6 +24,7 @@ import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -41,7 +42,6 @@ class ChatRepository @Inject constructor(
 ) {
 
     private val workManager = WorkManager.getInstance(application)
-    private var uid: String? = null
 
     fun getUnreadChatCount(): Flow<Int> {
         return try {
@@ -51,41 +51,10 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun getMessagesFromRemote(channelId: String) {
-        try {
-            val request = ListRoomMessagesRequest.newBuilder()
-                .setRoomId(channelId)
-                .build()
-
-            val response = chatService.listRoomMessages(request)
-            val messages = response.messagesList.map { it.message.toTextMessage() }
-            chatDao.insertMessages(messages)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     suspend fun getMessages(channelId: String): Flow<List<ChatMessage>> =
         withContext(Dispatchers.IO) {
             return@withContext chatDao.getMessages(channelId = channelId)
         }
-
-    suspend fun joinChannel(channelId: String) = withContext(Dispatchers.IO) {
-        try {
-            launch {
-                chatDao.seenChannel(channelId)
-            }
-            val request = JoinRoomRequest.newBuilder()
-                .setRoomId(channelId)
-                .build()
-
-            chatService.joinRoom(request).collect {
-                chatDao.insertMessage(it.toTextMessage())
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     suspend fun getRoomMembers(roomId: String): Result<List<UserItem>> {
         try {
@@ -102,7 +71,7 @@ class ChatRepository @Inject constructor(
     }
 
     fun getChannel(channelId: String): Flow<ChatChannel> {
-        return chatDao.getChannelFlow(channelId = channelId)
+        return chatDao.getChannelFlow(channelId = channelId).filterNotNull()
     }
 
     suspend fun getChatWithUser(userId: String): ChatChannel = withContext(Dispatchers.IO) {
@@ -185,6 +154,10 @@ class ChatRepository @Inject constructor(
         }
     }
 
+    suspend fun seenRoom(roomId: String) {
+        chatDao.setStatus(roomId, RoomStatus.RECEIVED)
+    }
+
     suspend fun sendImage(
         channelId: String,
         images: List<Uri>
@@ -233,13 +206,16 @@ class ChatRepository @Inject constructor(
         return withContext(Dispatchers.IO) {
             val user = userRepository.getCurrentUser()
 
+            val id = UUID.randomUUID().toString()
+
             val msg = SendMessageRequest.newBuilder()
+                .setClientId(id)
                 .setRoomId(channelId)
                 .setText(text)
                 .build()
 
             val message = ChatMessage(
-                id = UUID.randomUUID().toString(),
+                id = id,
                 senderId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
                 senderName= user.name,
                 senderUsername = user.username,
@@ -257,13 +233,14 @@ class ChatRepository @Inject constructor(
             launch {
                 chatDao.insertMessage(message)
                 chatDao.updateLastMessage(channelId, message.text, message.createTime, message.type)
+                chatDao.setStatus(channelId, RoomStatus.SENT)
             }
 
             try {
                 val response = chatService.sendMessage(msg)
-                chatDao.insertMessage(response.message.toTextMessage())
+                chatDao.insertMessage(response.message.toTextMessage().copy(id = message.id))
 
-                return@withContext Resource.Error("Not implemented")
+                return@withContext Resource.Success(response)
             } catch (e: StatusException) {
                 e.printStackTrace()
                 return@withContext Resource.Error(e.localizedMessage)
@@ -289,11 +266,12 @@ class ChatRepository @Inject constructor(
             val request = GetInboxRequest.newBuilder()
                 .build()
             val response = chatService.getInbox(request = request)
-            chatDao.clearRooms()
+
+            val rooms = response.inboxList.map { it.room.toChatChannel(uid) }
+            chatDao.insertInbox(rooms)
+
             response.inboxList.forEach { roomWithMessages ->
-                val chatChannel = roomWithMessages.room.toChatChannel(uid)
-                val messages = roomWithMessages.messagesList.map { it.toTextMessage() }
-                chatDao.insert(chatChannel)
+                val messages = roomWithMessages.messagesList.map { it.toTextMessage().copy(status = ChatMessageStatus.DELIVERED) }
                 chatDao.insertMessages(messages)
             }
         } catch (e: Exception) {

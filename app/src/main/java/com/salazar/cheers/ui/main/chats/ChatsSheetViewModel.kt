@@ -50,21 +50,24 @@ class ChatsSheetViewModel @Inject constructor(
         }
     }
 
-    fun leaveChannel() {
+    fun leaveChannel(onComplete: () -> Unit) {
         viewModelScope.launch {
             chatRepository.leaveRoom(roomId = channelId)
+            onComplete()
         }
     }
 
-    fun deleteChats() {
+    fun deleteChats(onComplete: () -> Unit) {
         viewModelScope.launch {
             chatRepository.deleteChats(channelId = channelId)
+            onComplete()
         }
     }
 
-    fun deleteChannel() {
+    fun deleteChannel(onComplete: () -> Unit) {
         viewModelScope.launch {
             chatRepository.deleteRoom(channelId = channelId)
+            onComplete()
         }
     }
 }

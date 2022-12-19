@@ -27,8 +27,9 @@ import com.salazar.cheers.internal.*
         UserStats::class,
         Activity::class,
         UserSuggestion::class,
+        Ticket::class,
     ],
-    version = 3,
+    version = 5,
     exportSchema = true,
     autoMigrations = []
 )
@@ -43,4 +44,5 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
     abstract fun userPreferenceDao(): UserPreferenceDao
     abstract fun activityDao(): ActivityDao
+    abstract fun ticketDao(): TicketDao
 }

@@ -47,15 +47,18 @@ fun NewChatScreen(
     onGroupNameChange: (String) -> Unit,
 ) {
     Scaffold(
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
+        bottomBar = {
+            Button(
                 onClick = onFabClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 val text = if (uiState.selectedUsers.size > 1) "Chat with Group" else "Chat"
                 Text(text = text)
             }
         },
-        floatingActionButtonPosition = FabPosition.Center,
     ) {
         Column(
             modifier = Modifier

@@ -14,10 +14,17 @@ interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(channel: ChatChannel)
 
+    @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(channel: List<ChatChannel>)
+    suspend fun insertInbox(rooms: List<ChatChannel>) {
+        clearRooms()
+        insertRooms(rooms)
+    }
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRooms(channel: List<ChatChannel>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messages: List<ChatMessage>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -56,7 +63,7 @@ interface ChatDao {
 
     @Transaction
     @Query("SELECT * FROM room WHERE id = :channelId")
-    fun getChannelFlow(channelId: String): Flow<ChatChannel>
+    fun getChannelFlow(channelId: String): Flow<ChatChannel?>
 
     @Transaction
     @Query("SELECT * FROM room WHERE type = :direct AND members  LIKE '%' || :userId || '%' LIMIT 1")

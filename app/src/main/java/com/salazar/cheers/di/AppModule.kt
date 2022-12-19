@@ -8,6 +8,7 @@ import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.story.v1.StoryServiceGrpcKt
+import cheers.ticket.v1.TicketServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.db.*
@@ -19,6 +20,8 @@ import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.data.repository.party.impl.PartyRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
+import com.salazar.cheers.data.repository.ticket.TicketRepository
+import com.salazar.cheers.data.repository.ticket.impl.TicketRepositoryImpl
 import com.salazar.cheers.data.serializer.settingsDataStore
 import com.salazar.cheers.util.Constants
 import dagger.Module
@@ -66,6 +69,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideTicketRepository(
+        ticketRepositoryImpl: TicketRepositoryImpl,
+    ): TicketRepository {
+        return ticketRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
     fun providePartyRepository(
         partyRepositoryImpl: PartyRepositoryImpl,
     ): PartyRepository {
@@ -96,6 +107,20 @@ object AppModule {
     ): StoryServiceGrpcKt.StoryServiceCoroutineStub {
         return StoryServiceGrpcKt
             .StoryServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTicketServiceCoroutineStub(
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): TicketServiceGrpcKt.TicketServiceCoroutineStub {
+        val a = ManagedChannelBuilder
+            .forAddress(Constants.GATEWAY_HOST, 443)
+            .build()
+        return TicketServiceGrpcKt
+            .TicketServiceCoroutineStub(a)
             .withInterceptors(errorHandleInterceptor)
             .withInterceptors()
     }
@@ -189,6 +214,14 @@ object AppModule {
             .databaseBuilder(context.applicationContext, CheersDatabase::class.java, "cheers.db")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideTicketDao(
+        cheersDatabase: CheersDatabase,
+    ): TicketDao {
+        return cheersDatabase.ticketDao()
     }
 
     @Singleton

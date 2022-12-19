@@ -12,7 +12,7 @@ fun Toolbar(
     title: String,
     onBackPressed: () -> Unit,
 ) {
-    SmallTopAppBar(
+    TopAppBar(
         title = {
             Text(
                 text = title,

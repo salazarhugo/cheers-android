@@ -95,7 +95,7 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = relativeTimeFormatter(epoch = createTime / 1000),
+                text = relativeTimeFormatter(epoch = createTime),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
                 color = color,

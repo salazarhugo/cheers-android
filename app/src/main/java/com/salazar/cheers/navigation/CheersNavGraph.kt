@@ -12,19 +12,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.CheersUiState
-import com.salazar.cheers.compose.CheersNavigationBar
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.compose.CheersBottomBar
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.theme.GreySheet
 
@@ -92,22 +87,19 @@ fun CheersNavGraph(
                 AnimatedVisibility(
                     visible = !hide,
                 ) {
-                    CheersNavigationBar(
+                    CheersBottomBar(
                         unreadChatCount = uiState.unreadChatCount,
                         profilePictureUrl = "",
                         currentRoute = currentRoute,
-                        navigateToHome = navActions.navigateToHome,
-                        navigateToMap = navActions.navigateToMap,
-                        navigateToSearch = navActions.navigateToSearch,
-                        navigateToCamera = navActions.navigateToEvents,
-                        navigateToMessages = navActions.navigateToMessages,
-                        navigateToProfile = navActions.navigateToProfile,
+                        onNavigate = { route ->
+                            appState.navController.navigate(route)
+                        },
                     )
                 }
             },
         ) { innerPadding ->
             AnimatedNavHost(
-                modifier = Modifier,
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                 route = CheersDestinations.ROOT_ROUTE,
                 navController = appState.navController,
                 startDestination = startDestination,

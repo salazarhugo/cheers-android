@@ -30,6 +30,7 @@ object MainDestinations {
     const val MESSAGES_MORE_SHEET = "messagesMoreSheet"
     const val NEW_CHAT_ROUTE = "newChat"
     const val TICKETING_ROUTE = "ticketing"
+    const val TICKETS_ROUTE = "tickets"
     const val PROFILE_ROUTE = "profile"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"

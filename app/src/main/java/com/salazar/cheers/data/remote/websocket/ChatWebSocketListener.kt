@@ -6,6 +6,7 @@ import com.salazar.cheers.data.db.ChatDao
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.internal.ChatMessageStatus
 import com.salazar.cheers.internal.MessageType
+import com.salazar.cheers.internal.RoomStatus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -19,7 +20,6 @@ class ChatWebSocketListener @Inject constructor(
 ) : WebSocketListener() {
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
-        webSocket.send("G")
         Log.d("WEBSOCKET MESSAGE", "WEBSOCKET OPEN")
     }
 
@@ -31,18 +31,20 @@ class ChatWebSocketListener @Inject constructor(
         Log.d(TAG, message.toString())
 
         message?.let {
-            runBlocking {
+            GlobalScope.launch {
                 chatDao.insertMessage(
                     message.copy(
                         likedBy = emptyList(),
                         seenBy = emptyList(),
                         photoUrl = "",
                         senderUsername = "",
+                        senderName = "",
                         senderProfilePictureUrl = "",
                         type = MessageType.TEXT,
-                        status = ChatMessageStatus.EMPTY,
+                        status = ChatMessageStatus.DELIVERED,
                     )
                 )
+                chatDao.setStatus(message.roomId, RoomStatus.NEW)
             }
         }
     }

@@ -54,6 +54,7 @@ import com.salazar.cheers.ui.main.story.feed.SetStoryStatusBars
 import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
+import com.salazar.cheers.ui.main.tickets.TicketsRoute
 import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
@@ -72,6 +73,14 @@ fun NavGraphBuilder.mainNavGraph(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
+        composable(
+            route = MainDestinations.TICKETS_ROUTE,
+        ) {
+            TicketsRoute(
+                navActions = appState.navActions
+            )
+        }
+
         composable(
             route = MainDestinations.NFC_ROUTE,
         ) {
@@ -536,16 +545,19 @@ fun NavGraphBuilder.mainNavGraph(
                 isAdmin = room.admins.contains(uid),
                 roomType = room.type,
                 onDeleteClick = {
-                    chatsSheetViewModel.deleteChannel()
-                    appState.navActions.navigateBack()
+                    chatsSheetViewModel.deleteChannel {
+                        appState.navActions.navigateBack()
+                    }
                 },
                 onLeaveClick = {
-                    chatsSheetViewModel.leaveChannel()
-                    appState.navActions.navigateBack()
+                    chatsSheetViewModel.leaveChannel {
+                        appState.navActions.navigateBack()
+                    }
                 },
                 onDeleteChats = {
-                    chatsSheetViewModel.deleteChats()
-                    appState.navActions.navigateBack()
+                    chatsSheetViewModel.deleteChats {
+                        appState.navActions.navigateBack()
+                    }
                 }
             )
         else

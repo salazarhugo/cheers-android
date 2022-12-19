@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.main.chat
 
 import OnMessageLongClickDialog
+import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -166,6 +167,7 @@ fun Messages(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
+
     Box(modifier = modifier) {
         LazyColumn(
             reverseLayout = true,
@@ -175,45 +177,47 @@ fun Messages(
                 .testTag(ConversationTestTag)
                 .fillMaxSize()
         ) {
-            for (index in messages.indices) {
-                val prevAuthor = messages.getOrNull(index - 1)?.senderId
-                val nextAuthor = messages.getOrNull(index + 1)?.senderId
-                val prevMessage = messages.getOrNull(index - 1)
-                val message = messages[index]
-                val isFirstMessageByAuthor = prevAuthor != message.senderId
-                val isLastMessageByAuthor = nextAuthor != message.senderId
-//                if (!message.time.isToday() && prevMessage?.time?.isToday() == true) {
-//                    item {
-//                        DayHeader("Today")
-//                    }
-//                }
+                for (index in messages.indices) {
+                    val prevAuthor = messages.getOrNull(index - 1)?.senderId
+                    val nextAuthor = messages.getOrNull(index + 1)?.senderId
+                    val prevMessage = messages.getOrNull(index - 1)
+                    val message = messages[index]
+                    val isFirstMessageByAuthor = prevAuthor != message.senderId
+                    val isLastMessageByAuthor = nextAuthor != message.senderId
 
-                item {
-                    val dismissState = rememberDismissState(
-                        confirmStateChange = {
-                            if (it == DismissValue.DismissedToStart) {
-                                onChatUIAction(ChatUIAction.OnReplyMessage(message))
-                                return@rememberDismissState false
-                            }
-                            true
-                        }
-                    )
-                    SwipeableMessage(dismissState = dismissState) {
-                        Message(
-//                        modifier = Modifier.animateItemPlacement(),
-                            onAuthorClick = { name -> navigateToProfile(name) },
-                            onLongClickMessage = onLongClickMessage,
-                            onDoubleTapMessage = onDoubleTapMessage,
-                            message = message,
-                            isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
-                            isGroup = isGroup,
-                            seen = index == 0 && seen,
-                            isFirstMessageByAuthor = isFirstMessageByAuthor,
-                            isLastMessageByAuthor = isLastMessageByAuthor,
-                        )
+                if (!DateUtils.isToday(message.createTime * 1000) &&
+                    DateUtils.isToday((prevMessage?.createTime ?: 0) * 1000)) {
+                    item {
+                        DayHeader("Today")
                     }
                 }
-            }
+
+                    item {
+                        val dismissState = rememberDismissState(
+                            confirmStateChange = {
+                                if (it == DismissValue.DismissedToStart) {
+                                    onChatUIAction(ChatUIAction.OnReplyMessage(message))
+                                    return@rememberDismissState false
+                                }
+                                true
+                            }
+                        )
+                        SwipeableMessage(dismissState = dismissState) {
+                            Message(
+//                        modifier = Modifier.animateItemPlacement(),
+                                onAuthorClick = { name -> navigateToProfile(name) },
+                                onLongClickMessage = onLongClickMessage,
+                                onDoubleTapMessage = onDoubleTapMessage,
+                                message = message,
+                                isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                                isGroup = isGroup,
+                                seen = index == 0 && seen,
+                                isFirstMessageByAuthor = isFirstMessageByAuthor,
+                                isLastMessageByAuthor = isLastMessageByAuthor,
+                            )
+                        }
+                    }
+                }
         }
 
         val jumpThreshold = with(LocalDensity.current) {
@@ -305,8 +309,9 @@ fun AuthorAndTextMessage(
     onDoubleTapMessage: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isGroup = false
     Column(modifier = modifier) {
-        if (isLastMessageByAuthor && !isUserMe) {
+        if (isLastMessageByAuthor && !isUserMe && isGroup) {
             AuthorNameTimestamp(msg)
         }
         if (msg.type == MessageType.TEXT)
@@ -348,7 +353,7 @@ private fun AuthorNameTimestamp(msg: ChatMessage) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         val formatter = SimpleDateFormat("HH:mm")
-        val date = Date(msg.createTime.toLong() * 1000)
+        val date = Date(msg.createTime * 1000)
 
         Text(
             text = formatter.format(date),
@@ -359,8 +364,8 @@ private fun AuthorNameTimestamp(msg: ChatMessage) {
     }
 }
 
-private val ChatBubbleStartShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
-private val ChatBubbleEndShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp)
+private val ChatBubbleStartShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
+private val ChatBubbleEndShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
 
 @Composable
 fun DayHeader(dayString: String) {
@@ -441,7 +446,8 @@ fun ChatItemBubble(
         Surface(
             color = backgroundBubbleColor,
             shape = shape,
-            modifier = Modifier.pointerInput(Unit) {
+            modifier = Modifier
+                .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = { onLongClickMessage(message.id) },
                     onDoubleTap = { onDoubleTapMessage(message.id) }
@@ -449,17 +455,18 @@ fun ChatItemBubble(
             }
         ) {
             Row(
+                modifier = Modifier.padding(start = 12.dp),
                 verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ClickableMessage(
                     message = message,
                     isUserMe = isUserMe,
                     authorClicked = authorClicked
                 )
-                MessageStatus(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp, end = 12.dp, top = 8.dp)
-                        .size(14.dp),
+                TimestampAndStatus(
+                    isUserMe = isUserMe,
+                    timestamp = message.createTime,
                     status = message.status,
                 )
             }
@@ -500,6 +507,40 @@ fun ChatItemBubble(
 }
 
 @Composable
+fun TimestampAndStatus(
+    isUserMe: Boolean,
+    timestamp: Long,
+    status: ChatMessageStatus,
+) {
+    val formatter = SimpleDateFormat("HH:mm")
+    val date = Date(timestamp * 1000)
+    val color = if (isUserMe)
+        MaterialTheme.colorScheme.onPrimary
+    else
+        MaterialTheme.colorScheme.onSurfaceVariant
+
+    Row(
+        modifier = Modifier
+            .padding(bottom = 8.dp, end = 12.dp, top = 8.dp),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = formatter.format(date),
+            style = MaterialTheme.typography.bodySmall,
+            color = color,
+        )
+
+        if (isUserMe) {
+            MessageStatus(
+                modifier = Modifier.size(14.dp),
+                status = status,
+            )
+        }
+    }
+}
+
+@Composable
 fun MessageStatus(
     modifier: Modifier = Modifier,
     status: ChatMessageStatus,
@@ -511,6 +552,7 @@ fun MessageStatus(
                 modifier = modifier,
                 imageVector = Icons.Default.Schedule,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
         ChatMessageStatus.SENT -> {
@@ -518,13 +560,15 @@ fun MessageStatus(
                 modifier = modifier,
                 imageVector = Icons.Default.Done,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
         ChatMessageStatus.DELIVERED -> {
             Icon(
                 modifier = modifier,
                 imageVector = Icons.Default.DoneAll,
-                contentDescription = null
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
         ChatMessageStatus.READ -> {
@@ -576,7 +620,7 @@ fun ClickableMessage(
     ClickableText(
         text = styledMessage,
         style = MaterialTheme.typography.bodyLarge.copy(color = color),
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+        modifier = Modifier.padding(vertical = 10.dp),
         onClick = {
             styledMessage
                 .getStringAnnotations(start = it, end = it)

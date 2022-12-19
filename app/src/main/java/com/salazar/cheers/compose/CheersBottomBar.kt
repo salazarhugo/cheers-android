@@ -7,8 +7,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Badge
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.ConfirmationNumber
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Place
@@ -33,81 +35,77 @@ import com.salazar.cheers.internal.Screen
 import com.salazar.cheers.navigation.MainDestinations
 
 @Composable
-fun CheersNavigationBar(
+fun CheersBottomBar(
     unreadChatCount: Int,
     profilePictureUrl: String,
     currentRoute: String,
-    navigateToHome: () -> Unit,
-    navigateToMap: () -> Unit,
-    navigateToSearch: () -> Unit,
-    navigateToCamera: () -> Unit,
-    navigateToMessages: () -> Unit,
-    navigateToProfile: () -> Unit,
-    modifier: Modifier = Modifier
+    onNavigate: (String) -> Unit,
 ) {
     val items = listOf(
         Screen(
-            MainDestinations.HOME_ROUTE,
-            navigateToHome,
-            { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
-            { Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
-            "Home"
+            route = MainDestinations.HOME_ROUTE,
+            icon = { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
+            label = "Home"
         ),
         Screen(
-            MainDestinations.MAP_ROUTE,
-            navigateToMap,
-            { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onBackground) },
-            { Icon(Icons.Filled.Place, null, tint = MaterialTheme.colorScheme.onBackground) },
-            "Map"
+            route = MainDestinations.EVENTS_ROUTE,
+            icon = { Icon(Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Filled.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
+            label = "Events"
         ),
         Screen(
-            MainDestinations.EVENTS_ROUTE,
-            navigateToCamera,
-            { Icon(Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
-            { Icon(Icons.Default.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
-            "Camera"
+            route = MainDestinations.EVENTS_ROUTE,
+            icon = { Icon(Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Default.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
+            label = "Camera"
         ),
         Screen(
-            MainDestinations.MESSAGES_ROUTE,
-            navigateToMessages,
-            icon = {
-                BadgedBox(badge = {
-                    if (unreadChatCount > 0)
-                        Badge {
-                            Text(
-                                text = unreadChatCount.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            )
-                        }
-                }
-                ) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            },
-            selectedIcon = {
-                BadgedBox(badge = {
-                    if (unreadChatCount > 0)
-                        Badge {
-                            Text(
-                                text = unreadChatCount.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            )
-                        }
-                }
-                ) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            },
-            "Messages"
+            route = MainDestinations.TICKETS_ROUTE,
+            icon = { Icon(Icons.Outlined.ConfirmationNumber, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Default.ConfirmationNumber, null, tint = MaterialTheme.colorScheme.onBackground) },
+            label = "Tickets"
         ),
+//        Screen(
+//            route = MainDestinations.MESSAGES_ROUTE,
+//            icon = {
+//                BadgedBox(badge = {
+//                    if (unreadChatCount > 0)
+//                        Badge {
+//                            Text(
+//                                text = unreadChatCount.toString(),
+//                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+//                            )
+//                        }
+//                }
+//                ) {
+//                    Icon(
+//                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+//                        contentDescription = null,
+//                        tint = MaterialTheme.colorScheme.onBackground
+//                    )
+//                }
+//            },
+//            selectedIcon = {
+//                BadgedBox(badge = {
+//                    if (unreadChatCount > 0)
+//                        Badge {
+//                            Text(
+//                                text = unreadChatCount.toString(),
+//                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+//                            )
+//                        }
+//                }
+//                ) {
+//                    Icon(
+//                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+//                        contentDescription = null,
+//                        tint = MaterialTheme.colorScheme.onBackground
+//                    )
+//                }
+//            },
+//            label = "Messages"
+//        ),
     )
 
     CompositionLocalProvider(
@@ -126,7 +124,7 @@ fun CheersNavigationBar(
                         icon()
                     },
                     selected = currentRoute == screen.route,
-                    onClick = screen.onNavigate,
+                    onClick = {onNavigate(screen.route)},
                 )
             }
             NavigationBarItem(
@@ -147,7 +145,7 @@ fun CheersNavigationBar(
                     )
                 },
                 selected = currentRoute == MainDestinations.PROFILE_ROUTE,
-                onClick = navigateToProfile,
+                onClick = { onNavigate(MainDestinations.PROFILE_ROUTE) },
             )
         }
     }

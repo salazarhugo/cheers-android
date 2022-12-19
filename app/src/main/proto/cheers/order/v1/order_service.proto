@@ -4,7 +4,7 @@ package cheers.order.v1;
 
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
-import "cheers/ticket/v1/ticket.proto";
+import "cheers/ticket/v1/ticket_service.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/order/v1;order";
