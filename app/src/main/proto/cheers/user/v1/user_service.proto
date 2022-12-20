@@ -10,17 +10,22 @@ option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/user/v1;user";
 
 service UserService {
-  rpc CreateUser (CreateUserRequest) returns (cheers.type.User);
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  };
 
   rpc GetUser (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
-      get: "/v1/users/{id}"
+      get: "/v1/users/{user_id}"
     };
   };
 
   rpc UpdateUser (UpdateUserRequest) returns (cheers.type.User) {
     option (google.api.http) = {
-      post: "/v1/users"
+      patch: "/v1/users"
       body: "*"
     };
   };
@@ -30,8 +35,20 @@ service UserService {
   rpc GetUsersIn (GetUsersInRequest) returns (GetUsersInResponse);
   rpc GetUserItemsIn (GetUserItemsInRequest) returns (GetUserItemsInResponse);
   rpc SearchUser (SearchUserRequest) returns (SearchUserResponse);
-  rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty);
-  rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty);
+
+  rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/follow"
+      body: "*"
+    };
+  };
+
+  rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/users/{user_id}/unfollow"
+    };
+  };
+
   rpc BlockUser (BlockUserRequest) returns (BlockUserResponse);
   rpc UnblockUser (UnblockUserRequest) returns (UnblockUserResponse);
 
@@ -49,6 +66,13 @@ service UserService {
 }
 
 message CreateUserRequest {
+  string email = 1;
+  string name = 2;
+  string picture = 4;
+  string username = 5;
+}
+
+message CreateUserResponse {
   cheers.type.User user = 1;
 }
 
@@ -108,19 +132,19 @@ message GetUserResponse {
 }
 
 message BlockUserRequest {
-  string id = 1;
+  string user_id = 1;
 }
 
 message UnblockUserRequest {
-  string id = 1;
+  string user_id = 1;
 }
 
 message UnfollowUserRequest {
-  string id = 1;
+  string user_id = 1;
 }
 
 message FollowUserRequest {
-  string id = 1;
+  string user_id = 1;
 }
 
 message SearchUserRequest {
@@ -128,7 +152,7 @@ message SearchUserRequest {
 }
 
 message GetUserRequest {
-  string id = 1;
+  string user_id = 1;
 }
 
 message UpdateUserRequest {
@@ -141,5 +165,5 @@ message UpdateUserRequest {
 }
 
 message DeleteUserRequest {
-  string id = 1;
+  string user_id = 1;
 }

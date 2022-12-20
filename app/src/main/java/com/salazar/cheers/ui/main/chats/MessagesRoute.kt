@@ -21,6 +21,7 @@ fun MessagesRoute(
     MessagesScreen(
         uiState = uiState,
         onSwipeRefresh = messagesViewModel::onSwipeRefresh,
+        onBackPressed = { navActions.navigateBack() },
         onActivityIconClicked = {
         },
         onChannelClicked = { channelId ->

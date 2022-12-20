@@ -8,5 +8,7 @@ fun Ticket.toTicket(): com.salazar.cheers.internal.Ticket {
         name = name,
         description = description,
         partyName = partyName,
+        price = price.toInt(),
+        organization = organizer,
     )
 }

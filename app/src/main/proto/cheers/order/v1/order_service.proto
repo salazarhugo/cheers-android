@@ -36,9 +36,21 @@ service OrderService {
     };
   }
 
-  rpc ListOrder (ListOrderRequest) returns (ListOrderResponse) {
+  rpc ListUserOrders (ListUserOrdersRequest) returns (ListUserOrdersResponse) {
     option (google.api.http) = {
-      get: "/v1/orders/list"
+      get: "/v1/orders/user"
+    };
+  }
+
+  rpc ListOrganizerOrders (ListOrganizerOrdersRequest) returns (ListOrganizerOrdersResponse) {
+    option (google.api.http) = {
+      get: "/v1/orders/organization"
+    };
+  }
+
+  rpc ListPartyOrders(ListPartyOrdersRequest) returns (ListPartyOrdersResponse) {
+    option (google.api.http) = {
+      get: "/v1/orders/party"
     };
   }
 }
@@ -94,13 +106,25 @@ message DeleteOrderRequest {
 message DeleteOrderResponse {
 }
 
-message ListOrderRequest {
-  oneof filter {
-    string party_id = 1;
-    string user_id = 2;
-  }
+message ListUserOrdersRequest {
 }
 
-message ListOrderResponse {
+message ListUserOrdersResponse {
+  repeated Order orders = 1;
+}
+
+message ListOrganizerOrdersRequest {
+  string query = 1;
+}
+
+message ListOrganizerOrdersResponse {
+  repeated Order orders = 1;
+}
+
+message ListPartyOrdersRequest {
+  string party_id = 1;
+}
+
+message ListPartyOrdersResponse {
   repeated Order orders = 1;
 }

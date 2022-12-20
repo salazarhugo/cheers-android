@@ -5,6 +5,7 @@ package cheers.story.v1;
 import "cheers/type/story/story.proto";
 import "cheers/type/user/user.proto";
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/story/v1;story";
@@ -15,7 +16,11 @@ service StoryService {
   rpc UpdateStory (UpdateStoryRequest) returns (StoryResponse);
   rpc DeleteStory (DeleteStoryRequest) returns (google.protobuf.Empty);
 
-  rpc FeedStory (FeedStoryRequest) returns (FeedStoryResponse);
+  rpc FeedStory (FeedStoryRequest) returns (FeedStoryResponse) {
+    option (google.api.http) = {
+      get: "/v1/stories/feed"
+    };
+  };
   /*
     Return stories of a specific user
    */

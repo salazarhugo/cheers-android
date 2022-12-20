@@ -137,6 +137,9 @@ dependencies {
     implementation "com.google.accompanist:accompanist-navigation-material:0.26.5-rc"
     implementation "com.google.accompanist:accompanist-navigation-animation:0.24.8-beta"
 
+    // QR Code
+    implementation("com.simonsickle:composed-barcodes:1.1.1")
+
     // Jetpack Compose
     implementation "androidx.compose.ui:ui:1.4.0-alpha03"
     implementation "androidx.compose.ui:ui-util:1.4.0-alpha03"

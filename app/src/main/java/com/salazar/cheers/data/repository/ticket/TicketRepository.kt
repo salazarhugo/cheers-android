@@ -11,4 +11,9 @@ interface TicketRepository {
      * List current user tickets.
      */
     suspend fun listTicket(): Flow<List<Ticket>>
+
+    /**
+     * Get ticket by id.
+     */
+    suspend fun getTicket(id: String): Flow<Ticket>
 }

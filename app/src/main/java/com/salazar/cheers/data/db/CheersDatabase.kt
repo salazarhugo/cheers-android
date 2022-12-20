@@ -29,7 +29,7 @@ import com.salazar.cheers.internal.*
         UserSuggestion::class,
         Ticket::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
     autoMigrations = []
 )

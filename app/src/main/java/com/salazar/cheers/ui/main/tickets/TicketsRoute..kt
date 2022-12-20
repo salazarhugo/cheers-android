@@ -20,5 +20,13 @@ fun TicketsRoute(
 
     TicketsScreen(
         uiState = uiState,
+        onTicketsUIAction = { action ->
+            when (action) {
+                TicketsUIAction.OnSwipeRefresh -> TODO()
+                is TicketsUIAction.OnTicketClick -> {
+                    navActions.navigateToTicketDetails(action.ticketId)
+                }
+            }
+        }
     )
 }

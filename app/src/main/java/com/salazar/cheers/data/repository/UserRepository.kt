@@ -44,19 +44,14 @@ class UserRepository @Inject constructor(
         try {
             val authUser = FirebaseAuth.getInstance().currentUser!!
 
-            val user = cheers.type.UserOuterClass.User.newBuilder()
+            val request = CreateUserRequest.newBuilder()
                 .setUsername(username)
                 .setEmail(authUser.email ?: email)
                 .setName(authUser.displayName ?: "")
-                .setPhoneNumber(authUser.phoneNumber ?: "")
-                .build()
-
-            val request = CreateUserRequest.newBuilder()
-                .setUser(user)
                 .build()
 
             val response = userService.createUser(request = request)
-            val createTimeUser = response.toUser()
+            val createTimeUser = response.user.toUser()
 
             userDao.insert(createTimeUser)
 
@@ -97,7 +92,7 @@ class UserRepository @Inject constructor(
         try {
             postDao.deleteWithAuthorId(authorId = userId)
             val request = BlockUserRequest.newBuilder()
-                .setId(userId)
+                .setUserId(userId)
                 .build()
 
             userService.blockUser(request)
@@ -269,7 +264,7 @@ class UserRepository @Inject constructor(
     @Throws(Exception::class)
     suspend fun followUser(userID: String) {
         val request = FollowUserRequest.newBuilder()
-            .setId(userID)
+            .setUserId(userID)
             .build()
 
         userService.followUser(request)
@@ -278,7 +273,7 @@ class UserRepository @Inject constructor(
     @Throws(Exception::class)
     suspend fun unfollowUser(userID: String) {
         val request = UnfollowUserRequest.newBuilder()
-            .setId(userID)
+            .setUserId(userID)
             .build()
 
         userService.unfollowUser(request)
@@ -336,7 +331,7 @@ class UserRepository @Inject constructor(
 
             val remoteUser = try {
                 val request = GetUserRequest.newBuilder()
-                    .setId(userId)
+                    .setUserId(userId)
                     .build()
                 userService.getUser(request)
             } catch (e: NullPointerException) {
@@ -368,7 +363,7 @@ class UserRepository @Inject constructor(
         userIDorUsername: String,
     ): Resource<Unit> {
         val request = GetUserRequest.newBuilder()
-            .setId(userIDorUsername)
+            .setUserId(userIDorUsername)
             .build()
 
         return try {

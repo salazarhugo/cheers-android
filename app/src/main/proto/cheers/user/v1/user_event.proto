@@ -2,27 +2,23 @@ syntax = "proto3";
 
 package cheers.user.v1;
 
+import "cheers/type/user/user.proto";
+
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/user/v1;user";
 
 message UserEvent {
-  string user_id = 1;
-  string creator_id = 2;
-  string caption = 3;
-  string address = 4;
-  repeated string photos = 6;
-  bool is_comment_enabled = 7;
-  string location_name = 8;
-  string drink = 9;
-  int64 drunkenness = 10;
-  bool comments_enabled = 13;
-  bool share_enabled = 14;
-  enum EventType  {
-    CREATE = 0;
-    UPDATE = 1;
-    DELETE = 2;
-    LIKE = 3;
-    COMMENT = 4;
-  }
-  EventType type = 12;
+  oneof event {
+    CreateUser create = 1;
+    FollowUser follow = 2;
+  };
+}
+
+message CreateUser {
+  cheers.type.User user = 1;
+}
+
+message FollowUser {
+  cheers.type.User user = 1;
+  cheers.type.User followed_user = 2;
 }

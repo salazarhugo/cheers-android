@@ -32,6 +32,7 @@ import com.salazar.cheers.compose.LoadingScreen
 import com.salazar.cheers.compose.Username
 import com.salazar.cheers.compose.chat.*
 import com.salazar.cheers.compose.share.SwipeToRefresh
+import com.salazar.cheers.compose.share.Toolbar
 import com.salazar.cheers.compose.share.UserProfilePicture
 import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.compose.user.FollowButton
@@ -56,24 +57,18 @@ fun MessagesScreen(
     onSwipeRefresh: () -> Unit,
     onCameraClick: (String) -> Unit,
     onSearchInputChange: (String) -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     Scaffold(
         topBar = {
-            CheersAppBar(
-                navigationIcon = {
-                     Icon(Icons.Default.ArrowBack, null)
-                },
-                title = {
-                    Text(
-                        text = "Chat",
-                    )
-                },
+            Toolbar(
+                onBackPressed = onBackPressed,
+                title = "Chat",
                 actions = {
                     IconButton(onClick = onNewChatClicked) {
                         Icon(Icons.Default.Add, null)
                     }
                 },
-                center = false,
             )
         },
     ) {

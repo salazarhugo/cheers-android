@@ -21,6 +21,20 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc VerifyUser(VerifyUserRequest) returns (VerifyUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/auths/verify"
+      body: "*"
+    };
+  }
+}
+
+message VerifyUserRequest {
+  string user_id = 1;
+}
+
+message VerifyUserResponse {
 }
 
 message CreateModeratorRequest {

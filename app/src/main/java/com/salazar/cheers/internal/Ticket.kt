@@ -12,4 +12,5 @@ data class Ticket(
     val description: String = "",
     val organization: String = "",
     val validated: Boolean = false,
+    val price: Int = 0,
 )

@@ -1,5 +1,6 @@
 package com.salazar.cheers.compose.share
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -11,6 +12,7 @@ import com.salazar.cheers.ui.theme.Roboto
 fun Toolbar(
     title: String,
     onBackPressed: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
         title = {
@@ -27,6 +29,7 @@ fun Toolbar(
                 Icon(Icons.Default.ArrowBack, contentDescription = null)
             }
         },
+        actions = actions,
     )
 }
 

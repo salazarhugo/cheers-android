@@ -31,6 +31,7 @@ object MainDestinations {
     const val NEW_CHAT_ROUTE = "newChat"
     const val TICKETING_ROUTE = "ticketing"
     const val TICKETS_ROUTE = "tickets"
+    const val TICKET_DETAILS_ROUTE = "ticket"
     const val PROFILE_ROUTE = "profile"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
@@ -88,10 +89,17 @@ object SettingDestinations {
 /**
  * Models the navigation actions in the app.
  */
-class CheersNavigationActions(private val navController: NavHostController) {
-
+class CheersNavigationActions(
+    private val navController: NavHostController,
+) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToTicketDetails: (String) -> Unit = { ticketId ->
+        navController.navigate("${MainDestinations.TICKET_DETAILS_ROUTE}/${ticketId}") {
+            launchSingleTop = true
+        }
     }
 
     val navigateToRegister: () -> Unit = {

@@ -36,7 +36,7 @@ class AuthRepository @Inject constructor(
             return Result.Success(user)
 
         val request = GetUserRequest.newBuilder()
-            .setId(userId)
+            .setUserId(userId)
             .build()
 
         return try {

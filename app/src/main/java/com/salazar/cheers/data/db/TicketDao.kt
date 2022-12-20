@@ -15,6 +15,9 @@ interface TicketDao {
     @Query("SELECT * FROM tickets")
     fun listTickets(): Flow<List<Ticket>>
 
+    @Query("SELECT * FROM tickets WHERE id = :id")
+    fun getTicket(id: String): Flow<Ticket>
+
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTickets(tickets: List<Ticket>) {

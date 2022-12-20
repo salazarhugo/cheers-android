@@ -47,6 +47,35 @@ service PartyService {
       get: "/v1/parties/feed"
     };
   }
+
+  rpc AnswerParty (AnswerPartyRequest) returns (AnswerPartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties/{party_id}/answer"
+      body: "*"
+    };
+  }
+
+  rpc ListGoing (ListGoingRequest) returns (ListGoingResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}/going"
+    };
+  }
+}
+
+message ListGoingRequest {
+  string party_id = 1;
+}
+
+message ListGoingResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message AnswerPartyRequest {
+  string party_id = 1;
+  PartyAnswer answer = 2;
+}
+
+message AnswerPartyResponse {
 }
 
 message CreatePartyRequest {
@@ -106,11 +135,12 @@ message PartyItem {
   int64 interested_count = 4;
   int64 invited_count = 5;
   bool is_creator = 8;
-  PartyUserResponse user_response = 9;
+  PartyAnswer answer = 9;
 }
 
-enum PartyUserResponse {
+enum PartyAnswer {
   GOING = 0;
   INTERESTED = 1;
   NOT_INTERESTED = 2;
+  MAYBE = 3;
 }

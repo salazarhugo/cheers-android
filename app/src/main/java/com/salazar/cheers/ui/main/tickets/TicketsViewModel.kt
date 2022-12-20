@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.ticket.TicketRepository
 import com.salazar.cheers.internal.Ticket
+import com.salazar.cheers.ui.main.home.HomeUIAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -44,3 +45,7 @@ class TicketsViewModel @Inject constructor(
     }
 }
 
+sealed class TicketsUIAction {
+    object OnSwipeRefresh : TicketsUIAction()
+    data class OnTicketClick(val ticketId: String) : TicketsUIAction()
+}

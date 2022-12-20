@@ -55,6 +55,7 @@ import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.main.tickets.TicketsRoute
+import com.salazar.cheers.ui.main.tickets.details.TicketDetailsRoute
 import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
@@ -77,6 +78,14 @@ fun NavGraphBuilder.mainNavGraph(
             route = MainDestinations.TICKETS_ROUTE,
         ) {
             TicketsRoute(
+                navActions = appState.navActions
+            )
+        }
+
+        composable(
+            route = "${MainDestinations.TICKET_DETAILS_ROUTE}/{ticketId}",
+        ) {
+            TicketDetailsRoute(
                 navActions = appState.navActions
             )
         }
