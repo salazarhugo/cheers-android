@@ -10,8 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.share.Toolbar
 
 @Composable
 fun CreatePasswordScreen(

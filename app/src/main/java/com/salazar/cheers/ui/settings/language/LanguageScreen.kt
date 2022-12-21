@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.compose.items.SettingTitle
-import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.ui.compose.items.SettingTitle
+import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.internal.Language
 
 @Composable

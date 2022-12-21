@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.android.billingclient.api.SkuDetails
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.animations.AnimatedTextCounter
-import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
+import com.salazar.cheers.ui.compose.share.Toolbar
 
 @Composable
 fun RechargeScreen(

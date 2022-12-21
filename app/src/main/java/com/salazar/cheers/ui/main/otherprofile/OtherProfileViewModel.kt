@@ -137,7 +137,7 @@ class OtherProfileViewModel @Inject constructor(
 
     private fun refreshUserPosts() {
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.profilePost(userIdOrUsername = username).collect {
+            postRepository.listPost(userIdOrUsername = username).collect {
                 updatePosts(it)
             }
         }

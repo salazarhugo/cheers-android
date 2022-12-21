@@ -11,6 +11,8 @@ import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -45,23 +47,32 @@ class PostRepository @Inject constructor(
         return postDao.getPostFeed()
     }
 
-    suspend fun profilePost(userIdOrUsername: String): Flow<List<Post>> {
-        return flow {
-            val posts = postDao.getUserPosts(userIdOrUsername)
+    suspend fun listPost(userIdOrUsername: String): Flow<List<Post>> {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 
-            emit(posts)
+        return flow {
+            emit(postDao.getUserPosts(userIdOrUsername).first())
 
             val remoteUserPosts = try {
-//                val response = coreService.getUserPosts(userIdOrUsername, 0, 20)
-//                response
-                null
+                val request = ListPostRequest.newBuilder()
+                    .setPage(0)
+                    .setPageSize(9)
+                    .setUsername(userIdOrUsername)
+                    .build()
+
+                val response = postService.listPost(request)
+                val posts = response.postsList.map {
+                    it.toPost(accountId = uid)
+                }
+                posts
             } catch (e: Exception) {
+                e.printStackTrace()
                 null
             }
 
             remoteUserPosts?.let {
-                postDao.insertAll(it)
-                emit(postDao.getUserPosts(userIdOrUsername))
+                postDao.insertUserPosts(uid, it)
+                emitAll(postDao.getUserPosts(userIdOrUsername))
             }
         }
     }

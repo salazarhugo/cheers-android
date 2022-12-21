@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.share.AppBar
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.compose.share.AppBar
 import com.salazar.cheers.ui.theme.Green
 import com.salazar.cheers.ui.theme.GreenSurface
 import kotlinx.coroutines.delay

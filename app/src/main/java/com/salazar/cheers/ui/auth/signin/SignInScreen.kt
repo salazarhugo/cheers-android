@@ -37,10 +37,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.CircularProgressIndicatorM3
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.buttons.GoogleButton
-import com.salazar.cheers.compose.animations.AnimatedLogo
+import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.animations.AnimatedLogo
+import com.salazar.cheers.ui.compose.buttons.GoogleButton
 import com.salazar.cheers.ui.theme.Typography
 
 @Composable

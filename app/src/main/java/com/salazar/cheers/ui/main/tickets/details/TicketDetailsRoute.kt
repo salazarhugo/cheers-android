@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.compose.ForceBrightness
+import com.salazar.cheers.ui.compose.ForceBrightness
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.main.tickets.TicketsScreen
 import com.salazar.cheers.ui.main.tickets.TicketsViewModel

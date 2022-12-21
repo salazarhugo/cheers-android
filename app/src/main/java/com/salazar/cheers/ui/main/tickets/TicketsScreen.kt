@@ -12,8 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.compose.EmptyActivity
-import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.ui.compose.EmptyActivity
+import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.internal.Ticket
 
 @Composable

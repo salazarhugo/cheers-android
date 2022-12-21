@@ -4,12 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.domain.usecase.ListFriendUseCase
 import com.salazar.cheers.util.addOrRemove
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +23,7 @@ data class NewChatUiState(
     val groupName: String = "",
     val query: String = "",
     val isGroup: Boolean = false,
-    val selectedUsers: Set<User> = emptySet(),
-    val recentUsers: List<User> = emptyList(),
+    val selectedUsers: Set<UserItem> = emptySet(),
     val users: List<UserItem>? = emptyList(),
 )
 
@@ -34,9 +31,10 @@ data class NewChatUiState(
 class NewChatViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
+    private val listFriendUseCase: ListFriendUseCase,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(NewChatUiState(isLoading = true))
+    private val viewModelState = MutableStateFlow(NewChatUiState())
 
     val uiState = viewModelState
         .stateIn(
@@ -47,41 +45,53 @@ class NewChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getRecentUsers().collect { recentUsers ->
-                onRecentUsersChange(recentUsers = recentUsers)
+            listFriendUseCase().collect { users ->
+                onRecentUsersChange(users = users)
             }
         }
     }
 
-    private fun onRecentUsersChange(recentUsers: List<RecentUser>) {
+    private fun onRecentUsersChange(users: List<UserItem>) {
         viewModelState.update {
-            it.copy(recentUsers = recentUsers.map { it.toUser() })
+            it.copy(users = users)
         }
     }
 
-    fun onFabClick(onSuccess: (String) -> Unit) {
+    fun onCreateChat(onSuccess: (String) -> Unit) {
         val state = uiState.value
 
-        if (state.selectedUsers.isEmpty()) return
+        if (state.selectedUsers.isEmpty())
+            return
 
-        if (state.selectedUsers.size > 1 && state.groupName.isBlank())
+        if (state.selectedUsers.size > 1 && state.groupName.isBlank()) {
             onErrorMessageChange(errorMessage = "Group name can't be blank")
-        else
-            viewModelScope.launch {
-                val result = chatRepository.createGroupChat(
-                    state.groupName,
-                    state.selectedUsers.map { it.id },
-                )
-                when (result) {
-                    is Result.Success -> onSuccess(result.data)
-                    is Result.Error -> onErrorMessageChange(result.message)
-                }
+            return
+        }
+
+        updateIsLoading(true)
+
+        viewModelScope.launch {
+            val result = chatRepository.createGroupChat(
+                groupName = state.groupName,
+                UUIDs = state.selectedUsers.map { it.id },
+            )
+            when (result) {
+                is Result.Success -> onSuccess(result.data)
+                is Result.Error -> onErrorMessageChange(result.message)
             }
+            updateIsLoading(false)
+        }
     }
 
     private fun onErrorMessageChange(errorMessage: String) {
         viewModelState.update {
             it.copy(errorMessage = errorMessage)
+        }
+    }
+
+    fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
         }
     }
 
@@ -97,7 +107,7 @@ class NewChatViewModel @Inject constructor(
         }
     }
 
-    fun onUserCheckedChange(user: User) {
+    fun onUserCheckedChange(user: UserItem) {
         viewModelState.update {
             val set = it.selectedUsers.toMutableSet()
             set.addOrRemove(user)

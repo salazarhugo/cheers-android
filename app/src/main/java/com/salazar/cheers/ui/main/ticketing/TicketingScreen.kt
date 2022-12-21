@@ -17,12 +17,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.share.SwipeToRefresh
-import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.dateTimeFormatter
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 
 
 @Composable

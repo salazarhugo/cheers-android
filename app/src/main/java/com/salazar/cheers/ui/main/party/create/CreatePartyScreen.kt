@@ -40,8 +40,8 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.mapbox.search.result.SearchSuggestion
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.event.EventDetails
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.event.EventDetails
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.startDateFormatter
 import com.salazar.cheers.internal.timeFormatter

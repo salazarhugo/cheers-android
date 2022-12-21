@@ -51,13 +51,14 @@ import com.mapbox.search.ResponseInfo
 import com.mapbox.search.ReverseGeoOptions
 import com.mapbox.search.SearchCallback
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.compose.ChipGroup
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.post.MultipleAnnotation
-import com.salazar.cheers.compose.share.ErrorMessage
-import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.compose.ChipGroup
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.post.MultipleAnnotation
+import com.salazar.cheers.ui.compose.share.ErrorMessage
+import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.main.party.create.Item
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
@@ -525,7 +526,7 @@ fun SelectedLocation(
 
 @Composable
 fun AddPeople(
-    selectedTagUsers: List<User>,
+    selectedTagUsers: List<UserItem>,
     navigateToTagUser: () -> Unit,
 ) {
     Row(

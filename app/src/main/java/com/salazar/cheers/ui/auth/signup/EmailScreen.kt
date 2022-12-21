@@ -27,7 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.compose.share.ButtonWithLoading
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.util.Utils.isEmailValid
 
 @Composable

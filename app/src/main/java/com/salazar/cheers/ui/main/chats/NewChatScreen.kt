@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,9 +30,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.ChipGroup
-import com.salazar.cheers.compose.Username
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.ui.compose.ChipGroup
+import com.salazar.cheers.ui.compose.Username
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
+import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.ui.theme.BlueCheers
 import com.salazar.cheers.ui.theme.Typography
 
@@ -42,22 +43,29 @@ fun NewChatScreen(
     uiState: NewChatUiState,
     onNewGroupClick: () -> Unit,
     onFabClick: () -> Unit,
-    onUserCheckedChange: (User) -> Unit,
+    onUserCheckedChange: (UserItem) -> Unit,
     onQueryChange: (String) -> Unit,
     onGroupNameChange: (String) -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     Scaffold(
+        topBar = {
+            Toolbar(
+                title = "Create Chat",
+                onBackPressed = onBackPressed,
+            )
+        },
         bottomBar = {
-            Button(
+            val text = if (uiState.selectedUsers.size > 1) "Chat with Group" else "Chat"
+            ButtonWithLoading(
+                text = text,
+                isLoading = uiState.isLoading,
                 onClick = onFabClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
                 shape = MaterialTheme.shapes.medium,
-            ) {
-                val text = if (uiState.selectedUsers.size > 1) "Chat with Group" else "Chat"
-                Text(text = text)
-            }
+            )
         },
     ) {
         Column(
@@ -83,14 +91,6 @@ fun NewChatScreen(
             else
                 NewGroupButton(onNewGroupClick = onNewGroupClick)
             LazyColumn {
-                stickyHeader {
-                    val text = if (uiState.query.isBlank()) "Recents" else "Friends"
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                        modifier = Modifier.padding(16.dp),
-                    )
-                }
                 item {
                     Surface(
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -98,22 +98,13 @@ fun NewChatScreen(
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Column {
-                            if (uiState.query.isBlank())
-                                uiState.recentUsers.forEach { user ->
-                                    UserCard(
-                                        user = user,
-                                        selected = uiState.selectedUsers.contains(user),
-                                        onUserCheckedChange = onUserCheckedChange,
-                                    )
-                                }
-                            else
-                                uiState.users?.forEach { user ->
-//                                    UserCard(
-//                                        user = user,
-//                                        selected = uiState.selectedUsers.contains(user),
-//                                        onUserCheckedChange = onUserCheckedChange,
-//                                    )
-                                }
+                            uiState.users?.forEach { user ->
+                                UserCard(
+                                    user = user,
+                                    selected = uiState.selectedUsers.contains(user),
+                                    onUserCheckedChange = onUserCheckedChange,
+                                )
+                            }
                         }
                     }
                 }
@@ -162,9 +153,9 @@ fun NewGroupButton(
 
 @Composable
 fun UserCard(
-    user: User,
+    user: UserItem,
     selected: Boolean,
-    onUserCheckedChange: (User) -> Unit,
+    onUserCheckedChange: (UserItem) -> Unit,
 ) {
     val color = if (selected) BlueCheers else MaterialTheme.colorScheme.onBackground
 

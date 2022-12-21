@@ -3,7 +3,9 @@ package com.salazar.cheers.ui.main.taguser
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.domain.usecase.ListFriendUseCase
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +18,8 @@ import javax.inject.Inject
 
 data class AddPeopleUiState(
     val isLoading: Boolean,
-    val users: List<User>? = null,
-    val selectedUsers: List<User> = emptyList(),
+    val users: List<UserItem>? = null,
+    val selectedUsers: List<UserItem> = emptyList(),
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 )
@@ -25,6 +27,7 @@ data class AddPeopleUiState(
 @HiltViewModel
 class AddPeopleViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val listFriendUseCase: ListFriendUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPeopleUiState(isLoading = true))
@@ -49,14 +52,13 @@ class AddPeopleViewModel @Inject constructor(
 
     private fun refreshFriends(query: String = "") {
         viewModelScope.launch {
-            userRepository.queryUsers(fetchFromRemote = true, query = query).collect {
-//                if (it is Resource.Success)
-//                    updateUsers(it.data)
+            listFriendUseCase().collect {
+                updateUsers(it)
             }
         }
     }
 
-    private fun updateUsers(users: List<User>?) {
+    private fun updateUsers(users: List<UserItem>?) {
         viewModelState.update {
             it.copy(users = users)
         }

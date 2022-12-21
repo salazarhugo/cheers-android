@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.auth.signin.username
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
@@ -23,8 +22,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.compose.share.AppBar
-import com.salazar.cheers.compose.share.ButtonWithLoading
+import com.salazar.cheers.ui.compose.share.AppBar
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.util.Utils.validateUsername
 
 @Composable

@@ -41,8 +41,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.compose.animations.Bounce
-import com.salazar.cheers.compose.utils.Permission
+import com.salazar.cheers.ui.compose.animations.Bounce
+import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.util.Utils.createFile
 import com.salazar.cheers.util.Utils.getOutputDirectory
 import com.salazar.cheers.util.Utils.getOutputFileOptions

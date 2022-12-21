@@ -11,8 +11,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.utils.Permission
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.navigation.CheersNavigationActions
 import java.io.File
 import java.io.IOException

@@ -34,19 +34,19 @@ import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.CircularProgressIndicatorM3
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.MultiFabState
-import com.salazar.cheers.compose.post.NoPosts
-import com.salazar.cheers.compose.post.PostView
-import com.salazar.cheers.compose.share.SwipeToRefresh
-import com.salazar.cheers.compose.share.UserProfilePicture
-import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.compose.story.Story
-import com.salazar.cheers.compose.story.YourStory
 import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.MultiFabState
+import com.salazar.cheers.ui.compose.post.NoPosts
+import com.salazar.cheers.ui.compose.post.PostView
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.ui.compose.story.Story
+import com.salazar.cheers.ui.compose.story.YourStory
 
 
 @Composable

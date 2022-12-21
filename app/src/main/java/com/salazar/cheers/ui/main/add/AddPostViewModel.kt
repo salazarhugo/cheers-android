@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.PostType
@@ -40,7 +41,7 @@ data class AddPostUiState(
     val location: String = "",
     val locationResults: List<SearchResult> = emptyList(),
     val selectedLocation: SearchResult? = null,
-    val selectedTagUsers: List<User> = emptyList(),
+    val selectedTagUsers: List<UserItem> = emptyList(),
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
     val privacy: Privacy = Privacy.FRIENDS,
     val allowJoin: Boolean = true,
@@ -85,7 +86,7 @@ class AddPostViewModel @Inject constructor(
         }
     }
 
-    fun selectTagUser(user: User) {
+    fun selectTagUser(user: UserItem) {
         val l = viewModelState.value.selectedTagUsers.toMutableList()
         if (l.contains(user)) l.remove(user) else l.add(user)
         viewModelState.update {

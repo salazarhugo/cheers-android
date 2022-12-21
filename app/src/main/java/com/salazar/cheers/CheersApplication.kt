@@ -34,7 +34,7 @@ class CheersApplication : Application(), Configuration.Provider {
         MapboxSearchSdk.initialize(
             application = this,
             accessToken = getString(R.string.mapbox_access_token),
-            locationEngine = LocationEngineProvider.getBestLocationEngine(this)
+//            locationEngine = LocationEngineProvider.getBestLocationEngine(this)
         )
     }
 

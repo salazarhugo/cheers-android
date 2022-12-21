@@ -135,7 +135,7 @@ class ProfileViewModel @Inject constructor(
     private fun refreshUserPosts() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid!!
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.profilePost(userIdOrUsername = userId).collect {
+            postRepository.listPost(userIdOrUsername = userId).collect {
                 updatePosts(it)
             }
         }

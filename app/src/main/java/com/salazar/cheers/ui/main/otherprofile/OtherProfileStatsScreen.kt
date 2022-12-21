@@ -8,15 +8,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -34,13 +37,13 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.Username
-import com.salazar.cheers.compose.items.UserItem
-import com.salazar.cheers.compose.share.SwipeToRefresh
-import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.Username
+import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.main.profile.Following
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
@@ -224,22 +227,20 @@ fun Toolbar(
     onBackPressed: () -> Unit,
 ) {
     Column {
-        SmallTopAppBar(
-            title = {
-                Username(
-                    username = username,
-                    verified = verified,
-                    textStyle = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Roboto
-                    ),
-                )
-            },
+        TopAppBar(title = {
+            Username(
+                username = username,
+                verified = verified,
+                textStyle = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto
+                ),
+            )
+        },
             navigationIcon = {
                 IconButton(onClick = onBackPressed) {
                     Icon(Icons.Outlined.ArrowBack, "")
                 }
-            },
-        )
+            })
     }
 }

@@ -13,11 +13,11 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.post.PostMoreBottomSheet
-import com.salazar.cheers.compose.sheets.StoryMoreBottomSheet
-import com.salazar.cheers.compose.sheets.StorySheetUIAction
 import com.salazar.cheers.ui.CheersAppState
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.post.PostMoreBottomSheet
+import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
+import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
 import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.AddPostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute

@@ -42,10 +42,10 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.post.PostHeader
-import com.salazar.cheers.compose.story.StoryProgressBar
-import com.salazar.cheers.compose.utils.PrettyImage
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.post.PostHeader
+import com.salazar.cheers.ui.compose.story.StoryProgressBar
+import com.salazar.cheers.ui.compose.utils.PrettyImage
 import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.internal.Beverage

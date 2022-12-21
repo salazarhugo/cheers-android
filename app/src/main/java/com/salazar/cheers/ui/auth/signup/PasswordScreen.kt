@@ -26,7 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.compose.share.ButtonWithLoading
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 
 @Composable
 fun PasswordScreen(

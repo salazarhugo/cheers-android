@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.compose.items.UserItem
-import com.salazar.cheers.compose.share.SwipeToRefresh
-import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.ui.compose.user.FollowButton
 import com.salazar.cheers.ui.main.party.create.TopAppBar
 import kotlinx.coroutines.launch
 

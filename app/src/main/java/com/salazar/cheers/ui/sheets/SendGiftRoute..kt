@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Green
 import com.salazar.cheers.ui.theme.GreenSurface

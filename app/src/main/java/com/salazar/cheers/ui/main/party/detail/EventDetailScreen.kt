@@ -23,8 +23,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.event.*
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.event.*
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.numberFormatter
 import com.salazar.cheers.ui.theme.GreySheet

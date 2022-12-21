@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.beust.klaxon.token.VALUE_TYPE.value
-import com.salazar.cheers.compose.share.Toolbar
+import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.internal.Ticket
 import com.simonsickle.compose.barcodes.Barcode
 import com.simonsickle.compose.barcodes.BarcodeType

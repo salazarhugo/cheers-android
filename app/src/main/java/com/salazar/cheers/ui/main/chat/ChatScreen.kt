@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.animations.AnimateHeart
-import com.salazar.cheers.compose.chat.*
+import com.salazar.cheers.ui.compose.animations.AnimateHeart
+import com.salazar.cheers.ui.compose.chat.*
 import com.salazar.cheers.internal.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat

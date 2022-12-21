@@ -117,6 +117,10 @@ class UserRepository @Inject constructor(
         }
     }
 
+    fun listFriend(): Flow<List<UserItem>> {
+        return userItemDao.listUserItems()
+    }
+
     suspend fun getFollowing(userIdOrUsername: String) = withContext(Dispatchers.IO) {
         return@withContext try {
             val request = ListFollowingRequest.newBuilder()

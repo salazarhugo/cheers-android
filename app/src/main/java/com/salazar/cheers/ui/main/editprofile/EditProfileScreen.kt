@@ -23,8 +23,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.MyTopAppBar
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.MyTopAppBar
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.Constants.BIO_MAX_CHAR
 import com.salazar.cheers.util.Constants.NAME_MAX_CHAR

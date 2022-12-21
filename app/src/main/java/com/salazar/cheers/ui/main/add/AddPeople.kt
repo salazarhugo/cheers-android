@@ -27,10 +27,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.compose.ChipGroup
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.Username
-import com.salazar.cheers.compose.share.UserProfilePicture
+import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.ui.compose.ChipGroup
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.Username
+import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
 import com.salazar.cheers.ui.theme.Roboto
@@ -38,8 +39,8 @@ import com.salazar.cheers.ui.theme.Typography
 
 @Composable
 fun AddPeopleScreen(
-    onSelectUser: (User) -> Unit,
-    selectedUsers: List<User>,
+    selectedUsers: List<UserItem>,
+    onSelectUser: (UserItem) -> Unit,
     onBackPressed: () -> Unit,
     onDone: () -> Unit,
 ) {
@@ -104,9 +105,9 @@ fun AddPeopleTopBar(
 
 @Composable
 fun Users(
-    users: List<User>,
-    selectedUsers: List<User>,
-    onSelectUser: (User) -> Unit,
+    users: List<UserItem>,
+    selectedUsers: List<UserItem>,
+    onSelectUser: (UserItem) -> Unit,
 ) {
     LazyColumn {
         items(users, key = { it.id }) { user ->
@@ -117,9 +118,9 @@ fun Users(
 
 @Composable
 fun UserCard(
-    user: User,
+    user: UserItem,
     selected: Boolean,
-    onSelectUser: (User) -> Unit,
+    onSelectUser: (UserItem) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -157,7 +158,7 @@ fun UserCard(
 @Composable
 fun SearchTextInput(
     searchInput: String,
-    selectedUsers: List<User>,
+    selectedUsers: List<UserItem>,
     onSearchInputChanged: (String) -> Unit,
 ) {
     TextField(
@@ -184,7 +185,7 @@ fun SearchTextInput(
 
 @Composable
 fun ChipInput(
-    selectedUsers: List<User>,
+    selectedUsers: List<UserItem>,
 ) {
     ChipGroup(
         users = selectedUsers.map { it.username },

@@ -11,9 +11,9 @@ import java.util.*
 
 @Dao
 interface PostDao {
-    @Transaction
+
     @Query("SELECT * FROM posts WHERE (authorId = :userIdOrUsername OR username = :userIdOrUsername) ORDER BY posts.createTime DESC")
-    fun getUserPosts(userIdOrUsername: String): List<Post>
+    fun getUserPosts(userIdOrUsername: String): Flow<List<Post>>
 
     /**
      ** Get User posts. Only IMAGE, VIDEO posts.
@@ -51,6 +51,12 @@ interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(posts: List<Post>)
 
+    @Transaction
+    suspend fun insertUserPosts(userId: String, posts: List<Post>) {
+        clearUserPosts(userId = userId)
+        insertAll(posts)
+    }
+
     @Delete
     suspend fun delete(post: Post)
 
@@ -66,4 +72,7 @@ interface PostDao {
 
     @Query("DELETE FROM posts")
     suspend fun clearAll()
+
+    @Query("DELETE FROM posts WHERE authorId = :userId")
+    suspend fun clearUserPosts(userId: String)
 }

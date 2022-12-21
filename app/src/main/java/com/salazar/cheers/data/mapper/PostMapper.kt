@@ -7,6 +7,7 @@ import com.salazar.cheers.internal.Post
 fun PostResponse.toPost(accountId: String): Post {
  return Post().copy(
      id = post.id,
+     authorId = user.id,
      caption = post.caption,
      username  = user.username,
      verified = user.verified,

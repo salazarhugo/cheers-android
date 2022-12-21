@@ -45,7 +45,7 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.utils.Permission
+import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils

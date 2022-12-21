@@ -24,9 +24,9 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.compose.DividerM3
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.animations.AnimatedTextCounter
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.main.search.UserCard

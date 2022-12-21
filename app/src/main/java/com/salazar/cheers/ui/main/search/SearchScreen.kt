@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
@@ -33,15 +32,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.compose.CircularProgressIndicatorM3
-import com.salazar.cheers.compose.Username
-import com.salazar.cheers.compose.items.UserItem
-import com.salazar.cheers.compose.share.SwipeToRefresh
-import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.compose.user.FollowButton
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
+import com.salazar.cheers.ui.compose.Username
+import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.ui.compose.user.FollowButton
 import com.salazar.cheers.ui.theme.Typography
 
 @Composable

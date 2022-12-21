@@ -24,8 +24,9 @@ fun NewChatRoute(
         onUserCheckedChange = newChatViewModel::onUserCheckedChange,
         onQueryChange = newChatViewModel::onQueryChange,
         onGroupNameChange = newChatViewModel::onGroupNameChange,
+        onBackPressed = { navActions.navigateBack() },
         onFabClick = {
-            newChatViewModel.onFabClick {
+            newChatViewModel.onCreateChat {
                 navActions.navigateToChatWithChannelId(it)
             }
         },

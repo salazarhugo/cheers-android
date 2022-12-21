@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.salazar.cheers.data.db.entities.UserItem
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserItemDao {
@@ -13,6 +14,9 @@ interface UserItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(users: List<UserItem>)
+
+    @Query("SELECT * FROM user_item")
+    fun listUserItems(): Flow<List<UserItem>>
 
     @Query("SELECT * FROM user_item WHERE username LIKE '%' || :query || '%' ")
     suspend fun searchUser(query: String): List<UserItem>

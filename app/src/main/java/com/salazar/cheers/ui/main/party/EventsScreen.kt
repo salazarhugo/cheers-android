@@ -23,16 +23,16 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.compose.ChipGroup
-import com.salazar.cheers.compose.LoadingScreen
-import com.salazar.cheers.compose.event.EventDetails
-import com.salazar.cheers.compose.event.EventGoingButton
-import com.salazar.cheers.compose.event.EventInterestButton
-import com.salazar.cheers.compose.share.SwipeToRefresh
-import com.salazar.cheers.compose.share.UserProfilePicture
-import com.salazar.cheers.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.numberFormatter
+import com.salazar.cheers.ui.compose.ChipGroup
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.event.EventDetails
+import com.salazar.cheers.ui.compose.event.EventGoingButton
+import com.salazar.cheers.ui.compose.event.EventInterestButton
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.main.search.SearchBar
 
 @Composable
