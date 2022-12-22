@@ -189,6 +189,7 @@ fun Profile(
                                         onInterestedToggle = {},
                                         onGoingToggle = {},
                                         onMoreClick = {},
+                                        onShareClick = {}
                                     )
                                 }
                                 2 -> FunctionalityNotAvailablePanel()
@@ -214,6 +215,7 @@ fun EventList(
                     onGoingToggle = {},
                     onInterestedToggle = {},
                     onMoreClick = {},
+                    onShareClick = {},
                 )
             }
         }
@@ -251,6 +253,7 @@ fun Post(
     post: Post,
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
+    onPostShare: (String) -> Unit = {},
     onPostMoreClicked: (String, String) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
@@ -282,9 +285,10 @@ fun Post(
         pagerState = pagerState,
     )
     PostFooter(
-        post,
+        post = post,
         onLike = onPostLike,
         onCommentClick = {},
+        onShareClick = onPostShare,
         pagerState = pagerState,
     )
 }

@@ -15,7 +15,6 @@ interface ChatDao {
     suspend fun insert(channel: ChatChannel)
 
     @Transaction
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertInbox(rooms: List<ChatChannel>) {
         clearRooms()
         insertRooms(rooms)
@@ -47,7 +46,6 @@ interface ChatDao {
     @Query("SELECT * FROM message WHERE roomId = :channelId ORDER BY createTime DESC")
     fun getMessages(channelId: String): Flow<List<ChatMessage>>
 
-    @Transaction
     @Query("SELECT * FROM room WHERE accountId = :me ORDER BY lastMessageTime DESC")
     fun getChannels(me: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<ChatChannel>>
 

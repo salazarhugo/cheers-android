@@ -53,7 +53,6 @@ import com.mapbox.search.SearchCallback
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.post.MultipleAnnotation
@@ -132,11 +131,13 @@ fun AddPostScreen(
                     paddingValues = PaddingValues(16.dp),
                 )
                 CaptionSection(
+                    modifier = Modifier
+                        .padding(start = 15.dp, end = 15.dp)
+                        .fillMaxWidth(),
                     profilePictureUrl = profilePictureUrl,
                     caption = uiState.caption,
                     onCaptionChanged = onCaptionChanged,
                     photos = uiState.photos,
-                    postType = uiState.postType,
                 )
                 DividerM3()
                 AddPeople(
@@ -555,16 +556,14 @@ fun AddPeople(
 
 @Composable
 fun CaptionSection(
+    modifier: Modifier = Modifier,
     profilePictureUrl: String?,
     photos: List<Uri>,
-    postType: String,
     caption: String,
     onCaptionChanged: (String) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .padding(start = 15.dp, end = 15.dp)
-            .fillMaxWidth(),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         UserProfilePicture(
@@ -612,7 +611,6 @@ fun CaptionSection(
                 }
             }
         )
-
     }
 }
 

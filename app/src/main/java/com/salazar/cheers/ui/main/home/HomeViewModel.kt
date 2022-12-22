@@ -252,6 +252,7 @@ sealed class HomeUIAction {
     object OnAddPostClick : HomeUIAction()
     object OnLoadNextItems : HomeUIAction()
     data class OnCommentClick(val postID: String) : HomeUIAction()
+    data class OnShareClick(val postID: String) : HomeUIAction()
     data class OnLikeClick(val post: Post) : HomeUIAction()
     data class OnStoryFeedClick(val page: Int) : HomeUIAction()
     data class OnStoryClick(val userID: String) : HomeUIAction()

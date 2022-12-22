@@ -57,6 +57,7 @@ object MainDestinations {
     const val SEND_GIFT_SHEET = "giftSheet"
     const val DRINKING_STATS = "drinkingStats"
     const val NFC_ROUTE = "nfc"
+    const val SHARE_ROUTE = "share"
 }
 
 /**
@@ -94,6 +95,12 @@ class CheersNavigationActions(
 ) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToShare: (String) -> Unit = { partyId ->
+        navController.navigate("${MainDestinations.SHARE_ROUTE}/${partyId}") {
+            launchSingleTop = true
+        }
     }
 
     val navigateToTicketDetails: (String) -> Unit = { ticketId ->

@@ -7,7 +7,7 @@ import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.domain.usecase.ListFriendUseCase
+import com.salazar.cheers.domain.usecase.list_friend.ListFriendUseCase
 import com.salazar.cheers.util.addOrRemove
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

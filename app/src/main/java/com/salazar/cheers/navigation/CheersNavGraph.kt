@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,6 +23,7 @@ import com.salazar.cheers.CheersUiState
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
 import com.salazar.cheers.ui.theme.GreySheet
+import kotlinx.serialization.json.JsonNull.content
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,12 +61,13 @@ fun CheersNavGraph(
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = appState.bottomSheetNavigator,
-        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetShape = MaterialTheme.shapes.extraLarge,
         sheetBackgroundColor = if (isSystemInDarkTheme()) GreySheet else MaterialTheme.colorScheme.background,
         sheetElevation = 0.dp,
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding(),
+            .navigationBarsPadding()
+            .imePadding()
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(appState.snackBarHostState) },

@@ -32,5 +32,8 @@ fun EventsRoute(
         onCreateEventClick = {
             navActions.navigateToAddEvent()
         },
+        onShareClick = { partyId ->
+            navActions.navigateToShare(partyId)
+        },
     )
 }

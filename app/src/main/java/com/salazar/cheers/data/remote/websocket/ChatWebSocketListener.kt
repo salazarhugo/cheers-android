@@ -9,7 +9,6 @@ import com.salazar.cheers.internal.MessageType
 import com.salazar.cheers.internal.RoomStatus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -43,6 +42,12 @@ class ChatWebSocketListener @Inject constructor(
                         type = MessageType.TEXT,
                         status = ChatMessageStatus.DELIVERED,
                     )
+                )
+                chatDao.updateLastMessage(
+                    channelId = message.roomId,
+                    message = message.text,
+                    type = MessageType.TEXT,
+                    time = message.createTime,
                 )
                 chatDao.setStatus(message.roomId, RoomStatus.NEW)
             }

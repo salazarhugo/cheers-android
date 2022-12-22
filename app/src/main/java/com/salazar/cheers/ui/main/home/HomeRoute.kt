@@ -55,6 +55,7 @@ fun HomeRoute(
                 is HomeUIAction.OnPostMoreClick -> navActions.navigateToPostMoreSheet(action.postID)
                 is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextPosts()
                 is HomeUIAction.OnChatClick -> navActions.navigateToMessages()
+                is HomeUIAction.OnShareClick -> navActions.navigateToShare(action.postID)
             }
         }
     )

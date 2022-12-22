@@ -26,12 +26,13 @@ import com.salazar.cheers.ui.theme.GreenGoogle
 
 @Composable
 fun SwipeableChatItem(
+    modifier: Modifier = Modifier,
     dismissState: DismissState,
     content: @Composable RowScope.() -> Unit,
 ) {
     SwipeToDismiss(
         state = dismissState,
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = Dp(1f)),
         directions = setOf(DismissDirection.EndToStart, DismissDirection.StartToEnd),
         dismissThresholds = {

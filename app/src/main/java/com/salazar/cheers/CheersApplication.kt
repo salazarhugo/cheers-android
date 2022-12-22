@@ -31,11 +31,15 @@ class CheersApplication : Application(), Configuration.Provider {
     }
 
     private fun initMapBox() {
-        MapboxSearchSdk.initialize(
-            application = this,
-            accessToken = getString(R.string.mapbox_access_token),
+        try {
+            MapboxSearchSdk.initialize(
+                application = this,
+                accessToken = getString(R.string.mapbox_access_token),
 //            locationEngine = LocationEngineProvider.getBestLocationEngine(this)
-        )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun initFirebase() {

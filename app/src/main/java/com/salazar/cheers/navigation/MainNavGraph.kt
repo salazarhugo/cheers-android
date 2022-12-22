@@ -48,6 +48,7 @@ import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
 import com.salazar.cheers.ui.main.profile.*
 import com.salazar.cheers.ui.main.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
+import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.feed.SetStoryStatusBars
@@ -74,6 +75,15 @@ fun NavGraphBuilder.mainNavGraph(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
+        bottomSheet(
+            route = "${MainDestinations.SHARE_ROUTE}/{partyId}",
+        ) {
+            ShareRoute(
+                appState = appState,
+                navActions = appState.navActions,
+            )
+        }
+
         composable(
             route = MainDestinations.TICKETS_ROUTE,
         ) {

@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
@@ -19,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -151,13 +148,15 @@ fun ConversationList(
     LazyColumn(
         modifier = Modifier.fillMaxHeight()
     ) {
-        items(channels, key = { it.id }) { channel ->
-            SwipeableChatItem(dismissState = rememberDismissState()) {
+        items(items = channels, key = { it.id }) { channel ->
+            SwipeableChatItem(
+                modifier = Modifier.animateItemPlacement(),
+                dismissState = rememberDismissState(),
+            ) {
                 DirectConversation(
-                    modifier = Modifier.animateItemPlacement(),
                     channel = channel,
-                    onChannelClicked,
-                    onLongPress,
+                    onChannelClicked = onChannelClicked,
+                    onLongPress = onLongPress,
                     onCameraClick = onCameraClick,
                 )
             }
@@ -290,13 +289,14 @@ fun DirectConversation(
                             RoomStatus.UNRECOGNIZED -> {}
                         }
                     }
-                    Text(
-                        text = subtitle,
-                        style = Typography.bodySmall,
-                        fontWeight = fontWeight,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                    )
+                    if (channel.status != RoomStatus.EMPTY)
+                        Text(
+                            text = subtitle,
+                            style = Typography.bodySmall,
+                            fontWeight = fontWeight,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
                 }
             }
         }

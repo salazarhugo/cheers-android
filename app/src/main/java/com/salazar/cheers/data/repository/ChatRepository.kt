@@ -23,10 +23,7 @@ import com.salazar.cheers.internal.RoomType
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -154,8 +151,8 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun seenRoom(roomId: String) {
-        chatDao.setStatus(roomId, RoomStatus.RECEIVED)
+    suspend fun setRoomStatus(roomId: String, status: RoomStatus) {
+        chatDao.setStatus(roomId, status)
     }
 
     suspend fun sendImage(
@@ -200,7 +197,7 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun sendMessage(
-        channelId: String,
+        roomId: String,
         text: String
     ): Resource<SendMessageResponse> {
         return withContext(Dispatchers.IO) {
@@ -210,7 +207,7 @@ class ChatRepository @Inject constructor(
 
             val msg = SendMessageRequest.newBuilder()
                 .setClientId(id)
-                .setRoomId(channelId)
+                .setRoomId(roomId)
                 .setText(text)
                 .build()
 
@@ -220,7 +217,7 @@ class ChatRepository @Inject constructor(
                 senderName= user.name,
                 senderUsername = user.username,
                 senderProfilePictureUrl = user.picture ?: "",
-                roomId = channelId,
+                roomId = roomId,
                 text = text,
                 type = com.salazar.cheers.internal.MessageType.TEXT,
                 status = ChatMessageStatus.SCHEDULED,
@@ -232,8 +229,8 @@ class ChatRepository @Inject constructor(
 
             launch {
                 chatDao.insertMessage(message)
-                chatDao.updateLastMessage(channelId, message.text, message.createTime, message.type)
-                chatDao.setStatus(channelId, RoomStatus.SENT)
+                chatDao.updateLastMessage(roomId, message.text, message.createTime, message.type)
+                chatDao.setStatus(roomId, RoomStatus.SENT)
             }
 
             try {

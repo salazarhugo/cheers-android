@@ -30,7 +30,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
@@ -41,7 +40,7 @@ import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.MultiFabState
 import com.salazar.cheers.ui.compose.post.NoPosts
-import com.salazar.cheers.ui.compose.post.PostView
+import com.salazar.cheers.ui.compose.post.PostItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
@@ -129,7 +128,7 @@ fun PostList(
                     onHomeUIAction(HomeUIAction.OnLoadNextItems)
                 }
             }
-            PostView(
+            PostItem(
                 post = post,
                 onHomeUIAction = onHomeUIAction,
                 modifier = Modifier.animateItemPlacement(),

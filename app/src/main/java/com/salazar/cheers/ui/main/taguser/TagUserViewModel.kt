@@ -2,11 +2,9 @@ package com.salazar.cheers.ui.main.taguser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.domain.usecase.ListFriendUseCase
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.domain.usecase.list_friend.ListFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

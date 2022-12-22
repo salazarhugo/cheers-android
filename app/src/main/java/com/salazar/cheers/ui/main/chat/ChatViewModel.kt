@@ -11,6 +11,8 @@ import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.domain.usecase.seen_room.SeenRoomUseCase
+import com.salazar.cheers.domain.usecase.send_message.SendMessageUseCase
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
 import com.salazar.cheers.internal.RoomStatus
@@ -36,6 +38,8 @@ class ChatViewModel @Inject constructor(
     statsHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
+    private val seenRoomUseCase: SeenRoomUseCase,
+    private val sendMessageUseCase: SendMessageUseCase,
 ) : ViewModel() {
 
     lateinit var userID: String
@@ -74,7 +78,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatRepository.getChannel(channelId = channelID).collect { channel ->
                 updateChatChannel(channel)
-                chatRepository.seenRoom(channelID)
+                seenRoomUseCase(roomId = channelID)
             }
         }
         viewModelScope.launch {
@@ -118,7 +122,7 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            val result = chatRepository.sendMessage(channelId = channelId, text)
+            val result = sendMessageUseCase(roomId = channelId, text = text)
             when (result) {
                 is Resource.Error -> updateErrorMessage(result.message)
                 else -> {}

@@ -15,7 +15,7 @@ import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.main.home.HomeUIAction
 
 @Composable
-fun PostView(
+fun PostItem(
     post: Post,
     modifier: Modifier = Modifier,
     onHomeUIAction: (HomeUIAction) -> Unit,
@@ -55,6 +55,7 @@ fun PostView(
             pagerState = pagerState,
             onLike = { onHomeUIAction(HomeUIAction.OnLikeClick(it)) },
             onCommentClick = { onHomeUIAction(HomeUIAction.OnCommentClick(it)) },
+            onShareClick = {  onHomeUIAction(HomeUIAction.OnShareClick(it)) },
         )
     }
 }

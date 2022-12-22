@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -27,6 +28,7 @@ fun PostFooter(
     post: Post,
     onLike: (post: Post) -> Unit,
     onCommentClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
     pagerState: PagerState,
 ) {
     Column(
@@ -45,9 +47,10 @@ fun PostFooter(
 //        Text(postFeed.post.tagUsersId.toString())
 //        Text(postFeed.tagUsers.toString())
         PostFooterButtons(
-            post,
+            post = post,
             onLike = onLike,
             onCommentClick = onCommentClick,
+            onShareClick = onShareClick,
         )
         if (post.type != PostType.TEXT) {
 //            LikedBy(post = postFeed.post)
@@ -85,6 +88,7 @@ fun PostFooterButtons(
     post: Post,
     onLike: (post: Post) -> Unit,
     onCommentClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -106,7 +110,9 @@ fun PostFooterButtons(
                     contentDescription = null
                 )
             }
-            Icon(Icons.Outlined.Share, null)
+            IconButton(onClick = {onShareClick(post.id)}) {
+                Icon(Icons.Outlined.Share, null)
+            }
         }
         if (post.drunkenness > 0)
             DrunkennessLevelIndicator(drunkenness = post.drunkenness)

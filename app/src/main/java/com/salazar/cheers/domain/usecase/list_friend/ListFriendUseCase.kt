@@ -1,4 +1,4 @@
-package com.salazar.cheers.domain.usecase
+package com.salazar.cheers.domain.usecase.list_friend
 
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository

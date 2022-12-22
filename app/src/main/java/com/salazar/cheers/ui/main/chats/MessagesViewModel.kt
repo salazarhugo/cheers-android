@@ -60,11 +60,13 @@ class MessagesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            chatRepository.getChannels().collect { channels ->
-                viewModelState.update {
-                    it.copy(channels = channels, isLoading = false)
-                }
-            }
+            chatRepository.getChannels().collect(::updateRooms)
+        }
+    }
+
+    private fun updateRooms(rooms: List<ChatChannel>) {
+        viewModelState.update {
+            it.copy(channels = rooms, isLoading = false)
         }
     }
 

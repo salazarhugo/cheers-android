@@ -43,6 +43,7 @@ fun EventsScreen(
     onGoingToggle: (Party) -> Unit,
     onQueryChange: (String) -> Unit,
     onMoreClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
     onCreateEventClick: () -> Unit,
 ) {
     Scaffold(
@@ -89,6 +90,7 @@ fun EventsScreen(
                     onInterestedToggle = onInterestedToggle,
                     onMoreClick = onMoreClick,
                     onGoingToggle = onGoingToggle,
+                    onShareClick = onShareClick,
                 )
             }
     }
@@ -101,20 +103,20 @@ fun EventList(
     onInterestedToggle: (Party) -> Unit,
     onGoingToggle: (Party) -> Unit,
     onMoreClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp),
     ) {
         items(events, key = { it.id }) { event ->
-            if (event != null) {
-                Event(
-                    party = event,
-                    onEventClicked = onEventClicked,
-                    onInterestedToggle = onInterestedToggle,
-                    onMoreClick = onMoreClick,
-                    onGoingToggle = onGoingToggle,
-                )
-            }
+            Event(
+                party = event,
+                onEventClicked = onEventClicked,
+                onInterestedToggle = onInterestedToggle,
+                onMoreClick = onMoreClick,
+                onGoingToggle = onGoingToggle,
+                onShareClick = onShareClick,
+            )
         }
     }
 }
@@ -126,7 +128,7 @@ fun Event(
     onInterestedToggle: (Party) -> Unit,
     onGoingToggle: (Party) -> Unit,
     onMoreClick: (String) -> Unit,
-    onShareClick: () -> Unit = {},
+    onShareClick: (String) -> Unit,
 ) {
     Column {
         Box(contentAlignment = Alignment.TopEnd) {
@@ -190,7 +192,7 @@ fun Event(
 
         if (party.hostId == uid)
             FilledTonalButton(
-                onClick = onShareClick,
+                onClick = { onShareClick(party.id)},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
