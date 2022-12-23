@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.main.home
 
 import android.content.Context
-import android.provider.SyncStateContract.Helpers.update
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -16,13 +15,17 @@ import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.paging.DefaultPaginator
 import com.salazar.cheers.data.repository.PostRepository
-import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.domain.usecase.get_unread_chat_counter.GetUnreadChatCounterUseCase
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,6 +48,7 @@ data class HomeUiState(
     val page: Int = 0,
     val storyPage: Int = 0,
     val storyEndReached: Boolean = false,
+    val unreadChatCounter: Int = 0,
 )
 
 @HiltViewModel
@@ -53,6 +57,7 @@ class HomeViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
+    private val getUnreadChatCounterUseCase: GetUnreadChatCounterUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeUiState())
@@ -82,7 +87,7 @@ class HomeViewModel @Inject constructor(
                 it.copy(
                     storyPage = newKey,
                     storyEndReached = items.isEmpty(),
-                    userWithStoriesList =  items,
+                    userWithStoriesList = items,
                 )
             }
         }
@@ -107,7 +112,7 @@ class HomeViewModel @Inject constructor(
                 it.copy(
                     page = newKey,
                     endReached = items.isEmpty(),
-                    posts =  it.posts + items,
+                    posts = it.posts + items,
                 )
             }
         }
@@ -123,34 +128,39 @@ class HomeViewModel @Inject constructor(
         loadNextStories()
 
         viewModelScope.launch {
-            userRepository.getCurrentUserFlow().collect { user ->
-                viewModelState.update {
-                    it.copy(user = user)
-                }
-            }
-        }
-        viewModelScope.launch {
-            postRepository.getPostFeedFlow().collect { posts ->
-                viewModelState.update {
-                    it.copy(posts = posts)
-                }
-            }
+            userRepository.getCurrentUserFlow()
+                .collect(::updateUser)
         }
 
         viewModelScope.launch {
-            storyRepository.feedStory(1, 10).collect {
-                updateStories(userWithStoriesList = it)
-            }
+            getUnreadChatCounterUseCase()
+                .collect(::updateUnreadChatCounter)
+        }
+
+        viewModelScope.launch {
+            postRepository.getPostFeedFlow()
+                .collect(::updatePosts)
+        }
+
+        viewModelScope.launch {
+            storyRepository.feedStory(1, 10)
+                .collect(::updateStories)
         }
     }
 
-    fun updateStories(userWithStoriesList: List<UserWithStories>) {
+    private fun updateUnreadChatCounter(unreadChatCounter: Int) {
+        viewModelState.update {
+            it.copy(unreadChatCounter = unreadChatCounter)
+        }
+    }
+
+    private fun updateStories(userWithStoriesList: List<UserWithStories>) {
         viewModelState.update {
             it.copy(userWithStoriesList = userWithStoriesList)
         }
     }
 
-    fun loadNextStories() {
+    private fun loadNextStories() {
         viewModelScope.launch {
             storyPaginator.loadNextItems()
         }

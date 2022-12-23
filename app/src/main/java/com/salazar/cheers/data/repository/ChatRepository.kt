@@ -264,7 +264,7 @@ class ChatRepository @Inject constructor(
                 .build()
             val response = chatService.getInbox(request = request)
 
-            val rooms = response.inboxList.map { it.room.toChatChannel(uid) }
+            val rooms = response.inboxList.map { it.room.toChatChannel(accountId = uid) }
             chatDao.insertInbox(rooms)
 
             response.inboxList.forEach { roomWithMessages ->

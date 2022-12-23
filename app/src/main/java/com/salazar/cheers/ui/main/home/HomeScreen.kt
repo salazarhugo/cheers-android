@@ -13,7 +13,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -341,11 +343,26 @@ fun HomeTopBar(
                         contentDescription = "Search icon"
                     )
                 }
-                IconButton(onClick = onChatClick) {
-                    Icon(
-                        Icons.Outlined.Send,
-                        contentDescription = "Send icon"
-                    )
+                val unreadChatCount = uiState.unreadChatCounter
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (unreadChatCount > 0)
+                        Badge(
+                            modifier = Modifier.offset(y = (-14).dp, x = 14.dp),
+                        ) {
+                            Text(
+                                text = unreadChatCount.toString(),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
+                    IconButton(onClick = onChatClick) {
+                        Icon(
+                            painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+                            contentDescription = null,
+                        )
+                    }
                 }
             },
         )
@@ -381,7 +398,7 @@ fun Stories(
                     },
                     storyState = user.storyState,
                 )
-        }
+            }
 
         itemsIndexed(
             items = userWithStoriesList,
@@ -392,13 +409,13 @@ fun Stories(
             val viewed = remember(userWithStories.stories) { stories.all { it.viewed } }
 
 //            if (userWithStories.user.id != uid)
-                Story(
-                    modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
-                    username = user.username,
-                    viewed = viewed,
-                    picture = user.picture,
-                    onStoryClick = { onStoryClick(i)},
-                )
+            Story(
+                modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
+                username = user.username,
+                viewed = viewed,
+                picture = user.picture,
+                onStoryClick = { onStoryClick(i) },
+            )
         }
     }
 }
