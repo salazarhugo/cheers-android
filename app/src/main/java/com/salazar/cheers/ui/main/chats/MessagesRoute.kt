@@ -20,23 +20,24 @@ fun MessagesRoute(
 
     MessagesScreen(
         uiState = uiState,
-        onSwipeRefresh = messagesViewModel::onSwipeRefresh,
-        onBackPressed = { navActions.navigateBack() },
-        onActivityIconClicked = {
-        },
-        onChannelClicked = { channelId ->
-            navActions.navigateToChatWithChannelId(channelId)
-        },
-        onLongPress = { channelId ->
-            if (channelId.isNotBlank())
-                navActions.navigateToChatsMoreSheet(channelId)
-        },
         onNewChatClicked = {
             navActions.navigateToNewChat()
         },
-        onFollowToggle = messagesViewModel::onFollowToggle,
-        onUserClick = { navActions.navigateToOtherProfile(it) },
-        onCameraClick = { navActions.navigateToChatCamera(it) },
-        onSearchInputChange = messagesViewModel::onSearchInputChange,
+        onRoomsUIAction =  { action ->
+            when(action) {
+                RoomsUIAction.OnBackPressed -> navActions.navigateBack()
+                is RoomsUIAction.OnPinRoom -> messagesViewModel.onRoomPin(action.roomId)
+                RoomsUIAction.OnSwipeRefresh -> messagesViewModel.onSwipeRefresh()
+                is RoomsUIAction.OnCameraClick -> navActions.navigateToChatCamera(action.id)
+                is RoomsUIAction.OnFollowToggle ->  messagesViewModel.onFollowToggle(action.user)
+                is RoomsUIAction.OnRoomLongPress ->  {
+                    if (action.roomId.isNotBlank())
+                        navActions.navigateToChatsMoreSheet(action.roomId)
+                }
+                is RoomsUIAction.OnSearchInputChange -> messagesViewModel.onSearchInputChange(action.query)
+                is RoomsUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userId)
+                is RoomsUIAction.OnRoomClick -> navActions.navigateToChatWithChannelId(action.roomId)
+            }
+        }
     )
 }

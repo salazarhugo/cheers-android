@@ -1,7 +1,9 @@
 package com.salazar.cheers.ui.compose
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Badge
@@ -113,7 +115,10 @@ fun CheersBottomBar(
     ) {
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.background.compositeOver(Color.White),
-            modifier = Modifier.height(52.dp),
+            modifier = Modifier
+                .navigationBarsPadding()
+                .height(52.dp),
+            windowInsets = BottomAppBarDefaults.windowInsets,
             tonalElevation = 0.dp,
         ) {
             items.forEachIndexed { index, screen ->

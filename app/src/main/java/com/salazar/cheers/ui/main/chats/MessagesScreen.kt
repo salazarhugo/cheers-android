@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.DismissValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.RoomStatus
@@ -36,29 +42,24 @@ import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.user.FollowButton
+import com.salazar.cheers.ui.main.party.Event
+import com.salazar.cheers.ui.main.profile.Post
 import com.salazar.cheers.ui.theme.BlueCheers
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun MessagesScreen(
     uiState: MessagesUiState,
     onNewChatClicked: () -> Unit,
-    onChannelClicked: (channelId: String) -> Unit,
-    onLongPress: (String) -> Unit,
-    onFollowToggle: (User) -> Unit,
-    onUserClick: (String) -> Unit,
-    onActivityIconClicked: () -> Unit,
-    onSwipeRefresh: () -> Unit,
-    onCameraClick: (String) -> Unit,
-    onSearchInputChange: (String) -> Unit,
-    onBackPressed: () -> Unit,
+    onRoomsUIAction: (RoomsUIAction) -> Unit,
 ) {
     Scaffold(
         topBar = {
             Toolbar(
-                onBackPressed = onBackPressed,
+                onBackPressed = { onRoomsUIAction(RoomsUIAction.OnBackPressed) },
                 title = "Chat",
                 actions = {
                     IconButton(onClick = onNewChatClicked) {
@@ -70,18 +71,15 @@ fun MessagesScreen(
     ) {
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
-            onRefresh = { onSwipeRefresh() },
+            onRefresh = { onRoomsUIAction(RoomsUIAction.OnSwipeRefresh) },
             modifier = Modifier.padding(it),
         ) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            Column(
+                modifier = Modifier.background(MaterialTheme.colorScheme.background)
+            ) {
                 Tabs(
                     uiState = uiState,
-                    onChannelClicked = onChannelClicked,
-                    onLongPress = onLongPress,
-                    onFollowToggle = onFollowToggle,
-                    onUserClick = onUserClick,
-                    onCameraClick = onCameraClick,
-                    onSearchInputChange = onSearchInputChange,
+                    onRoomsUIAction = onRoomsUIAction,
                 )
             }
         }
@@ -91,12 +89,7 @@ fun MessagesScreen(
 @Composable
 fun Tabs(
     uiState: MessagesUiState,
-    onChannelClicked: (String) -> Unit,
-    onLongPress: (String) -> Unit,
-    onFollowToggle: (User) -> Unit,
-    onUserClick: (String) -> Unit,
-    onCameraClick: (String) -> Unit,
-    onSearchInputChange: (String) -> Unit,
+    onRoomsUIAction: (RoomsUIAction) -> Unit,
 ) {
     val suggestions = uiState.suggestions
 
@@ -110,7 +103,7 @@ fun Tabs(
         SearchBar(
             modifier = Modifier.padding(horizontal = 16.dp),
             searchInput = uiState.searchInput,
-            onSearchInputChanged = onSearchInputChange,
+            onSearchInputChanged = { onRoomsUIAction(RoomsUIAction.OnSearchInputChange(it))},
             placeholder = {
                 Text("Search")
             },
@@ -119,29 +112,25 @@ fun Tabs(
             },
         )
 
-        if (uiState.channels != null)
-            ConversationList(
-                channels = uiState.channels,
-                onChannelClicked = onChannelClicked,
-                onLongPress = onLongPress,
-                suggestions = suggestions,
-                onFollowToggle = onFollowToggle,
-                onUserClick = onUserClick,
-                onCameraClick = onCameraClick,
-            )
+
+
+        ConversationList(
+            channels = uiState.channels,
+            suggestions = suggestions,
+            onRoomsUIAction = onRoomsUIAction,
+        )
     }
 }
 
 @Composable
 fun ConversationList(
-    channels: List<ChatChannel>,
+    channels: List<ChatChannel>?,
     suggestions: List<User>?,
-    onChannelClicked: (String) -> Unit,
-    onLongPress: (String) -> Unit,
-    onFollowToggle: (User) -> Unit,
-    onUserClick: (String) -> Unit,
-    onCameraClick: (String) -> Unit,
+    onRoomsUIAction: (RoomsUIAction) -> Unit,
 ) {
+    if (channels == null)
+        return
+
     if (channels.isEmpty())
         NoMessages()
 
@@ -149,15 +138,28 @@ fun ConversationList(
         modifier = Modifier.fillMaxHeight()
     ) {
         items(items = channels, key = { it.id }) { channel ->
+            val dismissState = rememberDismissState {
+                return@rememberDismissState when (it) {
+                    DismissValue.DismissedToStart -> {
+                        onRoomsUIAction(RoomsUIAction.OnPinRoom(channel.id))
+                        false
+                    }
+                    DismissValue.DismissedToEnd -> {
+                        false
+                    }
+                    DismissValue.Default -> {
+                        true
+                    }
+                }
+            }
+
             SwipeableChatItem(
                 modifier = Modifier.animateItemPlacement(),
-                dismissState = rememberDismissState(),
+                dismissState = dismissState,
             ) {
                 DirectConversation(
                     channel = channel,
-                    onChannelClicked = onChannelClicked,
-                    onLongPress = onLongPress,
-                    onCameraClick = onCameraClick,
+                    onRoomsUIAction = onRoomsUIAction,
                 )
             }
         }
@@ -173,8 +175,8 @@ fun ConversationList(
             items(suggestions) { user ->
                 UserItem(
                     user = user,
-                    onUserClick = onUserClick,
-                    onFollowToggle = onFollowToggle,
+                    onUserClick = { onRoomsUIAction(RoomsUIAction.OnUserClick(user.id))},
+                    onFollowToggle = {onRoomsUIAction(RoomsUIAction.OnFollowToggle(user))},
                 )
             }
     }
@@ -232,18 +234,21 @@ fun LinkContactsItem() {
 fun DirectConversation(
     modifier: Modifier = Modifier,
     channel: ChatChannel,
-    onChannelClicked: (String) -> Unit,
-    onLongPress: (String) -> Unit,
-    onCameraClick: (String) -> Unit,
+    onRoomsUIAction: (RoomsUIAction) -> Unit,
 ) {
+    val backgroundColor = if (channel.pinned)
+        MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
+    else
+        MaterialTheme.colorScheme.background
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+            .background(backgroundColor)
             .combinedClickable(
-                onClick = { onChannelClicked(channel.id) },
+                onClick = { onRoomsUIAction(RoomsUIAction.OnRoomClick(channel.id)) },
                 onLongClick = {
-                    onLongPress(channel.id)
+                    onRoomsUIAction(RoomsUIAction.OnRoomLongPress(channel.id))
                 })
             .padding(15.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -258,8 +263,6 @@ fun DirectConversation(
             )
             Spacer(modifier = Modifier.width(14.dp))
             Column {
-                val title = channel.name
-
                 val subtitle = buildAnnotatedString {
                     append("  •  ")
                     append(relativeTimeFormatter(epoch = channel.lastMessageTime))
@@ -267,14 +270,9 @@ fun DirectConversation(
 
                 val fontWeight =
                     if (channel.status == RoomStatus.NEW) FontWeight.Bold else FontWeight.Normal
-//                if (title.isNotBlank())
-//                    Text(
-//                        text = title,
-//                        style = Typography.bodyMedium,
-//                        fontWeight = fontWeight,
-//                    )
-//                else
+
                 Username(username = channel.name, verified = channel.verified)
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -316,12 +314,16 @@ fun DirectConversation(
             }
 
             val icon =
-                if (channel.status == RoomStatus.NEW)
+                if (channel.pinned)
+                    Icons.Outlined.PinDrop
+                else if (channel.status == RoomStatus.NEW)
                     Icons.Outlined.Sms
                 else
                     Icons.Outlined.PhotoCamera
 
-            IconButton(onClick = { onCameraClick(channel.id) }) {
+            IconButton(
+                onClick = { onRoomsUIAction(RoomsUIAction.OnCameraClick(channel.id)) },
+            ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = "Camera Icon",

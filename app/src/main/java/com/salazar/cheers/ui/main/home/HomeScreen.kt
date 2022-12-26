@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.main.home
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,9 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,8 +52,6 @@ fun HomeScreen(
     uiState: HomeUiState,
     onHomeUIAction: (HomeUIAction) -> Unit,
 ) {
-    val fabState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
-
     Scaffold(
         topBar = {
             HomeTopBar(
@@ -82,13 +77,6 @@ fun HomeScreen(
                     onHomeUIAction = onHomeUIAction,
                 )
             }
-            val alpha = if (fabState == MultiFabState.EXPANDED) 0.92f else 0f
-            Box(
-                modifier = Modifier
-                    .alpha(animateFloatAsState(alpha).value)
-                    .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
-                    .fillMaxSize()
-            )
         }
     }
 }

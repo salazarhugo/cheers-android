@@ -3,10 +3,7 @@ package com.salazar.cheers.ui.main.chat
 import OnMessageLongClickDialog
 import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -30,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -101,6 +99,7 @@ fun ChatScreen(
                     onChatUIAction = onChatUIAction,
                 )
                 ChatBottomBar(
+                    modifier = Modifier.navigationBarsPadding(),
                     textState = textState,
                     replyMessage = replyMessage,
                     onMessageSent = {
@@ -112,7 +111,6 @@ fun ChatScreen(
                             scrollState.scrollToItem(0)
                         }
                     },
-                    modifier = Modifier.imePadding(),
                     onImageSelectorClick = onImageSelectorClick,
                     micInteractionSource = micInteractionSource,
                     onChatUIAction = onChatUIAction,

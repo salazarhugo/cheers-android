@@ -42,11 +42,14 @@ interface ChatDao {
     @Query("UPDATE room SET lastMessage = :message, lastMessageTime = :time, lastMessageType = :type WHERE id = :channelId")
     fun updateLastMessage(channelId: String, message: String, time: Long, type: MessageType)
 
+    @Query("UPDATE room SET pinned = :pinned WHERE id = :roomId")
+    fun updatePinnedRoom(roomId: String, pinned: Boolean)
+
     @Transaction
     @Query("SELECT * FROM message WHERE roomId = :channelId ORDER BY createTime DESC")
     fun getMessages(channelId: String): Flow<List<ChatMessage>>
 
-    @Query("SELECT * FROM room WHERE accountId = :me ORDER BY lastMessageTime DESC")
+    @Query("SELECT * FROM room WHERE accountId = :me ORDER BY pinned DESC, lastMessageTime DESC")
     fun getChannels(me: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<ChatChannel>>
 
     @Query("SELECT COUNT(id) FROM room WHERE status = :status AND accountId = :accountId")

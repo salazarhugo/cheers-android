@@ -119,7 +119,11 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.CHAT_ROUTE}?channelId={channelId}&userId={userID}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" }),
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { 1000 })
+                              },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             ChatRoute(
                 navActions = appState.navActions,
@@ -380,8 +384,14 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = MainDestinations.MESSAGES_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) }
+            enterTransition = {
+                val dir = if (this.initialState.destination.route?.contains(MainDestinations.CHAT_ROUTE) == true)
+                    -1000
+                else
+                    1000
+                slideInHorizontally(initialOffsetX = { dir })
+                              },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             MessagesRoute(
                 navActions = appState.navActions,

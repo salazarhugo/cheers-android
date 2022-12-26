@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import cheers.chat.v1.Room
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.domain.usecase.pin_room.PinRoomUseCase
 import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.main.home.HomeUIAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -45,6 +48,7 @@ private data class MessagesViewModelState(
 class MessagesViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
+    private val pinRoomUseCase: PinRoomUseCase,
 ) : ViewModel() {
 
     private val viewModelState =
@@ -87,4 +91,22 @@ class MessagesViewModel @Inject constructor(
             userRepository.toggleFollow(user.id)
         }
     }
+
+    fun onRoomPin(roomId: String) {
+        viewModelScope.launch {
+            pinRoomUseCase(roomId = roomId)
+        }
+    }
+}
+
+sealed class RoomsUIAction {
+    object OnBackPressed : RoomsUIAction()
+    object OnSwipeRefresh : RoomsUIAction()
+    data class OnRoomClick(val roomId: String) : RoomsUIAction()
+    data class OnCameraClick(val id: String) : RoomsUIAction()
+    data class OnPinRoom(val roomId: String) : RoomsUIAction()
+    data class OnRoomLongPress(val roomId: String) : RoomsUIAction()
+    data class OnUserClick(val userId: String) : RoomsUIAction()
+    data class OnSearchInputChange(val query: String) : RoomsUIAction()
+    data class OnFollowToggle(val user: User) : RoomsUIAction()
 }

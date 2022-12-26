@@ -22,6 +22,7 @@ data class ChatChannel(
     val status: RoomStatus = RoomStatus.UNRECOGNIZED,
     val accountId: String = "",
     val ownerId: String = "",
+    val pinned: Boolean = false,
 )
 
 enum class RoomStatus {

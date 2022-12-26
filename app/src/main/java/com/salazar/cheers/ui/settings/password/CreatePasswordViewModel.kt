@@ -9,12 +9,11 @@ import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CreatePasswordUiState(
@@ -31,7 +30,7 @@ class CreatePasswordViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(CreatePasswordUiState(isLoading = true))
+    private val viewModelState = MutableStateFlow(CreatePasswordUiState())
 
     val uiState = viewModelState
         .stateIn(
@@ -61,20 +60,21 @@ class CreatePasswordViewModel @Inject constructor(
             updateMessage("Password can't be blank")
             return
         }
-        Firebase.auth.currentUser!!.updatePassword(password)
-            .addOnSuccessListener {
-                Firebase.auth.currentUser?.reload()
-                updateDone(true)
-            }
-            .addOnFailureListener {
-                Log.e("AUTH", "Failed updating password $it")
-                when (it) {
-                    is FirebaseAuthRecentLoginRequiredException -> {}
-                    is FirebaseAuthWeakPasswordException -> {}
-                    is FirebaseAuthInvalidUserException -> {}
+        viewModelScope.launch {
+            authRepository.updatePassword(password = password).collect {
+                when(it) {
+                    is Resource.Success -> {}
+                    is Resource.Error -> updateMessage(it.message.orEmpty())
+                    is Resource.Loading -> updateIsLoading(it.isLoading)
                 }
-                updateMessage(it.message.toString())
             }
+        }
+    }
+
+    fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
+        }
     }
 
     fun updateDone(done: Boolean) {

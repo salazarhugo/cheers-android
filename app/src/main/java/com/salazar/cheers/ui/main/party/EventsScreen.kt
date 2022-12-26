@@ -3,13 +3,12 @@ package com.salazar.cheers.ui.main.party
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.PinDrop
 import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBarDefaults.windowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,8 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Party
@@ -49,17 +46,13 @@ fun EventsScreen(
     Scaffold(
         topBar = {
             Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SearchBar(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                        searchInput = uiState.query,
-                        onSearchInputChanged = onQueryChange,
-                    )
-                }
+                SearchBar(
+                    modifier = Modifier
+                        .windowInsetsPadding(windowInsets)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    searchInput = uiState.query,
+                    onSearchInputChanged = onQueryChange,
+                )
                 ChipGroup(
                     users = listOf(
                         "For you",

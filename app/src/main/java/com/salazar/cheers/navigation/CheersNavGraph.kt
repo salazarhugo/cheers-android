@@ -66,28 +66,27 @@ fun CheersNavGraph(
         sheetElevation = 0.dp,
         modifier = Modifier
             .fillMaxSize()
-            .navigationBarsPadding()
             .imePadding()
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(appState.snackBarHostState) },
-            floatingActionButtonPosition = FabPosition.Center,
-            floatingActionButton = {
-                if (!hide)
-                    FloatingActionButton(
-                        onClick = {
-                            navActions.navigateToAddEvent()
-                        },
-                        modifier = Modifier.offset(y = (+58).dp),
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSecondary
-                        )
-                    }
-            },
+//            floatingActionButtonPosition = FabPosition.Center,
+//            floatingActionButton = {
+//                if (!hide)
+//                    FloatingActionButton(
+//                        onClick = {
+//                            navActions.navigateToAddEvent()
+//                        },
+//                        modifier = Modifier.offset(y = (+58).dp),
+//                        containerColor = MaterialTheme.colorScheme.secondary
+//                    ) {
+//                        Icon(
+//                            Icons.Default.Add,
+//                            contentDescription = null,
+//                            tint = MaterialTheme.colorScheme.onSecondary
+//                        )
+//                    }
+//            },
             bottomBar = {
                 AnimatedVisibility(
                     visible = !hide,
@@ -103,8 +102,12 @@ fun CheersNavGraph(
                 }
             },
         ) { innerPadding ->
+            val padding = if (hide)
+                0.dp
+            else
+                innerPadding.calculateBottomPadding()
             AnimatedNavHost(
-                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+                modifier = Modifier.padding(bottom = padding),
                 route = CheersDestinations.ROOT_ROUTE,
                 navController = appState.navController,
                 startDestination = startDestination,

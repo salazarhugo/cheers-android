@@ -1,12 +1,17 @@
 package com.salazar.cheers.data.repository
 
+import android.util.Log
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.user.v1.GetUserRequest
 import cheers.user.v1.UserServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.mapper.toUser
@@ -62,18 +67,27 @@ class AuthRepository @Inject constructor(
         return Firebase.auth.sendSignInLinkToEmail(email, actionCodeSettings)
     }
 
-    fun reAuthenticate(email: String) {
-//        val user = Firebase.auth.currentUser!!
-//        sendSignInLink(email = email)
-//
-//        val credential = EmailAuthProvider
-//            .getCredentialWithLink("user@example.com", )
-//
-//        user.reauthenticate(credential)
-//            .addOnCompleteListener { Log.d(TAG, "User re-authenticated.") }
+    fun updatePassword(
+        password: String,
+    )  = flow {
+        emit(Resource.Loading(true))
+        try {
+            Firebase.auth.currentUser!!.updatePassword(password).await()
+            Firebase.auth.currentUser?.reload()
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            Log.e("AUTH", "Failed updating password $e")
+            when (e) {
+                is FirebaseAuthRecentLoginRequiredException -> {}
+                is FirebaseAuthWeakPasswordException -> {}
+                is FirebaseAuthInvalidUserException -> {}
+            }
+            emit(Resource.Error(e.message.toString()))
+        }
+        emit(Resource.Loading(false))
     }
 
-    fun getUserAuthState() = callbackFlow {
+fun getUserAuthState() = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser)
         }

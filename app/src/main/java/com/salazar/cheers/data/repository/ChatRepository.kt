@@ -48,6 +48,10 @@ class ChatRepository @Inject constructor(
         }
     }
 
+    fun pinRoom(roomId: String) {
+        chatDao.updatePinnedRoom(roomId = roomId, pinned = true)
+    }
+
     suspend fun getMessages(channelId: String): Flow<List<ChatMessage>> =
         withContext(Dispatchers.IO) {
             return@withContext chatDao.getMessages(channelId = channelId)

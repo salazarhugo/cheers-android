@@ -54,15 +54,11 @@ fun SetStatusBars(
     val systemUiController = rememberSystemUiController()
     val darkIcons = !darkTheme
 
-    val color = if (darkIcons) Color.White else Color(0xFF101010)
+//    val color = if (darkIcons) Color.White else Color(0xFF101010)
 
     LaunchedEffect(Unit) {
-        systemUiController.setStatusBarColor(
+        systemUiController.setSystemBarsColor(
             color = Color.Transparent,
-            darkIcons = darkIcons,
-        )
-        systemUiController.setNavigationBarColor(
-            color = color,
             darkIcons = darkIcons,
         )
     }

@@ -1,8 +1,6 @@
 package com.salazar.cheers.data.db
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.salazar.cheers.data.db.entities.*
@@ -29,7 +27,7 @@ import com.salazar.cheers.internal.*
         UserSuggestion::class,
         Ticket::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
     autoMigrations = []
 )

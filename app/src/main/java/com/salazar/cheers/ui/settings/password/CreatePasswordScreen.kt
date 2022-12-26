@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.ui.compose.share.Toolbar
 
 @Composable
@@ -33,6 +34,7 @@ fun CreatePasswordScreen(
         bottomBar = {
             ShareButton(
                 text = uiState.title,
+                isLoading = uiState.isLoading,
                 onClick = onCreatePassword,
             )
         }
@@ -66,6 +68,7 @@ fun CreatePasswordScreen(
 @Composable
 fun ShareButton(
     text: String,
+    isLoading: Boolean,
     onClick: () -> Unit,
 ) {
     Column(
@@ -73,14 +76,14 @@ fun ShareButton(
         verticalArrangement = Arrangement.Bottom,
     ) {
         DividerM3()
-        Button(
+        ButtonWithLoading(
             onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             shape = MaterialTheme.shapes.medium,
-        ) {
-            Text(text = text)
-        }
+            text = text,
+            isLoading = isLoading,
+        )
     }
 }
