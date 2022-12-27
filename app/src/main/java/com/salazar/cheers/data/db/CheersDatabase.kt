@@ -26,6 +26,7 @@ import com.salazar.cheers.internal.*
         Activity::class,
         UserSuggestion::class,
         Ticket::class,
+        Comment::class,
     ],
     version = 7,
     exportSchema = true,
@@ -43,4 +44,5 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun userPreferenceDao(): UserPreferenceDao
     abstract fun activityDao(): ActivityDao
     abstract fun ticketDao(): TicketDao
+    abstract fun commentDao(): CommentDao
 }

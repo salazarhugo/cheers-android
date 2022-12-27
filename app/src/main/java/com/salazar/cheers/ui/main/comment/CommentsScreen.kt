@@ -32,6 +32,7 @@ import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.comment.CommentItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
@@ -88,12 +89,26 @@ fun Comments(
         }
         if (post != null && post.caption.isNotBlank())
             item {
-                Caption(post = post)
+                CommentItem(
+                    comment = Comment(
+                        username = post.username,
+                        verified = post.verified,
+                        text = post.caption,
+                        createTime = post.createTime,
+                        avatar = post.profilePictureUrl,
+                    ),
+                    canReply = false,
+                    onLike = {},
+                    onReply = {},
+                    onCommentClicked = {},
+                    onDeleteComment = onDeleteComment,
+                )
                 DividerM3()
             }
         if (comments != null)
-            items(comments) { comment ->
-                com.salazar.cheers.ui.compose.comment.Comment(
+            items(comments, key = { it.id }) { comment ->
+                com.salazar.cheers.ui.compose.comment.CommentItem(
+                    modifier = Modifier.animateItemPlacement(),
                     comment = comment,
                     onLike = {},
                     onReply = {},

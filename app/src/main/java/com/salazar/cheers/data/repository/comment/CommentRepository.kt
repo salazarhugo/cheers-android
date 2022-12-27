@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.repository.comment
 
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Party
 import kotlinx.coroutines.flow.Flow
@@ -17,5 +18,5 @@ interface CommentRepository {
     /**
      * List post comments.
      */
-    suspend fun listComment(postId: String): Flow<List<Comment>>
+    suspend fun listComment(postId: String): Flow<Resource<List<Comment>>>
 }

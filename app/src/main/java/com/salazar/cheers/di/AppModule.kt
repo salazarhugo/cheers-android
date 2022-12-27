@@ -241,6 +241,14 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideCommentDao(
+        cheersDatabase: CheersDatabase,
+    ): CommentDao {
+        return cheersDatabase.commentDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideTicketDao(
         cheersDatabase: CheersDatabase,
     ): TicketDao {

@@ -26,15 +26,17 @@ import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.Username
 
 @Composable
-fun Comment(
+fun CommentItem(
     comment: Comment,
+    canReply: Boolean = true,
+    modifier: Modifier = Modifier,
     onLike: () -> Unit,
     onReply: () -> Unit,
     onDeleteComment: (String) -> Unit,
     onCommentClicked: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onCommentClicked() }
             .padding(16.dp, 8.dp),
@@ -57,32 +59,34 @@ fun Comment(
                 contentScale = ContentScale.Crop,
             )
             Spacer(Modifier.width(8.dp))
-            Column(modifier = Modifier.padding(top = 2.dp)) {
+            Column(
+                modifier = Modifier.padding(top = 2.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Username(
                         username = comment.username,
                         verified = comment.verified,
                         textStyle = MaterialTheme.typography.bodyMedium,
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text(comment.text)
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
                     Text(
                         text = relativeTimeFormatter(epoch = comment.createTime),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "Reply",
-                        modifier = Modifier.clickable { onReply() },
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelMedium,
                     )
                 }
+                Text(
+                    text = comment.text,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                if (canReply)
+                Text(
+                    text = "Reply",
+                    modifier = Modifier.clickable { onReply() },
+                    style = MaterialTheme.typography.labelMedium,
+                )
             }
         }
         if (comment.authorId == FirebaseAuth.getInstance().currentUser?.uid)

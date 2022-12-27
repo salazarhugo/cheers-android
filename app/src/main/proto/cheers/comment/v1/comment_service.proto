@@ -42,6 +42,7 @@ message Comment {
   string text = 2;
   int64 create_time = 5;
   string user_id = 3;
+  string post_id = 4;
 }
 
 message CreateCommentRequest {

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.comment.CommentRepository
@@ -20,7 +21,7 @@ data class CommentsUiState(
     val user: User? = null,
     val comments: List<Comment>? = null,
     val isLoading: Boolean = false,
-    val errorMessages: List<String> = emptyList(),
+    val errorMessage: String? = null,
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
     val input: String = "",
@@ -72,9 +73,17 @@ class CommentsViewModel @Inject constructor(
         }
     }
 
-    private fun updateComments(comments: List<Comment>) {
-        viewModelState.update {
-            it.copy(comments = comments)
+    private fun updateComments(resource: Resource<List<Comment>>) {
+        when(resource) {
+            is Resource.Error ->  viewModelState.update {
+                it.copy(errorMessage = resource.message)
+            }
+            is Resource.Loading -> viewModelState.update {
+                it.copy(isLoading = resource.isLoading)
+            }
+            is Resource.Success -> viewModelState.update {
+                it.copy(comments = resource.data)
+            }
         }
     }
 
