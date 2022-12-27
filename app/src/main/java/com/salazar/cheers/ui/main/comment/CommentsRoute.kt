@@ -15,8 +15,7 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 fun CommentsRoute(
     commentsViewModel: CommentsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
-
-    ) {
+) {
     val uiState by commentsViewModel.uiState.collectAsState()
 
     CommentsScreen(
@@ -26,5 +25,6 @@ fun CommentsRoute(
         onInputChange = commentsViewModel::onInputChange,
         onBackPressed = { navActions.navigateBack() },
         onDeleteComment = commentsViewModel::deleteComment,
+        onSwipeRefresh = { commentsViewModel.onSwipeRefresh() },
     )
 }

@@ -6,15 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.repository.comment.CommentRepository
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,6 +32,7 @@ class CommentsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
+    private val commentRepository: CommentRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CommentsUiState(isLoading = true))
@@ -63,11 +62,19 @@ class CommentsViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            FirestoreUtil.getComments(postId).collect { comments ->
-                viewModelState.update {
-                    it.copy(comments = comments)
-                }
-            }
+            commentRepository.listComment(postId = postId).collect(::updateComments)
+        }
+    }
+
+    fun onSwipeRefresh() {
+        viewModelScope.launch {
+            commentRepository.listComment(postId = postId).collect(::updateComments)
+        }
+    }
+
+    private fun updateComments(comments: List<Comment>) {
+        viewModelState.update {
+            it.copy(comments = comments)
         }
     }
 
@@ -100,7 +107,7 @@ class CommentsViewModel @Inject constructor(
             text = text,
         )
         viewModelScope.launch {
-            postRepository.commentPost(comment = comment)
+            commentRepository.createComment(postId = postId, comment = comment.text)
         }
         onInputChange("")
     }

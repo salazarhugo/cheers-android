@@ -1,7 +1,11 @@
 package com.salazar.cheers.ui.main.chat
 
+import android.content.Context
+import android.media.MediaRecorder
 import android.net.Uri
-import android.util.Log
+import android.os.Environment
+import android.os.Environment.getExternalStorageDirectory
+import android.provider.MediaStore
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,19 +13,22 @@ import androidx.lifecycle.viewModelScope
 import cheers.chat.v1.Message
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.models.generateRecordingName
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.domain.usecase.seen_room.SeenRoomUseCase
 import com.salazar.cheers.domain.usecase.send_message.SendMessageUseCase
 import com.salazar.cheers.internal.ChatChannel
 import com.salazar.cheers.internal.ChatMessage
-import com.salazar.cheers.internal.RoomStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 data class ChatUiState(
@@ -31,11 +38,13 @@ data class ChatUiState(
     val messages: List<ChatMessage> = emptyList(),
     val textState: TextFieldValue = TextFieldValue(),
     val replyMessage: ChatMessage? = null,
+    val isRecording: Boolean = false,
 )
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     statsHandle: SavedStateHandle,
+    @ApplicationContext private val context: Context,
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
     private val seenRoomUseCase: SeenRoomUseCase,
@@ -93,9 +102,9 @@ class ChatViewModel @Inject constructor(
     fun sendImageMessage(images: List<Uri>) {
         val channel = uiState.value.channel
         if (channel != null)
-        viewModelScope.launch {
-            chatRepository.sendImage(channel.id, images)
-        }
+            viewModelScope.launch {
+                chatRepository.sendImage(channel.id, images)
+            }
     }
 
     suspend fun createGroupChat(): Result<String> {
@@ -111,7 +120,7 @@ class ChatViewModel @Inject constructor(
             var channelId = uiState.value.channel?.id!!
             if (!hasChannel) {
                 val result = createGroupChat()
-                when(result) {
+                when (result) {
                     is Result.Success -> {
                         channelId = result.data
                         loadChannel(result.data)
@@ -143,9 +152,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun unsendMessage(messageId: String) {
-        viewModelScope.launch {
-//            FirestoreChat.unsendMessage(channelId = channelId, messageId = messageId)
-        }
+        // TODO Unsend message
     }
 
     fun onTextChanged(textState: TextFieldValue) {
@@ -161,22 +168,18 @@ class ChatViewModel @Inject constructor(
             return
         }
 
-//        typingJob = viewModelScope.launch {
-//            chatRepository.startTyping(channelId = channelId)
-//            delay(2000L)
-//        }
+        typingJob = viewModelScope.launch {
+            // TODO Start Typing
+            delay(2000L)
+        }
     }
 
     fun likeMessage(messageId: String) {
-        viewModelScope.launch {
-//            FirestoreChat.likeMessage(channelId = channelId, messageId = messageId)
-        }
+        //TODO Like Message
     }
 
     fun unlikeMessage(messageId: String) {
-        viewModelScope.launch {
-//            FirestoreChat.unlikeMessage(channelId = channelId, messageId = messageId)
-        }
+        //TODO Unlike Message
     }
 
     fun onReplyMessage(message: ChatMessage?) {
@@ -186,10 +189,67 @@ class ChatViewModel @Inject constructor(
         // Jump to bottom
         // Open keyboard
     }
+
+    fun updateIsRecording(isRecording: Boolean) {
+        viewModelState.update {
+            it.copy(isRecording = isRecording)
+        }
+    }
+
+
+    var recorder: MediaRecorder? = null
+
+    fun startRecording() {
+        val fileName = generateRecordingName("")
+
+
+        val path = context.externalCacheDir?.absolutePath + fileName
+        val dir = File(path)
+        if (!dir.exists())
+            dir.createNewFile()
+
+        recorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setOutputFile(path)
+
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setAudioEncodingBitRate(16 * 44100)
+            setAudioSamplingRate(44100)
+        }
+
+        try {
+            recorder?.prepare()
+            recorder?.start()
+            updateIsRecording(true)
+        } catch (e: IOException) {
+            updateIsRecording(false)
+        }
+    }
+
+    fun stopRecording() {
+        recorder?.apply {
+            stop()
+            reset()
+            release()
+        }
+        recorder = null
+        updateIsRecording(false)
+//        readRecordings()
+    }
 }
 
 sealed class ChatUIAction {
+    object OnBackPressed : ChatUIAction()
     object OnSwipeRefresh : ChatUIAction()
-    data class OnLikeClick(val message: Message) : ChatUIAction()
+    object OnImageSelectorClick : ChatUIAction()
+    data class OnTextInputChange(val text: TextFieldValue) : ChatUIAction()
+    data class OnCopyText(val text: String) : ChatUIAction()
+    data class OnRoomInfoClick(val roomId: String) : ChatUIAction()
+    data class OnUserClick(val userId: String) : ChatUIAction()
+    data class OnLikeClick(val messageId: String) : ChatUIAction()
+    data class OnUnLikeClick(val messageId: String) : ChatUIAction()
     data class OnReplyMessage(val message: ChatMessage?) : ChatUIAction()
+    data class OnUnSendMessage(val messageId: String) : ChatUIAction()
+    data class OnSendTextMessage(val text: String) : ChatUIAction()
 }

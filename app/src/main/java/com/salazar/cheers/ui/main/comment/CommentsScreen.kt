@@ -47,6 +47,7 @@ fun CommentsScreen(
     onBackPressed: () -> Unit,
     onInputChange: (String) -> Unit,
     onDeleteComment: (String) -> Unit,
+    onSwipeRefresh: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -63,7 +64,7 @@ fun CommentsScreen(
     ) {
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
-            onRefresh = { Unit },
+            onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {
             Comments(
@@ -196,6 +197,7 @@ fun CommentBottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .imePadding()
+            .navigationBarsPadding()
     ) {
         DividerM3()
         Row(

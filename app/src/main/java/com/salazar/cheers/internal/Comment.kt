@@ -16,3 +16,15 @@ data class Comment(
     val text: String = "",
     val createTime: Long = 0L,
 )
+
+fun cheers.comment.v1.CommentItem.toComment(): Comment {
+    return Comment(
+        id = comment.id,
+        text = comment.text,
+        createTime = comment.createTime,
+        avatar = userItem.picture,
+        authorId = userItem.id,
+        verified = userItem.verified,
+        username = userItem.username,
+    )
+}

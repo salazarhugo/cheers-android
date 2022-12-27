@@ -5,7 +5,6 @@ import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -27,7 +26,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -36,15 +34,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.compose.animations.AnimateHeart
 import com.salazar.cheers.ui.compose.chat.*
-import com.salazar.cheers.internal.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,29 +50,15 @@ const val ConversationTestTag = "ConversationTestTag"
 
 @Composable
 fun ChatScreen(
-    replyMessage: ChatMessage?,
-    channel: ChatChannel,
-    textState: TextFieldValue,
-    messages: List<ChatMessage>,
-    onMessageSent: (msg: String) -> Unit,
-    onUnsendMessage: (msgId: String) -> Unit,
-    onLike: (msgId: String) -> Unit,
-    onUnlike: (msgId: String) -> Unit,
-    onTitleClick: (username: String) -> Unit,
-    onCopyText: (String) -> Unit,
-    onAuthorClick: (String) -> Unit,
-    onImageSelectorClick: () -> Unit,
-    onPoBackStack: () -> Unit,
-    onTextChanged: (TextFieldValue) -> Unit,
-    onInfoClick: (String) -> Unit,
+    uiState: ChatUiState,
     onChatUIAction: (ChatUIAction) -> Unit,
-    micInteractionSource: MutableInteractionSource,
 ) {
     val scrollState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
     val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }
+    val channel = uiState.channel
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -85,55 +68,71 @@ fun ChatScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 Messages(
-                    seen = channel.status == RoomStatus.OPENED,
-                    isGroup = channel.type == RoomType.GROUP,
-                    messages = messages,
-                    navigateToProfile = onAuthorClick,
+                    seen = uiState.channel?.status == RoomStatus.OPENED,
+                    isGroup = uiState.channel?.type == RoomType.GROUP,
+                    messages = uiState.messages,
+                    navigateToProfile = {
+                        onChatUIAction(ChatUIAction.OnUserClick(it))
+                    },
                     modifier = Modifier.weight(1f),
                     scrollState = scrollState,
                     onLongClickMessage = {
                         openDialog.value = true
-//                        selectedMessage.value = it
                     },
-                    onDoubleTapMessage = onLike,
+                    onDoubleTapMessage = {
+                        onChatUIAction(ChatUIAction.OnLikeClick(it))
+                    },
                     onChatUIAction = onChatUIAction,
                 )
                 ChatBottomBar(
                     modifier = Modifier.navigationBarsPadding(),
-                    textState = textState,
-                    replyMessage = replyMessage,
+                    textState = uiState.textState,
+                    replyMessage = uiState.replyMessage,
                     onMessageSent = {
-                        onMessageSent(it)
+                        onChatUIAction(ChatUIAction.OnSendTextMessage(it))
                     },
-                    onTextChanged = onTextChanged,
+                    onTextChanged = {
+                        onChatUIAction(ChatUIAction.OnTextInputChange(it))
+                    },
                     resetScroll = {
                         scope.launch {
                             scrollState.scrollToItem(0)
                         }
                     },
-                    onImageSelectorClick = onImageSelectorClick,
-                    micInteractionSource = micInteractionSource,
+                    onImageSelectorClick = {
+                        onChatUIAction(ChatUIAction.OnImageSelectorClick)
+                    },
                     onChatUIAction = onChatUIAction,
                 )
             }
-            if (channel.type == RoomType.DIRECT)
+            if (channel?.type == RoomType.DIRECT)
                 DirectChatBar(
                     name = channel.name,
                     verified = channel.verified,
                     picture = channel.picture,
-                    onNavIconPressed = { onPoBackStack() },
-                    onTitleClick = onTitleClick,
+                    onNavIconPressed = {
+                        onChatUIAction(ChatUIAction.OnBackPressed)
+                    },
+                    onTitleClick = {
+                        onChatUIAction(ChatUIAction.OnUserClick(it))
+                    },
                     scrollBehavior = scrollBehavior,
-                    onInfoClick = { onInfoClick(channel.id) },
+                    onInfoClick = {
+                        onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
+                    },
                 )
-            else if (channel.type == RoomType.GROUP)
+            else if (channel?.type == RoomType.GROUP)
                 GroupChatBar(
                     name = channel.name,
                     members = channel.members.size,
                     picture = channel.picture,
-                    onNavIconPressed = { onPoBackStack() },
+                    onNavIconPressed = {
+                        onChatUIAction(ChatUIAction.OnBackPressed)
+                    },
                     onTitleClick = {},
-                    onInfoClick = { onInfoClick(channel.id) },
+                    onInfoClick = {
+                        onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
+                    },
                     scrollBehavior = scrollBehavior,
                 )
         }
@@ -143,12 +142,20 @@ fun ChatScreen(
 
     if (openDialog.value && a != null)
         OnMessageLongClickDialog(
-            openDialog,
+            openDialog = openDialog,
             msg = a,
-            onUnsendMessage = onUnsendMessage,
-            onCopyText = onCopyText,
-            onLike = onLike,
-            onUnlike = onUnlike,
+            onUnsendMessage = {
+                onChatUIAction(ChatUIAction.OnUnSendMessage(it))
+            },
+            onCopyText = {
+                onChatUIAction(ChatUIAction.OnCopyText(it))
+            },
+            onLike = {
+                onChatUIAction(ChatUIAction.OnLikeClick(it))
+            },
+            onUnlike = {
+                onChatUIAction(ChatUIAction.OnUnLikeClick(it))
+            },
         )
 }
 
@@ -175,47 +182,48 @@ fun Messages(
                 .testTag(ConversationTestTag)
                 .fillMaxSize()
         ) {
-                for (index in messages.indices) {
-                    val prevAuthor = messages.getOrNull(index - 1)?.senderId
-                    val nextAuthor = messages.getOrNull(index + 1)?.senderId
-                    val prevMessage = messages.getOrNull(index - 1)
-                    val message = messages[index]
-                    val isFirstMessageByAuthor = prevAuthor != message.senderId
-                    val isLastMessageByAuthor = nextAuthor != message.senderId
+            for (index in messages.indices) {
+                val prevAuthor = messages.getOrNull(index - 1)?.senderId
+                val nextAuthor = messages.getOrNull(index + 1)?.senderId
+                val prevMessage = messages.getOrNull(index - 1)
+                val message = messages[index]
+                val isFirstMessageByAuthor = prevAuthor != message.senderId
+                val isLastMessageByAuthor = nextAuthor != message.senderId
 
                 if (!DateUtils.isToday(message.createTime * 1000) &&
-                    DateUtils.isToday((prevMessage?.createTime ?: 0) * 1000)) {
+                    DateUtils.isToday((prevMessage?.createTime ?: 0) * 1000)
+                ) {
                     item {
                         DayHeader("Today")
                     }
                 }
 
-                    item {
-                        val dismissState = rememberDismissState(
-                            confirmStateChange = {
-                                if (it == DismissValue.DismissedToStart) {
-                                    onChatUIAction(ChatUIAction.OnReplyMessage(message))
-                                    return@rememberDismissState false
-                                }
-                                true
+                item {
+                    val dismissState = rememberDismissState(
+                        confirmStateChange = {
+                            if (it == DismissValue.DismissedToStart) {
+                                onChatUIAction(ChatUIAction.OnReplyMessage(message))
+                                return@rememberDismissState false
                             }
-                        )
-                        SwipeableMessage(dismissState = dismissState) {
-                            Message(
-//                        modifier = Modifier.animateItemPlacement(),
-                                onAuthorClick = { name -> navigateToProfile(name) },
-                                onLongClickMessage = onLongClickMessage,
-                                onDoubleTapMessage = onDoubleTapMessage,
-                                message = message,
-                                isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
-                                isGroup = isGroup,
-                                seen = index == 0 && seen,
-                                isFirstMessageByAuthor = isFirstMessageByAuthor,
-                                isLastMessageByAuthor = isLastMessageByAuthor,
-                            )
+                            true
                         }
+                    )
+                    SwipeableMessage(dismissState = dismissState) {
+                        Message(
+//                        modifier = Modifier.animateItemPlacement(),
+                            onAuthorClick = { name -> navigateToProfile(name) },
+                            onLongClickMessage = onLongClickMessage,
+                            onDoubleTapMessage = onDoubleTapMessage,
+                            message = message,
+                            isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
+                            isGroup = isGroup,
+                            seen = index == 0 && seen,
+                            isFirstMessageByAuthor = isFirstMessageByAuthor,
+                            isLastMessageByAuthor = isLastMessageByAuthor,
+                        )
                     }
                 }
+            }
         }
 
         val jumpThreshold = with(LocalDensity.current) {
@@ -446,11 +454,11 @@ fun ChatItemBubble(
             shape = shape,
             modifier = Modifier
                 .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = { onLongClickMessage(message.id) },
-                    onDoubleTap = { onDoubleTapMessage(message.id) }
-                )
-            }
+                    detectTapGestures(
+                        onLongPress = { onLongClickMessage(message.id) },
+                        onDoubleTap = { onDoubleTapMessage(message.id) }
+                    )
+                }
         ) {
             Row(
                 modifier = Modifier.padding(start = 12.dp),

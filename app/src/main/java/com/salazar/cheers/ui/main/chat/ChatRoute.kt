@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.ui.compose.NoScreenshot
 import java.io.File
 import java.io.IOException
 
@@ -46,81 +47,44 @@ fun ChatRoute(
     val micInteractionSource = remember { MutableInteractionSource() }
     val isPressed by micInteractionSource.collectIsPressedAsState()
 
-    val mediaRecorder = remember { MediaRecorder() }
     if (isPressed) {
         Permission(permission = Manifest.permission.RECORD_AUDIO) {
             Permission(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                LaunchedEffect(Unit) {
-                    mediaRecorder.startRecording()
+                SideEffect {
+                    chatViewModel.startRecording()
                 }
                 DisposableEffect(Unit) {
                     onDispose {
-                        mediaRecorder.stopRecording()
+                        chatViewModel.stopRecording()
                     }
                 }
             }
         }
     }
 
+    NoScreenshot()
+
     val channel = uiState.channel
     if (channel == null)
         LoadingScreen()
     else
         ChatScreen(
-            textState = uiState.textState,
-            channel = channel,
-            replyMessage = uiState.replyMessage,
-            messages = uiState.messages,
-            onTitleClick = { navActions.navigateToOtherProfile(it) },
-            onPoBackStack = { navActions.navigateBack() },
-            onUnlike = chatViewModel::unlikeMessage,
-            onLike = chatViewModel::likeMessage,
-            onUnsendMessage = chatViewModel::unsendMessage,
-            onMessageSent = chatViewModel::sendTextMessage,
-            onImageSelectorClick = { launcher.launch("image/*") },
-            onCopyText = {},
-            onAuthorClick = { navActions.navigateToOtherProfile(it) },
-            onTextChanged = chatViewModel::onTextChanged,
-            onInfoClick = { navActions.navigateToRoomDetails(it) },
-            micInteractionSource = micInteractionSource,
-            onChatUIAction = { chatAction ->
-                when (chatAction) {
-                    is ChatUIAction.OnReplyMessage -> chatViewModel.onReplyMessage(chatAction.message)
-                    is ChatUIAction.OnLikeClick -> TODO()
+            uiState = uiState,
+            onChatUIAction = { action ->
+                when (action) {
+                    is ChatUIAction.OnReplyMessage -> chatViewModel.onReplyMessage(action.message)
+                    is ChatUIAction.OnLikeClick -> chatViewModel.likeMessage(action.messageId)
+                    is ChatUIAction.OnUnLikeClick -> chatViewModel.unlikeMessage(action.messageId)
                     is ChatUIAction.OnSwipeRefresh -> TODO()
+                    is ChatUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userId)
+                    is ChatUIAction.OnBackPressed -> navActions.navigateBack()
+                    is ChatUIAction.OnUnSendMessage -> chatViewModel.unsendMessage(action.messageId)
+                    is ChatUIAction.OnSendTextMessage -> chatViewModel.sendTextMessage(action.text)
+                    is ChatUIAction.OnImageSelectorClick -> launcher.launch("image/*")
+                    is ChatUIAction.OnCopyText -> TODO()
+                    is ChatUIAction.OnTextInputChange -> chatViewModel.onTextChanged(action.text)
+                    is ChatUIAction.OnRoomInfoClick -> navActions.navigateToRoomDetails(action.roomId)
                 }
             },
         )
-}
-
-private fun MediaRecorder.startRecording() {
-
-    var audiofile: File? = null
-
-    val dir = Environment.getExternalStorageDirectory()
-    try {
-        audiofile = File.createTempFile("sound", ".3gp", dir)
-    } catch (e: IOException) {
-        Log.e(TAG, e.toString())
-        return
-    }
-
-    setAudioSource(MediaRecorder.AudioSource.MIC)
-    setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-    setOutputFile(audiofile.absolutePath)
-
-    try {
-        prepare()
-    } catch (e: IOException) {
-        Log.e("TAG", e.toString())
-    }
-
-    start()
-}
-
-fun MediaRecorder.stopRecording() {
-    stop()
-    reset()
-    release()
 }
