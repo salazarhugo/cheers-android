@@ -39,7 +39,6 @@ fun AddPostRoute(
         AddPostPage.AddPost ->
             AddPostScreen(
                 uiState = uiState,
-                profilePictureUrl = uiState.profilePictureUrl,
                 onCaptionChanged = addPostViewModel::onCaptionChanged,
                 onSelectLocation = addPostViewModel::selectLocation,
                 onUploadPost = addPostViewModel::uploadPost,

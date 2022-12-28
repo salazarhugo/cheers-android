@@ -13,7 +13,7 @@ interface CommentRepository {
     /**
      * Create a comment on a post.
      */
-    suspend fun createComment(postId: String, comment: String): Result<Unit>
+    suspend fun createComment(postId: String, comment: Comment): Result<Unit>
 
     /**
      * List post comments.

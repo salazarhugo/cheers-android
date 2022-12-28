@@ -8,6 +8,7 @@ import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.comment.CommentRepository
+import com.salazar.cheers.domain.usecase.create_comment.CreateCommentUseCase
 import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -34,6 +35,7 @@ class CommentsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
     private val commentRepository: CommentRepository,
+    private val createCommentUseCase: CreateCommentUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CommentsUiState(isLoading = true))
@@ -99,7 +101,6 @@ class CommentsViewModel @Inject constructor(
     }
 
     fun deleteComment(commentId: String) {
-        FirestoreUtil.deleteComment(commentId = commentId)
     }
 
     fun onComment() {
@@ -116,7 +117,7 @@ class CommentsViewModel @Inject constructor(
             text = text,
         )
         viewModelScope.launch {
-            commentRepository.createComment(postId = postId, comment = comment.text)
+            createCommentUseCase(postId = postId, comment = comment.text)
         }
         onInputChange("")
     }

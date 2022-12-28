@@ -6,10 +6,8 @@ import cheers.chat.v1.Room
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.domain.usecase.pin_room.PinRoomUseCase
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.Post
+import com.salazar.cheers.domain.models.ChatChannel
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.home.HomeUIAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

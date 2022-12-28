@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.usecase.seen_room
 
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.di.IODispatcher
-import com.salazar.cheers.internal.RoomStatus
+import com.salazar.cheers.domain.models.RoomStatus
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext

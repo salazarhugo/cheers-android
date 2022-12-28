@@ -71,10 +71,6 @@ object Utils {
         return isLowerCase(this) && hasValidChars(this) && matches(regex)
     }
 
-    fun getCurrentUserToken(): String {
-        return ""
-    }
-
     fun Context.copyToClipboard(text: CharSequence) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("label", text)
@@ -119,17 +115,6 @@ object Utils {
         return currentNightMode == Configuration.UI_MODE_NIGHT_YES
     }
 
-    fun getImageUri(
-        inContext: Context,
-        inImage: Bitmap
-    ): Uri? {
-//        val bytes = ByteArrayOutputStream()
-//        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path =
-            MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "", null)
-        return Uri.parse(path)
-    }
-
     fun getOutputFileOptions(
         lensFacing: Int,
         photoFile: File
@@ -163,28 +148,6 @@ object Utils {
         }
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else this.filesDir
-    }
-
-    fun openPhotoVideoChooser(
-        resultLauncher: ActivityResultLauncher<Intent>,
-        allowMultiple: Boolean = false
-    ) {
-        val intent = Intent()
-        intent.type = "image/* video/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple)
-        resultLauncher.launch(Intent.createChooser(intent, "Select Picture"))
-    }
-
-    fun openPhotoChooser(
-        resultLauncher: ActivityResultLauncher<Intent>,
-        allowMultiple: Boolean = false
-    ) {
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple)
-        resultLauncher.launch(Intent.createChooser(intent, "Select Picture"))
     }
 
     fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap? {

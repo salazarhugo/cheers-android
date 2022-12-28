@@ -12,8 +12,6 @@ import com.salazar.cheers.util.Constants.URI
 
 
 object FirebaseDynamicLinksUtil {
-
-
     fun createShortLink(url: String): Task<ShortDynamicLink> {
         return Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
             link = Uri.parse("$URI/$url")

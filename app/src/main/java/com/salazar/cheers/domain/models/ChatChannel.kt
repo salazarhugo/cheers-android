@@ -1,4 +1,4 @@
-package com.salazar.cheers.internal
+package com.salazar.cheers.domain.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

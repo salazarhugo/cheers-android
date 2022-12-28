@@ -22,9 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.ui.compose.chat.FunctionalityNotAvailablePanel
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.main.story.feed.SetStoryStatusBars
+import com.salazar.cheers.ui.compose.chat.FunctionalityNotAvailablePanel
 import kotlinx.coroutines.launch
 
 /**
@@ -93,13 +92,14 @@ fun CameraRoute(
                         cameraViewModel.onSwitchCameraClicked()
                     is CameraUIAction.OnCameraClick -> {
                         imageCapture.takePicture(
-                            context,
-                            uiState.lensFacing,
-                            uiState.flashMode,
-                            { uri, fromGallery ->
+                            context = context,
+                            lensFacing = uiState.lensFacing,
+                            flashMode = uiState.flashMode,
+                            onImageCaptured = { uri, fromGallery ->
                                 cameraViewModel.setImageUri(uri)
                             },
-                            {})
+                            onError = {},
+                        )
                     }
                     is CameraUIAction.OnGalleryViewClick -> {
                         launcher.launch("image/* video/*")

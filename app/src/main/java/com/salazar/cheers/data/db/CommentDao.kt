@@ -15,7 +15,7 @@ interface CommentDao {
     @Query("DELETE FROM comments WHERE postId = :postId")
     suspend fun clear(postId: String)
 
-    @Query("SELECT * FROM comments WHERE postId = :postId")
+    @Query("SELECT * FROM comments WHERE postId = :postId ORDER BY createTime DESC")
     fun listPostComments(postId: String): Flow<List<Comment>>
 
     @Query("SELECT * FROM comments WHERE id = :id")

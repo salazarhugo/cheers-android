@@ -14,9 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,12 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.RoomStatus
+import com.salazar.cheers.domain.models.ChatChannel
+import com.salazar.cheers.domain.models.RoomStatus
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.LoadingScreen
@@ -42,12 +37,9 @@ import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.user.FollowButton
-import com.salazar.cheers.ui.main.party.Event
-import com.salazar.cheers.ui.main.profile.Post
 import com.salazar.cheers.ui.theme.BlueCheers
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
-import kotlinx.coroutines.launch
 
 
 @Composable

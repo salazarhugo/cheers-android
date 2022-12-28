@@ -21,6 +21,7 @@ import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -71,12 +72,12 @@ class AddPostViewModel @Inject constructor(
         stateHandle.get<String>("photoUri")?.let {
             addPhoto(Uri.parse(it))
         }
-//        viewModelScope.launch {
-//            val user = userRepository.getCurrentUser()
-//            viewModelState.update {
-//                it.copy(profilePictureUrl = user.picture)
-//            }
-//        }
+        viewModelScope.launch {
+            val user = userRepository.getCurrentUser()
+            viewModelState.update {
+                it.copy(profilePictureUrl = user.picture)
+            }
+        }
     }
 
 

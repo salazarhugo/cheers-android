@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.salazar.cheers.data.db.entities.*
+import com.salazar.cheers.domain.models.ChatChannel
+import com.salazar.cheers.domain.models.ChatMessage
 import com.salazar.cheers.internal.*
 
 

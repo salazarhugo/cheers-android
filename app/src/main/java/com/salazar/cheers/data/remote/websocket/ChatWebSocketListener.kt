@@ -3,10 +3,10 @@ package com.salazar.cheers.data.remote.websocket
 import android.util.Log
 import com.google.gson.Gson
 import com.salazar.cheers.data.db.ChatDao
-import com.salazar.cheers.internal.ChatMessage
-import com.salazar.cheers.internal.ChatMessageStatus
-import com.salazar.cheers.internal.MessageType
-import com.salazar.cheers.internal.RoomStatus
+import com.salazar.cheers.domain.models.ChatMessage
+import com.salazar.cheers.domain.models.ChatMessageStatus
+import com.salazar.cheers.domain.models.MessageType
+import com.salazar.cheers.domain.models.RoomStatus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.Response

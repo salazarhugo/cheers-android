@@ -1,10 +1,10 @@
 package com.salazar.cheers.data.mapper
 
 import cheers.chat.v1.Room
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.MessageType
-import com.salazar.cheers.internal.RoomStatus
-import com.salazar.cheers.internal.RoomType
+import com.salazar.cheers.domain.models.ChatChannel
+import com.salazar.cheers.domain.models.MessageType
+import com.salazar.cheers.domain.models.RoomStatus
+import com.salazar.cheers.domain.models.RoomType
 
 fun Room.toChatChannel(accountId: String): ChatChannel {
     return ChatChannel(

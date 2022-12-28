@@ -31,7 +31,7 @@ fun StoryFeedRoute(
         }
     }
 
-    SetStoryStatusBars()
+//    SetStoryStatusBars()
 
     StoryFeedScreen(
         uiState = uiState,

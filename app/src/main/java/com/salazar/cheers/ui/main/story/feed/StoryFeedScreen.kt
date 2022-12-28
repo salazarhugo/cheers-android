@@ -85,7 +85,9 @@ fun StoryFeedCarousel(
     val currentPage = pagerState.currentPage
 
     HorizontalPager(
-        modifier = Modifier,
+        modifier = Modifier
+            .background(Color.Black)
+            .systemBarsPadding(),
         count = usersWithStories.size,
         state = pagerState,
         verticalAlignment = Alignment.Top,
@@ -96,7 +98,6 @@ fun StoryFeedCarousel(
         UserWithStories(
             isCurrentPage = currentPage == page,
             modifier = Modifier
-                .background(Color.Black)
                 .carousel(pageOffset),
             userWithStories = userWithStories,
             onStoryFeedUIAction = onStoryFeedUIAction,

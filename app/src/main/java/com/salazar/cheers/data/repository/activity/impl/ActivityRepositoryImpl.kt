@@ -6,33 +6,35 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.ActivityDao
 import com.salazar.cheers.data.mapper.toActivity
-import javax.inject.Inject
-import javax.inject.Singleton
 import com.salazar.cheers.data.repository.activity.ActivityRepository
 import com.salazar.cheers.internal.Activity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class ActivityRepositoryImpl @Inject constructor(
     private val activityDao: ActivityDao,
     private val service: ActivityServiceGrpcKt.ActivityServiceCoroutineStub,
-): ActivityRepository {
+) : ActivityRepository {
 
     override suspend fun listActivity(): Flow<Resource<List<Activity>>> = flow {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+
         emit(Resource.Loading(true))
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-        val activities = activityDao.listActivity(uid)
-
-        emit(Resource.Success(activities))
+        val localActivities = activityDao.listActivity(uid)
+        emit(Resource.Success(localActivities))
 
 
         val remoteActivities = try {
             val request = ListActivityRequest.newBuilder().build()
             val response = service.listActivity(request)
 
-            response.activitiesList.map { it.toActivity(uid) }
+            response.activitiesList.map {
+                it.toActivity(uid)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             emit(Resource.Error("Couldn't refresh activity"))
@@ -40,9 +42,8 @@ class ActivityRepositoryImpl @Inject constructor(
         }
 
         remoteActivities?.let { activities ->
-            activityDao.insertAll(activities)
-            val localActivities = activityDao.listActivity(uid)
-            emit(Resource.Success(localActivities))
+            activityDao.insertActivities(activities)
+            emit(Resource.Success(activityDao.listActivity(uid)))
         }
 
         emit(Resource.Loading(false))

@@ -254,7 +254,6 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(MainDestinations.CAMERA_ROUTE) {
-            SetStoryStatusBars()
             CameraRoute(
                 navActions = appState.navActions
             )

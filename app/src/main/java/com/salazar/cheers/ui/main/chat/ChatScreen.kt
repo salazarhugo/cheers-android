@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.domain.models.*
 import com.salazar.cheers.ui.compose.animations.AnimateHeart
 import com.salazar.cheers.ui.compose.chat.*
 import kotlinx.coroutines.launch

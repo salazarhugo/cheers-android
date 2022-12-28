@@ -73,8 +73,12 @@ fun CameraScreen(
 ) {
     Scaffold(
         modifier = Modifier
-            .fillMaxSize(),
+            .background(Color.Black)
+            .systemBarsPadding()
+            .fillMaxSize()
+        ,
         containerColor = Color.Black,
+        contentWindowInsets = WindowInsets.systemBars,
         bottomBar = {
             CameraFooter(
                 imageTaken = uiState.imageUri != null,

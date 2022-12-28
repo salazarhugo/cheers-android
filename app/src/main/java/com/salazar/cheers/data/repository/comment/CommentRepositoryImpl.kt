@@ -16,16 +16,12 @@ class CommentRepositoryImpl @Inject constructor(
     private val commentDao: CommentDao,
     private val service: CommentServiceGrpcKt.CommentServiceCoroutineStub,
 ) : CommentRepository {
-    override suspend fun createComment(postId: String, comment: String): Result<Unit> {
-        val localComment = Comment(
-            postId = postId,
-            text = comment,
-            createTime = Date().time / 1000
-        )
-        commentDao.insert(localComment)
+    override suspend fun createComment(postId: String, comment: Comment): Result<Unit> {
+
+        commentDao.insert(comment)
 
         val request = CreateCommentRequest.newBuilder()
-            .setComment(comment)
+            .setComment(comment.text)
             .setPostId(postId)
             .build()
 

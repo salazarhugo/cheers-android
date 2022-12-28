@@ -67,7 +67,6 @@ import java.util.*
 @Composable
 fun AddPostScreen(
     uiState: AddPostUiState,
-    profilePictureUrl: String?,
     onDismiss: () -> Unit,
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
@@ -134,7 +133,7 @@ fun AddPostScreen(
                     modifier = Modifier
                         .padding(start = 15.dp, end = 15.dp)
                         .fillMaxWidth(),
-                    profilePictureUrl = profilePictureUrl,
+                    profilePictureUrl = uiState.profilePictureUrl,
                     caption = uiState.caption,
                     onCaptionChanged = onCaptionChanged,
                     photos = uiState.photos,

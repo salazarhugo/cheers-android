@@ -7,8 +7,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import cheers.chat.v1.*
-import cheers.chat.v1.Message
-import cheers.chat.v1.MessageType
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
@@ -17,16 +15,15 @@ import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toChatChannel
 import com.salazar.cheers.data.mapper.toTextMessage
 import com.salazar.cheers.data.mapper.toUserItem
-import com.salazar.cheers.internal.*
-import com.salazar.cheers.internal.RoomStatus
-import com.salazar.cheers.internal.RoomType
+import com.salazar.cheers.domain.models.*
+import com.salazar.cheers.domain.models.RoomStatus
+import com.salazar.cheers.domain.models.RoomType
 import com.salazar.cheers.workers.UploadImageMessage
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -202,50 +199,27 @@ class ChatRepository @Inject constructor(
 
     suspend fun sendMessage(
         roomId: String,
-        text: String
+        message: ChatMessage,
     ): Resource<SendMessageResponse> {
-        return withContext(Dispatchers.IO) {
-            val user = userRepository.getCurrentUser()
+        chatDao.insertMessage(message)
+        chatDao.updateLastMessage(roomId, message.text, message.createTime, message.type)
+        chatDao.setStatus(roomId, RoomStatus.SENT)
 
-            val id = UUID.randomUUID().toString()
+        val msg = SendMessageRequest.newBuilder()
+            .setClientId(message.id)
+            .setRoomId(roomId)
+            .setText(message.text)
+            .build()
 
-            val msg = SendMessageRequest.newBuilder()
-                .setClientId(id)
-                .setRoomId(roomId)
-                .setText(text)
-                .build()
+        return try {
+            val response = chatService.sendMessage(msg)
+            val textMessage = response.message.toTextMessage().copy(id = message.id)
+            chatDao.insertMessage(textMessage)
 
-            val message = ChatMessage(
-                id = id,
-                senderId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
-                senderName= user.name,
-                senderUsername = user.username,
-                senderProfilePictureUrl = user.picture ?: "",
-                roomId = roomId,
-                text = text,
-                type = com.salazar.cheers.internal.MessageType.TEXT,
-                status = ChatMessageStatus.SCHEDULED,
-                photoUrl = "",
-                seenBy = emptyList(),
-                likedBy = emptyList(),
-                createTime = Date().time / 1000,
-            )
-
-            launch {
-                chatDao.insertMessage(message)
-                chatDao.updateLastMessage(roomId, message.text, message.createTime, message.type)
-                chatDao.setStatus(roomId, RoomStatus.SENT)
-            }
-
-            try {
-                val response = chatService.sendMessage(msg)
-                chatDao.insertMessage(response.message.toTextMessage().copy(id = message.id))
-
-                return@withContext Resource.Success(response)
-            } catch (e: StatusException) {
-                e.printStackTrace()
-                return@withContext Resource.Error(e.localizedMessage)
-            }
+            Resource.Success(response)
+        } catch (e: StatusException) {
+            e.printStackTrace()
+            Resource.Error(e.localizedMessage)
         }
     }
 

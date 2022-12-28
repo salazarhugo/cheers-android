@@ -1,31 +1,24 @@
 package com.salazar.cheers.data.repository.story.impl
 
-import android.util.Log
-import cheers.story.v1.*
 import androidx.paging.PagingData
-import androidx.room.withTransaction
-import cheers.post.v1.FeedPostRequest
+import cheers.story.v1.*
 import cheers.type.StoryOuterClass
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.repository.story.StoryRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 import com.salazar.cheers.data.db.StoryDao
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserWithStories
-import com.salazar.cheers.data.mapper.toPost
+import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.mapper.toStory
 import com.salazar.cheers.data.mapper.toUser
-import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.main.story.fakeUsersWIthStories
-import com.salazar.cheers.ui.sheets.DeleteStoryDialog
+import com.salazar.cheers.data.repository.story.StoryRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class StoryRepositoryImpl @Inject constructor(
@@ -33,7 +26,7 @@ class StoryRepositoryImpl @Inject constructor(
     private val storyDao: StoryDao,
     private val database: CheersDatabase,
     private val service: StoryServiceGrpcKt.StoryServiceCoroutineStub,
-): StoryRepository {
+) : StoryRepository {
 
     override suspend fun createStory(story: StoryOuterClass.Story): Result<Unit> {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
@@ -52,17 +45,17 @@ class StoryRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStory(storyId: String?): kotlin.Result<Story> {
+    override suspend fun getStory(storyId: String?): Result<Story> {
         TODO("Not yet implemented")
     }
 
     override suspend fun feedStory(
         page: Int,
         pageSize: Int
-    ): Flow<List<UserWithStories>>  {
+    ): Flow<List<UserWithStories>> {
         val skip = pageSize * (page - 1)
         return storyDao.feedStory(skip, pageSize)
-            .map {  userWithStories ->
+            .map { userWithStories ->
                 userWithStories
                     // Remove users with no stories
                     .filter { it.stories.isNotEmpty() }
@@ -82,13 +75,25 @@ class StoryRepositoryImpl @Inject constructor(
         try {
             val response = service.feedStory(request)
             val remoteUserWithStoriesList = response.itemsList
-            val userWithStoriesList = remoteUserWithStoriesList.map {  userWithStories ->
-                UserWithStories(userWithStories.user.toUser(), stories = userWithStories.storiesList.map { it.toStory(userWithStories.user.id, uid) })
+            val userWithStoriesList = remoteUserWithStoriesList.map { userWithStories ->
+                UserWithStories(
+                    userWithStories.user.toUser(),
+                    stories = userWithStories.storiesList.map {
+                        it.toStory(
+                            userWithStories.user.id,
+                            uid
+                        )
+                    })
             }
 
             remoteUserWithStoriesList.forEach { userWithStories ->
                 val user = userWithStories.user.toUser()
-                val stories = userWithStories.storiesList.map { it.toStory(authorId = user.id, accountId = uid) }
+                val stories = userWithStories.storiesList.map {
+                    it.toStory(
+                        authorId = user.id,
+                        accountId = uid
+                    )
+                }
 
                 userDao.insert(user)
                 storyDao.insertAll(stories)

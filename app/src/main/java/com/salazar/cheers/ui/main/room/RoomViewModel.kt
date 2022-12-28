@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.ChatChannel
+import com.salazar.cheers.domain.models.ChatChannel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

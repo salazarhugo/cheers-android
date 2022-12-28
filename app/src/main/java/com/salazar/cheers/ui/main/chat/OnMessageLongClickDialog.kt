@@ -8,7 +8,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.domain.models.ChatMessage
 
 @Composable
 fun OnMessageLongClickDialog(

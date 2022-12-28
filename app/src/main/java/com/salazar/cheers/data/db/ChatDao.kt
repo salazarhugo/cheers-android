@@ -2,8 +2,7 @@ package com.salazar.cheers.data.db
 
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.protobuf.Timestamp
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.domain.models.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -3,14 +3,10 @@ package com.salazar.cheers.ui.main.chat
 import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
-import android.os.Environment
-import android.os.Environment.getExternalStorageDirectory
-import android.provider.MediaStore
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.chat.v1.Message
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.models.generateRecordingName
@@ -18,8 +14,8 @@ import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.domain.usecase.seen_room.SeenRoomUseCase
 import com.salazar.cheers.domain.usecase.send_message.SendMessageUseCase
-import com.salazar.cheers.internal.ChatChannel
-import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.domain.models.ChatChannel
+import com.salazar.cheers.domain.models.ChatMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job

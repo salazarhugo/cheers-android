@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.ChatMessage
+import com.salazar.cheers.domain.models.ChatMessage
 import com.salazar.cheers.ui.main.chat.ChatUIAction
 
 

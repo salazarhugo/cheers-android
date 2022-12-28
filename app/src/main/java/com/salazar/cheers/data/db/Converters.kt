@@ -3,6 +3,9 @@ package com.salazar.cheers.data.db
 import androidx.room.TypeConverter
 import com.google.protobuf.Timestamp
 import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.domain.models.MessageType
+import com.salazar.cheers.domain.models.RoomStatus
+import com.salazar.cheers.domain.models.RoomType
 import com.salazar.cheers.internal.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

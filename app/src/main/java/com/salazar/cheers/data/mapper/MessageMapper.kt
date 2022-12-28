@@ -1,10 +1,10 @@
 package com.salazar.cheers.data.mapper
 
 import cheers.chat.v1.Message
-import com.salazar.cheers.internal.ChatMessage
-import com.salazar.cheers.internal.ChatMessageStatus
+import com.salazar.cheers.domain.models.ChatMessage
+import com.salazar.cheers.domain.models.ChatMessageStatus
 import com.salazar.cheers.internal.ImageMessage
-import com.salazar.cheers.internal.MessageType
+import com.salazar.cheers.domain.models.MessageType
 
 fun Message.toTextMessage(): ChatMessage {
     return ChatMessage(
