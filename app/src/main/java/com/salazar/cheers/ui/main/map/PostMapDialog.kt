@@ -16,6 +16,7 @@ import com.salazar.cheers.ui.compose.post.PostHeader
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.ui.compose.post.PostItem
 import com.salazar.cheers.ui.main.detail.PostFooter
 
 
@@ -36,9 +37,9 @@ fun PostMapScreen(
         )
         Column {
             if (uiState.selectedPost != null)
-                Post(
+                PostItem(
                     post = uiState.selectedPost,
-                    onUserClick = onUserClick,
+                    onHomeUIAction = {},
                 )
         }
     }

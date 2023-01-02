@@ -26,7 +26,7 @@ interface StoryDao {
     suspend fun getUserStory(username: String): List<Story>
 
     @Query("SELECT * FROM users LIMIT :pageSize OFFSET :skip")
-    fun feedStory(skip: Int, pageSize: Int): Flow<List<UserWithStories>>
+    fun feedStory(skip: Int, pageSize: Int, now: Long = Date().time / 1000): Flow<List<UserWithStories>>
 
     @Query("SELECT * FROM story WHERE storyId = :storyId")
     suspend fun getStory(storyId: String): Story?
