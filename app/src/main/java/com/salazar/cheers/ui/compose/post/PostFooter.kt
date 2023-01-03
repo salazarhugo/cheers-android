@@ -14,6 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -22,6 +27,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.ui.compose.animations.Bounce
+import com.salazar.cheers.ui.compose.extensions.noRippleClickable
 
 @Composable
 fun PostFooter(
@@ -57,10 +63,10 @@ fun PostFooter(
 //            if (post.tagUsers.isNotEmpty())
 //                TagUsers(postFeed.tagUsers)
         }
-//        PostComments(
-//            commentCount = 402,
-//            onCommentClick = { onCommentClick(post.id) },
-//        )
+        PostComments(
+            post = post,
+            onCommentClick = { onCommentClick(post.id) },
+        )
     }
     if (post.type != PostType.TEXT)
         Spacer(Modifier.height(12.dp))
@@ -68,19 +74,58 @@ fun PostFooter(
 
 @Composable
 fun PostComments(
-    commentCount: Int = 0,
+    post: Post,
     onCommentClick: () -> Unit,
 ) {
-    val text = if (commentCount > 1) "View all $commentCount comments" else "View 1 comment"
+    if (post.lastCommentText.isBlank())
+        return
 
+    val commentCount = post.comments
+
+    val text = if (commentCount > 1)
+        "View all $commentCount comments"
+    else
+        "View 1 comment"
+
+    PostLastComment(
+        username = post.lastCommentUsername,
+        text = post.lastCommentText,
+        createTime = post.lastCommentCreateTime,
+    )
     if (commentCount > 0)
+        Spacer(Modifier.height(8.dp))
         Text(
             text = text,
             modifier = Modifier
-                .clickable { onCommentClick() }
-                .padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
+                .noRippleClickable {
+                    onCommentClick()
+                },
+            style = MaterialTheme.typography.labelMedium,
         )
+
+}
+
+@Composable
+fun PostLastComment(
+    username: String,
+    text: String,
+    createTime: Long,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        val annotatedString = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(text = username)
+            }
+            append(" ")
+            append(text)
+        }
+        Text(
+            text = annotatedString,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
 }
 
 @Composable
@@ -110,7 +155,7 @@ fun PostFooterButtons(
                     contentDescription = null
                 )
             }
-            IconButton(onClick = {onShareClick(post.id)}) {
+            IconButton(onClick = { onShareClick(post.id) }) {
                 Icon(Icons.Outlined.Share, null)
             }
         }

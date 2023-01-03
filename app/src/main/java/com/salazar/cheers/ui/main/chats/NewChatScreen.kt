@@ -63,6 +63,7 @@ fun NewChatScreen(
                 onClick = onFabClick,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .navigationBarsPadding()
                     .padding(12.dp),
                 shape = MaterialTheme.shapes.medium,
             )

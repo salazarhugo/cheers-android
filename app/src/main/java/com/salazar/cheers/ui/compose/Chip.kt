@@ -24,6 +24,9 @@ fun ChipGroup(
     isPrimary: Boolean = false,
     onSelectedChanged: (String) -> Unit = {},
 ) {
+    if (users.isEmpty())
+        return
+
     Column(modifier = Modifier.padding(8.dp)) {
         LazyRow {
             items(users) {

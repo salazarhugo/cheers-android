@@ -56,4 +56,7 @@ data class Post(
     val tagUsersId: List<String> = emptyList(),
     val type: String = PostType.TEXT,
     val accountId: String = "",
+    val lastCommentText: String = "",
+    val lastCommentUsername: String = "",
+    val lastCommentCreateTime: Long = 0,
 )
