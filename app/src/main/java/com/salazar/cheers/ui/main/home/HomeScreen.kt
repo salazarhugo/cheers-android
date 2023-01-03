@@ -88,7 +88,7 @@ fun PostList(
 ) {
     LazyColumn(
         state = uiState.listState,
-        modifier = Modifier.fillMaxHeight(),
+//        modifier = Modifier.fillMaxHeight(),
     ) {
         item {
             Stories(
@@ -111,7 +111,10 @@ fun PostList(
             UploadingSection()
         }
 
-        items(uiState.posts.size) { i ->
+        items(
+            count = uiState.posts.size,
+            key = { uiState.posts[it].id },
+        ) { i ->
             val post = uiState.posts[i]
             if (i >= uiState.posts.size - 1 && !uiState.endReached && !uiState.isLoading) {
                 LaunchedEffect(Unit) {
@@ -124,26 +127,6 @@ fun PostList(
                 modifier = Modifier.animateItemPlacement(),
             )
         }
-
-//        itemsIndexed(
-//            items = uiState.posts,
-//            key = { _, post -> post.id },
-//        ) { i, post ->
-//
-//            if ((i - 1) % 3 == 0 && uiState.nativeAd != null) {
-//                DividerM3()
-//                NativeAdPost(ad = uiState.nativeAd)
-//            }
-//
-//            if (post != null)
-//                PostView(
-//                    post = post,
-//                    onHomeUIAction = onHomeUIAction,
-//                    modifier = Modifier.animateItemPlacement(),
-//                )
-//            else
-//                PostPlaceholder()
-//        }
 
         item {
             if (uiState.isLoading) {
@@ -273,89 +256,6 @@ fun WhatsUpSection(
                 tint = MaterialTheme.colorScheme.primary
             )
         }
-    }
-}
-
-@Composable
-fun HomeTopBar(
-    uiState: HomeUiState,
-    notificationCount: Int,
-    onSearchClick: () -> Unit,
-    onActivityClick: () -> Unit,
-    onChatClick: () -> Unit,
-) {
-    val showDivider by remember {
-        derivedStateOf {
-            uiState.listState.firstVisibleItemIndex > 0
-        }
-    }
-
-    Column {
-        val icon =
-            if (isSystemInDarkTheme()) R.drawable.ic_cheers_logo else R.drawable.ic_cheers_logo
-        TopAppBar(
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-            colors = TopAppBarDefaults.topAppBarColors(),
-            navigationIcon = {
-                Image(
-                    painter = painterResource(icon),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .size(34.dp),
-                    contentDescription = null,
-                )
-            },
-            title = {
-                Image(
-                    painter = painterResource(R.drawable.cheers_logo),
-                    modifier = Modifier
-                        .height(34.dp),
-                    contentDescription = null,
-                )
-            },
-            actions = {
-                IconButton(onClick = onActivityClick) {
-                    BadgedBox(badge = {
-                        if (notificationCount > 0)
-                            Badge { Text(text = notificationCount.toString()) }
-                    }) {
-                        Icon(
-                            Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Search icon"
-                        )
-                    }
-                }
-                IconButton(onClick = onSearchClick) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(model = R.drawable.ic_search_icon),
-                        contentDescription = "Search icon"
-                    )
-                }
-                val unreadChatCount = uiState.unreadChatCounter
-
-                Box(
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (unreadChatCount > 0)
-                        Badge(
-                            modifier = Modifier.offset(y = (-14).dp, x = 14.dp),
-                        ) {
-                            Text(
-                                text = unreadChatCount.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            )
-                        }
-                    IconButton(onClick = onChatClick) {
-                        Icon(
-                            painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                            contentDescription = null,
-                        )
-                    }
-                }
-            },
-        )
-        if (showDivider)
-            DividerM3()
     }
 }
 

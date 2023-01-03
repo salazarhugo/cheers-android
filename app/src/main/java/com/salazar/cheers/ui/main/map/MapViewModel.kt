@@ -12,6 +12,7 @@ import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.ui.main.home.HomeUIAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -97,4 +98,8 @@ class MapViewModel @Inject constructor(
         }
         refreshPosts()
     }
+
+    fun onMyLocationClick() {
+    }
 }
+

@@ -74,6 +74,7 @@ fun SignInScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .animateContentSize(),
         ) {
             Column(

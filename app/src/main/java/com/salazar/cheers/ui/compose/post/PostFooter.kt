@@ -96,7 +96,7 @@ fun PostComments(
         createTime = post.lastCommentCreateTime,
     )
     if (commentCount > 0)
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(4.dp))
         Text(
             text = text,
             modifier = Modifier

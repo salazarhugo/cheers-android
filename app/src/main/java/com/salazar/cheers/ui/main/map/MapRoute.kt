@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.main.map
 
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,21 +32,26 @@ fun MapRoute(
 
     MapScreen(
         uiState = uiState,
-        onCityChanged = { mapViewModel.updateCity(it) },
-        onSelectPost = {
-            scope.launch {
-                uiState.postSheetState.animateTo(ModalBottomSheetValue.HalfExpanded)
+        onMapUIAction = { action ->
+            when(action) {
+                MapUIAction.OnBackPressed -> navActions.navigateBack()
+                MapUIAction.OnCreatePostClick -> navActions.navigateToCreatePost()
+                MapUIAction.OnPublicToggle -> mapViewModel.onTogglePublic()
+                MapUIAction.OnSwipeRefresh -> TODO()
+                is MapUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userID)
+                is MapUIAction.OnMapReady -> {
+                    scope.launch {
+                        mapViewModel.mapRepository.onMapReady(action.map, action.ctx)
+                    }
+                }
+                is MapUIAction.OnPostClick -> {
+                    scope.launch {
+                        uiState.postSheetState.animateTo(ModalBottomSheetValue.HalfExpanded)
+                    }
+                    mapViewModel.selectPost(action.post)
+                }
+                MapUIAction.OnMyLocationClick -> mapViewModel.onMyLocationClick()
             }
-            mapViewModel.selectPost(it)
         },
-        navigateToSettingsScreen = { },
-        onTogglePublic = mapViewModel::onTogglePublic,
-        onAddPostClicked = { navActions.navigateToAddPostSheet() },
-        onUserClick = { navActions.navigateToOtherProfile(it) },
-        onMapReady = { map, c ->
-            scope.launch {
-                mapViewModel.mapRepository.onMapReady(map, c)
-            }
-        },
-        )
+    )
 }

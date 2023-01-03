@@ -51,7 +51,6 @@ import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
-import com.salazar.cheers.ui.main.story.feed.SetStoryStatusBars
 import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
@@ -188,7 +187,7 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
-            route = "${MainDestinations.ADD_POST_SHEET}?photoUri={photoUri}",
+            route = "${MainDestinations.CREATE_POST_ROUTE}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
             AddPostRoute(

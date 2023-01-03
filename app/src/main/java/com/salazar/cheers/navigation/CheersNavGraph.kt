@@ -4,16 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,7 +18,6 @@ import com.salazar.cheers.CheersUiState
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
 import com.salazar.cheers.ui.theme.GreySheet
-import kotlinx.serialization.json.JsonNull.content
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -55,7 +49,7 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
                 || currentRoute.contains(MainDestinations.POST_COMMENTS)
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
-                || currentRoute.contains(MainDestinations.ADD_POST_SHEET)
+                || currentRoute.contains(MainDestinations.CREATE_POST_ROUTE)
                 || currentRoute.contains(MainDestinations.EDIT_PROFILE_ROUTE)
                 || currentRoute.contains(MainDestinations.CAMERA_ROUTE)
 

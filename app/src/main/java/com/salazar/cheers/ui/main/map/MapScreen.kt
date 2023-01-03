@@ -13,10 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.NearMe
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.PublicOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -44,6 +42,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.ui.compose.extensions.noRippleClickable
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.util.Utils
 import com.salazar.cheers.util.Utils.getCircularBitmapWithWhiteBorder
@@ -56,13 +55,7 @@ import java.net.URL
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    onCityChanged: (String) -> Unit,
-    onSelectPost: (Post) -> Unit,
-    onTogglePublic: () -> Unit,
-    navigateToSettingsScreen: () -> Unit,
-    onAddPostClicked: () -> Unit,
-    onMapReady: (MapView, Context) -> Unit,
-    onUserClick: (String) -> Unit,
+    onMapUIAction: (MapUIAction) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -86,7 +79,7 @@ fun MapScreen(
         sheetContent = {
             PostMapScreen(
                 uiState = uiState,
-                onUserClick = onUserClick,
+                onUserClick = { onMapUIAction(MapUIAction.OnUserClick(it)) },
             )
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -97,39 +90,35 @@ fun MapScreen(
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = {},
+                    onClick = { onMapUIAction(MapUIAction.OnCreatePostClick) },
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.background,
                 ) {
-                    Icon(Icons.Default.NearMe, null)
+                    Icon(Icons.Default.Add, null)
                 }
             }
         ) {
             it
             Box(
                 contentAlignment = Alignment.BottomCenter,
-//                modifier = Modifier.padding(it),
             ) {
                 Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
                         factory = {
-                            onMapReady(mapView, context)
+                            onMapUIAction(MapUIAction.OnMapReady(mapView, context))
                             mapView
                         },
                     ) { mapView ->
-//                        addUserAnnotations(
-//                            context = context,
-//                            features = uiState.users,
-//                            mapView = mapView,
-//                        )
                         scope.launch {
                             uiState.posts?.forEach { post ->
                                 launch {
                                     addPostsAnnotation(
                                         post = post,
                                         mapView = mapView,
-                                        onSelectPost = onSelectPost,
+                                        onSelectPost = { post ->
+                                            onMapUIAction(MapUIAction.OnPostClick(post))
+                                        }
                                     )
                                 }
                             }
@@ -139,11 +128,9 @@ fun MapScreen(
                         uiState = uiState,
                         modifier = Modifier
                             .systemBarsPadding()
+                            .fillMaxSize()
                             .align(Alignment.TopCenter),
-                        onSelectPost = onSelectPost,
-                        onTogglePublic = onTogglePublic,
-                        isPublic = uiState.isPublic,
-                        onAddPostClicked = onAddPostClicked,
+                        onMapUIAction = onMapUIAction,
                     )
                 }
             }
@@ -198,59 +185,41 @@ suspend fun addPostsAnnotation(
 fun UiLayer(
     uiState: MapUiState,
     modifier: Modifier = Modifier,
-    isPublic: Boolean,
-    onSelectPost: (Post) -> Unit,
-    onTogglePublic: () -> Unit,
-    onAddPostClicked: () -> Unit,
+    onMapUIAction: (MapUIAction) -> Unit,
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    Surface(
-        shape = RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-        modifier = modifier
-            .padding(8.dp)
-            .clickable {
-                scope.launch { uiState.postSheetState.hide() }
-                       },
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(
-            text = uiState.city,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        MapTopBar(
+            isPublic = uiState.isPublic,
+            onMapUIAction = onMapUIAction,
         )
+        MapBottomBar()
     }
+}
 
-    if (uiState.postSheetState.isVisible)
-        Surface(
-            shape = RoundedCornerShape(22.dp),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-            modifier = modifier
-                .padding(8.dp)
-                .clickable {
-                    scope.launch { uiState.postSheetState.hide() }
-                           },
-        ) {
-            Icon(
-                Icons.Default.Close,
-                contentDescription = null,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            )
-        }
-    Surface(
-        shape = RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.background,
-        modifier = modifier
-            .padding(8.dp)
-            .clickable { onTogglePublic() },
-    ) {
-        val icon = if (isPublic) Icons.Default.Public else Icons.Default.PublicOff
-        Icon(
-            icon,
-            contentDescription = null,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        )
+@Composable
+fun MapTopBar(
+    isPublic: Boolean,
+    onMapUIAction: (MapUIAction) -> Unit,
+) {
+    val icon = when (isPublic)  {
+        true -> Icons.Default.Public
+        false -> Icons.Default.PublicOff
     }
+    MapButton(
+        icon = icon,
+        onClick = { onMapUIAction(MapUIAction.OnPublicToggle) },
+    )
+    MapButton(
+        icon = Icons.Default.NearMe,
+        onClick = { onMapUIAction(MapUIAction.OnMyLocationClick) },
+    )
+}
+
+@Composable
+fun MapBottomBar() {
 }
 
 private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) {
@@ -299,3 +268,22 @@ private fun bitmapFromDrawableRes(
     Utils.convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
 
 
+@Composable
+fun MapButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier
+            .padding(8.dp)
+            .noRippleClickable { onClick() },
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        )
+    }
+}

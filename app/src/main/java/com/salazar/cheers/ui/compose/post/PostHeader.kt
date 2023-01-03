@@ -39,9 +39,8 @@ fun PostHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-//            .background(MaterialTheme.colorScheme.surface)
             .clickable { onHeaderClicked(username) }
-            .padding(16.dp, 11.dp),
+            .padding(16.dp, 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

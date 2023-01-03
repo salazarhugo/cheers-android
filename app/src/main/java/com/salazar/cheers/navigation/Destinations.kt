@@ -47,7 +47,7 @@ object MainDestinations {
     const val POST_DETAIL_ROUTE = "postDetail"
     const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val GUEST_LIST_ROUTE = "guestList"
-    const val ADD_POST_SHEET = "addPostSheet"
+    const val CREATE_POST_ROUTE = "createPost"
     const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
@@ -279,7 +279,7 @@ class CheersNavigationActions(
     }
 
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
-        navController.navigate("${MainDestinations.ADD_POST_SHEET}?photoUri=$photoUri") {
+        navController.navigate("${MainDestinations.CREATE_POST_ROUTE}?photoUri=$photoUri") {
             popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
         }
@@ -306,8 +306,8 @@ class CheersNavigationActions(
         }
     }
 
-    val navigateToAddPostSheet: () -> Unit = {
-        navController.navigate(MainDestinations.ADD_POST_SHEET) {
+    val navigateToCreatePost: () -> Unit = {
+        navController.navigate(MainDestinations.CREATE_POST_ROUTE) {
             popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
             restoreState = true
