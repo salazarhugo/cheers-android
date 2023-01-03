@@ -71,73 +71,18 @@ class CreatePostWorker @AssistedInject constructor(
         val notify =
             inputData.getBoolean("NOTIFY", true)
 
+        val postBuilder = PostOuterClass.Post.newBuilder()
+            .setCaption(photoCaption)
+            .setLatitude(latitude)
+            .setLongitude(longitude)
+            .setDrunkenness(drunkenness.toLong())
+            .setDrink(beverage)
+            .setLocationName(locationName)
+
         try {
             when (postType) {
-                PostType.VIDEO -> {
-//                    val videoUri = Uri.parse(mediaUri) ?: return Result.failure()
-//
-//                    val ref = StorageUtil.currentUserRef.child("posts/${UUID.randomUUID()}")
-//                    val uploadTask = ref.putFile(videoUri)
-//
-//                    uploadTask.addOnProgressListener {
-//                        val progress = (100.0 * it.bytesTransferred) / it.totalByteCount
-//                        setProgressAsync(workDataOf("Progress" to progress))
-//                    }.continueWithTask {
-//                        ref.downloadUrl
-//                    }.addOnSuccessListener { downloadUri ->
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-////                            val videoThumbnail: Bitmap = ThumbnailUtils.createVideoThumbnail(File(videoUri.path), Size(120, 120), null)
-//                            val videoThumbnail: Bitmap = appContext.contentResolver.loadThumbnail(
-//                                videoUri,
-//                                Size(1080, 1080),
-//                                null
-//                            )
-//                            val thumbnailBytes = extractBitmap(videoThumbnail)
-//
-//                            StorageUtil.uploadPostImage(thumbnailBytes) { thumbnailUrl ->
-//                                val post = Post(
-//                                    name = name,
-//                                    type = postType,
-//                                    authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
-//                                    caption = photoCaption,
-//                                    videoUrl = downloadUri.toString(),
-//                                    videoThumbnailUrl = thumbnailUrl,
-//                                    locationName = locationName,
-//                                    locationLatitude = latitude,
-//                                    locationLongitude = longitude,
-//                                    privacy = privacy,
-//                                    allowJoin = allowJoin,
-//                                    tagUsersId = tagUserIds.toList(),
-//                                )
-//                                GlobalScope.launch {
-//                                    Neo4jUtil.addPost(post)
-//                                }
-//                                makeStatusNotification("Successfully uploaded", appContext)
-//                            }
-//                        } else {
-//                            val post = Post(
-//                                name = name,
-//                                type = postType,
-//                                authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
-//                                caption = photoCaption,
-//                                videoUrl = downloadUri.toString(),
-//                                locationName = locationName,
-//                                locationLatitude = latitude,
-//                                locationLongitude = longitude,
-//                                privacy = privacy,
-//                                allowJoin = allowJoin,
-//                                tagUsersId = tagUserIds.toList()
-//                            )
-//                            GlobalScope.launch {
-//                                Neo4jUtil.addPost(post)
-//                            }
-//                            makeStatusNotification("Successfully uploaded", appContext)
-//                        }
-//                    }
-//
-                }
+                PostType.VIDEO -> {}
                 PostType.IMAGE -> {
-
                     val downloadUrls = mutableListOf<String>()
 
                     coroutineScope {
@@ -151,25 +96,16 @@ class CreatePostWorker @AssistedInject constructor(
                     }
 
 
-                    val post = PostOuterClass.Post.newBuilder()
+                    val post = postBuilder
                         .setType(PostOuterClass.PostType.IMAGE)
-                        .setCaption(photoCaption)
                         .addAllPhotos(downloadUrls)
-                        .setDrunkenness(drunkenness.toLong())
-                        .setDrink(beverage)
-                        .setLocationName(locationName)
                         .build()
 
                     postRepository.createPost(post = post)
-
                 }
                 PostType.TEXT -> {
-                    val post = PostOuterClass.Post.newBuilder()
+                    val post = postBuilder
                         .setType(PostOuterClass.PostType.TEXT)
-                        .setCaption(photoCaption)
-                        .setDrunkenness(drunkenness.toLong())
-                        .setDrink(beverage)
-                        .setLocationName(locationName)
                         .build()
 
                     postRepository.createPost(post = post)

@@ -240,10 +240,6 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.core:core-ktx:+'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'androidx.core:core-ktx:+'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     kapt("androidx.hilt:hilt-compiler:1.0.0")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 
@@ -264,9 +260,10 @@ dependencies {
     implementation "androidx.room:room-paging:2.4.3"
 
     // Map Box SDK
-    implementation 'com.mapbox.maps:android:10.4.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.8.0'
-    implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.29"
+    implementation ('com.mapbox.maps:android:10.10.0'){
+//        exclude group: 'com.mapbox.android.core.location.LocationEngine'
+    }
+    implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.43"
 
     // Paging
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")

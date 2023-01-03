@@ -507,7 +507,7 @@ private fun UserInputText(
 
                 val disableContentColor =
                     MaterialTheme.colorScheme.onSurfaceVariant
-                if (textFieldValue.text.isEmpty() && !focusState) {
+                if (textFieldValue.text.isEmpty()) {
                     Text(
                         modifier = Modifier
                             .align(Alignment.CenterStart)

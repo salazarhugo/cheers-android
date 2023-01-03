@@ -18,6 +18,7 @@ import com.salazar.cheers.notifications.defaultNotification
 import com.salazar.cheers.notifications.newFollowerNotification
 import com.salazar.cheers.notifications.newPostNotification
 import com.salazar.cheers.ui.MainActivity
+import com.salazar.cheers.util.Constants
 import com.salazar.cheers.util.Utils.getCircledBitmap
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -93,11 +94,11 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         }
 
 
-        val pending = setIntent("https://cheers-a275e.web.app".toUri())
+        val pending = setIntent(Constants.URI.toUri())
         builder.setContentIntent(pending)
 
         if (roomId != null) {
-            val uri = "https://cheers-a275e.web.app/chat/${roomId}".toUri()
+            val uri = "${Constants.URI}/chat/${roomId}".toUri()
             val pending = setIntent(uri)
             builder.setContentIntent(pending)
         }

@@ -46,11 +46,9 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
-import com.mapbox.search.MapboxSearchSdk
-import com.mapbox.search.ResponseInfo
-import com.mapbox.search.ReverseGeoOptions
-import com.mapbox.search.SearchCallback
+import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.R
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.compose.ChipGroup
@@ -102,7 +100,12 @@ fun AddPostScreen(
         val options = ReverseGeoOptions(
             center = uiState.locationPoint,
         )
-        val reverseGeocoding = remember { MapboxSearchSdk.getSearchEngine() }
+        val context = LocalContext.current
+        val reverseGeocoding = remember {
+            SearchEngine.createSearchEngine(
+                SearchEngineSettings(context.getString(R.string.mapbox_access_token))
+            )
+        }
         reverseGeocoding.search(options, searchCallback)
     }
 

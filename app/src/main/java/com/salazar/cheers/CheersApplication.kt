@@ -10,8 +10,6 @@ import androidx.work.Configuration
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
-import com.mapbox.android.core.location.LocationEngineProvider
-import com.mapbox.search.MapboxSearchSdk
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -31,15 +29,11 @@ class CheersApplication : Application(), Configuration.Provider {
     }
 
     private fun initMapBox() {
-        try {
-            MapboxSearchSdk.initialize(
-                application = this,
-                accessToken = getString(R.string.mapbox_access_token),
-//            locationEngine = LocationEngineProvider.getBestLocationEngine(this)
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+//        MapboxSearchSdk.initialize(
+//            application = this,
+//            accessToken = getString(R.string.mapbox_access_token),
+////        locationEngine = LocationEngineProvider.getBestLocationEngine(this)
+//        )
     }
 
     private fun initFirebase() {

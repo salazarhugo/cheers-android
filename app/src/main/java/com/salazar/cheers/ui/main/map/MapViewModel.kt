@@ -13,10 +13,7 @@ import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -61,13 +58,18 @@ class MapViewModel @Inject constructor(
     }
 
     private fun refreshPosts() {
-        viewModelState.update { it.copy(isLoading = true) }
+        viewModelState.update {
+            it.copy(isLoading = true)
+        }
 
-        val privacy = if (uiState.value.isPublic) Privacy.PUBLIC else Privacy.FRIENDS
+        val privacy = if (uiState.value.isPublic)
+            Privacy.PUBLIC
+        else
+            Privacy.FRIENDS
 
         viewModelScope.launch {
-            val posts = postRepository.getMapPosts(privacy = privacy)
-            updateMapPosts(posts)
+            postRepository.listMapPost(privacy = privacy)
+                .collect(::updateMapPosts)
         }
     }
 

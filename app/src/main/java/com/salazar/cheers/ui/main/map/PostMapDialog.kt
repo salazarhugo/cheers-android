@@ -25,7 +25,10 @@ fun PostMapScreen(
     uiState: MapUiState,
     onUserClick: (String) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .systemBarsPadding()
+    ) {
         Box(
             modifier = Modifier
                 .padding(vertical = 10.dp)

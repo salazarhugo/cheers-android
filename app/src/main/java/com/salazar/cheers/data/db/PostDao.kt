@@ -5,7 +5,6 @@ import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.User
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -35,12 +34,11 @@ interface PostDao {
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
     suspend fun getPost(postId: String): Post
 
-    @Transaction
     @Query("SELECT * FROM posts WHERE privacy = :privacy AND createTime > :yesterday")
-    suspend fun getMapPosts(
+    fun listMapPost(
         privacy: Privacy,
-        yesterday: Long = Date().time - 24 * 60 * 60 * 1000
-    ): List<Post>
+        yesterday: Long = (Date().time/1000) - 24 * 60 * 60
+    ): Flow<List<Post>>
 
     @Query("SELECT * FROM posts ORDER BY createTime DESC")
     fun pagingSource(): PagingSource<Int, Post>

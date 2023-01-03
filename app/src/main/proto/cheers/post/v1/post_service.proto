@@ -8,7 +8,7 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 option java_multiple_files = true;
-option go_package = "github.com/salazarhugo/cheers1/genproto/cheers/post/v1;post";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/post/v1;post";
 
 service PostService {
   /*
@@ -23,6 +23,7 @@ service PostService {
 
   rpc GetPost (GetPostRequest) returns (PostResponse);
   rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
+
   rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v1/posts"
@@ -38,9 +39,21 @@ service PostService {
     };
   };
 
+  /*
+    Friends post feed
+   */
   rpc FeedPost (FeedPostRequest) returns (FeedPostResponse) {
     option (google.api.http) = {
       get: "/v1/posts/feed"
+    };
+  };
+
+  /*
+    Map post feed
+   */
+  rpc ListMapPost (ListMapPostRequest) returns (ListMapPostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/map"
     };
   };
 
@@ -69,6 +82,15 @@ service PostService {
   };
 }
 
+message ListMapPostRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListMapPostResponse {
+  repeated PostResponse posts = 1;
+}
 
 message CreatePostRequest {
   cheers.type.Post post = 1;

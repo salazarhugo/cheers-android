@@ -8,10 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
@@ -108,9 +105,10 @@ fun MapScreen(
                 }
             }
         ) {
+            it
             Box(
                 contentAlignment = Alignment.BottomCenter,
-                modifier = Modifier.padding(it),
+//                modifier = Modifier.padding(it),
             ) {
                 Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                     AndroidView(
@@ -138,9 +136,10 @@ fun MapScreen(
                         }
                     }
                     UiLayer(
-                        this,
                         uiState = uiState,
-                        mapView = mapView,
+                        modifier = Modifier
+                            .systemBarsPadding()
+                            .align(Alignment.TopCenter),
                         onSelectPost = onSelectPost,
                         onTogglePublic = onTogglePublic,
                         isPublic = uiState.isPublic,
@@ -197,62 +196,60 @@ suspend fun addPostsAnnotation(
 
 @Composable
 fun UiLayer(
-    scope: BoxScope,
     uiState: MapUiState,
-    mapView: MapView,
+    modifier: Modifier = Modifier,
     isPublic: Boolean,
     onSelectPost: (Post) -> Unit,
     onTogglePublic: () -> Unit,
     onAddPostClicked: () -> Unit,
 ) {
     val context = LocalContext.current
-    val scope2 = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
-    scope.apply {
+    Surface(
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+        modifier = modifier
+            .padding(8.dp)
+            .clickable {
+                scope.launch { uiState.postSheetState.hide() }
+                       },
+    ) {
+        Text(
+            text = uiState.city,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        )
+    }
+
+    if (uiState.postSheetState.isVisible)
         Surface(
             shape = RoundedCornerShape(22.dp),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
+            modifier = modifier
                 .padding(8.dp)
-                .clickable { scope2.launch { uiState.postSheetState.hide() } },
+                .clickable {
+                    scope.launch { uiState.postSheetState.hide() }
+                           },
         ) {
-            Text(
-                text = uiState.city,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            )
-        }
-
-        if (uiState.postSheetState.isVisible)
-            Surface(
-                shape = RoundedCornerShape(22.dp),
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(8.dp)
-                    .clickable { scope2.launch { uiState.postSheetState.hide() } },
-            ) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = null,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                )
-            }
-        Surface(
-            shape = RoundedCornerShape(22.dp),
-            color = MaterialTheme.colorScheme.background,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-                .clickable { onTogglePublic() },
-        ) {
-            val icon = if (isPublic) Icons.Default.Public else Icons.Default.PublicOff
             Icon(
-                icon,
+                Icons.Default.Close,
                 contentDescription = null,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             )
         }
+    Surface(
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.background,
+        modifier = modifier
+            .padding(8.dp)
+            .clickable { onTogglePublic() },
+    ) {
+        val icon = if (isPublic) Icons.Default.Public else Icons.Default.PublicOff
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        )
     }
 }
 

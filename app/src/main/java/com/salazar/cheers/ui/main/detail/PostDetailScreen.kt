@@ -33,9 +33,6 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.auth.FirebaseAuth
-import com.mapbox.api.staticmap.v1.MapboxStaticMap
-import com.mapbox.api.staticmap.v1.StaticMapCriteria
-import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.items.UserItem
@@ -123,34 +120,37 @@ fun StaticMap(
     onMapClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val style =
-        if (context.isDarkModeOn()) StaticMapCriteria.DARK_STYLE else StaticMapCriteria.LIGHT_STYLE
-
-    val token = stringResource(R.string.mapbox_access_token)
-    val staticImage = remember {
-        MapboxStaticMap.builder()
-            .accessToken(token)
-            .styleId(style)
-            .cameraPoint(Point.fromLngLat(longitude, latitude)) // Image's center point on map
-            .staticMarkerAnnotations(
-                listOf(
-                    StaticMarkerAnnotation.builder().lnglat(Point.fromLngLat(longitude, latitude))
-                        .build()
-                )
-            )
-            .cameraZoom(13.0)
-            .width(640) // Image width
-            .height(640) // Image height
-            .retina(true) // Retina 2x image will be returned
-            .build()
-    }
-
-    val url = remember { staticImage.url().toString() }
-    PrettyImage(
-        modifier = modifier
-            .clickable { onMapClick() },
-        data = url,
-    )
+//    val style =
+//        if (context.isDarkModeOn())
+//            StaticMapCriteria.DARK_STYLE
+//        else
+//            StaticMapCriteria.LIGHT_STYLE
+//
+//    val token = stringResource(R.string.mapbox_access_token)
+//    val staticImage = remember {
+//        MapboxStaticMap.builder()
+//            .accessToken(token)
+//            .styleId(style)
+//            .cameraPoint(Point.fromLngLat(longitude, latitude)) // Image's center point on map
+//            .staticMarkerAnnotations(
+//                listOf(
+//                    StaticMarkerAnnotation.builder().lnglat(Point.fromLngLat(longitude, latitude))
+//                        .build()
+//                )
+//            )
+//            .cameraZoom(13.0)
+//            .width(640) // Image width
+//            .height(640) // Image height
+//            .retina(true) // Retina 2x image will be returned
+//            .build()
+//    }
+//
+//    val url = remember { staticImage.url().toString() }
+//    PrettyImage(
+//        modifier = modifier
+//            .clickable { onMapClick() },
+//        data = url,
+//    )
 }
 
 @Composable

@@ -12,12 +12,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.mapbox.search.MapboxSearchSdk
-import com.mapbox.search.ResponseInfo
-import com.mapbox.search.SearchOptions
-import com.mapbox.search.SearchSelectionCallback
+import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
+import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
@@ -87,7 +85,9 @@ class CreatePartyViewModel @Inject constructor(
             viewModelState.value
         )
 
-    val searchEngine = MapboxSearchSdk.getSearchEngine()
+    val searchEngine = SearchEngine.createSearchEngine(
+            SearchEngineSettings(application.applicationContext.getString(R.string.mapbox_access_token))
+        )
     val searchCallback = object : SearchSelectionCallback {
         override fun onCategoryResult(
             suggestion: SearchSuggestion,

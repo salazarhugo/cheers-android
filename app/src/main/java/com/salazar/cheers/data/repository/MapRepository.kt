@@ -1,7 +1,9 @@
 package com.salazar.cheers.data.repository
 
 import android.content.Context
+import android.support.v4.media.MediaBrowserCompat
 import android.util.Log
+import com.google.android.gms.ads.ResponseInfo
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
@@ -15,8 +17,11 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.locationcomponent.location2
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.search.*
+import com.mapbox.search.common.AsyncOperationTask
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.util.Utils.isDarkModeOn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,12 +30,16 @@ import javax.inject.Singleton
 class MapRepository @Inject constructor(
 ) {
     private lateinit var reverseGeocoding: SearchEngine
-    private lateinit var searchRequestTask: SearchRequestTask
+    private lateinit var searchRequestTask: AsyncOperationTask
 
     val searchCallback = object : SearchCallback {
+        override fun onError(e: Exception) {
+            Log.i("SearchApiExample", "Reverse geocoding error", e)
+        }
+
         override fun onResults(
             results: List<SearchResult>,
-            responseInfo: ResponseInfo
+            responseInfo: com.mapbox.search.ResponseInfo
         ) {
             if (results.isEmpty()) {
                 Log.i("SearchApiExample", "No reverse geocoding results")
@@ -39,17 +48,15 @@ class MapRepository @Inject constructor(
                 Log.i("SearchApiExample", "Reverse geocoding results: $results")
             }
         }
-
-        override fun onError(e: Exception) {
-            Log.i("SearchApiExample", "Reverse geocoding error", e)
-        }
     }
 
-    fun onMapReady(
+    suspend fun onMapReady(
         mapView: MapView,
         context: Context
-    ) {
-        reverseGeocoding = MapboxSearchSdk.getSearchEngine()
+    ) = withContext(Dispatchers.Main) {
+        reverseGeocoding = SearchEngine.createSearchEngine(
+            SearchEngineSettings(context.getString(com.salazar.cheers.R.string.mapbox_access_token))
+        )
         mapView.gestures.rotateEnabled = false
         mapView.attribution.enabled = false
         mapView.scalebar.enabled = false

@@ -11,11 +11,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.outlined.ConfirmationNumber
-import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
@@ -57,10 +55,10 @@ fun CheersBottomBar(
             label = "Events"
         ),
         Screen(
-            route = MainDestinations.EVENTS_ROUTE,
-            icon = { Icon(Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Default.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
-            label = "Camera"
+            route = MainDestinations.MAP_ROUTE,
+            icon = { Icon(Icons.Outlined.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Default.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
+            label = "Map"
         ),
         Screen(
             route = MainDestinations.TICKETS_ROUTE,

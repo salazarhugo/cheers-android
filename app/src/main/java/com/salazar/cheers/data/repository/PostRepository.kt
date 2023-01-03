@@ -163,8 +163,8 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun getMapPosts(privacy: Privacy): List<Post> {
-        return postDao.getMapPosts(privacy = privacy)
+    fun listMapPost(privacy: Privacy): Flow<List<Post>> {
+        return postDao.listMapPost(privacy = privacy)
     }
 
     suspend fun postFlow(postId: String) = postDao.postFlow(postId = postId)

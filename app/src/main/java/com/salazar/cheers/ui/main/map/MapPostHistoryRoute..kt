@@ -32,10 +32,10 @@ fun MapPostHistoryRoute(
         uiState = uiState,
         mapView = mapView,
         onMapReady = {
-            mapPostHistoryViewModel.mapRepository.onMapReady(
-                mapView = mapView,
-                context = context
-            )
+//            mapPostHistoryViewModel.mapRepository.onMapReady(
+//                mapView = mapView,
+//                context = context
+//            )
         }
     )
 }
