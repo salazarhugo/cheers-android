@@ -17,7 +17,8 @@ fun PostText(
     onUserClicked: (username: String) -> Unit,
     onPostClicked: () -> Unit,
 ) {
-    if (caption.isBlank()) return
+    if (caption.isBlank())
+        return
 
     val styledCaption = messageFormatter(
         text = caption,
@@ -30,7 +31,7 @@ fun PostText(
         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
+            .padding(top = 8.dp, end = 16.dp, start = 16.dp),
         onClick = {
             styledCaption
                 .getStringAnnotations(start = it, end = it)

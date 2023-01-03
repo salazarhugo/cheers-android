@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.compose.post
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,13 +42,14 @@ fun PostFooter(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
 
         if (post.photos.size > 1)
             HorizontalPagerIndicator(
                 pagerState = pagerState,
                 modifier = Modifier
+                    .padding(top = 8.dp)
                     .align(Alignment.CenterHorizontally),
                 activeColor = MaterialTheme.colorScheme.primary,
             )

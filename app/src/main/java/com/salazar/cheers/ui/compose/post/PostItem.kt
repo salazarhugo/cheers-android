@@ -42,7 +42,7 @@ fun PostItem(
             onPostClicked = { onHomeUIAction(HomeUIAction.OnPostClick(post.id)) },
         )
         PostBody(
-            post,
+            post = post,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp)),

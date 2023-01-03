@@ -3,8 +3,10 @@ package com.salazar.cheers.ui.compose.post
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.internal.Post
@@ -18,7 +20,12 @@ fun PostBody(
     onLike: (post: Post) -> Unit,
     pagerState: PagerState = rememberPagerState(),
 ) {
-    Box {
+    if (post.videoUrl.isBlank() && post.photos.isEmpty())
+        return
+
+    Box(
+        modifier = Modifier.padding(top = 16.dp)
+    ) {
         if (post.videoUrl.isNotBlank())
             VideoPlayer(
                 uri = post.videoUrl,
