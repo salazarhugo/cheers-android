@@ -56,7 +56,9 @@ fun SearchScreen(
     Scaffold(
         topBar = {
             SearchBar(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(16.dp),
                 searchInput = uiState.searchInput,
                 onSearchInputChanged = onSearchInputChanged,
             )
@@ -65,7 +67,7 @@ fun SearchScreen(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = onSwipeRefresh,
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
             SearchBody(
                 uiState = uiState,

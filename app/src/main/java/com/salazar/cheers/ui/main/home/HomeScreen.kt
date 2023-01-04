@@ -66,7 +66,7 @@ fun HomeScreen(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(isRefreshing = false),
             onRefresh = { onHomeUIAction(HomeUIAction.OnSwipeRefresh) },
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
             Column(
                 modifier = Modifier

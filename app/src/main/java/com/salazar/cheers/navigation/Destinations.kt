@@ -280,7 +280,7 @@ class CheersNavigationActions(
 
     val navigateToAddPostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
         navController.navigate("${MainDestinations.CREATE_POST_ROUTE}?photoUri=$photoUri") {
-            popUpTo(MainDestinations.HOME_ROUTE)
+//            popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
         }
     }
