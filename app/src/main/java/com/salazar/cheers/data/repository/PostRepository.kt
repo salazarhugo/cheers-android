@@ -47,6 +47,10 @@ class PostRepository @Inject constructor(
         return postDao.getPostFeed()
     }
 
+    suspend fun updatePost(post: Post) {
+        postDao.update(post = post)
+    }
+
     suspend fun listPost(userIdOrUsername: String): Flow<List<Post>> {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 

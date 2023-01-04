@@ -54,6 +54,7 @@ import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.post.MultipleAnnotation
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.ui.compose.share.ErrorMessage
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.main.party.create.Item
@@ -63,8 +64,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun AddPostScreen(
-    uiState: AddPostUiState,
+fun CreatePostScreen(
+    uiState: CreatePostUiState,
     onDismiss: () -> Unit,
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
@@ -188,10 +189,14 @@ fun AddPostScreen(
                     checked = uiState.notify,
                     onCheckedChange = onNotifyChange
                 )
-                ShareButton("Share", onClick = {
-                    onUploadPost()
-                    onDismiss()
-                })
+                ShareButton(
+                    text = "Share",
+                    isLoading = uiState.isLoading,
+                    onClick = {
+                        onUploadPost()
+                        onDismiss()
+                    },
+                )
             }
         }
     }
@@ -363,6 +368,7 @@ fun TopAppBar(
 @Composable
 fun ShareButton(
     text: String,
+    isLoading: Boolean,
     onClick: () -> Unit,
 ) {
     Column(
@@ -370,16 +376,16 @@ fun ShareButton(
         verticalArrangement = Arrangement.Bottom,
     ) {
         DividerM3()
-        Button(
-            onClick = onClick,
+        ButtonWithLoading(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .height(48.dp),
+            text = text,
             shape = MaterialTheme.shapes.medium,
-        ) {
-            Text(text = text)
-        }
+            isLoading = isLoading,
+            onClick = onClick
+        )
     }
 }
 

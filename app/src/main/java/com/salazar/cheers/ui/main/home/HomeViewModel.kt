@@ -259,7 +259,7 @@ sealed class HomeUIAction {
     object OnSearchClick : HomeUIAction()
     object OnSwipeRefresh : HomeUIAction()
     object OnAddStoryClick : HomeUIAction()
-    object OnAddPostClick : HomeUIAction()
+    object OnCreatePostClick : HomeUIAction()
     object OnLoadNextItems : HomeUIAction()
     data class OnCommentClick(val postID: String) : HomeUIAction()
     data class OnShareClick(val postID: String) : HomeUIAction()

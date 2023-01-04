@@ -69,7 +69,11 @@ fun EditEventScreen(
                 )
                 DividerM3()
                 LocationSection("", navigateToChooseOnMap = {})
-                ShareButton(onClick = onSave, text = "Share")
+                ShareButton(
+                    onClick = onSave,
+                    text = "Share",
+                    isLoading = uiState.isLoading,
+                )
             }
         }
 }

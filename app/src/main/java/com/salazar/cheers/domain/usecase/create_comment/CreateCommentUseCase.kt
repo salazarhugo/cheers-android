@@ -1,5 +1,7 @@
 package com.salazar.cheers.domain.usecase.create_comment
 
+import com.salazar.cheers.data.repository.ChatRepository
+import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.comment.CommentRepository
 import com.salazar.cheers.di.IODispatcher
@@ -11,6 +13,7 @@ import javax.inject.Inject
 
 class CreateCommentUseCase @Inject constructor(
     private val repository: CommentRepository,
+    private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
 ) {
@@ -28,6 +31,15 @@ class CreateCommentUseCase @Inject constructor(
             verified = user.verified,
             authorId = user.id,
             avatar = user.picture,
+        )
+
+        val post = postRepository.getPost(postId = postId)
+        postRepository.updatePost(
+            post.copy(
+                lastCommentUsername = localComment.username,
+                lastCommentText = localComment.text,
+                lastCommentCreateTime = localComment.createTime,
+            )
         )
 
         return@withContext repository.createComment(

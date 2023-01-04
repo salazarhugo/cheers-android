@@ -66,7 +66,7 @@ fun MapPostHistoryScreen(
 //                    onSelectPost = onSelectPost,
 //                    onTogglePublic = onTogglePublic,
 //                    isPublic = uiState.isPublic,
-//                    onAddPostClicked = onAddPostClicked,
+//                    onCreatePostClicked = onCreatePostClicked,
 //                )
             }
         }

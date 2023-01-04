@@ -17,7 +17,6 @@ import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -25,11 +24,11 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
-enum class AddPostPage {
-    AddPost, ChooseOnMap, ChooseBeverage, AddPeople, DrunkennessLevel
+enum class CreatePostPage {
+    CreatePost, ChooseOnMap, ChooseBeverage, AddPeople, DrunkennessLevel
 }
 
-data class AddPostUiState(
+data class CreatePostUiState(
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
@@ -47,18 +46,18 @@ data class AddPostUiState(
     val privacy: Privacy = Privacy.FRIENDS,
     val allowJoin: Boolean = true,
     val notify: Boolean = true,
-    val page: AddPostPage = AddPostPage.AddPost,
+    val page: CreatePostPage = CreatePostPage.CreatePost,
     val profilePictureUrl: String? = null,
 )
 
 @HiltViewModel
-class AddPostViewModel @Inject constructor(
+class CreatePostViewModel @Inject constructor(
     application: Application,
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(AddPostUiState(isLoading = true))
+    private val viewModelState = MutableStateFlow(CreatePostUiState(isLoading = false))
     private val workManager = WorkManager.getInstance(application)
 
     val uiState = viewModelState
@@ -137,7 +136,7 @@ class AddPostViewModel @Inject constructor(
         }
     }
 
-    fun updatePage(page: AddPostPage) {
+    fun updatePage(page: CreatePostPage) {
         viewModelState.update {
             it.copy(page = page)
         }
@@ -152,6 +151,12 @@ class AddPostViewModel @Inject constructor(
     fun updateLocation(location: String) {
         viewModelState.update {
             it.copy(location = location)
+        }
+    }
+
+    fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
         }
     }
 
@@ -184,6 +189,7 @@ class AddPostViewModel @Inject constructor(
 
     fun uploadPost() {
         val uiState = viewModelState.value
+        updateIsLoading(true)
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -219,6 +225,7 @@ class AddPostViewModel @Inject constructor(
         )
 
         uploadWorkerState = workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).asFlow()
+        updateIsLoading(false)
     }
 }
 

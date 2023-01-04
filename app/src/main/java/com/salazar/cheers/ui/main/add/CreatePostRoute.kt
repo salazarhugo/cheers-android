@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.main.add
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,9 +16,9 @@ import com.salazar.cheers.ui.main.map.ChooseOnMapScreen
  * @param addPostViewModel ViewModel that handles the business logic of this screen
  */
 @Composable
-fun AddPostRoute(
+fun CreatePostRoute(
     navActions: CheersNavigationActions,
-    addPostViewModel: AddPostViewModel = hiltViewModel(),
+    addPostViewModel: CreatePostViewModel = hiltViewModel(),
 ) {
     val uiState by addPostViewModel.uiState.collectAsState()
     val launcher =
@@ -31,22 +30,21 @@ fun AddPostRoute(
         }
 
     BackHandler {
-        addPostViewModel.updatePage(AddPostPage.AddPost)
-        Log.d("HAHA", "System back intercepted")
-        println("System back intercepted")
+        addPostViewModel.updatePage(CreatePostPage.CreatePost)
     }
+
     when (uiState.page) {
-        AddPostPage.AddPost ->
-            AddPostScreen(
+        CreatePostPage.CreatePost ->
+            CreatePostScreen(
                 uiState = uiState,
                 onCaptionChanged = addPostViewModel::onCaptionChanged,
                 onSelectLocation = addPostViewModel::selectLocation,
                 onUploadPost = addPostViewModel::uploadPost,
                 onDismiss = navActions.navigateBack,
-                interactWithChooseOnMap = { addPostViewModel.updatePage(AddPostPage.ChooseOnMap) },
-                interactWithChooseBeverage = { addPostViewModel.updatePage(AddPostPage.ChooseBeverage) },
-                interactWithDrunkennessLevel = { addPostViewModel.updatePage(AddPostPage.DrunkennessLevel) },
-                navigateToTagUser = { addPostViewModel.updatePage(AddPostPage.AddPeople) },
+                interactWithChooseOnMap = { addPostViewModel.updatePage(CreatePostPage.ChooseOnMap) },
+                interactWithChooseBeverage = { addPostViewModel.updatePage(CreatePostPage.ChooseBeverage) },
+                interactWithDrunkennessLevel = { addPostViewModel.updatePage(CreatePostPage.DrunkennessLevel) },
+                navigateToTagUser = { addPostViewModel.updatePage(CreatePostPage.AddPeople) },
                 navigateToCamera = { navActions.navigateToCamera() },
                 unselectLocation = addPostViewModel::unselectLocation,
                 updateLocationName = addPostViewModel::updateLocation,
@@ -56,33 +54,33 @@ fun AddPostRoute(
                 onSelectPrivacy = addPostViewModel::selectPrivacy,
                 onNotifyChange = addPostViewModel::toggleNotify
             )
-        AddPostPage.ChooseOnMap ->
+        CreatePostPage.ChooseOnMap ->
             ChooseOnMapScreen(
                 onSelectLocation = {
                     addPostViewModel.updateLocationPoint(it)
-                    addPostViewModel.updatePage(AddPostPage.AddPost)
+                    addPostViewModel.updatePage(CreatePostPage.CreatePost)
                 },
-                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
             )
-        AddPostPage.ChooseBeverage ->
+        CreatePostPage.ChooseBeverage ->
             BeverageScreen(
-                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
                 onSelectBeverage = {
                     addPostViewModel.onSelectBeverage(it)
-                    addPostViewModel.updatePage(AddPostPage.AddPost)
+                    addPostViewModel.updatePage(CreatePostPage.CreatePost)
                 },
             )
-        AddPostPage.AddPeople ->
+        CreatePostPage.AddPeople ->
             AddPeopleScreen(
-                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
                 onSelectUser = addPostViewModel::selectTagUser,
                 selectedUsers = uiState.selectedTagUsers,
-                onDone = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onDone = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
             )
-        AddPostPage.DrunkennessLevel ->
+        CreatePostPage.DrunkennessLevel ->
             DrunkennessLevelScreen(
-                onBackPressed = { addPostViewModel.updatePage(AddPostPage.AddPost) },
-                onDone = { addPostViewModel.updatePage(AddPostPage.AddPost) },
+                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
+                onDone = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
                 onSelectDrunkenness = addPostViewModel::onDrunkennessChange,
                 drunkenness = uiState.drunkenness,
             )

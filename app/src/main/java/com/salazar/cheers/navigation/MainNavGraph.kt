@@ -19,7 +19,7 @@ import com.salazar.cheers.ui.compose.post.PostMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
 import com.salazar.cheers.ui.main.activity.ActivityRoute
-import com.salazar.cheers.ui.main.add.AddPostRoute
+import com.salazar.cheers.ui.main.add.CreatePostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
 import com.salazar.cheers.ui.main.chat.ChatRoute
@@ -190,7 +190,7 @@ fun NavGraphBuilder.mainNavGraph(
             route = "${MainDestinations.CREATE_POST_ROUTE}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
-            AddPostRoute(
+            CreatePostRoute(
                 navActions = appState.navActions,
             )
         }

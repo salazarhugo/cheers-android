@@ -102,7 +102,7 @@ fun PostList(
         item {
             WhatsUpSection(
                 avatar = uiState.user?.picture ?: "",
-                onClick = { onHomeUIAction(HomeUIAction.OnAddPostClick) },
+                onClick = { onHomeUIAction(HomeUIAction.OnCreatePostClick) },
             )
             DividerM3()
         }

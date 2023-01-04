@@ -14,7 +14,10 @@ class TicketRepositoryImpl @Inject constructor(
 ): TicketRepository {
     override suspend fun listTicket(): Flow<List<Ticket>> {
         return flow {
-            emit(ticketDao.listTickets().first())
+            val localTickets = ticketDao.listTickets().first()
+            if (localTickets.isNotEmpty())
+                emit(localTickets)
+
             val result = ticketDataSource.listTicket()
             if (result.isFailure)
                 Log.e("TICKET", result.exceptionOrNull().toString())

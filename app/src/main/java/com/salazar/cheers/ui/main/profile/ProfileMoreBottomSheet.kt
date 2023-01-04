@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.profile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
@@ -29,7 +28,10 @@ sealed class ProfileSheetUIAction {
 fun ProfileMoreBottomSheet(
     onProfileSheetUIAction: (ProfileSheetUIAction) -> Unit,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.systemBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(
             modifier = Modifier
                 .padding(vertical = 10.dp)
@@ -58,8 +60,14 @@ fun ProfileMoreBottomSheet(
             icon = Icons.Outlined.Contactless,
             onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnNfcClick) }
         )
-        SheetItem(text = "QR code", icon = Icons.Outlined.QrCode)
-        SheetItem(text = "Saved", icon = Icons.Outlined.BookmarkBorder)
+        SheetItem(
+            text = "QR code",
+            icon = Icons.Outlined.QrCode,
+        )
+        SheetItem(
+            text = "Saved",
+            icon = Icons.Outlined.BookmarkBorder,
+        )
         SheetItem(
             text = "Copy Profile URL",
             icon = Icons.Outlined.ContentCopy,
