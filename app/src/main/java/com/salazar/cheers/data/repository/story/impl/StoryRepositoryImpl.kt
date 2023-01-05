@@ -96,7 +96,7 @@ class StoryRepositoryImpl @Inject constructor(
                 }
 
                 userDao.insert(user)
-                storyDao.insertAll(stories)
+                storyDao.insertStories(stories)
             }
 
             return Result.success(userWithStoriesList)

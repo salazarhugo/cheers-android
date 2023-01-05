@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.db
 
+import android.text.method.TextKeyListener.clear
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
@@ -51,6 +52,13 @@ interface StoryDao {
 
     @Query("DELETE FROM story")
     suspend fun clearAll()
+
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStories(stories: List<Story>) {
+        clearAll()
+        insertAll(stories)
+    }
 }
 
 data class UserWithStories(
