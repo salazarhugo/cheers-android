@@ -13,5 +13,7 @@ fun UserItem.toUserItem(): com.salazar.cheers.data.db.entities.UserItem {
         username = username,
         verified = verified,
         story_state = StoryState.EMPTY,
+        friend = friend,
+        requested = requested,
     )
 }

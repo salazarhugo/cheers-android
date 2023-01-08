@@ -48,6 +48,20 @@ service ChatService {
     };
   }
 
+  rpc PinRoom(PinRoomRequest) returns (PinRoomResponse) {
+    option (google.api.http) = {
+      put: "/v1/chats/{room_id}/pin"
+      body: "*"
+    };
+  }
+
+  rpc UnPinRoom(UnPinRoomRequest) returns (UnPinRoomResponse) {
+    option (google.api.http) = {
+      put: "/v1/chats/{room_id}/unpin"
+      body: "*"
+    };
+  }
+
   rpc LikeMessage(LikeMessageReq) returns (Empty) {}
   rpc UnlikeMessage(LikeMessageReq) returns (Empty) {}
 
@@ -58,6 +72,20 @@ service ChatService {
 
   rpc AddToken(AddTokenReq) returns (Empty) {}
   rpc DeleteUser(UserIdReq) returns (Empty) {}
+}
+
+message PinRoomRequest {
+  string room_id = 1;
+}
+
+message PinRoomResponse {
+}
+
+message UnPinRoomResponse {
+}
+
+message UnPinRoomRequest {
+  string room_id = 1;
 }
 
 message SendMessageRequest {

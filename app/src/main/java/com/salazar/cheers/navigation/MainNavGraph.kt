@@ -31,6 +31,7 @@ import com.salazar.cheers.ui.main.comment.CommentsRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
+import com.salazar.cheers.ui.main.friendrequests.FriendRequestsRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
 import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
 import com.salazar.cheers.ui.main.party.EventsRoute
@@ -74,6 +75,14 @@ fun NavGraphBuilder.mainNavGraph(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
+        composable(
+            route = MainDestinations.FRIEND_REQUESTS,
+        ) {
+            FriendRequestsRoute(
+                navActions = appState.navActions,
+            )
+        }
+
         bottomSheet(
             route = "${MainDestinations.SHARE_ROUTE}/{partyId}",
         ) {

@@ -1,10 +1,8 @@
 package com.salazar.cheers.internal
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import cheers.type.UserOuterClass
 import com.salazar.cheers.data.enums.StoryState
 import java.util.*
 
@@ -18,6 +16,7 @@ data class User(
     val username: String = "",
     val name: String = "",
     val postCount: Int = 0,
+    val friendsCount: Int = 0,
     val followers: Int = 0,
     val following: Int = 0,
     val coins: Int = 0,
@@ -31,11 +30,10 @@ data class User(
     val darkMode: Boolean = false,
     val registrationTokens: List<String> = emptyList(),
     val followBack: Boolean = false,
-    @ColumnInfo(defaultValue = "false")
     val friend: Boolean = false,
-    @ColumnInfo(defaultValue = "EMPTY")
+    val requested: Boolean = false,
+    val hasRequestedViewer: Boolean = false,
     val storyState: StoryState = StoryState.EMPTY,
-    @ColumnInfo(defaultValue = "false")
     val seenStory: Boolean = false,
     val createTime: Long = 0L,
 )

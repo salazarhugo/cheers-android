@@ -25,6 +25,7 @@ import com.salazar.cheers.ui.compose.profile.ProfileText
 import com.salazar.cheers.ui.compose.user.FollowButton
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.ui.compose.user.FriendButton
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,9 @@ fun OtherProfileScreen(
     onPostClicked: (postId: String) -> Unit,
     onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
-    onFollowToggle: (User) -> Unit,
+    onSendFriendRequest: (String) -> Unit,
+    onCancelFriendRequest: (String) -> Unit,
+    onAcceptFriendRequest: (String) -> Unit,
     onMessageClicked: () -> Unit,
     onWebsiteClick: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
@@ -49,6 +52,7 @@ fun OtherProfileScreen(
         Icons.Default.GridView,
         Icons.Outlined.Celebration
     )
+    val user = uiState.user
 
     LazyColumn {
         item {
@@ -56,20 +60,29 @@ fun OtherProfileScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 ProfileHeader(
-                    user = uiState.user,
+                    user = user,
                     onStatClicked = onStatClicked,
                     onStoryClick = onStoryClick
                 )
-                ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClick)
-                val isFollowed = uiState.user.followBack
+                ProfileText(user = user, onWebsiteClicked = onWebsiteClick)
                 HeaderButtons(
-                    isFollowed = isFollowed,
-                    onFollowToggle = { onFollowToggle(uiState.user) },
+                    friend = user.friend,
+                    requested = user.requested,
+                    hasRequestedViewer = user.hasRequestedViewer,
+                    onSendFriendRequest = {
+                        onSendFriendRequest(uiState.user.id)
+                    },
+                    onCancelFriendRequest = {
+                        onCancelFriendRequest(uiState.user.id)
+                    },
+                    onAcceptFriendRequest = {
+                        onAcceptFriendRequest(uiState.user.id)
+                    },
                     onMessageClicked = onMessageClicked,
-                    onGiftClick = onGiftClick,
                 )
             }
         }
+        if (user.friend)
         stickyHeader {
             val scope = rememberCoroutineScope()
             androidx.compose.material.TabRow(
@@ -96,6 +109,7 @@ fun OtherProfileScreen(
             }
         }
 
+        if (user.friend)
         item {
             HorizontalPager(
                 count = tabs.size,
@@ -214,20 +228,28 @@ fun MoreDialog(
 
 @Composable
 fun HeaderButtons(
-    isFollowed: Boolean,
-    onFollowToggle: () -> Unit,
+    friend: Boolean,
+    requested: Boolean,
+    hasRequestedViewer: Boolean,
+    onCancelFriendRequest: () -> Unit,
+    onSendFriendRequest: () -> Unit,
+    onAcceptFriendRequest: () -> Unit,
     onMessageClicked: () -> Unit,
-    onGiftClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.padding(vertical = 16.dp)
+        modifier = Modifier.padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        FollowButton(
-            isFollowing = isFollowed,
-            onClick = onFollowToggle,
+        FriendButton(
+            friend = friend,
+            requested = requested,
+            hasRequestedViewer = hasRequestedViewer,
             modifier = Modifier.weight(1f),
+            onCancelFriendRequest = onCancelFriendRequest,
+            onSendFriendRequest = onSendFriendRequest,
+            onAcceptFriendRequest = onAcceptFriendRequest,
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        if (friend)
         CheersOutlinedButton(
             modifier = Modifier.weight(1f),
             onClick = onMessageClicked,

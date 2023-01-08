@@ -65,7 +65,7 @@ fun SearchScreen(
         },
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {

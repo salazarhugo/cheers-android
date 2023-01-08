@@ -2,13 +2,17 @@ syntax = "proto3";
 
 package cheers.activity.v1;
 
-
-
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/activity/v1;activity";
 
+import "google/api/annotations.proto";
+
 service ActivityService {
-  rpc ListActivity (ListActivityRequest) returns (ListActivityResponse);
+  rpc ListActivity (ListActivityRequest) returns (ListActivityResponse) {
+    option (google.api.http) = {
+      get: "/v1/activities"
+    };
+  };
 }
 
 message ListActivityRequest {

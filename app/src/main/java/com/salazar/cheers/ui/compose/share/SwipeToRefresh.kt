@@ -41,8 +41,8 @@ fun SwipeToRefresh(
     val coroutineScope = rememberCoroutineScope()
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
 
-    LaunchedEffect(state.isSwipeInProgress) {
-        if (!state.isSwipeInProgress) {
+    LaunchedEffect(state.isSwipeInProgress, state.isRefreshing) {
+        if (!state.isSwipeInProgress && !state.isRefreshing) {
             state.animateOffsetTo(0f)
         }
     }
@@ -66,7 +66,7 @@ fun SwipeToRefresh(
         modifier.nestedScroll(connection = nestedScrollConnection),
         contentAlignment = Alignment.TopCenter
     ) {
-        if (state.isSwipeInProgress && state.indicatorOffset > 10)
+        if (state.isSwipeInProgress && state.indicatorOffset > 10 || state.isRefreshing)
             RefreshSection()
         Box(
             Modifier

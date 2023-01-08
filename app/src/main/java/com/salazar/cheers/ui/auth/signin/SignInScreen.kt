@@ -2,14 +2,11 @@ package com.salazar.cheers.ui.auth.signin
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -59,6 +56,10 @@ fun SignInScreen(
             targetState = true
         }
     }
+    val image = when (isSystemInDarkTheme()) {
+        true -> R.drawable.cheers_logo_white
+        false -> R.drawable.cheers_logo
+    }
 
     val density = LocalDensity.current
     AnimatedVisibility(
@@ -85,7 +86,7 @@ fun SignInScreen(
             ) {
                 Spacer(Modifier.height(32.dp))
                 Image(
-                    painter = rememberAsyncImagePainter(R.drawable.cheers_logo),
+                    painter = rememberAsyncImagePainter(image),
                     contentDescription = null,
                     modifier = Modifier
                         .height(60.dp)

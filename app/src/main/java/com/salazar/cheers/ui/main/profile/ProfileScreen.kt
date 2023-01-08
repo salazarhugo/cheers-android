@@ -115,7 +115,7 @@ fun Profile(
         )
 
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {
@@ -386,8 +386,8 @@ fun ProfileStats(
     ) {
         val items = listOf(
             Counter("Posts", user.postCount, null),
-            Counter("Followers", user.followers),
-            Counter("Following", user.following),
+            Counter("Parties", user.followers),
+            Counter("Friends", user.friendsCount),
         )
 
         items.forEach { item ->

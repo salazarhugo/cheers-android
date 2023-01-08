@@ -10,8 +10,8 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import cheers.story.v1.StoryOuterClass
 import cheers.type.PrivacyOuterClass
-import cheers.type.StoryOuterClass
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.data.repository.story.StoryRepository

@@ -30,7 +30,7 @@ import com.salazar.cheers.internal.*
         Ticket::class,
         Comment::class,
     ],
-    version = 7,
+    version = 11,
     exportSchema = true,
     autoMigrations = []
 )

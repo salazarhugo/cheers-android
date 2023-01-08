@@ -26,9 +26,12 @@ fun ProfileHeader(
             picture = user.picture,
             size = 80.dp,
             storyState = user.storyState,
-            onClick = { onStoryClick(user.username) }
+            onClick = { onStoryClick(user.username) },
         )
-        ProfileStats(user, onStatClicked)
+        ProfileStats(
+            user = user,
+            onStatClicked = onStatClicked,
+        )
         Spacer(Modifier.height(18.dp))
     }
 }

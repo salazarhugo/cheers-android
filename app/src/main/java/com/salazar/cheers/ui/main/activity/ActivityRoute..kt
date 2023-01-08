@@ -31,17 +31,13 @@ fun ActivityRoute(
 
     ActivityScreen(
         uiState = uiState,
-        onBackNav = { navActions.navigateBack() },
-        onSwipeRefresh = activityViewModel::onSwipeRefresh,
-        onActivityClick = {
-            navActions.navigateToOtherProfile(it.username)
-//            when (it.type) {
-//                ActivityType.FOLLOW -> navActions.navigateToOtherProfile(it.username)
-//                ActivityType.POST_LIKE -> navActions.navigateToOtherProfile(it.username)
-//                else -> {
-//                    navActions.navigateToOtherProfile(it.username)
-//                }
-//            }
-        }
+        onActivityUIAction = { action ->
+            when(action) {
+                is ActivityUIAction.OnActivityClick -> navActions.navigateToOtherProfile(action.activity.username)
+                ActivityUIAction.OnBackPressed -> navActions.navigateBack()
+                ActivityUIAction.OnFriendRequestsClick -> navActions.navigateToFriendRequests()
+                ActivityUIAction.OnSwipeRefresh -> activityViewModel.onSwipeRefresh()
+            }
+        },
     )
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheers.story.v1;
 
-import "cheers/type/story/story.proto";
+import "cheers/story/v1/story.proto";
 import "cheers/type/user/user.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
@@ -43,7 +43,7 @@ message ListUserStoryResponse {
 }
 
 message CreateStoryRequest {
-  cheers.type.Story story = 1;
+  cheers.story.v1.Story story = 1;
 }
 
 message GetStoryRequest {
@@ -51,7 +51,7 @@ message GetStoryRequest {
 }
 
 message UpdateStoryRequest {
-  cheers.type.Story story = 1;
+  cheers.story.v1.Story story = 1;
 }
 
 message DeleteStoryRequest {
@@ -120,7 +120,7 @@ message UserWithStories {
 }
 
 message StoryResponse {
-  cheers.type.Story story = 2;
+  cheers.story.v1.Story story = 2;
   bool has_liked = 5;
   bool has_viewed = 6;
 }

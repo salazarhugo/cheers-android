@@ -22,6 +22,20 @@ service CommentService {
       get: "/v1/comments"
     };
   }
+
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
+    option (google.api.http) = {
+      delete: "/v1/comments"
+    };
+  }
+}
+
+message DeleteCommentRequest {
+  string post_id = 1;
+  string comment_id = 2;
+}
+
+message DeleteCommentResponse {
 }
 
 message ListCommentRequest {

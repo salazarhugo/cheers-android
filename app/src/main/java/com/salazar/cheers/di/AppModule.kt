@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import cheers.activity.v1.ActivityServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
 import cheers.comment.v1.CommentServiceGrpcKt
+import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
@@ -19,6 +20,8 @@ import com.salazar.cheers.data.repository.activity.ActivityRepository
 import com.salazar.cheers.data.repository.activity.impl.ActivityRepositoryImpl
 import com.salazar.cheers.data.repository.comment.CommentRepository
 import com.salazar.cheers.data.repository.comment.CommentRepositoryImpl
+import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.cheers.data.repository.friendship.FriendshipRepositoryImpl
 import com.salazar.cheers.data.repository.party.PartyRepository
 import com.salazar.cheers.data.repository.party.impl.PartyRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
@@ -80,6 +83,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFriendshipRepository(
+        commentRepositoryImpl: FriendshipRepositoryImpl,
+    ): FriendshipRepository {
+        return commentRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
     fun provideCommentRepository(
         commentRepositoryImpl: CommentRepositoryImpl,
     ): CommentRepository {
@@ -108,6 +119,18 @@ object AppModule {
         storyRepositoryImpl: StoryRepositoryImpl,
     ): StoryRepository {
         return storyRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideFriendshipServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        errorHandleInterceptor: ErrorHandleInterceptor,
+    ): FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub {
+        return FriendshipServiceGrpcKt
+            .FriendshipServiceCoroutineStub(managedChannel)
+            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors()
     }
 
     @Provides

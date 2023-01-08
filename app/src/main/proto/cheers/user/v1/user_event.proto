@@ -11,10 +11,15 @@ message UserEvent {
   oneof event {
     CreateUser create = 1;
     FollowUser follow = 2;
+    UpdateUser update = 3;
   };
 }
 
 message CreateUser {
+  cheers.type.User user = 1;
+}
+
+message UpdateUser {
   cheers.type.User user = 1;
 }
 

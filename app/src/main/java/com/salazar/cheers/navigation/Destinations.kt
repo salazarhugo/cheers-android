@@ -58,6 +58,7 @@ object MainDestinations {
     const val DRINKING_STATS = "drinkingStats"
     const val NFC_ROUTE = "nfc"
     const val SHARE_ROUTE = "share"
+    const val FRIEND_REQUESTS = "friendRequests"
 }
 
 /**
@@ -95,6 +96,12 @@ class CheersNavigationActions(
 ) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToFriendRequests: () -> Unit = {
+        navController.navigate(MainDestinations.FRIEND_REQUESTS) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToShare: (String) -> Unit = { partyId ->

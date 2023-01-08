@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.activity.ActivityRepository
+import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import com.salazar.cheers.internal.Activity
+import com.salazar.cheers.internal.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,10 +20,13 @@ data class ActivityUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val activities: List<Activity>? = null,
+    val friendRequestCounter: Int? = null,
+    val friendRequestPicture: String? = null,
 )
 
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
+    private val friendshipRepository: FriendshipRepository,
     private val activityRepository: ActivityRepository,
 ) : ViewModel() {
 
@@ -35,7 +40,24 @@ class ActivityViewModel @Inject constructor(
         )
 
     init {
-        getActivity()
+        onSwipeRefresh()
+    }
+
+    private fun getFriendRequests() {
+        viewModelScope.launch {
+            friendshipRepository.listFriendRequest().collect { result ->
+                when(result) {
+                    is Resource.Error -> {}
+                    is Resource.Loading -> {}
+                    is Resource.Success -> viewModelState.update {
+                        it.copy(
+                            friendRequestCounter = result.data?.size,
+                            friendRequestPicture = result.data?.firstOrNull()?.picture
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun getActivity() {
@@ -70,6 +92,13 @@ class ActivityViewModel @Inject constructor(
 
     fun onSwipeRefresh() {
         getActivity()
+        getFriendRequests()
     }
 }
 
+sealed class ActivityUIAction {
+    object OnBackPressed : ActivityUIAction()
+    object OnSwipeRefresh : ActivityUIAction()
+    object OnFriendRequestsClick : ActivityUIAction()
+    data class OnActivityClick(val activity: Activity) : ActivityUIAction()
+}

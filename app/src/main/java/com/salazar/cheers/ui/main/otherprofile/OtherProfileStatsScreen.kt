@@ -67,7 +67,7 @@ fun OtherProfileStatsScreen(
         }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoadingFollowers || uiState.isLoadingFollowing),
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {

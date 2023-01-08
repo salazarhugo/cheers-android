@@ -99,6 +99,7 @@ class HomeViewModel @Inject constructor(
             updateIsLoading(isLoading = it)
         },
         onRequest = { nextPage ->
+            updateIsLoading(true)
             postRepository.getPostFeed(nextPage, 5)
         },
         getNextKey = {
@@ -106,6 +107,7 @@ class HomeViewModel @Inject constructor(
         },
         onError = {
             updateError("Couldn't refresh feed")
+            updateIsLoading(false)
         },
         onSuccess = { items, newKey ->
             viewModelState.update {
@@ -113,6 +115,7 @@ class HomeViewModel @Inject constructor(
                     page = newKey,
                     endReached = items.isEmpty(),
                     posts = it.posts + items,
+                    isLoading = false,
                 )
             }
         }

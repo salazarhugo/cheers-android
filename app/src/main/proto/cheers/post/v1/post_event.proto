@@ -3,27 +3,30 @@ syntax = "proto3";
 package cheers.post.v1;
 
 option java_multiple_files = true;
-option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/post/v1;post";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/post/v1;post";
+
+import "cheers/post/v1/post_service.proto";
+import "cheers/type/user/user.proto";
+import "cheers/type/post/post.proto";
 
 message PostEvent {
-  string user_id = 1;
-  string post_id = 11;
-  string creator_id = 2;
-  string caption = 3;
-  string address = 4;
-  repeated string photos = 6;
-  bool is_comment_enabled = 7;
-  string location_name = 8;
-  string drink = 9;
-  int64 drunkenness = 10;
-  bool comments_enabled = 13;
-  bool share_enabled = 14;
-  enum EventType  {
-    CREATE = 0;
-    UPDATE = 1;
-    DELETE = 2;
-    LIKE = 3;
-    COMMENT = 4;
-  }
-  EventType type = 12;
+  oneof event {
+    CreatePost create = 1;
+    LikePost like = 2;
+    DeletePost delete = 3;
+  };
+}
+
+message CreatePost {
+  cheers.type.Post post = 1;
+  cheers.type.UserItem user = 2;
+}
+
+message LikePost {
+  cheers.type.Post post = 1;
+  cheers.type.UserItem user = 2;
+}
+
+message DeletePost {
+  cheers.type.UserItem sender = 2;
 }

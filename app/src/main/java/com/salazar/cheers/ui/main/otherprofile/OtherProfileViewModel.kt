@@ -7,6 +7,10 @@ import cheers.chat.v1.GetRoomIdReq
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.cheers.domain.usecase.accept_friend_request.AcceptFriendRequestUseCase
+import com.salazar.cheers.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.usecase.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -62,9 +66,12 @@ class OtherProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
     private val chatRepository: ChatRepository,
+    private val sendFriendRequestUseCase: SendFriendRequestUseCase,
+    private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
+    private val acceptFriendRequestUseCase: AcceptFriendRequestUseCase,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = false))
     lateinit var username: String
 
     val uiState = viewModelState
@@ -111,9 +118,21 @@ class OtherProfileViewModel @Inject constructor(
         refreshUserPosts()
     }
 
-    fun toggleFollow(user: User) {
+    fun acceptFriendRequest(userId: String) {
         viewModelScope.launch {
-            userRepository.toggleFollow(user.id)
+            acceptFriendRequestUseCase(userId = userId)
+        }
+    }
+
+    fun cancelFriendRequest(userId: String) {
+        viewModelScope.launch {
+            cancelFriendRequestUseCase(userId = userId)
+        }
+    }
+
+    fun sendFriendRequest(userId: String) {
+        viewModelScope.launch {
+            sendFriendRequestUseCase(userId = userId)
         }
     }
 

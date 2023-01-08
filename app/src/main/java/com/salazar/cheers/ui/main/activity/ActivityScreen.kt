@@ -5,9 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +22,7 @@ import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.ActivityType
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.internal.toSentence
+import com.salazar.cheers.ui.compose.CheersBadgeBox
 import com.salazar.cheers.ui.compose.EmptyActivity
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
@@ -35,14 +36,12 @@ import com.salazar.cheers.ui.main.party.create.TopAppBar
 @Composable
 fun ActivityScreen(
     uiState: ActivityUiState,
-    onBackNav: () -> Unit,
-    onSwipeRefresh: () -> Unit,
-    onActivityClick: (Activity) -> Unit,
+    onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                onDismiss = onBackNav,
+                onDismiss = { onActivityUIAction(ActivityUIAction.OnBackPressed)},
                 title = "Activity"
             )
         }
@@ -51,8 +50,8 @@ fun ActivityScreen(
             LoadingScreen()
         else
             SwipeToRefresh(
-                state = rememberSwipeToRefreshState(isRefreshing = false),
-                onRefresh = onSwipeRefresh,
+                state = rememberSwipeToRefreshState(uiState.isLoading),
+                onRefresh = { onActivityUIAction(ActivityUIAction.OnSwipeRefresh)},
                 modifier = Modifier.padding(it),
             ) {
                 Column {
@@ -62,8 +61,9 @@ fun ActivityScreen(
                         EmptyActivity()
                     else
                         ActivityList(
+                            uiState = uiState,
                             activities = activities,
-                            onActivityClick = onActivityClick,
+                            onActivityUIAction = onActivityUIAction,
                         )
                 }
             }
@@ -73,10 +73,18 @@ fun ActivityScreen(
 
 @Composable
 fun ActivityList(
+    uiState: ActivityUiState,
     activities: List<Activity>?,
-    onActivityClick: (Activity) -> Unit,
+    onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     LazyColumn {
+        item {
+            FriendRequests(
+                count = uiState.friendRequestCounter,
+                picture = uiState.friendRequestPicture,
+                onClick = { onActivityUIAction(ActivityUIAction.OnFriendRequestsClick)},
+            )
+        }
         item {
             MyText(
                 text = "This week",
@@ -86,8 +94,53 @@ fun ActivityList(
         }
         if (activities != null)
             items(activities) {
-                ActivityItem(activity = it, onActivityClick)
+                ActivityItem(
+                    activity = it,
+                    onActivityClick = { onActivityUIAction(ActivityUIAction.OnActivityClick(it))},
+                )
             }
+    }
+}
+
+@Composable
+fun FriendRequests(
+    count: Int? = null,
+    picture: String? = null,
+    onClick: () -> Unit,
+) {
+    if (count == null || count == 0)
+        return
+
+    Row(
+        modifier = Modifier
+            .clickable { onClick() }
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CheersBadgeBox(count = count) {
+                UserProfilePicture(
+                    picture = picture,
+                    size = 40.dp,
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column() {
+                Text(
+                    text = "Friend requests",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Text(
+                    text = "Approve or ignore requests",
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal),
+                )
+            }
+        }
     }
 }
 

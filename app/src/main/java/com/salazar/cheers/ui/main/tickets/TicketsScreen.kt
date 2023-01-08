@@ -24,7 +24,7 @@ fun TicketsScreen(
     Scaffold(
         topBar = {
             Toolbar(
-                onBackPressed = {},
+                onBackPressed = { onTicketsUIAction(TicketsUIAction.OnBackPressed)},
                 title = "Tickets",
             )
         },

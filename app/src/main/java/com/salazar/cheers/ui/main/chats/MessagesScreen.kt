@@ -62,7 +62,7 @@ fun MessagesScreen(
         },
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = { onRoomsUIAction(RoomsUIAction.OnSwipeRefresh) },
             modifier = Modifier.padding(it),
         ) {

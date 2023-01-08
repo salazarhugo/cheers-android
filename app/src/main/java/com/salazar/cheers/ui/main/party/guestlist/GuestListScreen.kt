@@ -36,7 +36,7 @@ fun GuestListScreen(
         topBar = { TopAppBar(title = "Guest list", onDismiss = onDismiss) }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {

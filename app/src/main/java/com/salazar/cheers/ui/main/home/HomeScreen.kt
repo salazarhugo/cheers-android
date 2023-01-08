@@ -64,7 +64,7 @@ fun HomeScreen(
         },
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = { onHomeUIAction(HomeUIAction.OnSwipeRefresh) },
             modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {

@@ -1,6 +1,6 @@
 package com.salazar.cheers.data.repository.story
 
-import cheers.type.StoryOuterClass
+import cheers.story.v1.StoryOuterClass
 import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
 import kotlinx.coroutines.flow.Flow

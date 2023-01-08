@@ -2,7 +2,6 @@ package com.salazar.cheers.data.repository.story.impl
 
 import androidx.paging.PagingData
 import cheers.story.v1.*
-import cheers.type.StoryOuterClass
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.StoryDao

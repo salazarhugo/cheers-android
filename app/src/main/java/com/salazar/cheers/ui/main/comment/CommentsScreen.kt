@@ -64,7 +64,7 @@ fun CommentsScreen(
         }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(it),
         ) {

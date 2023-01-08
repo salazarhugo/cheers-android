@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
+import com.salazar.cheers.ui.compose.CheersBadgeBox
 import com.salazar.cheers.ui.compose.DividerM3
 
 @Composable
@@ -84,18 +85,7 @@ fun HomeTopBar(
                 }
                 val unreadChatCount = uiState.unreadChatCounter
 
-                Box(
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (unreadChatCount > 0)
-                        Badge(
-                            modifier = Modifier.offset(y = (-14).dp, x = 14.dp),
-                        ) {
-                            Text(
-                                text = unreadChatCount.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            )
-                        }
+                CheersBadgeBox(count = unreadChatCount) {
                     IconButton(onClick = onChatClick) {
                         Icon(
                             painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),

@@ -212,6 +212,10 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun updateLocalUser(user: User) {
+        userDao.update(user)
+    }
+
     suspend fun updateUser(user: User) = withContext(Dispatchers.IO) {
         try {
             userDao.update(user)

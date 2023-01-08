@@ -26,6 +26,7 @@ fun TicketsRoute(
                 is TicketsUIAction.OnTicketClick -> {
                     navActions.navigateToTicketDetails(action.ticketId)
                 }
+                TicketsUIAction.OnBackPressed -> navActions.navigateBack()
             }
         }
     )

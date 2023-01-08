@@ -164,7 +164,7 @@ suspend fun addPostsAnnotation(
         return
 
     val annotationApi = mapView.annotations
-    val btm = getBitmapFromUrl(post.photos[0])
+    val btm = getBitmapFromUrl(post.profilePictureUrl)
     val pointAnnotationManager = annotationApi.createPointAnnotationManager()
     val pointAnnotationOptions = PointAnnotationOptions()
         .withPoint(Point.fromLngLat(post.longitude, post.latitude))

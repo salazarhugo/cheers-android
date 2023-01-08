@@ -17,5 +17,7 @@ data class UserItem(
     val verified: Boolean,
     val picture: String?,
     val has_followed: Boolean,
-    val story_state: StoryState
+    val story_state: StoryState,
+    val friend: Boolean,
+    val requested: Boolean,
 )

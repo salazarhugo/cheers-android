@@ -47,5 +47,6 @@ class TicketsViewModel @Inject constructor(
 
 sealed class TicketsUIAction {
     object OnSwipeRefresh : TicketsUIAction()
+    object OnBackPressed : TicketsUIAction()
     data class OnTicketClick(val ticketId: String) : TicketsUIAction()
 }

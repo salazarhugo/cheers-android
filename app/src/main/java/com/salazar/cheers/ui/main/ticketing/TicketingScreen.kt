@@ -37,7 +37,7 @@ fun TicketingScreen(
     ) {
         SwipeToRefresh(
             onRefresh = onSwipeRefresh,
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             modifier = Modifier
                 .padding(it)
                 .verticalScroll(rememberScrollState()),

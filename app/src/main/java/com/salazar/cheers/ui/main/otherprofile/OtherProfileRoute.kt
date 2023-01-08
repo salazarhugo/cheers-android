@@ -47,9 +47,9 @@ fun OtherProfileRoute(
         }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(isRefreshing = false),
+            state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = otherProfileViewModel::onSwipeRefresh,
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
             if (uiState is OtherProfileUiState.HasUser) {
                 val uiState = uiState as OtherProfileUiState.HasUser
@@ -58,7 +58,9 @@ fun OtherProfileRoute(
                     uiState = uiState,
                     onPostClicked = { navActions.navigateToPostDetail(it) },
                     onPostLike = otherProfileViewModel::toggleLike,
-                    onFollowToggle = otherProfileViewModel::toggleFollow,
+                    onSendFriendRequest = otherProfileViewModel::sendFriendRequest,
+                    onCancelFriendRequest = otherProfileViewModel::cancelFriendRequest,
+                    onAcceptFriendRequest = otherProfileViewModel::acceptFriendRequest,
                     onPostMoreClicked = { postId, authorId ->
                         navActions.navigateToPostMoreSheet(postId)
                     },
@@ -89,7 +91,7 @@ fun OtherProfileRoute(
                     },
                     onCommentClick = {
                         navActions.navigateToComments(it)
-                    }
+                    },
                 )
             }
         }

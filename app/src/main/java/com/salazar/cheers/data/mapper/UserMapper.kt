@@ -20,6 +20,10 @@ fun GetUserResponse.toUser(): User {
         followBack = hasFollowed,
         followers = followersCount,
         following = followingCount,
+        friend = friend,
+        requested = requested,
+        hasRequestedViewer = hasRequestedViewer,
+        friendsCount = friendsCount,
     )
 }
 
