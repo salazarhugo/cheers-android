@@ -244,6 +244,7 @@ class HomeViewModel @Inject constructor(
             }
             .withAdListener(object : AdListener() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
+                    print(adError.message)
                 }
             })
             .withNativeAdOptions(

@@ -37,6 +37,7 @@ import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.MultiFabState
+import com.salazar.cheers.ui.compose.ads.NativeAdPost
 import com.salazar.cheers.ui.compose.post.NoPosts
 import com.salazar.cheers.ui.compose.post.PostItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
@@ -114,6 +115,11 @@ fun PostList(
             count = uiState.posts.size,
             key = { uiState.posts[it].id },
         ) { i ->
+            NativeAdPost(
+                index = i,
+                ad = uiState.nativeAd,
+            )
+
             val post = uiState.posts[i]
             if (i >= uiState.posts.size - 1 && !uiState.endReached && !uiState.isLoading) {
                 LaunchedEffect(Unit) {
@@ -289,7 +295,9 @@ fun Stories(
 
         itemsIndexed(
             items = userWithStoriesList,
-            key = { i, userWithStories: UserWithStories -> userWithStories.user.id },
+            key = { _, userWithStories: UserWithStories ->
+                userWithStories.user.id
+            },
         ) { i, userWithStories ->
             val user = userWithStories.user
             val stories = userWithStories.stories

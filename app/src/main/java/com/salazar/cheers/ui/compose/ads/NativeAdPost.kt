@@ -22,8 +22,15 @@ import com.salazar.cheers.ui.compose.DividerM3
 
 
 @Composable
-fun NativeAdPost(ad: NativeAd) {
+fun NativeAdPost(
+    index: Int,
+    ad: NativeAd?,
+) {
+    if (index == 0 || index % 4 != 0 || ad == null)
+        return
+
     Column {
+        DividerM3()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
