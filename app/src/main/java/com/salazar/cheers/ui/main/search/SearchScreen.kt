@@ -99,7 +99,7 @@ private fun SearchBody(
                     )
                 }
 
-            items(uiState.recentUsers, key = { it.username }) { user ->
+            items(uiState.recentUsers) { user ->
                 RecentUserCard(user, onDeleteRecentUser = onDeleteRecentUser, onRecentUserClicked)
             }
 

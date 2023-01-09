@@ -117,7 +117,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun listFriend(): Flow<List<UserItem>> {
+    fun listUserItems(): Flow<List<UserItem>> {
         return userItemDao.listUserItems()
     }
 
@@ -206,7 +206,8 @@ class UserRepository @Inject constructor(
             remoteUsers?.let { it ->
                 val users = it.map { it.toUserItem() }
                 userItemDao.insertAll(users)
-                emit(Resource.Success(data = users))
+                val local = userItemDao.searchUser(query = query)
+                emit(Resource.Success(data = local))
             }
             emit(Resource.Loading(false))
         }
@@ -361,6 +362,10 @@ class UserRepository @Inject constructor(
 
     fun getCurrentUserFlow(): Flow<User> {
         return userDao.getUserFlow(userIdOrUsername = Firebase.auth.currentUser?.uid!!)
+    }
+
+    fun listUser(userIdOrUsername: String): Flow<User> {
+        return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
     }
 
     fun getUserFlow(userIdOrUsername: String): Flow<User> {

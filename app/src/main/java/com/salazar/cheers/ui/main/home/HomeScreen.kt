@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,8 +31,8 @@ import androidx.work.WorkManager
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.domain.models.UserWithStories
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
@@ -294,9 +293,10 @@ fun Stories(
         ) { i, userWithStories ->
             val user = userWithStories.user
             val stories = userWithStories.stories
-            val viewed = remember(userWithStories.stories) { stories.all { it.viewed } }
+            val viewed = remember(userWithStories.stories) {
+                stories.all { it.viewed }
+            }
 
-//            if (userWithStories.user.id != uid)
             Story(
                 modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
                 username = user.username,

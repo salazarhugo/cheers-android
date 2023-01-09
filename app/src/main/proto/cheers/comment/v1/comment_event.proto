@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cheers.comment.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/comment/v1;comment";
+
+import "cheers/comment/v1/comment_service.proto";
+import "cheers/type/user/user.proto";
+
+message CommentEvent {
+  oneof event {
+    CreatedComment created = 1;
+    DeletedComment deleted = 2;
+  };
+}
+
+message CreatedComment {
+  cheers.comment.v1.Comment comment = 1;
+  cheers.type.UserItem user = 2;
+}
+
+message DeletedComment {
+  cheers.comment.v1.Comment comment = 1;
+  cheers.type.UserItem user = 2;
+}

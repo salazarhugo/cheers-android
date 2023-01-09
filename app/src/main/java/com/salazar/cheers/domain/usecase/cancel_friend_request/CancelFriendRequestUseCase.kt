@@ -15,7 +15,7 @@ class CancelFriendRequestUseCase @Inject constructor(
 ){
     suspend operator fun invoke(userId: String) = withContext(dispatcher) {
         val otherUser = userRepository.getUserFlow(userId).first()
-        userRepository.updateUser(
+        userRepository.updateLocalUser(
             otherUser.copy(requested = false)
         )
         return@withContext repository.cancelFriendRequest(userId = userId)

@@ -19,9 +19,6 @@ data class Story(
     @ColumnInfo(name = "storyId")
     val id: String = "",
     val authorId: String = "",
-    val username: String = "",
-    val verified: Boolean = false,
-    val profilePictureUrl: String = "",
     val viewed: Boolean = false,
     val liked: Boolean = false,
     val createTime: Long = 0,
@@ -36,10 +33,4 @@ data class Story(
     val tagUsersId: List<String> = emptyList(),
     val type: String = StoryType.TEXT,
     val accountId: String = "",
-)
-
-data class StoryDetail(
-    val story: Story,
-    val author: User = User(),
-    val viewers: List<User> = ArrayList()
 )

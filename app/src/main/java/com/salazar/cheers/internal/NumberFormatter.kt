@@ -8,7 +8,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 fun numberFormatter(
     value: Int,
 ): AnnotatedString {
-
     return buildAnnotatedString {
         val res = when {
             value < 10E3 -> value.toString()

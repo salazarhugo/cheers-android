@@ -123,6 +123,7 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Error -> updateError(result.message)
                 else -> {}
             }
+            viewModelState.update { it.copy(isLoading = false) }
         }
     }
 

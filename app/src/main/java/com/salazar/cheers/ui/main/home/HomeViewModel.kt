@@ -12,11 +12,12 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.paging.DefaultPaginator
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.domain.models.UserWithStories
+import com.salazar.cheers.domain.usecase.feed_story.ListStoryFeedUseCase
 import com.salazar.cheers.domain.usecase.get_unread_chat_counter.GetUnreadChatCounterUseCase
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
@@ -57,6 +58,7 @@ class HomeViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
+    private val listStoryFeedUseCase: ListStoryFeedUseCase,
     private val getUnreadChatCounterUseCase: GetUnreadChatCounterUseCase,
 ) : ViewModel() {
 
@@ -87,7 +89,6 @@ class HomeViewModel @Inject constructor(
                 it.copy(
                     storyPage = newKey,
                     storyEndReached = items.isEmpty(),
-                    userWithStoriesList = items,
                 )
             }
         }
@@ -146,8 +147,7 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            storyRepository.feedStory(1, 10)
-                .collect(::updateStories)
+            listStoryFeedUseCase().collect(::updateStories)
         }
     }
 

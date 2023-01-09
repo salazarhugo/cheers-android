@@ -36,7 +36,7 @@ fun FriendButton(
         ) {
             Text("Cancel request")
         }
-    if (hasRequestedViewer) {
+    else if (hasRequestedViewer) {
         Button(
             modifier = modifier.height(34.dp),
             shape = shape,

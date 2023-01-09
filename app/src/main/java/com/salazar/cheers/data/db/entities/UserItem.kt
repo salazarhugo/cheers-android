@@ -11,13 +11,13 @@ import com.salazar.cheers.data.enums.StoryState
 )
 data class UserItem(
     @PrimaryKey
-    val id: String,
-    val username: String,
-    val name: String,
-    val verified: Boolean,
-    val picture: String?,
-    val has_followed: Boolean,
-    val story_state: StoryState,
-    val friend: Boolean,
-    val requested: Boolean,
+    val id: String = "",
+    val username: String = "",
+    val name: String = "",
+    val verified: Boolean = false,
+    val picture: String? = null,
+    val has_followed: Boolean = false,
+    val story_state: StoryState = StoryState.EMPTY,
+    val friend: Boolean = false,
+    val requested: Boolean = false,
 )

@@ -46,8 +46,9 @@ import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.post.PostHeader
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import com.salazar.cheers.ui.compose.utils.PrettyImage
-import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.domain.models.UserWithStories
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.carousel
@@ -269,7 +270,7 @@ fun StoryPage(
 
 @Composable
 fun StoryFeedHeader(
-    user: User,
+    user: UserItem,
     story: Story,
     count: Int,
     currentStep: Int,

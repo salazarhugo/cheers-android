@@ -250,12 +250,12 @@ fun HeaderButtons(
             onAcceptFriendRequest = onAcceptFriendRequest,
         )
         if (friend)
-        CheersOutlinedButton(
-            modifier = Modifier.weight(1f),
-            onClick = onMessageClicked,
-        ) {
-            Text("Message")
-        }
+            CheersOutlinedButton(
+                modifier = Modifier.weight(1f),
+                onClick = onMessageClicked,
+            ) {
+                Text("Message")
+            }
 //        Spacer(modifier = Modifier.width(12.dp))
 //        IconButton(onClick = onGiftClick) {
 //            Icon(

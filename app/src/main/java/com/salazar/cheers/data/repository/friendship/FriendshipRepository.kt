@@ -18,6 +18,11 @@ interface FriendshipRepository {
     suspend fun createFriendRequest(userId: String): Result<Unit>
 
     /**
+     * List friends.
+     */
+    suspend fun listFriend(): Flow<Resource<List<UserItem>>>
+
+    /**
      * List friend request.
      */
     suspend fun listFriendRequest(): Flow<Resource<List<UserItem>>>

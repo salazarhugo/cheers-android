@@ -1,8 +1,8 @@
 package com.salazar.cheers.data.repository.story
 
 import cheers.story.v1.StoryOuterClass
-import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.domain.models.UserWithStories
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -23,7 +23,7 @@ interface StoryRepository {
     /**
      * Get story feed from local database.
      */
-    suspend fun feedStory(page: Int, pageSize: Int): Flow<List<UserWithStories>>
+    suspend fun feedStory(page: Int, pageSize: Int): Flow<List<Story>>
 
     /**
      * Fetch story feed from backend.

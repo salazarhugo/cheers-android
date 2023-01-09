@@ -15,7 +15,7 @@ interface UserItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(users: List<UserItem>)
 
-    @Query("SELECT * FROM user_item WHERE friend = 1")
+    @Query("SELECT * FROM user_item")
     fun listUserItems(): Flow<List<UserItem>>
 
     @Query("SELECT * FROM user_item WHERE username LIKE '%' || :query || '%' ")

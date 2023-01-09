@@ -82,6 +82,7 @@ message DeleteFriendRequestResponse {
 }
 
 message ListFriendResponse {
+  repeated cheers.type.UserItem items = 1;
 }
 
 message DeleteFriendRequest2 {

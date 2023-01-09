@@ -23,17 +23,23 @@ fun MapRoute(
 
     val systemUiController = rememberSystemUiController()
 
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
+    DisposableEffect(Unit) {
+        systemUiController.setNavigationBarColor(
+            color = Color.Black,
             darkIcons = true,
         )
+        onDispose {
+            systemUiController.setNavigationBarColor(
+                color = Color.Transparent,
+                darkIcons = true,
+            )
+        }
     }
 
     MapScreen(
         uiState = uiState,
         onMapUIAction = { action ->
-            when(action) {
+            when (action) {
                 MapUIAction.OnBackPressed -> navActions.navigateBack()
                 MapUIAction.OnCreatePostClick -> navActions.navigateToCreatePost()
                 MapUIAction.OnPublicToggle -> mapViewModel.onTogglePublic()

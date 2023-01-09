@@ -35,4 +35,3 @@ fun ProfileHeader(
         Spacer(Modifier.height(18.dp))
     }
 }
-

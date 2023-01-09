@@ -5,9 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +23,6 @@ import com.salazar.cheers.internal.ActivityType
 import com.salazar.cheers.internal.relativeTimeFormatter
 import com.salazar.cheers.internal.toSentence
 import com.salazar.cheers.ui.compose.CheersBadgeBox
-import com.salazar.cheers.ui.compose.EmptyActivity
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
@@ -41,7 +40,7 @@ fun ActivityScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                onDismiss = { onActivityUIAction(ActivityUIAction.OnBackPressed)},
+                onDismiss = { onActivityUIAction(ActivityUIAction.OnBackPressed) },
                 title = "Activity"
             )
         }
@@ -51,20 +50,17 @@ fun ActivityScreen(
         else
             SwipeToRefresh(
                 state = rememberSwipeToRefreshState(uiState.isLoading),
-                onRefresh = { onActivityUIAction(ActivityUIAction.OnSwipeRefresh)},
+                onRefresh = { onActivityUIAction(ActivityUIAction.OnSwipeRefresh) },
                 modifier = Modifier.padding(it),
             ) {
                 Column {
                     val activities = uiState.activities
 
-                    if (activities?.isEmpty() == true)
-                        EmptyActivity()
-                    else
-                        ActivityList(
-                            uiState = uiState,
-                            activities = activities,
-                            onActivityUIAction = onActivityUIAction,
-                        )
+                    ActivityList(
+                        uiState = uiState,
+                        activities = activities,
+                        onActivityUIAction = onActivityUIAction,
+                    )
                 }
             }
     }
@@ -82,7 +78,7 @@ fun ActivityList(
             FriendRequests(
                 count = uiState.friendRequestCounter,
                 picture = uiState.friendRequestPicture,
-                onClick = { onActivityUIAction(ActivityUIAction.OnFriendRequestsClick)},
+                onClick = { onActivityUIAction(ActivityUIAction.OnFriendRequestsClick) },
             )
         }
         item {
@@ -93,10 +89,10 @@ fun ActivityList(
             )
         }
         if (activities != null)
-            items(activities) {
+            items(activities, key = { it.id }) {
                 ActivityItem(
                     activity = it,
-                    onActivityClick = { onActivityUIAction(ActivityUIAction.OnActivityClick(it))},
+                    onActivityClick = { onActivityUIAction(ActivityUIAction.OnActivityClick(it)) },
                 )
             }
     }

@@ -1,10 +1,6 @@
 package com.salazar.cheers.data.repository.friendship
 
-import cheers.friendship.v1.AcceptFriendRequestRequest
-import cheers.friendship.v1.CreateFriendRequestRequest
-import cheers.friendship.v1.DeleteFriendRequestRequest
-import cheers.friendship.v1.FriendshipServiceGrpcKt
-import cheers.friendship.v1.ListFriendRequestsRequest
+import cheers.friendship.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.entities.UserItem
@@ -27,6 +23,31 @@ class FriendshipRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun listFriend(): Flow<Resource<List<UserItem>>> = flow {
+        emit(Resource.Loading(true))
+
+        val request = ListFriendRequest.newBuilder()
+            .setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+            .build()
+
+        val remoteFriendRequests = try {
+            val response = service.listFriend(request = request)
+            val users = response.itemsList.map {
+                it.toUserItem()
+            }
+            users
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "Couldn't refresh friend requests"))
+            null
+        }
+
+        remoteFriendRequests?.let {
+            emit(Resource.Success(it))
+        }
+
+        emit(Resource.Loading(false))
     }
 
     override suspend fun listFriendRequest(): Flow<Resource<List<UserItem>>>

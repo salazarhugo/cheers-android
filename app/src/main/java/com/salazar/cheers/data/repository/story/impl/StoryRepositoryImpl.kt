@@ -3,14 +3,15 @@ package com.salazar.cheers.data.repository.story.impl
 import androidx.paging.PagingData
 import cheers.story.v1.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.db.CheersDatabase
-import com.salazar.cheers.data.db.StoryDao
-import com.salazar.cheers.data.db.UserDao
-import com.salazar.cheers.data.db.UserWithStories
+import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.data.mapper.toStory
 import com.salazar.cheers.data.mapper.toUser
+import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.domain.models.UserWithStories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -21,6 +22,7 @@ import javax.inject.Singleton
 
 @Singleton
 class StoryRepositoryImpl @Inject constructor(
+    private val userItemDao: UserItemDao,
     private val userDao: UserDao,
     private val storyDao: StoryDao,
     private val database: CheersDatabase,
@@ -51,19 +53,11 @@ class StoryRepositoryImpl @Inject constructor(
     override suspend fun feedStory(
         page: Int,
         pageSize: Int
-    ): Flow<List<UserWithStories>> {
-        val skip = pageSize * (page - 1)
-        return storyDao.feedStory(skip, pageSize)
-            .map { userWithStories ->
-                userWithStories
-                    // Remove users with no stories
-                    .filter { it.stories.isNotEmpty() }
-                    // Sort by un-viewed story first
-                    .sortedBy { it.stories.all { it.viewed } }
-            }
+    ): Flow<List<Story>> {
+        return storyDao.listStory()
     }
 
-    override suspend fun fetchFeedStory(page: Int, pageSize: Int): Result<List<UserWithStories>> {
+    override suspend fun fetchFeedStory(page: Int, pageSize: Int): Result<List<com.salazar.cheers.domain.models.UserWithStories>> {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 
         val request = FeedStoryRequest.newBuilder()
@@ -76,17 +70,19 @@ class StoryRepositoryImpl @Inject constructor(
             val remoteUserWithStoriesList = response.itemsList
             val userWithStoriesList = remoteUserWithStoriesList.map { userWithStories ->
                 UserWithStories(
-                    userWithStories.user.toUser(),
+                    userWithStories.user.toUserItem(),
                     stories = userWithStories.storiesList.map {
                         it.toStory(
-                            userWithStories.user.id,
-                            uid
+                            authorId = userWithStories.user.id,
+                            accountId = uid
                         )
                     })
             }
 
+            storyDao.clearAll()
+
             remoteUserWithStoriesList.forEach { userWithStories ->
-                val user = userWithStories.user.toUser()
+                val user = userWithStories.user.toUserItem()
                 val stories = userWithStories.storiesList.map {
                     it.toStory(
                         authorId = user.id,
@@ -94,8 +90,8 @@ class StoryRepositoryImpl @Inject constructor(
                     )
                 }
 
-                userDao.insert(user)
-                storyDao.insertStories(stories)
+                userItemDao.insert(user)
+                storyDao.insertAll(stories)
             }
 
             return Result.success(userWithStoriesList)

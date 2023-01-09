@@ -6,8 +6,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.salazar.cheers.data.db.UserWithStories
 import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.domain.models.UserWithStories
+import com.salazar.cheers.domain.usecase.feed_story.ListStoryFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -39,6 +40,7 @@ data class StoryFeedUiState(
 class StoryFeedViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val storyRepository: StoryRepository,
+    private val listStoryFeedUseCase: ListStoryFeedUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(StoryFeedUiState(isLoading = true))
@@ -56,7 +58,7 @@ class StoryFeedViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            storyRepository.feedStory(1, 10).collect {
+            listStoryFeedUseCase().collect {
                 updateUsersWithStories(usersWithStories = it)
             }
         }
