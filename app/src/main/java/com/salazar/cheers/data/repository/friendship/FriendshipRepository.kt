@@ -36,4 +36,9 @@ interface FriendshipRepository {
      * Refuse friend request.
      */
     suspend fun cancelFriendRequest(userId: String): Result<Unit>
+
+    /**
+     * Remove a friend.
+     */
+    suspend fun removeFriend(userId: String): Result<Unit>
 }

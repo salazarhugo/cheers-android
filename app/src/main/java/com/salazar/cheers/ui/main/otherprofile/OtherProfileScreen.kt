@@ -143,6 +143,7 @@ fun Toolbar(
     verified: Boolean,
     onBackPressed: () -> Unit,
     onCopyUrl: () -> Unit,
+    onRemoveFriend: () -> Unit,
 ) {
     val openDialog = remember { mutableStateOf(false) }
     //                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
@@ -166,17 +167,22 @@ fun Toolbar(
                 //                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
                 openDialog.value = true
             }) {
-                Icon(Icons.Default.MoreVert, "")
+                Icon(Icons.Default.MoreVert, null)
             }
         })
     if (openDialog.value)
-        MoreDialog(openDialog = openDialog, onCopyUrl = onCopyUrl)
+        MoreDialog(
+            openDialog = openDialog,
+            onCopyUrl = onCopyUrl,
+            onRemoveFriend = onRemoveFriend,
+        )
 }
 
 @Composable
 fun MoreDialog(
     openDialog: MutableState<Boolean>,
     onCopyUrl: () -> Unit,
+    onRemoveFriend: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -185,10 +191,13 @@ fun MoreDialog(
         text = {
             Column {
                 TextButton(
-                    onClick = { openDialog.value = false },
+                    onClick = {
+                        onRemoveFriend()
+                        openDialog.value = false
+                      },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Report")
+                    Text("Remove friend")
                 }
                 TextButton(
                     onClick = { openDialog.value = false },

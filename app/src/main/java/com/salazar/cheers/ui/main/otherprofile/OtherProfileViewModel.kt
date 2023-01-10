@@ -10,6 +10,7 @@ import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import com.salazar.cheers.domain.usecase.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.usecase.remove_friend.RemoveFriendUseCase
 import com.salazar.cheers.domain.usecase.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
@@ -69,6 +70,7 @@ class OtherProfileViewModel @Inject constructor(
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
     private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
     private val acceptFriendRequestUseCase: AcceptFriendRequestUseCase,
+    private val removeFriendUseCase: RemoveFriendUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = false))
@@ -121,6 +123,12 @@ class OtherProfileViewModel @Inject constructor(
     fun acceptFriendRequest(userId: String) {
         viewModelScope.launch {
             acceptFriendRequestUseCase(userId = userId)
+        }
+    }
+
+    fun removeFriend(userId: String) {
+        viewModelScope.launch {
+            removeFriendUseCase(userId = userId)
         }
     }
 

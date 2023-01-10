@@ -101,4 +101,17 @@ class FriendshipRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun removeFriend(userId: String): Result<Unit> {
+        val request = DeleteFriendRequest2.newBuilder()
+            .setUserId(userId)
+            .build()
+
+        return try {
+            service.deleteFriend(request = request)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

@@ -59,7 +59,7 @@ fun YourStory(
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp),
                 onClick = onClick,
             )
-            if (storyState == StoryState.EMPTY)
+            if (storyState == StoryState.EMPTY && uploadInfo?.state != WorkInfo.State.RUNNING)
                 Box(
                     modifier = Modifier
                         .offset(x = (-6).dp, y = (-6).dp)

@@ -36,6 +36,10 @@ fun OtherProfileRoute(
                 username = username,
                 verified = if (uiState is OtherProfileUiState.HasUser) (uiState as OtherProfileUiState.HasUser).user.verified else false,
                 onBackPressed = { navActions.navigateBack() },
+                onRemoveFriend = {
+                    if (uiState is OtherProfileUiState.HasUser)
+                         otherProfileViewModel.removeFriend((uiState as OtherProfileUiState.HasUser).user.id)
+                },
                 onCopyUrl = {
                     if (uiState is OtherProfileUiState.HasUser)
                         FirebaseDynamicLinksUtil.createShortLink("u/${(uiState as OtherProfileUiState.HasUser).user.username}")
