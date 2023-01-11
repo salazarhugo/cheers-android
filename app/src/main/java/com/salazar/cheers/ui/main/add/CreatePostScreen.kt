@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.pager.PagerState
 import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -50,7 +52,9 @@ import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.ui.compose.CarouselDrinks
 import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.post.MultipleAnnotation
@@ -66,10 +70,8 @@ import java.util.*
 @Composable
 fun CreatePostScreen(
     uiState: CreatePostUiState,
-    onDismiss: () -> Unit,
     onUploadPost: () -> Unit,
     interactWithChooseOnMap: () -> Unit,
-    interactWithChooseBeverage: () -> Unit,
     interactWithDrunkennessLevel: () -> Unit,
     navigateToCamera: () -> Unit,
     navigateToTagUser: () -> Unit,
@@ -82,6 +84,7 @@ fun CreatePostScreen(
     updateLocationResults: (List<SearchResult>) -> Unit,
     onMediaSelectorClicked: () -> Unit,
     onSelectPrivacy: (Privacy) -> Unit,
+    onCreatePostUIAction: (CreatePostUIAction) -> Unit,
 ) {
     val searchCallback = object : SearchCallback {
         override fun onResults(
@@ -116,7 +119,7 @@ fun CreatePostScreen(
         onSelectPrivacy = onSelectPrivacy,
     ) {
         Scaffold(
-            topBar = { TopAppBar(onDismiss = onDismiss) },
+            topBar = { TopAppBar(onDismiss = {onCreatePostUIAction(CreatePostUIAction.OnBackPressed)}) },
         ) {
             Column(
                 modifier = Modifier
@@ -165,8 +168,8 @@ fun CreatePostScreen(
                 )
                 DividerM3()
                 BeverageSection(
-                    beverage = uiState.beverage.displayName,
-                    interactWithChooseBeverage = interactWithChooseBeverage
+                    uiState = uiState,
+                    onCreatePostUIAction = onCreatePostUIAction,
                 )
                 DividerM3()
                 DrunkennessLevelSection(
@@ -194,7 +197,7 @@ fun CreatePostScreen(
                     isLoading = uiState.isLoading,
                     onClick = {
                         onUploadPost()
-                        onDismiss()
+                        onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
                     },
                 )
             }
@@ -320,32 +323,20 @@ fun DrunkennessLevelSection(
 
 @Composable
 fun BeverageSection(
-    beverage: String,
-    interactWithChooseBeverage: () -> Unit,
+    uiState: CreatePostUiState,
+    onCreatePostUIAction: (CreatePostUIAction) -> Unit,
 ) {
-    Row(
+    Column(
         modifier = Modifier
-            .clickable { interactWithChooseBeverage() }
-            .padding(15.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .fillMaxWidth()
+            .padding(15.dp),
     ) {
-        Text(
-            text = "Add beverage",
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
+        CarouselDrinks(
+            pagerState = uiState.drinkState,
+            drinks = uiState.drinks,
+            onBeverageClick = {
+            },
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(Icons.Outlined.LocalBar, null)
-            if (beverage.isNotBlank())
-                Text(
-                    text = beverage,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-                )
-        }
     }
 }
 
@@ -406,6 +397,16 @@ fun SwitchPreference(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
+            thumbContent = {
+                when (checked) {
+                    true -> Icon(
+                        imageVector = Icons.Default.NotificationsActive,
+                        contentDescription = null,
+                        modifier = Modifier.size(androidx.compose.material3.SwitchDefaults.IconSize),
+                    )
+                    false -> Unit
+                }
+            }
         )
     }
 }

@@ -25,6 +25,12 @@ interface UserDao {
     @Query("SELECT * FROM user_suggestion WHERE username = :username")
     suspend fun getUserSuggestion(username: String): UserSuggestion?
 
+    @Transaction
+    suspend fun deleteFriend(userId: String)  {
+        val user = getUserNullable(userId) ?: return
+        update(user.copy(friend = false))
+    }
+
     @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
     suspend fun getUser(userIdOrUsername: String): User
 

@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.main.taguser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.domain.usecase.list_friend.ListFriendUseCase
@@ -50,9 +51,7 @@ class AddPeopleViewModel @Inject constructor(
 
     private fun refreshFriends(query: String = "") {
         viewModelScope.launch {
-            listFriendUseCase().collect {
-                updateUsers(it)
-            }
+            listFriendUseCase(FirebaseAuth.getInstance().currentUser?.uid!!).collect(::updateUsers)
         }
     }
 

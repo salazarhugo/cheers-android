@@ -39,7 +39,7 @@ fun ProfileRoute(
             navActions.navigateToPostMoreSheet(postId)
         },
         onStatClicked = { statName, username, verified ->
-            navActions.navigateToProfileStats(
+            navActions.navigateToOtherProfileStats(
                 statName,
                 username,
                 verified,

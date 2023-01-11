@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.share
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.domain.usecase.get_party.GetPartyUseCase
 import com.salazar.cheers.domain.usecase.list_friend.ListFriendUseCase
@@ -55,7 +56,7 @@ class ShareViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            listFriendUseCase().collect(::updateUsers)
+            listFriendUseCase(FirebaseAuth.getInstance().currentUser?.uid!!).collect(::updateUsers)
         }
     }
 

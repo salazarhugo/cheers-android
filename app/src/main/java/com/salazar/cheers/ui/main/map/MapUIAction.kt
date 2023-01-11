@@ -8,6 +8,7 @@ sealed class MapUIAction {
     object OnSwipeRefresh : MapUIAction()
     object OnBackPressed : MapUIAction()
     object OnCreatePostClick : MapUIAction()
+    object OnSettingsClick : MapUIAction()
     object OnPublicToggle : MapUIAction()
     object OnMyLocationClick : MapUIAction()
     data class OnMapReady(val map: MapView, val ctx: Context) : MapUIAction()

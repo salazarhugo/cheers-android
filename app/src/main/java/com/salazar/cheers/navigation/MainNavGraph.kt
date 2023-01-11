@@ -43,6 +43,7 @@ import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.map.MapPostHistoryRoute
 import com.salazar.cheers.ui.main.map.MapRoute
+import com.salazar.cheers.ui.main.map.settings.MapSettingsRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
@@ -75,6 +76,14 @@ fun NavGraphBuilder.mainNavGraph(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = MainDestinations.HOME_ROUTE,
     ) {
+        bottomSheet(
+            route = MainDestinations.MAP_SETTINGS_ROUTE,
+        ) {
+            MapSettingsRoute(
+                navActions = appState.navActions,
+            )
+        }
+
         composable(
             route = MainDestinations.FRIEND_REQUESTS,
         ) {

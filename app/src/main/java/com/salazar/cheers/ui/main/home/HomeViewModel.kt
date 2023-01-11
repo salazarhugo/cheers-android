@@ -17,6 +17,7 @@ import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.domain.models.UserWithStories
+import com.salazar.cheers.domain.usecase.feed_post.ListPostFeedUseCase
 import com.salazar.cheers.domain.usecase.feed_story.ListStoryFeedUseCase
 import com.salazar.cheers.domain.usecase.get_unread_chat_counter.GetUnreadChatCounterUseCase
 import com.salazar.cheers.internal.Post
@@ -60,6 +61,7 @@ class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val listStoryFeedUseCase: ListStoryFeedUseCase,
     private val getUnreadChatCounterUseCase: GetUnreadChatCounterUseCase,
+    private val listPostFeedUseCase: ListPostFeedUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeUiState())
@@ -142,12 +144,13 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            postRepository.getPostFeedFlow()
+            listPostFeedUseCase()
                 .collect(::updatePosts)
         }
 
         viewModelScope.launch {
-            listStoryFeedUseCase().collect(::updateStories)
+            listStoryFeedUseCase()
+                .collect(::updateStories)
         }
     }
 
@@ -182,8 +185,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onSwipeRefresh() {
-        viewModelState.update { it.copy(isLoading = true) }
-
+        updateIsLoading(true)
         viewModelScope.launch {
             userRepository.getUserSignIn(userId = FirebaseAuth.getInstance().currentUser?.uid!!)
                 .collect {
@@ -191,7 +193,10 @@ class HomeViewModel @Inject constructor(
                         updateUser(user = it.data)
                 }
         }
-
+        viewModelScope.launch {
+            paginator.reset()
+            paginator.loadNextItems()
+        }
         viewModelScope.launch {
             storyPaginator.reset()
             storyPaginator.loadNextItems()

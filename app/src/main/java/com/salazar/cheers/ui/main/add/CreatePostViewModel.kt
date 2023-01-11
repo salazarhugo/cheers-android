@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
+import com.google.accompanist.pager.PagerState
+import com.mapbox.common.BillingServiceErrorCode
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.data.db.entities.UserItem
@@ -34,7 +36,6 @@ data class CreatePostUiState(
     val imageUri: Uri? = null,
     val drunkenness: Int = 0,
     val caption: String = "",
-    val beverage: Beverage = Beverage.NONE,
     val postType: String = PostType.TEXT,
     val photos: List<Uri> = emptyList(),
     val locationPoint: Point? = null,
@@ -48,6 +49,8 @@ data class CreatePostUiState(
     val notify: Boolean = true,
     val page: CreatePostPage = CreatePostPage.CreatePost,
     val profilePictureUrl: String? = null,
+    val drinkState: PagerState = PagerState(),
+    val drinks: List<Beverage> = emptyList(),
 )
 
 @HiltViewModel
@@ -77,6 +80,11 @@ class CreatePostViewModel @Inject constructor(
                 it.copy(profilePictureUrl = user.picture)
             }
         }
+        viewModelState.update {
+            val drinks = Beverage.values().toList().sortedBy { it.displayName }
+                .filter { it.displayName.isNotBlank() }
+            it.copy(drinks = drinks)
+        }
     }
 
 
@@ -103,12 +111,6 @@ class CreatePostViewModel @Inject constructor(
     fun onDrunkennessChange(drunkenness: Int) {
         viewModelState.update {
             it.copy(drunkenness = drunkenness)
-        }
-    }
-
-    fun onSelectBeverage(beverage: Beverage) {
-        viewModelState.update {
-            it.copy(beverage = beverage)
         }
     }
 
@@ -195,6 +197,8 @@ class CreatePostViewModel @Inject constructor(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
+        val drink = uiState.drinks[uiState.drinkState.currentPage].displayName
+
         val uploadWorkRequest =
             OneTimeWorkRequestBuilder<CreatePostWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -204,7 +208,7 @@ class CreatePostViewModel @Inject constructor(
                         "POST_TYPE" to uiState.postType,
                         "PHOTO_CAPTION" to uiState.caption,
                         "DRUNKENNESS" to uiState.drunkenness,
-                        "BEVERAGE" to uiState.beverage.name,
+                        "BEVERAGE" to drink,
                         "LOCATION_NAME" to uiState.selectedLocation?.name,
                         "LOCATION_LATITUDE" to uiState.locationPoint?.latitude(),
                         "LOCATION_LONGITUDE" to uiState.locationPoint?.longitude(),
@@ -229,3 +233,8 @@ class CreatePostViewModel @Inject constructor(
     }
 }
 
+sealed class CreatePostUIAction {
+    object OnBackPressed : CreatePostUIAction()
+    object OnSwipeRefresh : CreatePostUIAction()
+    data class OnSelectDrink(val drink: Beverage) : CreatePostUIAction()
+}

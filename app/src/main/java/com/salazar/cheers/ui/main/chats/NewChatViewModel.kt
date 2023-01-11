@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.main.chats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
 import com.salazar.cheers.data.db.entities.UserItem
@@ -45,7 +46,7 @@ class NewChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            listFriendUseCase().collect { users ->
+            listFriendUseCase(FirebaseAuth.getInstance().currentUser?.uid!!).collect { users ->
                 onRecentUsersChange(users = users)
             }
         }

@@ -5,12 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.domain.usecase.list_friend.ListFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +18,7 @@ data class OtherProfileStatsUiState(
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
     val followers: List<UserItem>? = null,
-    val following: List<UserItem>? = null,
+    val friends: List<UserItem>? = null,
     val username: String = "",
     val verified: Boolean = false,
 )
@@ -31,6 +28,7 @@ data class OtherProfileStatsUiState(
 class OtherProfileStatsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
+    private val listFriendUseCase: ListFriendUseCase,
 ) : ViewModel() {
 
     private val viewModelState =
@@ -57,33 +55,23 @@ class OtherProfileStatsViewModel @Inject constructor(
     }
 
     fun onSwipeRefresh() {
-        refreshFollowers()
-        refreshFollowing()
+        refreshFriends()
     }
 
-    private fun refreshFollowing() {
+    private fun refreshFriends() {
         viewModelState.update {
             it.copy(isLoadingFollowing = true)
         }
 
         viewModelScope.launch {
-            val following = userRepository.getFollowing(username)
-            viewModelState.update {
-                it.copy(following = following, isLoadingFollowing = false)
-            }
+            val userId = userRepository.getUserFlow(username).first().id
+            listFriendUseCase(userId).collect(::updateFriends)
         }
     }
 
-    private fun refreshFollowers() {
+    private fun updateFriends(friends: List<UserItem>) {
         viewModelState.update {
-            it.copy(isLoadingFollowers = true)
-        }
-
-        viewModelScope.launch {
-            val followers = userRepository.getFollowers(username)
-            viewModelState.update {
-                it.copy(followers = followers, isLoadingFollowers = false)
-            }
+            it.copy(friends = friends, isLoadingFollowing = false)
         }
     }
 

@@ -213,6 +213,10 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun updateLocalUserItem(userItem: UserItem) {
+        userItemDao.update(userItem)
+    }
+
     suspend fun updateLocalUser(user: User) {
         userDao.update(user)
     }
@@ -366,6 +370,10 @@ class UserRepository @Inject constructor(
 
     fun listUser(userIdOrUsername: String): Flow<User> {
         return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
+    }
+
+    fun getUserItem(userIdOrUsername: String): Flow<UserItem> {
+        return userItemDao.getUserItem(userIdOrUsername = userIdOrUsername)
     }
 
     fun getUserFlow(userIdOrUsername: String): Flow<User> {

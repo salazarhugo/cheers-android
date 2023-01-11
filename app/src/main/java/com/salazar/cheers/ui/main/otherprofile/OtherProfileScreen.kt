@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.otherprofile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.TabRowDefaults
@@ -29,6 +30,7 @@ import com.salazar.cheers.ui.compose.user.FriendButton
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun OtherProfileScreen(
     uiState: OtherProfileUiState.HasUser,

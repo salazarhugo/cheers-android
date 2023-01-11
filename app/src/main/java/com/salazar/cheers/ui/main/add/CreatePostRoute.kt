@@ -30,7 +30,10 @@ fun CreatePostRoute(
         }
 
     BackHandler {
-        addPostViewModel.updatePage(CreatePostPage.CreatePost)
+        if (uiState.page == CreatePostPage.CreatePost)
+            navActions.navigateBack()
+        else
+            addPostViewModel.updatePage(CreatePostPage.CreatePost)
     }
 
     when (uiState.page) {
@@ -40,9 +43,7 @@ fun CreatePostRoute(
                 onCaptionChanged = addPostViewModel::onCaptionChanged,
                 onSelectLocation = addPostViewModel::selectLocation,
                 onUploadPost = addPostViewModel::uploadPost,
-                onDismiss = navActions.navigateBack,
                 interactWithChooseOnMap = { addPostViewModel.updatePage(CreatePostPage.ChooseOnMap) },
-                interactWithChooseBeverage = { addPostViewModel.updatePage(CreatePostPage.ChooseBeverage) },
                 interactWithDrunkennessLevel = { addPostViewModel.updatePage(CreatePostPage.DrunkennessLevel) },
                 navigateToTagUser = { addPostViewModel.updatePage(CreatePostPage.AddPeople) },
                 navigateToCamera = { navActions.navigateToCamera() },
@@ -52,7 +53,14 @@ fun CreatePostRoute(
                 onSelectMedia = addPostViewModel::addPhoto,
                 onMediaSelectorClicked = { launcher.launch("image/* video/*") },
                 onSelectPrivacy = addPostViewModel::selectPrivacy,
-                onNotifyChange = addPostViewModel::toggleNotify
+                onNotifyChange = addPostViewModel::toggleNotify,
+                onCreatePostUIAction = {
+                    when(it) {
+                        CreatePostUIAction.OnBackPressed -> navActions.navigateBack()
+                        is CreatePostUIAction.OnSelectDrink -> {}
+                        CreatePostUIAction.OnSwipeRefresh -> TODO()
+                    }
+                }
             )
         CreatePostPage.ChooseOnMap ->
             ChooseOnMapScreen(
@@ -65,10 +73,7 @@ fun CreatePostRoute(
         CreatePostPage.ChooseBeverage ->
             BeverageScreen(
                 onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
-                onSelectBeverage = {
-                    addPostViewModel.onSelectBeverage(it)
-                    addPostViewModel.updatePage(CreatePostPage.CreatePost)
-                },
+                onSelectBeverage = {},
             )
         CreatePostPage.AddPeople ->
             AddPeopleScreen(

@@ -20,7 +20,7 @@ interface FriendshipRepository {
     /**
      * List friends.
      */
-    suspend fun listFriend(): Flow<Resource<List<UserItem>>>
+    suspend fun listFriend(userId: String): Flow<Resource<List<UserItem>>>
 
     /**
      * List friend request.

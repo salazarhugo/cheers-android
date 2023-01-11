@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
 import com.salazar.cheers.data.repository.MapRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
@@ -30,6 +32,7 @@ data class MapUiState(
     val postSheetState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
+    val mapboxMap: MapboxMap? = null,
 )
 
 @HiltViewModel
@@ -55,6 +58,12 @@ class MapViewModel @Inject constructor(
             if (geojson?.features() != null)
                 viewModelState.update { it.copy(users = geojson.features()!!.toList()) }
             Log.d("HAHA", uiState.value.geojson?.features()?.size.toString())
+        }
+    }
+
+    fun onMapReady(map: MapView) {
+        viewModelState.update {
+            it.copy(mapboxMap = map.getMapboxMap())
         }
     }
 

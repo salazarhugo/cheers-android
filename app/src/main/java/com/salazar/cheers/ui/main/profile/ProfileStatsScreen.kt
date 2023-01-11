@@ -196,7 +196,7 @@ fun Following(
                     onClick = onUserClicked,
                     onStoryClick = onStoryClick,
                 ) {
-                    FollowButton(isFollowing = user.has_followed, onClick = { onFollowToggle(user.id)})
+//                    FollowButton(isFollowing = user.has_followed, onClick = { onFollowToggle(user.id)})
                 }
             }
         }

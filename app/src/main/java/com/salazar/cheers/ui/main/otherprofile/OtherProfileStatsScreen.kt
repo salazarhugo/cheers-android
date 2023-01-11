@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -38,7 +37,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.items.UserItem
@@ -90,11 +88,13 @@ fun Tabs(
     onStoryClick: (username: String) -> Unit,
     onFollowToggle: (String) -> Unit,
 ) {
-    val followersTitle =
-        if (uiState.followers == null) "Followers" else "${uiState.followers.size} followers"
-    val followingTitle =
-        if (uiState.following == null) "Following" else "${uiState.following.size} following"
-    val pages = listOf(followersTitle, followingTitle)
+    val friendsTitle =
+        if (uiState.friends == null)
+            "Friends"
+        else
+            "${uiState.friends.size} friends"
+
+    val pages = listOf(friendsTitle)
 
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
@@ -120,7 +120,6 @@ fun Tabs(
                     scope.launch {
                         pagerState.scrollToPage(index)
                     }
-//                    viewModel.toggle()
                 },
             )
         }
@@ -132,13 +131,8 @@ fun Tabs(
     ) { page ->
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
-                0 -> Followers(
-                    followers = uiState.followers,
-                    onUserClicked = onUserClicked,
-                    onStoryClick = onStoryClick,
-                )
-                1 -> Following(
-                    following = uiState.following,
+                0 -> Following(
+                    following = uiState.friends,
                     onUserClicked = onUserClicked,
                     onStoryClick = onStoryClick,
                     onFollowToggle = onFollowToggle,

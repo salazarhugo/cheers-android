@@ -3,6 +3,8 @@ package com.salazar.cheers.data.repository.friendship
 import cheers.friendship.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
+import com.salazar.cheers.data.db.UserDao
+import com.salazar.cheers.data.db.UserItemDao
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toUserItem
 import kotlinx.coroutines.flow.*
@@ -10,6 +12,8 @@ import javax.inject.Inject
 
 
 class FriendshipRepositoryImpl @Inject constructor(
+    private val userDao: UserDao,
+    private val userItemDao: UserItemDao,
     private val service: FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub,
 ): FriendshipRepository {
     override suspend fun createFriendRequest(userId: String): Result<Unit> {
@@ -25,11 +29,11 @@ class FriendshipRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun listFriend(): Flow<Resource<List<UserItem>>> = flow {
+    override suspend fun listFriend(userId: String): Flow<Resource<List<UserItem>>> = flow {
         emit(Resource.Loading(true))
 
         val request = ListFriendRequest.newBuilder()
-            .setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+            .setUserId(userId)
             .build()
 
         val remoteFriendRequests = try {
@@ -109,6 +113,8 @@ class FriendshipRepositoryImpl @Inject constructor(
 
         return try {
             service.deleteFriend(request = request)
+            userDao.deleteFriend(userId = userId)
+            userItemDao.deleteFriend(userId = userId)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

@@ -59,6 +59,7 @@ object MainDestinations {
     const val NFC_ROUTE = "nfc"
     const val SHARE_ROUTE = "share"
     const val FRIEND_REQUESTS = "friendRequests"
+    const val MAP_SETTINGS_ROUTE = "mapSettings"
 }
 
 /**
@@ -96,6 +97,12 @@ class CheersNavigationActions(
 ) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToMapSettings: () -> Unit = {
+        navController.navigate(MainDestinations.MAP_SETTINGS_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     val navigateToFriendRequests: () -> Unit = {
@@ -287,7 +294,6 @@ class CheersNavigationActions(
 
     val navigateToCreatePostSheetWithPhotoUri: (photoUri: String) -> Unit = { photoUri ->
         navController.navigate("${MainDestinations.CREATE_POST_ROUTE}?photoUri=$photoUri") {
-//            popUpTo(MainDestinations.HOME_ROUTE)
             launchSingleTop = true
         }
     }

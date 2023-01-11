@@ -13,8 +13,8 @@ import javax.inject.Inject
 class ListFriendUseCase @Inject constructor(
     private val friendshipRepository: FriendshipRepository,
 ){
-    suspend operator fun invoke(): Flow<List<UserItem>> {
-        return friendshipRepository.listFriend()
+    suspend operator fun invoke(userID: String): Flow<List<UserItem>> {
+        return friendshipRepository.listFriend(userId = userID)
             .filter { it is Resource.Success }
             .mapNotNull { it.data }
     }

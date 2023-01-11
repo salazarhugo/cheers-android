@@ -117,7 +117,7 @@ fun Profile(
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(uiState.isLoading),
             onRefresh = onSwipeRefresh,
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxHeight()

@@ -55,16 +55,11 @@ import java.net.URL
 @Composable
 fun MapScreen(
     uiState: MapUiState,
+    mapView: MapView,
     onMapUIAction: (MapUIAction) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    val mapView = remember {
-        MapView(
-            context = context,
-        )
-    }
 
     LaunchedEffect(uiState.geojson) {
         if (uiState.geojson != null)
@@ -195,7 +190,9 @@ fun UiLayer(
             isPublic = uiState.isPublic,
             onMapUIAction = onMapUIAction,
         )
-        MapBottomBar()
+        MapBottomBar(
+            onMapUIAction = onMapUIAction,
+        )
     }
 }
 
@@ -208,18 +205,34 @@ fun MapTopBar(
         true -> Icons.Default.Public
         false -> Icons.Default.PublicOff
     }
-    MapButton(
-        icon = icon,
-        onClick = { onMapUIAction(MapUIAction.OnPublicToggle) },
-    )
-    MapButton(
-        icon = Icons.Default.NearMe,
-        onClick = { onMapUIAction(MapUIAction.OnMyLocationClick) },
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        MapButton(
+            icon = icon,
+            onClick = { onMapUIAction(MapUIAction.OnPublicToggle) },
+        )
+        MapButton(
+            icon = Icons.Default.Settings,
+            onClick = { onMapUIAction(MapUIAction.OnSettingsClick) },
+        )
+    }
 }
 
 @Composable
-fun MapBottomBar() {
+fun MapBottomBar(
+    onMapUIAction: (MapUIAction) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        MapButton(
+            icon = Icons.Default.NearMe,
+            onClick = { onMapUIAction(MapUIAction.OnMyLocationClick) },
+        )
+    }
 }
 
 private suspend fun getBitmapFromUrl(url: String) = withContext(Dispatchers.IO) {
