@@ -730,7 +730,7 @@ fun PrivacyBottomSheet(
                 Item(it, it == privacy, onSelectPrivacy = {
                     onSelectPrivacy(it)
                     scope.launch {
-                        privacyState.animateTo(ModalBottomSheetValue.Expanded)
+                        privacyState.show()
                     }
                 })
             }

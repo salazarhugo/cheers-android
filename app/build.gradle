@@ -112,14 +112,18 @@ protobuf {
 }
 
 dependencies {
+
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'com.google.android.material:material:1.7.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     implementation("io.grpc:grpc-okhttp:1.51.1")
-    implementation("io.grpc:grpc-protobuf-lite:1.51.1")
+    implementation("io.grpc:grpc-protobuf-lite:1.51.1") {
+        exclude group: "com.google.protobuf:protobuf-javalite"
+        exclude module:'protobuf-javalite'
+    }
     implementation("io.grpc:grpc-stub:1.51.1")
     implementation("io.grpc:grpc-kotlin-stub:1.3.0")
     implementation("io.grpc:grpc-netty-shaded:1.51.1")
@@ -139,15 +143,15 @@ dependencies {
     implementation("com.simonsickle:composed-barcodes:1.1.1")
 
     // Jetpack Compose
-    implementation "androidx.compose.ui:ui:1.4.0-alpha03"
-    implementation "androidx.compose.ui:ui-util:1.4.0-alpha03"
-    implementation "androidx.compose.material:material:1.4.0-alpha03"
-    implementation "androidx.compose.foundation:foundation:1.4.0-alpha03"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.3.2"
-    implementation 'androidx.compose.ui:ui-viewbinding:1.4.0-alpha03'
+    implementation "androidx.compose.ui:ui:1.4.0-alpha04"
+    implementation "androidx.compose.ui:ui-util:1.4.0-alpha04"
+    implementation "androidx.compose.material:material:1.4.0-alpha04"
+    implementation "androidx.compose.foundation:foundation:1.4.0-alpha04"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.3.3"
+    implementation 'androidx.compose.ui:ui-viewbinding:1.4.0-alpha04'
     implementation 'androidx.activity:activity-compose:1.6.1'
-    implementation "androidx.compose.runtime:runtime-livedata:1.3.2"
-    implementation "androidx.compose.material3:material3:1.1.0-alpha03"
+    implementation "androidx.compose.runtime:runtime-livedata:1.3.3"
+    implementation "androidx.compose.material3:material3:1.1.0-alpha04"
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
@@ -198,6 +202,7 @@ dependencies {
     // Firebase BOM
     implementation platform('com.google.firebase:firebase-bom:31.1.1') {
         exclude group: 'com.google.protobuf'
+        exclude group: "com.google.protobuf:protobuf-javalite"
     }
 
     // Firebase Analytics
@@ -249,12 +254,12 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
 
     // Room
-    implementation("androidx.room:room-runtime:2.4.3")
-    annotationProcessor("androidx.room:room-compiler:2.4.3")
-    ksp("androidx.room:room-compiler:2.4.3")
-    implementation("androidx.room:room-ktx:2.4.3")
+    implementation("androidx.room:room-runtime:2.5.0")
+    annotationProcessor("androidx.room:room-compiler:2.5.0")
+    ksp("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-ktx:2.5.0")
     // optional - Paging 3 Integration
-    implementation "androidx.room:room-paging:2.4.3"
+    implementation "androidx.room:room-paging:2.5.0"
 
     // Map Box SDK
     implementation('com.mapbox.maps:android:10.10.0') {
@@ -289,7 +294,7 @@ dependencies {
     // User Messaging Platform
     implementation 'com.google.android.ump:user-messaging-platform:2.0.0'
 
-    implementation("androidx.compose.animation:animation-graphics:1.3.2")
+    implementation("androidx.compose.animation:animation-graphics:1.3.3")
 
     // ML Kit
     implementation 'com.google.mlkit:object-detection:17.0.0'
@@ -298,6 +303,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.3.2"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.3.2"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.3.3"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.3.3"
 }

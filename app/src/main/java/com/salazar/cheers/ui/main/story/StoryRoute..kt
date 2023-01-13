@@ -54,7 +54,7 @@ fun StoryRoute(
                 is StoryUIAction.OnActivity -> navActions.navigateToStoryStats(storyId)
                 is StoryUIAction.OnMore -> {
                     scope.launch {
-                        uiState.sheetState.animateTo(ModalBottomSheetValue.Expanded)
+                        uiState.sheetState.show()
                     }
                 }
                 else -> {}

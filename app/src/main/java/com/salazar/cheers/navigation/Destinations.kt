@@ -272,7 +272,8 @@ class CheersNavigationActions(
 
     val navigateToSignIn: () -> Unit = {
         navController.navigate(AuthDestinations.SIGN_IN_ROUTE) {
-            navController.popBackStack(route = AuthDestinations.SIGN_IN_ROUTE, inclusive = true)
+            val a = navController.popBackStack(route = AuthDestinations.SIGN_IN_ROUTE, inclusive = true)
+            print(a)
             launchSingleTop = true
             restoreState = true
         }

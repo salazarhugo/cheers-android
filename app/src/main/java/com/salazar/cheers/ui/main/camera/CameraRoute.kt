@@ -113,7 +113,7 @@ fun CameraRoute(
                     }
                     is CameraUIAction.OnAddContent -> {
                         scope.launch {
-                            sheetState.animateTo(ModalBottomSheetValue.Expanded)
+                            sheetState.show()
                         }
                     }
                     else -> {}

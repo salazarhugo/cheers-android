@@ -77,7 +77,7 @@ fun MapRoute(
                 }
                 is MapUIAction.OnPostClick -> {
                     scope.launch {
-                        uiState.postSheetState.animateTo(ModalBottomSheetValue.HalfExpanded)
+                        uiState.postSheetState.show()
                     }
                     mapViewModel.selectPost(action.post)
                 }
