@@ -31,7 +31,7 @@ import com.salazar.cheers.internal.*
         Comment::class,
     ],
     version = 12,
-    exportSchema = true,
+    exportSchema = false,
     autoMigrations = []
 )
 abstract class CheersDatabase : RoomDatabase() {

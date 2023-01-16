@@ -24,8 +24,6 @@
 -keep class com.salazar.cheers.data.** { *; }
 -keep class com.salazar.cheers.internal.** { *; }
 
--keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
-
 # ServiceLoader support
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
@@ -35,11 +33,6 @@
 -keep class com.google.android.gms.auth.** { *; }
 -keep class kotlinx.coroutines.android.AndroidExceptionPreHandler
 -keep class kotlinx.coroutines.android.AndroidDispatcherFactory
-
-# Most of volatile fields are updated with AFU and should not be mangled
--keepclassmembernames class kotlinx.** {
-    volatile <fields>;
-}
 
 -keepclassmembers class * extends androidx.work.Worker {
     public <init>(android.content.Context,androidx.work.WorkerParameters);

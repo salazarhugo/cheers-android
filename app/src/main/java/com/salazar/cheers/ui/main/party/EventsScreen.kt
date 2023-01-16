@@ -75,7 +75,7 @@ fun EventsScreen(
             SwipeToRefresh(
                 onRefresh = {},
                 state = rememberSwipeToRefreshState(uiState.isLoading),
-                modifier = Modifier.padding(it),
+                modifier = Modifier.padding(top = it.calculateTopPadding()),
             ) {
                 EventList(
                     events = parties,
