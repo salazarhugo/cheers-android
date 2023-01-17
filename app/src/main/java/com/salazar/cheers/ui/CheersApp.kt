@@ -21,24 +21,23 @@ import com.salazar.cheers.ui.theme.CheersTheme
 fun CheersApp(
     showInterstitialAd: () -> Unit,
     appSettings: Settings,
-//    appState: CheersAppState = rememberCheersAppState()
+    appState: CheersAppState = rememberCheersAppState()
 ) {
     val cheersViewModel = hiltViewModel<CheersViewModel>()
     val uiState by cheersViewModel.uiState.collectAsState()
 
     val darkTheme = isDarkTheme(appSettings.theme, isSystemInDarkTheme())
-    val a = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
 
     SetStatusBars(darkTheme = darkTheme)
     Text( text = "")
 
-//    CheersTheme(darkTheme = darkTheme) {
-//        CheersNavGraph(
-//            uiState = uiState,
-//            showInterstitialAd = showInterstitialAd,
-//            appState = appState,
-//        )
-//    }
+    CheersTheme(darkTheme = darkTheme) {
+        CheersNavGraph(
+            uiState = uiState,
+            showInterstitialAd = showInterstitialAd,
+            appState = appState,
+        )
+    }
 }
 
 fun isDarkTheme(

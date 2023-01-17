@@ -47,7 +47,7 @@ fun HomeTopBar(
     Column {
         TopAppBar(
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-            colors = TopAppBarDefaults.topAppBarColors(),
+            colors = TopAppBarDefaults.mediumTopAppBarColors(),
             navigationIcon = {
                 Image(
                     painter = painterResource(icon),
