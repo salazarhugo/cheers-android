@@ -92,10 +92,10 @@ protobuf {
     }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.51.1'
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.52.1'
         }
         grpckt {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.2.1:jdk7@jar"
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.3.0:jdk8@jar"
         }
     }
     generateProtoTasks {
@@ -118,14 +118,13 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
-    implementation("io.grpc:grpc-okhttp:1.51.1")
-    implementation("io.grpc:grpc-protobuf-lite:1.51.1")
-    implementation("io.grpc:grpc-stub:1.51.1")
+    implementation("io.grpc:grpc-okhttp:1.52.1")
+    implementation("io.grpc:grpc-protobuf-lite:1.52.1")
+    implementation("io.grpc:grpc-stub:1.52.1")
     implementation("io.grpc:grpc-kotlin-stub:1.3.0")
-    implementation("io.grpc:grpc-netty-shaded:1.51.1")
-    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
 
-    implementation "com.google.protobuf:protobuf-javalite:3.21.7"
+//    implementation "com.google.protobuf:protobuf-javalite:3.21.7"
 
     // KSP
     implementation "com.google.devtools.ksp:symbol-processing-api:1.7.20-1.0.6"
