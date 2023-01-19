@@ -119,7 +119,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     implementation("io.grpc:grpc-okhttp:1.52.1")
-    implementation("io.grpc:grpc-protobuf-lite:1.52.1")
+//    implementation "io.grpc:grpc-protobuf-lite:1.52.1"
     implementation("io.grpc:grpc-stub:1.52.1")
     implementation("io.grpc:grpc-kotlin-stub:1.3.0")
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
@@ -256,7 +256,6 @@ dependencies {
 
     // Room
     implementation("androidx.room:room-runtime:2.5.0")
-    annotationProcessor("androidx.room:room-compiler:2.5.0")
     ksp("androidx.room:room-compiler:2.5.0")
     implementation("androidx.room:room-ktx:2.5.0")
     // optional - Paging 3 Integration
