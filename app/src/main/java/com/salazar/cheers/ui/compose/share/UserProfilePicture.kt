@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.google.firebase.perf.metrics.resource.ResourceType
 import com.salazar.cheers.R
 import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.ui.compose.animations.Bounce
@@ -33,7 +32,7 @@ fun UserProfilePicture(
     modifier: Modifier = Modifier,
     picture: String?,
     storyState: StoryState = StoryState.EMPTY,
-    @ResourceType placeHolder: Int = R.drawable.default_profile_picture,
+    placeHolder: Int = R.drawable.default_profile_picture,
     size: Dp = 54.dp,
     onClick: () -> Unit = {},
 ) {

@@ -119,7 +119,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     implementation("io.grpc:grpc-okhttp:1.52.1")
-//    implementation "io.grpc:grpc-protobuf-lite:1.52.1"
+    compileOnly "io.grpc:grpc-protobuf-lite:1.50.2"
     implementation("io.grpc:grpc-stub:1.52.1")
     implementation("io.grpc:grpc-kotlin-stub:1.3.0")
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
@@ -224,7 +224,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
 
     // Firebase Firestore
-    implementation 'com.google.firebase:firebase-firestore-ktx'
+//    implementation 'com.google.firebase:firebase-firestore-ktx'
 
     // Firebase Functions
     implementation 'com.google.firebase:firebase-functions-ktx'
@@ -236,7 +236,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage-ktx'
 
     // Firebase Performance
-    implementation 'com.google.firebase:firebase-perf-ktx'
+//    implementation 'com.google.firebase:firebase-perf-ktx'
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.44")

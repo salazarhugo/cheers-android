@@ -50,9 +50,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     @Inject
-    lateinit var firebaseAuth: FirebaseAuth
-
-    @Inject
     lateinit var dataStoreRepository: DataStoreRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +75,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
-                if (firebaseAuth.currentUser == null) return
                 for (location in p0.locations) {
 //                    GlobalScope.launch {
 //                        goApi.updateLocation(longitude = location.longitude, latitude = location.latitude)

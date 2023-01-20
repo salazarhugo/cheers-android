@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -75,28 +74,28 @@ class SendGiftViewModel @Inject constructor(
 
     fun sendGift() {
         updateIsLoading(true)
-        FirestoreUtil.sendGift(
-            receiverId = receiverId,
-            price = uiState.value.selectedSticker?.price ?: 50
-        ).addOnSuccessListener { result ->
-            Log.e("SendGift", result.toString())
-
-            val success = result["success"] as Boolean
-
-            if (success)
-                viewModelState.update {
-                    it.copy(success = success, isLoading = false)
-                }
-            else
-                viewModelState.update {
-                    it.copy(
-                        errorMessage = result["displayError"] as String,
-                        success = success,
-                        isLoading = false
-                    )
-                }
-        }.addOnFailureListener {
-            Log.e("SendGift", it.toString())
-        }
+//        FirestoreUtil.sendGift(
+//            receiverId = receiverId,
+//            price = uiState.value.selectedSticker?.price ?: 50
+//        ).addOnSuccessListener { result ->
+//            Log.e("SendGift", result.toString())
+//
+//            val success = result["success"] as Boolean
+//
+//            if (success)
+//                viewModelState.update {
+//                    it.copy(success = success, isLoading = false)
+//                }
+//            else
+//                viewModelState.update {
+//                    it.copy(
+//                        errorMessage = result["displayError"] as String,
+//                        success = success,
+//                        isLoading = false
+//                    )
+//                }
+//        }.addOnFailureListener {
+//            Log.e("SendGift", it.toString())
+//        }
     }
 }

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.SkuDetails
 import com.salazar.cheers.data.repository.BillingRepository
-import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,11 +30,11 @@ class RechargeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            FirestoreUtil.getUserCoins().collect { coins ->
-                viewModelState.update {
-                    it.copy(coins = coins)
-                }
-            }
+//            FirestoreUtil.getUserCoins().collect { coins ->
+//                viewModelState.update {
+//                    it.copy(coins = coins)
+//                }
+//            }
         }
         billingRepository.startConnection()
         refreshSkuDetails()

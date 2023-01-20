@@ -12,7 +12,6 @@ import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -117,7 +116,6 @@ class CheersViewModel @Inject constructor(
             viewModelScope.launch {
                 chatRepository.addToken(token = token)
                 userRepository.addTokenToNeo4j(token)
-                FirestoreUtil.addFCMRegistrationToken(token = token)
             }
         }
     }

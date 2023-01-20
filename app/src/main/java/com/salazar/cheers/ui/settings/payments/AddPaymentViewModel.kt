@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.internal.Source
-import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,11 +33,11 @@ class AddPaymentViewModel @Inject constructor() : ViewModel() {
 
     init {
         viewModelScope.launch {
-            FirestoreUtil.listenSources().collect { sources ->
-                viewModelState.update {
-                    it.copy(sources = sources, isLoading = false)
-                }
-            }
+//            FirestoreUtil.listenSources().collect { sources ->
+//                viewModelState.update {
+//                    it.copy(sources = sources, isLoading = false)
+//                }
+//            }
         }
     }
 
