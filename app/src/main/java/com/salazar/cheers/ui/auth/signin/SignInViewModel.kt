@@ -33,7 +33,6 @@ class SignInViewModel @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignInUiState(isLoading = false))
@@ -74,7 +73,8 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             storeUserEmail.getEmail.collect { email ->
 
-                if (email == null) return@collect
+                if (email == null)
+                    return@collect
 
                 auth.signInWithEmailLink(email, emailLink).addOnCompleteListener { task ->
                     if (!task.isSuccessful) {

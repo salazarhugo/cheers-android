@@ -16,7 +16,7 @@ fun NavGraphBuilder.authNavGraph(
 
     navigation(
         route = CheersDestinations.AUTH_ROUTE,
-        startDestination = AuthDestinations.SIGN_IN_ROUTE,
+        startDestination = "${AuthDestinations.REGISTER_ROUTE}/{emailLink}",
     ) {
 
         composable(

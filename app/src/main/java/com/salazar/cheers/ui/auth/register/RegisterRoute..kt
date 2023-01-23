@@ -2,6 +2,8 @@ package com.salazar.cheers.ui.auth.register
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,7 +30,7 @@ fun RegisterRoute(
         navActions.navigateToMain()
     }
 
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(initialPage = 0)
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(uiState.isUsernameAvailable) {
@@ -38,22 +40,23 @@ fun RegisterRoute(
         }
     }
 
-    HorizontalPager(
-        count = 3,
-        state = pagerState,
-        userScrollEnabled = false,
-    ) { page ->
-
-        Column(modifier = Modifier.fillMaxHeight()) {
-            when (page) {
-                0 -> WelcomeScreen(
+    Scaffold() {
+        HorizontalPager(
+            modifier = Modifier.padding(it),
+            count = 3,
+            state = pagerState,
+            userScrollEnabled = true,
+        ) { page ->
+            Column(modifier = Modifier.fillMaxHeight()) {
+                when (page) {
+                    0 -> WelcomeScreen(
                         onClick = {
                             scope.launch {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         }
                     )
-                1 -> ChooseUsernameScreen(
+                    1 -> ChooseUsernameScreen(
                         username = uiState.username,
                         errorMessage = uiState.errorMessage,
                         isLoading = uiState.isLoading,
@@ -67,11 +70,12 @@ fun RegisterRoute(
                             navActions.navigateToSignIn()
                         }
                     )
-                2 -> RegisterScreen(
+                    2 -> RegisterScreen(
                         uiState = uiState,
                         onRegisterClick = registerViewModel::registerUser,
                         onAcceptTermsChange = registerViewModel::onAcceptTermsChange,
                     )
+                }
             }
         }
     }

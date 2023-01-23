@@ -123,7 +123,9 @@ class RegisterViewModel @Inject constructor(
                 email = email,
             )
             if (result.isSuccess)
-                viewModelState.update { it.copy(success = true) }
+                viewModelState.update {
+                    it.copy(success = true)
+                }
             else
                 updateErrorMessage(result.exceptionOrNull()?.localizedMessage)
         }

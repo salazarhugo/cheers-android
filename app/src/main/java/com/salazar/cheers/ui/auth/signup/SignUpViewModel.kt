@@ -150,7 +150,9 @@ class SignUpViewModel @Inject constructor(
                     return@addOnCompleteListener
                 }
 
-                viewModelScope.launch { storeUserEmail.saveEmail(email) }
+                viewModelScope.launch {
+                    storeUserEmail.saveEmail(email)
+                }
                 updateIsLoading(false)
                 nextPage()
             }
