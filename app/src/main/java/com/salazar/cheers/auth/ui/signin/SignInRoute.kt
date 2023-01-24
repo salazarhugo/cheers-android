@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signin
+package com.salazar.cheers.auth.ui.signin
 
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult

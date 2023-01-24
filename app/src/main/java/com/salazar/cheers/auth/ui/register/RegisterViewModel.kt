@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.register
+package com.salazar.cheers.auth.ui.register
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.auth.domain.usecase.RegisterUseCase
+import com.salazar.cheers.auth.domain.usecase.SignInUseCase
+import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.util.Utils.validateUsername
@@ -13,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.sign
 
 data class RegisterUiState(
     val isLoading: Boolean = false,
@@ -28,6 +32,8 @@ class RegisterViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val storeUserEmail: StoreUserEmail,
     private val userRepository: UserRepository,
+    private val registerUseCase: RegisterUseCase,
+    private val signInUseCase: SignInUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RegisterUiState(isLoading = false))
@@ -113,59 +119,23 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun createUser(
-        email: String,
-        username: String,
-    ) {
-        viewModelScope.launch {
-            val result = userRepository.createUser(
-                username = username,
-                email = email,
-            )
-            if (result.isSuccess)
-                viewModelState.update {
-                    it.copy(success = true)
-                }
-            else
-                updateErrorMessage(result.exceptionOrNull()?.localizedMessage)
-        }
-    }
-
     fun registerUser() {
-        val auth = Firebase.auth
         val username = uiState.value.username
 
-        if (auth.currentUser != null) {
-            viewModelScope.launch {
-                storeUserEmail.getEmail.collect { email ->
-                    if (email == null) return@collect
-                    createUser(email = email, username = username)
-                }
-            }
-        }
-
-        if (!auth.isSignInWithEmailLink(emailLink)) {
-            updateErrorMessage("Invalid link")
-            return
-        }
-
-        updateIsLoading(true)
-
         viewModelScope.launch {
-            val email = storeUserEmail.getEmail.firstOrNull() ?: return@launch
+            val signInResult = signInUseCase(
+                emailLink = emailLink,
+            )
+            if (signInResult is Resource.Error)
+                return@launch
 
-            auth.signInWithEmailLink(email, emailLink).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    updateErrorMessage("Couldn't sign in with email link")
-                    updateIsLoading(false)
-                    return@addOnCompleteListener
-                }
-
-                createUser(
-                    email = email,
-                    username = username,
-                )
-                updateIsLoading(false)
+            val result = registerUseCase(
+                username = username,
+            )
+            when(result) {
+                is Resource.Error -> updateErrorMessage(result.message)
+                is Resource.Loading -> updateIsLoading(result.isLoading)
+                is Resource.Success -> viewModelState.update { it.copy(success = true) }
             }
         }
     }

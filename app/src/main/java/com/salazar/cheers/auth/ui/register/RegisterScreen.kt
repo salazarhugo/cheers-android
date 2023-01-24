@@ -1,7 +1,7 @@
-package com.salazar.cheers.ui.auth.register
+package com.salazar.cheers.auth.ui.register
 
 import androidx.compose.runtime.Composable
-import com.salazar.cheers.ui.auth.signin.CreateAccountScreen
+import com.salazar.cheers.auth.ui.signin.CreateAccountScreen
 
 @Composable
 fun RegisterScreen(

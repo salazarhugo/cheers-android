@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signin
+package com.salazar.cheers.auth.ui.signin
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

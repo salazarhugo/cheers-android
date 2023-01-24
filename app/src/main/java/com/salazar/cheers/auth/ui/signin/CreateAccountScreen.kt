@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signin
+package com.salazar.cheers.auth.ui.signin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,7 +47,7 @@ fun CreateAccountScreen(
             .fillMaxSize()
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -56,7 +56,7 @@ fun CreateAccountScreen(
             Text("Sign up as $username?", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(8.dp))
             Text("You can't change it later")
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(64.dp))
             AcceptTerms(
                 onAcceptTermsChange = onAcceptTermsChange,
                 acceptTerms = acceptTerms,

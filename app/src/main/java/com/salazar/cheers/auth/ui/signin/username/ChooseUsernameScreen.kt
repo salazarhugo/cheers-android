@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signin.username
+package com.salazar.cheers.auth.ui.signin.username
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -89,7 +89,7 @@ fun UsernameTextField(
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+//        focusRequester.requestFocus()
     }
 
     TextField(

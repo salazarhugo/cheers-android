@@ -1,7 +1,7 @@
-package com.salazar.cheers.ui.auth.signup
+package com.salazar.cheers.auth.ui.signup
 
 import androidx.compose.runtime.Composable
-import com.salazar.cheers.ui.auth.signin.SignInUiState
+import com.salazar.cheers.auth.ui.signin.SignInUiState
 
 @Composable
 fun SignUpScreen(

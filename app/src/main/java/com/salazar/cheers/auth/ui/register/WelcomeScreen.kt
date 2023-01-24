@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.register
+package com.salazar.cheers.auth.ui.register
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image

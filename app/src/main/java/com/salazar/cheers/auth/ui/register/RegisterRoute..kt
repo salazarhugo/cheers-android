@@ -1,16 +1,18 @@
-package com.salazar.cheers.ui.auth.register
+package com.salazar.cheers.auth.ui.register
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.auth.signin.username.ChooseUsernameScreen
+import com.salazar.cheers.auth.ui.signin.username.ChooseUsernameScreen
 import kotlinx.coroutines.launch
 
 /**
@@ -40,23 +42,23 @@ fun RegisterRoute(
         }
     }
 
-    Scaffold() {
-        HorizontalPager(
-            modifier = Modifier.padding(it),
-            count = 3,
-            state = pagerState,
-            userScrollEnabled = true,
-        ) { page ->
-            Column(modifier = Modifier.fillMaxHeight()) {
-                when (page) {
-                    0 -> WelcomeScreen(
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
+    HorizontalPager(
+        modifier = Modifier.systemBarsPadding(),
+        count = 3,
+        state = pagerState,
+        userScrollEnabled = false,
+    ) { page ->
+        Column(modifier = Modifier.fillMaxHeight()) {
+            when (page) {
+                0 -> WelcomeScreen(
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(1)
                         }
-                    )
-                    1 -> ChooseUsernameScreen(
+                    }
+                )
+                1 -> {
+                    ChooseUsernameScreen(
                         username = uiState.username,
                         errorMessage = uiState.errorMessage,
                         isLoading = uiState.isLoading,
@@ -67,17 +69,18 @@ fun RegisterRoute(
                             registerViewModel.checkUsername()
                         },
                         onBackPressed = {
-                            navActions.navigateToSignIn()
+                            scope.launch {
+                                pagerState.animateScrollToPage(0)
+                            }
                         }
                     )
-                    2 -> RegisterScreen(
-                        uiState = uiState,
-                        onRegisterClick = registerViewModel::registerUser,
-                        onAcceptTermsChange = registerViewModel::onAcceptTermsChange,
-                    )
                 }
+                2 -> RegisterScreen(
+                    uiState = uiState,
+                    onRegisterClick = registerViewModel::registerUser,
+                    onAcceptTermsChange = registerViewModel::onAcceptTermsChange,
+                )
             }
         }
     }
-
 }

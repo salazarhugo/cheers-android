@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signin
+package com.salazar.cheers.auth.ui.signin
 
 import android.app.Activity
 import android.content.Context

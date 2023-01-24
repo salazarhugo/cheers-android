@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signup
+package com.salazar.cheers.auth.ui.signup
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle

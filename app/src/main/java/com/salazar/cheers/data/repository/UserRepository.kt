@@ -36,7 +36,6 @@ class UserRepository @Inject constructor(
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
     private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
 ) {
-
     suspend fun createUser(
         username: String,
         email: String,

@@ -1,7 +1,6 @@
-package com.salazar.cheers.data.repository
+package com.salazar.cheers.auth.data
 
 import android.util.Log
-import cheers.post.v1.PostServiceGrpcKt
 import cheers.user.v1.GetUserRequest
 import cheers.user.v1.UserServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
@@ -17,7 +16,6 @@ import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -30,7 +28,6 @@ class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
 ) {
-
     suspend fun getUser(): Result<User?> {
         if (auth.currentUser == null)
             return Result.Success(null)

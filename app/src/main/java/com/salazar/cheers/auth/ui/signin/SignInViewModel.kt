@@ -1,4 +1,4 @@
-package com.salazar.cheers.ui.auth.signin
+package com.salazar.cheers.auth.ui.signin
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -15,8 +15,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.StoreUserEmail
-import com.salazar.cheers.data.repository.AuthRepository
-import com.salazar.cheers.data.repository.ChatRepository
+import com.salazar.cheers.auth.data.AuthRepository
+import com.salazar.cheers.auth.domain.usecase.SignInUseCase
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +33,7 @@ class SignInViewModel @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
+    private val signInUseCase: SignInUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignInUiState(isLoading = false))
@@ -63,29 +64,12 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun signInWithEmailLink(emailLink: String) {
-        val auth = Firebase.auth
-
-        if (!auth.isSignInWithEmailLink(emailLink))
-            return
-
-        updateIsLoading(true)
-
         viewModelScope.launch {
-            storeUserEmail.getEmail.collect { email ->
-
-                if (email == null)
-                    return@collect
-
-                auth.signInWithEmailLink(email, emailLink).addOnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Log.e("YES", "Error signing in with email link", task.exception)
-                        return@addOnCompleteListener
-                    }
-                    Log.d("YES", "Successfully signed in with email link!")
-                    viewModelScope.launch {
-                        viewModelState.update { it.copy(isSignedIn = true) }
-                    }
-                }
+            val result = signInUseCase.invoke(emailLink = emailLink)
+            when(result) {
+                is Resource.Error -> updateErrorMessage(result.message)
+                is Resource.Loading -> updateIsLoading(result.isLoading)
+                is Resource.Success -> viewModelState.update { it.copy(isSignedIn = true) }
             }
         }
     }

@@ -5,9 +5,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
-import com.salazar.cheers.ui.auth.register.RegisterRoute
-import com.salazar.cheers.ui.auth.signin.SignInRoute
-import com.salazar.cheers.ui.auth.signup.SignUpRoute
+import com.salazar.cheers.auth.ui.register.RegisterRoute
+import com.salazar.cheers.auth.ui.signin.SignInRoute
+import com.salazar.cheers.auth.ui.signup.SignUpRoute
 
 fun NavGraphBuilder.authNavGraph(
     navActions: CheersNavigationActions,
@@ -16,7 +16,7 @@ fun NavGraphBuilder.authNavGraph(
 
     navigation(
         route = CheersDestinations.AUTH_ROUTE,
-        startDestination = "${AuthDestinations.REGISTER_ROUTE}/{emailLink}",
+        startDestination = AuthDestinations.SIGN_IN_ROUTE,
     ) {
 
         composable(
@@ -35,7 +35,9 @@ fun NavGraphBuilder.authNavGraph(
             route = "${AuthDestinations.REGISTER_ROUTE}/{emailLink}",
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/register/{emailLink}" }),
         ) {
-            RegisterRoute(navActions = navActions)
+            RegisterRoute(
+                navActions = navActions,
+            )
         }
 
         composable(

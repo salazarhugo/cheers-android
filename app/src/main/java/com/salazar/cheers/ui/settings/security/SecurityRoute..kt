@@ -8,7 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.GoogleAuthProvider
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.auth.signin.AuthResultContract
+import com.salazar.cheers.auth.ui.signin.AuthResultContract
 
 /**
  * Stateful composable that displays the Navigation route for the Security screen.
