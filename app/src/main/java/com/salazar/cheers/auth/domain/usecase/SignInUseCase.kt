@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 class SignInUseCase @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
-    private val authRepository: AuthRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(

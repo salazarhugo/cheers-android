@@ -120,14 +120,18 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun registerUser() {
+        updateIsLoading(true)
         val username = uiState.value.username
 
         viewModelScope.launch {
             val signInResult = signInUseCase(
                 emailLink = emailLink,
             )
-            if (signInResult is Resource.Error)
+
+            if (signInResult is Resource.Error) {
+                updateIsLoading(false)
                 return@launch
+            }
 
             val result = registerUseCase(
                 username = username,
@@ -137,6 +141,7 @@ class RegisterViewModel @Inject constructor(
                 is Resource.Loading -> updateIsLoading(result.isLoading)
                 is Resource.Success -> viewModelState.update { it.copy(success = true) }
             }
+            updateIsLoading(false)
         }
     }
 }
