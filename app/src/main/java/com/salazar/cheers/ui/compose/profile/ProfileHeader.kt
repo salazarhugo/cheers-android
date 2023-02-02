@@ -1,9 +1,16 @@
 package com.salazar.cheers.ui.compose.profile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
@@ -14,19 +21,29 @@ fun ProfileHeader(
     user: User,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     onStoryClick: (String) -> Unit,
+    onWebsiteClick: (String) -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
     ) {
         UserProfilePicture(
             picture = user.picture,
-            size = 80.dp,
+            size = 110.dp,
             storyState = user.storyState,
             onClick = { onStoryClick(user.username) },
+        )
+        ProfileName(
+            name = user.name,
+        )
+        ProfileBio(
+            bio = user.bio,
+        )
+        ProfileWebsite(
+            website = user.website,
+            onClick = onWebsiteClick,
         )
         ProfileStats(
             user = user,
@@ -34,4 +51,49 @@ fun ProfileHeader(
         )
         Spacer(Modifier.height(18.dp))
     }
+}
+
+@Composable
+fun ProfileName(
+    name: String,
+) {
+    if (name.isBlank())
+        return
+    Spacer(Modifier.height(4.dp))
+    Text(
+        text = name,
+        style = MaterialTheme.typography.titleMedium.copy(),
+    )
+}
+
+@Composable
+fun ProfileBio(
+    bio: String
+) {
+    if (bio.isBlank())
+        return
+    Spacer(Modifier.height(4.dp))
+    Text(
+        text = bio,
+        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+fun ProfileWebsite(
+    website: String,
+    onClick: (String) -> Unit,
+) {
+    if (website.isBlank())
+        return
+    Spacer(Modifier.height(4.dp))
+    ClickableText(
+        text = AnnotatedString(website),
+        style = TextStyle(
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Normal
+        ),
+        onClick = { onClick(website) },
+    )
 }

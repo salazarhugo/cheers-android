@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.internal.Beverage
@@ -45,16 +46,17 @@ fun PostHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-
             UserProfilePicture(
                 picture = picture,
                 storyState = StoryState.EMPTY,
                 size = 33.dp,
             )
             Spacer(Modifier.width(8.dp))
-            Column {
+            Column(
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -68,26 +70,12 @@ fun PostHeader(
                         Text(
                             text = " is drinking ${beverage.displayName.lowercase()}",
                             style = MaterialTheme.typography.bodyMedium,
+                            overflow = TextOverflow.Ellipsis,
                         )
-//                        Text(
-//                            text = beverage.displayName.lowercase(Locale.getDefault()),
-//                            style = MaterialTheme.typography.bodyMedium,
-//                        )
                     }
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (locationName.isNotBlank())
-                        Text(text = locationName, style = MaterialTheme.typography.labelSmall)
-//                    Box(
-//                        modifier = Modifier
-//                            .padding(horizontal = 8.dp)
-//                            .size(4.dp)
-//                            .clip(CircleShape)
-//                            .background(MaterialTheme.colorScheme.onBackground)
-//                    )
-                }
+                if (locationName.isNotBlank())
+                    Text(text = locationName, style = MaterialTheme.typography.labelSmall)
             }
         }
         Row(

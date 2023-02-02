@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.sheets
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,12 +37,13 @@ class DialogDeletePostViewModel @Inject constructor(
         }
     }
 
-    fun deletePost() {
+    fun deletePost(onCompleted: () -> Unit) {
         if (!::postID.isInitialized)
             return
 
         viewModelScope.launch {
             postRepository.deletePost(postId = postID)
+            onCompleted()
         }
     }
 }

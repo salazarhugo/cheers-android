@@ -8,6 +8,7 @@ fun RegisterScreen(
     uiState: RegisterUiState,
     onRegisterClick: () -> Unit,
     onAcceptTermsChange: (Boolean) -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     CreateAccountScreen(
         errorMessage = uiState.errorMessage,
@@ -16,5 +17,6 @@ fun RegisterScreen(
         acceptTerms = uiState.termsAccepted,
         onSignUp = onRegisterClick,
         onAcceptTermsChange = onAcceptTermsChange,
+        onBackPressed = onBackPressed,
     )
 }

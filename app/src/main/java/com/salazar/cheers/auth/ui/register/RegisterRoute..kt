@@ -35,13 +35,6 @@ fun RegisterRoute(
     val pagerState = rememberPagerState(initialPage = 0)
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(uiState.isUsernameAvailable) {
-        if (!uiState.isUsernameAvailable) return@LaunchedEffect
-        scope.launch {
-            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-        }
-    }
-
     HorizontalPager(
         modifier = Modifier.systemBarsPadding(),
         count = 3,
@@ -66,7 +59,12 @@ fun RegisterRoute(
                         onClearUsername = registerViewModel::onClearUsername,
                         onUsernameChanged = registerViewModel::onUsernameChanged,
                         onNextClicked = {
-                            registerViewModel.checkUsername()
+                            registerViewModel.checkUsername {
+                                if (it)
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(2)
+                                    }
+                            }
                         },
                         onBackPressed = {
                             scope.launch {
@@ -79,6 +77,11 @@ fun RegisterRoute(
                     uiState = uiState,
                     onRegisterClick = registerViewModel::registerUser,
                     onAcceptTermsChange = registerViewModel::onAcceptTermsChange,
+                    onBackPressed = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(1)
+                        }
+                    }
                 )
             }
         }

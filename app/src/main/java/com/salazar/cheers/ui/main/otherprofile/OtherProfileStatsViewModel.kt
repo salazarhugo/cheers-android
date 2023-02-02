@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class OtherProfileStatsUiState(
-    val isLoadingFollowers: Boolean = true,
-    val isLoadingFollowing: Boolean = true,
+    val isLoading: Boolean = true,
     val isFollowers: Boolean = true,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
@@ -60,7 +59,7 @@ class OtherProfileStatsViewModel @Inject constructor(
 
     private fun refreshFriends() {
         viewModelState.update {
-            it.copy(isLoadingFollowing = true)
+            it.copy(isLoading = true)
         }
 
         viewModelScope.launch {
@@ -71,7 +70,7 @@ class OtherProfileStatsViewModel @Inject constructor(
 
     private fun updateFriends(friends: List<UserItem>) {
         viewModelState.update {
-            it.copy(friends = friends, isLoadingFollowing = false)
+            it.copy(friends = friends, isLoading = false)
         }
     }
 

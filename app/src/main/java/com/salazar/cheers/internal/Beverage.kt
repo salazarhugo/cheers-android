@@ -11,7 +11,7 @@ enum class Beverage(
     NONE(
         displayName = "",
         alcohol = 0f,
-        icon = R.drawable.ic_cocktail,
+        icon = 0,
     ),
     WATER(
         displayName = "Water",

@@ -64,9 +64,9 @@ fun OtherProfileScreen(
                 ProfileHeader(
                     user = user,
                     onStatClicked = onStatClicked,
-                    onStoryClick = onStoryClick
+                    onStoryClick = onStoryClick,
+                    onWebsiteClick = onWebsiteClick,
                 )
-                ProfileText(user = user, onWebsiteClicked = onWebsiteClick)
                 HeaderButtons(
                     friend = user.friend,
                     requested = user.requested,
@@ -146,6 +146,7 @@ fun Toolbar(
     onBackPressed: () -> Unit,
     onCopyUrl: () -> Unit,
     onRemoveFriend: () -> Unit,
+    onManageFriendship: () -> Unit,
 ) {
     val openDialog = remember { mutableStateOf(false) }
     //                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
@@ -177,6 +178,7 @@ fun Toolbar(
             openDialog = openDialog,
             onCopyUrl = onCopyUrl,
             onRemoveFriend = onRemoveFriend,
+            onManageFriendship = onManageFriendship,
         )
 }
 
@@ -185,6 +187,7 @@ fun MoreDialog(
     openDialog: MutableState<Boolean>,
     onCopyUrl: () -> Unit,
     onRemoveFriend: () -> Unit,
+    onManageFriendship: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -202,10 +205,13 @@ fun MoreDialog(
                     Text("Remove friend")
                 }
                 TextButton(
-                    onClick = { openDialog.value = false },
+                    onClick = {
+                        openDialog.value = false
+                        onManageFriendship()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Report")
+                    Text("Manage Friendship")
                 }
                 TextButton(
                     onClick = {

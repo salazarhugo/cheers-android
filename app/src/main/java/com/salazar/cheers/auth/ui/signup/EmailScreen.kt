@@ -96,7 +96,7 @@ fun EmailTextField(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
-            else
+            else if (email.isNotEmpty())
                 Icon(
                     imageVector = Icons.Default.Error,
                     contentDescription = null,

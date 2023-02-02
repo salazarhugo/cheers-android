@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +43,7 @@ import com.salazar.cheers.ui.compose.post.PostFooter
 import com.salazar.cheers.ui.compose.post.PostHeader
 import com.salazar.cheers.ui.compose.post.PostText
 import com.salazar.cheers.ui.compose.profile.ProfileHeader
+import com.salazar.cheers.ui.compose.profile.ProfileItem
 import com.salazar.cheers.ui.compose.profile.ProfileText
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
@@ -123,37 +125,41 @@ fun Profile(
                 modifier = Modifier.fillMaxHeight()
             ) {
                 item {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    ) {
-                        ProfileHeader(
-                            user = uiState.user,
-                            onStatClicked = onStatClicked,
-                            onStoryClick = onStoryClick
-                        )
-                        ProfileText(user = uiState.user, onWebsiteClicked = onWebsiteClicked)
-                        ProfileButtons(
-                            onEditProfileClicked = onEditProfileClicked,
-                            onDrinkingStatsClick = { onDrinkingStatsClick(uiState.user.username) },
-                        )
-                    }
+                    ProfileItem(
+                        user = uiState.user,
+                        onWebsiteClick = onWebsiteClicked,
+                        onEditProfileClicked = onEditProfileClicked,
+                        onDrinkingStatsClick = onDrinkingStatsClick,
+                        onStoryClick = onStoryClick,
+                        onStatClicked = onStatClicked,
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 stickyHeader {
                     val scope = rememberCoroutineScope()
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
-                                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-                            )
+//                            TabRowDefaults.Indicator(
+//                                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+//                            )
                         },
                         backgroundColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.onBackground,
                     ) {
                         tabs.forEachIndexed { index, icon ->
+                            val selected = pagerState.currentPage == index
                             Tab(
-                                icon = { Icon(icon, contentDescription = null) },
-                                selected = pagerState.currentPage == index,
+                                icon = {
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = null,
+                                        tint = if (selected) MaterialTheme.colorScheme.onBackground else Color.LightGray
+                                    )
+                               },
+                                selected = selected,
                                 onClick = {
                                     scope.launch {
                                         pagerState.animateScrollToPage(index)
@@ -381,7 +387,9 @@ fun ProfileStats(
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         val items = listOf(

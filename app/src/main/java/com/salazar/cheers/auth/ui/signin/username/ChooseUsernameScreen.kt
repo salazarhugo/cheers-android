@@ -121,7 +121,7 @@ fun UsernameTextField(
                     Icon(imageVector = Icons.Default.Close, null)
                 }
         },
-        isError = !isUsernameAvailable || !username.validateUsername(),
+        isError = username.isNotEmpty() && !username.validateUsername(),
     )
     if (errorMessage?.isNotEmpty() == true)
         Text(

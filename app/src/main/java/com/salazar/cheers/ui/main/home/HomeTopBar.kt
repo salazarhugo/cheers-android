@@ -66,14 +66,11 @@ fun HomeTopBar(
                 )
             },
             actions = {
-                IconButton(onClick = onActivityClick) {
-                    BadgedBox(badge = {
-                        if (notificationCount > 0)
-                            Badge { Text(text = notificationCount.toString()) }
-                    }) {
+                CheersBadgeBox(count = notificationCount) {
+                    IconButton(onClick = onActivityClick) {
                         Icon(
                             Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Search icon"
+                            contentDescription = "Notification icon"
                         )
                     }
                 }

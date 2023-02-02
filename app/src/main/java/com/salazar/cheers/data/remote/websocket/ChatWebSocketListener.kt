@@ -65,6 +65,7 @@ class ChatWebSocketListener @Inject constructor(
         super.onFailure(webSocket, t, response)
 
         Log.d(TAG, "onFailure")
+        Log.d(TAG, t.message.toString())
         Log.d(TAG, response?.message ?: "")
     }
 

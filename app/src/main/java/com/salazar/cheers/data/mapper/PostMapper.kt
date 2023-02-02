@@ -8,6 +8,7 @@ fun PostResponse.toPost(accountId: String): Post {
     return Post().copy(
         id = post.id,
         authorId = user.id,
+        isAuthor = user.id == accountId,
         caption = post.caption,
         username = user.username,
         verified = user.verified,

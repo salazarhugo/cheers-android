@@ -27,8 +27,9 @@ fun DeletePostDialog(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.deletePost()
-                    navActions.navigateBack()
+                    viewModel.deletePost {
+                        navActions.navigateBack()
+                    }
                 }) {
                     Text("Delete")
                 }

@@ -8,7 +8,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.salazar.cheers.R
+import com.salazar.cheers.core.domain.model.ErrorMessage
+import com.salazar.cheers.core.ui.CheersDialog
 import com.salazar.cheers.navigation.CheersNavigationActions
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContentTriggered
 
 /**
  * Stateful composable that displays the Navigation route for the SignIn screen.
@@ -28,10 +32,31 @@ fun SignInRoute(
         )
 
     val signedIn = uiState.isSignedIn
+    val event = uiState.dialog
 
     LaunchedEffect(uiState.navigateToRegister) {
         if (uiState.navigateToRegister)
             navActions.navigateToRegister()
+    }
+
+    var open by remember { mutableStateOf(false) }
+
+    EventEffect(
+        event = event,
+        onConsumed = {},
+        action = {
+            open = true
+        },
+    )
+
+    if (event is StateEventWithContentTriggered<ErrorMessage>) {
+        CheersDialog(
+            error = event.content,
+            openDialog = open,
+            onDismiss = {
+                open = false
+            },
+        )
     }
 
     if (signedIn)

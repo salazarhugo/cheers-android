@@ -31,14 +31,33 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.animations.AnimateVisibilityFade
 import com.salazar.cheers.ui.compose.animations.AnimatedLogo
 import com.salazar.cheers.ui.compose.buttons.GoogleButton
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
+import com.salazar.cheers.ui.compose.share.ErrorMessage
 import com.salazar.cheers.ui.theme.Typography
+
+@Preview
+@Composable
+fun SignInScreenPreview() {
+    SignInScreen(
+        uiState = SignInUiState(isLoading = false),
+        onSignInClick = { /*TODO*/ },
+        signInWithGoogle = { /*TODO*/ },
+        navigateToPhone = { /*TODO*/ },
+        onPasswordLessChange = { /*TODO*/ },
+        navigateToSignUp = { /*TODO*/ },
+        onEmailChanged = {},
+        onPasswordChanged = {},
+    )
+}
 
 @Composable
 fun SignInScreen(
@@ -75,16 +94,17 @@ fun SignInScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
-                .navigationBarsPadding()
-                .animateContentSize(),
+                .systemBarsPadding(),
         ) {
             Column(
                 modifier = Modifier
+                    .weight(1f)
                     .padding(22.dp)
+                    .fillMaxHeight()
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
-                Spacer(Modifier.height(32.dp))
                 Image(
                     painter = rememberAsyncImagePainter(image),
                     contentDescription = null,
@@ -94,17 +114,21 @@ fun SignInScreen(
                 AnimatedLogo()
                 Spacer(modifier = Modifier.height(30.dp))
                 EmailTextField(uiState, onEmailChanged = onEmailChanged)
-                if (!uiState.isPasswordless) {
-                    Spacer(Modifier.height(8.dp))
+                AnimatedVisibility(
+                    visible = !uiState.isPasswordless,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
                     PasswordTextField(uiState, onPasswordChanged = onPasswordChanged)
                 }
                 Spacer(Modifier.height(16.dp))
                 LoginButton(
-                    uiState = uiState,
+                    isLoading = uiState.isLoading,
                     signInWithEmailPassword = onSignInClick,
                 )
-                if (uiState.errorMessage != null)
-                    Text(uiState.errorMessage, color = MaterialTheme.colorScheme.error)
+                ErrorMessage(
+                    errorMessage = uiState.errorMessage,
+                    paddingValues = PaddingValues(vertical = 8.dp)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextDivider(dayString = "OR")
                 val text =
@@ -114,10 +138,9 @@ fun SignInScreen(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 GoogleButton { signInWithGoogle() }
-                Spacer(modifier = Modifier.height(16.dp))
-//                PhoneButton(navigateToPhone = navigateToPhone)
             }
             Footer(
+//                modifier = Modifier.weight(1f),
                 navigateToSignUp = navigateToSignUp,
             )
         }
@@ -221,32 +244,25 @@ fun EmailTextField(
 
 @Composable
 fun LoginButton(
-    uiState: SignInUiState,
+    isLoading: Boolean,
     signInWithEmailPassword: () -> Unit,
 ) {
-    Button(
+    ButtonWithLoading(
+        modifier = Modifier.fillMaxWidth(),
+        text = "Sign In",
+        isLoading = isLoading,
+        onClick = signInWithEmailPassword,
         shape = MaterialTheme.shapes.medium,
-        onClick = {
-            signInWithEmailPassword()
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        enabled = !uiState.isLoading,
-    ) {
-        if (uiState.isLoading)
-            CircularProgressIndicatorM3()
-        else
-            Text(text = "Sign In")
-    }
+    )
 }
 
 @Composable
 fun Footer(
+    modifier: Modifier = Modifier,
     navigateToSignUp: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.clickable { navigateToSignUp() }
+        modifier = modifier.clickable { navigateToSignUp() }
     ) {
         DividerM3()
         Row(

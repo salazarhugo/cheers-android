@@ -82,7 +82,7 @@ class CreatePostViewModel @Inject constructor(
         }
         viewModelState.update {
             val drinks = Beverage.values().toList().sortedBy { it.displayName }
-                .filter { it.displayName.isNotBlank() }
+//                .filter { it.displayName.isNotBlank() }
             it.copy(drinks = drinks)
         }
     }

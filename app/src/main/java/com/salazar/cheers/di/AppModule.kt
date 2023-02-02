@@ -263,6 +263,14 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideFriendRequestDao(
+        cheersDatabase: CheersDatabase,
+    ): FriendRequestDao {
+        return cheersDatabase.friendRequestDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideCommentDao(
         cheersDatabase: CheersDatabase,
     ): CommentDao {

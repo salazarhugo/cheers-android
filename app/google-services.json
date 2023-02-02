@@ -22,6 +22,22 @@
           }
         },
         {
+          "client_id": "988221557023-bmpo3ceq7gpfisu0ovfaggahdml7uaea.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salazar.cheers",
+            "certificate_hash": "38c1701d5e46bbcf40d3335905e01ca52e250c1f"
+          }
+        },
+        {
+          "client_id": "988221557023-mrhup764vh2nb61op5hctr4qhr3vro45.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salazar.cheers",
+            "certificate_hash": "43d1cee78fd4ddba75478b88504dd7a728b5cb1c"
+          }
+        },
+        {
           "client_id": "988221557023-tesorgnkjtn6k87fapu859qedstt4jci.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

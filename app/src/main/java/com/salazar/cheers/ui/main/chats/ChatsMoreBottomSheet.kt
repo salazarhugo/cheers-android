@@ -21,6 +21,7 @@ import com.salazar.cheers.domain.models.RoomType
 
 @Composable
 fun ChatsMoreBottomSheet(
+    modifier: Modifier = Modifier,
     name: String,
     isAdmin: Boolean,
     roomType: RoomType,
@@ -29,6 +30,7 @@ fun ChatsMoreBottomSheet(
     onLeaveClick: () -> Unit,
 ) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(

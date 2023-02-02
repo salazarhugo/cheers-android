@@ -101,11 +101,11 @@ class StoryRepositoryImpl @Inject constructor(
     }
 
     override fun getMyStories(): Flow<List<Story>> {
-        TODO("Not yet implemented")
+        return emptyFlow()
     }
 
     override fun getUserStory(username: String): Flow<List<Story>> {
-        TODO("Not yet implemented")
+        return emptyFlow()
     }
 
     override suspend fun deleteStory(storyId: String): Result<Unit> = withContext(Dispatchers.IO) {

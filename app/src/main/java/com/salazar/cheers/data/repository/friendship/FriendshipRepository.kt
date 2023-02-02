@@ -41,4 +41,9 @@ interface FriendshipRepository {
      * Remove a friend.
      */
     suspend fun removeFriend(userId: String): Result<Unit>
+
+    /**
+     * Get friend request count.
+     */
+    suspend fun getFriendRequestCount(): Flow<Int>
 }

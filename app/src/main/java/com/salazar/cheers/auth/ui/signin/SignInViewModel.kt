@@ -1,6 +1,9 @@
 package com.salazar.cheers.auth.ui.signin
 
 import android.util.Log
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +20,7 @@ import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.StoreUserEmail
 import com.salazar.cheers.auth.data.AuthRepository
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
+import com.salazar.cheers.core.domain.model.ErrorMessage
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +30,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SignInUiState(
+    val navigateToRegister: Boolean = false,
+    val isPasswordless: Boolean = true,
+    val isSignedIn: Boolean = false,
+    val isLoading: Boolean,
+    val errorMessage: String? = null,
+    val email: String = "",
+    val acct: GoogleSignInAccount? = null,
+    val password: String = "",
+    val dialog: StateEventWithContent<ErrorMessage> = consumed(),
+)
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -92,6 +108,12 @@ class SignInViewModel @Inject constructor(
         }
     }
 
+    private fun showDialogMessage(errorMessage: ErrorMessage) {
+        viewModelState.update {
+            it.copy(dialog = triggered(errorMessage))
+        }
+    }
+
     private fun updateErrorMessage(errorMessage: String?) {
         viewModelState.update {
             it.copy(errorMessage = errorMessage, isLoading = false)
@@ -128,7 +150,13 @@ class SignInViewModel @Inject constructor(
     private fun sendSignInLinkToEmail(email: String) {
         authRepository.sendSignInLink(email = email)
             .addOnSuccessListener {
-                updateErrorMessage("Email sent")
+                showDialogMessage(
+                    ErrorMessage(
+                    title = "Sign In Request Sent",
+                    text = "We have sent you an email with instructions on how to sign in. Please check your email and follow the instructions provided.",
+                )
+                )
+                updateIsLoading(false)
                 viewModelScope.launch { storeUserEmail.saveEmail(email) }
             }
             .addOnFailureListener {
@@ -151,8 +179,12 @@ class SignInViewModel @Inject constructor(
     }
 
     fun onGoogleSignInResult(task: Task<GoogleSignInAccount>?) {
+        if (task == null) {
+            updateIsLoading(false)
+            return
+        }
         try {
-            val account = task?.getResult(ApiException::class.java) ?: return
+            val account = task.getResult(ApiException::class.java) ?: return
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
             signInWithCredential(credential = credential)
         } catch (e: ApiException) {
@@ -201,14 +233,3 @@ class SignInViewModel @Inject constructor(
         }
     }
 }
-
-data class SignInUiState(
-    val navigateToRegister: Boolean = false,
-    val isPasswordless: Boolean = true,
-    val isSignedIn: Boolean = false,
-    val isLoading: Boolean,
-    val errorMessage: String? = null,
-    val email: String = "",
-    val acct: GoogleSignInAccount? = null,
-    val password: String = "",
-)

@@ -1,6 +1,7 @@
 package com.salazar.cheers.ui.compose.share
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Button
@@ -16,7 +17,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ButtonWithLoading(
     text: String,
-    shape: Shape = ButtonDefaults.shape,
+    shape: Shape = MaterialTheme.shapes.medium,
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     valid: Boolean = true,
@@ -31,7 +32,7 @@ fun ButtonWithLoading(
         if (isLoading)
             CircularProgressIndicator(
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(ButtonDefaults.IconSize)
                     .align(Alignment.CenterVertically),
                 color = MaterialTheme.colorScheme.onSurface,
                 strokeWidth = 1.dp

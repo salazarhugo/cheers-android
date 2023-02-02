@@ -1,6 +1,10 @@
 package com.salazar.cheers.ui.compose.share
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.background
@@ -58,16 +62,26 @@ fun SwipeToRefresh(
         this.refreshTrigger = refreshTriggerPx
     }
 
-    val offset = remember(state.indicatorOffset) {
-        min(state.indicatorOffset.roundToInt(), 100).dp
+    val offset = remember(state.indicatorOffset, state.isRefreshing) {
+        if (state.isRefreshing)
+            100.dp
+        else
+            min(state.indicatorOffset.roundToInt(), 100).dp
     }
 
     Box(
         modifier.nestedScroll(connection = nestedScrollConnection),
         contentAlignment = Alignment.TopCenter
     ) {
-        if (state.isSwipeInProgress && state.indicatorOffset > 10 || state.isRefreshing)
+        val visible = state.isSwipeInProgress && state.indicatorOffset > 10 || state.isRefreshing
+
+        AnimatedVisibility(
+            visible = visible,
+            enter = slideInVertically(),
+            exit = slideOutVertically(),
+        ) {
             RefreshSection()
+        }
         Box(
             Modifier
                 .offset(y = offset)

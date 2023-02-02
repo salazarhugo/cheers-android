@@ -9,7 +9,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -40,8 +40,7 @@ class CheersApplication : Application(), Configuration.Provider {
         FirebaseApp.initializeApp(this)
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
-//            DebugAppCheckProviderFactory.getInstance()
-            SafetyNetAppCheckProviderFactory.getInstance()
+            PlayIntegrityAppCheckProviderFactory.getInstance()
         )
     }
 

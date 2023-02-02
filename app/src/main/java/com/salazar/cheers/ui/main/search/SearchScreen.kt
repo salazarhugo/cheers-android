@@ -131,18 +131,6 @@ private fun SearchBody(
             )
         }
 
-        if (uiState.isLoading)
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicatorM3()
-                }
-            }
-
         if (uiState.users != null) {
             if (uiState.users.isEmpty() && !uiState.isLoading)
                 item() {

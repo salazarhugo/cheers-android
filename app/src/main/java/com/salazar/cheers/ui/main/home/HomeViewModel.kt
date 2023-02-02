@@ -19,6 +19,7 @@ import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.domain.models.UserWithStories
 import com.salazar.cheers.domain.usecase.feed_post.ListPostFeedUseCase
 import com.salazar.cheers.domain.usecase.feed_story.ListStoryFeedUseCase
+import com.salazar.cheers.domain.usecase.get_notification_counter.GetNotificationCounter
 import com.salazar.cheers.domain.usecase.get_unread_chat_counter.GetUnreadChatCounterUseCase
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
@@ -61,6 +62,7 @@ class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val listStoryFeedUseCase: ListStoryFeedUseCase,
     private val getUnreadChatCounterUseCase: GetUnreadChatCounterUseCase,
+    private val getNotificationCounter: GetNotificationCounter,
     private val listPostFeedUseCase: ListPostFeedUseCase,
 ) : ViewModel() {
 
@@ -117,7 +119,7 @@ class HomeViewModel @Inject constructor(
                 it.copy(
                     page = newKey,
                     endReached = items.isEmpty(),
-                    posts = it.posts + items,
+//                    posts = it.posts + items,
                     isLoading = false,
                 )
             }
@@ -139,6 +141,11 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            getNotificationCounter()
+                .collect(::updateNotificationCounter)
+        }
+
+        viewModelScope.launch {
             getUnreadChatCounterUseCase()
                 .collect(::updateUnreadChatCounter)
         }
@@ -151,6 +158,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             listStoryFeedUseCase()
                 .collect(::updateStories)
+        }
+    }
+
+    private fun updateNotificationCounter(count: Int) {
+        viewModelState.update {
+            it.copy(notificationCount = count)
         }
     }
 

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ErrorMessage(
     errorMessage: String?,
-    paddingValues: PaddingValues,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
     if (errorMessage == null || errorMessage.isBlank()) return
 

@@ -60,6 +60,8 @@ object MainDestinations {
     const val SHARE_ROUTE = "share"
     const val FRIEND_REQUESTS = "friendRequests"
     const val MAP_SETTINGS_ROUTE = "mapSettings"
+    const val MANAGE_FRIENDSHIP_SHEET = "manageFriendship"
+    const val DIALOG_REMOVE_FRIEND = "dialogRemoveFriend"
 }
 
 /**
@@ -97,6 +99,19 @@ class CheersNavigationActions(
 ) {
     val navigateBack: () -> Unit = {
         navController.popBackStack()
+    }
+
+    val navigateToRemoveFriendDialog: (friendId: String) -> Unit = { postId ->
+        navController.navigate("${MainDestinations.DIALOG_DELETE_POST}/$postId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToManageFriendship: (String) -> Unit = { friendId ->
+        navController.navigate("${MainDestinations.MANAGE_FRIENDSHIP_SHEET}/$friendId") {
+            launchSingleTop = true
+        }
     }
 
     val navigateToMapSettings: () -> Unit = {

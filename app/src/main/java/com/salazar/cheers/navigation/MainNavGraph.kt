@@ -3,7 +3,9 @@ package com.salazar.cheers.navigation
 import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
@@ -15,7 +17,6 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.post.PostMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
 import com.salazar.cheers.ui.main.activity.ActivityRoute
@@ -58,9 +59,9 @@ import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.main.tickets.TicketsRoute
 import com.salazar.cheers.ui.main.tickets.details.TicketDetailsRoute
-import com.salazar.cheers.ui.sheets.DeletePostDialog
-import com.salazar.cheers.ui.sheets.DeleteStoryDialog
-import com.salazar.cheers.ui.sheets.SendGiftRoute
+import com.salazar.cheers.ui.sheets.*
+import com.salazar.cheers.ui.sheets.manage_friendship.ManageFriendshipRoute
+import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Constants.URI
 import com.salazar.cheers.util.FirebaseDynamicLinksUtil
@@ -469,47 +470,33 @@ fun NavGraphBuilder.mainNavGraph(
             })
         }
 
+        dialog(
+            route = "${MainDestinations.DIALOG_REMOVE_FRIEND}/{friendId}",
+        ) {
+            DeletePostDialog(
+                navActions = appState.navActions
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.MANAGE_FRIENDSHIP_SHEET}/{friendId}",
+            arguments = listOf(
+                navArgument("friendId") { nullable = false },
+            )
+        ) {
+            ManageFriendshipRoute(
+                navActions = appState.navActions,
+            )
+        }
+
         bottomSheet(
             route = "${MainDestinations.POST_MORE_SHEET}/{postID}",
             arguments = listOf(
                 navArgument("postID") { nullable = false },
             )
         ) {
-            val postId = it.arguments?.getString("postID")!!
-            val isAuthor = true
-            val context = LocalContext.current
-
-            PostMoreBottomSheet(
-                isAuthor = isAuthor,
-                onDetails = { appState.navActions.navigateToPostDetail(postId) },
-                onDelete = {
-                    appState.navActions.navigateToDeletePostDialog(postId)
-                           },
-                onUnfollow = {}, //{ homeViewModel.unfollowUser(post.creator.username)},
-                onReport = {},
-                onShare = {
-                    FirebaseDynamicLinksUtil.createShortLink("p/$postId")
-                        .addOnSuccessListener { shortLink ->
-                            val sendIntent: Intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, shortLink.shortLink.toString())
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            context.startActivity(shareIntent)
-                        }
-                    appState.navActions.navigateBack()
-                },
-                onBlock = {
-                    appState.navActions.navigateBack()
-                },
-                onLinkClick = {
-                    FirebaseDynamicLinksUtil.createShortLink("p/$postId")
-                        .addOnSuccessListener { shortLink ->
-                            context.copyToClipboard(shortLink.shortLink.toString())
-                        }
-                    appState.navActions.navigateBack()
-                }
+            PostMoreRoute(
+                navActions = appState.navActions,
             )
         }
 
@@ -586,6 +573,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         if (room != null)
             ChatsMoreBottomSheet(
+                modifier = Modifier.navigationBarsPadding(),
                 name = room.name,
                 isAdmin = room.admins.contains(uid),
                 roomType = room.type,

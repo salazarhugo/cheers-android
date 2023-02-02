@@ -124,13 +124,17 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun deleteRoom(channelId: String) = withContext(Dispatchers.IO) {
-        val request = DeleteRoomRequest.newBuilder()
-            .setRoomId(channelId)
-            .build()
+        try {
+            val request = DeleteRoomRequest.newBuilder()
+                .setRoomId(channelId)
+                .build()
 
-        chatDao.deleteChannel(channelId)
-        chatDao.deleteChannelMessages(channelId)
-        chatService.deleteRoom(request)
+            chatService.deleteRoom(request)
+            chatDao.deleteChannel(channelId)
+            chatDao.deleteChannelMessages(channelId)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 
     suspend fun getRoomId(request: GetRoomIdReq) = withContext(Dispatchers.IO) {

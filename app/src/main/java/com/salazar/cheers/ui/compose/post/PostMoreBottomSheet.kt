@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PostMoreBottomSheet(
+    modifier: Modifier = Modifier,
     isAuthor: Boolean,
     onDetails: () -> Unit,
     onDelete: () -> Unit,
@@ -27,7 +28,10 @@ fun PostMoreBottomSheet(
     onLinkClick: () -> Unit,
     onUnfollow: () -> Unit,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(
             modifier = Modifier
                 .padding(vertical = 10.dp)

@@ -40,6 +40,10 @@ fun OtherProfileRoute(
                     if (uiState is OtherProfileUiState.HasUser)
                          otherProfileViewModel.removeFriend((uiState as OtherProfileUiState.HasUser).user.id)
                 },
+                onManageFriendship = {
+                    if (uiState is OtherProfileUiState.HasUser)
+                        navActions.navigateToManageFriendship((uiState as OtherProfileUiState.HasUser).user.id)
+                },
                 onCopyUrl = {
                     if (uiState is OtherProfileUiState.HasUser)
                         FirebaseDynamicLinksUtil.createShortLink("u/${(uiState as OtherProfileUiState.HasUser).user.username}")

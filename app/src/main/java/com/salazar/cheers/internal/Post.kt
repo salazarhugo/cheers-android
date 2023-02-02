@@ -32,6 +32,7 @@ data class Post(
     @ColumnInfo(name = "postId")
     val id: String = "",
     val authorId: String = "",
+    val isAuthor: Boolean = false,
     val caption: String = "",
     val username: String = "",
 //    val storyState: UserOuterClass.StoryState = UserOuterClass.StoryState.EMPTY,

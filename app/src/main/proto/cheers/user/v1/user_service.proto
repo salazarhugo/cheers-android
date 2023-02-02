@@ -63,6 +63,20 @@ service UserService {
       get: "/v1/users/{user_id}/following"
     };
   };
+
+  rpc CheckUsername (CheckUsernameRequest) returns (CheckUsernameResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{username}/check"
+    };
+  };
+}
+
+message CheckUsernameRequest {
+  string username = 1;
+}
+
+message CheckUsernameResponse {
+  bool valid = 1;
 }
 
 message CreateUserRequest {

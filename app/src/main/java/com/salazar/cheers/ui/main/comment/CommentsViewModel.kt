@@ -77,13 +77,13 @@ class CommentsViewModel @Inject constructor(
     private fun updateComments(resource: Resource<List<Comment>>) {
         when(resource) {
             is Resource.Error ->  viewModelState.update {
-                it.copy(errorMessage = resource.message)
+                it.copy(errorMessage = resource.message, isLoading = false)
             }
             is Resource.Loading -> viewModelState.update {
                 it.copy(isLoading = resource.isLoading)
             }
             is Resource.Success -> viewModelState.update {
-                it.copy(comments = resource.data)
+                it.copy(comments = resource.data, isLoading = false)
             }
         }
     }

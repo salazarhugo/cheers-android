@@ -49,13 +49,13 @@ class EventsViewModel @Inject constructor(
 
     private fun updateError(message: String) {
         viewModelState.update {
-            it.copy(errorMessage = message)
+            it.copy(errorMessage = message, isLoading = false)
         }
     }
 
     private fun updateParties(parties: List<Party>?) {
         viewModelState.update {
-            it.copy(parties = parties)
+            it.copy(parties = parties, isLoading = false)
         }
     }
 

@@ -36,6 +36,22 @@ class UserRepository @Inject constructor(
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
     private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
 ) {
+    suspend fun checkUsername(
+        username: String,
+    ): Result<Boolean> {
+        return try {
+            val request = CheckUsernameRequest.newBuilder()
+                .setUsername(username)
+                .build()
+
+            val response = userService.checkUsername(request = request)
+            Result.success(response.valid)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
     suspend fun createUser(
         username: String,
         email: String,

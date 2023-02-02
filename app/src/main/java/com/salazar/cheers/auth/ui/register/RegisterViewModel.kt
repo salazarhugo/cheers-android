@@ -30,7 +30,6 @@ data class RegisterUiState(
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val storeUserEmail: StoreUserEmail,
     private val userRepository: UserRepository,
     private val registerUseCase: RegisterUseCase,
     private val signInUseCase: SignInUseCase,
@@ -50,6 +49,16 @@ class RegisterViewModel @Inject constructor(
     init {
         stateHandle.get<String>("emailLink")?.let {
             emailLink = it
+        }
+
+        viewModelScope.launch {
+            val signInResult = signInUseCase(
+                emailLink = emailLink,
+            )
+
+            if (signInResult is Resource.Error) {
+                updateIsLoading(false)
+            }
         }
     }
 
@@ -89,7 +98,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun checkUsername() {
+    fun checkUsername(onComplete: (Boolean) -> Unit) {
         val username = uiState.value.username
         updateIsLoading(true)
 
@@ -99,23 +108,15 @@ class RegisterViewModel @Inject constructor(
             return
         }
 
-        isUsernameAvailable(username) { result ->
-            updateIsLoading(false)
-            if (!result) {
-                updateErrorMessage("This username is taken")
-                return@isUsernameAvailable
-            }
-            updateUsernameAvailable(result)
-        }
-    }
-
-    private fun isUsernameAvailable(
-        username: String,
-        onResponse: (Boolean) -> Unit,
-    ) {
         viewModelScope.launch {
-            val res = userRepository.isUsernameAvailable(username = username)
-            onResponse(res)
+            val result = userRepository.checkUsername(username = username)
+            result.onSuccess { valid ->
+                updateUsernameAvailable(valid)
+                onComplete(valid)
+                if (!valid)
+                    updateErrorMessage("This username is taken")
+            }
+            updateIsLoading(false)
         }
     }
 
@@ -124,15 +125,6 @@ class RegisterViewModel @Inject constructor(
         val username = uiState.value.username
 
         viewModelScope.launch {
-            val signInResult = signInUseCase(
-                emailLink = emailLink,
-            )
-
-            if (signInResult is Resource.Error) {
-                updateIsLoading(false)
-                return@launch
-            }
-
             val result = registerUseCase(
                 username = username,
             )

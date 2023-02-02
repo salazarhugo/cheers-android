@@ -3,15 +3,18 @@ package com.salazar.cheers.data.repository.friendship
 import cheers.friendship.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
+import com.salazar.cheers.data.db.FriendRequestDao
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserItemDao
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toUserItem
+import com.salazar.cheers.domain.models.FriendRequest
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 
 class FriendshipRepositoryImpl @Inject constructor(
+    private val friendRequestDao: FriendRequestDao,
     private val userDao: UserDao,
     private val userItemDao: UserItemDao,
     private val service: FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub,
@@ -67,6 +70,11 @@ class FriendshipRepositoryImpl @Inject constructor(
                 val users = response.itemsList.map {
                     it.toUserItem()
                 }
+                friendRequestDao.insertFriendRequests(
+                    friendRequests = response.itemsList.map {
+                        FriendRequest(id = it.id)
+                    }
+                )
                 users
             } catch (e: Exception) {
                 emit(Resource.Error(e.localizedMessage ?: "Couldn't refresh friend requests"))
@@ -87,6 +95,7 @@ class FriendshipRepositoryImpl @Inject constructor(
 
         return try {
             service.acceptFriendRequest(request = request)
+            friendRequestDao.clear(userId)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -100,6 +109,7 @@ class FriendshipRepositoryImpl @Inject constructor(
 
         return try {
             service.deleteFriendRequest(request = request)
+            friendRequestDao.clear(userId)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -119,5 +129,10 @@ class FriendshipRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun getFriendRequestCount(): Flow<Int> {
+        return friendRequestDao.listFriendRequests()
+            .map { it.size }
     }
 }

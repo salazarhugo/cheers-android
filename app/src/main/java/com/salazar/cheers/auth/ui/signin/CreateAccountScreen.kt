@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.ui.compose.share.AppBar
 import com.salazar.cheers.ui.compose.share.ErrorMessage
 
 @Composable
@@ -38,40 +39,52 @@ fun CreateAccountScreen(
     isLoading: Boolean,
     onAcceptTermsChange: (Boolean) -> Unit,
     onSignUp: () -> Unit,
+    onBackPressed: () -> Unit,
 ) {
 
     val uriHandler = LocalUriHandler.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(Modifier.height(8.dp))
-            Text("Sign up as $username?", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(8.dp))
-            Text("You can't change it later")
-            Spacer(Modifier.height(64.dp))
-            AcceptTerms(
-                onAcceptTermsChange = onAcceptTermsChange,
-                acceptTerms = acceptTerms,
-                onOpenLink = {
-                    uriHandler.openUri(it)
-                })
-            Spacer(Modifier.height(32.dp))
-            ErrorMessage(errorMessage = errorMessage, paddingValues = PaddingValues(vertical = 16.dp))
-            SignUpButton(
-                acceptTerms = acceptTerms,
-                isLoading = isLoading,
-                onSignUp = onSignUp,
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = "",
+                center = true,
+                backNavigation = true,
+                onNavigateBack = onBackPressed,
             )
         }
-
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(8.dp))
+                Text("Sign up as $username?", style = MaterialTheme.typography.headlineMedium)
+                Spacer(Modifier.height(8.dp))
+                Text("You can't change it later")
+                Spacer(Modifier.height(64.dp))
+                AcceptTerms(
+                    onAcceptTermsChange = onAcceptTermsChange,
+                    acceptTerms = acceptTerms,
+                    onOpenLink = {
+                        uriHandler.openUri(it)
+                    })
+                Spacer(Modifier.height(32.dp))
+                ErrorMessage(errorMessage = errorMessage, paddingValues = PaddingValues(vertical = 16.dp))
+                SignUpButton(
+                    acceptTerms = acceptTerms,
+                    isLoading = isLoading,
+                    onSignUp = onSignUp,
+                )
+            }
+        }
     }
 }
 
