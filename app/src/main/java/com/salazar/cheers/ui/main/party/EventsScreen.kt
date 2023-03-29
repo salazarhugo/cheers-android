@@ -1,70 +1,49 @@
 package com.salazar.cheers.ui.main.party
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
-import androidx.compose.material3.TopAppBarDefaults.windowInsets
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.unit.sp
+import com.salazar.cheers.R
+import com.salazar.cheers.core.ui.CategoryTitle
+import com.salazar.cheers.parties.ui.PartyItem
 import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.numberFormatter
-import com.salazar.cheers.ui.compose.ChipGroup
+import com.salazar.cheers.internal.dateTimeFormatter
+import com.salazar.cheers.parties.ui.EventsTopBar
 import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.event.EventDetails
-import com.salazar.cheers.ui.compose.event.EventGoingButton
-import com.salazar.cheers.ui.compose.event.EventInterestButton
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.main.search.SearchBar
+import com.salazar.cheers.ui.theme.StrongRed
+
 
 @Composable
 fun EventsScreen(
     uiState: EventsUiState,
     onEventClicked: (String) -> Unit,
-    onInterestedToggle: (Party) -> Unit,
-    onGoingToggle: (Party) -> Unit,
     onQueryChange: (String) -> Unit,
     onMoreClick: (String) -> Unit,
-    onShareClick: (String) -> Unit,
-    onCreateEventClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
-            Column {
-                SearchBar(
-                    modifier = Modifier
-                        .windowInsetsPadding(windowInsets)
-                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    searchInput = uiState.query,
-                    onSearchInputChanged = onQueryChange,
-                )
-                ChipGroup(
-                    users = listOf(
-                        "For you",
-                        "Local",
-                        "This week",
-                        "Friends",
-                        "Groups",
-                        "Online",
-                        "Following"
-                    )
-                )
-            }
+             EventsTopBar(
+                 query = uiState.query,
+                 onQueryChange = onQueryChange,
+             )
         },
     ) {
         val parties = uiState.parties
@@ -80,10 +59,7 @@ fun EventsScreen(
                 EventList(
                     events = parties,
                     onEventClicked = onEventClicked,
-                    onInterestedToggle = onInterestedToggle,
                     onMoreClick = onMoreClick,
-                    onGoingToggle = onGoingToggle,
-                    onShareClick = onShareClick,
                 )
             }
     }
@@ -93,125 +69,46 @@ fun EventsScreen(
 fun EventList(
     events: List<Party>,
     onEventClicked: (String) -> Unit,
-    onInterestedToggle: (Party) -> Unit,
-    onGoingToggle: (Party) -> Unit,
     onMoreClick: (String) -> Unit,
-    onShareClick: (String) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp),
     ) {
+        item {
+            CategoryTitle(
+                modifier = Modifier.padding(16.dp),
+                text = stringResource(id = R.string.on_display),
+            )
+        }
+        item {
+            LazyRow(
+            ) {
+                items(events, key = { it.id }) { event ->
+                    PartyItem(
+                        modifier = Modifier.width(260.dp),
+                        party = event,
+                        onEventClicked = onEventClicked,
+                        onMoreClick = onMoreClick,
+                    )
+                }
+            }
+        }
+//        item {
+//            CategoryTitle(
+//                modifier = Modifier.padding(16.dp),
+//                text = stringResource(id = R.string.on_display),
+//            )
+//        }
         items(events, key = { it.id }) { event ->
-            Event(
+            PartyItem(
                 party = event,
                 onEventClicked = onEventClicked,
-                onInterestedToggle = onInterestedToggle,
                 onMoreClick = onMoreClick,
-                onGoingToggle = onGoingToggle,
-                onShareClick = onShareClick,
             )
         }
     }
 }
 
-@Composable
-fun Event(
-    party: Party,
-    onEventClicked: (String) -> Unit,
-    onInterestedToggle: (Party) -> Unit,
-    onGoingToggle: (Party) -> Unit,
-    onMoreClick: (String) -> Unit,
-    onShareClick: (String) -> Unit,
-) {
-    Column {
-        Box(contentAlignment = Alignment.TopEnd) {
-            AsyncImage(
-                model = party.bannerUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-                    .aspectRatio(16 / 9f)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center,
-                placeholder = ColorPainter(Color.LightGray),
-                error = ColorPainter(Color.LightGray),
-                fallback = ColorPainter(Color.LightGray),
-            )
-            IconButton(
-                onClick = { onMoreClick(party.id) },
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(Icons.Default.MoreVert, contentDescription = null)
-            }
-        }
-        EventDetails(
-            name = party.name,
-            privacy = party.privacy,
-            startTimeSeconds = party.startDate,
-            onEventDetailsClick = { onEventClicked(party.id) },
-            showArrow = true,
-        )
-        if (party.locationName.isNotBlank()) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(Icons.Outlined.PinDrop, null)
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = party.locationName,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-        }
-        Text(
-            text = "${numberFormatter(value = party.interestedCount.toInt())} interested - ${
-                numberFormatter(
-                    value = party.goingCount.toInt()
-                )
-            } going",
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-        )
-
-        EventMutualFriends(
-            profilePictureUrls = party.mutualProfilePictureUrls,
-            usernames = party.mutualUsernames,
-            mutualCount = party.mutualCount,
-        )
-
-        val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
-
-        if (party.hostId == uid)
-            FilledTonalButton(
-                onClick = { onShareClick(party.id)},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                Icon(Icons.Default.Share, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Share")
-            }
-        else
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                EventInterestButton(
-                    interested = party.interested,
-                    modifier = Modifier.weight(1f),
-                    onInterestedToggle = { onInterestedToggle(party) },
-                )
-                EventGoingButton(
-                    going = party.going,
-                    modifier = Modifier.weight(1f),
-                    onGoingToggle = { onGoingToggle(party) },
-                )
-            }
-    }
-}
 
 @Composable
 fun EventMutualFriends(
@@ -256,3 +153,64 @@ fun EventMutualFriends(
         }
 }
 
+@Composable
+fun EventItemDetails(
+    name: String,
+    hostName: String,
+    price: Int,
+    startTimeSeconds: Long,
+) {
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = hostName,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = dateTimeFormatter(timestamp = startTimeSeconds),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
+                    color = MaterialTheme.colorScheme.error,
+                )
+                PriceTag(
+                    price = price,
+                )
+            }
+        }
+        Icon(Icons.Outlined.Star, null)
+    }
+}
+
+@Composable
+fun PriceTag(
+    price: Int,
+) {
+    val text = if (price == 0)
+        "Free"
+    else
+        "${String.format("%.2f", price / 10E2)}€"
+
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+        modifier = Modifier
+            .clip(RoundedCornerShape(22.dp))
+            .background(StrongRed)
+            .padding(horizontal = 8.dp),
+        color = Color.White,
+    )
+}

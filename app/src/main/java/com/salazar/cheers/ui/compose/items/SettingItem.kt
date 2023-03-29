@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 fun SettingRadioButtonItem(
     title: String,
     icon: ImageVector,
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -38,7 +38,7 @@ fun SettingRadioButtonItem(
 fun SettingItem(
     title: String,
     icon: ImageVector,
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier

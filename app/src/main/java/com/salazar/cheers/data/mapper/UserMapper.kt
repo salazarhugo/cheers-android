@@ -40,5 +40,6 @@ fun cheers.type.UserOuterClass.User.toUser(): User {
         website = website,
         registrationTokens = registrationTokensList,
         createTime = createTime,
+        isBusinessAccount = isBusinessAccount,
     )
 }

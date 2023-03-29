@@ -58,6 +58,7 @@ fun SecurityScreen(
                 onUnlink = {},
                 linked = hasEmailPassword,
                 onClick = { onAddPassword(hasEmailPassword) },
+                onLink = { onAddPassword(hasEmailPassword) },
             )
 
             SignInMethodItem(

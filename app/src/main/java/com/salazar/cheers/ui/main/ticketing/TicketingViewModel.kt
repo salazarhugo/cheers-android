@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,8 +50,8 @@ class TicketingViewModel @Inject constructor(
         updateTickets()
     }
 
-    fun updateTickets() {
-        val tickets = listOf<TicketingTicket>(
+    private fun updateTickets() {
+        val tickets = listOf(
             TicketingTicket(
                 title = "Entree Standard",
                 description = "Avec une boisson offerte",
@@ -69,7 +69,7 @@ class TicketingViewModel @Inject constructor(
             ),
         )
         viewModelState.update {
-            it.copy(tickets =  tickets)
+            it.copy(tickets =  tickets, isLoading = false)
         }
     }
 

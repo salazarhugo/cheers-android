@@ -44,7 +44,7 @@ class PostMoreViewModel @Inject constructor(
         }
     }
 
-    fun updatePost(post: Post) {
+    private fun updatePost(post: Post?) {
         viewModelState.update {
             it.copy(post = post)
         }

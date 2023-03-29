@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.SkuDetails
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
@@ -22,8 +23,8 @@ import com.salazar.cheers.ui.compose.share.Toolbar
 @Composable
 fun RechargeScreen(
     coins: Int,
-    onRecharge: (SkuDetails) -> Unit,
-    recharges: List<SkuDetails>,
+    onRecharge: (ProductDetails) -> Unit,
+    recharges: List<ProductDetails>,
     onBackPressed: () -> Unit,
 ) {
     Scaffold(
@@ -50,19 +51,33 @@ fun RechargeScreen(
                 )
             }
             DividerM3(modifier = Modifier.padding(vertical = 16.dp))
-            LazyColumn {
-                items(recharges) {
-                    RechargeItem(it, onRecharge = onRecharge)
-                }
-            }
+            RechargeList(
+                recharges = recharges,
+                onRecharge = onRecharge,
+            )
+        }
+    }
+}
+
+@Composable
+fun RechargeList(
+    recharges: List<ProductDetails>,
+    onRecharge: (ProductDetails) -> Unit,
+) {
+    LazyColumn {
+        items(items = recharges) {
+            RechargeItem(
+                recharge = it,
+                onRecharge = onRecharge
+            )
         }
     }
 }
 
 @Composable
 fun RechargeItem(
-    recharge: SkuDetails,
-    onRecharge: (SkuDetails) -> Unit,
+    recharge: ProductDetails,
+    onRecharge: (ProductDetails) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -73,7 +88,7 @@ fun RechargeItem(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberAsyncImagePainter(model = recharge.iconUrl),
+                painter = rememberAsyncImagePainter(model = ""),
                 contentDescription = null,
             )
             Spacer(Modifier.width(16.dp))
@@ -87,7 +102,7 @@ fun RechargeItem(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.width(100.dp)
         ) {
-            Text(text = recharge.price)
+            Text(text = recharge.oneTimePurchaseOfferDetails?.formattedPrice ?: "")
         }
     }
 }

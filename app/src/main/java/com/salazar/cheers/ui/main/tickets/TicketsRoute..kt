@@ -22,7 +22,7 @@ fun TicketsRoute(
         uiState = uiState,
         onTicketsUIAction = { action ->
             when (action) {
-                TicketsUIAction.OnSwipeRefresh -> TODO()
+                TicketsUIAction.OnSwipeRefresh -> ticketsViewModel.onSwipeRefresh()
                 is TicketsUIAction.OnTicketClick -> {
                     navActions.navigateToTicketDetails(action.ticketId)
                 }

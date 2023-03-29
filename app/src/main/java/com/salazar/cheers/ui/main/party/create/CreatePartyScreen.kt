@@ -123,14 +123,12 @@ fun TopAppBar(
     title: String,
     onDismiss: () -> Unit,
 ) {
-    SmallTopAppBar(
-        title = { Text(title, fontWeight = FontWeight.Bold, fontFamily = Roboto) },
+    TopAppBar(title = { Text(title, fontWeight = FontWeight.Bold, fontFamily = Roboto) },
         navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.ArrowBack, "")
             }
-        },
-    )
+        })
 }
 
 @Composable

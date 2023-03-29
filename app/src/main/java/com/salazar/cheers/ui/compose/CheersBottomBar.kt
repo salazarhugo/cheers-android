@@ -1,18 +1,13 @@
 package com.salazar.cheers.ui.compose
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Badge
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ConfirmationNumber
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -37,7 +32,7 @@ import com.salazar.cheers.navigation.MainDestinations
 @Composable
 fun CheersBottomBar(
     unreadChatCount: Int,
-    profilePictureUrl: String,
+    picture: String,
     currentRoute: String,
     onNavigate: (String) -> Unit,
 ) {
@@ -50,8 +45,8 @@ fun CheersBottomBar(
         ),
         Screen(
             route = MainDestinations.EVENTS_ROUTE,
-            icon = { Icon(Icons.Outlined.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Filled.Event, null, tint = MaterialTheme.colorScheme.onBackground) },
+            icon = { Icon(Icons.Outlined.Bolt, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Filled.Bolt, null, tint = MaterialTheme.colorScheme.onBackground) },
             label = "Events"
         ),
         Screen(
@@ -60,52 +55,52 @@ fun CheersBottomBar(
             selectedIcon = { Icon(Icons.Default.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
             label = "Map"
         ),
-        Screen(
-            route = MainDestinations.TICKETS_ROUTE,
-            icon = { Icon(Icons.Outlined.ConfirmationNumber, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Default.ConfirmationNumber, null, tint = MaterialTheme.colorScheme.onBackground) },
-            label = "Tickets"
-        ),
 //        Screen(
-//            route = MainDestinations.MESSAGES_ROUTE,
-//            icon = {
-//                BadgedBox(badge = {
-//                    if (unreadChatCount > 0)
-//                        Badge {
-//                            Text(
-//                                text = unreadChatCount.toString(),
-//                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-//                            )
-//                        }
-//                }
-//                ) {
-//                    Icon(
-//                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-//                        contentDescription = null,
-//                        tint = MaterialTheme.colorScheme.onBackground
-//                    )
-//                }
-//            },
-//            selectedIcon = {
-//                BadgedBox(badge = {
-//                    if (unreadChatCount > 0)
-//                        Badge {
-//                            Text(
-//                                text = unreadChatCount.toString(),
-//                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-//                            )
-//                        }
-//                }
-//                ) {
-//                    Icon(
-//                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-//                        contentDescription = null,
-//                        tint = MaterialTheme.colorScheme.onBackground
-//                    )
-//                }
-//            },
-//            label = "Messages"
+//            route = MainDestinations.TICKETS_ROUTE,
+//            icon = { Icon(Icons.Outlined.ConfirmationNumber, null, tint = MaterialTheme.colorScheme.onBackground) },
+//            selectedIcon = { Icon(Icons.Default.ConfirmationNumber, null, tint = MaterialTheme.colorScheme.onBackground) },
+//            label = "Tickets"
 //        ),
+        Screen(
+            route = MainDestinations.MESSAGES_ROUTE,
+            icon = {
+                BadgedBox(badge = {
+                    if (unreadChatCount > 0)
+                        Badge {
+                            Text(
+                                text = unreadChatCount.toString(),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
+                }
+                ) {
+                    Icon(
+                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            },
+            selectedIcon = {
+                BadgedBox(badge = {
+                    if (unreadChatCount > 0)
+                        Badge {
+                            Text(
+                                text = unreadChatCount.toString(),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
+                }
+                ) {
+                    Icon(
+                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            },
+            label = "Messages"
+        ),
     )
 
     CompositionLocalProvider(
@@ -135,7 +130,7 @@ fun CheersBottomBar(
                     Image(
                         painter = rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
-                                .data(data = profilePictureUrl)
+                                .data(data = picture)
                                 .apply(block = fun ImageRequest.Builder.() {
                                     transformations(CircleCropTransformation())
                                     error(R.drawable.default_profile_picture)

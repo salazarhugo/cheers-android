@@ -1,8 +1,11 @@
 package com.salazar.cheers.ui.main.ticketing
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 
@@ -20,6 +23,7 @@ fun TicketingRoute(
 
     TicketingScreen(
         uiState = uiState,
+        modifier = Modifier.navigationBarsPadding(),
         onSwipeRefresh = ticketingViewModel::onSwipeRefresh,
         onBackPressed = { navActions.navigateBack() },
     )

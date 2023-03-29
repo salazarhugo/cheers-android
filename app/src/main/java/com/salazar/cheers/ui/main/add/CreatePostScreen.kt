@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -41,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
-import com.google.accompanist.pager.PagerState
 import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -52,12 +52,11 @@ import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.compose.CarouselDrinks
 import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.post.MultipleAnnotation
+import com.salazar.cheers.post.ui.MultipleAnnotation
 import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.ui.compose.share.ErrorMessage
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
@@ -118,12 +117,25 @@ fun CreatePostScreen(
         privacyState = uiState.privacyState,
         onSelectPrivacy = onSelectPrivacy,
     ) {
+        val enabled = uiState.caption.isNotEmpty() || uiState.photos.isNotEmpty() || uiState.drinkState.currentPage > 0
+
         Scaffold(
             topBar = { TopAppBar(onDismiss = {onCreatePostUIAction(CreatePostUIAction.OnBackPressed)}) },
+            bottomBar = {
+                ShareButton(
+                    modifier = Modifier.navigationBarsPadding(),
+                    text = stringResource(id = R.string.share),
+                    isLoading = uiState.isLoading,
+                    onClick = {
+                        onUploadPost()
+                        onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
+                    },
+                    enabled = enabled,
+                )
+            }
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(it)
             ) {
                 AddPhotoOrVideo(
@@ -188,17 +200,9 @@ fun CreatePostScreen(
                 )
                 DividerM3()
                 SwitchPreference(
-                    text = "Notify followers",
+                    text = "Send notification to friends",
                     checked = uiState.notify,
                     onCheckedChange = onNotifyChange
-                )
-                ShareButton(
-                    text = "Share",
-                    isLoading = uiState.isLoading,
-                    onClick = {
-                        onUploadPost()
-                        onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
-                    },
                 )
             }
         }
@@ -358,26 +362,23 @@ fun TopAppBar(
 
 @Composable
 fun ShareButton(
+    modifier: Modifier = Modifier,
     text: String,
     isLoading: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.Bottom,
-    ) {
-        DividerM3()
-        ButtonWithLoading(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .height(48.dp),
-            text = text,
-            shape = MaterialTheme.shapes.medium,
-            isLoading = isLoading,
-            onClick = onClick
-        )
-    }
+    ButtonWithLoading(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(48.dp),
+        text = text,
+        shape = MaterialTheme.shapes.medium,
+        isLoading = isLoading,
+        onClick = onClick,
+        valid = enabled,
+    )
 }
 
 @Composable

@@ -9,11 +9,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.Language
 import com.salazar.cheers.ui.compose.items.SettingTitle
 import com.salazar.cheers.ui.compose.share.Toolbar
-import com.salazar.cheers.internal.Language
 
 @Composable
 fun LanguageScreen(
@@ -22,7 +23,9 @@ fun LanguageScreen(
     onBackPressed: () -> Unit,
 ) {
     Scaffold(
-        topBar = { Toolbar(onBackPressed = onBackPressed, title = "Language") },
+        topBar = {
+            Toolbar(onBackPressed = onBackPressed, title = stringResource(id = com.salazar.cheers.R.string.language))
+        },
     ) {
         Column(
             modifier = Modifier.padding(it),
@@ -40,7 +43,7 @@ fun LanguagesSection(
     language: Language,
     onLanguageChange: (Language) -> Unit,
 ) {
-    SettingTitle(title = "Language")
+    SettingTitle(title = stringResource(id = com.salazar.cheers.R.string.language))
     val radioOptions = Language.values()
 
     Column(Modifier.selectableGroup()) {

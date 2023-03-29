@@ -16,80 +16,81 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.internal.numberFormatter
 import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.ui.compose.extensions.noRippleClickable
 
 @Composable
 fun EventInfo(
-    address: String,
-    hostName: String,
-    privacy: Privacy,
-    price: Int,
-    startTimeSeconds: Long,
-    interestedCount: Int,
-    goingCount: Int,
-    locationName: String,
+    party: Party,
     onTicketingClick: () -> Unit,
+    onUserClick: (String) -> Unit,
 ) {
-    Column {
-        EventHeaderItem(
-            icon = Icons.Default.Timer,
-            text = relativeTimeFormatter(startTimeSeconds).toString(),
-            modifier = Modifier.padding(16.dp, vertical = 8.dp),
-        )
-        EventHeaderItem(
-            icon = Icons.Default.Group,
-            text = "${numberFormatter(value = interestedCount)} interested - ${
-                numberFormatter(value = goingCount)
-            } going",
-            modifier = Modifier.padding(16.dp, vertical = 8.dp),
-        )
-        val eventBy = buildAnnotatedString {
-            append("Event by ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(hostName)
+    party.apply {
+        Column {
+            EventHeaderItem(
+                icon = Icons.Default.Timer,
+                text = relativeTimeFormatter(startDate).toString(),
+                modifier = Modifier.padding(16.dp, vertical = 8.dp),
+            )
+            EventHeaderItem(
+                icon = Icons.Default.Group,
+                text = "${numberFormatter(value = interestedCount)} interested - ${
+                    numberFormatter(value = goingCount)
+                } going",
+                modifier = Modifier.padding(16.dp, vertical = 8.dp),
+            )
+            val eventBy = buildAnnotatedString {
+                append("Event by ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(hostName)
+                }
             }
-        }
-        Row(
-            modifier = Modifier.padding(16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Default.Flag, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = eventBy,
+            Row(
+                modifier = Modifier.padding(16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Default.Flag, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = eventBy,
+                    modifier = Modifier.noRippleClickable {
+                        onUserClick(party.hostId)
+                    },
+                )
+            }
+            Row(
+                modifier = Modifier.padding(16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Default.PinDrop, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(
+                        text = locationName,
+                    )
+                    if (address.isNotBlank())
+                        Text(
+                            text = address,
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                }
+            }
+            val text = if (price <= 0) "Free" else "Price ${price / 100}"
+            EventHeaderItem(
+                icon = Icons.Default.Paid,
+                text = text,
+                modifier = Modifier.padding(16.dp, vertical = 8.dp),
+                onClick = onTicketingClick,
+            )
+            EventHeaderItem(
+                icon = Icons.Default.Public,
+                text = "${privacy.title} - ${privacy.subtitle}",
+                modifier = Modifier.padding(16.dp, vertical = 8.dp),
             )
         }
-        Row(
-            modifier = Modifier.padding(16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Default.PinDrop, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Column {
-                Text(
-                    text = locationName,
-                )
-                if (address.isNotBlank())
-                    Text(
-                        text = address,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-            }
-        }
-        val text = if (price <= 0) "Free" else "Price ${price / 100}"
-        EventHeaderItem(
-            icon = Icons.Default.Paid,
-            text = text,
-            modifier = Modifier.padding(16.dp, vertical = 8.dp),
-            onClick = onTicketingClick,
-        )
-        EventHeaderItem(
-            icon = Icons.Default.Public,
-            text = "${privacy.title} - ${privacy.subtitle}",
-            modifier = Modifier.padding(16.dp, vertical = 8.dp),
-        )
     }
 }
 

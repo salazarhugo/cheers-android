@@ -2,6 +2,7 @@ package com.salazar.cheers.data.db
 
 import androidx.room.*
 import com.salazar.cheers.internal.Activity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ActivityDao {
@@ -10,6 +11,12 @@ interface ActivityDao {
 
     @Query("SELECT * FROM activity WHERE accountId = :accountId ORDER BY activity.createTime DESC")
     suspend fun listActivity(accountId: String): List<Activity>
+
+    @Query("SELECT COUNT(*) FROM activity WHERE accountId = :accountId AND acknowledged = 0")
+    fun countUnreadActivity(accountId: String): Flow<Int>
+
+    @Query("UPDATE activity SET acknowledged = 1")
+    suspend fun acknowledgeAll()
 
     @Query("DELETE FROM activity")
     suspend fun clear()

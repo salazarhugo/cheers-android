@@ -3,10 +3,10 @@ package com.salazar.cheers.data.repository
 import cheers.post.v1.*
 import cheers.type.PostOuterClass
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.mapper.toPost
-import com.salazar.cheers.internal.Comment
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import kotlinx.coroutines.Dispatchers
@@ -113,11 +113,15 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun createPost(post: PostOuterClass.Post): Resource<Unit> {
+    suspend fun createPost(
+        post: PostOuterClass.Post,
+        sendNotificationToFriends: Boolean,
+    ): Resource<Unit> {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 
         val request = CreatePostRequest.newBuilder()
             .setPost(post)
+            .setSendNotificationToFriends(sendNotificationToFriends)
             .build()
 
         val response = try {
@@ -171,11 +175,10 @@ class PostRepository @Inject constructor(
         return postDao.listMapPost(privacy = privacy)
     }
 
-    suspend fun postFlow(postId: String) = postDao.postFlow(postId = postId)
+    fun postFlow(postId: String) = postDao.postFlow(postId = postId)
 
-    suspend fun getPost(postId: String): Post {
-        val post = postDao.getPost(postId = postId)
-        return post.copy()
+    suspend fun getPost(postId: String): Post? {
+        return postDao.getPost(postId = postId)
     }
 
     suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {

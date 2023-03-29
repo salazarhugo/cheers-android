@@ -213,7 +213,7 @@ private fun RefreshSection() {
         ) {
             CircularProgressIndicatorM3(
                 modifier = Modifier
-                    .size(40.dp),
+                    .size(20.dp),
                 strokeWidth = 1.dp
             )
         }

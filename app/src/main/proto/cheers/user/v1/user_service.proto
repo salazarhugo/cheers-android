@@ -17,6 +17,8 @@ service UserService {
     };
   };
 
+  rpc GetUserNode (GetUserNodeRequest) returns (GetUserNodeResponse);
+
   rpc GetUser (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
       get: "/v1/users/{user_id}"
@@ -69,6 +71,20 @@ service UserService {
       post: "/v1/users/{username}/check"
     };
   };
+
+  rpc ListSuggestions(ListSuggestionsRequest) returns (ListSuggestionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/suggestions"
+    };
+  };
+}
+
+message ListSuggestionsRequest {
+  string user_id = 1;
+}
+
+message ListSuggestionsResponse {
+  repeated cheers.type.UserItem users = 1;
 }
 
 message CheckUsernameRequest {
@@ -136,6 +152,10 @@ message ListFollowingResponse {
   repeated cheers.type.UserItem users = 1;
 }
 
+message GetUserNodeResponse {
+  cheers.type.User user = 1;
+}
+
 message GetUserResponse {
   cheers.type.User user = 1;
   int32 post_count = 2;
@@ -167,6 +187,10 @@ message FollowUserRequest {
 
 message SearchUserRequest {
   string query = 1;
+}
+
+message GetUserNodeRequest {
+  string user_id = 1;
 }
 
 message GetUserRequest {

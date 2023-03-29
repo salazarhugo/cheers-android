@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.BuildConfig
+import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.items.SettingItem
 import com.salazar.cheers.ui.compose.items.SettingTitle
 import com.salazar.cheers.ui.compose.share.ErrorMessage
@@ -30,7 +32,12 @@ fun SettingsScreen(
     onDeleteAccount: () -> Unit,
 ) {
     Scaffold(
-        topBar = { Toolbar(onBackPressed = onBackPressed, title = "Settings") },
+        topBar = {
+            Toolbar(
+                onBackPressed = onBackPressed,
+                title = stringResource(id = R.string.settings),
+            )
+        },
     ) {
         Column(
             modifier = Modifier
@@ -54,7 +61,7 @@ fun SettingsScreen(
 @Composable
 fun VersionSection() {
     Text(
-        text = "Cheers v.${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+        text = "${stringResource(id = R.string.app_name)} v.${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
         style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier
             .fillMaxWidth()
@@ -69,9 +76,16 @@ fun LoginsSection(
     onDeleteAccount: () -> Unit,
 ) {
     Column {
-        SettingTitle(title = "Logins")
-        SignOutButton(onSignOut = onSignOut)
-        RedButton(text = "Delete Account", onClick = onDeleteAccount)
+        SettingTitle(
+            title = stringResource(id = R.string.logins),
+        )
+        SignOutButton(
+            onSignOut = onSignOut,
+        )
+        RedButton(
+            stringResource(id = R.string.delete_account),
+            onClick = onDeleteAccount,
+        )
     }
 }
 
@@ -80,12 +94,23 @@ fun HelpSection(
     onSettingsUIAction: (SettingsUIAction) -> Unit,
 ) {
     Column {
-        SettingTitle(title = "Help")
-        SettingItem("Ask a Question", Icons.Outlined.QuestionAnswer, {})
-        SettingItem("Privacy Policy", Icons.Outlined.Policy) {
+        SettingTitle(
+            title = stringResource(id = R.string.help),
+        )
+        SettingItem(
+            title = stringResource(id = R.string.ask_a_question),
+            icon = Icons.Outlined.QuestionAnswer,
+        )
+        SettingItem(
+            title = stringResource(id = R.string.privacy_policy),
+            icon = Icons.Outlined.Policy,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnPrivacyPolicyClick)
         }
-        SettingItem("Terms of Use", Icons.Outlined.Policy) {
+        SettingItem(
+            title = stringResource(id = R.string.terms_of_use),
+            icon = Icons.Outlined.Policy,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnTermsOfUseClick)
         }
     }
@@ -96,7 +121,9 @@ fun AccountSection(
     navigateToBecomeVip: () -> Unit,
 ) {
     Column {
-        SettingTitle(title = "Account")
+        SettingTitle(
+            title = stringResource(id = R.string.account),
+        )
         SettingItem("Become VIP", Icons.Outlined.WorkspacePremium, navigateToBecomeVip)
     }
 }
@@ -106,33 +133,61 @@ fun SettingsSection(
     onSettingsUIAction: (SettingsUIAction) -> Unit,
 ) {
     Column {
-        SettingTitle(title = "Settings")
-        SettingItem("Notifications and Sounds", Icons.Outlined.Notifications) {
+        SettingTitle(
+            title = stringResource(id = R.string.settings),
+        )
+        SettingItem(
+            "Notifications and Sounds",
+            Icons.Outlined.Notifications,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
         }
-        SettingItem("Chat Settings", Icons.Outlined.ChatBubbleOutline) {
+        SettingItem(
+            "Chat Settings",
+            Icons.Outlined.ChatBubbleOutline,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
         }
-        SettingItem("Security", Icons.Outlined.Security) {
+        SettingItem(
+            stringResource(id = R.string.security),
+            Icons.Outlined.Security,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnSecurityClick)
         }
-        SettingItem("Devices", Icons.Outlined.Computer, {})
+        SettingItem(
+            stringResource(id = R.string.devices),
+            Icons.Outlined.Computer,
+            {},
+        )
 //        SettingItem("Payment Methods", Icons.Outlined.CreditCard) {
 //            onSettingsUIAction(SettingsUIAction.OnAddPaymentClick)
 //        }
-        SettingItem("Recharge coins", Icons.Outlined.CreditCard) {
+        SettingItem(
+            stringResource(id = R.string.recharge_coins),
+            Icons.Outlined.CreditCard,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnRechargeClick)
         }
 //        SettingItem("Payment History", Icons.Outlined.CreditCard) {
 //            onSettingsUIAction(SettingsUIAction.OnPaymentHistoryClick)
 //        }
-        SettingItem("Language", Icons.Outlined.Language) {
+        SettingItem(
+            stringResource(id = R.string.language),
+            Icons.Outlined.Language,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnLanguageClick)
         }
-        SettingItem("Theme", Icons.Outlined.Palette) {
+        SettingItem(
+            stringResource(id = R.string.theme),
+            Icons.Outlined.Palette,
+        ) {
             onSettingsUIAction(SettingsUIAction.OnThemeClick)
         }
-        SettingItem("About", Icons.Outlined.Info, {})
+        SettingItem(
+            stringResource(id = R.string.about),
+            Icons.Outlined.Info,
+            {}
+        )
     }
 }
 

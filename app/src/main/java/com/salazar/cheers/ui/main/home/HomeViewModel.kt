@@ -19,11 +19,13 @@ import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.domain.models.UserWithStories
 import com.salazar.cheers.domain.usecase.feed_post.ListPostFeedUseCase
 import com.salazar.cheers.domain.usecase.feed_story.ListStoryFeedUseCase
-import com.salazar.cheers.domain.usecase.get_notification_counter.GetNotificationCounter
+import com.salazar.cheers.domain.usecase.get_notification_counter.GetNotificationCounterUseCase
 import com.salazar.cheers.domain.usecase.get_unread_chat_counter.GetUnreadChatCounterUseCase
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.SuggestionUser
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.notes.data.repository.NoteRepository
+import com.salazar.cheers.notes.domain.models.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -52,17 +54,20 @@ data class HomeUiState(
     val storyPage: Int = 0,
     val storyEndReached: Boolean = false,
     val unreadChatCounter: Int = 0,
+    val notes: List<Note> = emptyList(),
+    val yourNote: Note? = null,
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val postRepository: PostRepository,
+    private val noteRepository: NoteRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
     private val listStoryFeedUseCase: ListStoryFeedUseCase,
     private val getUnreadChatCounterUseCase: GetUnreadChatCounterUseCase,
-    private val getNotificationCounter: GetNotificationCounter,
+    private val getNotificationCounterUseCase: GetNotificationCounterUseCase,
     private val listPostFeedUseCase: ListPostFeedUseCase,
 ) : ViewModel() {
 
@@ -141,7 +146,7 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            getNotificationCounter()
+            getNotificationCounterUseCase()
                 .collect(::updateNotificationCounter)
         }
 
@@ -158,6 +163,22 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             listStoryFeedUseCase()
                 .collect(::updateStories)
+        }
+
+        viewModelScope.launch {
+            noteRepository.listFriendNotes()
+                .collect(::updateNotes)
+        }
+
+        viewModelScope.launch {
+            noteRepository.getYourNote()
+                .collect(::updateYourNote)
+        }
+    }
+
+    private fun refreshFriendNotes() {
+        viewModelScope.launch {
+            noteRepository.refreshFriendNotes()
         }
     }
 
@@ -176,6 +197,26 @@ class HomeViewModel @Inject constructor(
     private fun updateStories(userWithStoriesList: List<UserWithStories>) {
         viewModelState.update {
             it.copy(userWithStoriesList = userWithStoriesList)
+        }
+    }
+
+    private fun updateYourNote(note: Note?) {
+        viewModelState.update {
+            it.copy(yourNote = note)
+        }
+    }
+
+    private fun updateNotes(notes: List<Note>) {
+        viewModelState.update {
+            it.copy(notes = notes)
+        }
+    }
+
+    private fun updateNotesResponse(result: Resource<List<Note>>) {
+        when(result) {
+            is Resource.Error -> {}
+            is Resource.Loading -> {}
+            is Resource.Success -> updateNotes(result.data ?: emptyList())
         }
     }
 
@@ -214,6 +255,7 @@ class HomeViewModel @Inject constructor(
             storyPaginator.reset()
             storyPaginator.loadNextItems()
         }
+        refreshFriendNotes()
     }
 
     private fun updateError(message: String?) {
@@ -283,6 +325,7 @@ sealed class HomeUIAction {
     object OnAddStoryClick : HomeUIAction()
     object OnCreatePostClick : HomeUIAction()
     object OnLoadNextItems : HomeUIAction()
+    object OnCreateNoteClick : HomeUIAction()
     data class OnCommentClick(val postID: String) : HomeUIAction()
     data class OnShareClick(val postID: String) : HomeUIAction()
     data class OnLikeClick(val post: Post) : HomeUIAction()
@@ -290,5 +333,6 @@ sealed class HomeUIAction {
     data class OnStoryClick(val userID: String) : HomeUIAction()
     data class OnUserClick(val userID: String) : HomeUIAction()
     data class OnPostClick(val postID: String) : HomeUIAction()
+    data class OnNoteClick(val userID: String) : HomeUIAction()
     data class OnPostMoreClick(val postID: String) : HomeUIAction()
 }

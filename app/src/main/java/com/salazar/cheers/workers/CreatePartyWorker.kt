@@ -14,7 +14,7 @@ import cheers.type.PrivacyOuterClass
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

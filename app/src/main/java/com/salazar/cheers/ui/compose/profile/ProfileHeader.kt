@@ -2,6 +2,9 @@ package com.salazar.cheers.ui.compose.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.internal.User
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.main.profile.ProfileStats
+import kotlinx.serialization.json.JsonNull.content
 
 @Composable
 fun ProfileHeader(
@@ -37,6 +41,7 @@ fun ProfileHeader(
         )
         ProfileName(
             name = user.name,
+            isBusinessAccount = user.isBusinessAccount,
         )
         ProfileBio(
             bio = user.bio,
@@ -56,14 +61,27 @@ fun ProfileHeader(
 @Composable
 fun ProfileName(
     name: String,
+    isBusinessAccount: Boolean,
 ) {
     if (name.isBlank())
         return
     Spacer(Modifier.height(4.dp))
-    Text(
-        text = name,
-        style = MaterialTheme.typography.titleMedium.copy(),
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        if (isBusinessAccount) {
+            Icon(
+                imageVector = Icons.Default.Business,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline,
+            )
+        }
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium.copy(),
+        )
+    }
 }
 
 @Composable

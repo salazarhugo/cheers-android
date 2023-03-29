@@ -13,4 +13,8 @@ interface ActivityRepository {
      * List activity of current user.
      */
     suspend fun listActivity(): Flow<Resource<List<Activity>>>
+
+    suspend fun countActivity(): Flow<Int>
+
+    suspend fun acknowledgeAll()
 }

@@ -36,10 +36,6 @@ fun OtherProfileRoute(
                 username = username,
                 verified = if (uiState is OtherProfileUiState.HasUser) (uiState as OtherProfileUiState.HasUser).user.verified else false,
                 onBackPressed = { navActions.navigateBack() },
-                onRemoveFriend = {
-                    if (uiState is OtherProfileUiState.HasUser)
-                         otherProfileViewModel.removeFriend((uiState as OtherProfileUiState.HasUser).user.id)
-                },
                 onManageFriendship = {
                     if (uiState is OtherProfileUiState.HasUser)
                         navActions.navigateToManageFriendship((uiState as OtherProfileUiState.HasUser).user.id)

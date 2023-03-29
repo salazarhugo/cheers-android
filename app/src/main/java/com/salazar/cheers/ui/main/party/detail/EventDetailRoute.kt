@@ -28,8 +28,7 @@ fun EventDetailRoute(
             uiState = uiState as EventDetailUiState.HasEvent,
             onMapClick = { navActions.navigateToMap() },
             onUserClicked = { navActions.navigateToOtherProfile(it) },
-            onInterestedToggle = eventDetailViewModel::onInterestedToggle,
-            onGoingToggle = eventDetailViewModel::onGoingToggle,
+            onWatchStatusChange = eventDetailViewModel::onWatchStatusChange,
             onCopyLink = {
                 val eventId = (uiState as EventDetailUiState.HasEvent).party.id
                 FirebaseDynamicLinksUtil.createShortLink("event/$eventId")

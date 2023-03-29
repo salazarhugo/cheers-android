@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.Celebration
@@ -27,28 +26,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
+import com.salazar.cheers.core.ui.PrettyPanel
+import com.salazar.cheers.parties.ui.PartyItem
 import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.chat.FunctionalityNotAvailablePanel
-import com.salazar.cheers.ui.compose.post.PostBody
-import com.salazar.cheers.ui.compose.post.PostFooter
-import com.salazar.cheers.ui.compose.post.PostHeader
-import com.salazar.cheers.ui.compose.post.PostText
-import com.salazar.cheers.ui.compose.profile.ProfileHeader
+import com.salazar.cheers.post.ui.item.PostBody
+import com.salazar.cheers.post.ui.item.PostFooter
+import com.salazar.cheers.post.ui.item.PostHeader
+import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.ui.compose.profile.ProfileItem
-import com.salazar.cheers.ui.compose.profile.ProfileText
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.utils.PrettyImage
-import com.salazar.cheers.ui.main.party.Event
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -179,23 +177,18 @@ fun Profile(
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             when (page) {
-                                0 -> posts?.forEach { postFeed ->
-                                    Post(
-                                        postFeed,
-                                        onPostClicked,
-                                        onPostLike = onPostLike,
-                                        onPostMoreClicked = onPostMoreClicked,
-                                        onCommentClick = onCommentClick,
-                                    )
-                                }
+                                0 -> PostTab(
+                                    posts = posts,
+                                    onCommentClick = onCommentClick,
+                                    onPostClicked = onPostClicked,
+                                    onPostLike = onPostLike,
+                                    onPostMoreClicked = onPostMoreClicked,
+                                )
                                 1 -> uiState.parties?.forEach {
-                                    Event(
+                                    PartyItem(
                                         party = it,
                                         onEventClicked = {},
-                                        onInterestedToggle = {},
-                                        onGoingToggle = {},
                                         onMoreClick = {},
-                                        onShareClick = {}
                                     )
                                 }
                                 2 -> FunctionalityNotAvailablePanel()
@@ -209,19 +202,44 @@ fun Profile(
 }
 
 @Composable
+fun PostTab(
+    posts: List<Post>?,
+    onPostClicked: (postId: String) -> Unit,
+    onPostLike: (post: Post) -> Unit,
+    onPostMoreClicked: (String, String) -> Unit,
+    onCommentClick: (String) -> Unit,
+) {
+    if (posts == null)
+        return
+
+    if (posts.isEmpty())
+        PrettyPanel(
+            title = stringResource(id = R.string.profile),
+            body = stringResource(id = R.string.profile_empty_post),
+        )
+
+    posts.forEach { postFeed ->
+        Post(
+            postFeed,
+            onPostClicked,
+            onPostLike = onPostLike,
+            onPostMoreClicked = onPostMoreClicked,
+            onCommentClick = onCommentClick,
+        )
+    }
+}
+
+@Composable
 fun EventList(
     parties: List<Party>?,
 ) {
     if (parties != null)
         LazyColumn {
             items(parties, key = { it.id }) { event ->
-                Event(
+                PartyItem(
                     party = event,
                     onEventClicked = {},
-                    onGoingToggle = {},
-                    onInterestedToggle = {},
                     onMoreClick = {},
-                    onShareClick = {},
                 )
             }
         }

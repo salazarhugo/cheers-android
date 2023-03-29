@@ -16,7 +16,7 @@ import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.workers.CreatePartyWorker

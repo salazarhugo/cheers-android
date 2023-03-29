@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.salazar.cheers.Language
 import com.salazar.cheers.Settings
 import com.salazar.cheers.Theme
 import kotlinx.coroutines.flow.Flow
@@ -37,11 +38,15 @@ class DataStoreRepository @Inject constructor(
         }
     }
 
-    suspend fun resetChatCounter() {
-//        settingsStore.updateData { currentPreferences ->
-//            val chatCounter = currentPreferences.chatCounter
-//            chatCounter.toBuilder().unreadChatCounter = chatCounter.unreadChatCounter + 1
-//            currentPreferences.toBuilder().setChatCounter(chatCounter).build()
-//        }
+    suspend fun updateLanguage(theme: Language) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setLanguage(theme).build()
+        }
+    }
+
+    suspend fun updateGhostMode(ghostMode: Boolean) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setGhostMode(ghostMode).build()
+        }
     }
 }

@@ -48,6 +48,15 @@ service PartyService {
     };
   }
 
+  /*
+    List parties of a specific user
+   */
+  rpc ListParty (ListPartyRequest) returns (ListPartyResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{user_id}/list"
+    };
+  }
+
   rpc AnswerParty (AnswerPartyRequest) returns (AnswerPartyResponse) {
     option (google.api.http) = {
       post: "/v1/parties/{party_id}/answer"
@@ -60,6 +69,46 @@ service PartyService {
       get: "/v1/parties/{party_id}/going"
     };
   }
+
+  rpc TransferParty (TransferPartyRequest) returns (TransferPartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties/{party_id}/transfer"
+      body: "*"
+    };
+  }
+
+  rpc DuplicateParty (DuplicatePartyRequest) returns (DuplicatePartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties/{party_id}/duplicate"
+      body: "*"
+    };
+  }
+}
+
+message DuplicatePartyRequest {
+  string party_id = 1;
+}
+
+message DuplicatePartyResponse {
+}
+
+message TransferPartyRequest {
+  string user_id = 1;
+  string party_id = 2;
+}
+
+message TransferPartyResponse {
+}
+
+message ListPartyRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string user_id = 3;
+}
+
+message ListPartyResponse {
+  repeated PartyItem items = 1;
+  string next_page_token = 2;
 }
 
 message ListGoingRequest {
@@ -72,7 +121,7 @@ message ListGoingResponse {
 
 message AnswerPartyRequest {
   string party_id = 1;
-  PartyAnswer answer = 2;
+  WatchStatus watch_status = 2;
 }
 
 message AnswerPartyResponse {
@@ -135,12 +184,14 @@ message PartyItem {
   int64 interested_count = 4;
   int64 invited_count = 5;
   bool is_creator = 8;
-  PartyAnswer answer = 9;
+  WatchStatus viewer_watch_status = 9;
+  repeated string mutual_usernames = 10;
+  repeated string mutual_pictures = 11;
 }
 
-enum PartyAnswer {
-  GOING = 0;
-  INTERESTED = 1;
-  NOT_INTERESTED = 2;
+enum WatchStatus {
+  UNWATCHED = 0;
+  GOING = 1;
+  INTERESTED = 2;
   MAYBE = 3;
 }

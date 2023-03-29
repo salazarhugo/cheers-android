@@ -21,7 +21,7 @@ import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.user.FollowButton
+import com.salazar.cheers.user.ui.FollowButton
 import com.salazar.cheers.ui.main.party.create.TopAppBar
 import kotlinx.coroutines.launch
 

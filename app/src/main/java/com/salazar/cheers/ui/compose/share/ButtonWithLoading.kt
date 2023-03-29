@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ButtonWithLoading(
     text: String,
-    shape: Shape = MaterialTheme.shapes.medium,
     modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.medium,
     isLoading: Boolean,
     valid: Boolean = true,
     onClick: () -> Unit,

@@ -21,18 +21,25 @@ import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.dateTimeFormatter
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-
+import com.salazar.cheers.ui.main.party.PriceTag
 
 @Composable
 fun TicketingScreen(
     uiState: TicketingUiState,
+    modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onSwipeRefresh: () -> Unit,
 ) {
     Scaffold(
-        topBar = {
+        modifier = modifier,
+        bottomBar = {
+            Basket(
+                total = 1113,
+                onClick = {},
+            )
         },
     ) {
         SwipeToRefresh(
@@ -51,15 +58,6 @@ fun TicketingScreen(
             Tickets(
                 tickets = uiState.tickets.orEmpty(),
             )
-            Button(
-                modifier = Modifier.padding(16.dp),
-                onClick = { /*TODO*/ },
-                shape = MaterialTheme.shapes.medium,
-            ) {
-                Text(
-                    text = "Next",
-                )
-            }
         }
     }
 }
@@ -74,7 +72,7 @@ fun Tickets(
             .padding(16.dp),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
         ) {
             tickets.forEach { ticket ->
                 Ticket(
@@ -114,11 +112,11 @@ fun TicketingHeader(
         ) {
             Text(
                 text = "Ticketing ${party.name}",
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
             )
             Text(
                 text = "by ${party.hostName}",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
             )
             Spacer(Modifier.height(8.dp))
             Row(
@@ -147,20 +145,18 @@ fun Ticket(
 
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = ticket.title,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
         )
         Text(
             text = ticket.description,
             style = MaterialTheme.typography.titleMedium,
         )
-        Text(
-            text = "${ticket.price/100} $",
-            style = MaterialTheme.typography.headlineLarge,
+        PriceTag(
+            price = ticket.price,
         )
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -189,4 +185,19 @@ fun Ticket(
 @Composable
 fun TicketingOption() {
 
+}
+
+@Composable
+fun Basket(
+    total: Int,
+    onClick: () -> Unit,
+) {
+    ButtonWithLoading(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        text = "View basket ${total/100} €",
+        isLoading = false,
+        onClick = onClick,
+    )
 }

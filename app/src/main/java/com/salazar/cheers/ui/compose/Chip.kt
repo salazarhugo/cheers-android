@@ -7,7 +7,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,15 +30,22 @@ fun ChipGroup(
         return
 
     Column(modifier = Modifier.padding(8.dp)) {
-        LazyRow {
+        LazyRow(
+        ) {
             items(users) {
                 Animate {
-                    Chip(
-                        name = it,
-                        isSelected = true,
-                        onSelectionChanged = {
+                    SuggestionChip(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        onClick = {
                             onSelectedChanged(it)
                         },
+                        shape = MaterialTheme.shapes.medium,
+                        label = {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
                     )
                 }
             }
@@ -60,7 +69,7 @@ fun Chip(
 
     Surface(
         modifier = Modifier.padding(4.dp),
-        shadowElevation = 8.dp,
+        shadowElevation = 0.dp,
         shape = CircleShape,
         color = backgroundColor
     ) {

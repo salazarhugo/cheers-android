@@ -36,7 +36,7 @@ import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.user.FollowButton
+import com.salazar.cheers.user.ui.FollowButton
 import com.salazar.cheers.ui.theme.BlueCheers
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography

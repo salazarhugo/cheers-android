@@ -18,7 +18,7 @@ class ListPostFeedUseCase @Inject constructor(
             .combine(userRepository.listUserItems()) { posts, users ->
                 // Only friend posts
                 posts.filter { post ->
-                    users.find { it.id == post.authorId }?.friend == true
+                    post.isAuthor || users.find { it.id == post.authorId }?.friend == true
                 }
             }
     }

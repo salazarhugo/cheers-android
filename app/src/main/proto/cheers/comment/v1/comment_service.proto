@@ -23,11 +23,43 @@ service CommentService {
     };
   }
 
+  rpc ListReplies(ListRepliesRequest) returns (ListRepliesResponse) {
+    option (google.api.http) = {
+      get: "/v1/comments/{comment_id}/replies"
+    };
+  }
+
   rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
     option (google.api.http) = {
       delete: "/v1/comments"
     };
   }
+
+  rpc CreateLikeComment(CreateLikeCommentRequest) returns (CreateLikeCommentResponse) {
+    option (google.api.http) = {
+      post: "/v1/comments/{comment_id}/like"
+    };
+  }
+
+  rpc DeleteLikeComment(DeleteLikeCommentRequest) returns (DeleteLikeCommentResponse) {
+    option (google.api.http) = {
+      delete: "/v1/comments/{comment_id}/like"
+    };
+  }
+}
+
+message CreateLikeCommentRequest {
+  string comment_id = 1;
+}
+
+message CreateLikeCommentResponse {
+}
+
+message DeleteLikeCommentRequest {
+  string comment_id = 1;
+}
+
+message DeleteLikeCommentResponse {
 }
 
 message DeleteCommentRequest {
@@ -42,6 +74,14 @@ message ListCommentRequest {
   string post_id = 1;
 }
 
+message ListRepliesRequest {
+  string comment_id = 1;
+}
+
+message ListRepliesResponse {
+  repeated CommentItem items = 1;
+}
+
 message ListCommentResponse {
   repeated CommentItem items = 1;
 }
@@ -49,6 +89,9 @@ message ListCommentResponse {
 message CommentItem {
   Comment comment = 1;
   cheers.type.UserItem user_item = 2;
+  int64 reply_count = 3;
+  int64 like_count = 4;
+  bool has_liked = 5;
 }
 
 message Comment {
@@ -57,12 +100,15 @@ message Comment {
   int64 create_time = 5;
   string user_id = 3;
   string post_id = 4;
+  string reply_to_comment_id = 6;
 }
 
 message CreateCommentRequest {
   string post_id = 1;
   string comment = 2;
+  string reply_to_comment_id = 3;
 }
 
 message CreateCommentResponse {
+  CommentItem item = 1;
 }

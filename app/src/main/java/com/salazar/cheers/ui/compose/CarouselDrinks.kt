@@ -16,6 +16,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.salazar.cheers.drink.domain.models.Drink
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.ui.carousel
 import com.salazar.cheers.ui.compose.extensions.noRippleClickable
@@ -26,8 +27,8 @@ import kotlin.math.absoluteValue
 @Composable
 fun CarouselDrinks(
     pagerState: PagerState,
-    drinks: List<Beverage>,
-    onBeverageClick: (Beverage) -> Unit,
+    drinks: List<Drink>,
+    onBeverageClick: (Drink) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val currentPage = pagerState.currentPage
@@ -61,16 +62,16 @@ fun CarouselDrinks(
 
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = drinks[currentPage].displayName,
+        text = drinks.getOrNull(currentPage)?.name ?: "",
         textAlign = TextAlign.Center,
     )
 }
 
 @Composable
 fun VerticalDrink(
-    drink: Beverage,
+    drink: Drink,
     modifier: Modifier = Modifier,
-    onBeverageClick: (Beverage) -> Unit,
+    onBeverageClick: (Drink) -> Unit,
 ) {
     Column(
         modifier = modifier

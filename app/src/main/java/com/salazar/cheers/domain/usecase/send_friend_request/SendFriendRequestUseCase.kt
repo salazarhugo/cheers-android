@@ -14,10 +14,10 @@ class SendFriendRequestUseCase @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher
 ){
     suspend operator fun invoke(userId: String) = withContext(dispatcher) {
-        val otherUser = userRepository.getUserFlow(userId).first()
-        userRepository.updateLocalUser(
-            otherUser.copy(requested = true)
-        )
+//        val otherUser = userRepository.getUserFlow(userId).first()
+//        userRepository.updateLocalUser(
+//            otherUser.copy(requested = true)
+//        )
         return@withContext repository.createFriendRequest(userId = userId)
     }
 }

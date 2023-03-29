@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package cheers.note.v1;
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/note/v1;note";
+
+service NoteService {
+  rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse) {
+    option (google.api.http) = {
+      post: "/v1/notes"
+      body: "*"
+    };
+  }
+
+  rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/notes"
+    };
+  }
+
+  rpc ListFriendNote (ListFriendNoteRequest) returns (ListFriendNoteResponse) {
+    option (google.api.http) = {
+      get: "/v1/notes/friends"
+    };
+  }
+}
+
+message ListFriendNoteRequest {
+}
+
+message ListFriendNoteResponse {
+  repeated Note items = 1;
+}
+
+message Note {
+  string user_id = 1;
+  string text = 2;
+  string name = 3;
+  string username = 4;
+  string picture = 5;
+  int64 created = 6;
+}
+
+message CreateNoteRequest {
+  string text = 1;
+}
+
+message CreateNoteResponse {
+  Note note = 1;
+}
+
+message DeleteNoteRequest {
+  string text = 1;
+}
+
+message DeleteNoteResponse {
+}

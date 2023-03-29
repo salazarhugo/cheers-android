@@ -7,12 +7,12 @@ import androidx.camera.core.ImageCapture
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.internal.User
 import com.salazar.cheers.workers.UploadStoryWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CameraUiState(
@@ -21,11 +21,13 @@ data class CameraUiState(
     val errorMessage: String? = null,
     val imageUri: Uri? = null,
     val lensFacing: Int = CameraSelector.LENS_FACING_BACK,
+    val user: User? = null,
 )
 
 @HiltViewModel
 class CameraViewModel @Inject constructor(
-    application: Application
+    application: Application,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val workManager = WorkManager.getInstance(application)
@@ -39,6 +41,15 @@ class CameraViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            userRepository.getCurrentUserFlow().collect(::updateUser)
+        }
+    }
+
+    private fun updateUser(user: User) {
+        viewModelState.update {
+            it.copy(user = user)
+        }
     }
 
     fun uploadStory() {

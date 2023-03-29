@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.location
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -12,22 +13,31 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class DefaultLocationClient(
     private val context: Context,
     private val client: FusedLocationProviderClient,
 ) : LocationClient {
+
+    @SuppressLint("MissingPermission")
+    override suspend fun getLastKnownLocation(): Location? {
+        if (checkPermissions()) {
+            return null //throw LocationClient.LocationException("Missing location permissions")
+        }
+        return try {
+            client.lastLocation.await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     override fun getLocationUpdates(interval: Long): Flow<Location> {
         return callbackFlow {
 
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (checkPermissions()) {
                 throw LocationClient.LocationException("Missing location permissions")
             }
 
@@ -63,5 +73,15 @@ class DefaultLocationClient(
                 client.removeLocationUpdates(locationCallback)
             }
         }
+    }
+
+    private fun checkPermissions(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
     }
 }

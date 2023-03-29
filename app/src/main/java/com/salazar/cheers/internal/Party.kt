@@ -20,10 +20,9 @@ data class Party(
     val participants: List<String> = emptyList(),
     val showGuestList: Boolean = false,
     val showOnMap: Boolean = false,
-    val interested: Boolean = false,
     val interestedCount: Int = 0,
-    val going: Boolean = false,
     val goingCount: Int = 0,
+    val watchStatus: WatchStatus = WatchStatus.UNWATCHED,
     val bannerUrl: String = "",
     val address: String = "",
     val mutualProfilePictureUrls: List<String> = emptyList(),
@@ -36,6 +35,12 @@ data class Party(
     val type: String = Privacy.PUBLIC.name,
     val accountId: String = "",
 )
+
+enum class WatchStatus {
+    INTERESTED,
+    GOING,
+    UNWATCHED,
+}
 
 data class EventUi(
     val party: Party,

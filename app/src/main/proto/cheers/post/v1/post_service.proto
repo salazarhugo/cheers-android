@@ -21,7 +21,8 @@ service PostService {
     };
   };
 
-  rpc GetPost (GetPostRequest) returns (PostResponse);
+  rpc GetPost (GetPostRequest) returns (GetPostResponse);
+  rpc GetPostItem (GetPostItemRequest) returns (PostResponse);
   rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
 
   rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty) {
@@ -94,10 +95,19 @@ message ListMapPostResponse {
 
 message CreatePostRequest {
   cheers.type.Post post = 1;
+  bool send_notification_to_friends = 2;
 }
 
 message GetPostRequest {
-  string id = 1;
+  string post_id = 1;
+}
+
+message GetPostResponse {
+  cheers.type.Post post = 1;
+}
+
+message GetPostItemRequest {
+  string post_id = 1;
 }
 
 message UpdatePostRequest {

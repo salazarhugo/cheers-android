@@ -21,15 +21,16 @@ import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.ActivityType
 import com.salazar.cheers.internal.relativeTimeFormatter
-import com.salazar.cheers.internal.toSentence
 import com.salazar.cheers.ui.compose.CheersBadgeBox
-import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.text.MyText
-import com.salazar.cheers.ui.compose.user.FollowButton
+import com.salazar.cheers.user.ui.FollowButton
+import com.salazar.cheers.ui.main.chat.messageFormatter
 import com.salazar.cheers.ui.main.party.create.TopAppBar
+import com.salazar.cheers.user.ui.AddFriendButton
 
 
 @Composable
@@ -45,24 +46,21 @@ fun ActivityScreen(
             )
         }
     ) {
-        if (uiState.isLoading)
-            LoadingScreen()
-        else
-            SwipeToRefresh(
-                state = rememberSwipeToRefreshState(uiState.isLoading),
-                onRefresh = { onActivityUIAction(ActivityUIAction.OnSwipeRefresh) },
-                modifier = Modifier.padding(it),
-            ) {
-                Column {
-                    val activities = uiState.activities
+        SwipeToRefresh(
+            state = rememberSwipeToRefreshState(uiState.isLoading),
+            onRefresh = { onActivityUIAction(ActivityUIAction.OnSwipeRefresh) },
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
+        ) {
+            Column {
+                val activities = uiState.activities
 
-                    ActivityList(
-                        uiState = uiState,
-                        activities = activities,
-                        onActivityUIAction = onActivityUIAction,
-                    )
-                }
+                ActivityList(
+                    uiState = uiState,
+                    activities = activities,
+                    onActivityUIAction = onActivityUIAction,
+                )
             }
+        }
     }
 }
 
@@ -73,6 +71,7 @@ fun ActivityList(
     activities: List<Activity>?,
     onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
+    val suggestions = uiState.suggestions
     LazyColumn {
         item {
             FriendRequests(
@@ -81,18 +80,51 @@ fun ActivityList(
                 onClick = { onActivityUIAction(ActivityUIAction.OnFriendRequestsClick) },
             )
         }
-        item {
-            MyText(
-                text = "This week",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp),
-            )
+        if (suggestions != null && activities?.isEmpty() == true) {
+            item {
+                MyText(
+                    text = "Suggested for you",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+            items(items = suggestions) { user ->
+                UserItem(
+                    userItem = user,
+                    onClick = {
+                        onActivityUIAction(ActivityUIAction.OnUserClick(user.username))
+                    },
+                    content = {
+                        AddFriendButton(
+                            requestedByViewer = user.requested,
+                            onAddFriendClick = {
+                                onActivityUIAction(ActivityUIAction.OnAddFriendClick(user.id))
+                            },
+                            onCancelFriendRequestClick = {
+                                onActivityUIAction(ActivityUIAction.OnCancelFriendRequestClick(user.id))
+                            },
+                            onDelete = {
+                                onActivityUIAction(ActivityUIAction.OnRemoveSuggestion(user))
+                            }
+                        )
+                    }
+                )
+            }
         }
+        if (activities != null)
+            item {
+                MyText(
+                    text = "This week",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         if (activities != null)
             items(activities, key = { it.id }) {
                 ActivityItem(
                     activity = it,
                     onActivityClick = { onActivityUIAction(ActivityUIAction.OnActivityClick(it)) },
+                    onActivityUIAction = onActivityUIAction,
                 )
             }
     }
@@ -144,6 +176,7 @@ fun FriendRequests(
 fun ActivityItem(
     activity: Activity,
     onActivityClick: (Activity) -> Unit,
+    onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -159,16 +192,16 @@ fun ActivityItem(
         ) {
             UserProfilePicture(
                 picture = activity.avatar,
-                size = 40.dp,
+                size = 46.dp,
+                onClick = {
+                  onActivityUIAction(ActivityUIAction.OnUserClick(userId = activity.username))
+                },
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             val annotatedString = buildAnnotatedString {
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(activity.username)
-                }
-                append(" ")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
-                    append(activity.type.toSentence())
+                    val text = messageFormatter(text = activity.text, primary = true)
+                    append(text)
                 }
                 append(" ")
                 withStyle(
@@ -187,19 +220,23 @@ fun ActivityItem(
                 softWrap = true,
             )
         }
-        if (activity.type == ActivityType.FOLLOW)
+        if (activity.type == ActivityType.FRIEND_ADDED)
             FollowButton(
                 modifier = Modifier.padding(start = 16.dp),
                 isFollowing = true,
                 onClick = {},
             )
-        else if (activity.type == ActivityType.POST_LIKE)
+        if (activity.photoUrl.isNotBlank()) {
             Image(
                 modifier = Modifier
-                    .size(50.dp),
+                    .padding(start = 8.dp)
+                    .clickable { onActivityUIAction(ActivityUIAction.OnPostClick(activity.mediaId)) }
+                    .size(50.dp)
+                ,
                 painter = rememberAsyncImagePainter(model = activity.photoUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
+        }
     }
 }

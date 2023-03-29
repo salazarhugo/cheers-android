@@ -6,8 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.*
@@ -17,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,21 +31,18 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.auth.FirebaseAuth
-import com.mapbox.geojson.Point
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.ui.compose.post.LikeButton
-import com.salazar.cheers.ui.compose.post.PostBody
-import com.salazar.cheers.ui.compose.post.PostHeader
-import com.salazar.cheers.ui.compose.post.PostText
-import com.salazar.cheers.ui.compose.user.FollowButton
-import com.salazar.cheers.ui.compose.utils.PrettyImage
+import com.salazar.cheers.post.ui.item.LikeButton
+import com.salazar.cheers.post.ui.item.PostBody
+import com.salazar.cheers.post.ui.item.PostHeader
+import com.salazar.cheers.post.ui.PostText
+import com.salazar.cheers.user.ui.FollowButton
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.Privacy
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.util.Utils.isDarkModeOn
 import java.util.*
 
 @Composable
@@ -67,17 +62,23 @@ fun PostDetailScreen(
 
     Scaffold(
         topBar = {
-            Toolbar(
-                onBackPressed = onBackPressed,
-                name = post.locationName,
-                scrollBehavior = scrollBehavior,
-            )
+            TopAppBar(title = { 
+                Text(
+                text = stringResource(id = R.string.post),
+                fontWeight = FontWeight.Bold,
+                fontFamily = Roboto)
+              },
+                navigationIcon = {
+                    IconButton(onClick = onBackPressed) {
+                        Icon(Icons.Default.ArrowBack, "")
+                    }
+                })
         }
     ) {
         Column(
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(it)
+                .padding(top = it.calculateTopPadding()),
         ) {
             Post(
                 post = uiState.postFeed,
@@ -369,59 +370,6 @@ fun PostFooter(
             )
     }
 }
-
-@Composable
-fun Toolbar(
-    name: String,
-    onBackPressed: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
-//    val backgroundColor = backgroundColors.containerColor(
-//        scrollFraction = scrollBehavior?.scrollFraction ?: 0f
-//    ).value
-
-    val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-        containerColor = Color.Transparent,
-        scrolledContainerColor = Color.Transparent
-    )
-
-    Box(
-//        modifier = Modifier.background(backgroundColor)
-    ) {
-        CenterAlignedTopAppBar(
-            scrollBehavior = scrollBehavior,
-            colors = foregroundColors,
-            title = {
-                Column {
-                    Text(
-                        text = name,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Roboto,
-                    )
-//                    Text(
-//                        d.toLocalDateTime().format(DateTimeFormatter.ofPattern("E, d MMM HH:mm a")),
-//                        style = MaterialTheme.typography.bodyMedium
-//                    )
-                }
-            },
-            navigationIcon = {
-                IconButton(onClick = onBackPressed) {
-                    Icon(Icons.Outlined.ArrowBack, "")
-                }
-            },
-            actions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = null
-                    )
-                }
-            }
-        )
-    }
-}
-
 
 @Composable
 fun VideoPlayer(

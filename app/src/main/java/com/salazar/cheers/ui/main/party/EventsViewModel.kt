@@ -2,7 +2,7 @@ package com.salazar.cheers.ui.main.party
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -40,9 +40,8 @@ class EventsViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val result = partyRepository.fetchFeedParty(1, 10)
-            when(result.isSuccess) {
-                true -> updateParties(result.getOrNull())
-                false -> updateError("Couldn't refresh party feed")
+            result.onFailure {
+                updateError("Couldn't refresh party feed")
             }
         }
     }

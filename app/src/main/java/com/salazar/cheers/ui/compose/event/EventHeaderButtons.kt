@@ -6,22 +6,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Handyman
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.internal.WatchStatus
 
 @Composable
 fun EventHeaderButtons(
     hostId: String,
-    going: Boolean,
-    interested: Boolean,
+    watchStatus: WatchStatus,
     onManageClick: () -> Unit,
     onInviteClick: () -> Unit,
-    onInterestedClick: () -> Unit,
-    onGoingClick: () -> Unit,
+    onWatchStatusChange: (WatchStatus) -> Unit,
 ) {
     val uid = remember { FirebaseAuth.getInstance().currentUser?.uid!! }
 
@@ -53,18 +56,71 @@ fun EventHeaderButtons(
                 Text("Invite")
             }
         } else {
-            EventGoingButton(
-                going = going,
-                onGoingToggle = onGoingClick,
-//                shape = MaterialTheme.shapes.small,
+            var expanded by remember { mutableStateOf(false) }
+
+            EventWatchStatusButton(
+                watchStatus = watchStatus,
+                onGoingToggle = {
+                    expanded = true
+                },
                 modifier = Modifier.weight(1f),
             )
             Spacer(Modifier.width(8.dp))
-            EventInterestButton(
-                interested = interested,
-                modifier = Modifier.weight(1f),
-                onInterestedToggle = { onInterestedClick() },
-            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Interested") },
+                    onClick = { onWatchStatusChange(WatchStatus.INTERESTED) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Rounded.Star,
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        RadioButton(
+                            selected = watchStatus == WatchStatus.INTERESTED,
+                            onClick = { onWatchStatusChange(WatchStatus.INTERESTED) }
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("Going") },
+                    onClick = { onWatchStatusChange(WatchStatus.GOING) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Rounded.Check,
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        RadioButton(
+                            selected = watchStatus == WatchStatus.GOING,
+                            onClick = { onWatchStatusChange(WatchStatus.GOING) }
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("Not Going") },
+                    onClick = { onWatchStatusChange(WatchStatus.UNWATCHED) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.Close,
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        RadioButton(
+                            selected = watchStatus == WatchStatus.UNWATCHED,
+                            onClick = { onWatchStatusChange(WatchStatus.UNWATCHED) }
+                        )
+                    },
+                )
+            }
         }
     }
 }

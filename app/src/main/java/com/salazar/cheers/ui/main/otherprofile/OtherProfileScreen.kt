@@ -22,11 +22,9 @@ import com.salazar.cheers.ui.compose.chat.FunctionalityNotAvailablePanel
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.buttons.CheersOutlinedButton
 import com.salazar.cheers.ui.compose.profile.ProfileHeader
-import com.salazar.cheers.ui.compose.profile.ProfileText
-import com.salazar.cheers.ui.compose.user.FollowButton
 import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.compose.user.FriendButton
+import com.salazar.cheers.parties.ui.PartyItem
+import com.salazar.cheers.user.ui.FriendButton
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -48,6 +46,7 @@ fun OtherProfileScreen(
     onCommentClick: (String) -> Unit,
 ) {
     val posts = uiState.posts
+    val parties = uiState.parties
     val pagerState = rememberPagerState()
     val tabs = listOf(
         Icons.Outlined.ViewList,
@@ -84,7 +83,7 @@ fun OtherProfileScreen(
                 )
             }
         }
-        if (user.friend)
+        if (user.friend || user.isBusinessAccount)
         stickyHeader {
             val scope = rememberCoroutineScope()
             androidx.compose.material.TabRow(
@@ -111,7 +110,7 @@ fun OtherProfileScreen(
             }
         }
 
-        if (user.friend)
+        if (user.friend || user.isBusinessAccount)
         item {
             HorizontalPager(
                 count = tabs.size,
@@ -130,7 +129,13 @@ fun OtherProfileScreen(
                                 onCommentClick = { onCommentClick(postFeed.id) },
                             )
                         }
-                        1 -> FunctionalityNotAvailablePanel()
+                        1 -> parties?.forEach { party ->
+                            PartyItem(
+                                party = party,
+                                onEventClicked = {},
+                                onMoreClick = {},
+                            )
+                        }
                         2 -> FunctionalityNotAvailablePanel()
                     }
                 }
@@ -145,7 +150,6 @@ fun Toolbar(
     verified: Boolean,
     onBackPressed: () -> Unit,
     onCopyUrl: () -> Unit,
-    onRemoveFriend: () -> Unit,
     onManageFriendship: () -> Unit,
 ) {
     val openDialog = remember { mutableStateOf(false) }
@@ -177,7 +181,6 @@ fun Toolbar(
         MoreDialog(
             openDialog = openDialog,
             onCopyUrl = onCopyUrl,
-            onRemoveFriend = onRemoveFriend,
             onManageFriendship = onManageFriendship,
         )
 }
@@ -186,7 +189,6 @@ fun Toolbar(
 fun MoreDialog(
     openDialog: MutableState<Boolean>,
     onCopyUrl: () -> Unit,
-    onRemoveFriend: () -> Unit,
     onManageFriendship: () -> Unit,
 ) {
     AlertDialog(
@@ -195,15 +197,6 @@ fun MoreDialog(
         },
         text = {
             Column {
-                TextButton(
-                    onClick = {
-                        onRemoveFriend()
-                        openDialog.value = false
-                      },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Remove friend")
-                }
                 TextButton(
                     onClick = {
                         openDialog.value = false

@@ -99,7 +99,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updatePost(post: Post) {
+    private fun updatePost(post: Post?) {
         viewModelState.update {
             it.copy(postFeed = post)
         }

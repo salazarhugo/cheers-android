@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,9 +20,9 @@ import com.salazar.cheers.ui.compose.buttons.CheersOutlinedButton
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.user.FollowButton
+import com.salazar.cheers.ui.compose.text.MyText
 import com.salazar.cheers.ui.main.party.create.TopAppBar
-import kotlinx.serialization.json.JsonNull.content
+import com.salazar.cheers.user.ui.AddFriendButton
 
 @Composable
 fun FriendRequestsScreen(
@@ -47,6 +48,7 @@ fun FriendRequestsScreen(
                 val friendRequests = uiState.friendRequests
                 if (friendRequests != null)
                     FriendRequestList(
+                        suggestions = uiState.suggestions,
                         friendRequests = friendRequests,
                         onFriendRequestsUIAction = onFriendRequestsUIAction,
                     )
@@ -56,6 +58,7 @@ fun FriendRequestsScreen(
 
 @Composable
 fun FriendRequestList(
+    suggestions: List<UserItem>?,
     friendRequests: List<UserItem>,
     onFriendRequestsUIAction: (FriendRequestsUIAction) -> Unit
 ) {
@@ -74,6 +77,37 @@ fun FriendRequestList(
                 }
             )
         }
+        if (suggestions != null) {
+            item {
+                MyText(
+                    text = "Suggested for you",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+            items(items = suggestions) { user ->
+                UserItem(
+                    userItem = user,
+                    onClick = {
+                        onFriendRequestsUIAction(FriendRequestsUIAction.OnUserClick(user.username))
+                    },
+                    content = {
+                        AddFriendButton(
+                            requestedByViewer = user.requested,
+                            onAddFriendClick = {
+                                onFriendRequestsUIAction(FriendRequestsUIAction.OnAddFriendClick(user.id))
+                            },
+                            onCancelFriendRequestClick = {
+                                onFriendRequestsUIAction(FriendRequestsUIAction.OnCancelFriendRequestClick(user.id))
+                            },
+                            onDelete = {
+                                onFriendRequestsUIAction(FriendRequestsUIAction.OnRemoveSuggestion(user))
+                            }
+                        )
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -86,18 +120,20 @@ fun FriendRequestButtons(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Button(
-            modifier = Modifier.height(34.dp),
+        CheersOutlinedButton(
             onClick = {
                 onFriendRequestsUIAction(FriendRequestsUIAction.OnAcceptFriendRequest(user.id))
             },
         ) {
-            Text("Accept")
+            Icon(Icons.Default.Check, contentDescription = null)
         }
-        CheersOutlinedButton(
-            onClick = {},
+        IconButton(
+            modifier = Modifier.height(34.dp),
+            onClick = {
+                onFriendRequestsUIAction(FriendRequestsUIAction.OnRefuseFriendRequest(user.id))
+            },
         ) {
-            Text("Cancel")
+            Icon(Icons.Default.Close, contentDescription = null)
         }
     }
 }

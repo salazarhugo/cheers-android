@@ -37,6 +37,9 @@ object MainDestinations {
     const val PROFILE_STATS_ROUTE = "profileStats"
     const val OTHER_PROFILE_STATS_ROUTE = "otherProfileStats"
     const val POST_COMMENTS = "comments"
+    const val COMMENT_REPLIES = "replies"
+    const val COMMENT_MORE_SHEET = "commentMore"
+    const val COMMENT_DELETE = "deleteComment"
     const val CAMERA_ROUTE = "camera"
     const val CHAT_CAMERA_ROUTE = "chatCamera"
     const val OTHER_PROFILE_ROUTE = "otherProfile"
@@ -48,6 +51,7 @@ object MainDestinations {
     const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val GUEST_LIST_ROUTE = "guestList"
     const val CREATE_POST_ROUTE = "createPost"
+    const val CREATE_NOTE_ROUTE = "createNote"
     const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
@@ -61,6 +65,7 @@ object MainDestinations {
     const val FRIEND_REQUESTS = "friendRequests"
     const val MAP_SETTINGS_ROUTE = "mapSettings"
     const val MANAGE_FRIENDSHIP_SHEET = "manageFriendship"
+    const val NOTE_SHEET = "note"
     const val DIALOG_REMOVE_FRIEND = "dialogRemoveFriend"
 }
 
@@ -102,9 +107,15 @@ class CheersNavigationActions(
     }
 
     val navigateToRemoveFriendDialog: (friendId: String) -> Unit = { postId ->
-        navController.navigate("${MainDestinations.DIALOG_DELETE_POST}/$postId") {
+        navController.navigate("${MainDestinations.DIALOG_REMOVE_FRIEND}/$postId") {
             launchSingleTop = true
             restoreState = true
+        }
+    }
+
+    val navigateToNote: (String) -> Unit = { userID ->
+        navController.navigate("${MainDestinations.NOTE_SHEET}/$userID") {
+            launchSingleTop = true
         }
     }
 
@@ -335,6 +346,14 @@ class CheersNavigationActions(
         }
     }
 
+    val navigateToCreateNote: () -> Unit = {
+        navController.navigate(MainDestinations.CREATE_NOTE_ROUTE) {
+            popUpTo(MainDestinations.HOME_ROUTE)
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val navigateToCreatePost: () -> Unit = {
         navController.navigate(MainDestinations.CREATE_POST_ROUTE) {
             popUpTo(MainDestinations.HOME_ROUTE)
@@ -397,6 +416,29 @@ class CheersNavigationActions(
             restoreState = true
         }
     }
+
+    val navigateToCommentReplies: (commentId: String) -> Unit = { commentId ->
+        navController.navigate("${MainDestinations.COMMENT_REPLIES}/$commentId") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToCommentMoreSheet: (commentID: String) -> Unit = { commentID ->
+        navController.navigate("${MainDestinations.COMMENT_MORE_SHEET}/$commentID") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    val navigateToDeleteCommentDialog: (commentID: String) -> Unit = { commentID ->
+        navController.navigate("${MainDestinations.COMMENT_DELETE}/$commentID") {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+
 
     val navigateToDrinkingStats: (username: String) -> Unit = { username ->
         navController.navigate("${MainDestinations.DRINKING_STATS}/$username") {

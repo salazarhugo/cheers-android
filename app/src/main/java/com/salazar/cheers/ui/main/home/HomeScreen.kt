@@ -1,10 +1,8 @@
 package com.salazar.cheers.ui.main.home
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,25 +19,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.R
 import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.domain.models.UserWithStories
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.notes.ui.NoteList
 import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.MultiFabState
 import com.salazar.cheers.ui.compose.ads.NativeAdPost
 import com.salazar.cheers.ui.compose.post.NoPosts
-import com.salazar.cheers.ui.compose.post.PostItem
+import com.salazar.cheers.post.ui.item.PostItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
@@ -88,16 +83,26 @@ fun PostList(
 ) {
     LazyColumn(
         state = uiState.listState,
-//        modifier = Modifier.fillMaxHeight(),
     ) {
         item {
-            Stories(
-                uiState = uiState,
-                onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryFeedClick(it)) },
-                onAddStoryClick = { onHomeUIAction(HomeUIAction.OnAddStoryClick) },
+            NoteList(
+                picture = uiState.user?.picture,
+                notes = uiState.notes,
+                yourNote = uiState.yourNote,
+                onCreateNoteClick = { onHomeUIAction(HomeUIAction.OnCreateNoteClick) },
+                onNoteClick = { onHomeUIAction(HomeUIAction.OnNoteClick(it)) },
             )
             DividerM3()
         }
+
+//        item {
+//            Stories(
+//                uiState = uiState,
+//                onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryFeedClick(it)) },
+//                onAddStoryClick = { onHomeUIAction(HomeUIAction.OnAddStoryClick) },
+//            )
+//            DividerM3()
+//        }
 
         item {
             WhatsUpSection(

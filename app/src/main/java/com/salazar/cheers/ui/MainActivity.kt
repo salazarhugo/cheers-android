@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -32,10 +33,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.CheersViewModel
+import com.salazar.cheers.Language
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.datastore.DataStoreRepository
+import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import com.salazar.cheers.util.StorageUtil
+import com.salazar.cheers.util.Utils.setLocale
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -52,6 +59,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @Inject
     lateinit var dataStoreRepository: DataStoreRepository
 
+    @Inject
+    lateinit var friendshipRepository: FriendshipRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,6 +71,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             val appSettings by dataStoreRepository.userPreferencesFlow.collectAsState(
                 initial = Settings.getDefaultInstance(),
             )
+
+            val locale = if (appSettings.language == Language.FRENCH) "fr" else "en"
+            setLocale(locale)
 
             CheersApp(
                 appSettings = appSettings,
@@ -88,6 +101,12 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     override fun onResume() {
         super.onResume()
 
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch {
+            friendshipRepository.fetchFriendRequest().collect {}
+        }
+
+        Log.d("INTENT", intent.data.toString())
         val data = intent.data ?: return
         val auth = Firebase.auth
 

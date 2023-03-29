@@ -46,6 +46,7 @@ message Account {
   string id = 1;
   int32 balance = 2;
   int32 ticket_sold = 3;
+  int32 coins = 4;
 }
 
 message CreateAccountRequest {

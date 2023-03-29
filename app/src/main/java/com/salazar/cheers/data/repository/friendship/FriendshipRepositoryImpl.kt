@@ -57,12 +57,16 @@ class FriendshipRepositoryImpl @Inject constructor(
         emit(Resource.Loading(false))
     }
 
-    override suspend fun listFriendRequest(): Flow<Resource<List<UserItem>>>
+    override suspend fun listFriendRequest(): Flow<List<FriendRequest>> {
+        return friendRequestDao.listFriendRequests()
+    }
+
+    override suspend fun fetchFriendRequest(): Flow<Resource<List<UserItem>>>
         = flow {
             emit(Resource.Loading(true))
-
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@flow
             val request = ListFriendRequestsRequest.newBuilder()
-                .setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+                .setUserId(uid)
                 .build()
 
             val remoteFriendRequests = try {
@@ -70,6 +74,7 @@ class FriendshipRepositoryImpl @Inject constructor(
                 val users = response.itemsList.map {
                     it.toUserItem()
                 }
+                userItemDao.insertAll(users)
                 friendRequestDao.insertFriendRequests(
                     friendRequests = response.itemsList.map {
                         FriendRequest(id = it.id)
@@ -95,7 +100,7 @@ class FriendshipRepositoryImpl @Inject constructor(
 
         return try {
             service.acceptFriendRequest(request = request)
-            friendRequestDao.clear(userId)
+            friendRequestDao.delete(userId)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -109,7 +114,7 @@ class FriendshipRepositoryImpl @Inject constructor(
 
         return try {
             service.deleteFriendRequest(request = request)
-            friendRequestDao.clear(userId)
+            friendRequestDao.delete(userId)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

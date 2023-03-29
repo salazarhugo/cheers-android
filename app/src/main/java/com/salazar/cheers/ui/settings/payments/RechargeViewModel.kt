@@ -3,8 +3,11 @@ package com.salazar.cheers.ui.settings.payments
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.billingclient.api.SkuDetails
+import com.android.billingclient.api.ProductDetails
 import com.salazar.cheers.data.repository.BillingRepository
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.repository.account.AccountRepository
+import com.salazar.cheers.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RechargeViewModel @Inject constructor(
+    private val accountRepository: AccountRepository,
     private val billingRepository: BillingRepository,
 ) : ViewModel() {
 
@@ -30,32 +34,37 @@ class RechargeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            FirestoreUtil.getUserCoins().collect { coins ->
-//                viewModelState.update {
-//                    it.copy(coins = coins)
-//                }
-//            }
+            accountRepository.getAccount().onSuccess {
+                updateCoins(it.coins)
+            }
         }
         billingRepository.startConnection()
         refreshSkuDetails()
     }
 
+
+    private fun updateCoins(coins: Int) {
+        viewModelState.update {
+            it.copy(coins = coins)
+        }
+    }
+
     fun refreshSkuDetails() {
         viewModelScope.launch {
-            val skuDetails = billingRepository.querySkuDetails().skuDetailsList
-            if (skuDetails != null) {
+            val productDetails = billingRepository.queryProductDetails().productDetailsList
+            if (productDetails != null) {
                 viewModelState.update {
-                    it.copy(skuDetails = skuDetails.sortedBy { it.priceAmountMicros })
+                    it.copy(skuDetails = productDetails.sortedBy { it.oneTimePurchaseOfferDetails?.priceAmountMicros })
                 }
             }
         }
     }
 
-    fun onSkuClick(
-        skuDetails: SkuDetails,
+    fun onProductClick(
+        productDetails: ProductDetails,
         activity: Activity
     ) {
-        billingRepository.launchBillingFlow(skuDetails = skuDetails, activity = activity)
+        billingRepository.launchBillingFlow(activity, productDetails)
     }
 
     fun updateIsLoading(isLoading: Boolean) {
@@ -70,6 +79,6 @@ data class RechargeUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
     val coins: Int = 0,
-    val skuDetails: List<SkuDetails>? = null,
+    val skuDetails: List<ProductDetails>? = null,
 )
 

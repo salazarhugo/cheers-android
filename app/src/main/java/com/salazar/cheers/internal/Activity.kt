@@ -15,8 +15,10 @@ data class Activity(
     val eventId: String = "",
     val avatar: String = "",
     val photoUrl: String = "",
+    val text: String = "",
     val username: String = "",
     val verified: Boolean = false,
+    val mediaId: String = "",
     val followBack: Boolean = false,
     val acknowledged: Boolean = false,
     val createTime: Long = 0,
@@ -25,26 +27,13 @@ data class Activity(
 
 enum class ActivityType {
     NONE,
-    FOLLOW,
+    FRIEND_ADDED,
     POST_LIKE,
     STORY_LIKE,
     COMMENT,
+    COMMENT_LIKED,
     MENTION,
     CREATE_POST,
     CREATE_EVENT,
     CREATE_STORY,
-}
-
-fun ActivityType.toSentence(): String {
-    return when (this) {
-        NONE -> ""
-        FOLLOW -> "started following you."
-        POST_LIKE -> "liked your post."
-        STORY_LIKE -> "liked your story."
-        COMMENT -> "commented on your post."
-        MENTION -> "mentioned you."
-        CREATE_POST -> "createTime a post"
-        CREATE_EVENT -> TODO()
-        CREATE_STORY -> TODO()
-    }
 }

@@ -72,7 +72,7 @@ fun ShareButton(
     onClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
         verticalArrangement = Arrangement.Bottom,
     ) {
         DividerM3()
@@ -80,7 +80,7 @@ fun ShareButton(
             onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             shape = MaterialTheme.shapes.medium,
             text = text,
             isLoading = isLoading,

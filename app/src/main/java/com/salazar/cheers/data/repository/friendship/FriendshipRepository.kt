@@ -2,9 +2,7 @@ package com.salazar.cheers.data.repository.friendship
 
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.internal.Comment
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.domain.models.FriendRequest
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -25,7 +23,12 @@ interface FriendshipRepository {
     /**
      * List friend request.
      */
-    suspend fun listFriendRequest(): Flow<Resource<List<UserItem>>>
+    suspend fun listFriendRequest(): Flow<List<FriendRequest>>
+
+    /**
+     * Fetch friend request from remote.
+     */
+    suspend fun fetchFriendRequest(): Flow<Resource<List<UserItem>>>
 
     /**
      * Accept friend request.

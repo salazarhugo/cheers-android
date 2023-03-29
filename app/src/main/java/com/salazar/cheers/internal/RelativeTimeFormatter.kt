@@ -2,8 +2,10 @@ package com.salazar.cheers.internal
 
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import com.salazar.cheers.R
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -102,22 +104,22 @@ fun dateTimeFormatter(
         val time = SimpleDateFormat("HH:mm").format(date)
 
         if (DateUtils.isToday(timestamp * 1000)) {
-            append("Today, $time")
+            append("${stringResource(id = R.string.today)}, $time")
             return@buildAnnotatedString
         }
 
         if (DateUtils.isToday(timestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
-            append("Tomorrow, $time")
+            append("${stringResource(id = R.string.tomorrow)}, $time")
             return@buildAnnotatedString
         }
 
         if (Date().time > timestamp * 1000 - 5 * DateUtils.DAY_IN_MILLIS) {
-            val res = SimpleDateFormat("EEEE, HH:mm").format(date)
+            val res = SimpleDateFormat("EEEE, HH:mm", Locale.getDefault()).format(date)
             append(res)
             return@buildAnnotatedString
         }
 
-        val res = SimpleDateFormat("dd MMMM yyyy, HH:mm").format(date)
+        val res = SimpleDateFormat("EEE dd MMM, HH:mm", Locale.getDefault()).format(date)
         append(res)
         return@buildAnnotatedString
     }

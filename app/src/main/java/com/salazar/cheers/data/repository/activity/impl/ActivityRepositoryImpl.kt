@@ -48,4 +48,13 @@ class ActivityRepositoryImpl @Inject constructor(
 
         emit(Resource.Loading(false))
     }
+
+    override suspend fun countActivity(): Flow<Int> {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+        return activityDao.countUnreadActivity(uid)
+    }
+
+    override suspend fun acknowledgeAll() {
+        activityDao.acknowledgeAll()
+    }
 }

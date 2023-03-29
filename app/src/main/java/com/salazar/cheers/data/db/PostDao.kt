@@ -32,7 +32,7 @@ interface PostDao {
     fun postFlow(postId: String): Flow<Post>
 
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
-    suspend fun getPost(postId: String): Post
+    suspend fun getPost(postId: String): Post?
 
     @Query("SELECT * FROM posts WHERE privacy = :privacy AND createTime > :yesterday")
     fun listMapPost(

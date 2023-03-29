@@ -29,7 +29,9 @@ fun CreatePasswordRoute(
         onBackPressed = { navActions.navigateBack() },
         onPasswordChange = createPasswordViewModel::onPasswordChange,
         onCreatePassword = {
-            createPasswordViewModel.onCreatePassword()
+            createPasswordViewModel.onCreatePassword {
+                navActions.navigateBack()
+            }
         },
     )
 }

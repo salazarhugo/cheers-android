@@ -77,7 +77,7 @@ fun CreateAccountScreen(
                         uriHandler.openUri(it)
                     })
                 Spacer(Modifier.height(32.dp))
-                ErrorMessage(errorMessage = errorMessage, paddingValues = PaddingValues(vertical = 16.dp))
+//                ErrorMessage(errorMessage = errorMessage, paddingValues = PaddingValues(vertical = 16.dp))
                 SignUpButton(
                     acceptTerms = acceptTerms,
                     isLoading = isLoading,

@@ -7,13 +7,14 @@ import cheers.chat.v1.GetRoomIdReq
 import com.salazar.cheers.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import com.salazar.cheers.domain.usecase.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.domain.usecase.remove_friend.RemoveFriendUseCase
 import com.salazar.cheers.domain.usecase.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Post
 import com.salazar.cheers.internal.User
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -32,6 +33,7 @@ sealed interface OtherProfileUiState {
 
     data class HasUser(
         val posts: List<Post>? = null,
+        val parties: List<Party>? = null,
         val user: User,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -41,6 +43,7 @@ sealed interface OtherProfileUiState {
 private data class OtherProfileViewModelState(
     val user: User? = null,
     val posts: List<Post>? = null,
+    val parties: List<Party>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
     val isFollowing: Boolean = false,
@@ -50,6 +53,7 @@ private data class OtherProfileViewModelState(
             OtherProfileUiState.HasUser(
                 user = user,
                 posts = posts,
+                parties = parties,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
             )
@@ -67,10 +71,10 @@ class OtherProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
     private val chatRepository: ChatRepository,
+    private val partyRepository: PartyRepository,
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
     private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
     private val acceptFriendRequestUseCase: AcceptFriendRequestUseCase,
-    private val removeFriendUseCase: RemoveFriendUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = false))
@@ -91,10 +95,10 @@ class OtherProfileViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
                 updateUser(user)
+                refreshUserParties()
             }
         }
-        refreshUser()
-        refreshUserPosts()
+        onSwipeRefresh()
     }
 
     private fun refreshUser() {
@@ -118,17 +122,12 @@ class OtherProfileViewModel @Inject constructor(
     fun onSwipeRefresh() {
         refreshUser()
         refreshUserPosts()
+        refreshUserParties()
     }
 
     fun acceptFriendRequest(userId: String) {
         viewModelScope.launch {
             acceptFriendRequestUseCase(userId = userId)
-        }
-    }
-
-    fun removeFriend(userId: String) {
-        viewModelScope.launch {
-            removeFriendUseCase(userId = userId)
         }
     }
 
@@ -156,6 +155,12 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
+    private fun updateParties(parties: List<Party>) {
+        viewModelState.update {
+            it.copy(parties = parties)
+        }
+    }
+
     private fun updatePosts(posts: List<Post>) {
         viewModelState.update {
             it.copy(posts = posts)
@@ -167,6 +172,14 @@ class OtherProfileViewModel @Inject constructor(
             postRepository.listPost(userIdOrUsername = username).collect {
                 updatePosts(it)
             }
+        }
+    }
+
+    private fun refreshUserParties() {
+        val otherUserId = viewModelState.value.user?.id ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            partyRepository.listParty(userId = otherUserId)
+                .collect(::updateParties)
         }
     }
 }

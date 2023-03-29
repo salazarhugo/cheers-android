@@ -10,15 +10,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 
 object FirestoreUtil {
-//
 //    private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
-//    private val stripeCustomerDocRef: DocumentReference
-//        get() = firestoreInstance.document(
-//            "stripe_customers/${
-//                FirebaseAuth.getInstance().uid
-//                    ?: throw NullPointerException("UID is null.")
-//            }"
-//        )
 //    private val currentUserDocRef: DocumentReference
 //        get() = firestoreInstance.document(
 //            "users/${
@@ -70,7 +62,6 @@ object FirestoreUtil {
 //    }
 //
 //    fun getUserCoins() = callbackFlow<Int> {
-//
 //        val subscription = currentUserDocRef.addSnapshotListener { snapshot, e ->
 //            if (e != null) {
 //                return@addSnapshotListener

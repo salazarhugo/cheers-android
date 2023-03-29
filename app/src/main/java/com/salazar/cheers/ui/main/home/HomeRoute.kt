@@ -56,6 +56,8 @@ fun HomeRoute(
                 is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextPosts()
                 is HomeUIAction.OnChatClick -> navActions.navigateToMessages()
                 is HomeUIAction.OnShareClick -> navActions.navigateToShare(action.postID)
+                HomeUIAction.OnCreateNoteClick -> navActions.navigateToCreateNote()
+                is HomeUIAction.OnNoteClick -> navActions.navigateToNote(action.userID)
             }
         }
     )

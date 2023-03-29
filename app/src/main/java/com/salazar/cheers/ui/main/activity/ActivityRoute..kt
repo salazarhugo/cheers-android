@@ -17,10 +17,10 @@ import com.salazar.cheers.ui.CheersAppState
 @Composable
 fun ActivityRoute(
     appState: CheersAppState,
-    activityViewModel: ActivityViewModel = hiltViewModel(),
+    viewModel: ActivityViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by activityViewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val errorMessage = uiState.errorMessage
 
     if (errorMessage != null) {
@@ -33,10 +33,28 @@ fun ActivityRoute(
         uiState = uiState,
         onActivityUIAction = { action ->
             when(action) {
-                is ActivityUIAction.OnActivityClick -> navActions.navigateToOtherProfile(action.activity.username)
+                is ActivityUIAction.OnActivityClick -> {
+                    when(action.activity.type) {
+                        ActivityType.NONE -> {}
+                        ActivityType.FRIEND_ADDED -> navActions.navigateToOtherProfile(action.activity.username)
+                        ActivityType.POST_LIKE -> navActions.navigateToPostDetail(action.activity.mediaId)
+                        ActivityType.STORY_LIKE -> {}
+                        ActivityType.COMMENT -> {}
+                        ActivityType.MENTION -> navActions.navigateToComments(action.activity.mediaId)
+                        ActivityType.CREATE_POST -> {}
+                        ActivityType.CREATE_EVENT -> {}
+                        ActivityType.CREATE_STORY -> {}
+                        ActivityType.COMMENT_LIKED -> {}
+                    }
+                }
                 ActivityUIAction.OnBackPressed -> navActions.navigateBack()
                 ActivityUIAction.OnFriendRequestsClick -> navActions.navigateToFriendRequests()
-                ActivityUIAction.OnSwipeRefresh -> activityViewModel.onSwipeRefresh()
+                ActivityUIAction.OnSwipeRefresh -> viewModel.onSwipeRefresh()
+                is ActivityUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userId)
+                is ActivityUIAction.OnPostClick -> navActions.navigateToPostDetail(action.postId)
+                is ActivityUIAction.OnAddFriendClick -> viewModel.onAddFriendClick(action.userID)
+                is ActivityUIAction.OnCancelFriendRequestClick -> viewModel.onCancelFriendRequestClick(userID = action.userID)
+                is ActivityUIAction.OnRemoveSuggestion -> viewModel.onRemoveSuggestion(action.user)
             }
         },
     )

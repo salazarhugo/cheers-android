@@ -3,6 +3,7 @@ package com.salazar.cheers.data.mapper
 import cheers.party.v1.PartyItem
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.parties.data.mapper.toWatchStatus
 
 fun PartyItem.toParty(accountId: String): Party {
  return Party().copy(
@@ -14,19 +15,18 @@ fun PartyItem.toParty(accountId: String): Party {
      createTime = party.createTime,
      hostId = party.hostId,
      hostName = user.name,
-     price = 0,
+     watchStatus = viewerWatchStatus.toWatchStatus(),
+     price = party.minimumPrice.toInt(),
      participants = emptyList(),
      showGuestList = false,
      showOnMap = false,
-     interested = false,
      interestedCount = interestedCount.toInt(),
-     going = false,
      goingCount = goingCount.toInt(),
      bannerUrl = party.bannerUrl,
      address = party.address,
-     mutualProfilePictureUrls= emptyList(),
-     mutualUsernames= emptyList(),
-     mutualCount = 0,
+     mutualProfilePictureUrls= mutualPicturesList,
+     mutualUsernames= mutualUsernamesList,
+     mutualCount = 2,
      locationName = party.locationName,
      latitude= party.latitude,
      longitude= party.longitude,

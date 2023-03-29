@@ -15,7 +15,7 @@ import javax.inject.Inject
 data class TicketsUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val tickets: List<Ticket> = emptyList(),
+    val tickets: List<Ticket>? = null,
 )
 
 @HiltViewModel
@@ -33,6 +33,10 @@ class TicketsViewModel @Inject constructor(
         )
 
     init {
+        onSwipeRefresh()
+    }
+
+    fun onSwipeRefresh() {
         viewModelScope.launch {
             ticketRepository.listTicket().collect(::updateTickets)
         }
@@ -40,7 +44,7 @@ class TicketsViewModel @Inject constructor(
 
     private fun updateTickets(tickets: List<Ticket>) {
         viewModelState.update {
-            it.copy(tickets = tickets)
+            it.copy(tickets = tickets, isLoading = false)
         }
     }
 }

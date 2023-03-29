@@ -9,22 +9,27 @@ import com.salazar.cheers.navigation.CheersNavigationActions
 /**
  * Stateful composable that displays the Navigation route for the FriendRequests screen.
  *
- * @param friendRequestsViewModel ViewModel that handles the business logic of this screen
+ * @param viewModel ViewModel that handles the business logic of this screen
  */
 @Composable
 fun FriendRequestsRoute(
-    friendRequestsViewModel: FriendRequestsViewModel = hiltViewModel(),
+    viewModel: FriendRequestsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by friendRequestsViewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     FriendRequestsScreen(
         uiState = uiState,
         onFriendRequestsUIAction = { action ->
             when(action) {
                 FriendRequestsUIAction.OnBackPressed -> navActions.navigateBack()
-                FriendRequestsUIAction.OnSwipeRefresh -> friendRequestsViewModel.onSwipeToRefresh()
-                is FriendRequestsUIAction.OnAcceptFriendRequest -> friendRequestsViewModel.onAcceptFriendRequest(action.userId)
+                FriendRequestsUIAction.OnSwipeRefresh -> viewModel.onSwipeToRefresh()
+                is FriendRequestsUIAction.OnAcceptFriendRequest -> viewModel.onAcceptFriendRequest(action.userId)
+                is FriendRequestsUIAction.OnRefuseFriendRequest -> viewModel.onRefuseFriendRequest(action.userId)
+                is FriendRequestsUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userId)
+                is FriendRequestsUIAction.OnAddFriendClick -> viewModel.onAddFriendClick(action.userID)
+                is FriendRequestsUIAction.OnCancelFriendRequestClick -> viewModel.onCancelFriendRequestClick(userID = action.userID)
+                is FriendRequestsUIAction.OnRemoveSuggestion -> viewModel.onRemoveSuggestion(action.user)
             }
         }
     )

@@ -3,11 +3,15 @@ package com.salazar.cheers.data.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.salazar.cheers.comment.data.db.CommentDao
+import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.data.db.entities.*
 import com.salazar.cheers.domain.models.ChatChannel
 import com.salazar.cheers.domain.models.ChatMessage
 import com.salazar.cheers.domain.models.FriendRequest
 import com.salazar.cheers.internal.*
+import com.salazar.cheers.notes.data.db.NoteDao
+import com.salazar.cheers.notes.domain.models.Note
 
 
 @TypeConverters(Converters::class)
@@ -31,8 +35,9 @@ import com.salazar.cheers.internal.*
         Ticket::class,
         Comment::class,
         FriendRequest::class,
+        Note::class,
     ],
-    version = 15,
+    version = 26,
     exportSchema = false,
     autoMigrations = []
 )
@@ -50,4 +55,5 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun ticketDao(): TicketDao
     abstract fun commentDao(): CommentDao
     abstract fun friendRequestDao(): FriendRequestDao
+    abstract fun noteDao(): NoteDao
 }

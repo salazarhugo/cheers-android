@@ -20,11 +20,12 @@ message PostEvent {
 message CreatePost {
   cheers.type.Post post = 1;
   cheers.type.UserItem user = 2;
+  bool send_notification_to_friends = 3;
 }
 
 message LikePost {
-  cheers.type.Post post = 1;
-  cheers.type.UserItem user = 2;
+  string post_id = 1;
+  string user_id = 2;
 }
 
 message DeletePost {

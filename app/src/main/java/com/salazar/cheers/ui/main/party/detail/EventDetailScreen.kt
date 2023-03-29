@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.event.*
 import com.salazar.cheers.internal.Party
+import com.salazar.cheers.internal.WatchStatus
 import com.salazar.cheers.internal.numberFormatter
 import com.salazar.cheers.ui.theme.GreySheet
 import kotlinx.coroutines.launch
@@ -38,8 +39,7 @@ fun EventDetailScreen(
     onCopyLink: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onInterestedToggle: (Party) -> Unit,
-    onGoingToggle: (Party) -> Unit,
+    onWatchStatusChange: (WatchStatus) -> Unit,
     onGoingCountClick: () -> Unit,
     onInterestedCountClick: () -> Unit,
     onTicketingClick: (String) -> Unit,
@@ -54,6 +54,8 @@ fun EventDetailScreen(
         sheetState = state,
         sheetContent = {
             EventManageSheet(
+                modifier = Modifier.fillMaxSize()
+                    .systemBarsPadding(),
                 onCopyLink = onCopyLink,
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,
@@ -67,7 +69,7 @@ fun EventDetailScreen(
                 modifier = Modifier.padding(it)
             ) {
                 when (uiState) {
-                    is EventDetailUiState.HasEvent -> Event(
+                    is EventDetailUiState.HasEvent -> PartyDetail(
                         party = uiState.party,
                         onMapClick = onMapClick,
                         onUserClicked = onUserClicked,
@@ -76,8 +78,7 @@ fun EventDetailScreen(
                                 state.show()
                             }
                         },
-                        onInterestedToggle = onInterestedToggle,
-                        onGoingToggle = onGoingToggle,
+                        onWatchStatusChange = onWatchStatusChange,
                         onGoingCountClick = onGoingCountClick,
                         onInterestedCountClick = onInterestedCountClick,
                         onTicketingClick = onTicketingClick,
@@ -92,13 +93,12 @@ fun EventDetailScreen(
 }
 
 @Composable
-fun Event(
+fun PartyDetail(
     party: Party,
     onMapClick: () -> Unit,
     onUserClicked: (String) -> Unit,
     onManageClick: () -> Unit,
-    onInterestedToggle: (Party) -> Unit,
-    onGoingToggle: (Party) -> Unit,
+    onWatchStatusChange: (WatchStatus) -> Unit,
     onGoingCountClick: () -> Unit,
     onInterestedCountClick: () -> Unit,
     onTicketingClick: (String) -> Unit,
@@ -118,9 +118,9 @@ fun Event(
                     }
                 },
                 onManageClick = onManageClick,
-                onInterested = onInterestedToggle,
-                onGoing = onGoingToggle,
+                onWatchStatusChange = onWatchStatusChange,
                 onTicketingClick = onTicketingClick,
+                onUserClick = onUserClicked,
             )
         }
 
@@ -218,9 +218,9 @@ fun EventHeader(
     party: Party,
     onAboutClick: () -> Unit,
     onManageClick: () -> Unit,
-    onGoing: (Party) -> Unit,
-    onInterested: (Party) -> Unit,
+    onWatchStatusChange: (WatchStatus) -> Unit,
     onTicketingClick: (String) -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     AsyncImage(
         model = party.bannerUrl,
@@ -239,24 +239,16 @@ fun EventHeader(
             onEventDetailsClick = {},
         )
         EventHeaderButtons(
-            party.hostId,
+            hostId = party.hostId,
             onManageClick = onManageClick,
-            onGoingClick = { onGoing(party) },
-            onInterestedClick = { onInterested(party) },
+            onWatchStatusChange = onWatchStatusChange,
             onInviteClick = {},
-            interested = party.interested,
-            going = party.going,
+            watchStatus = party.watchStatus,
         )
         EventInfo(
-            locationName = party.locationName,
-            address = party.address,
-            hostName = party.hostName,
-            price = party.price,
-            privacy = party.privacy,
-            startTimeSeconds = party.startDate,
-            interestedCount = party.interestedCount,
-            goingCount = party.goingCount,
+            party = party,
             onTicketingClick = { onTicketingClick(party.id) },
+            onUserClick = onUserClick,
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),

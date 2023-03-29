@@ -29,7 +29,7 @@ fun ProfileMoreBottomSheet(
     onProfileSheetUIAction: (ProfileSheetUIAction) -> Unit,
 ) {
     Column(
-        modifier = Modifier.systemBarsPadding(),
+        modifier = Modifier.navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(

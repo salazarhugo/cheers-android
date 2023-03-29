@@ -19,11 +19,15 @@ import com.salazar.cheers.ui.main.profile.SheetItem
 
 @Composable
 fun EventManageSheet(
+    modifier: Modifier = Modifier,
     onEditClick: () -> Unit,
     onCopyLink: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Box(
             modifier = Modifier
                 .padding(vertical = 10.dp)

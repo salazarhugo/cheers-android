@@ -4,9 +4,9 @@ import android.app.Activity
 import android.app.Application
 import android.util.Log
 import com.android.billingclient.api.*
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.functions.FirebaseFunctions
+import com.salazar.cheers.core.data.api.ApiService
+import com.salazar.cheers.core.data.response.RechargeCoinRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,20 +17,21 @@ import javax.inject.Singleton
 @Singleton
 class BillingRepository @Inject constructor(
     val application: Application,
+    private val apiService: ApiService,
 ) : PurchasesUpdatedListener, PurchasesResponseListener {
 
     override fun onPurchasesUpdated(
         billingResult: BillingResult,
         purchases: MutableList<Purchase>?
     ) {
-        Log.d("BILLING", billingResult.toString())
-        Log.d("BILLING", purchases.toString())
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             for (purchase in purchases) {
-                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged)
-                    verifyPurchase(purchase)
+                handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            // TODO Handle an error caused by a user cancelling the purchase flow.
+        } else {
+            // TODO Handle any other error codes.
         }
     }
 
@@ -40,8 +41,7 @@ class BillingRepository @Inject constructor(
     ) {
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
             for (purchase in purchases) {
-                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged)
-                    verifyPurchase(purchase)
+                handlePurchase(purchase)
             }
         }
     }
@@ -51,42 +51,44 @@ class BillingRepository @Inject constructor(
         .enablePendingPurchases()
         .build()
 
-    private fun handlePurchaseCloud(purchase: Purchase): Task<HashMap<*, *>> {
-        // Create the arguments to the callable function.
-        val data = hashMapOf(
-            "packageName" to purchase.packageName,
-            "productId" to purchase.skus[0],
-            "purchaseToken" to purchase.purchaseToken,
+    private suspend fun verifyPurchase(purchase: Purchase): Boolean {
+        val request = RechargeCoinRequest(
+            packageName = purchase.packageName,
+            productId = purchase.products[0],
+            purchaseToken = purchase.purchaseToken,
         )
 
-        return FirebaseFunctions.getInstance("europe-west2")
-            .getHttpsCallable("rechargeCoins")
-            .call(data)
-            .continueWith { task ->
-                val result = task.result?.data as HashMap<*, *>
-                result
-            }
-    }
-
-    suspend fun queryPurchases() {
-        billingClient.queryPurchasesAsync(BillingClient.SkuType.INAPP, this)
-    }
-
-    private fun verifyPurchase(purchase: Purchase) {
-        handlePurchaseCloud(purchase = purchase).addOnSuccessListener {
-            GlobalScope.launch {
-                consumePurchase(purchase = purchase)
-            }
+        return try {
+            val response = apiService.rechargeCoins(request = request)
+            true
+        } catch(e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 
-    private suspend fun consumePurchase(purchase: Purchase) = withContext(Dispatchers.IO) {
+    private fun handlePurchase(purchase: Purchase) {
+        if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED || purchase.isAcknowledged) {
+            return
+        }
+
+        GlobalScope.launch {
+            verifyPurchase(purchase = purchase)
+            consumePurchase(purchaseToken = purchase.purchaseToken)
+        }
+    }
+
+    private suspend fun consumePurchase(purchaseToken: String): ConsumeResult {
         val consumeParams =
             ConsumeParams.newBuilder()
-                .setPurchaseToken(purchase.purchaseToken)
+                .setPurchaseToken(purchaseToken)
                 .build()
 
-        billingClient.consumePurchase(consumeParams)
+        val consumeResult = withContext(Dispatchers.IO) {
+            billingClient.consumePurchase(consumeParams)
+        }
+
+        return consumeResult
     }
 
     fun startConnection() {
@@ -105,34 +107,53 @@ class BillingRepository @Inject constructor(
 
     fun launchBillingFlow(
         activity: Activity,
-        skuDetails: SkuDetails
+        productDetails: ProductDetails
     ) {
+        val productDetailsParamsList = listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .build()
+        )
+
         val flowParams = BillingFlowParams.newBuilder()
-            .setSkuDetails(skuDetails)
+            .setProductDetailsParamsList(productDetailsParamsList)
             .setObfuscatedAccountId(FirebaseAuth.getInstance().currentUser?.uid!!)
             .build()
+
         val responseCode = billingClient.launchBillingFlow(
             activity,
             flowParams
         ).responseCode
     }
 
-    suspend fun querySkuDetails(): SkuDetailsResult {
-        val skuList = ArrayList<String>()
-        skuList.add("coins_36")
-        skuList.add("coins_70")
-        skuList.add("coins_350")
-        skuList.add("coins_700")
-        skuList.add("coins_1400")
-        skuList.add("coins_3500")
-        skuList.add("coins_7000")
-        skuList.add("coins_17500")
-        val params = SkuDetailsParams.newBuilder()
-        params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP)
+    suspend fun queryProductDetails(): ProductDetailsResult {
+        val productList = ArrayList<String>()
+        productList.add("coins_36")
+        productList.add("coins_70")
+        productList.add("coins_350")
+        productList.add("coins_700")
+        productList.add("coins_1400")
+        productList.add("coins_3500")
+        productList.add("coins_7000")
+        productList.add("coins_17500")
 
-        return withContext(Dispatchers.IO) {
-            return@withContext billingClient.querySkuDetails(params.build())
+        val products = productList.map {
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(it)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
         }
+
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(products)
+            .build()
+
+        // leverage queryProductDetails Kotlin extension function
+        val productDetailsResult = withContext(Dispatchers.IO) {
+            billingClient.queryProductDetails(params)
+        }
+
+        return productDetailsResult
     }
 
 }

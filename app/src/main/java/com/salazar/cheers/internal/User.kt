@@ -36,4 +36,5 @@ data class User(
     val storyState: StoryState = StoryState.EMPTY,
     val seenStory: Boolean = false,
     val createTime: Long = 0L,
+    val isBusinessAccount: Boolean = false,
 )

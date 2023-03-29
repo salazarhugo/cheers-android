@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import cheers.party.v1.PartyServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.data.repository.PostRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.internal.Party

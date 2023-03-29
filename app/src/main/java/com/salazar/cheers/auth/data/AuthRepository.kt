@@ -12,11 +12,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.Result
+import com.salazar.cheers.data.db.CheersDatabase
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -24,6 +26,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
+    private val database: CheersDatabase,
     private val userDao: UserDao,
     private val auth: FirebaseAuth,
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
@@ -33,7 +36,7 @@ class AuthRepository @Inject constructor(
             return Result.Success(null)
 
         val userId = auth.currentUser?.uid!!
-        val user = userDao.getUserNullable(userIdOrUsername = userId)
+        val user = userDao.getUserNullable(userIdOrUsername = userId).firstOrNull()
         if (user != null)
             return Result.Success(user)
 
@@ -48,6 +51,11 @@ class AuthRepository @Inject constructor(
             e.printStackTrace()
             Result.Error("Failed to get user")
         }
+    }
+
+    suspend fun signOut() {
+        FirebaseAuth.getInstance().signOut()
+        database.clearAllTables()
     }
 
     fun sendSignInLink(email: String): com.google.android.gms.tasks.Task<Void> {

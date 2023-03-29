@@ -81,6 +81,7 @@ fun UserProfilePicture(
                     .apply(block = fun ImageRequest.Builder.() {
                         transformations(CircleCropTransformation())
                         error(placeHolder)
+                        fallback(placeHolder)
                     }).build()
             ),
             contentDescription = "Profile picture",

@@ -13,7 +13,7 @@ class CancelFriendRequestUseCase @Inject constructor(
     private val repository: FriendshipRepository,
     @IODispatcher private val dispatcher: CoroutineDispatcher
 ){
-    suspend operator fun invoke(userId: String) = withContext(dispatcher) {
+    suspend operator fun invoke(userId: String): Result<Unit> = withContext(dispatcher) {
         val otherUser = userRepository.getUserFlow(userId).first()
         userRepository.updateLocalUser(
             otherUser.copy(requested = false)

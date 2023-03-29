@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.tickets
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,10 +12,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.EmptyActivity
 import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.internal.Ticket
+import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.ui.compose.share.SwipeToRefresh
+import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.ui.main.home.HomeUIAction
+import com.salazar.cheers.ui.main.home.PostList
 
 @Composable
 fun TicketsScreen(
@@ -25,15 +33,28 @@ fun TicketsScreen(
         topBar = {
             Toolbar(
                 onBackPressed = { onTicketsUIAction(TicketsUIAction.OnBackPressed)},
-                title = "Tickets",
+                title = stringResource(id = R.string.tickets),
             )
         },
     ) {
-        Column(modifier = Modifier.padding(it)) {
-            TicketList(
-                tickets = uiState.tickets,
-                onTicketsUIAction = onTicketsUIAction,
-            )
+        SwipeToRefresh(
+            state = rememberSwipeToRefreshState(uiState.isLoading),
+            onRefresh = { onTicketsUIAction(TicketsUIAction.OnSwipeRefresh) },
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background),
+            ) {
+                val tickets = uiState.tickets
+                if (tickets == null)
+                    LoadingScreen()
+                else
+                    TicketList(
+                        tickets = tickets,
+                        onTicketsUIAction = onTicketsUIAction,
+                    )
+            }
         }
     }
 }

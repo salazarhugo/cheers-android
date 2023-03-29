@@ -5,7 +5,9 @@ import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.internal.Party
 import com.salazar.cheers.internal.Post
+import com.salazar.cheers.internal.WatchStatus
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 @Dao
 interface PartyDao{
@@ -18,8 +20,16 @@ interface PartyDao{
     @Query("SELECT * FROM events WHERE hostId = :accountId")
     fun getEvents(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Party>>
 
-    @Query("SELECT * FROM events WHERE accountId = :accountId ORDER BY events.startDate DESC")
-    fun feedParty(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Party>>
+    @Query("""
+        SELECT * FROM events 
+        WHERE accountId = :accountId 
+        AND startDate > :now
+        ORDER BY events.startDate ASC
+        """)
+    fun feedParty(
+        accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!,
+        now: Long = Date().time / 1000,
+    ): Flow<List<Party>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(party: Party)
@@ -40,35 +50,11 @@ interface PartyDao{
     @Update
     suspend fun update(party: Party)
 
-    @Query("UPDATE events SET interested = :interested, interestedCount = :count WHERE eventId = :eventId")
-    suspend fun updateInterested(
+    @Query("UPDATE events SET watchStatus = :watchStatus WHERE eventId = :eventId")
+    suspend fun updateWatchStatus(
         eventId: String,
-        interested: Boolean,
-        count: Int
+        watchStatus: WatchStatus,
     )
-
-    @Query("UPDATE events SET going = :going, goingCount = :count WHERE eventId = :eventId")
-    suspend fun updateGoing(
-        eventId: String,
-        going: Boolean,
-        count: Int
-    )
-
-    @Transaction
-    suspend fun toggleGoing(eventId: String) {
-        val event = getEventT(eventId)
-        val going = !event.going
-        val count = if (event.going) event.goingCount - 1 else event.goingCount + 1
-        updateGoing(eventId, going, count)
-    }
-
-    @Transaction
-    suspend fun toggleInterested(eventId: String) {
-        val event = getEventT(eventId)
-        val interested = !event.interested
-        val count = if (event.interested) event.interestedCount - 1 else event.interestedCount + 1
-        updateInterested(eventId, interested, count)
-    }
 
     @Query("DELETE FROM events")
     suspend fun clearAll()

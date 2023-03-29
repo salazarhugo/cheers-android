@@ -3,8 +3,9 @@ package com.salazar.cheers.ui.main.party.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.party.PartyRepository
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.internal.Party
+import com.salazar.cheers.internal.WatchStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -82,21 +83,12 @@ class EventDetailViewModel @Inject constructor(
         }
     }
 
-    fun onGoingToggle() {
-//        viewModelScope.launch {
-//            eventRepository.toggleGoing(eventId = eventId)
-//        }
-    }
-
-    fun onGoingToggle(party: Party) {
+    fun onWatchStatusChange(watchStatus: WatchStatus) {
         viewModelScope.launch {
-//            partyRepository.toggleGoing(party = party)
-        }
-    }
-
-    fun onInterestedToggle(party: Party) {
-        viewModelScope.launch {
-//            partyRepository.toggleInterested(party = party)
+            partyRepository.setWatchStatus(
+                partyId = eventId,
+                watchStatus = watchStatus,
+            )
         }
     }
 

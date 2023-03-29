@@ -35,12 +35,11 @@ import com.salazar.cheers.R
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.internal.User
-import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.user.FollowButton
+import com.salazar.cheers.user.ui.FollowButton
 import com.salazar.cheers.ui.theme.Typography
 
 @Composable
@@ -300,7 +299,7 @@ fun SearchBar(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(46.dp),
+                .height(44.dp),
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
         ) {}
 
@@ -328,7 +327,12 @@ fun SearchBar(
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
             }),
-            placeholder = { Text("Search") },
+            placeholder = {
+                Text(
+                    text = "Search",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            },
             trailingIcon = {
                 if (searchInput.isNotBlank())
                     Icon(Icons.Filled.Close, null,

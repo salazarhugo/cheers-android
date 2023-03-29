@@ -4,8 +4,6 @@ package cheers.type;
 
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/user;user";
 
-
-
 message User {
   string id = 1;
   string name = 2;
@@ -20,6 +18,7 @@ message User {
   string phone_number = 9;
   int64 create_time = 10;
   repeated string registration_tokens = 11;
+  bool is_business_account = 14;
 }
 
 message UserItem {

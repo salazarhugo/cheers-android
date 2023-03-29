@@ -5,7 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.Resource
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.cheers.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.usecase.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.friendship.domain.usecase.ListFriendRequestUseCase
 import com.salazar.cheers.internal.Activity
+import com.salazar.cheers.ui.main.activity.ActivityUIAction
+import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,11 +25,16 @@ data class FriendRequestsUiState(
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
     val friendRequests: List<UserItem>? = null,
+    val suggestions: List<UserItem>? = null,
 )
 
 @HiltViewModel
 class FriendRequestsViewModel @Inject constructor(
     private val friendshipRepository: FriendshipRepository,
+    private val listFriendRequestUseCase: ListFriendRequestUseCase,
+    private val listSuggestionsUseCase: ListSuggestionsUseCase,
+    private val sendFriendRequestUseCase: SendFriendRequestUseCase,
+    private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(FriendRequestsUiState(isLoading = true))
@@ -37,12 +47,16 @@ class FriendRequestsViewModel @Inject constructor(
         )
 
     init {
-        onSwipeToRefresh()
+        viewModelScope.launch {
+            listFriendRequestUseCase().collect(::updateFriendRequests)
+        }
+        refreshSuggestions()
     }
 
     fun onSwipeToRefresh() {
+        refreshSuggestions()
         viewModelScope.launch {
-            friendshipRepository.listFriendRequest().collect {
+            friendshipRepository.fetchFriendRequest().collect {
                 when(it) {
                     is Resource.Error -> updateErrorMessage(it.message)
                     is Resource.Loading -> updateIsRefreshing(it.isLoading)
@@ -63,7 +77,7 @@ class FriendRequestsViewModel @Inject constructor(
 
     fun onRefuseFriendRequest(userId: String) {
         viewModelScope.launch {
-//            friendshipRepository.cancelFriendRequest()
+            friendshipRepository.cancelFriendRequest(userId = userId)
         }
     }
 
@@ -90,10 +104,51 @@ class FriendRequestsViewModel @Inject constructor(
             it.copy(friendRequests = users, isLoading = false)
         }
     }
+
+    private fun refreshSuggestions() {
+        viewModelScope.launch {
+            listSuggestionsUseCase().onSuccess {
+                updateSuggestions(it)
+            }
+        }
+    }
+
+    private fun updateSuggestions(suggestions: List<UserItem>) {
+        viewModelState.update {
+            it.copy(suggestions = suggestions)
+        }
+    }
+
+    fun onRemoveSuggestion(user: UserItem) {
+        viewModelState.update {
+            val l = it.suggestions?.toMutableList()
+            l?.remove(user)
+            it.copy(suggestions = l)
+        }
+    }
+
+    fun onCancelFriendRequestClick(userID: String) {
+        viewModelScope.launch {
+            cancelFriendRequestUseCase(userId = userID).onSuccess {
+            }
+        }
+    }
+
+    fun onAddFriendClick(userID: String) {
+        viewModelScope.launch {
+            sendFriendRequestUseCase(userId = userID).onSuccess {
+            }
+        }
+    }
 }
 
 sealed class FriendRequestsUIAction {
     object OnBackPressed : FriendRequestsUIAction()
     object OnSwipeRefresh : FriendRequestsUIAction()
     data class OnAcceptFriendRequest(val userId: String) : FriendRequestsUIAction()
+    data class OnRefuseFriendRequest(val userId: String) : FriendRequestsUIAction()
+    data class OnUserClick(val userId: String) : FriendRequestsUIAction()
+    data class OnCancelFriendRequestClick(val userID: String) : FriendRequestsUIAction()
+    data class OnAddFriendClick(val userID: String) : FriendRequestsUIAction()
+    data class OnRemoveSuggestion(val user: UserItem) : FriendRequestsUIAction()
 }

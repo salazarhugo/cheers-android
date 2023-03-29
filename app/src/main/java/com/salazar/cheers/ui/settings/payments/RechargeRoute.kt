@@ -32,9 +32,10 @@ fun RechargeRoute(
         RechargeScreen(
             onRecharge = {
                 val activity = context.getActivity()
-                if (activity != null)
-                    rechargeViewModel.onSkuClick(it, activity = activity)
-//                rechargeViewModel.updateIsLoading(true)
+                if (activity != null) {
+                    rechargeViewModel.onProductClick(it, activity = activity)
+                    rechargeViewModel.updateIsLoading(true)
+                }
             },
             recharges = recharges,
             onBackPressed = { navActions.navigateBack() },

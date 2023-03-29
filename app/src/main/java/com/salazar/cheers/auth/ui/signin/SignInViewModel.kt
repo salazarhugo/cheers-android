@@ -24,10 +24,7 @@ import com.salazar.cheers.core.domain.model.ErrorMessage
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -71,7 +68,7 @@ class SignInViewModel @Inject constructor(
     private fun checkIfAlreadySignedIn() {
         if (Firebase.auth.currentUser != null) {
             viewModelScope.launch {
-                userRepository.getCurrentUserNullable() ?: return@launch
+                userRepository.getCurrentUserFlow().firstOrNull() ?: return@launch
                 viewModelState.update {
                     it.copy(isSignedIn = true)
                 }

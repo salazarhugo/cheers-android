@@ -22,7 +22,6 @@ fun EventDetails(
     name: String,
     privacy: Privacy,
     startTimeSeconds: Long,
-    showArrow: Boolean = false,
     onEventDetailsClick: () -> Unit,
 ) {
     Row(
@@ -35,7 +34,7 @@ fun EventDetails(
     ) {
         Column {
             Text(
-                text = dateTimeFormatter(timestamp = startTimeSeconds.toLong()),
+                text = dateTimeFormatter(timestamp = startTimeSeconds),
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
                 color = MaterialTheme.colorScheme.error,
             )
@@ -48,8 +47,6 @@ fun EventDetails(
                 style = MaterialTheme.typography.labelLarge
             )
         }
-        if (showArrow)
-            Icon(Icons.Outlined.ChevronRight, null)
     }
 }
 

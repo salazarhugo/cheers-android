@@ -11,11 +11,16 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.google.accompanist.pager.PagerState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.mapbox.common.BillingServiceErrorCode
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.data.location.DefaultLocationClient
 import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.drink.domain.models.Drink
+import com.salazar.cheers.drink.domain.usecase.ListDrinkUseCase
 import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.internal.PostType
 import com.salazar.cheers.internal.Privacy
@@ -23,6 +28,7 @@ import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
 
@@ -50,7 +56,7 @@ data class CreatePostUiState(
     val page: CreatePostPage = CreatePostPage.CreatePost,
     val profilePictureUrl: String? = null,
     val drinkState: PagerState = PagerState(),
-    val drinks: List<Beverage> = emptyList(),
+    val drinks: List<Drink> = emptyList(),
 )
 
 @HiltViewModel
@@ -58,6 +64,8 @@ class CreatePostViewModel @Inject constructor(
     application: Application,
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
+    private val locationClient: DefaultLocationClient,
+    private val listDrinkUseCase: ListDrinkUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CreatePostUiState(isLoading = false))
@@ -80,13 +88,24 @@ class CreatePostViewModel @Inject constructor(
                 it.copy(profilePictureUrl = user.picture)
             }
         }
-        viewModelState.update {
-            val drinks = Beverage.values().toList().sortedBy { it.displayName }
-//                .filter { it.displayName.isNotBlank() }
-            it.copy(drinks = drinks)
+
+        viewModelScope.launch {
+            val location = locationClient.getLastKnownLocation() ?: return@launch
+            updateLocationPoint(Point.fromLngLat(location.longitude, location.latitude))
+        }
+
+        viewModelScope.launch {
+            listDrinkUseCase().onSuccess {
+                updateDrinks(it)
+            }
         }
     }
 
+    private fun updateDrinks(drinks: List<Drink>) {
+        viewModelState.update {
+            it.copy(drinks = drinks)
+        }
+    }
 
     fun selectPrivacy(privacy: Privacy) {
         viewModelState.update {
@@ -197,7 +216,7 @@ class CreatePostViewModel @Inject constructor(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val drink = uiState.drinks[uiState.drinkState.currentPage].displayName
+        val drink = uiState.drinks[uiState.drinkState.currentPage].name
 
         val uploadWorkRequest =
             OneTimeWorkRequestBuilder<CreatePostWorker>()

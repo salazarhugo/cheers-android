@@ -101,14 +101,20 @@ class CreatePostWorker @AssistedInject constructor(
                         .addAllPhotos(downloadUrls)
                         .build()
 
-                    postRepository.createPost(post = post)
+                    postRepository.createPost(
+                        post = post,
+                        sendNotificationToFriends = notify,
+                    )
                 }
                 PostType.TEXT -> {
                     val post = postBuilder
                         .setType(PostOuterClass.PostType.TEXT)
                         .build()
 
-                    postRepository.createPost(post = post)
+                    postRepository.createPost(
+                        post = post,
+                        sendNotificationToFriends = notify,
+                    )
                 }
             }
             return Result.success()

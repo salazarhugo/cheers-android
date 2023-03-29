@@ -15,6 +15,10 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.comment.ui.comment_more.CommentMoreRoute
+import com.salazar.cheers.comment.ui.comments.CommentsRoute
+import com.salazar.cheers.comment.ui.delete.DeleteCommentDialog
+import com.salazar.cheers.comment.ui.replies.RepliesRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
@@ -28,7 +32,6 @@ import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
 import com.salazar.cheers.ui.main.chats.MessagesRoute
 import com.salazar.cheers.ui.main.chats.NewChatRoute
-import com.salazar.cheers.ui.main.comment.CommentsRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
@@ -42,9 +45,7 @@ import com.salazar.cheers.ui.main.party.edit.EditEventRoute
 import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
 import com.salazar.cheers.ui.main.home.HomeRoute
 import com.salazar.cheers.ui.main.home.HomeViewModel
-import com.salazar.cheers.ui.main.map.MapPostHistoryRoute
-import com.salazar.cheers.ui.main.map.MapRoute
-import com.salazar.cheers.ui.main.map.settings.MapSettingsRoute
+import com.salazar.cheers.map.screens.settings.MapSettingsRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
@@ -60,7 +61,12 @@ import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.main.tickets.TicketsRoute
 import com.salazar.cheers.ui.main.tickets.details.TicketDetailsRoute
 import com.salazar.cheers.ui.sheets.*
-import com.salazar.cheers.ui.sheets.manage_friendship.ManageFriendshipRoute
+import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
+import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
+import com.salazar.cheers.map.ui.MapPostHistoryRoute
+import com.salazar.cheers.map.screens.map.MapRoute
+import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
+import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
 import com.salazar.cheers.ui.theme.CheersTheme
 import com.salazar.cheers.util.Constants.URI
@@ -206,6 +212,14 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
+            route = MainDestinations.CREATE_NOTE_ROUTE,
+        ) {
+            CreateNoteRoute(
+                navActions = appState.navActions,
+            )
+        }
+
+        composable(
             route = "${MainDestinations.CREATE_POST_ROUTE}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
@@ -299,6 +313,37 @@ fun NavGraphBuilder.mainNavGraph(
                 navActions = appState.navActions,
             )
         }
+
+        composable(
+            route = "${MainDestinations.COMMENT_REPLIES}/{commentId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{commentId}/replies" }),
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
+            RepliesRoute(
+                navActions = appState.navActions,
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.COMMENT_MORE_SHEET}/{commentID}",
+            arguments = listOf(
+                navArgument("commentID") { nullable = false },
+            )
+        ) {
+            CommentMoreRoute(
+                navActions = appState.navActions,
+            )
+        }
+
+        dialog(
+            route = "${MainDestinations.COMMENT_DELETE}/{commentID}",
+        ) {
+            DeleteCommentDialog(
+                navActions = appState.navActions
+            )
+        }
+
 
         composable(
             route = "${MainDestinations.DRINKING_STATS}/{username}",
@@ -473,8 +518,19 @@ fun NavGraphBuilder.mainNavGraph(
         dialog(
             route = "${MainDestinations.DIALOG_REMOVE_FRIEND}/{friendId}",
         ) {
-            DeletePostDialog(
+            RemoveFriendDialog(
                 navActions = appState.navActions
+            )
+        }
+
+        bottomSheet(
+            route = "${MainDestinations.NOTE_SHEET}/{userID}",
+            arguments = listOf(
+                navArgument("userID") { nullable = false },
+            )
+        ) {
+            NoteRoute(
+                navActions = appState.navActions,
             )
         }
 
@@ -506,6 +562,7 @@ fun NavGraphBuilder.mainNavGraph(
             val viewModel = hiltViewModel<EventMoreSheetViewModel>()
 
             EventMoreBottomSheet(
+                modifier = Modifier.navigationBarsPadding(),
                 isAuthor = false,
                 onDetails = { appState.navActions.navigateToEventDetail(eventId) },
                 onDelete = { },

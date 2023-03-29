@@ -14,7 +14,7 @@ interface FriendRequestDao {
     suspend fun clear()
 
     @Query("DELETE FROM friend_requests WHERE id = :id")
-    suspend fun clear(id: String)
+    suspend fun delete(id: String)
 
     @Query("SELECT * FROM friend_requests")
     fun listFriendRequests(): Flow<List<FriendRequest>>

@@ -48,7 +48,7 @@ class CreatePasswordViewModel @Inject constructor(
         }
     }
 
-    fun onCreatePassword() {
+    fun onCreatePassword(onComplete: () -> Unit) {
         val password = uiState.value.password
         if (password.isBlank()) {
             updateMessage("Password can't be blank")
@@ -57,7 +57,7 @@ class CreatePasswordViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.updatePassword(password = password).collect {
                 when(it) {
-                    is Resource.Success -> {}
+                    is Resource.Success -> { onComplete() }
                     is Resource.Error -> updateMessage(it.message.orEmpty())
                     is Resource.Loading -> updateIsLoading(it.isLoading)
                 }

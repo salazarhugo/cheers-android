@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +42,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
+import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.animations.Bounce
 import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.util.Utils.createFile
@@ -75,19 +79,19 @@ fun CameraScreen(
         modifier = Modifier
             .background(Color.Black)
             .systemBarsPadding()
-            .fillMaxSize()
-        ,
+            .fillMaxSize(),
         containerColor = Color.Black,
         contentWindowInsets = WindowInsets.systemBars,
         bottomBar = {
             CameraFooter(
-                imageTaken = uiState.imageUri != null,
+                uiState = uiState,
                 cameraUIAction = onCameraUIAction,
                 onPostClicked = onPostClicked,
                 onStoryClick = onStoryClick,
             )
         }
     ) {
+        it
         Permission(Manifest.permission.CAMERA) {
             CameraPreview(
 //                modifier = Modifier.padding(it),
@@ -103,11 +107,12 @@ fun CameraScreen(
 
 @Composable
 fun CameraFooter(
-    imageTaken: Boolean,
+    uiState: CameraUiState,
     cameraUIAction: (CameraUIAction) -> Unit,
     onPostClicked: () -> Unit,
     onStoryClick: () -> Unit,
 ) {
+    val imageTaken = uiState.imageUri != null
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,6 +122,7 @@ fun CameraFooter(
     ) {
         if (imageTaken)
             CameraFooterSendTo(
+                picture = uiState.user?.picture,
                 onPostClicked = onPostClicked,
                 onStoryClick = onStoryClick,
             )
@@ -127,6 +133,7 @@ fun CameraFooter(
 
 @Composable
 fun CameraFooterSendTo(
+    picture: String?,
     onPostClicked: () -> Unit,
     onStoryClick: () -> Unit,
 ) {
@@ -140,7 +147,21 @@ fun CameraFooterSendTo(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(Icons.Filled.AccountCircle, null, tint = MaterialTheme.colorScheme.primary)
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current).data(data = picture)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                transformations(CircleCropTransformation())
+                                error(R.drawable.default_profile_picture)
+                                fallback(R.drawable.default_profile_picture)
+                            }).build()
+                    ),
+                    contentDescription = "Profile picture",
+                    modifier = Modifier
+                        .size(ButtonDefaults.IconSize)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
                 Spacer(Modifier.width(4.dp))
                 Text("Your Story")
             }

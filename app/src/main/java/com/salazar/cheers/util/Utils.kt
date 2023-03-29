@@ -28,6 +28,18 @@ import java.util.*
 
 object Utils {
 
+    fun Context.setLocale(language: String) {
+        resources.apply {
+            val locale = Locale(language)
+            val config = Configuration(configuration)
+
+            createConfigurationContext(configuration)
+            Locale.setDefault(locale)
+            config.setLocale(locale)
+            resources.updateConfiguration(config, displayMetrics)
+        }
+    }
+
     fun Context.shareToSnapchat(username: String) {
         val snapCreativeKitApi = SnapCreative.getApi(this)
         val snapMediaFactory = SnapCreative.getMediaFactory(this)

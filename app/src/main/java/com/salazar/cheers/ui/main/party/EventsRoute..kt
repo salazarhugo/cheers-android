@@ -24,16 +24,8 @@ fun EventsRoute(
             navActions.navigateToEventDetail(it)
         },
         onQueryChange = eventsViewModel::onQueryChange,
-        onInterestedToggle = eventsViewModel::onInterestedToggle,
-        onGoingToggle = eventsViewModel::onGoingToggle,
         onMoreClick = {
             navActions.navigateToEventMoreSheet(it)
-        },
-        onCreateEventClick = {
-            navActions.navigateToAddEvent()
-        },
-        onShareClick = { partyId ->
-            navActions.navigateToShare(partyId)
         },
     )
 }

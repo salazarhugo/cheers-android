@@ -18,6 +18,7 @@ import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -36,6 +37,20 @@ class UserRepository @Inject constructor(
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
     private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
 ) {
+    suspend fun listSuggestions(): Result<List<UserItem>> {
+        return try {
+            val request = ListSuggestionsRequest.newBuilder().build()
+
+            val followers = userService.listSuggestions(request).usersList
+            val userItems = followers.map { it.toUserItem() }
+            userItemDao.insertAll(userItems)
+            Result.success(userItems)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
     suspend fun checkUsername(
         username: String,
     ): Result<Boolean> {
@@ -339,10 +354,6 @@ class UserRepository @Inject constructor(
         return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 
-    suspend fun getCurrentUserNullable(): User? {
-        return userDao.getUserNullable(FirebaseAuth.getInstance().currentUser?.uid!!)
-    }
-
     suspend fun getCurrentUser(): User {
         return userDao.getUser(FirebaseAuth.getInstance().currentUser?.uid!!)
     }
@@ -350,7 +361,7 @@ class UserRepository @Inject constructor(
     suspend fun getUserSignIn(userId: String): Flow<Resource<User>> {
         return flow {
             emit(Resource.Loading(true))
-            val user = userDao.getUserNullable(userIdOrUsername = userId)
+            val user = userDao.getUserNullable(userIdOrUsername = userId).firstOrNull()
 
             if (user != null) {
                 emit(Resource.Success(user))
@@ -371,8 +382,11 @@ class UserRepository @Inject constructor(
                 null
             }
 
-            remoteUser?.let { safeRemoteUser ->
-                userDao.insert(safeRemoteUser.toUser())
+            if (remoteUser == null) {
+                emit(Resource.Error("Failed to get user"))
+            }
+            else {
+                userDao.insert(remoteUser.toUser())
                 emit(Resource.Success(userDao.getUser(userId)))
             }
             emit(Resource.Loading(false))

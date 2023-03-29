@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -257,6 +259,7 @@ fun SearchBar(
     onSearchInputChanged: (String) -> Unit,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
+    focusRequester: FocusRequester = FocusRequester(),
 ) {
     Box(
         modifier = modifier,
@@ -281,7 +284,9 @@ fun SearchBar(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             onValueChange = { onSearchInputChanged(it) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
@@ -300,7 +305,7 @@ fun SearchBar(
                 if (searchInput.isNotBlank())
                     Icon(Icons.Filled.Close, null,
                         Modifier.clickable { onSearchInputChanged("") })
-            }
+            },
         )
     }
 }

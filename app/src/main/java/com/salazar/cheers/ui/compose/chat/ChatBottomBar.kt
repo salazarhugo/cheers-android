@@ -182,8 +182,6 @@ fun ReplyMessage(
 
     AnimatedVisibility(
         visible = message != null,
-//        enter = slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
-//        exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight })
     ) {
         ref.value?.let { message ->
             Surface(tonalElevation = 8.dp) {

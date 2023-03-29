@@ -48,8 +48,12 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.NEW_CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
                 || currentRoute.contains(MainDestinations.POST_COMMENTS)
+                || currentRoute.contains(MainDestinations.COMMENT_REPLIES)
+                || currentRoute.contains(MainDestinations.COMMENT_MORE_SHEET)
+                || currentRoute.contains(MainDestinations.COMMENT_DELETE)
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
                 || currentRoute.contains(MainDestinations.CREATE_POST_ROUTE)
+                || currentRoute.contains(MainDestinations.CREATE_NOTE_ROUTE)
                 || currentRoute.contains(MainDestinations.EDIT_PROFILE_ROUTE)
                 || currentRoute.contains(MainDestinations.CAMERA_ROUTE)
 
@@ -64,30 +68,13 @@ fun CheersNavGraph(
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(appState.snackBarHostState) },
-//            floatingActionButtonPosition = FabPosition.Center,
-//            floatingActionButton = {
-//                if (!hide)
-//                    FloatingActionButton(
-//                        onClick = {
-//                            navActions.navigateToAddEvent()
-//                        },
-//                        modifier = Modifier.offset(y = (+58).dp),
-//                        containerColor = MaterialTheme.colorScheme.secondary
-//                    ) {
-//                        Icon(
-//                            Icons.Default.Add,
-//                            contentDescription = null,
-//                            tint = MaterialTheme.colorScheme.onSecondary
-//                        )
-//                    }
-//            },
             bottomBar = {
                 AnimatedVisibility(
                     visible = !hide,
                 ) {
                     CheersBottomBar(
                         unreadChatCount = uiState.unreadChatCount,
-                        profilePictureUrl = uiState.user?.picture ?: "",
+                        picture = uiState.user?.picture ?: "",
                         currentRoute = currentRoute,
                         onNavigate = { route ->
                             appState.navController.navigate(route)

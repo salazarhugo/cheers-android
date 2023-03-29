@@ -8,6 +8,8 @@ import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.internal.Activity
 import com.salazar.cheers.internal.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 
 @Dao
 interface UserDao {
@@ -27,7 +29,7 @@ interface UserDao {
 
     @Transaction
     suspend fun deleteFriend(userId: String)  {
-        val user = getUserNullable(userId) ?: return
+        val user = getUserNullable(userId).firstOrNull() ?: return
         update(user.copy(friend = false))
     }
 
@@ -35,7 +37,7 @@ interface UserDao {
     suspend fun getUser(userIdOrUsername: String): User
 
     @Query("SELECT * FROM users WHERE users.id = :userIdOrUsername OR username = :userIdOrUsername")
-    suspend fun getUserNullable(userIdOrUsername: String): User?
+    fun getUserNullable(userIdOrUsername: String): Flow<User>
 
     @Query("SELECT * FROM users WHERE friend = 1")
     suspend fun getFriends(): List<User>
