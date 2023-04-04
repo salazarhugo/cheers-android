@@ -7,15 +7,14 @@ import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.mapbox.geojson.FeatureCollection
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.data.mapper.toUserItem
-import com.salazar.cheers.internal.Activity
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.Activity
+import com.salazar.cheers.core.data.internal.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -77,7 +76,6 @@ class UserRepository @Inject constructor(
             val request = CreateUserRequest.newBuilder()
                 .setUsername(username)
                 .setEmail(authUser.email ?: email)
-                .setName(authUser.displayName ?: "")
                 .build()
 
             val response = userService.createUser(request = request)
@@ -164,19 +162,6 @@ class UserRepository @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             null
-        }
-    }
-
-    suspend fun getLocations(): FeatureCollection? {
-        return withContext(Dispatchers.IO) {
-            try {
-//                val json = coreService.getLocations().string()
-//                return@withContext FeatureCollection.fromJson(json)
-                null
-            } catch (e: HttpException) {
-                Log.e("User Repository", e.toString())
-                null
-            }
         }
     }
 
@@ -322,16 +307,6 @@ class UserRepository @Inject constructor(
         userService.unfollowUser(request)
     }
 
-    suspend fun isUsernameAvailable(username: String): Boolean {
-        return try {
-//            publicService.isUsernameAvailable(username = username)
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
     suspend fun toggleFollow(userID: String) {
         try {
             val user = userDao.getUser(userID)
@@ -447,7 +422,7 @@ class UserRepository @Inject constructor(
         if (newRegistrationToken == null)
             throw NullPointerException("FCM token is null.")
 
-        Log.e("GRPC", "ADDING TOKEN $newRegistrationToken")
+        Log.i("GRPC", "ADDING TOKEN $newRegistrationToken")
         try {
             val request = CreateRegistrationTokenRequest.newBuilder()
                 .setToken(newRegistrationToken)

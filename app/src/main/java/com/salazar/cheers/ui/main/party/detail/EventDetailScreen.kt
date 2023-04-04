@@ -25,9 +25,9 @@ import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.event.*
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.WatchStatus
-import com.salazar.cheers.internal.numberFormatter
+import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.data.internal.WatchStatus
+import com.salazar.cheers.core.data.internal.numberFormatter
 import com.salazar.cheers.ui.theme.GreySheet
 import kotlinx.coroutines.launch
 

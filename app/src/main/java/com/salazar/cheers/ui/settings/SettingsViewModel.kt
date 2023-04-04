@@ -7,7 +7,7 @@ import com.salazar.cheers.Language
 import com.salazar.cheers.Theme
 import com.salazar.cheers.auth.data.AuthRepository
 import com.salazar.cheers.auth.domain.usecase.SignOutUseCase
-import com.salazar.cheers.data.datastore.DataStoreRepository
+import com.salazar.cheers.core.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.UserPreferenceDao
 import com.salazar.cheers.data.repository.UserRepository

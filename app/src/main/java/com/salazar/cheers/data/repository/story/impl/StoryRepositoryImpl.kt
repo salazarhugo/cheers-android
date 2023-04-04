@@ -3,19 +3,16 @@ package com.salazar.cheers.data.repository.story.impl
 import androidx.paging.PagingData
 import cheers.story.v1.*
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.core.data.db.CheersDatabase
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.data.enums.StoryState
 import com.salazar.cheers.data.mapper.toStory
-import com.salazar.cheers.data.mapper.toUser
 import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.data.repository.story.StoryRepository
-import com.salazar.cheers.domain.models.UserWithStories
+import com.salazar.cheers.core.domain.model.UserWithStories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -57,7 +54,7 @@ class StoryRepositoryImpl @Inject constructor(
         return storyDao.listStory()
     }
 
-    override suspend fun fetchFeedStory(page: Int, pageSize: Int): Result<List<com.salazar.cheers.domain.models.UserWithStories>> {
+    override suspend fun fetchFeedStory(page: Int, pageSize: Int): Result<List<UserWithStories>> {
         val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 
         val request = FeedStoryRequest.newBuilder()

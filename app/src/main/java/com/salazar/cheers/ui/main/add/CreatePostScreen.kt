@@ -8,21 +8,20 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -52,7 +51,7 @@ import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.ui.compose.CarouselDrinks
 import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.DividerM3
@@ -60,6 +59,7 @@ import com.salazar.cheers.post.ui.MultipleAnnotation
 import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.ui.compose.share.ErrorMessage
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.ui.main.home.HomeUIAction
 import com.salazar.cheers.ui.main.party.create.Item
 import com.salazar.cheers.ui.theme.GreySheet
 import com.salazar.cheers.ui.theme.Roboto
@@ -120,18 +120,27 @@ fun CreatePostScreen(
         val enabled = uiState.caption.isNotEmpty() || uiState.photos.isNotEmpty() || uiState.drinkState.currentPage > 0
 
         Scaffold(
-            topBar = { TopAppBar(onDismiss = {onCreatePostUIAction(CreatePostUIAction.OnBackPressed)}) },
-            bottomBar = {
-                ShareButton(
-                    modifier = Modifier.navigationBarsPadding(),
-                    text = stringResource(id = R.string.share),
-                    isLoading = uiState.isLoading,
-                    onClick = {
+            topBar = {
+                TopAppBar(
+                    onDismiss = { onCreatePostUIAction(CreatePostUIAction.OnBackPressed) },
+                    onShare = {
                         onUploadPost()
                         onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
                     },
-                    enabled = enabled,
+                    isLoading = uiState.isLoading,
                 )
+             },
+            bottomBar = {
+//                ShareButton(
+//                    modifier = Modifier.navigationBarsPadding(),
+//                    text = stringResource(id = R.string.share),
+//                    isLoading = uiState.isLoading,
+//                    onClick = {
+//                        onUploadPost()
+//                        onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
+//                    },
+//                    enabled = enabled,
+//                )
             }
         ) {
             Column(
@@ -346,17 +355,38 @@ fun BeverageSection(
 
 @Composable
 fun TopAppBar(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onShare: () -> Unit,
+    isLoading: Boolean,
 ) {
-    SmallTopAppBar(
+    TopAppBar(
         title = {
-            Text("New post", fontWeight = FontWeight.Bold, fontFamily = Roboto)
+            Text(
+                text = "New post",
+                fontWeight = FontWeight.Bold,
+                fontFamily = Roboto,
+            )
         },
         navigationIcon = {
-            IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, "")
+            IconButton(
+                onClick = onDismiss,
+            ) {
+                Icon(Icons.Default.Close, null)
             }
         },
+        actions = {
+            if (isLoading)
+                CircularProgressIndicator()
+            else
+                TextButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = onShare,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.share),
+                    )
+                }
+        }
     )
 }
 

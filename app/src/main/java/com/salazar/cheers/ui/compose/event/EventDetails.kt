@@ -14,8 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cheers.type.PrivacyOuterClass
-import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.dateTimeFormatter
+import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.data.internal.dateTimeFormatter
 
 @Composable
 fun EventDetails(

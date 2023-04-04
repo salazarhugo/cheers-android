@@ -3,9 +3,9 @@ package com.salazar.cheers.map.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Settings
-import com.salazar.cheers.data.datastore.DataStoreRepository
+import com.salazar.cheers.core.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.map.data.repository.MapRepository
 import com.salazar.cheers.map.domain.usecase.update_ghost_mode.UpdateGhostModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

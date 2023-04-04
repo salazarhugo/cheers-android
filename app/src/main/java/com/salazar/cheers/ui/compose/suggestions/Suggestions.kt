@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.internal.SuggestionUser
+import com.salazar.cheers.core.data.internal.SuggestionUser
 
 
 @Composable

@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.internal.Party
+import com.salazar.cheers.core.data.internal.Party
 import com.salazar.cheers.ui.main.party.EventItemDetails
 import com.salazar.cheers.ui.main.party.EventMutualFriends
 

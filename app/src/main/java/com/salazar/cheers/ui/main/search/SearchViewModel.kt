@@ -2,7 +2,7 @@ package com.salazar.cheers.ui.main.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserItem

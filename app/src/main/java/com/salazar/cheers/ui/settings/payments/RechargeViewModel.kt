@@ -7,7 +7,7 @@ import com.android.billingclient.api.ProductDetails
 import com.salazar.cheers.data.repository.BillingRepository
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.account.AccountRepository
-import com.salazar.cheers.util.FirestoreUtil
+import com.salazar.cheers.core.data.util.FirestoreUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

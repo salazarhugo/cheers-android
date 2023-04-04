@@ -44,12 +44,12 @@ fun SendGiftSheet(
             onClick = onStickerClick,
             price = 1,
         ),
-        Sticker(
-            name = "Shot",
-            icon = com.salazar.cheers.R.drawable.ic_tequila_shot,
-            onClick = onStickerClick,
-            price = 5,
-        ),
+//        Sticker(
+//            name = "Shot",
+//            icon = com.salazar.cheers.R.drawable.ic_tequila_shot,
+//            onClick = onStickerClick,
+//            price = 5,
+//        ),
         Sticker(
             name = "Pint",
             icon = com.salazar.cheers.R.drawable.ic_beer,

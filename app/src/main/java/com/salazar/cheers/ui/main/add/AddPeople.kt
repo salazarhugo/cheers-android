@@ -32,7 +32,7 @@ import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
@@ -88,8 +88,7 @@ fun AddPeopleTopBar(
     onDismiss: () -> Unit,
     onDone: () -> Unit
 ) {
-    SmallTopAppBar(
-        title = { Text("Add people", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
+    TopAppBar(title = { Text("Add people", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
         navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, contentDescription = null)
@@ -99,8 +98,7 @@ fun AddPeopleTopBar(
             TextButton(onClick = onDone) {
                 Text("DONE")
             }
-        }
-    )
+        })
 }
 
 @Composable

@@ -3,9 +3,9 @@ package com.salazar.cheers.data.db
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.WatchStatus
+import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.WatchStatus
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 

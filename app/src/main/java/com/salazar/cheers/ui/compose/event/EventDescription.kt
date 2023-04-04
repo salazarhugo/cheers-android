@@ -11,8 +11,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.main.chat.SymbolAnnotationType
-import com.salazar.cheers.ui.main.chat.messageFormatter
+import com.salazar.cheers.chat.ui.components.SymbolAnnotationType
+import com.salazar.cheers.chat.ui.components.messageFormatter
 
 
 @Preview

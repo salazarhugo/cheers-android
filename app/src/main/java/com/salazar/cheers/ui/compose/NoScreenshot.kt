@@ -4,7 +4,7 @@ import android.view.WindowManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
-import com.salazar.cheers.util.Utils.getActivity
+import com.salazar.cheers.core.data.util.Utils.getActivity
 
 /**
  * Prevents a Compose screen from appearing in screenshots and video captures

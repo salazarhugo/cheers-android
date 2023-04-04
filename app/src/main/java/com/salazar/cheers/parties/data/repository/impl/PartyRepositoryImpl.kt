@@ -7,8 +7,8 @@ import com.salazar.cheers.data.db.PartyDao
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.mapper.toParty
 import com.salazar.cheers.parties.data.repository.PartyRepository
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.WatchStatus
+import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.data.internal.WatchStatus
 import com.salazar.cheers.parties.data.mapper.toPartyAnswer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll

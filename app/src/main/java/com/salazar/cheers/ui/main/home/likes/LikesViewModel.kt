@@ -3,8 +3,7 @@ package com.salazar.cheers.ui.main.home.likes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

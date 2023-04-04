@@ -3,8 +3,8 @@ package com.salazar.cheers.data.db
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.Privacy
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -22,11 +22,11 @@ interface PostDao {
     suspend fun getPostsWithAuthorId(authorId: String): List<Post>
 
     @Transaction
-    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.createTime DESC")
-    suspend fun getPosts(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): List<Post>
+    @Query("SELECT * FROM posts ORDER BY posts.createTime DESC")
+    suspend fun getPosts(): List<Post>
 
-    @Query("SELECT * FROM posts WHERE accountId = :accountId ORDER BY posts.createTime DESC")
-    fun getPostFeed(accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!): Flow<List<Post>>
+    @Query("SELECT * FROM posts ORDER BY posts.createTime DESC")
+    fun getPostFeed(): Flow<List<Post>>
 
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
     fun postFlow(postId: String): Flow<Post>

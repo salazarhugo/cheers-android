@@ -24,8 +24,6 @@ fun CreateNoteScreen(
     onCreateNoteUIAction: (CreateNoteUIAction) -> Unit,
 ) {
     val text = uiState.text
-    val focusRequester = remember { FocusRequester() }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,6 +55,7 @@ fun CreateNoteScreen(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(16.dp))
+
             SearchBar(
                 searchInput = text,
                 onSearchInputChanged = { text ->
@@ -67,7 +66,7 @@ fun CreateNoteScreen(
                         text = "Share what's on your mind..."
                     )
                 },
-                focusRequester = focusRequester,
+                autoFocus = true,
             )
             Text(
                 text = "${text.length}/60",

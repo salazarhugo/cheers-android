@@ -47,9 +47,9 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.animations.Bounce
 import com.salazar.cheers.ui.compose.utils.Permission
-import com.salazar.cheers.util.Utils.createFile
-import com.salazar.cheers.util.Utils.getOutputDirectory
-import com.salazar.cheers.util.Utils.getOutputFileOptions
+import com.salazar.cheers.core.data.util.Utils.createFile
+import com.salazar.cheers.core.data.util.Utils.getOutputDirectory
+import com.salazar.cheers.core.data.util.Utils.getOutputFileOptions
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine

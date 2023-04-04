@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.CategoryTitle
 import com.salazar.cheers.parties.ui.PartyItem
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.dateTimeFormatter
+import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.data.internal.dateTimeFormatter
 import com.salazar.cheers.parties.ui.EventsTopBar
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh

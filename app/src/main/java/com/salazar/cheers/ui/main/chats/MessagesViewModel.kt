@@ -3,11 +3,11 @@ package com.salazar.cheers.ui.main.chats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.chat.v1.Room
-import com.salazar.cheers.data.repository.ChatRepository
+import com.salazar.cheers.chat.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.domain.models.ChatChannel
-import com.salazar.cheers.domain.usecase.pin_room.PinRoomUseCase
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.chat.domain.models.ChatChannel
+import com.salazar.cheers.chat.domain.usecase.pin_room.PinRoomUseCase
+import com.salazar.cheers.core.data.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

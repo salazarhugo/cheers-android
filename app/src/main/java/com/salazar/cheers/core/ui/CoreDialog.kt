@@ -40,24 +40,26 @@ fun CoreDialog(
             )
         },
         dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                content = {
-                    Text(
-                        text = dismissButton,
-                    )
-                }
-            )
+            if (dismissButton.isNotBlank())
+                TextButton(
+                    onClick = onDismiss,
+                    content = {
+                        Text(
+                            text = dismissButton,
+                        )
+                    }
+                )
         },
         confirmButton = {
-            Button(
-                onClick = onConfirm,
-                content = {
-                    Text(
-                        text = confirmButton,
-                    )
-                }
-            )
+            if (confirmButton.isNotBlank())
+                Button(
+                    onClick = onConfirm,
+                    content = {
+                        Text(
+                            text = confirmButton,
+                        )
+                    }
+                )
         },
     )
 }

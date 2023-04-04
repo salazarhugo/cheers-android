@@ -2,7 +2,7 @@ package com.salazar.cheers.comment.data
 
 import android.content.res.Resources.NotFoundException
 import cheers.comment.v1.*
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.comment.data.mapper.toComment
 import com.salazar.cheers.comment.domain.models.Comment

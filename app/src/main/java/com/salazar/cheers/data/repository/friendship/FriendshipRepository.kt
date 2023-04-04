@@ -1,8 +1,8 @@
 package com.salazar.cheers.data.repository.friendship
 
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.domain.models.FriendRequest
+import com.salazar.cheers.friendship.domain.models.FriendRequest
 import kotlinx.coroutines.flow.Flow
 
 /**

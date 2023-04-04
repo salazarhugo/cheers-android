@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -32,13 +31,13 @@ import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.CheersViewModel
+import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.Language
 import com.salazar.cheers.Settings
-import com.salazar.cheers.data.datastore.DataStoreRepository
+import com.salazar.cheers.core.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
-import com.salazar.cheers.util.StorageUtil
-import com.salazar.cheers.util.Utils.setLocale
+import com.salazar.cheers.core.data.util.StorageUtil
+import com.salazar.cheers.core.data.util.Utils.setLocale
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

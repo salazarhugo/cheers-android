@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -42,13 +41,13 @@ import com.google.accompanist.pager.rememberPagerState
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.event.EventDetails
-import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.startDateFormatter
-import com.salazar.cheers.internal.timeFormatter
+import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.data.internal.startDateFormatter
+import com.salazar.cheers.core.data.internal.timeFormatter
 import com.salazar.cheers.ui.main.add.LocationSection
 import com.salazar.cheers.ui.main.add.PrivacyBottomSheet
 import com.salazar.cheers.ui.main.add.SwitchPreference
-import com.salazar.cheers.ui.main.chat.messageFormatter
+import com.salazar.cheers.chat.ui.components.messageFormatter
 import com.salazar.cheers.ui.main.search.SearchLocation
 import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch

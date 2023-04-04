@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.domain.usecase.remove_friend.RemoveFriendUseCase
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.friendship.domain.usecase.remove_friend.RemoveFriendUseCase
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

@@ -16,9 +16,9 @@ import androidx.work.WorkerParameters
 import cheers.type.PostOuterClass
 import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.PostRepository
-import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.util.StorageUtil
+import com.salazar.cheers.post.data.repository.PostRepository
+import com.salazar.cheers.core.data.internal.PostType
+import com.salazar.cheers.core.data.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope

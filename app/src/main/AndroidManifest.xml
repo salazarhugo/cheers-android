@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" package="com.salazar.cheers">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -23,7 +23,7 @@
     </queries>
 
     <application
-        android:name=".CheersApplication"
+        android:name=".core.ui.CheersApplication"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -31,6 +31,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Cheers">
 
         <provider
@@ -121,10 +122,16 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
 
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="maparty.fr"
+                    android:scheme="https" />
+                <data
+                    android:host="maparty.app"
+                    android:scheme="https" />
                 <data
                     android:host="web-cheers.web.app"
                     android:scheme="https" />
@@ -135,7 +142,7 @@
         </activity>
 
         <service
-            android:name=".service.MyFirebaseMessagingService"
+            android:name=".core.data.service.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

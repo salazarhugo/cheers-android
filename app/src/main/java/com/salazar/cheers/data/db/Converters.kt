@@ -2,11 +2,11 @@ package com.salazar.cheers.data.db
 
 import androidx.room.TypeConverter
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.data.enums.StoryState
-import com.salazar.cheers.domain.models.MessageType
-import com.salazar.cheers.domain.models.RoomStatus
-import com.salazar.cheers.domain.models.RoomType
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.core.data.enums.StoryState
+import com.salazar.cheers.chat.domain.models.MessageType
+import com.salazar.cheers.chat.domain.models.RoomStatus
+import com.salazar.cheers.chat.domain.models.RoomType
+import com.salazar.cheers.core.data.internal.ActivityType
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -55,12 +55,6 @@ class Converters {
         RoomStatus.values()
             .firstOrNull { it.name.equals(name, ignoreCase = true) }
             ?: RoomStatus.UNRECOGNIZED
-
-    @TypeConverter
-    fun fromBeverage(value: Beverage) = value.name
-
-    @TypeConverter
-    fun toBeverage(name: String) = Beverage.fromName(name)
 
     @TypeConverter
     fun fromTimestamp(value: Timestamp) = value.seconds

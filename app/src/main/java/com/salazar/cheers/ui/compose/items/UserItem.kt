@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.core.data.enums.StoryState
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 

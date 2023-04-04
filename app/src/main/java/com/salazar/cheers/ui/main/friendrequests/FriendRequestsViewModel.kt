@@ -2,14 +2,12 @@ package com.salazar.cheers.ui.main.friendrequests
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
-import com.salazar.cheers.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
-import com.salazar.cheers.domain.usecase.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.friendship.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.friendship.domain.usecase.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.friendship.domain.usecase.ListFriendRequestUseCase
-import com.salazar.cheers.internal.Activity
-import com.salazar.cheers.ui.main.activity.ActivityUIAction
 import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 data class FriendRequestsUiState(

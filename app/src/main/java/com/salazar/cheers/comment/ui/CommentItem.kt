@@ -23,11 +23,11 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
 import com.salazar.cheers.ui.compose.extensions.noRippleClickable
-import com.salazar.cheers.util.Utils.conditional
+import com.salazar.cheers.core.data.util.Utils.conditional
 
 @Preview
 @Composable

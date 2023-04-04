@@ -41,8 +41,8 @@ import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import com.salazar.cheers.ui.compose.utils.PrettyImage
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.domain.models.UserWithStories
-import com.salazar.cheers.internal.Beverage
+import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.ui.carousel
 import com.salazar.cheers.ui.theme.StrongRed
 import kotlinx.coroutines.launch
@@ -277,15 +277,19 @@ fun StoryFeedHeader(
             onStepFinish = onStepFinish,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
+        val post = Post()
+            .copy(
+                username = user.username,
+                verified = user.verified,
+                createTime = story.createTime,
+                beverage = "",
+                locationName = "",
+                profilePictureUrl = user.picture ?: "",
+            )
         PostHeader(
-            username = user.username,
-            verified = user.verified,
-            createTime = story.createTime,
-            beverage = Beverage.NONE,
+            post = post,
             darkMode = true,
             public = false,
-            locationName = "",
-            picture = user.picture,
             onHeaderClicked = onUserClick,
             onMoreClicked = {},
         )

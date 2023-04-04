@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.compose.chat.FunctionalityNotAvailablePanel
+import com.salazar.cheers.chat.ui.components.FunctionalityNotAvailablePanel
 import kotlinx.coroutines.launch
 
 /**

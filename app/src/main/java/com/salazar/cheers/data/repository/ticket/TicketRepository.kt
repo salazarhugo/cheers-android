@@ -1,6 +1,6 @@
 package com.salazar.cheers.data.repository.ticket
 
-import com.salazar.cheers.internal.Ticket
+import com.salazar.cheers.core.data.internal.Ticket
 import kotlinx.coroutines.flow.Flow
 
 /**

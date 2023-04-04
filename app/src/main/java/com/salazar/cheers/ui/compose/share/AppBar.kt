@@ -39,7 +39,7 @@ fun AppBar(
 //            )
         )
     } else {
-        SmallTopAppBar(
+        TopAppBar(
             title = {
                 Text(
                     text = title,

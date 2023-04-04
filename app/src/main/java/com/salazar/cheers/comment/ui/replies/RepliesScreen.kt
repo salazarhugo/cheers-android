@@ -30,8 +30,8 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.comment.ui.CommentItem
 import com.salazar.cheers.ui.compose.LoadingScreen

@@ -9,9 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.internal.Beverage
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.ui.main.home.HomeUIAction
 
@@ -27,13 +26,8 @@ fun PostItem(
         modifier = modifier.fillMaxWidth()
     ) {
         PostHeader(
-            username = post.username,
-            verified = post.verified,
-            beverage = Beverage.fromName(post.beverage),
+            post = post,
             public = post.privacy == Privacy.PUBLIC.name,
-            createTime = post.createTime,
-            picture = post.profilePictureUrl,
-            locationName = post.locationName,
             onHeaderClicked = { onHomeUIAction(HomeUIAction.OnUserClick(it)) },
             onMoreClicked = { onHomeUIAction(HomeUIAction.OnPostMoreClick(post.id)) },
         )

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import com.salazar.cheers.internal.numberFormatter
+import com.salazar.cheers.core.data.internal.numberFormatter
 
 @Composable
 fun AnimatedTextCounter(

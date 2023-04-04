@@ -15,8 +15,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.util.Utils.copyToClipboard
+import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.core.data.util.Utils.copyToClipboard
 
 /**
  * Stateful composable that displays the Navigation route for the Comments screen.

@@ -1,22 +1,17 @@
 package com.salazar.cheers.auth.ui.register
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.auth.domain.usecase.RegisterUseCase
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
-import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.StoreUserEmail
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.util.Utils.validateUsername
+import com.salazar.cheers.core.data.util.Utils.validateUsername
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.sign
 
 data class RegisterUiState(
     val isLoading: Boolean = false,

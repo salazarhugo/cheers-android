@@ -25,13 +25,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.domain.models.ChatChannel
-import com.salazar.cheers.domain.models.RoomStatus
-import com.salazar.cheers.internal.User
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.chat.ui.chat.*
+import com.salazar.cheers.chat.domain.models.ChatChannel
+import com.salazar.cheers.chat.domain.models.RoomStatus
+import com.salazar.cheers.chat.ui.components.*
+import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.chat.*
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
@@ -95,7 +96,7 @@ fun Tabs(
         SearchBar(
             modifier = Modifier.padding(horizontal = 16.dp),
             searchInput = uiState.searchInput,
-            onSearchInputChanged = { onRoomsUIAction(RoomsUIAction.OnSearchInputChange(it))},
+            onSearchInputChanged = { onRoomsUIAction(RoomsUIAction.OnSearchInputChange(it)) },
             placeholder = {
                 Text("Search")
             },
@@ -166,8 +167,8 @@ fun ConversationList(
             items(suggestions) { user ->
                 UserItem(
                     user = user,
-                    onUserClick = { onRoomsUIAction(RoomsUIAction.OnUserClick(user.id))},
-                    onFollowToggle = {onRoomsUIAction(RoomsUIAction.OnFollowToggle(user))},
+                    onUserClick = { onRoomsUIAction(RoomsUIAction.OnUserClick(user.id)) },
+                    onFollowToggle = { onRoomsUIAction(RoomsUIAction.OnFollowToggle(user)) },
                 )
             }
     }
@@ -384,16 +385,15 @@ fun MyAppBar(
     onBackPressed: () -> Unit,
     onActivityIconClicked: () -> Unit,
 ) {
-    SmallTopAppBar(
-        title = {
-            Text(
-                text = "Chats",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto
-                ),
-            )
-        },
+    TopAppBar(title = {
+        Text(
+            text = "Chats",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontFamily = Roboto
+            ),
+        )
+    },
         actions = {
             IconButton(onClick = onActivityIconClicked) {
                 Icon(
@@ -401,8 +401,7 @@ fun MyAppBar(
                     contentDescription = "Activity icon"
                 )
             }
-        },
-    )
+        })
 }
 
 @Composable

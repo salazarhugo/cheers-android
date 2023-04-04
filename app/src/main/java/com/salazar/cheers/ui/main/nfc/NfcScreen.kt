@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.util.Utils.getActivity
+import com.salazar.cheers.core.data.util.Utils.getActivity
 
 
 fun createNdefMessage(): NdefMessage {

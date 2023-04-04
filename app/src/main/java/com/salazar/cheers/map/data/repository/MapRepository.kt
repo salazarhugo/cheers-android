@@ -23,7 +23,7 @@ import com.mapbox.search.common.AsyncOperationTask
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.map.data.mapper.toUserLocation
 import com.salazar.cheers.map.domain.models.UserLocation
-import com.salazar.cheers.util.Utils.isDarkModeOn
+import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

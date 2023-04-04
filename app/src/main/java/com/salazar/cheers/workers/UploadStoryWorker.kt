@@ -15,7 +15,7 @@ import cheers.type.PrivacyOuterClass
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.data.repository.story.StoryRepository
-import com.salazar.cheers.util.StorageUtil
+import com.salazar.cheers.core.data.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await

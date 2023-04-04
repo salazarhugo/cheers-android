@@ -2,7 +2,7 @@ package com.salazar.cheers.data.mapper
 
 import cheers.user.v1.GetUserResponse
 import com.salazar.cheers.data.db.entities.RecentUser
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 
 fun RecentUser.toUser(): User {
     return User().copy(

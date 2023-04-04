@@ -37,15 +37,18 @@ import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import com.salazar.cheers.ui.compose.utils.Permission
-import com.salazar.cheers.internal.Post
+import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.map.domain.models.UserLocation
 import com.salazar.cheers.map.ui.annotations.CurrentUserAnnotation
 import com.salazar.cheers.map.ui.annotations.FriendAnnotation
+import com.salazar.cheers.map.ui.annotations.PostAnnotation
 import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
+import com.salazar.cheers.map.ui.dialogs.PostMapDialog
 import com.salazar.cheers.map.ui.dialogs.UserMapDialog
 import com.salazar.cheers.ui.compose.extensions.noRippleClickable
+import com.salazar.cheers.ui.main.home.HomeUIAction
 import com.salazar.cheers.ui.theme.GreySheet
-import com.salazar.cheers.util.Utils
+import com.salazar.cheers.core.data.util.Utils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,29 +57,9 @@ fun MapScreen(
     mapView: MapView,
     onMapUIAction: (MapUIAction) -> Unit,
 ) {
-    val ghostMode = uiState.ghostMode
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = uiState.sheetState)
-    val userLocation = uiState.userLocation
-    val currentUserView = remember(userLocation, ghostMode) {
-        ComposeView(context).apply {
-            setContent {
-                CurrentUserAnnotation(
-                    isSelected = isSelected,
-                    name = userLocation?.name ?: "",
-                    picture = userLocation?.picture ?: "",
-                    onClick = {},
-                    ghostMode = ghostMode,
-                )
-            }
-            layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-    }
-
 
     BottomSheetScaffold(
         modifier = Modifier
@@ -86,18 +69,29 @@ fun MapScreen(
         scaffoldState = scaffoldState,
         sheetContent =  {
             BottomSheetM3 {
-                if (uiState.selectedUser != null)
-                    UserMapDialog(
-                        userLocation = uiState.selectedUser,
-                        onClose = {
-                            scope.launch {
-                                uiState.sheetState.collapse()
-                            }
-                        },
-                        onChatClick = {
-                            onMapUIAction(MapUIAction.OnChatClick(it))
+                when(uiState.selected) {
+                    MapAnnotationType.POST -> PostMapDialog(
+                        uiState = uiState,
+                        onHomeUIAction = {
+                            if (it is HomeUIAction.OnCommentClick)
+                                onMapUIAction(MapUIAction.OnCommentClick(it.postID))
+                            if (it is HomeUIAction.OnUserClick)
+                                onMapUIAction(MapUIAction.OnUserClick(it.userID))
                         }
                     )
+                    MapAnnotationType.USER -> UserMapDialog(
+                            userLocation = uiState.selectedUser,
+                            onClose = {
+                                scope.launch {
+                                    uiState.sheetState.collapse()
+                                }
+                            },
+                            onChatClick = {
+                                onMapUIAction(MapUIAction.OnChatClick(it))
+                            }
+                        )
+                    null -> {}
+                }
             }
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -124,6 +118,7 @@ fun MapScreen(
                         mapView
                     },
                     update = { mapView ->
+                        mapView.viewAnnotationManager.removeAllViewAnnotations()
                         scope.launch {
 //                            val userLocation = uiState.userLocation
 //                            if (userLocation != null)
@@ -261,17 +256,13 @@ suspend fun addPostsAnnotation(
     mapView: MapView,
     onMapUIAction: (MapUIAction) -> Unit,
 ) {
-    if (post.photos.isEmpty())
-        return
-
     val point = Point.fromLngLat(post.longitude, post.latitude)
 
     val view = ComposeView(context).apply {
         setContent {
-            FriendAnnotation(
+            PostAnnotation(
                 modifier = Modifier.size(120.dp),
-                name = "",
-                picture = post.profilePictureUrl,
+                post = post,
                 onClick = {
                     onMapUIAction(MapUIAction.OnPostClick(post))
                 },
@@ -351,38 +342,6 @@ fun MapBottomBar(
         )
     }
 }
-
-private fun onPostAnnotationClick(
-    post: Post,
-    onSelectPost: (Post) -> Unit,
-    mapView: MapView,
-): OnPointAnnotationClickListener {
-    return OnPointAnnotationClickListener {
-        onSelectPost(post)
-        mapView.getMapboxMap().flyTo(
-            cameraOptions = CameraOptions.Builder()
-                .center(
-                    Point.fromLngLat(
-                        post.longitude,
-                        post.latitude - 0.01
-                    )
-                )
-                .zoom(13.0)
-                .build(),
-            animationOptions = MapAnimationOptions.mapAnimationOptions {
-                duration(2000)
-            }
-        )
-        true
-    }
-}
-
-private fun bitmapFromDrawableRes(
-    context: Context,
-    @DrawableRes resourceId: Int
-) =
-    Utils.convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
-
 
 @Composable
 fun MapButton(

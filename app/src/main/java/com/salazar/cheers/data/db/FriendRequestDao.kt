@@ -1,8 +1,7 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
-import com.salazar.cheers.domain.models.FriendRequest
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.friendship.domain.models.FriendRequest
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -16,21 +16,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.data.enums.StoryState
-import com.salazar.cheers.internal.Beverage
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.core.data.enums.StoryState
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 
 @Composable
 fun PostHeader(
-    username: String,
-    verified: Boolean,
-    beverage: Beverage,
+    post: Post,
     public: Boolean,
-    createTime: Long,
-    locationName: String,
-    picture: String?,
     darkMode: Boolean = false,
     onHeaderClicked: (username: String) -> Unit = {},
     onMoreClicked: () -> Unit = {},
@@ -40,7 +35,7 @@ fun PostHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onHeaderClicked(username) }
+            .clickable { onHeaderClicked(post.username) }
             .padding(16.dp, 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -50,7 +45,7 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserProfilePicture(
-                picture = picture,
+                picture = post.profilePictureUrl,
                 storyState = StoryState.EMPTY,
                 size = 33.dp,
             )
@@ -61,28 +56,28 @@ fun PostHeader(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Username(
-                        username = username,
-                        verified = verified,
+                        username = post.username,
+                        verified = post.verified,
                         textStyle = MaterialTheme.typography.bodyMedium,
                         color = color,
                     )
-                    if (beverage != Beverage.NONE) {
+                    if (post.beverage.isNotBlank()) {
                         Text(
-                            text = " is drinking ${beverage.displayName.lowercase()}",
+                            text = " is drinking ${post.beverage.lowercase()}",
                             style = MaterialTheme.typography.bodyMedium,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
-                if (locationName.isNotBlank())
-                    Text(text = locationName, style = MaterialTheme.typography.labelSmall)
+                if (post.locationName.isNotBlank())
+                    Text(text = post.locationName, style = MaterialTheme.typography.labelSmall)
             }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = relativeTimeFormatter(epoch = createTime),
+                text = relativeTimeFormatter(epoch = post.createTime),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
                 color = color,

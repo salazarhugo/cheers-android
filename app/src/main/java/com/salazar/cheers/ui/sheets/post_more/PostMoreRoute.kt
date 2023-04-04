@@ -10,8 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.post.ui.PostMoreBottomSheet
-import com.salazar.cheers.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.util.Utils.copyToClipboard
+import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.core.data.util.Utils.copyToClipboard
 
 /**
  * Stateful composable that displays the Navigation route for the Comments screen.

@@ -4,10 +4,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -26,20 +23,22 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.enums.StoryState
-import com.salazar.cheers.domain.models.UserWithStories
-import com.salazar.cheers.internal.Post
+import com.salazar.cheers.core.data.enums.StoryState
+import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.notes.ui.NoteList
 import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.ads.NativeAdPost
 import com.salazar.cheers.ui.compose.post.NoPosts
 import com.salazar.cheers.post.ui.item.PostItem
+import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.story.Story
 import com.salazar.cheers.ui.compose.story.YourStory
+import com.salazar.cheers.user.ui.AddFriendButton
 
 
 @Composable
@@ -95,14 +94,14 @@ fun PostList(
             DividerM3()
         }
 
-//        item {
-//            Stories(
-//                uiState = uiState,
-//                onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryFeedClick(it)) },
-//                onAddStoryClick = { onHomeUIAction(HomeUIAction.OnAddStoryClick) },
-//            )
-//            DividerM3()
-//        }
+        /* item {
+            Stories(
+                uiState = uiState,
+                onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryFeedClick(it)) },
+                onAddStoryClick = { onHomeUIAction(HomeUIAction.OnAddStoryClick) },
+            )
+            DividerM3()
+        } */
 
         item {
             WhatsUpSection(
@@ -150,6 +149,30 @@ fun PostList(
                 }
             }
         }
+
+        if (uiState.suggestions != null)
+            items(items = uiState.suggestions) { user ->
+                UserItem(
+                    userItem = user,
+                    onClick = {
+    //                    onFriendRequestsUIAction(FriendRequestsUIAction.OnUserClick(user.username))
+                    },
+                    content = {
+                        AddFriendButton(
+                            requestedByViewer = user.requested,
+                            onAddFriendClick = {
+    //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnAddFriendClick(user.id))
+                            },
+                            onCancelFriendRequestClick = {
+    //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnCancelFriendRequestClick(user.id))
+                            },
+                            onDelete = {
+    //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnRemoveSuggestion(user))
+                            }
+                        )
+                    }
+                )
+            }
     }
 }
 

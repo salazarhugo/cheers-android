@@ -79,12 +79,6 @@ fun MapRoute(
                         mapViewModel.mapRepository.onMapReady(action.map, action.ctx)
                     }
                 }
-                is MapUIAction.OnPostClick -> {
-                    scope.launch {
-                        uiState.sheetState.expand()
-                    }
-                    mapViewModel.selectPost(action.post)
-                }
                 MapUIAction.OnMyLocationClick -> {
                     mapViewModel.onMyLocationClick()
                     scope.launch {
@@ -97,6 +91,33 @@ fun MapRoute(
                             .build()
                         mapbox.flyTo(cameraOptions)
                     }
+                }
+                is MapUIAction.OnPostClick -> {
+                    val post = action.post
+                    val mapbox = mapView.getMapboxMap()
+
+                    scope.launch {
+                        uiState.sheetState.expand()
+                    }
+
+                    val point = Point.fromLngLat(
+                        post.longitude,
+                        post.latitude - 0.006
+                    )
+
+                    val zoom = max(14.0, mapbox.cameraState.zoom)
+
+                    mapbox.flyTo(
+                        cameraOptions = CameraOptions.Builder()
+                            .center(point)
+                            .zoom(zoom)
+                            .build(),
+                        animationOptions = MapAnimationOptions.mapAnimationOptions {
+                            duration(1000)
+                        }
+                    )
+
+                    mapViewModel.selectPost(post = post)
                 }
                 is MapUIAction.OnUserViewAnnotationClick ->  {
                     val userLocation = action.userLocation
@@ -125,6 +146,7 @@ fun MapRoute(
                     mapViewModel.onUserViewAnnotationClick(userLocation = userLocation)
                 }
                 is MapUIAction.OnChatClick -> navActions.navigateToChatWithUserId(action.userID)
+                is MapUIAction.OnCommentClick -> navActions.navigateToComments(action.postID)
             }
         },
     )

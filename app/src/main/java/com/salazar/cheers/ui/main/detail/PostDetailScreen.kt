@@ -31,6 +31,10 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.auth.FirebaseAuth
+import com.mapbox.api.staticmap.v1.MapboxStaticMap
+import com.mapbox.api.staticmap.v1.StaticMapCriteria
+import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
+import com.mapbox.geojson.Point
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.post.ui.item.LikeButton
@@ -39,10 +43,11 @@ import com.salazar.cheers.post.ui.item.PostHeader
 import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.user.ui.FollowButton
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.internal.Beverage
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.ui.compose.utils.PrettyImage
 import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import java.util.*
 
 @Composable
@@ -121,37 +126,37 @@ fun StaticMap(
     onMapClick: () -> Unit,
 ) {
     val context = LocalContext.current
-//    val style =
-//        if (context.isDarkModeOn())
-//            StaticMapCriteria.DARK_STYLE
-//        else
-//            StaticMapCriteria.LIGHT_STYLE
-//
-//    val token = stringResource(R.string.mapbox_access_token)
-//    val staticImage = remember {
-//        MapboxStaticMap.builder()
-//            .accessToken(token)
-//            .styleId(style)
-//            .cameraPoint(Point.fromLngLat(longitude, latitude)) // Image's center point on map
-//            .staticMarkerAnnotations(
-//                listOf(
-//                    StaticMarkerAnnotation.builder().lnglat(Point.fromLngLat(longitude, latitude))
-//                        .build()
-//                )
-//            )
-//            .cameraZoom(13.0)
-//            .width(640) // Image width
-//            .height(640) // Image height
-//            .retina(true) // Retina 2x image will be returned
-//            .build()
-//    }
-//
-//    val url = remember { staticImage.url().toString() }
-//    PrettyImage(
-//        modifier = modifier
-//            .clickable { onMapClick() },
-//        data = url,
-//    )
+    val style =
+        if (context.isDarkModeOn())
+            StaticMapCriteria.DARK_STYLE
+        else
+            StaticMapCriteria.LIGHT_STYLE
+
+    val token = stringResource(R.string.mapbox_access_token)
+    val staticImage = remember {
+        MapboxStaticMap.builder()
+            .accessToken(token)
+            .styleId(style)
+            .cameraPoint(Point.fromLngLat(longitude, latitude)) // Image's center point on map
+            .staticMarkerAnnotations(
+                listOf(
+                    StaticMarkerAnnotation.builder().lnglat(Point.fromLngLat(longitude, latitude))
+                        .build()
+                )
+            )
+            .cameraZoom(13.0)
+            .width(640)
+            .height(640)
+            .retina(true)
+            .build()
+    }
+
+    val url = remember { staticImage.url().toString() }
+    PrettyImage(
+        modifier = modifier
+            .clickable { onMapClick() },
+        data = url,
+    )
 }
 
 @Composable
@@ -211,13 +216,8 @@ fun Post(
 
             item {
                 PostHeader(
-                    username = post.username,
-                    verified = post.verified,
-                    beverage = Beverage.fromName(post.beverage),
+                    post = post,
                     public = post.privacy == Privacy.PUBLIC.name,
-                    createTime = post.createTime,
-                    picture = post.profilePictureUrl,
-                    locationName = post.locationName,
                 )
                 PostText(
                     caption = post.caption,

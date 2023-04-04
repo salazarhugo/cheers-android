@@ -12,17 +12,15 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.StoreUserEmail
+import com.salazar.cheers.core.data.Resource
+import com.salazar.cheers.core.data.datastore.StoreUserEmail
 import com.salazar.cheers.auth.data.AuthRepository
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
 import com.salazar.cheers.core.domain.model.ErrorMessage
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.util.Utils.isEmailValid
+import com.salazar.cheers.core.data.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,7 +29,7 @@ import javax.inject.Inject
 data class SignInUiState(
     val navigateToRegister: Boolean = false,
     val isPasswordless: Boolean = true,
-    val isSignedIn: Boolean = false,
+    val isSignedIn: Boolean? = null,
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val email: String = "",
@@ -66,13 +64,15 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun checkIfAlreadySignedIn() {
-        if (Firebase.auth.currentUser != null) {
+        val isSignedIn = Firebase.auth.currentUser != null
+
+        if (isSignedIn) {
             viewModelScope.launch {
-                userRepository.getCurrentUserFlow().firstOrNull() ?: return@launch
-                viewModelState.update {
-                    it.copy(isSignedIn = true)
-                }
+                getUser(userId = Firebase.auth.currentUser?.uid!!)
             }
+        }
+        else {
+            updateIsSignedIn(false)
         }
     }
 
@@ -161,6 +161,11 @@ class SignInViewModel @Inject constructor(
             }
     }
 
+    fun signInWithOneTap(idToken: String?) {
+        val credential = authRepository.getFirebaseCredentialFromIdToken(idToken = idToken)
+        signInWithCredential(credential = credential)
+    }
+
     private fun signInWithEmailPassword(
         email: String,
         password: String,
@@ -175,6 +180,8 @@ class SignInViewModel @Inject constructor(
         signInWithCredential(credential)
     }
 
+
+
     fun onGoogleSignInResult(task: Task<GoogleSignInAccount>?) {
         if (task == null) {
             updateIsLoading(false)
@@ -182,7 +189,7 @@ class SignInViewModel @Inject constructor(
         }
         try {
             val account = task.getResult(ApiException::class.java) ?: return
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            val credential = authRepository.getFirebaseCredentialFromIdToken(account.idToken)
             signInWithCredential(credential = credential)
         } catch (e: ApiException) {
             Log.e("Error getting GoogleSignInAccount credential", e.toString())
@@ -190,7 +197,7 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun signInWithCredential(credential: AuthCredential) {
-        FirebaseAuth.getInstance().signInWithCredential(credential)
+        authRepository.signInWithCredential(credential)
             .addOnFailureListener {
                 updateErrorMessage("Authentication failed: ${it.message}")
                 updateIsLoading(false)
@@ -209,9 +216,9 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    private fun updateIsSignedIn(b: Boolean) {
+    private fun updateIsSignedIn(isSignedIn: Boolean) {
         viewModelState.update {
-            it.copy(isSignedIn = b)
+            it.copy(isSignedIn = isSignedIn)
         }
     }
 

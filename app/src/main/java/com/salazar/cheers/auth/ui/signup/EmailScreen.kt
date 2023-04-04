@@ -28,7 +28,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.ui.compose.share.ButtonWithLoading
-import com.salazar.cheers.util.Utils.isEmailValid
+import com.salazar.cheers.core.data.util.Utils.isEmailValid
 
 @Composable
 fun EmailScreen(

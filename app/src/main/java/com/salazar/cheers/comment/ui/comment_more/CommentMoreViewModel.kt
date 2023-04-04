@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.comment.domain.usecase.get_comment.GetCommentUseCase
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

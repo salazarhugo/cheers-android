@@ -18,6 +18,7 @@ fun MapSettingsScreen(
     onMapSettingsUIAction: (MapSettingsUIAction) -> Unit,
 ) {
     Scaffold(
+        modifier = Modifier.navigationBarsPadding(),
         topBar = {
             Toolbar(
                 onBackPressed = { onMapSettingsUIAction(MapSettingsUIAction.OnBackPressed) },
@@ -25,27 +26,28 @@ fun MapSettingsScreen(
             )
         },
     ) {
-        MapSettingsList(
-            uiState = uiState,
-            modifier = Modifier
-                .padding(top = it.calculateTopPadding())
-                .padding(16.dp),
-            onMapSettingsUIAction = onMapSettingsUIAction,
-        )
+        Column(
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
+        ) {
+            MapSettingsList(
+                uiState = uiState,
+                onMapSettingsUIAction = onMapSettingsUIAction,
+            )
+        }
     }
 }
 
 @Composable
 fun MapSettingsList(
     uiState: MapSettingsUiState,
-    modifier: Modifier = Modifier,
     onMapSettingsUIAction: (MapSettingsUIAction) -> Unit,
 ) {
     val picture = uiState.user?.picture
     val ghostMode = uiState.settings?.ghostMode ?: false
 
     LazyColumn(
-        modifier = modifier,
+        modifier = Modifier.fillMaxWidth()
+            .padding(16.dp),
     ) {
         item {
             GhostModeCard(

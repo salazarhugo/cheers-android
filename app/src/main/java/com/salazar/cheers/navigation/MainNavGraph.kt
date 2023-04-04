@@ -1,6 +1,8 @@
 package com.salazar.cheers.navigation
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -27,7 +29,7 @@ import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.CreatePostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
-import com.salazar.cheers.ui.main.chat.ChatRoute
+import com.salazar.cheers.chat.ui.screens.chat.ChatRoute
 import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
 import com.salazar.cheers.ui.main.chats.MessagesRoute
@@ -50,7 +52,7 @@ import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
 import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
 import com.salazar.cheers.ui.main.profile.*
-import com.salazar.cheers.ui.main.room.RoomRoute
+import com.salazar.cheers.chat.ui.screens.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
@@ -67,12 +69,13 @@ import com.salazar.cheers.map.ui.MapPostHistoryRoute
 import com.salazar.cheers.map.screens.map.MapRoute
 import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
 import com.salazar.cheers.notes.ui.note.NoteRoute
+import com.salazar.cheers.ui.compose.utils.RequestPermission
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
 import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.util.Constants.URI
-import com.salazar.cheers.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.util.Utils.copyToClipboard
-import com.salazar.cheers.util.Utils.shareToSnapchat
+import com.salazar.cheers.core.data.util.Constants.URI
+import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.core.data.util.Utils.copyToClipboard
+import com.salazar.cheers.core.data.util.Utils.shareToSnapchat
 
 
 fun NavGraphBuilder.mainNavGraph(
@@ -260,6 +263,10 @@ fun NavGraphBuilder.mainNavGraph(
                 appState.navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
             }
             val homeViewModel = hiltViewModel<HomeViewModel>(parentEntry)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
+            }
             HomeRoute(
                 appState = appState,
                 navActions = appState.navActions,

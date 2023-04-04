@@ -20,7 +20,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.user.ui.FollowButton
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.ui.theme.Typography
 
@@ -47,20 +47,18 @@ fun Toolbar(
     navigateBack: () -> Unit,
 ) {
     Column {
-        SmallTopAppBar(
-            title = {
-                Text(
-                    "Likes",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
-                )
-            },
+        TopAppBar(title = {
+            Text(
+                "Likes",
+                fontWeight = FontWeight.Bold,
+                fontFamily = Roboto,
+            )
+        },
             navigationIcon = {
                 IconButton(onClick = navigateBack) {
                     Icon(Icons.Outlined.ArrowBack, "")
                 }
-            },
-        )
+            })
     }
 }
 

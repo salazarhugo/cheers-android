@@ -34,7 +34,7 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserSuggestion
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh

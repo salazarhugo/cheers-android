@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.mapper
 
-import com.salazar.cheers.internal.Activity
-import com.salazar.cheers.internal.ActivityType
+import com.salazar.cheers.core.data.internal.Activity
+import com.salazar.cheers.core.data.internal.ActivityType
 
 
 fun cheers.activity.v1.Activity.toActivity(accountId: String): Activity {

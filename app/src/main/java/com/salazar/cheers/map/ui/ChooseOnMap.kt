@@ -32,7 +32,7 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.util.Utils.isDarkModeOn
+import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 
 @Composable
 fun ChooseOnMapScreen(
@@ -184,24 +184,23 @@ fun ChooseOnMapAppBar(
     onBackPressed: () -> Unit,
     onSelectLocation: (Point) -> Unit,
 ) {
-    SmallTopAppBar(
+    TopAppBar(title = {
+        Column {
+            Text(
+                text = "Choose post location",
+                fontWeight = FontWeight.Bold,
+                fontFamily = Roboto,
+                fontSize = 14.sp
+            )
+            Text(
+                text = "Pan and zoom map under pin",
+                fontSize = 14.sp
+            )
+        }
+    },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(Icons.Default.ArrowBack, null)
-            }
-        },
-        title = {
-            Column {
-                Text(
-                    text = "Choose post location",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "Pan and zoom map under pin",
-                    fontSize = 14.sp
-                )
             }
         },
         actions = {
@@ -211,6 +210,5 @@ fun ChooseOnMapAppBar(
             }) {
                 Text("DONE")
             }
-        },
-    )
+        })
 }

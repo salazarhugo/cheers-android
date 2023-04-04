@@ -10,14 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.salazar.cheers.drink.domain.models.Drink
-import com.salazar.cheers.internal.Beverage
 import com.salazar.cheers.ui.carousel
 import com.salazar.cheers.ui.compose.extensions.noRippleClickable
 import kotlinx.coroutines.launch
@@ -79,8 +82,11 @@ fun VerticalDrink(
             .border(2.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
             .padding(8.dp),
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(drink.icon),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(drink.icon)
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
             contentDescription = null,
             modifier = Modifier.size(32.dp)
         )

@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.domain.models.RoomType
+import com.salazar.cheers.chat.domain.models.RoomType
 
 @Composable
 fun ChatsMoreBottomSheet(

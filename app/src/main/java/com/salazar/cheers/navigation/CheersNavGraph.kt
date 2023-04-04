@@ -14,7 +14,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.salazar.cheers.CheersUiState
+import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
 import com.salazar.cheers.ui.theme.GreySheet

@@ -3,7 +3,7 @@ package com.salazar.cheers.data.db.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import java.util.*
 import kotlin.collections.ArrayList
 

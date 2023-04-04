@@ -1,6 +1,6 @@
 package com.salazar.cheers.map.domain.usecase.list_friend_location
 
-import com.salazar.cheers.di.IODispatcher
+import com.salazar.cheers.core.di.IODispatcher
 import com.salazar.cheers.map.data.repository.MapRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

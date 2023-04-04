@@ -3,7 +3,7 @@ package com.salazar.cheers.friendship.domain.usecase
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
-import com.salazar.cheers.di.IODispatcher
+import com.salazar.cheers.core.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext

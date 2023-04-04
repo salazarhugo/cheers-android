@@ -1,10 +1,7 @@
 package com.salazar.cheers.ui.main.add
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -77,24 +74,22 @@ fun DrunkennessAppBar(
     onBackPressed: () -> Unit,
     onDone: () -> Unit,
 ) {
-    SmallTopAppBar(
+    TopAppBar(title = {
+        Text(
+            text = "Drunkenness level",
+            fontWeight = FontWeight.Bold,
+            fontFamily = Roboto,
+            fontSize = 14.sp
+        )
+    },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(Icons.Default.ArrowBack, null)
             }
         },
-        title = {
-            Text(
-                text = "Drunkenness level",
-                fontWeight = FontWeight.Bold,
-                fontFamily = Roboto,
-                fontSize = 14.sp
-            )
-        },
         actions = {
             TextButton(onClick = onDone) {
                 Text("OK")
             }
-        },
-    )
+        })
 }

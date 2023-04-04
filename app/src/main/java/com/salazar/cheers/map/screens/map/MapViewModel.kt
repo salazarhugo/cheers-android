@@ -9,15 +9,13 @@ import com.mapbox.geojson.FeatureCollection
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.salazar.cheers.Settings
-import com.salazar.cheers.data.datastore.DataStoreRepository
-import com.salazar.cheers.data.location.DefaultLocationClient
+import com.salazar.cheers.core.data.datastore.DataStoreRepository
+import com.salazar.cheers.core.data.location.DefaultLocationClient
 import com.salazar.cheers.map.data.repository.MapRepository
-import com.salazar.cheers.data.repository.PostRepository
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.Post
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.post.data.repository.PostRepository
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.map.domain.models.UserLocation
-import com.salazar.cheers.map.domain.usecase.update_ghost_mode.UpdateGhostModeUseCase
 import com.salazar.cheers.map.domain.usecase.update_location.UpdateLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -26,6 +24,11 @@ import java.util.*
 import javax.inject.Inject
 
 
+enum class MapAnnotationType {
+    POST,
+    USER
+}
+
 data class MapUiState(
     val geojson: FeatureCollection? = null,
     val users: List<UserLocation> = emptyList(),
@@ -33,6 +36,7 @@ data class MapUiState(
     val city: String = "",
     val selectedPost: Post? = null,
     val selectedUser: UserLocation? = null,
+    val selected: MapAnnotationType? = null,
     val isLoading: Boolean = false,
     val isPublic: Boolean = false,
     val sheetState: BottomSheetState = BottomSheetState(BottomSheetValue.Collapsed),
@@ -72,28 +76,29 @@ class MapViewModel @Inject constructor(
     }
 
     private fun updateSettings(settings: Settings) {
+        val ghostMode = settings.ghostMode
         viewModelState.update {
-            it.copy(ghostMode = settings.ghostMode)
+            it.copy(ghostMode = ghostMode)
         }
+        refreshFriendsLocation()
     }
 
     private fun initUserLocation() {
         viewModelScope.launch {
-            locationClient.getLocationUpdates(1000).collect() {
-                val userLocation = UserLocation(
-                    id = "",
-                    latitude = it.latitude,
-                    longitude = it.longitude,
-                    name = "",
-                    locationName = "",
-                    lastUpdated = Date().time,
-                    username = "",
-                    picture = "",
-                    verified = false,
-                )
-                viewModelState.update {
-                    it.copy(userLocation = userLocation)
-                }
+            val location = locationClient.getLastKnownLocation() ?: return@launch
+            val userLocation = UserLocation(
+                id = "",
+                latitude = location.latitude,
+                longitude = location.longitude,
+                name = "",
+                locationName = "",
+                lastUpdated = Date().time,
+                username = "",
+                picture = "",
+                verified = false,
+            )
+            viewModelState.update {
+                it.copy(userLocation = userLocation)
             }
         }
     }
@@ -155,13 +160,13 @@ class MapViewModel @Inject constructor(
 
     fun onUserViewAnnotationClick(userLocation: UserLocation) {
         viewModelState.update {
-            it.copy(selectedUser = userLocation)
+            it.copy(selectedUser = userLocation, selected = MapAnnotationType.USER)
         }
     }
 
     fun selectPost(post: Post) {
         viewModelState.update {
-            it.copy(selectedPost = post)
+            it.copy(selectedPost = post, selected = MapAnnotationType.POST)
         }
     }
 

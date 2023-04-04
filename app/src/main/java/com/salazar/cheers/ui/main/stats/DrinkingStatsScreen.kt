@@ -21,7 +21,7 @@ fun DrinkingStatsScreen(
 //        Stat(title = "Number of drinks", value = userStats.drinks.toString())
         Stat(title = "Average drunkenness", value = userStats.avgDrunkenness.toString())
         Stat(title = "Max drunkenness", value = userStats.maxDrunkenness.toString())
-        Stat(title = "Favorite drink", value = userStats.favoriteDrink.displayName)
+//        Stat(title = "Favorite drink", value = userStats.favoriteDrink.displayName)
     }
 }
 

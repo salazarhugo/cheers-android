@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

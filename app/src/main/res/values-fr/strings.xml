@@ -35,4 +35,6 @@
     <string name="remove">Retirer</string>
     <string name="cancel">Annuler</string>
     <string name="new_note">Nouvelle note</string>
+    <string name="map">Carte</string>
+    <string name="dismiss">Rejeter</string>
 </resources>

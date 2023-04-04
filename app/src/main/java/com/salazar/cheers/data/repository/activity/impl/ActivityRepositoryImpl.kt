@@ -3,11 +3,11 @@ package com.salazar.cheers.data.repository.activity.impl
 import cheers.activity.v1.ActivityServiceGrpcKt
 import cheers.activity.v1.ListActivityRequest
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.db.ActivityDao
 import com.salazar.cheers.data.mapper.toActivity
 import com.salazar.cheers.data.repository.activity.ActivityRepository
-import com.salazar.cheers.internal.Activity
+import com.salazar.cheers.core.data.internal.Activity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

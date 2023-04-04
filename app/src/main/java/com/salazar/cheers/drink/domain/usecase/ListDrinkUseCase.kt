@@ -1,7 +1,8 @@
 package com.salazar.cheers.drink.domain.usecase
 
-import com.salazar.cheers.di.IODispatcher
+import com.salazar.cheers.core.di.IODispatcher
 import com.salazar.cheers.drink.data.repository.DrinkRepository
+import com.salazar.cheers.drink.domain.models.Drink
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

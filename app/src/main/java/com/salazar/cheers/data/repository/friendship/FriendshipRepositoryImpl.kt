@@ -2,13 +2,13 @@ package com.salazar.cheers.data.repository.friendship
 
 import cheers.friendship.v1.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.Resource
+import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.data.db.FriendRequestDao
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserItemDao
 import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.data.mapper.toUserItem
-import com.salazar.cheers.domain.models.FriendRequest
+import com.salazar.cheers.friendship.domain.models.FriendRequest
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 

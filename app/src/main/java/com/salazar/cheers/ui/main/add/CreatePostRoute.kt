@@ -57,8 +57,7 @@ fun CreatePostRoute(
                 onCreatePostUIAction = {
                     when(it) {
                         CreatePostUIAction.OnBackPressed -> navActions.navigateBack()
-                        is CreatePostUIAction.OnSelectDrink -> {}
-                        CreatePostUIAction.OnSwipeRefresh -> TODO()
+                        CreatePostUIAction.OnSwipeRefresh -> {}
                     }
                 }
             )
@@ -73,7 +72,6 @@ fun CreatePostRoute(
         CreatePostPage.ChooseBeverage ->
             BeverageScreen(
                 onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
-                onSelectBeverage = {},
             )
         CreatePostPage.AddPeople ->
             AddPeopleScreen(

@@ -5,8 +5,8 @@ import androidx.room.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.data.db.entities.UserSuggestion
-import com.salazar.cheers.internal.Activity
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.Activity
+import com.salazar.cheers.core.data.internal.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull

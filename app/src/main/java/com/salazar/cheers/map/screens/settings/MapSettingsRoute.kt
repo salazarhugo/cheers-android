@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
 import com.salazar.cheers.navigation.CheersNavigationActions
 
 /**
@@ -18,14 +19,16 @@ fun MapSettingsRoute(
 ) {
     val uiState by mapViewModel.uiState.collectAsState()
 
-    MapSettingsScreen(
-        uiState = uiState,
-        onMapSettingsUIAction = { action ->
-            when (action) {
-                MapSettingsUIAction.OnBackPressed -> navActions.navigateBack()
-                MapSettingsUIAction.OnSwipeRefresh -> TODO()
-                is MapSettingsUIAction.OnGhostModeChange -> mapViewModel.onGhostModeChange(action.enabled)
-            }
-        },
-    )
+    BottomSheetM3 {
+        MapSettingsScreen(
+            uiState = uiState,
+            onMapSettingsUIAction = { action ->
+                when (action) {
+                    MapSettingsUIAction.OnBackPressed -> navActions.navigateBack()
+                    MapSettingsUIAction.OnSwipeRefresh -> TODO()
+                    is MapSettingsUIAction.OnGhostModeChange -> mapViewModel.onGhostModeChange(action.enabled)
+                }
+            },
+        )
+    }
 }

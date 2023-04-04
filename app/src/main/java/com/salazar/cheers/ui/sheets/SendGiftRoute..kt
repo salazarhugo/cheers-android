@@ -25,6 +25,7 @@ import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.theme.Green
 import com.salazar.cheers.ui.theme.GreenSurface
+import com.snap.corekit.internal.y
 import kotlinx.coroutines.delay
 
 /**
@@ -54,7 +55,8 @@ fun SendGiftRoute(
         )
         when (success) {
             true -> {
-                val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                //val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                val y = 0f
                 SuccessSplashView(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -65,7 +67,8 @@ fun SendGiftRoute(
                 )
             }
             false -> {
-                val y = bottomSheetNavigator.navigatorSheetState.offset.value
+//                val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                val y = 0f
                 FailureSplashView(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -79,7 +82,8 @@ fun SendGiftRoute(
             }
             else -> {
                 if (uiState.isLoading) {
-                    val y = bottomSheetNavigator.navigatorSheetState.offset.value
+//                    val y = bottomSheetNavigator.navigatorSheetState.offset.value
+                    val y = 0f
                     LoadingScreen(
                         modifier = Modifier.offset(y = -LocalDensity.current.run { y.toDp() } / 2),
                     )

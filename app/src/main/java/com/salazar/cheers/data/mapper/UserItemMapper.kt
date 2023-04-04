@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.mapper
 
 import cheers.type.UserOuterClass.UserItem
-import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.core.data.enums.StoryState
 
 
 fun UserItem.toUserItem(): com.salazar.cheers.data.db.entities.UserItem {

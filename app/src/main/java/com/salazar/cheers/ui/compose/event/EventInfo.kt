@@ -16,10 +16,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.internal.Party
-import com.salazar.cheers.internal.Privacy
-import com.salazar.cheers.internal.numberFormatter
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.data.internal.numberFormatter
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.extensions.noRippleClickable
 
 @Composable

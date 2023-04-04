@@ -16,7 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.map.domain.models.UserLocation
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.theme.GreenGoogle
@@ -24,10 +24,13 @@ import com.salazar.cheers.ui.theme.GreenGoogle
 
 @Composable
 fun UserMapDialog(
-    userLocation: UserLocation,
+    userLocation: UserLocation?,
     onClose: () -> Unit,
     onChatClick: (String) -> Unit,
 ) {
+    if (userLocation == null)
+        return
+
     UserLocationItem(
         userLocation = userLocation,
         onClose = onClose,

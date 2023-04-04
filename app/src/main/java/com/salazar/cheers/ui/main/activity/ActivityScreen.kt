@@ -18,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.internal.Activity
-import com.salazar.cheers.internal.ActivityType
-import com.salazar.cheers.internal.relativeTimeFormatter
+import com.salazar.cheers.core.data.internal.Activity
+import com.salazar.cheers.core.data.internal.ActivityType
+import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.ui.compose.CheersBadgeBox
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
@@ -28,7 +28,7 @@ import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.text.MyText
 import com.salazar.cheers.user.ui.FollowButton
-import com.salazar.cheers.ui.main.chat.messageFormatter
+import com.salazar.cheers.chat.ui.components.messageFormatter
 import com.salazar.cheers.ui.main.party.create.TopAppBar
 import com.salazar.cheers.user.ui.AddFriendButton
 

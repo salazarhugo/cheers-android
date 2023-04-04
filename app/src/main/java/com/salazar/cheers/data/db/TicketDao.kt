@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
-import com.salazar.cheers.internal.*
+import com.salazar.cheers.core.data.internal.Ticket
 import kotlinx.coroutines.flow.Flow
 
 @Dao

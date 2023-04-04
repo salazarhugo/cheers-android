@@ -35,10 +35,10 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.PrettyPanel
 import com.salazar.cheers.parties.ui.PartyItem
-import com.salazar.cheers.internal.*
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.chat.FunctionalityNotAvailablePanel
+import com.salazar.cheers.chat.ui.components.FunctionalityNotAvailablePanel
+import com.salazar.cheers.core.data.internal.*
 import com.salazar.cheers.post.ui.item.PostBody
 import com.salazar.cheers.post.ui.item.PostFooter
 import com.salazar.cheers.post.ui.item.PostHeader
@@ -284,13 +284,8 @@ fun Post(
     val pagerState = rememberPagerState()
 
     PostHeader(
-        username = post.username,
-        verified = post.verified,
-        beverage = Beverage.fromName(post.beverage),
+        post = post,
         public = post.privacy == Privacy.PUBLIC.name,
-        createTime = post.createTime,
-        picture = post.profilePictureUrl,
-        locationName = post.locationName,
         onHeaderClicked = {},
         onMoreClicked = { onPostMoreClicked(post.id, post.authorId) },
     )

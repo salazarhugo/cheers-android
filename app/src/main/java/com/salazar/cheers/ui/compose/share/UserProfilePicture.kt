@@ -23,7 +23,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.core.data.enums.StoryState
 import com.salazar.cheers.ui.compose.animations.Bounce
 
 

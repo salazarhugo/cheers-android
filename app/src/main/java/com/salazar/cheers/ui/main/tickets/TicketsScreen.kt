@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.EmptyActivity
 import com.salazar.cheers.ui.compose.share.Toolbar
-import com.salazar.cheers.internal.Ticket
+import com.salazar.cheers.core.data.internal.Ticket
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState

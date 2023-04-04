@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.internal.WatchStatus
+import com.salazar.cheers.core.data.internal.WatchStatus
 
 @Composable
 fun EventHeaderButtons(

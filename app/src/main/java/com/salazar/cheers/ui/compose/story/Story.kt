@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import cheers.type.UserOuterClass
-import com.salazar.cheers.data.enums.StoryState
+import com.salazar.cheers.core.data.enums.StoryState
 import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.theme.BlueCheers
 

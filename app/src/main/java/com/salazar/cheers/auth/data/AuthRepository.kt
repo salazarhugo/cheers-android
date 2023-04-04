@@ -3,19 +3,17 @@ package com.salazar.cheers.auth.data
 import android.util.Log
 import cheers.user.v1.GetUserRequest
 import cheers.user.v1.UserServiceGrpcKt
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.Resource
-import com.salazar.cheers.data.Result
-import com.salazar.cheers.data.db.CheersDatabase
+import com.salazar.cheers.core.data.Resource
+import com.salazar.cheers.core.data.Result
+import com.salazar.cheers.core.data.db.CheersDatabase
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.mapper.toUser
-import com.salazar.cheers.internal.User
+import com.salazar.cheers.core.data.internal.User
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -31,6 +29,17 @@ class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
 ) {
+    fun getFirebaseCredentialFromIdToken(
+        idToken: String?,
+        accessToken: String? = null,
+    ): AuthCredential {
+      return GoogleAuthProvider.getCredential(idToken, accessToken)
+    }
+
+    fun signInWithCredential(credential: AuthCredential): Task<AuthResult> {
+        return auth.signInWithCredential(credential)
+    }
+
     suspend fun getUser(): Result<User?> {
         if (auth.currentUser == null)
             return Result.Success(null)
@@ -92,7 +101,7 @@ class AuthRepository @Inject constructor(
         emit(Resource.Loading(false))
     }
 
-fun getUserAuthState() = callbackFlow {
+    fun getUserAuthState() = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser)
         }

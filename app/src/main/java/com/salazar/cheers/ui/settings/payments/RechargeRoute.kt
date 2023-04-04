@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.ui.compose.LoadingScreen
 import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.util.Utils.getActivity
+import com.salazar.cheers.core.data.util.Utils.getActivity
 import kotlinx.coroutines.delay
 
 @Composable

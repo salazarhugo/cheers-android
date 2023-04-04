@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.compose
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -16,21 +17,19 @@ fun MyTopAppBar(
     onPop: () -> Unit = {},
     onSave: () -> Unit = {}
 ) {
-    SmallTopAppBar(
-        title = { Text(title, fontWeight = FontWeight.Bold, fontFamily = Roboto) },
-        actions = {
-            IconButton(onClick = {
-                onSave()
-            }) {
-                Icon(Icons.Default.Check, "", tint = MaterialTheme.colorScheme.primary)
-            }
-        },
+    TopAppBar(title = { Text(title, fontWeight = FontWeight.Bold, fontFamily = Roboto) },
         navigationIcon = {
             IconButton(onClick = {
                 onPop()
             }) {
                 Icon(Icons.Default.Close, "")
             }
-        }
-    )
+        },
+        actions = {
+            IconButton(onClick = {
+                onSave()
+            }) {
+                Icon(Icons.Default.Check, "", tint = MaterialTheme.colorScheme.primary)
+            }
+        })
 }

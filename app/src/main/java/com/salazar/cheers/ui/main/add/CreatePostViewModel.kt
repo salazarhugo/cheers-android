@@ -11,24 +11,19 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.google.accompanist.pager.PagerState
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.mapbox.common.BillingServiceErrorCode
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.data.location.DefaultLocationClient
+import com.salazar.cheers.core.data.location.DefaultLocationClient
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.drink.domain.models.Drink
 import com.salazar.cheers.drink.domain.usecase.ListDrinkUseCase
-import com.salazar.cheers.internal.Beverage
-import com.salazar.cheers.internal.PostType
-import com.salazar.cheers.internal.Privacy
+import com.salazar.cheers.core.data.internal.PostType
+import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
 
@@ -102,8 +97,16 @@ class CreatePostViewModel @Inject constructor(
     }
 
     private fun updateDrinks(drinks: List<Drink>) {
+        val emptyDrink = listOf(
+            Drink(
+                id = "",
+                name = "",
+                icon = "",
+                category = "",
+            )
+        )
         viewModelState.update {
-            it.copy(drinks = drinks)
+            it.copy(drinks = emptyDrink + drinks)
         }
     }
 
@@ -255,5 +258,4 @@ class CreatePostViewModel @Inject constructor(
 sealed class CreatePostUIAction {
     object OnBackPressed : CreatePostUIAction()
     object OnSwipeRefresh : CreatePostUIAction()
-    data class OnSelectDrink(val drink: Beverage) : CreatePostUIAction()
 }

@@ -12,8 +12,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.compose.share.SwipeToRefresh
 import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.util.Utils.copyToClipboard
+import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.core.data.util.Utils.copyToClipboard
 
 /**
  * Stateful composable that displays the Navigation route for the Other profile screen.

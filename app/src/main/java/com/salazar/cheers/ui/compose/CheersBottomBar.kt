@@ -19,14 +19,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.ClearRippleTheme
-import com.salazar.cheers.internal.Screen
+import com.salazar.cheers.core.data.internal.ClearRippleTheme
+import com.salazar.cheers.core.data.internal.Screen
 import com.salazar.cheers.navigation.MainDestinations
 
 @Composable
@@ -41,19 +42,25 @@ fun CheersBottomBar(
             route = MainDestinations.HOME_ROUTE,
             icon = { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
             selectedIcon = { Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
-            label = "Home"
+            label = stringResource(id = R.string.menu_home),
         ),
         Screen(
-            route = MainDestinations.EVENTS_ROUTE,
-            icon = { Icon(Icons.Outlined.Bolt, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Filled.Bolt, null, tint = MaterialTheme.colorScheme.onBackground) },
-            label = "Events"
+            route = MainDestinations.SEARCH_ROUTE,
+            icon = { Icon(Icons.Outlined.Search, null, tint = MaterialTheme.colorScheme.onBackground) },
+            selectedIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onBackground) },
+            label = stringResource(id = R.string.search),
         ),
+//        Screen(
+//            route = MainDestinations.EVENTS_ROUTE,
+//            icon = { Icon(Icons.Outlined.Bolt, null, tint = MaterialTheme.colorScheme.onBackground) },
+//            selectedIcon = { Icon(Icons.Filled.Bolt, null, tint = MaterialTheme.colorScheme.onBackground) },
+//            label = "Events"
+//        ),
         Screen(
             route = MainDestinations.MAP_ROUTE,
             icon = { Icon(Icons.Outlined.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
             selectedIcon = { Icon(Icons.Default.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
-            label = "Map"
+            label = stringResource(id = R.string.map)
         ),
 //        Screen(
 //            route = MainDestinations.TICKETS_ROUTE,

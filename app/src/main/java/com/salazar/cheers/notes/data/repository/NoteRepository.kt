@@ -1,6 +1,5 @@
 package com.salazar.cheers.notes.data.repository
 
-import com.salazar.cheers.data.Resource
 import com.salazar.cheers.notes.domain.models.Note
 import kotlinx.coroutines.flow.Flow
 

@@ -48,7 +48,7 @@ fun PhotoCarousel(
                     translationX = offset.x,
                     translationY = offset.y
                 )
-                .transformable(state = state)
+//                .transformable(state = state)
                 .clickable { onPostClick() }
         )
     }

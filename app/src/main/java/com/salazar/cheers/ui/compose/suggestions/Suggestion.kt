@@ -25,7 +25,7 @@ import coil.transform.CircleCropTransformation
 import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.salazar.cheers.R
-import com.salazar.cheers.internal.SuggestionUser
+import com.salazar.cheers.core.data.internal.SuggestionUser
 import kotlin.math.absoluteValue
 
 

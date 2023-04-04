@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.internal.ActivityType
+import com.salazar.cheers.core.data.internal.ActivityType
 import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
