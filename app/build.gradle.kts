@@ -1,6 +1,5 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
+    id("cheers.android.application")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
 //    id("com.google.protobuf")
@@ -33,15 +32,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
     }
@@ -53,31 +43,6 @@ android {
     packaging {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-        }
-    }
-
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).all {
-        compilerOptions {
-            freeCompilerArgs.addAll(
-                listOf(
-                    "-opt-in=kotlin.ExperimentalUnsignedTypes",
-                    "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                    "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
-                    "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
-                    "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
-                    "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-                    "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-                    "-opt-in=androidx.compose.runtime.ExperimentalComposeApi",
-                    "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
-                    "-opt-in=coil.annotation.ExperimentalCoilApi",
-                    "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-                    "-opt-in=com.google.accompanist.pager.ExperimentalPagerApi",
-                    "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
-                    "-opt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
-                    "-opt-in=androidx.paging.ExperimentalPagingApi",
-                    "-Xjvm-default=enable"
-                )
-            )
         }
     }
 }
