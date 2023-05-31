@@ -16,9 +16,9 @@ import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.R
-import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.core.data.internal.PostType
 import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.workers.CreatePartyWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

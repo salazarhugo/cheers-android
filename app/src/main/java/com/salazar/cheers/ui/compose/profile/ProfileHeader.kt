@@ -16,9 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.ui.main.profile.ProfileStats
-import kotlinx.serialization.json.JsonNull.content
 
 @Composable
 fun ProfileHeader(

@@ -1,7 +1,7 @@
 package com.salazar.cheers.comment.data
 
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.core.data.Resource
+import com.salazar.common.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 /**

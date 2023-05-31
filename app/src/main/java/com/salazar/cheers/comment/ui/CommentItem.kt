@@ -2,7 +2,6 @@ package com.salazar.cheers.comment.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,11 +22,10 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
-import com.salazar.cheers.ui.compose.extensions.noRippleClickable
+import com.salazar.cheers.core.util.relativeTimeFormatter
 import com.salazar.cheers.core.data.util.Utils.conditional
+import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.common.ui.extensions.noRippleClickable
 
 @Preview
 @Composable
@@ -92,13 +90,13 @@ fun CommentItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Username(
+                    com.salazar.cheers.core.share.ui.Username(
                         username = comment.username,
                         verified = comment.verified,
                         textStyle = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = relativeTimeFormatter(epoch = comment.createTime),
+                        text = com.salazar.cheers.core.util.relativeTimeFormatter(epoch = comment.createTime),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }

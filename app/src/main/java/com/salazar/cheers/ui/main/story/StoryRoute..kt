@@ -1,16 +1,19 @@
 package com.salazar.cheers.ui.main.story
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
 /**
@@ -23,10 +26,9 @@ fun StoryRoute(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     storyViewModel: StoryViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
-    showInterstitialAd: () -> Unit,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {
-    val uiState by storyViewModel.uiState.collectAsState()
+    val uiState by storyViewModel.uiState.collectAsStateWithLifecycle()
     val systemUiController = rememberSystemUiController()
     val darkIcons = !isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
@@ -57,6 +59,7 @@ fun StoryRoute(
                         uiState.sheetState.show()
                     }
                 }
+
                 else -> {}
             }
         },
@@ -65,7 +68,7 @@ fun StoryRoute(
         onUserClick = { navActions.navigateToOtherProfile(it) },
         onInputChange = storyViewModel::onInputChange,
         onSendReaction = storyViewModel::onSendReaction,
-        showInterstitialAd = showInterstitialAd,
+        showInterstitialAd = {},
         onPauseChange = storyViewModel::onPauseChange,
         onCurrentStepChange = storyViewModel::onCurrentStepChange,
     )

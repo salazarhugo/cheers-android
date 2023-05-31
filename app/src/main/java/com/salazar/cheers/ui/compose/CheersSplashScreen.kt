@@ -2,6 +2,7 @@ package com.salazar.cheers.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,7 @@ fun CheersSplashScreen(
             text = "We are setting up your account...",
             style = MaterialTheme.typography.bodyMedium,
         )
-        CircularProgressIndicatorM3(
+        CircularProgressIndicator(
             modifier = Modifier.padding(16.dp)
         )
     }

@@ -20,15 +20,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import cheers.type.UserOuterClass
-import com.salazar.cheers.core.data.enums.StoryState
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.theme.BlueCheers
+import com.salazar.cheers.core.model.StoryState
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun YourStory(
     profilePictureUrl: String?,
-    storyState: StoryState,
+    storyState: com.salazar.cheers.core.model.StoryState,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -44,7 +42,7 @@ fun YourStory(
 
     val storyState2 =
         if (uploadInfo?.state == WorkInfo.State.RUNNING)
-            StoryState.LOADING
+            com.salazar.cheers.core.model.StoryState.LOADING
         else
             storyState
 
@@ -59,14 +57,14 @@ fun YourStory(
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp),
                 onClick = onClick,
             )
-            if (storyState == StoryState.EMPTY && uploadInfo?.state != WorkInfo.State.RUNNING)
+            if (storyState == com.salazar.cheers.core.model.StoryState.EMPTY && uploadInfo?.state != WorkInfo.State.RUNNING)
                 Box(
                     modifier = Modifier
                         .offset(x = (-6).dp, y = (-6).dp)
                         .size(22.dp)
                         .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
                         .clip(CircleShape)
-                        .background(BlueCheers)
+                        .background(com.salazar.cheers.core.share.ui.BlueCheers)
                 ) {
                     Icon(
                         Icons.Rounded.Add,
@@ -94,9 +92,9 @@ fun Story(
     onStoryClick: (String) -> Unit,
 ) {
     val state = if (viewed)
-        StoryState.SEEN
+        com.salazar.cheers.core.model.StoryState.SEEN
     else
-        StoryState.NOT_SEEN
+        com.salazar.cheers.core.model.StoryState.NOT_SEEN
 
     Column(
         modifier = modifier,

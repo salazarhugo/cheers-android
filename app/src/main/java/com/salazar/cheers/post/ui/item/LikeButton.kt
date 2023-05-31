@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 
 @Composable
 fun LikeButton(

@@ -2,7 +2,14 @@ package com.salazar.cheers.ui.main.add
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,9 +21,14 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,28 +39,26 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.data.db.entities.UserItem
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.theme.Typography
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.ui.compose.ChipGroup
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.ui.main.taguser.AddPeopleViewModel
-import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
 
 @Composable
 fun AddPeopleScreen(
-    selectedUsers: List<UserItem>,
-    onSelectUser: (UserItem) -> Unit,
+    selectedUsers: List<com.salazar.cheers.core.model.UserItem>,
+    onSelectUser: (com.salazar.cheers.core.model.UserItem) -> Unit,
     onBackPressed: () -> Unit,
     onDone: () -> Unit,
 ) {
     val viewModel = hiltViewModel<AddPeopleViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.isLoading)
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
 
     Scaffold(
         topBar = {
@@ -116,9 +126,9 @@ fun Users(
 
 @Composable
 fun UserCard(
-    user: UserItem,
+    user: com.salazar.cheers.core.model.UserItem,
     selected: Boolean,
-    onSelectUser: (UserItem) -> Unit,
+    onSelectUser: (com.salazar.cheers.core.model.UserItem) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -134,7 +144,7 @@ fun UserCard(
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                Username(
+                com.salazar.cheers.core.share.ui.Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium
@@ -156,7 +166,7 @@ fun UserCard(
 @Composable
 fun SearchTextInput(
     searchInput: String,
-    selectedUsers: List<UserItem>,
+    selectedUsers: List<com.salazar.cheers.core.model.UserItem>,
     onSearchInputChanged: (String) -> Unit,
 ) {
     TextField(
@@ -183,7 +193,7 @@ fun SearchTextInput(
 
 @Composable
 fun ChipInput(
-    selectedUsers: List<UserItem>,
+    selectedUsers: List<com.salazar.cheers.core.model.UserItem>,
 ) {
     ChipGroup(
         users = selectedUsers.map { it.username },

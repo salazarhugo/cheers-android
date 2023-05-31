@@ -1,14 +1,12 @@
 package com.salazar.cheers.friendship.ui.manage_friendship
 
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the manage friendship bottom sheet.
@@ -20,7 +18,7 @@ fun ManageFriendshipRoute(
     viewModel: ManageFriendshipViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ManageFriendshipSheet(
         modifier = Modifier.navigationBarsPadding(),

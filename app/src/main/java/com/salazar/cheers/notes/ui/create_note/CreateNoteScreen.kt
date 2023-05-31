@@ -5,18 +5,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.main.add.ShareButton
-import com.salazar.cheers.ui.main.chats.SearchBar
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.feature.chat.ui.chats.SearchBar
+import com.salazar.cheers.core.ui.theme.Roboto
 
 @Composable
 fun CreateNoteScreen(

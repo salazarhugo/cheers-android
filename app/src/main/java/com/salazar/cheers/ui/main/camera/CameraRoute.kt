@@ -15,15 +15,19 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.chat.ui.components.FunctionalityNotAvailablePanel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.feature.chat.ui.components.FunctionalityNotAvailablePanel
 import kotlinx.coroutines.launch
 
 /**
@@ -38,7 +42,7 @@ fun CameraRoute(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val uiState by cameraViewModel.uiState.collectAsState()
+    val uiState by cameraViewModel.uiState.collectAsStateWithLifecycle()
     val imageCapture: ImageCapture = remember {
         ImageCapture.Builder()
             .setTargetAspectRatio(RATIO_16_9)

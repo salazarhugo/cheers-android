@@ -1,9 +1,9 @@
 package com.salazar.cheers.core.domain.usecase.feed_story
 
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
-import com.salazar.cheers.core.domain.model.UserWithStories
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -22,7 +22,8 @@ class ListStoryFeedUseCase @Inject constructor(
                     }
                     .map { userIdWithStories ->
                         UserWithStories(
-                            user = users.find { it.id == userIdWithStories.key } ?: UserItem(),
+                            user = users.find { it.id == userIdWithStories.key }
+                                ?: com.salazar.cheers.core.model.UserItem(),
                             stories = userIdWithStories.value,
                         )
                     }

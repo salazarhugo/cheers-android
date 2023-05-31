@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.mapbox.maps.MapView
 import com.salazar.cheers.map.screens.map.addPostsAnnotation
-import com.salazar.cheers.ui.compose.utils.Permission
+import com.salazar.cheers.core.share.ui.Permission
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,7 +40,7 @@ fun MapPostHistoryScreen(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier.padding(it),
         ) {
-            Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
+            com.salazar.cheers.core.share.ui.Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = {

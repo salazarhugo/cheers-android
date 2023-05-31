@@ -1,7 +1,6 @@
 package com.salazar.cheers.auth.ui.signin
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,8 +27,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.compose.share.AppBar
-import com.salazar.cheers.ui.compose.share.ErrorMessage
+import com.salazar.cheers.core.ui.ui.AppBar
 
 @Composable
 fun CreateAccountScreen(

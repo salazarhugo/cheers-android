@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
@@ -28,7 +31,7 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.ClearRippleTheme
 import com.salazar.cheers.core.data.internal.Screen
-import com.salazar.cheers.navigation.MainDestinations
+import com.salazar.cheers.core.share.ui.MainDestinations
 
 @Composable
 fun CheersBottomBar(

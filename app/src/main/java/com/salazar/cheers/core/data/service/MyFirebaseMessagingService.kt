@@ -12,14 +12,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.core.data.notifications.chatNotification
 import com.salazar.cheers.core.data.notifications.defaultNotification
 import com.salazar.cheers.core.data.notifications.newFollowerNotification
 import com.salazar.cheers.core.data.notifications.newPostNotification
-import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.core.data.util.Constants
 import com.salazar.cheers.core.data.util.Utils.getCircledBitmap
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import java.net.URL
@@ -103,7 +103,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             builder.setContentIntent(pending)
         }
 
-        if (avatar != null && avatar.isNotBlank()) {
+        if (!avatar.isNullOrBlank()) {
             try {
                 val url = URL(avatar)
                 val image = BitmapFactory.decodeStream(url.openConnection().getInputStream())
@@ -114,11 +114,11 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             }
 
             with(NotificationManagerCompat.from(this)) {
-                notify(1, builder.build())
+//                notify(1, builder.build())
             }
         } else {
             with(NotificationManagerCompat.from(this)) {
-                notify(1, builder.build())
+//                notify(1, builder.build())
             }
         }
     }

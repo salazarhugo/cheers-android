@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.post.data.repository.PostRepository
 import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ sealed interface PostDetailUiState {
 
     data class HasPost(
         val postFeed: Post,
-        val members: List<UserItem>?,
+        val members: List<com.salazar.cheers.core.model.UserItem>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
     ) : PostDetailUiState
@@ -32,7 +32,7 @@ sealed interface PostDetailUiState {
 
 private data class PostDetailViewModelState(
     val postFeed: Post? = null,
-    val members: List<UserItem>? = null,
+    val members: List<com.salazar.cheers.core.model.UserItem>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
 ) {
@@ -93,7 +93,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updateMembers(members: List<UserItem>?) {
+    private fun updateMembers(members: List<com.salazar.cheers.core.model.UserItem>?) {
         viewModelState.update {
             it.copy(members = members)
         }

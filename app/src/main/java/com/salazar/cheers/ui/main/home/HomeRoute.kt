@@ -2,12 +2,12 @@ package com.salazar.cheers.ui.main.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
 /**
@@ -21,7 +21,7 @@ fun HomeRoute(
     homeViewModel: HomeViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by homeViewModel.uiState.collectAsState()
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -58,6 +58,7 @@ fun HomeRoute(
                 is HomeUIAction.OnShareClick -> navActions.navigateToShare(action.postID)
                 HomeUIAction.OnCreateNoteClick -> navActions.navigateToCreateNote()
                 is HomeUIAction.OnNoteClick -> navActions.navigateToNote(action.userID)
+                is HomeUIAction.OnAddFriendClick -> homeViewModel.onAddFriendClick(action.userID)
             }
         }
     )

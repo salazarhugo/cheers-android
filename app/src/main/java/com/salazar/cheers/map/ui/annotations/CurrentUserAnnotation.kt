@@ -13,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.theme.BlueCheers
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun CurrentUserAnnotation(
@@ -27,7 +25,7 @@ fun CurrentUserAnnotation(
     onClick: () -> Unit,
 ) {
     val color = when(isSelected) {
-        true -> BlueCheers
+        true -> com.salazar.cheers.core.share.ui.BlueCheers
         false -> Color.White
     }
 

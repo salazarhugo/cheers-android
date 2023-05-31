@@ -8,15 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.core.data.enums.StoryState
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.core.model.StoryState
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 
 @Composable
 fun UserItem(
-    userItem: UserItem,
+    userItem: com.salazar.cheers.core.model.UserItem,
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit,
     onStoryClick: (String) -> Unit = {},
@@ -35,7 +34,7 @@ fun UserItem(
                 picture = userItem.picture,
                 storyState = userItem.story_state,
                 onClick = {
-                    if (userItem.story_state == StoryState.EMPTY)
+                    if (userItem.story_state == com.salazar.cheers.core.model.StoryState.EMPTY)
                         onClick(userItem.username)
                     else
                         onStoryClick(userItem.username)
@@ -45,7 +44,7 @@ fun UserItem(
             Column {
                 if (userItem.name.isNotBlank())
                     Text(text = userItem.name, style = MaterialTheme.typography.bodyMedium)
-                Username(
+                com.salazar.cheers.core.share.ui.Username(
                     username = userItem.username,
                     verified = userItem.verified,
                     textStyle = MaterialTheme.typography.bodyMedium

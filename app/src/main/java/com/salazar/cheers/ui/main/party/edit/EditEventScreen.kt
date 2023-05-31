@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.ui.compose.event.EventDetails
 import com.salazar.cheers.ui.main.add.LocationSection
 import com.salazar.cheers.ui.main.add.ShareButton
@@ -30,7 +30,7 @@ fun EditEventScreen(
     val event = uiState.party
 
     if (event == null)
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
     else
         Scaffold(
             topBar = {

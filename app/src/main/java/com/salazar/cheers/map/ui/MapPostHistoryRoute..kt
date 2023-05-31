@@ -1,13 +1,13 @@
 package com.salazar.cheers.map.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.maps.MapView
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the MapPostHistory screen.
@@ -19,7 +19,7 @@ fun MapPostHistoryRoute(
     mapPostHistoryViewModel: MapPostHistoryViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by mapPostHistoryViewModel.uiState.collectAsState()
+    val uiState by mapPostHistoryViewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val mapView = remember {

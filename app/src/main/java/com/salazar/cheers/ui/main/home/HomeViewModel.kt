@@ -11,22 +11,17 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.data.Resource
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.core.data.paging.DefaultPaginator
-import com.salazar.cheers.post.data.repository.PostRepository
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.data.repository.story.StoryRepository
-import com.salazar.cheers.core.domain.model.UserWithStories
-import com.salazar.cheers.post.domain.usecase.feed_post.ListPostFeedUseCase
-import com.salazar.cheers.core.domain.usecase.feed_story.ListStoryFeedUseCase
-import com.salazar.cheers.core.domain.usecase.get_notification_counter.GetNotificationCounterUseCase
-import com.salazar.cheers.chat.domain.usecase.get_unread_chat_counter.GetUnreadChatCounterUseCase
+import com.salazar.common.util.Resource
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.core.data.paging.DefaultPaginator
+import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.notes.data.repository.NoteRepository
 import com.salazar.cheers.notes.domain.models.Note
-import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
+import com.salazar.cheers.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,7 +38,7 @@ data class HomeUiState(
     val likes: Set<String> = emptySet(),
     val user: User? = null,
     val postSheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
-    val suggestions: List<UserItem>? = null,
+    val suggestions: List<com.salazar.cheers.core.model.UserItem>? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val searchInput: String = "",
@@ -66,11 +61,7 @@ class HomeViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
-    private val listStoryFeedUseCase: ListStoryFeedUseCase,
-    private val getUnreadChatCounterUseCase: GetUnreadChatCounterUseCase,
-    private val getNotificationCounterUseCase: GetNotificationCounterUseCase,
-    private val listPostFeedUseCase: ListPostFeedUseCase,
-    private val listSuggestionsUseCase: ListSuggestionsUseCase,
+    private val homeUseCases: HomeUseCases,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(HomeUiState())
@@ -152,22 +143,22 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            getNotificationCounterUseCase()
+            homeUseCases.getNotificationCounter()
                 .collect(::updateNotificationCounter)
         }
 
         viewModelScope.launch {
-            getUnreadChatCounterUseCase()
+            homeUseCases.getUnreadChatCounter()
                 .collect(::updateUnreadChatCounter)
         }
 
         viewModelScope.launch {
-            listPostFeedUseCase()
+            homeUseCases.listPostFeed()
                 .collect(::updatePosts)
         }
 
         viewModelScope.launch {
-            listStoryFeedUseCase()
+            homeUseCases.listStoryFeed()
                 .collect(::updateStories)
         }
 
@@ -184,13 +175,13 @@ class HomeViewModel @Inject constructor(
 
     private fun refreshSuggestions() {
         viewModelScope.launch {
-            listSuggestionsUseCase().onSuccess {
+            homeUseCases.listSuggestions().onSuccess {
                 updateSuggestions(it)
             }
         }
     }
 
-    private fun updateSuggestions(suggestions: List<UserItem>) {
+    private fun updateSuggestions(suggestions: List<com.salazar.cheers.core.model.UserItem>) {
         viewModelState.update {
             it.copy(suggestions = suggestions)
         }
@@ -329,6 +320,12 @@ class HomeViewModel @Inject constructor(
 
         adLoader.loadAd(AdRequest.Builder().build())
     }
+
+    fun onAddFriendClick(userID: String) {
+        viewModelScope.launch {
+            homeUseCases.sendFriendRequest(userId = userID).onSuccess {}
+        }
+    }
 }
 
 sealed class HomeUIAction {
@@ -349,4 +346,5 @@ sealed class HomeUIAction {
     data class OnPostClick(val postID: String) : HomeUIAction()
     data class OnNoteClick(val userID: String) : HomeUIAction()
     data class OnPostMoreClick(val postID: String) : HomeUIAction()
+    data class OnAddFriendClick(val userID: String) : HomeUIAction()
 }

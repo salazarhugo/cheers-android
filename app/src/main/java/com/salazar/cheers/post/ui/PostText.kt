@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.chat.ui.components.SymbolAnnotationType
-import com.salazar.cheers.chat.ui.components.messageFormatter
+import com.salazar.cheers.feature.chat.ui.components.SymbolAnnotationType
+import com.salazar.cheers.feature.chat.ui.components.messageFormatter
 
 @Composable
 fun PostText(

@@ -2,7 +2,6 @@ package com.salazar.cheers.data.db
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.data.internal.Privacy
 import kotlinx.coroutines.flow.Flow

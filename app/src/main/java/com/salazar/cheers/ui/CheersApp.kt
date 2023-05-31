@@ -1,36 +1,35 @@
 package com.salazar.cheers.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.Settings
 import com.salazar.cheers.Theme
+import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.navigation.CheersNavGraph
-import com.salazar.cheers.ui.theme.CheersTheme
+import com.salazar.cheers.core.ui.theme.CheersTheme
 
 
 @Composable
 fun CheersApp(
-    showInterstitialAd: () -> Unit,
     appSettings: Settings,
     appState: CheersAppState = rememberCheersAppState()
 ) {
     val cheersViewModel = hiltViewModel<CheersViewModel>()
-    val uiState by cheersViewModel.uiState.collectAsState()
+    val uiState by cheersViewModel.uiState.collectAsStateWithLifecycle()
 
     val darkTheme = isDarkTheme(appSettings.theme, isSystemInDarkTheme())
 
     SetStatusBars(darkTheme = darkTheme)
-    Text( text = "")
 
     CheersTheme(darkTheme = darkTheme) {
         CheersNavGraph(
             uiState = uiState,
-            showInterstitialAd = showInterstitialAd,
             appState = appState,
         )
     }

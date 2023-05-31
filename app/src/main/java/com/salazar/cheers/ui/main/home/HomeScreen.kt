@@ -23,19 +23,18 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.data.enums.StoryState
-import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.domain.model.UserWithStories
 import com.salazar.cheers.notes.ui.NoteList
-import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
+import com.salazar.cheers.post.ui.item.PostItem
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.ads.NativeAdPost
-import com.salazar.cheers.ui.compose.post.NoPosts
-import com.salazar.cheers.post.ui.item.PostItem
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.ui.compose.post.NoPosts
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.story.Story
 import com.salazar.cheers.ui.compose.story.YourStory
 import com.salazar.cheers.user.ui.AddFriendButton
@@ -161,7 +160,7 @@ fun PostList(
                         AddFriendButton(
                             requestedByViewer = user.requested,
                             onAddFriendClick = {
-    //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnAddFriendClick(user.id))
+                                onHomeUIAction(HomeUIAction.OnAddFriendClick(user.id))
                             },
                             onCancelFriendRequestClick = {
     //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnCancelFriendRequestClick(user.id))
@@ -186,7 +185,7 @@ fun HomeLazyPagingListState(
                 NoPosts()
             }
             loadState.refresh is LoadState.Loading -> {
-                CircularProgressIndicatorM3(
+                CircularProgressIndicator(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp)
@@ -194,7 +193,7 @@ fun HomeLazyPagingListState(
                 )
             }
             loadState.append is LoadState.Loading -> {
-                CircularProgressIndicatorM3(
+                CircularProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.CenterHorizontally)
@@ -312,7 +311,7 @@ fun Stories(
                 YourStory(
                     profilePictureUrl = profilePictureUrl,
                     onClick = {
-                        if (user.storyState == StoryState.SEEN || user.storyState == StoryState.NOT_SEEN)
+                        if (user.storyState == com.salazar.cheers.core.model.StoryState.SEEN || user.storyState == com.salazar.cheers.core.model.StoryState.NOT_SEEN)
                             onStoryClick(0)
                         else
                             onAddStoryClick()

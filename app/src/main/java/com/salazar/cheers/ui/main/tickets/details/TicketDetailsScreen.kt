@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.main.tickets.details
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -11,9 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.beust.klaxon.token.VALUE_TYPE.value
-import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.core.data.internal.Ticket
+import com.salazar.cheers.core.ui.ui.Toolbar
 import com.simonsickle.compose.barcodes.Barcode
 import com.simonsickle.compose.barcodes.BarcodeType
 
@@ -68,7 +66,8 @@ fun Ticket(
                 style = MaterialTheme.typography.bodyMedium
             )
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),

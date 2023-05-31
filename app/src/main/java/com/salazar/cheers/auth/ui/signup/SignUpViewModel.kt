@@ -8,9 +8,9 @@ import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.core.data.datastore.StoreUserEmail
+import com.salazar.cheers.core.data.util.Utils.isEmailValid
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.core.data.util.Utils.isEmailValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,12 +16,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.ui.compose.animations.Bounce
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.theme.BlueCheers
+import com.salazar.cheers.core.ui.animations.Bounce
+import com.salazar.cheers.core.share.ui.BlueCheers
 
 @Composable
 fun PostAnnotation(
@@ -32,7 +29,7 @@ fun PostAnnotation(
     onClick: () -> Unit,
 ) {
     val color = when(isSelected) {
-        true -> BlueCheers
+        true -> com.salazar.cheers.core.share.ui.BlueCheers
         false -> Color.White
     }
 

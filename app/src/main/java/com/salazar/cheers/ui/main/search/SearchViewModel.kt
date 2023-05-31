@@ -2,10 +2,10 @@ package com.salazar.cheers.ui.main.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.Resource
+import com.salazar.common.util.Resource
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.entities.RecentUser
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.db.entities.UserSuggestion
 import com.salazar.cheers.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 data class SearchUiState(
     val name: String = "",
-    val users: List<UserItem>? = null,
+    val users: List<com.salazar.cheers.core.model.UserItem>? = null,
     val suggestions: List<UserSuggestion> = emptyList(),
     val recentUsers: List<RecentUser> = emptyList(),
     val isLoading: Boolean = false,
@@ -100,7 +100,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun updateUsers(users: List<UserItem>?) {
+    private fun updateUsers(users: List<com.salazar.cheers.core.model.UserItem>?) {
         viewModelState.update {
             it.copy(users = users)
         }

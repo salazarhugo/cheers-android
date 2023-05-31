@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.taguser
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.friendship.domain.usecase.list_friend.ListFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +17,8 @@ import javax.inject.Inject
 
 data class AddPeopleUiState(
     val isLoading: Boolean,
-    val users: List<UserItem>? = null,
-    val selectedUsers: List<UserItem> = emptyList(),
+    val users: List<com.salazar.cheers.core.model.UserItem>? = null,
+    val selectedUsers: List<com.salazar.cheers.core.model.UserItem> = emptyList(),
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
 )
@@ -55,7 +55,7 @@ class AddPeopleViewModel @Inject constructor(
         }
     }
 
-    private fun updateUsers(users: List<UserItem>?) {
+    private fun updateUsers(users: List<com.salazar.cheers.core.model.UserItem>?) {
         viewModelState.update {
             it.copy(users = users)
         }

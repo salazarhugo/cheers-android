@@ -2,10 +2,10 @@ package com.salazar.cheers.ui.main.share
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
 /**
@@ -19,7 +19,7 @@ fun ShareRoute(
     shareViewModel: ShareViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by shareViewModel.uiState.collectAsState()
+    val uiState by shareViewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
 
     if (errorMessage != null) {

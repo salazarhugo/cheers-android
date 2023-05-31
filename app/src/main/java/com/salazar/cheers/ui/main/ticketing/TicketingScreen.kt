@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.ticketing
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,12 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.dateTimeFormatter
+import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.share.ButtonWithLoading
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.core.ui.ui.ButtonWithLoading
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.main.party.PriceTag
 
 @Composable
@@ -126,7 +124,7 @@ fun TicketingHeader(
                 Icon(Icons.Default.Event, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = dateTimeFormatter(timestamp = party.startDate.toLong()),
+                    text = com.salazar.cheers.core.util.dateTimeFormatter(timestamp = party.startDate.toLong()),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }

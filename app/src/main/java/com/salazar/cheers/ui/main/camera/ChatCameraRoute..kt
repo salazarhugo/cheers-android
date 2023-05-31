@@ -4,12 +4,16 @@ import androidx.activity.compose.BackHandler
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.ImageCapture
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the ChatCamera screen.
@@ -21,7 +25,7 @@ fun ChatCameraRoute(
     chatCameraViewModel: ChatCameraViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by chatCameraViewModel.uiState.collectAsState()
+    val uiState by chatCameraViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val imageCapture: ImageCapture = remember {
         ImageCapture.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build()

@@ -5,7 +5,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
 @Composable
@@ -16,7 +17,7 @@ fun DeleteStoryDialog(
 ) {
     var open by remember { mutableStateOf(true) }
 
-    val errorMessage = viewModel.errorMessage.collectAsState().value
+    val errorMessage = viewModel.errorMessage.collectAsStateWithLifecycle().value
 
     if (errorMessage != null) {
         LaunchedEffect(appState.snackBarHostState) {

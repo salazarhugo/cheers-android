@@ -2,12 +2,12 @@ package com.salazar.cheers.ui.main.friendrequests
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.Resource
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.common.util.Resource
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.cheers.friendship.domain.usecase.ListFriendRequestUseCase
 import com.salazar.cheers.friendship.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.friendship.domain.usecase.send_friend_request.SendFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.ListFriendRequestUseCase
 import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +21,8 @@ data class FriendRequestsUiState(
     val isLoading: Boolean,
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
-    val friendRequests: List<UserItem>? = null,
-    val suggestions: List<UserItem>? = null,
+    val friendRequests: List<com.salazar.cheers.core.model.UserItem>? = null,
+    val suggestions: List<com.salazar.cheers.core.model.UserItem>? = null,
 )
 
 @HiltViewModel
@@ -96,7 +96,7 @@ class FriendRequestsViewModel @Inject constructor(
         }
     }
 
-    private fun updateFriendRequests(users: List<UserItem>?) {
+    private fun updateFriendRequests(users: List<com.salazar.cheers.core.model.UserItem>?) {
         viewModelState.update {
             it.copy(friendRequests = users, isLoading = false)
         }
@@ -110,13 +110,13 @@ class FriendRequestsViewModel @Inject constructor(
         }
     }
 
-    private fun updateSuggestions(suggestions: List<UserItem>) {
+    private fun updateSuggestions(suggestions: List<com.salazar.cheers.core.model.UserItem>) {
         viewModelState.update {
             it.copy(suggestions = suggestions)
         }
     }
 
-    fun onRemoveSuggestion(user: UserItem) {
+    fun onRemoveSuggestion(user: com.salazar.cheers.core.model.UserItem) {
         viewModelState.update {
             val l = it.suggestions?.toMutableList()
             l?.remove(user)
@@ -147,5 +147,6 @@ sealed class FriendRequestsUIAction {
     data class OnUserClick(val userId: String) : FriendRequestsUIAction()
     data class OnCancelFriendRequestClick(val userID: String) : FriendRequestsUIAction()
     data class OnAddFriendClick(val userID: String) : FriendRequestsUIAction()
-    data class OnRemoveSuggestion(val user: UserItem) : FriendRequestsUIAction()
+    data class OnRemoveSuggestion(val user: com.salazar.cheers.core.model.UserItem) :
+        FriendRequestsUIAction()
 }

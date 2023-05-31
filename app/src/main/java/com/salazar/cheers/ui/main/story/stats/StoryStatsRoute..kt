@@ -1,10 +1,10 @@
 package com.salazar.cheers.ui.main.story.stats
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the StoryStatsRoute screen.
@@ -16,7 +16,7 @@ fun StoryStatsRoute(
     storyStatsViewModel: StoryStatsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by storyStatsViewModel.uiState.collectAsState()
+    val uiState by storyStatsViewModel.uiState.collectAsStateWithLifecycle()
 
     StoryStatsScreen(
         uiState = uiState,

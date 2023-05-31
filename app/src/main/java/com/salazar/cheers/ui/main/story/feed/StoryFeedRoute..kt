@@ -6,8 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
 /**
@@ -21,7 +22,7 @@ fun StoryFeedRoute(
     storyFeedViewModel: StoryFeedViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by storyFeedViewModel.uiState.collectAsState()
+    val uiState by storyFeedViewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val errorMessage = uiState.errorMessage
 

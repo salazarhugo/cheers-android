@@ -1,8 +1,8 @@
 package com.salazar.cheers.comment.data.db
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 import com.salazar.cheers.comment.domain.models.Comment
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CommentDao {

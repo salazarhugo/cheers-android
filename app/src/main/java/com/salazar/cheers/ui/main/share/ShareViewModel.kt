@@ -4,10 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.parties.domain.usecase.get_party.GetPartyUseCase
-import com.salazar.cheers.friendship.domain.usecase.list_friend.ListFriendUseCase
 import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.friendship.domain.usecase.list_friend.ListFriendUseCase
+import com.salazar.cheers.parties.domain.usecase.get_party.GetPartyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +26,7 @@ data class ShareUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val message: String = "",
-    val users: List<UserItem> = emptyList(),
+    val users: List<com.salazar.cheers.core.model.UserItem> = emptyList(),
     val party: Party? = null,
 )
 
@@ -72,7 +72,7 @@ class ShareViewModel @Inject constructor(
         }
     }
 
-    private fun updateUsers(users: List<UserItem>) {
+    private fun updateUsers(users: List<com.salazar.cheers.core.model.UserItem>) {
         viewModelState.update {
             it.copy(users = users)
         }

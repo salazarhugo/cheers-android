@@ -5,11 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.auth.domain.usecase.RegisterUseCase
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
-import com.salazar.cheers.core.data.Resource
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.common.util.Resource
 import com.salazar.cheers.core.data.util.Utils.validateUsername
+import com.salazar.cheers.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

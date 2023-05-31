@@ -1,7 +1,7 @@
 package com.salazar.cheers.parties.data.mapper
 
-import cheers.party.v1.WatchStatus as WatchStatusPb
 import com.salazar.cheers.core.data.internal.WatchStatus
+import cheers.party.v1.WatchStatus as WatchStatusPb
 
 
 fun WatchStatusPb.toWatchStatus(): WatchStatus {

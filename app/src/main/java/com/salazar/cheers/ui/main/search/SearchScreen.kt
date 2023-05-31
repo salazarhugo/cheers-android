@@ -32,15 +32,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
+import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.data.db.entities.RecentUser
 import com.salazar.cheers.data.db.entities.UserSuggestion
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.ui.compose.Username
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.user.ui.FollowButton
-import com.salazar.cheers.ui.theme.Typography
 
 @Composable
 fun SearchScreen(
@@ -183,7 +182,7 @@ fun RecentUserCard(
             Column {
                 if (user.fullName.isNotBlank())
                     Text(text = user.fullName, style = Typography.bodyMedium)
-                Username(
+                com.salazar.cheers.core.share.ui.Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium
@@ -230,7 +229,7 @@ fun UserSuggestionCard(
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                Username(
+                com.salazar.cheers.core.share.ui.Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium
@@ -274,7 +273,7 @@ fun UserCard(
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                Username(
+                com.salazar.cheers.core.share.ui.Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium

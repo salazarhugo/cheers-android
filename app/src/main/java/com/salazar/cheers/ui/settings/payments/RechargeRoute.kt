@@ -2,13 +2,13 @@ package com.salazar.cheers.ui.settings.payments
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.data.util.Utils.getActivity
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.LoadingScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -16,7 +16,7 @@ fun RechargeRoute(
     rechargeViewModel: RechargeViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by rechargeViewModel.uiState.collectAsState()
+    val uiState by rechargeViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val recharges = uiState.skuDetails
 
@@ -27,7 +27,7 @@ fun RechargeRoute(
     }
 
     if (recharges == null)
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
     else
         RechargeScreen(
             onRecharge = {

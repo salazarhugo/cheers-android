@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.party.guestlist
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.parties.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +16,8 @@ import javax.inject.Inject
 data class GuestListUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val interested: List<UserItem>? = null,
-    val going: List<UserItem>? = null,
+    val interested: List<com.salazar.cheers.core.model.UserItem>? = null,
+    val going: List<com.salazar.cheers.core.model.UserItem>? = null,
 )
 
 @HiltViewModel
@@ -58,13 +58,13 @@ class GuestListViewModel @Inject constructor(
         }
     }
 
-    private fun updateInterested(users: List<UserItem>) {
+    private fun updateInterested(users: List<com.salazar.cheers.core.model.UserItem>) {
         viewModelState.update {
             it.copy(interested = users)
         }
     }
 
-    private fun updateGoing(users: List<UserItem>) {
+    private fun updateGoing(users: List<com.salazar.cheers.core.model.UserItem>) {
         viewModelState.update {
             it.copy(going = users)
         }

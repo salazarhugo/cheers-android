@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.ui.compose.utils.Permission
+import com.salazar.cheers.core.share.ui.Permission
 
 @Composable
 fun ChatCameraScreen(
@@ -56,6 +56,7 @@ fun ChatCameraScreen(
                 )
         }
     ) {
+        it
         Permission(Manifest.permission.CAMERA) {
             ChatCameraPreview(
                 imageCapture = imageCapture,

@@ -35,16 +35,13 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.post.ui.item.PostHeader
-import com.salazar.cheers.ui.compose.story.StoryProgressBar
-import com.salazar.cheers.ui.compose.utils.PrettyImage
-import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.core.domain.model.UserWithStories
 import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.post.ui.item.PostHeader
 import com.salazar.cheers.ui.carousel
-import com.salazar.cheers.ui.theme.StrongRed
+import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -57,7 +54,7 @@ fun StoryFeedScreen(
     val usersWithStories = uiState.usersWithStories
 
     if (usersWithStories == null)
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
     else
         StoryFeedCarousel(
             initialPage = uiState.page,
@@ -223,7 +220,7 @@ fun StoryPage(
         onViewed(story.id)
     }
 
-    PrettyImage(
+    com.salazar.cheers.core.share.ui.PrettyImage(
         data = story.photo,
         contentDescription = null,
         alignment = Alignment.Center,
@@ -261,7 +258,7 @@ fun StoryPage(
 
 @Composable
 fun StoryFeedHeader(
-    user: UserItem,
+    user: com.salazar.cheers.core.model.UserItem,
     story: Story,
     count: Int,
     currentStep: Int,
@@ -331,7 +328,7 @@ fun StoryFeedFooter(
                 Icons.Default.FavoriteBorder
 
             val tint = when (hasLiked) {
-                true -> StrongRed
+                true -> com.salazar.cheers.core.share.ui.StrongRed
                 false -> Color.White
             }
 

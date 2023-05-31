@@ -10,8 +10,6 @@ import com.salazar.cheers.notes.data.mapper.toNote
 import com.salazar.cheers.notes.domain.models.Note
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

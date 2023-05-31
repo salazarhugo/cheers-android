@@ -32,18 +32,15 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
-import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.comment.ui.CommentItem
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.Toolbar
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.theme.GreySheet
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.Toolbar
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
     uiState: CommentsUiState,
@@ -160,7 +157,7 @@ fun Caption(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = relativeTimeFormatter(epoch = post.createTime),
+                    text = com.salazar.cheers.core.util.relativeTimeFormatter(epoch = post.createTime),
                     style = MaterialTheme.typography.labelMedium,
                 )
             }
@@ -225,7 +222,8 @@ fun CommentBottomBar(
     onInputChange: (String) -> Unit,
     onCommentsUIAction: (CommentsUIAction) -> Unit,
 ) {
-    val color = if (isSystemInDarkTheme()) GreySheet else MaterialTheme.colorScheme.background
+    val color =
+        if (isSystemInDarkTheme()) com.salazar.cheers.core.share.ui.GreySheet else MaterialTheme.colorScheme.background
     val focusRequester = remember { FocusRequester() }
     val input = uiState.input
     val replyComment = uiState.replyComment

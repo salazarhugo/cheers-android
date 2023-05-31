@@ -18,48 +18,9 @@ class ChooseUsernameViewModel @Inject constructor(
 
     val uiState = MutableStateFlow(ChooseUsernameState(isLoading = false))
 
-    fun clearUsername() {
-        uiState.update {
-            it.copy(username = "")
-        }
-    }
-
-    fun onUsernameChanged(username: String) {
-        uiState.update {
-            it.copy(username = username)
-        }
-    }
-
-    fun reset() {
-        uiState.update {
-            ChooseUsernameState()
-        }
-    }
-
     fun updateErrorMessage(error: String) {
         uiState.update {
             it.copy(errorMessage = error)
         }
     }
-
-    private fun isLowerCase(username: String): Boolean {
-        val isLower = username == username.lowercase()
-        if (!isLower)
-            updateErrorMessage("Must be lowercase")
-        return isLower
-    }
-
-    private fun hasValidChars(username: String): Boolean {
-        val regex = Regex("^[._a-z0-9]+\$")
-        val validChars = username.matches(regex)
-        if (!validChars)
-            updateErrorMessage("Only dots and underscores are allowed")
-        return validChars
-    }
-
-    private fun validateUsername(username: String): Boolean {
-        val regex = Regex("^(?!.*\\.\\.)(?!.*\\.\$)[^\\W][\\w.]{0,29}\$")
-        return isLowerCase(username) && hasValidChars(username) && username.matches(regex)
-    }
-
 }

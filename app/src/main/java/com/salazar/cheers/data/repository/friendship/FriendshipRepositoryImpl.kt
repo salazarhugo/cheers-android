@@ -2,14 +2,16 @@ package com.salazar.cheers.data.repository.friendship
 
 import cheers.friendship.v1.*
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.data.Resource
+import com.salazar.common.util.Resource
 import com.salazar.cheers.data.db.FriendRequestDao
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.db.UserItemDao
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.friendship.domain.models.FriendRequest
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -32,17 +34,18 @@ class FriendshipRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun listFriend(userId: String): Flow<Resource<List<UserItem>>> = flow {
-        emit(Resource.Loading(true))
+    override suspend fun listFriend(userId: String): Flow<Resource<List<com.salazar.cheers.core.model.UserItem>>> =
+        flow {
+            emit(Resource.Loading(true))
 
-        val request = ListFriendRequest.newBuilder()
-            .setUserId(userId)
-            .build()
+            val request = ListFriendRequest.newBuilder()
+                .setUserId(userId)
+                .build()
 
-        val remoteFriendRequests = try {
-            val response = service.listFriend(request = request)
-            val users = response.itemsList.map {
-                it.toUserItem()
+            val remoteFriendRequests = try {
+                val response = service.listFriend(request = request)
+                val users = response.itemsList.map {
+                    it.toUserItem()
             }
             users
         } catch (e: Exception) {
@@ -61,8 +64,8 @@ class FriendshipRepositoryImpl @Inject constructor(
         return friendRequestDao.listFriendRequests()
     }
 
-    override suspend fun fetchFriendRequest(): Flow<Resource<List<UserItem>>>
-        = flow {
+    override suspend fun fetchFriendRequest(): Flow<Resource<List<com.salazar.cheers.core.model.UserItem>>> =
+        flow {
             emit(Resource.Loading(true))
             val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@flow
             val request = ListFriendRequestsRequest.newBuilder()

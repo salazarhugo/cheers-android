@@ -1,8 +1,5 @@
 package com.salazar.cheers.data.models
 
-import android.media.MediaMetadataRetriever
-import android.os.Parcelable
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit

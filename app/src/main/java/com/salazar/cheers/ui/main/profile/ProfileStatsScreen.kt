@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,13 +36,11 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.Username
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.core.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
 @Composable
@@ -114,7 +111,12 @@ fun Tabs(
         // Add tabs for all of our pages
         pages.forEachIndexed { index, title ->
             Tab(
-                text = { Text(title, style = MaterialTheme.typography.bodyMedium) },
+                text = {
+                    androidx.compose.material3.Text(
+                        title,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 selected = pagerState.currentPage == index,
                 onClick = {
                     scope.launch {
@@ -150,12 +152,12 @@ fun Tabs(
 
 @Composable
 fun Followers(
-    followers: List<UserItem>?,
+    followers: List<com.salazar.cheers.core.model.UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
 ) {
     if (followers == null) {
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
     } else
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
@@ -169,7 +171,7 @@ fun Followers(
                         modifier = Modifier.height(34.dp),
                         onClick = { /* TODO */ }
                     ) {
-                        Text("Remove")
+                        androidx.compose.material3.Text("Remove")
                     }
                 }
             }
@@ -178,13 +180,13 @@ fun Followers(
 
 @Composable
 fun Following(
-    following: List<UserItem>?,
+    following: List<com.salazar.cheers.core.model.UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
     onFollowToggle: (String) -> Unit,
 ) {
     if (following == null) {
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
     } else
         LazyColumn {
             items(following, key = { it.id }) { user ->
@@ -241,7 +243,7 @@ fun SearchBar() {
             keyboardActions = KeyboardActions(onSearch = {
                 focusManager.clearFocus()
             }),
-            placeholder = { Text("Search") },
+            placeholder = { androidx.compose.material3.Text("Search") },
             trailingIcon = {
                 if (query.value.isNotBlank())
                     Icon(Icons.Filled.Close, null,
@@ -259,7 +261,7 @@ fun Toolbar(
 ) {
     Column {
         TopAppBar(title = {
-            Username(
+            com.salazar.cheers.core.share.ui.Username(
                 username = username,
                 verified = verified,
                 textStyle = MaterialTheme.typography.titleLarge.copy(

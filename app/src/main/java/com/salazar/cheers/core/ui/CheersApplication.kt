@@ -11,6 +11,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.salazar.ads.initializeAds
 import com.salazar.cheers.BuildConfig
 import com.salazar.cheers.R
 import dagger.hilt.android.HiltAndroidApp
@@ -29,6 +30,7 @@ class CheersApplication : Application(), Configuration.Provider {
         initFirebase()
         initMapBox()
         createNotificationChannel()
+        initializeAds(this)
     }
 
     private fun initMapBox() {

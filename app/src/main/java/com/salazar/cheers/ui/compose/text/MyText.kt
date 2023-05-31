@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import com.salazar.cheers.ui.theme.DarkTextColor
+import com.salazar.cheers.core.share.ui.DarkTextColor
 
 @Composable
 fun MyText(
@@ -38,7 +38,7 @@ fun MyText(
     val color = if (isSystemInDarkTheme())
         Color.Unspecified
     else
-        DarkTextColor
+        com.salazar.cheers.core.share.ui.DarkTextColor
 
     Text(
         text = text,

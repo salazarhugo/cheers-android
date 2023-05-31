@@ -3,7 +3,6 @@ package com.salazar.cheers.comment.ui.delete
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.domain.usecase.delete_comment.DeleteCommentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

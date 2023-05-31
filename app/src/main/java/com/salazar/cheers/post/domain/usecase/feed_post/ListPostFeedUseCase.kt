@@ -1,8 +1,8 @@
 package com.salazar.cheers.post.domain.usecase.feed_post
 
-import com.salazar.cheers.post.data.repository.PostRepository
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.post.data.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject

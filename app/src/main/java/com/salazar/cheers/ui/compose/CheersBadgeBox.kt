@@ -2,14 +2,16 @@ package com.salazar.cheers.ui.compose
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material3.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.theme.StrongRed
+import com.salazar.cheers.core.share.ui.StrongRed
 
 @Composable
 fun CheersBadgeBox(
@@ -23,7 +25,7 @@ fun CheersBadgeBox(
         if (count > 0)
             Badge(
                 modifier = Modifier.offset(y = (-14).dp, x = 14.dp),
-                containerColor = StrongRed,
+                containerColor = com.salazar.cheers.core.share.ui.StrongRed,
                 contentColor = Color.White,
             ) {
                 Text(

@@ -13,8 +13,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.Language
+import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.items.SettingTitle
-import com.salazar.cheers.ui.compose.share.Toolbar
+import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun LanguageScreen(
@@ -24,7 +25,7 @@ fun LanguageScreen(
 ) {
     Scaffold(
         topBar = {
-            Toolbar(onBackPressed = onBackPressed, title = stringResource(id = com.salazar.cheers.R.string.language))
+            Toolbar(onBackPressed = onBackPressed, title = stringResource(id = R.string.language))
         },
     ) {
         Column(

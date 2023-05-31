@@ -9,7 +9,6 @@ import cheers.location.v1.UpdateLocationRequest
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
-import com.mapbox.maps.extension.style.layers.generated.circleLayer
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.attribution.attribution
 import com.mapbox.maps.plugin.gestures.OnMoveListener
@@ -21,9 +20,9 @@ import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.search.*
 import com.mapbox.search.common.AsyncOperationTask
 import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import com.salazar.cheers.map.data.mapper.toUserLocation
 import com.salazar.cheers.map.domain.models.UserLocation
-import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

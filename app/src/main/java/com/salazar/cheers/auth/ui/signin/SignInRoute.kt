@@ -5,11 +5,10 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -19,9 +18,8 @@ import com.google.android.gms.common.api.ApiException
 import com.salazar.cheers.R
 import com.salazar.cheers.core.domain.model.ErrorMessage
 import com.salazar.cheers.core.ui.CheersDialog
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.LoadingScreenPreview
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.LoadingScreen
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContentTriggered
 
@@ -35,7 +33,7 @@ fun SignInRoute(
     viewModel: SignInViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authResultLauncher =
         rememberLauncherForActivityResult(
             contract = AuthResultContract(),
@@ -91,7 +89,8 @@ fun SignInRoute(
                 onSignIn = viewModel::signInWithOneTap,
             )
         }
-        null -> LoadingScreen()
+
+        null -> com.salazar.cheers.core.share.ui.LoadingScreen()
     }
 }
 

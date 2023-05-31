@@ -3,7 +3,7 @@ package com.salazar.cheers.core.data.internal
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.salazar.cheers.core.data.enums.StoryState
+import com.salazar.cheers.core.model.StoryState
 import java.util.*
 
 @Entity(
@@ -33,7 +33,7 @@ data class User(
     val friend: Boolean = false,
     val requested: Boolean = false,
     val hasRequestedViewer: Boolean = false,
-    val storyState: StoryState = StoryState.EMPTY,
+    val storyState: com.salazar.cheers.core.model.StoryState = com.salazar.cheers.core.model.StoryState.EMPTY,
     val seenStory: Boolean = false,
     val createTime: Long = 0L,
     val isBusinessAccount: Boolean = false,

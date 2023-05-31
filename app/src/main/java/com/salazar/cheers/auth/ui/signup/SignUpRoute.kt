@@ -19,11 +19,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.R
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.compose.share.AppBar
-import com.salazar.cheers.ui.theme.Green
-import com.salazar.cheers.ui.theme.GreenSurface
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.AppBar
 import kotlinx.coroutines.delay
 
 /**
@@ -36,7 +35,7 @@ fun SignUpRoute(
     signUpViewModel: SignUpViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by signUpViewModel.uiState.collectAsState()
+    val uiState by signUpViewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.isSignedIn) {
 //        CheersSplashScreen()
@@ -105,12 +104,12 @@ fun SentSignInLinkToEmailScreen() {
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(GreenSurface)
+                    .background(com.salazar.cheers.core.share.ui.GreenSurface)
                     .clickable {
                         atEnd = !atEnd
                     }
                     .padding(8.dp),
-                tint = Green
+                tint = com.salazar.cheers.core.share.ui.Green
             )
             Spacer(Modifier.height(32.dp))
             Text("A sign in link has been sent to your email account")

@@ -2,10 +2,8 @@ package com.salazar.cheers.notes.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +21,7 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.notes.domain.models.Note
-import com.salazar.cheers.ui.compose.animations.Bounce
+import com.salazar.cheers.core.ui.animations.Bounce
 
 @Composable
 fun NoteItem(

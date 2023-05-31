@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.ShareLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,10 +15,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
 import com.salazar.cheers.map.domain.models.UserLocation
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.theme.GreenGoogle
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 
 @Composable
@@ -68,9 +65,10 @@ fun UserLocationItem(
                         )
                     val annotatedString = buildAnnotatedString {
                         append(userLocation.locationName)
-                        val timestamp = relativeTimeFormatter(epoch = userLocation.lastUpdated).text
+                        val timestamp =
+                            com.salazar.cheers.core.util.relativeTimeFormatter(epoch = userLocation.lastUpdated).text
                         if (timestamp == "just now") {
-                            withStyle(style = SpanStyle(color = GreenGoogle)) {
+                            withStyle(style = SpanStyle(color = com.salazar.cheers.core.share.ui.GreenGoogle)) {
                                 append(timestamp)
                             }
                         } else {

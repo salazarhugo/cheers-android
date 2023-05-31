@@ -19,17 +19,17 @@ import cheers.user.v1.UserServiceGrpcKt
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.Settings
-import com.salazar.cheers.chat.data.db.ChatDao
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.data.CommentRepositoryImpl
 import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.core.data.api.ApiService
 import com.salazar.cheers.core.data.db.CheersDatabase
-import com.salazar.cheers.data.db.*
 import com.salazar.cheers.core.data.location.DefaultLocationClient
 import com.salazar.cheers.core.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
-import com.salazar.cheers.chat.data.websocket.ChatWebSocketListener
+import com.salazar.cheers.core.data.serializer.settingsDataStore
+import com.salazar.cheers.core.data.util.Constants
+import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.repository.account.AccountRepository
 import com.salazar.cheers.data.repository.account.AccountRepositoryImpl
 import com.salazar.cheers.data.repository.activity.ActivityRepository
@@ -40,15 +40,17 @@ import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.repository.ticket.TicketRepository
 import com.salazar.cheers.data.repository.ticket.impl.TicketRepositoryImpl
-import com.salazar.cheers.core.data.serializer.settingsDataStore
 import com.salazar.cheers.drink.data.repository.DrinkRepository
 import com.salazar.cheers.drink.data.repository.DrinkRepositoryImpl
+import com.salazar.cheers.feature.chat.data.db.ChatDao
+import com.salazar.cheers.feature.chat.data.repository.ChatRepository
+import com.salazar.cheers.feature.chat.data.repository.ChatRepositoryImpl
+import com.salazar.cheers.feature.chat.data.websocket.ChatWebSocketListener
 import com.salazar.cheers.notes.data.db.NoteDao
 import com.salazar.cheers.notes.data.repository.NoteRepository
 import com.salazar.cheers.notes.data.repository.NoteRepositoryImpl
 import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.parties.data.repository.impl.PartyRepositoryImpl
-import com.salazar.cheers.core.data.util.Constants
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -119,13 +121,13 @@ object AppModule {
 
 
     @Provides
-    @Singleton
     fun provideWebSocket(
         chatWebSocketListener: ChatWebSocketListener,
     ): WebSocket {
+        val authToken = "55FEvHawinQCa9jgH7ZdWESR3ri2"
         val request = Request.Builder()
-            .url(Constants.WEBSOCKET_URL)
-            .addHeader("Sec-Websocket-Protocol", "55FEvHawinQCa9jgH7ZdWESR3ri2")
+            .url("${Constants.WEBSOCKET_URL}?token=" + authToken)
+//            .addHeader("Sec-Websocket-Protocol", )
             .build()
         val client = OkHttpClient()
         return client.newWebSocket(request, chatWebSocketListener)
@@ -142,6 +144,14 @@ object AppModule {
         return ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatRepository(
+        chatRepositoryImpl: ChatRepositoryImpl,
+    ): ChatRepository {
+        return chatRepositoryImpl
     }
 
     @Provides

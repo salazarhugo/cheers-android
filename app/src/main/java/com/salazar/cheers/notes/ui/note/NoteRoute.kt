@@ -1,11 +1,11 @@
 package com.salazar.cheers.notes.ui.note
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Note screen.
@@ -17,7 +17,7 @@ fun NoteRoute(
     navActions: CheersNavigationActions,
     viewModel: NoteViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BottomSheetM3 {
         NoteScreen(

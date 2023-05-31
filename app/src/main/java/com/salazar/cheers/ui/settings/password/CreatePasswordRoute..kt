@@ -2,10 +2,10 @@ package com.salazar.cheers.ui.settings.password
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the CreatePassword screen.
@@ -17,7 +17,7 @@ fun CreatePasswordRoute(
     createPasswordViewModel: CreatePasswordViewModel = hiltViewModel(),
     navActions: CheersNavigationActions
 ) {
-    val uiState by createPasswordViewModel.uiState.collectAsState()
+    val uiState by createPasswordViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.done) {
         if (uiState.done)

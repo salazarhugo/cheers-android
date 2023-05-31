@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.otherprofile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.friendship.domain.usecase.list_friend.ListFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +16,8 @@ data class OtherProfileStatsUiState(
     val isFollowers: Boolean = true,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
-    val followers: List<UserItem>? = null,
-    val friends: List<UserItem>? = null,
+    val followers: List<com.salazar.cheers.core.model.UserItem>? = null,
+    val friends: List<com.salazar.cheers.core.model.UserItem>? = null,
     val username: String = "",
     val verified: Boolean = false,
 )
@@ -68,7 +68,7 @@ class OtherProfileStatsViewModel @Inject constructor(
         }
     }
 
-    private fun updateFriends(friends: List<UserItem>) {
+    private fun updateFriends(friends: List<com.salazar.cheers.core.model.UserItem>) {
         viewModelState.update {
             it.copy(friends = friends, isLoading = false)
         }

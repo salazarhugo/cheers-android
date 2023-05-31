@@ -8,7 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import com.salazar.cheers.ui.compose.items.SettingItem
 import com.salazar.cheers.ui.compose.items.SettingTitle
-import com.salazar.cheers.ui.compose.share.Toolbar
+import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun NotificationsScreen(

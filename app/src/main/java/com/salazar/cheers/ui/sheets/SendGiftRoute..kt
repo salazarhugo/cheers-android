@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,14 +17,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.theme.Green
-import com.salazar.cheers.ui.theme.GreenSurface
-import com.snap.corekit.internal.y
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.share.ui.Green
+import com.salazar.cheers.core.share.ui.GreenSurface
 import kotlinx.coroutines.delay
 
 /**
@@ -39,7 +38,7 @@ fun SendGiftRoute(
     navActions: CheersNavigationActions,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {
-    val uiState by sendGiftViewModel.uiState.collectAsState()
+    val uiState by sendGiftViewModel.uiState.collectAsStateWithLifecycle()
 
     val success = uiState.success
     val username = uiState.receiver?.username
@@ -84,7 +83,7 @@ fun SendGiftRoute(
                 if (uiState.isLoading) {
 //                    val y = bottomSheetNavigator.navigatorSheetState.offset.value
                     val y = 0f
-                    LoadingScreen(
+                    com.salazar.cheers.core.share.ui.LoadingScreen(
                         modifier = Modifier.offset(y = -LocalDensity.current.run { y.toDp() } / 2),
                     )
                 } else if (uiState.isConfirmationScreen) {
@@ -215,12 +214,12 @@ fun SuccessSplashView(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(GreenSurface)
+                    .background(com.salazar.cheers.core.share.ui.GreenSurface)
                     .clickable {
                         atEnd = !atEnd
                     }
                     .padding(8.dp),
-                tint = Green
+                tint = com.salazar.cheers.core.share.ui.Green
             )
         }
     }

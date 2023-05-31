@@ -33,21 +33,19 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
+import com.salazar.cheers.feature.chat.ui.components.FunctionalityNotAvailablePanel
+import com.salazar.cheers.core.data.internal.*
 import com.salazar.cheers.core.ui.PrettyPanel
 import com.salazar.cheers.parties.ui.PartyItem
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.chat.ui.components.FunctionalityNotAvailablePanel
-import com.salazar.cheers.core.data.internal.*
+import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.post.ui.item.PostBody
 import com.salazar.cheers.post.ui.item.PostFooter
 import com.salazar.cheers.post.ui.item.PostHeader
-import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.ui.compose.profile.ProfileItem
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.utils.PrettyImage
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.util.numberFormatter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,7 +64,7 @@ fun ProfileScreen(
     onCommentClick: (String) -> Unit,
 ) {
     when (uiState) {
-        is ProfileUiState.Loading -> LoadingScreen()
+        is ProfileUiState.Loading -> com.salazar.cheers.core.share.ui.LoadingScreen()
         is ProfileUiState.HasUser -> Profile(
             uiState = uiState,
             onEditProfileClicked = onEditProfileClicked,
@@ -244,7 +242,7 @@ fun EventList(
             }
         }
     else
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
 }
 
 @Composable
@@ -338,7 +336,7 @@ fun PostItem(
         contentAlignment = Alignment.TopEnd
     ) {
         val url = if (post.type == PostType.VIDEO) post.videoThumbnailUrl else post.photos[0]
-        PrettyImage(
+        com.salazar.cheers.core.share.ui.PrettyImage(
             data = url,
             contentDescription = "avatar",
             alignment = Alignment.Center,
@@ -374,7 +372,7 @@ fun Toolbar(
 
     TopAppBar(
         title = {
-            Username(
+            com.salazar.cheers.core.share.ui.Username(
                 username = otherUser.username,
                 verified = otherUser.verified,
                 textStyle = MaterialTheme.typography.titleLarge.copy(

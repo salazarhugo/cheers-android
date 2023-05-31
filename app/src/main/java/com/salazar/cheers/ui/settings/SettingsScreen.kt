@@ -2,7 +2,6 @@ package com.salazar.cheers.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -19,8 +18,8 @@ import com.salazar.cheers.BuildConfig
 import com.salazar.cheers.R
 import com.salazar.cheers.ui.compose.items.SettingItem
 import com.salazar.cheers.ui.compose.items.SettingTitle
-import com.salazar.cheers.ui.compose.share.ErrorMessage
-import com.salazar.cheers.ui.compose.share.Toolbar
+import com.salazar.cheers.core.ui.ui.ErrorMessage
+import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun SettingsScreen(

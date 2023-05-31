@@ -2,9 +2,6 @@ package com.salazar.cheers.ui.compose.event
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,9 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cheers.type.PrivacyOuterClass
 import com.salazar.cheers.core.data.internal.Privacy
-import com.salazar.cheers.core.data.internal.dateTimeFormatter
+import com.salazar.cheers.core.util.dateTimeFormatter
 
 @Composable
 fun EventDetails(
@@ -34,7 +30,7 @@ fun EventDetails(
     ) {
         Column {
             Text(
-                text = dateTimeFormatter(timestamp = startTimeSeconds),
+                text = com.salazar.cheers.core.util.dateTimeFormatter(timestamp = startTimeSeconds),
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
                 color = MaterialTheme.colorScheme.error,
             )

@@ -19,15 +19,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
-import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.data.internal.PostType
-import com.salazar.cheers.ui.compose.animations.AnimatedTextCounter
-import com.salazar.cheers.ui.compose.animations.Bounce
-import com.salazar.cheers.ui.compose.extensions.noRippleClickable
+import com.salazar.common.ui.extensions.noRippleClickable
 
 @Composable
 fun PostFooter(

@@ -1,13 +1,5 @@
 package com.salazar.cheers.core.data.util
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.functions.FirebaseFunctions
-import com.salazar.cheers.core.data.internal.Source
-import com.salazar.cheers.core.data.internal.User
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
-
 
 object FirestoreUtil {
 //    private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }

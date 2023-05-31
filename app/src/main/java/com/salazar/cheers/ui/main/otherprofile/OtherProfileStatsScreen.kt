@@ -6,9 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.Tab
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -19,7 +17,6 @@ import androidx.compose.material3.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,16 +31,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.Username
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.main.profile.Following
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.core.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
 @Composable
@@ -104,17 +98,22 @@ fun Tabs(
         selectedTabIndex = pagerState.currentPage,
         // Override the indicator, using the provided pagerTabIndicatorOffset modifier
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-            )
+//            TabRowDefaults.Indicator(
+//                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+//            )
         },
-        backgroundColor = MaterialTheme.colorScheme.background,
+//        backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         // Add tabs for all of our pages
         pages.forEachIndexed { index, title ->
             Tab(
-                text = { Text(title, style = MaterialTheme.typography.bodyMedium) },
+                text = {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
                 selected = pagerState.currentPage == index,
                 onClick = {
                     scope.launch {
@@ -144,12 +143,12 @@ fun Tabs(
 
 @Composable
 fun Followers(
-    followers: List<UserItem>?,
+    followers: List<com.salazar.cheers.core.model.UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
 ) {
     if (followers == null)
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
     else
         LazyColumn {
             items(followers, key = { it.id }) { follower ->
@@ -169,12 +168,12 @@ fun SearchBar() {
         contentAlignment = Alignment.Center,
     ) {
         Card(
-            elevation = 0.dp,
+//            elevation = CardElevation(),
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(46.dp),
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+//            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
         ) {}
         val query = remember { mutableStateOf("") }
         val focusManager = LocalFocusManager.current
@@ -222,7 +221,7 @@ fun Toolbar(
 ) {
     Column {
         TopAppBar(title = {
-            Username(
+            com.salazar.cheers.core.share.ui.Username(
                 username = username,
                 verified = verified,
                 textStyle = MaterialTheme.typography.titleLarge.copy(

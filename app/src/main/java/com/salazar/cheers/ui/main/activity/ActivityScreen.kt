@@ -2,7 +2,14 @@ package com.salazar.cheers.ui.main.activity
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -20,17 +27,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.core.data.internal.Activity
 import com.salazar.cheers.core.data.internal.ActivityType
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.feature.chat.ui.components.messageFormatter
 import com.salazar.cheers.ui.compose.CheersBadgeBox
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.text.MyText
-import com.salazar.cheers.user.ui.FollowButton
-import com.salazar.cheers.chat.ui.components.messageFormatter
 import com.salazar.cheers.ui.main.party.create.TopAppBar
 import com.salazar.cheers.user.ui.AddFriendButton
+import com.salazar.cheers.user.ui.FollowButton
 
 
 @Composable
@@ -211,7 +217,7 @@ fun ActivityItem(
                         ), fontWeight = FontWeight.Normal
                     )
                 ) {
-                    append(relativeTimeFormatter(epoch = activity.createTime))
+                    append(com.salazar.cheers.core.util.relativeTimeFormatter(epoch = activity.createTime))
                 }
             }
             Text(

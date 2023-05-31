@@ -1,10 +1,10 @@
 package com.salazar.cheers.ui.main.search
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Search screen.
@@ -16,7 +16,7 @@ fun SearchRoute(
     searchViewModel: SearchViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by searchViewModel.uiState.collectAsState()
+    val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
     SearchScreen(
         uiState = uiState,

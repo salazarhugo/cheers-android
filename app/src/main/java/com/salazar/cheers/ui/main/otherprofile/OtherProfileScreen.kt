@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.main.otherprofile
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.TabRowDefaults
@@ -18,17 +17,16 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.chat.ui.components.FunctionalityNotAvailablePanel
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.buttons.CheersOutlinedButton
-import com.salazar.cheers.ui.compose.profile.ProfileHeader
+import com.salazar.cheers.feature.chat.ui.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.parties.ui.PartyItem
+import com.salazar.cheers.core.share.ui.Username
+import com.salazar.cheers.ui.compose.buttons.CheersOutlinedButton
+import com.salazar.cheers.ui.compose.profile.ProfileHeader
+import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.user.ui.FriendButton
-import com.salazar.cheers.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
-@SuppressLint("SuspiciousIndentation")
 @Composable
 fun OtherProfileScreen(
     uiState: OtherProfileUiState.HasUser,
@@ -66,6 +64,9 @@ fun OtherProfileScreen(
                     onStoryClick = onStoryClick,
                     onWebsiteClick = onWebsiteClick,
                 )
+//                AdminButtons(
+//                    modifier = Modifier.fillMaxWidth(),
+//                )
                 HeaderButtons(
                     friend = user.friend,
                     requested = user.requested,
@@ -155,7 +156,7 @@ fun Toolbar(
     val openDialog = remember { mutableStateOf(false) }
     //                    findNavController().navigate(R.id.moreOtherProfileBottomSheet)
     TopAppBar(title = {
-        Username(
+        com.salazar.cheers.core.share.ui.Username(
             username = username,
             verified = verified,
             textStyle = MaterialTheme.typography.titleLarge.copy(
@@ -234,6 +235,27 @@ fun MoreDialog(
         confirmButton = {
         },
     )
+}
+
+@Composable
+fun AdminButtons(
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        onClick = { /*TODO*/ },
+        shape = MaterialTheme.shapes.extraLarge,
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            CheersOutlinedButton(
+                onClick = {},
+            ) {
+                Text("Verify User")
+            }
+        }
+    }
 }
 
 @Composable

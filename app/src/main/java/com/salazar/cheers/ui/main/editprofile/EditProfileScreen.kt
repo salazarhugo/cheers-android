@@ -6,8 +6,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -23,11 +21,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.MyTopAppBar
 import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.core.data.util.Constants.BIO_MAX_CHAR
 import com.salazar.cheers.core.data.util.Constants.NAME_MAX_CHAR
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.ui.compose.MyTopAppBar
 
 @Composable
 fun EditProfileScreen(
@@ -51,7 +49,7 @@ fun EditProfileScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             if (uiState.isLoading)
-                LoadingScreen()
+                com.salazar.cheers.core.share.ui.LoadingScreen()
             else {
                 EditProfileHeader(
                     user = uiState.user,

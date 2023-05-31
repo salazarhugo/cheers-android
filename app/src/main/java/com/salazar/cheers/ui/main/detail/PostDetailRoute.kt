@@ -2,12 +2,12 @@ package com.salazar.cheers.ui.main.detail
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.LoadingScreen
 
 /**
  * Stateful composable that displays the Navigation route for the Post detail screen.
@@ -19,7 +19,7 @@ fun PostDetailRoute(
     postDetailViewModel: PostDetailViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by postDetailViewModel.uiState.collectAsState()
+    val uiState by postDetailViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     if (uiState is PostDetailUiState.HasPost)
@@ -46,5 +46,5 @@ fun PostDetailRoute(
             onUserClick = { navActions.navigateToOtherProfile(it) },
         )
     else
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
 }

@@ -8,7 +8,7 @@ package com.salazar.cheers.ui.settings.payments
 //    navActions: CheersNavigationActions,
 //    onAddCard: () -> Unit,
 //) {
-//    val uiState by addPaymentViewModel.uiState.collectAsState()
+//    val uiState by addPaymentViewModel.uiState.collectAsStateWithLifecycle()
 //
 //    if (uiState.sources.isNotEmpty())
 //        onAddCard()

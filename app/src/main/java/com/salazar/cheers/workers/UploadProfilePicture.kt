@@ -15,10 +15,10 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.salazar.cheers.ui.MainActivity
 import com.salazar.cheers.R
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.core.data.util.StorageUtil
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.ByteArrayOutputStream

@@ -22,9 +22,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.ui.compose.share.AppBar
-import com.salazar.cheers.ui.compose.share.ButtonWithLoading
 import com.salazar.cheers.core.data.util.Utils.validateUsername
+import com.salazar.cheers.core.ui.ui.AppBar
+import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 
 @Composable
 fun ChooseUsernameScreen(

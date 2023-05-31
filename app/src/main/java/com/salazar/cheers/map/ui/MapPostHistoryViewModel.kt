@@ -2,9 +2,9 @@ package com.salazar.cheers.map.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.map.data.repository.MapRepository
 import com.salazar.cheers.post.data.repository.PostRepository
-import com.salazar.cheers.core.data.internal.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

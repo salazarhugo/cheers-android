@@ -2,7 +2,6 @@ package com.salazar.cheers.post.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
@@ -13,7 +12,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
-import com.salazar.cheers.ui.compose.utils.PrettyImage
+import com.salazar.cheers.core.share.ui.PrettyImage
 
 @Composable
 fun PhotoCarousel(
@@ -34,7 +33,7 @@ fun PhotoCarousel(
             offset += offsetChange
         }
 
-        PrettyImage(
+        com.salazar.cheers.core.share.ui.PrettyImage(
             data = photos[page],
             contentDescription = "avatar",
             alignment = Alignment.Center,

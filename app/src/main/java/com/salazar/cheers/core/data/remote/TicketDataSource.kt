@@ -3,8 +3,8 @@ package com.salazar.cheers.core.data.remote
 import cheers.ticket.v1.ListTicketRequest
 import cheers.ticket.v1.TicketServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.mapper.toTicket
 import com.salazar.cheers.core.data.internal.Ticket
+import com.salazar.cheers.data.mapper.toTicket
 import javax.inject.Inject
 
 class TicketDataSource @Inject constructor(

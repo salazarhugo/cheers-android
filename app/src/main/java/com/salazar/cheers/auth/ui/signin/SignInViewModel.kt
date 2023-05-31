@@ -1,9 +1,6 @@
 package com.salazar.cheers.auth.ui.signin
 
 import android.util.Log
-import de.palm.composestateevents.StateEventWithContent
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,15 +11,21 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.core.data.Resource
-import com.salazar.cheers.core.data.datastore.StoreUserEmail
 import com.salazar.cheers.auth.data.AuthRepository
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
+import com.salazar.cheers.core.data.datastore.StoreUserEmail
+import com.salazar.cheers.core.data.util.Utils.isEmailValid
 import com.salazar.cheers.core.domain.model.ErrorMessage
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.core.data.util.Utils.isEmailValid
+import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -1,10 +1,10 @@
 package com.salazar.cheers.ui.settings.notifications
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.settings.SettingsViewModel
 
 /**
@@ -17,7 +17,7 @@ fun NotificationsRoute(
     navActions: CheersNavigationActions,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val uiState by settingsViewModel.uiState.collectAsState()
+    val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
     NotificationsScreen(
         onBackPressed = { navActions.navigateBack() },

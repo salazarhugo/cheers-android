@@ -25,7 +25,7 @@
         <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 
-    <style name="Theme.Cheers.Starting" parent="Theme.AppCompat">
+    <style name="Theme.Cheers.Starting" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="windowSplashScreenBackground">@color/white</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_artboard_1cheers_logo_svg</item>
         <item name="windowSplashScreenAnimationDuration">20</item>

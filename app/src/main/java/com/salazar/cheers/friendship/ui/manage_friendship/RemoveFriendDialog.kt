@@ -1,11 +1,11 @@
 package com.salazar.cheers.friendship.ui.manage_friendship
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.CoreDialog
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 @Composable
 fun RemoveFriendDialog(

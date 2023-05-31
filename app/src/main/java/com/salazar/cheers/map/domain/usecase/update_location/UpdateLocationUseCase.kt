@@ -2,7 +2,7 @@ package com.salazar.cheers.map.domain.usecase.update_location
 
 import com.salazar.cheers.core.data.datastore.DataStoreRepository
 import com.salazar.cheers.core.data.location.DefaultLocationClient
-import com.salazar.cheers.core.di.IODispatcher
+import com.salazar.common.di.IODispatcher
 import com.salazar.cheers.map.data.repository.MapRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull

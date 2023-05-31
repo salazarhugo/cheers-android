@@ -1,7 +1,5 @@
 package com.salazar.cheers.core.data.internal
 
-import com.google.protobuf.Timestamp
-
 data class ImageMessage(
     val imagesDownloadUrl: List<String>,
     override var id: String,

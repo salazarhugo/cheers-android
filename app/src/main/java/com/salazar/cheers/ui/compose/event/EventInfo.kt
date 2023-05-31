@@ -17,10 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.Privacy
-import com.salazar.cheers.core.data.internal.numberFormatter
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
-import com.salazar.cheers.ui.compose.extensions.noRippleClickable
+import com.salazar.cheers.core.util.numberFormatter
+import com.salazar.common.ui.extensions.noRippleClickable
 
 @Composable
 fun EventInfo(
@@ -32,7 +30,7 @@ fun EventInfo(
         Column {
             EventHeaderItem(
                 icon = Icons.Default.Timer,
-                text = relativeTimeFormatter(startDate).toString(),
+                text = com.salazar.cheers.core.util.relativeTimeFormatter(startDate).toString(),
                 modifier = Modifier.padding(16.dp, vertical = 8.dp),
             )
             EventHeaderItem(

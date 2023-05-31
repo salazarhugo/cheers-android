@@ -7,14 +7,14 @@ import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.core.data.Resource
-import com.salazar.cheers.data.db.*
-import com.salazar.cheers.data.db.entities.RecentUser
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.data.mapper.toUser
-import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.core.data.internal.Activity
 import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.data.db.*
+import com.salazar.cheers.data.db.entities.RecentUser
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.data.mapper.toUser
+import com.salazar.cheers.data.mapper.toUserItem
+import com.salazar.common.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -36,7 +36,7 @@ class UserRepository @Inject constructor(
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
     private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
 ) {
-    suspend fun listSuggestions(): Result<List<UserItem>> {
+    suspend fun listSuggestions(): Result<List<com.salazar.cheers.core.model.UserItem>> {
         return try {
             val request = ListSuggestionsRequest.newBuilder().build()
 
@@ -145,7 +145,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun listUserItems(): Flow<List<UserItem>> {
+    fun listUserItems(): Flow<List<com.salazar.cheers.core.model.UserItem>> {
         return userItemDao.listUserItems()
     }
 
@@ -181,7 +181,7 @@ class UserRepository @Inject constructor(
     suspend fun queryUsers(
         fetchFromRemote: Boolean,
         query: String,
-    ): Flow<Resource<List<UserItem>>> {
+    ): Flow<Resource<List<com.salazar.cheers.core.model.UserItem>>> {
         return flow {
             emit(Resource.Loading(true))
             val localUsers = userItemDao.searchUser(query = query)
@@ -228,7 +228,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun updateLocalUserItem(userItem: UserItem) {
+    suspend fun updateLocalUserItem(userItem: com.salazar.cheers.core.model.UserItem) {
         userItemDao.update(userItem)
     }
 
@@ -376,7 +376,7 @@ class UserRepository @Inject constructor(
         return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
     }
 
-    fun getUserItem(userIdOrUsername: String): Flow<UserItem> {
+    fun getUserItem(userIdOrUsername: String): Flow<com.salazar.cheers.core.model.UserItem> {
         return userItemDao.getUserItem(userIdOrUsername = userIdOrUsername)
     }
 

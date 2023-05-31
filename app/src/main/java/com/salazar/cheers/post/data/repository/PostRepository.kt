@@ -4,12 +4,12 @@ import cheers.post.v1.*
 import cheers.type.PostOuterClass
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.core.data.Resource
+import com.salazar.common.util.Resource
 import com.salazar.cheers.core.data.db.CheersDatabase
-import com.salazar.cheers.data.mapper.toPost
-import com.salazar.cheers.data.mapper.toUserItem
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.data.mapper.toPost
+import com.salazar.cheers.data.mapper.toUserItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll

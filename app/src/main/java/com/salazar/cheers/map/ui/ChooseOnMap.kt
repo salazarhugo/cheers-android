@@ -30,9 +30,9 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
-import com.salazar.cheers.ui.compose.utils.Permission
-import com.salazar.cheers.ui.theme.Roboto
 import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
+import com.salazar.cheers.core.share.ui.Permission
+import com.salazar.cheers.core.ui.theme.Roboto
 
 @Composable
 fun ChooseOnMapScreen(
@@ -57,7 +57,7 @@ fun ChooseOnMapScreen(
             }
         }
     ) {
-        Permission(Manifest.permission.ACCESS_COARSE_LOCATION) {
+        com.salazar.cheers.core.share.ui.Permission(Manifest.permission.ACCESS_COARSE_LOCATION) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.padding(bottom = it.calculateBottomPadding())

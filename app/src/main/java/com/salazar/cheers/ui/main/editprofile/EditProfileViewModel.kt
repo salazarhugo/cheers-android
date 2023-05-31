@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.workers.UploadProfilePicture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*

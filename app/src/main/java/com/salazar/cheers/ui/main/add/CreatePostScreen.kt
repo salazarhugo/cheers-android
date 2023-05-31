@@ -18,10 +18,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -50,19 +46,17 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.mapbox.search.*
 import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
-import com.salazar.cheers.data.db.entities.UserItem
 import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.post.ui.MultipleAnnotation
 import com.salazar.cheers.ui.compose.CarouselDrinks
 import com.salazar.cheers.ui.compose.ChipGroup
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.post.ui.MultipleAnnotation
-import com.salazar.cheers.ui.compose.share.ButtonWithLoading
-import com.salazar.cheers.ui.compose.share.ErrorMessage
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.main.home.HomeUIAction
+import com.salazar.cheers.core.ui.ui.ButtonWithLoading
+import com.salazar.cheers.core.ui.ui.ErrorMessage
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.ui.main.party.create.Item
-import com.salazar.cheers.ui.theme.GreySheet
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.core.ui.theme.Roboto
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -567,7 +561,7 @@ fun SelectedLocation(
 
 @Composable
 fun AddPeople(
-    selectedTagUsers: List<UserItem>,
+    selectedTagUsers: List<com.salazar.cheers.core.model.UserItem>,
     navigateToTagUser: () -> Unit,
 ) {
     Row(
@@ -728,7 +722,7 @@ fun PrivacyBottomSheet(
 
     ModalBottomSheetLayout(
         sheetState = privacyState,
-        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else com.salazar.cheers.core.share.ui.GreySheet,
         sheetElevation = 0.dp,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetContent = {

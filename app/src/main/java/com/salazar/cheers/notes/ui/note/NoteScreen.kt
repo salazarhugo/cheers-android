@@ -9,14 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun NoteScreen(
@@ -44,7 +44,11 @@ fun NoteScreen(
                         append(note.name)
                     }
                     withStyle(MaterialTheme.typography.labelMedium.toSpanStyle()) {
-                        append("\" shared a note.\" " + relativeTimeFormatter(epoch = note.createTime))
+                        append(
+                            "\" shared a note.\" " + com.salazar.cheers.core.util.relativeTimeFormatter(
+                                epoch = note.createTime
+                            )
+                        )
                     }
                 }
 
@@ -63,7 +67,8 @@ fun NoteScreen(
     val uid = FirebaseAuth.getInstance().currentUser?.uid!!
     if (note.userId == uid) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(vertical = 32.dp)
             ,
             horizontalAlignment = Alignment.CenterHorizontally,

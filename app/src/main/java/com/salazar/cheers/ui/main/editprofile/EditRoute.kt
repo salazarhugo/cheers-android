@@ -1,9 +1,9 @@
 package com.salazar.cheers.ui.main.editprofile
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Edit profile screen.
@@ -15,7 +15,7 @@ fun EditProfileRoute(
     editProfileViewModel: EditProfileViewModel,
     navActions: CheersNavigationActions,
 ) {
-    val uiState by editProfileViewModel.uiState.collectAsState()
+    val uiState by editProfileViewModel.uiState.collectAsStateWithLifecycle()
 
     EditProfileScreen(
         uiState = uiState,

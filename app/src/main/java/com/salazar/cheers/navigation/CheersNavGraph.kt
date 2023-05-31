@@ -14,17 +14,18 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
+import com.salazar.cheers.core.share.ui.CheersDestinations
+import com.salazar.cheers.core.share.ui.GreySheet
+import com.salazar.cheers.core.share.ui.MainDestinations
 import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
-import com.salazar.cheers.ui.theme.GreySheet
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CheersNavGraph(
     uiState: CheersUiState,
-    showInterstitialAd: () -> Unit,
     appState: CheersAppState,
 ) {
     val startDestination = CheersDestinations.AUTH_ROUTE
@@ -99,7 +100,6 @@ fun CheersNavGraph(
                 authNavGraph(navActions = navActions)
                 mainNavGraph(
                     appState = appState,
-                    showInterstitialAd = showInterstitialAd,
                 )
             }
         }

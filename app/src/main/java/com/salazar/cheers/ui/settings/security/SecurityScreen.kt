@@ -19,9 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import com.salazar.cheers.ui.compose.items.SettingTitle
-import com.salazar.cheers.ui.compose.share.ErrorMessage
-import com.salazar.cheers.ui.compose.share.Toolbar
-import com.salazar.cheers.ui.theme.GreenGoogle
+import com.salazar.cheers.core.ui.ui.ErrorMessage
+import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun SecurityScreen(
@@ -131,7 +130,7 @@ fun SignInMethodItem(
                 Icon(
                     Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = GreenGoogle,
+                    tint = com.salazar.cheers.core.share.ui.GreenGoogle,
                 )
             } else {
                 TextButton(

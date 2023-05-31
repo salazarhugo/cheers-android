@@ -8,7 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,16 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.R
-import com.salazar.cheers.core.ui.CategoryTitle
-import com.salazar.cheers.parties.ui.PartyItem
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.dateTimeFormatter
+import com.salazar.cheers.core.ui.CategoryTitle
 import com.salazar.cheers.parties.ui.EventsTopBar
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.theme.StrongRed
+import com.salazar.cheers.parties.ui.PartyItem
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.core.util.dateTimeFormatter
 
 
 @Composable
@@ -49,7 +50,7 @@ fun EventsScreen(
         val parties = uiState.parties
 
         if (parties == null)
-            LoadingScreen()
+            com.salazar.cheers.core.share.ui.LoadingScreen()
         else
             SwipeToRefresh(
                 onRefresh = {},
@@ -209,7 +210,7 @@ fun PriceTag(
         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
         modifier = Modifier
             .clip(RoundedCornerShape(22.dp))
-            .background(StrongRed)
+            .background(com.salazar.cheers.core.share.ui.StrongRed)
             .padding(horizontal = 8.dp),
         color = Color.White,
     )

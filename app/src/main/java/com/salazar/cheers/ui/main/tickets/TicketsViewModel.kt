@@ -2,14 +2,14 @@ package com.salazar.cheers.ui.main.tickets
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.data.repository.ticket.TicketRepository
 import com.salazar.cheers.core.data.internal.Ticket
-import com.salazar.cheers.ui.main.home.HomeUIAction
+import com.salazar.cheers.data.repository.ticket.TicketRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 data class TicketsUiState(

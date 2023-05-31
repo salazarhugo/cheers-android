@@ -13,13 +13,13 @@ import androidx.work.*
 import com.google.accompanist.pager.PagerState
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.data.internal.PostType
+import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.core.data.location.DefaultLocationClient
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.drink.domain.models.Drink
 import com.salazar.cheers.drink.domain.usecase.ListDrinkUseCase
-import com.salazar.cheers.core.data.internal.PostType
-import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -43,7 +43,7 @@ data class CreatePostUiState(
     val location: String = "",
     val locationResults: List<SearchResult> = emptyList(),
     val selectedLocation: SearchResult? = null,
-    val selectedTagUsers: List<UserItem> = emptyList(),
+    val selectedTagUsers: List<com.salazar.cheers.core.model.UserItem> = emptyList(),
     val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
     val privacy: Privacy = Privacy.FRIENDS,
     val allowJoin: Boolean = true,
@@ -116,7 +116,7 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun selectTagUser(user: UserItem) {
+    fun selectTagUser(user: com.salazar.cheers.core.model.UserItem) {
         val l = viewModelState.value.selectedTagUsers.toMutableList()
         if (l.contains(user)) l.remove(user) else l.add(user)
         viewModelState.update {

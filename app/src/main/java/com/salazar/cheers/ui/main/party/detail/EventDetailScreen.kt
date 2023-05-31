@@ -23,12 +23,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.event.*
 import com.salazar.cheers.core.data.internal.Party
 import com.salazar.cheers.core.data.internal.WatchStatus
-import com.salazar.cheers.core.data.internal.numberFormatter
-import com.salazar.cheers.ui.theme.GreySheet
+import com.salazar.cheers.core.util.numberFormatter
+import com.salazar.cheers.ui.compose.DividerM3
+import com.salazar.cheers.ui.compose.event.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +53,8 @@ fun EventDetailScreen(
         sheetState = state,
         sheetContent = {
             EventManageSheet(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .systemBarsPadding(),
                 onCopyLink = onCopyLink,
                 onEditClick = onEditClick,
@@ -62,7 +62,7 @@ fun EventDetailScreen(
             )
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else com.salazar.cheers.core.share.ui.GreySheet,
     ) {
         Scaffold {
             Box(

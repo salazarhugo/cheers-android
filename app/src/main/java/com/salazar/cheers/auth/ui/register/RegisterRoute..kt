@@ -2,17 +2,18 @@ package com.salazar.cheers.auth.ui.register
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.navigation.CheersNavigationActions
 import com.salazar.cheers.auth.ui.signin.username.ChooseUsernameScreen
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
 /**
@@ -25,7 +26,7 @@ fun RegisterRoute(
     registerViewModel: RegisterViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by registerViewModel.uiState.collectAsState()
+    val uiState by registerViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.success) {
         if (!uiState.success) return@LaunchedEffect

@@ -1,9 +1,9 @@
 package com.salazar.cheers.ui.main.profile
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Profile stats screen.
@@ -17,7 +17,7 @@ fun ProfileStatsRoute(
     username: String,
     verified: Boolean,
 ) {
-    val uiState by profileStatsViewModel.uiState.collectAsState()
+    val uiState by profileStatsViewModel.uiState.collectAsStateWithLifecycle()
     ProfileStatsScreen(
         uiState = uiState,
         username = username,

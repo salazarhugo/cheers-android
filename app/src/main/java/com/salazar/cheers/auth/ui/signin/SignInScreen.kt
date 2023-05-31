@@ -4,7 +4,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
@@ -17,7 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -35,14 +33,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.CircularProgressIndicatorM3
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.animations.AnimateVisibilityFade
-import com.salazar.cheers.ui.compose.animations.AnimatedLogo
+import com.salazar.cheers.core.ui.animations.AnimatedLogo
 import com.salazar.cheers.ui.compose.buttons.GoogleButton
-import com.salazar.cheers.ui.compose.share.ButtonWithLoading
-import com.salazar.cheers.ui.compose.share.ErrorMessage
-import com.salazar.cheers.ui.theme.Typography
+import com.salazar.cheers.core.ui.ui.ButtonWithLoading
+import com.salazar.cheers.core.ui.ui.ErrorMessage
 
 @Preview
 @Composable
@@ -120,7 +115,7 @@ fun SignInScreen(
                 ) {
                     PasswordTextField(uiState, onPasswordChanged = onPasswordChanged)
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
                 LoginButton(
                     isLoading = uiState.isLoading,
                     signInWithEmailPassword = onSignInClick,

@@ -6,15 +6,18 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.core.data.Resource
-import com.salazar.cheers.post.data.repository.PostRepository
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.comment.domain.usecase.create_comment.CreateCommentUseCase
 import com.salazar.cheers.comment.domain.usecase.like_comment.LikeCommentUseCase
+import com.salazar.common.util.Resource
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

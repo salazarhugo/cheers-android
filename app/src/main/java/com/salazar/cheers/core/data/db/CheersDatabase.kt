@@ -3,14 +3,14 @@ package com.salazar.cheers.core.data.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.salazar.cheers.chat.data.db.ChatDao
 import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.comment.domain.models.Comment
+import com.salazar.cheers.core.data.internal.*
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.*
-import com.salazar.cheers.chat.domain.models.ChatChannel
-import com.salazar.cheers.chat.domain.models.ChatMessage
-import com.salazar.cheers.core.data.internal.*
+import com.salazar.cheers.feature.chat.data.db.ChatDao
+import com.salazar.cheers.feature.chat.domain.models.ChatChannel
+import com.salazar.cheers.feature.chat.domain.models.ChatMessage
 import com.salazar.cheers.friendship.domain.models.FriendRequest
 import com.salazar.cheers.notes.data.db.NoteDao
 import com.salazar.cheers.notes.domain.models.Note
@@ -22,7 +22,7 @@ import com.salazar.cheers.notes.domain.models.Note
         RecentUser::class,
         Post::class,
         Party::class,
-        UserItem::class,
+        com.salazar.cheers.core.model.UserItem::class,
         User::class,
         UserPreference::class,
         RemoteKey::class,

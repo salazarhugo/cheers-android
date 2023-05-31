@@ -39,17 +39,17 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.mapbox.search.result.SearchSuggestion
+import com.salazar.cheers.feature.chat.ui.components.messageFormatter
+import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.util.startDateFormatter
+import com.salazar.cheers.core.util.timeFormatter
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.event.EventDetails
-import com.salazar.cheers.core.data.internal.Privacy
-import com.salazar.cheers.core.data.internal.startDateFormatter
-import com.salazar.cheers.core.data.internal.timeFormatter
 import com.salazar.cheers.ui.main.add.LocationSection
 import com.salazar.cheers.ui.main.add.PrivacyBottomSheet
 import com.salazar.cheers.ui.main.add.SwitchPreference
-import com.salazar.cheers.chat.ui.components.messageFormatter
 import com.salazar.cheers.ui.main.search.SearchLocation
-import com.salazar.cheers.ui.theme.Roboto
+import com.salazar.cheers.core.ui.theme.Roboto
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -360,13 +360,13 @@ fun StartDateInput(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clickable { startDatePicker.show() },
-                text = startDateFormatter(timestamp = uiState.startTimeSeconds.toLong()),
+                text = com.salazar.cheers.core.util.startDateFormatter(timestamp = uiState.startTimeSeconds.toLong()),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 modifier = Modifier
                     .clickable { startTimePicker.show() },
-                text = timeFormatter(timestamp = uiState.startTimeSeconds.toLong()),
+                text = com.salazar.cheers.core.util.timeFormatter(timestamp = uiState.startTimeSeconds.toLong()),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -384,13 +384,13 @@ fun StartDateInput(
                     modifier = Modifier
                         .padding(vertical = 16.dp)
                         .clickable { endDatePicker.show() },
-                    text = startDateFormatter(timestamp = uiState.endTimeSeconds.toLong()),
+                    text = com.salazar.cheers.core.util.startDateFormatter(timestamp = uiState.endTimeSeconds.toLong()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     modifier = Modifier
                         .clickable { endTimePicker.show() },
-                    text = timeFormatter(timestamp = uiState.endTimeSeconds.toLong()),
+                    text = com.salazar.cheers.core.util.timeFormatter(timestamp = uiState.endTimeSeconds.toLong()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

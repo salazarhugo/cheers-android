@@ -1,11 +1,11 @@
 package com.salazar.cheers.ui.main.stats
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.LoadingScreen
 
 /**
  * Stateful composable that displays the Navigation route for the DrinkingStats screen.
@@ -17,7 +17,7 @@ fun DrinkingStatsRoute(
     drinkingStatsViewModel: DrinkingStatsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by drinkingStatsViewModel.uiState.collectAsState()
+    val uiState by drinkingStatsViewModel.uiState.collectAsStateWithLifecycle()
     val userStats = uiState.userStats
 
     if (userStats != null)
@@ -25,5 +25,5 @@ fun DrinkingStatsRoute(
             userStats = userStats
         )
     else
-        LoadingScreen()
+        com.salazar.cheers.core.share.ui.LoadingScreen()
 }

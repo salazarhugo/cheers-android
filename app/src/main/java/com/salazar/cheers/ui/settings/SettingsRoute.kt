@@ -2,12 +2,11 @@ package com.salazar.cheers.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Settings screen.
@@ -19,7 +18,7 @@ fun SettingsRoute(
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by settingsViewModel.uiState.collectAsState()
+    val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(uiState.signedOut) {
@@ -48,7 +47,7 @@ fun SettingsRoute(
             }
         },
         navigateToBecomeVip = {},
-        onDeleteAccount = settingsViewModel::onDeleteAccount,
+        onDeleteAccount = { navActions.navigateToDeleteAccount() },
     )
 }
 

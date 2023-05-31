@@ -1,11 +1,10 @@
 package com.salazar.cheers.comment.ui.replies
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.comment.ui.comments.CommentsUIAction
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Replies screen.
@@ -17,7 +16,7 @@ fun RepliesRoute(
     repliesViewModel: RepliesViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by repliesViewModel.uiState.collectAsState()
+    val uiState by repliesViewModel.uiState.collectAsStateWithLifecycle()
 
     RepliesScreen(
         uiState = uiState,

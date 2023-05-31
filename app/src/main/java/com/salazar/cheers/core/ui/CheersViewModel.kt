@@ -3,16 +3,29 @@ package com.salazar.cheers.core.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.messaging.FirebaseMessaging
+import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.core.data.util.Constants
 import com.salazar.cheers.data.db.entities.Theme
 import com.salazar.cheers.data.db.entities.UserPreference
-import com.salazar.cheers.chat.data.repository.ChatRepository
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.feature.chat.data.repository.ChatRepository
+import com.salazar.cheers.feature.chat.data.websocket.ChatWebSocketListener
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.WebSocket
 import javax.inject.Inject
 
@@ -27,7 +40,7 @@ data class CheersUiState(
 
 @HiltViewModel
 class CheersViewModel @Inject constructor(
-    webSocket: WebSocket,
+    private val chatWebSocketListener: ChatWebSocketListener,
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
@@ -42,14 +55,13 @@ class CheersViewModel @Inject constructor(
         )
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             chatRepository.getUnreadChatCount().collect { unreadChatCount ->
                 viewModelState.update {
                     it.copy(unreadChatCount = unreadChatCount)
                 }
             }
         }
-        webSocket.send("Hello")
     }
 
     fun onAuthChange(auth: FirebaseAuth) {
@@ -68,7 +80,11 @@ class CheersViewModel @Inject constructor(
 
         getAndSaveRegistrationToken()
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            initWebSocket(auth.currentUser!!)
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
             chatRepository.getUnreadChatCount().collect { unreadChatCount ->
                 viewModelState.update {
                     it.copy(unreadChatCount = unreadChatCount)
@@ -76,13 +92,27 @@ class CheersViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             chatRepository.getInbox()
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             userRepository.getCurrentUserFlow().collect(::updateUser)
         }
+    }
+
+    private suspend fun initWebSocket(user: FirebaseUser) = withContext(Dispatchers.IO) {
+        val task: Task<GetTokenResult> = user.getIdToken(false)
+        val tokenResult = Tasks.await(task)
+        val idToken = tokenResult.token ?: return@withContext
+
+        val request = Request.Builder()
+            .url("${Constants.WEBSOCKET_URL}?token=" + idToken)
+            .build()
+
+        val client = OkHttpClient()
+
+        client.newWebSocket(request, chatWebSocketListener)
     }
 
     private fun updateUser(user: User) {

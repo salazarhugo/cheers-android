@@ -3,17 +3,17 @@ package com.salazar.cheers.ui.main.otherprofile
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.core.data.util.Utils.copyToClipboard
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 
 /**
  * Stateful composable that displays the Navigation route for the Other profile screen.
@@ -26,7 +26,7 @@ fun OtherProfileRoute(
     navActions: CheersNavigationActions,
     username: String,
 ) {
-    val uiState by otherProfileViewModel.uiState.collectAsState()
+    val uiState by otherProfileViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
 

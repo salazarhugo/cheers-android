@@ -15,14 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.EmptyActivity
-import com.salazar.cheers.ui.compose.share.Toolbar
 import com.salazar.cheers.core.data.internal.Ticket
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.share.SwipeToRefresh
-import com.salazar.cheers.ui.compose.share.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.main.home.HomeUIAction
-import com.salazar.cheers.ui.main.home.PostList
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.Toolbar
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 
 @Composable
 fun TicketsScreen(
@@ -65,7 +62,7 @@ fun TicketList(
     onTicketsUIAction: (TicketsUIAction) -> Unit,
 ) {
     if (tickets.isEmpty())
-        EmptyActivity()
+        com.salazar.cheers.core.share.ui.EmptyActivity()
 
     LazyColumn() {
         items(tickets) { ticket ->

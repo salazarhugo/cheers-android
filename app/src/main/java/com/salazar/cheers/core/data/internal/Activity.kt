@@ -2,8 +2,8 @@ package com.salazar.cheers.core.data.internal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.salazar.cheers.core.data.internal.ActivityType.*
-import java.util.*
+import com.salazar.cheers.core.data.internal.ActivityType.NONE
+import java.util.UUID
 
 
 @Entity(tableName = "activity")

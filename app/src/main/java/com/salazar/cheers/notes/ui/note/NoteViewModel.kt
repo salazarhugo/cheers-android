@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.notes.data.repository.NoteRepository
 import com.salazar.cheers.notes.domain.models.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

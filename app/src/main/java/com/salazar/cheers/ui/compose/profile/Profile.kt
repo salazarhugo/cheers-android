@@ -1,14 +1,12 @@
 package com.salazar.cheers.ui.compose.profile
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
 import com.salazar.cheers.ui.main.profile.ProfileButtons
-import com.salazar.cheers.ui.main.profile.ProfileStats
 
 @Composable
 fun ProfileItem(

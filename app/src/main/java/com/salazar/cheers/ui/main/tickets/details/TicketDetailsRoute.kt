@@ -1,13 +1,11 @@
 package com.salazar.cheers.ui.main.tickets.details
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.compose.ForceBrightness
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.ui.main.tickets.TicketsScreen
-import com.salazar.cheers.ui.main.tickets.TicketsViewModel
 
 /**
  * Stateful composable that displays the Navigation route for the Tickets screen.
@@ -19,7 +17,7 @@ fun TicketDetailsRoute(
     ticketDetailsViewModel: TicketDetailsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by ticketDetailsViewModel.uiState.collectAsState()
+    val uiState by ticketDetailsViewModel.uiState.collectAsStateWithLifecycle()
 
     ForceBrightness()
 

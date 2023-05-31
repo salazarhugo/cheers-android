@@ -3,41 +3,71 @@ package com.salazar.cheers.navigation
 import android.Manifest
 import android.content.Intent
 import android.os.Build
-import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
+import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
+import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
 import com.salazar.cheers.comment.ui.comment_more.CommentMoreRoute
 import com.salazar.cheers.comment.ui.comments.CommentsRoute
 import com.salazar.cheers.comment.ui.delete.DeleteCommentDialog
 import com.salazar.cheers.comment.ui.replies.RepliesRoute
+import com.salazar.cheers.core.data.util.Constants.URI
+import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.core.data.util.Utils.copyToClipboard
+import com.salazar.cheers.core.data.util.Utils.shareToSnapchat
+import com.salazar.cheers.core.share.ui.CheersDestinations
+import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
+import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
+import com.salazar.cheers.map.screens.map.MapRoute
+import com.salazar.cheers.map.screens.settings.MapSettingsRoute
+import com.salazar.cheers.map.ui.MapPostHistoryRoute
+import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
+import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.ui.CheersAppState
-import com.salazar.cheers.ui.compose.LoadingScreen
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.share.ui.MainDestinations
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
+import com.salazar.cheers.core.share.ui.RequestPermission
 import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.CreatePostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
-import com.salazar.cheers.chat.ui.screens.chat.ChatRoute
-import com.salazar.cheers.ui.main.chats.ChatsMoreBottomSheet
-import com.salazar.cheers.ui.main.chats.ChatsSheetViewModel
-import com.salazar.cheers.ui.main.chats.MessagesRoute
-import com.salazar.cheers.ui.main.chats.NewChatRoute
+import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
+import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
+import com.salazar.cheers.feature.chat.ui.chats.MessagesRoute
+import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.main.friendrequests.FriendRequestsRoute
+import com.salazar.cheers.ui.main.home.HomeRoute
+import com.salazar.cheers.ui.main.home.HomeViewModel
+import com.salazar.cheers.ui.main.nfc.NfcRoute
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
+import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
 import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
 import com.salazar.cheers.ui.main.party.EventsRoute
@@ -45,14 +75,7 @@ import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
 import com.salazar.cheers.ui.main.party.detail.EventDetailRoute
 import com.salazar.cheers.ui.main.party.edit.EditEventRoute
 import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
-import com.salazar.cheers.ui.main.home.HomeRoute
-import com.salazar.cheers.ui.main.home.HomeViewModel
-import com.salazar.cheers.map.screens.settings.MapSettingsRoute
-import com.salazar.cheers.ui.main.nfc.NfcRoute
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
 import com.salazar.cheers.ui.main.profile.*
-import com.salazar.cheers.chat.ui.screens.room.RoomRoute
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
@@ -62,25 +85,15 @@ import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
 import com.salazar.cheers.ui.main.tickets.TicketsRoute
 import com.salazar.cheers.ui.main.tickets.details.TicketDetailsRoute
-import com.salazar.cheers.ui.sheets.*
-import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
-import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
-import com.salazar.cheers.map.ui.MapPostHistoryRoute
-import com.salazar.cheers.map.screens.map.MapRoute
-import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
-import com.salazar.cheers.notes.ui.note.NoteRoute
-import com.salazar.cheers.ui.compose.utils.RequestPermission
+import com.salazar.cheers.ui.sheets.DeletePostDialog
+import com.salazar.cheers.ui.sheets.DeleteStoryDialog
+import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
-import com.salazar.cheers.ui.theme.CheersTheme
-import com.salazar.cheers.core.data.util.Constants.URI
-import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.core.data.util.Utils.copyToClipboard
-import com.salazar.cheers.core.data.util.Utils.shareToSnapchat
+import com.salazar.cheers.core.ui.theme.CheersTheme
 
 
 fun NavGraphBuilder.mainNavGraph(
     appState: CheersAppState,
-    showInterstitialAd: () -> Unit,
 ) {
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
@@ -199,7 +212,6 @@ fun NavGraphBuilder.mainNavGraph(
             CheersTheme(darkTheme = true) {
                 StoryRoute(
                     navActions = appState.navActions,
-                    showInterstitialAd = showInterstitialAd,
                     bottomSheetNavigator = appState.bottomSheetNavigator,
                 )
             }
@@ -265,7 +277,7 @@ fun NavGraphBuilder.mainNavGraph(
             val homeViewModel = hiltViewModel<HomeViewModel>(parentEntry)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
+                com.salazar.cheers.core.share.ui.RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
             }
             HomeRoute(
                 appState = appState,
@@ -344,13 +356,20 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         dialog(
+            route = MainDestinations.ACCOUNT_DELETE,
+        ) {
+            DeleteAccountDialog(
+                navActions = appState.navActions
+            )
+        }
+
+        dialog(
             route = "${MainDestinations.COMMENT_DELETE}/{commentID}",
         ) {
             DeleteCommentDialog(
                 navActions = appState.navActions
             )
         }
-
 
         composable(
             route = "${MainDestinations.DRINKING_STATS}/{username}",
@@ -630,7 +649,7 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         val chatsSheetViewModel = hiltViewModel<ChatsSheetViewModel>()
 
-        val uiState by chatsSheetViewModel.uiState.collectAsState()
+        val uiState by chatsSheetViewModel.uiState.collectAsStateWithLifecycle()
         val room = uiState.room
 
         val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
@@ -658,6 +677,6 @@ fun NavGraphBuilder.mainNavGraph(
                 }
             )
         else
-            LoadingScreen()
+            com.salazar.cheers.core.share.ui.LoadingScreen()
     }
 }

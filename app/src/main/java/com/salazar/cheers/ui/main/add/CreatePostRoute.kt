@@ -4,11 +4,11 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.map.ui.ChooseOnMapScreen
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Add post screen.
@@ -20,7 +20,7 @@ fun CreatePostRoute(
     navActions: CheersNavigationActions,
     addPostViewModel: CreatePostViewModel = hiltViewModel(),
 ) {
-    val uiState by addPostViewModel.uiState.collectAsState()
+    val uiState by addPostViewModel.uiState.collectAsStateWithLifecycle()
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
             if (it.size <= 8)

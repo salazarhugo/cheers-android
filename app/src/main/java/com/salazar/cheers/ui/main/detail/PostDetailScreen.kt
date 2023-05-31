@@ -36,18 +36,17 @@ import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.post.ui.item.LikeButton
 import com.salazar.cheers.post.ui.item.PostBody
 import com.salazar.cheers.post.ui.item.PostHeader
-import com.salazar.cheers.post.ui.PostText
+import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.user.ui.FollowButton
-import com.salazar.cheers.data.db.entities.UserItem
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.Privacy
-import com.salazar.cheers.ui.compose.utils.PrettyImage
-import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import java.util.*
 
 @Composable
@@ -69,9 +68,10 @@ fun PostDetailScreen(
         topBar = {
             TopAppBar(title = { 
                 Text(
-                text = stringResource(id = R.string.post),
-                fontWeight = FontWeight.Bold,
-                fontFamily = Roboto)
+                    text = stringResource(id = R.string.post),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto
+                )
               },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
@@ -152,7 +152,7 @@ fun StaticMap(
     }
 
     val url = remember { staticImage.url().toString() }
-    PrettyImage(
+    com.salazar.cheers.core.share.ui.PrettyImage(
         modifier = modifier
             .clickable { onMapClick() },
         data = url,
@@ -198,7 +198,7 @@ fun PostDetails(
 @Composable
 fun Post(
     post: Post,
-    members: List<UserItem>?,
+    members: List<com.salazar.cheers.core.model.UserItem>?,
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
     onDelete: () -> Unit,

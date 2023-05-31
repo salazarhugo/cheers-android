@@ -1,10 +1,10 @@
 package com.salazar.cheers.ui.main.party
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Events screen.
@@ -16,7 +16,7 @@ fun EventsRoute(
     eventsViewModel: EventsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by eventsViewModel.uiState.collectAsState()
+    val uiState by eventsViewModel.uiState.collectAsStateWithLifecycle()
 
     EventsScreen(
         uiState = uiState,

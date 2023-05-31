@@ -3,15 +3,15 @@ package com.salazar.cheers.ui.sheets.post_more
 import android.content.Intent
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
-import com.salazar.cheers.post.ui.PostMoreBottomSheet
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.core.data.util.Utils.copyToClipboard
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.post.ui.PostMoreBottomSheet
 
 /**
  * Stateful composable that displays the Navigation route for the Comments screen.
@@ -23,7 +23,7 @@ fun PostMoreRoute(
     postMoreViewModel: PostMoreViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by postMoreViewModel.uiState.collectAsState()
+    val uiState by postMoreViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val post = uiState.post

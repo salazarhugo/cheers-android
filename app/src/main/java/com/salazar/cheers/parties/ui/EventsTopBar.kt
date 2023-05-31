@@ -1,9 +1,6 @@
 package com.salazar.cheers.parties.ui
 
 import androidx.compose.foundation.Image
-import com.salazar.cheers.ui.main.search.SearchBar
-import com.salazar.cheers.ui.compose.ChipGroup
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,9 +12,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.R
+import com.salazar.cheers.ui.compose.ChipGroup
 
 @Composable
 fun EventsTopBar(

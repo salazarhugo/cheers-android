@@ -1,11 +1,11 @@
 package com.salazar.cheers.map.screens.settings
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
-import com.salazar.cheers.navigation.CheersNavigationActions
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Map screen.
@@ -17,7 +17,7 @@ fun MapSettingsRoute(
     mapViewModel: MapSettingsViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by mapViewModel.uiState.collectAsState()
+    val uiState by mapViewModel.uiState.collectAsStateWithLifecycle()
 
     BottomSheetM3 {
         MapSettingsScreen(

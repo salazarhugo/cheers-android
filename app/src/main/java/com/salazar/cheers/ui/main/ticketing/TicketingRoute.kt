@@ -1,13 +1,12 @@
 package com.salazar.cheers.ui.main.ticketing
 
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Ticketing screen.
@@ -19,7 +18,7 @@ fun TicketingRoute(
     ticketingViewModel: TicketingViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
 ) {
-    val uiState by ticketingViewModel.uiState.collectAsState()
+    val uiState by ticketingViewModel.uiState.collectAsStateWithLifecycle()
 
     TicketingScreen(
         uiState = uiState,

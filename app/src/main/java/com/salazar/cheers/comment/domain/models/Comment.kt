@@ -2,7 +2,6 @@ package com.salazar.cheers.comment.domain.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.salazar.cheers.core.data.internal.User
 
 @Entity(tableName = "comments")
 data class Comment(

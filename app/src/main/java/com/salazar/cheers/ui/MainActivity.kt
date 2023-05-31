@@ -31,13 +31,13 @@ import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.Language
 import com.salazar.cheers.Settings
 import com.salazar.cheers.core.data.datastore.DataStoreRepository
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import com.salazar.cheers.core.data.util.StorageUtil
 import com.salazar.cheers.core.data.util.Utils.setLocale
+import com.salazar.cheers.core.ui.CheersViewModel
+import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -76,14 +76,12 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
             CheersApp(
                 appSettings = appSettings,
-                showInterstitialAd = ::showInterstitialAd,
             )
         }
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
-        initInterstitialAd()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
@@ -99,11 +97,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     override fun onResume() {
         super.onResume()
-
-        val scope = CoroutineScope(Dispatchers.Main)
-        scope.launch {
-            friendshipRepository.fetchFriendRequest().collect {}
-        }
 
         Log.d("INTENT", intent.data.toString())
         val data = intent.data ?: return
@@ -137,32 +130,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                 loadForm(consentInformation = consentInformation)
         },
             {
-            })
-    }
-
-    fun showInterstitialAd() {
-        mInterstitialAd?.show(this)
-    }
-
-    fun initInterstitialAd() {
-        val configuration = RequestConfiguration.Builder()
-            .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
-        MobileAds.setRequestConfiguration(configuration)
-
-        val adRequest: AdRequest = AdRequest.Builder().build()
-
-        InterstitialAd.load(
-            this,
-            "ca-app-pub-7182026441345500/2922347081",
-            adRequest,
-            object : InterstitialAdLoadCallback() {
-                override fun onAdLoaded(@NonNull interstitialAd: InterstitialAd) {
-                    mInterstitialAd = interstitialAd
-                }
-
-                override fun onAdFailedToLoad(@NonNull loadAdError: LoadAdError) {
-                    mInterstitialAd = null
-                }
             })
     }
 

@@ -5,7 +5,6 @@ import android.nfc.NdefRecord.createMime
 import android.nfc.NfcAdapter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Contactless
 import androidx.compose.material3.Card

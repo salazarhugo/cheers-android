@@ -1,7 +1,6 @@
 package com.salazar.cheers.ui.settings.password
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.share.ButtonWithLoading
-import com.salazar.cheers.ui.compose.share.Toolbar
+import com.salazar.cheers.core.ui.ui.ButtonWithLoading
+import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun CreatePasswordScreen(
@@ -72,7 +71,9 @@ fun ShareButton(
     onClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding(),
         verticalArrangement = Arrangement.Bottom,
     ) {
         DividerM3()

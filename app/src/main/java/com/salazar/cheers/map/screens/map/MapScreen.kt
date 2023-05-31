@@ -6,8 +6,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -19,7 +17,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,25 +27,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import com.mapbox.maps.plugin.animation.flyTo
-import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
-import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.map.domain.models.UserLocation
-import com.salazar.cheers.map.ui.annotations.CurrentUserAnnotation
 import com.salazar.cheers.map.ui.annotations.FriendAnnotation
 import com.salazar.cheers.map.ui.annotations.PostAnnotation
 import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
 import com.salazar.cheers.map.ui.dialogs.PostMapDialog
 import com.salazar.cheers.map.ui.dialogs.UserMapDialog
-import com.salazar.cheers.ui.compose.extensions.noRippleClickable
+import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.share.ui.Permission
 import com.salazar.cheers.ui.main.home.HomeUIAction
-import com.salazar.cheers.ui.theme.GreySheet
-import com.salazar.cheers.core.data.util.Utils
+import com.salazar.cheers.core.share.ui.GreySheet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -86,16 +77,17 @@ fun MapScreen(
                                     uiState.sheetState.collapse()
                                 }
                             },
-                            onChatClick = {
-                                onMapUIAction(MapUIAction.OnChatClick(it))
-                            }
-                        )
+                        onChatClick = {
+                            onMapUIAction(MapUIAction.OnChatClick(it))
+                        }
+                    )
+
                     null -> {}
                 }
             }
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else com.salazar.cheers.core.share.ui.GreySheet,
         sheetElevation = 0.dp,
         floatingActionButton = {
             FloatingActionButton(
@@ -110,7 +102,7 @@ fun MapScreen(
         Box(
             contentAlignment = Alignment.BottomCenter,
         ) {
-            Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
+            com.salazar.cheers.core.share.ui.Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = {

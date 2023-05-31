@@ -16,11 +16,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.data.enums.StoryState
+import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.relativeTimeFormatter
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.ui.compose.share.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun PostHeader(
@@ -55,7 +53,7 @@ fun PostHeader(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Username(
+                    com.salazar.cheers.core.share.ui.Username(
                         username = post.username,
                         verified = post.verified,
                         textStyle = MaterialTheme.typography.bodyMedium,
@@ -77,7 +75,7 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = relativeTimeFormatter(epoch = post.createTime),
+                text = com.salazar.cheers.core.util.relativeTimeFormatter(epoch = post.createTime),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
                 color = color,

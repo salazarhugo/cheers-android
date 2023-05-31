@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.PhotoAlbum
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -45,11 +43,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.ui.compose.animations.Bounce
-import com.salazar.cheers.ui.compose.utils.Permission
 import com.salazar.cheers.core.data.util.Utils.createFile
 import com.salazar.cheers.core.data.util.Utils.getOutputDirectory
 import com.salazar.cheers.core.data.util.Utils.getOutputFileOptions
+import com.salazar.cheers.core.ui.animations.Bounce
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -92,7 +89,7 @@ fun CameraScreen(
         }
     ) {
         it
-        Permission(Manifest.permission.CAMERA) {
+        com.salazar.cheers.core.share.ui.Permission(Manifest.permission.CAMERA) {
             CameraPreview(
 //                modifier = Modifier.padding(it),
                 imageCapture = imageCapture,
@@ -417,7 +414,7 @@ fun CameraPreview(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = {
-                              onCameraUIAction(CameraUIAction.OnSwitchCameraClick)
+                                onCameraUIAction(CameraUIAction.OnSwitchCameraClick)
                             },
                         )
                     }

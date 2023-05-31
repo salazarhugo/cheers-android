@@ -4,16 +4,22 @@ import android.util.Log
 import cheers.user.v1.GetUserRequest
 import cheers.user.v1.UserServiceGrpcKt
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.core.data.Resource
 import com.salazar.cheers.core.data.Result
 import com.salazar.cheers.core.data.db.CheersDatabase
+import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.data.db.UserDao
 import com.salazar.cheers.data.mapper.toUser
-import com.salazar.cheers.core.data.internal.User
+import com.salazar.common.util.Resource
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -65,6 +71,10 @@ class AuthRepository @Inject constructor(
     suspend fun signOut() {
         FirebaseAuth.getInstance().signOut()
         database.clearAllTables()
+    }
+
+    suspend fun deleteAccount(): Task<Void> {
+        return FirebaseAuth.getInstance().currentUser!!.delete()
     }
 
     fun sendSignInLink(email: String): com.google.android.gms.tasks.Task<Void> {

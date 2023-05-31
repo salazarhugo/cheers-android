@@ -1,7 +1,7 @@
 package com.salazar.cheers.user.domain.usecase.list_suggestions
 
+import com.salazar.common.di.IODispatcher
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.core.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

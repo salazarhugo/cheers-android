@@ -1,8 +1,8 @@
 package com.salazar.cheers.comment.domain.usecase.delete_comment
 
 import com.salazar.cheers.comment.data.CommentRepository
+import com.salazar.common.di.IODispatcher
 import com.salazar.cheers.post.data.repository.PostRepository
-import com.salazar.cheers.core.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

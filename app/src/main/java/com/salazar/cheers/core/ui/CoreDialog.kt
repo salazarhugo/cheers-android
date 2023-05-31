@@ -1,14 +1,10 @@
 package com.salazar.cheers.core.ui
 
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import com.salazar.cheers.R
-import com.salazar.cheers.core.domain.model.ErrorMessage
+import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 
 
 @Composable
@@ -19,6 +15,7 @@ fun CoreDialog(
     dismissButton: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    isLoading: Boolean = false,
 ) {
     var open by remember { mutableStateOf(true) }
 
@@ -52,13 +49,10 @@ fun CoreDialog(
         },
         confirmButton = {
             if (confirmButton.isNotBlank())
-                Button(
+                ButtonWithLoading(
                     onClick = onConfirm,
-                    content = {
-                        Text(
-                            text = confirmButton,
-                        )
-                    }
+                    text = confirmButton,
+                    isLoading = isLoading,
                 )
         },
     )

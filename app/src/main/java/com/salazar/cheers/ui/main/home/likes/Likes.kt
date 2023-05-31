@@ -17,12 +17,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.ui.compose.LoadingScreen
-import com.salazar.cheers.ui.compose.Username
-import com.salazar.cheers.user.ui.FollowButton
 import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.ui.theme.Roboto
-import com.salazar.cheers.ui.theme.Typography
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.share.ui.Username
+import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.theme.Typography
+import com.salazar.cheers.user.ui.FollowButton
 
 @Composable
 fun LikesScreen(
@@ -34,7 +34,7 @@ fun LikesScreen(
     ) {
         Column {
             if (uiState.isLoading)
-                LoadingScreen()
+                com.salazar.cheers.core.share.ui.LoadingScreen()
             val users = uiState.users
             if (users != null)
                 UserList(users = users)
@@ -95,7 +95,7 @@ fun UserCard(user: User) {
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                Username(
+                com.salazar.cheers.core.share.ui.Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium

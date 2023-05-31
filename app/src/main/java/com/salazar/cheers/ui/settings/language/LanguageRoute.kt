@@ -2,9 +2,9 @@ package com.salazar.cheers.ui.settings.language
 
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.salazar.cheers.navigation.CheersNavigationActions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.ui.settings.SettingsViewModel
 
 /**
@@ -17,7 +17,7 @@ fun LanguageRoute(
     navActions: CheersNavigationActions,
     settingsViewModel: SettingsViewModel,
 ) {
-    val uiState by settingsViewModel.uiState.collectAsState()
+    val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
     LanguageScreen(
         onBackPressed = { navActions.navigateBack() },

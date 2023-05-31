@@ -8,6 +8,9 @@ import com.google.accompanist.navigation.animation.navigation
 import com.salazar.cheers.auth.ui.register.RegisterRoute
 import com.salazar.cheers.auth.ui.signin.SignInRoute
 import com.salazar.cheers.auth.ui.signup.SignUpRoute
+import com.salazar.cheers.core.share.ui.AuthDestinations
+import com.salazar.cheers.core.share.ui.CheersDestinations
+import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 fun NavGraphBuilder.authNavGraph(
     navActions: CheersNavigationActions,

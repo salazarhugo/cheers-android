@@ -3,9 +3,8 @@ package com.salazar.cheers.ui.main.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.db.entities.UserItem
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.core.data.internal.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,8 +19,8 @@ data class ProfileStatsUiState(
     val isFollowers: Boolean = true,
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
-    val followers: List<UserItem>? = null,
-    val following: List<UserItem>? = null,
+    val followers: List<com.salazar.cheers.core.model.UserItem>? = null,
+    val following: List<com.salazar.cheers.core.model.UserItem>? = null,
 )
 
 @HiltViewModel
