@@ -4,11 +4,12 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ sealed interface PostDetailUiState {
     ) : PostDetailUiState
 
     data class HasPost(
-        val postFeed: Post,
+        val postFeed: com.salazar.cheers.data.post.repository.Post,
         val members: List<com.salazar.cheers.core.model.UserItem>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -31,7 +32,7 @@ sealed interface PostDetailUiState {
 }
 
 private data class PostDetailViewModelState(
-    val postFeed: Post? = null,
+    val postFeed: com.salazar.cheers.data.post.repository.Post? = null,
     val members: List<com.salazar.cheers.core.model.UserItem>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
@@ -54,7 +55,7 @@ private data class PostDetailViewModelState(
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -99,13 +100,13 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updatePost(post: Post?) {
+    private fun updatePost(post: com.salazar.cheers.data.post.repository.Post?) {
         viewModelState.update {
             it.copy(postFeed = post)
         }
     }
 
-    fun toggleLike(post: Post) {
+    fun toggleLike(post: com.salazar.cheers.data.post.repository.Post) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
         }

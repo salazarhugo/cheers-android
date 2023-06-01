@@ -15,9 +15,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import cheers.type.PostOuterClass
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.internal.PostType
 import com.salazar.cheers.core.data.util.StorageUtil
-import com.salazar.cheers.post.data.repository.PostRepository
 import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -29,7 +27,7 @@ import java.io.ByteArrayOutputStream
 class CreatePostWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
 ) : CoroutineWorker(appContext, params) {
 
 
@@ -81,8 +79,8 @@ class CreatePostWorker @AssistedInject constructor(
 
         try {
             when (postType) {
-                PostType.VIDEO -> {}
-                PostType.IMAGE -> {
+                com.salazar.cheers.data.post.repository.PostType.VIDEO -> {}
+                com.salazar.cheers.data.post.repository.PostType.IMAGE -> {
                     val downloadUrls = mutableListOf<String>()
 
                     coroutineScope {
@@ -106,7 +104,8 @@ class CreatePostWorker @AssistedInject constructor(
                         sendNotificationToFriends = notify,
                     )
                 }
-                PostType.TEXT -> {
+
+                com.salazar.cheers.data.post.repository.PostType.TEXT -> {
                     val post = postBuilder
                         .setType(PostOuterClass.PostType.TEXT)
                         .build()

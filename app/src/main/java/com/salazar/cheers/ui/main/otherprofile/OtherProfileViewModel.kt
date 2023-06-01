@@ -5,18 +5,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.chat.v1.GetRoomIdReq
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.feature.chat.data.repository.ChatRepository
 import com.salazar.cheers.friendship.domain.usecase.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.friendship.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.friendship.domain.usecase.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.parties.data.repository.PartyRepository
-import com.salazar.cheers.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +33,7 @@ sealed interface OtherProfileUiState {
     ) : OtherProfileUiState
 
     data class HasUser(
-        val posts: List<Post>? = null,
+        val posts: List<com.salazar.cheers.data.post.repository.Post>? = null,
         val parties: List<Party>? = null,
         val user: User,
         override val isLoading: Boolean,
@@ -41,7 +43,7 @@ sealed interface OtherProfileUiState {
 
 private data class OtherProfileViewModelState(
     val user: User? = null,
-    val posts: List<Post>? = null,
+    val posts: List<com.salazar.cheers.data.post.repository.Post>? = null,
     val parties: List<Party>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
@@ -68,7 +70,7 @@ private data class OtherProfileViewModelState(
 class OtherProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
     private val chatRepository: ChatRepository,
     private val partyRepository: PartyRepository,
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
@@ -148,7 +150,7 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike(post: Post) {
+    fun toggleLike(post: com.salazar.cheers.data.post.repository.Post) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
         }
@@ -160,7 +162,7 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    private fun updatePosts(posts: List<Post>) {
+    private fun updatePosts(posts: List<com.salazar.cheers.data.post.repository.Post>) {
         viewModelState.update {
             it.copy(posts = posts)
         }

@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.auth.domain.usecase.RegisterUseCase
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
-import com.salazar.common.util.Resource
 import com.salazar.cheers.core.data.util.Utils.validateUsername
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.UserRepository
+import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

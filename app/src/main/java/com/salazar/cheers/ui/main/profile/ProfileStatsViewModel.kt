@@ -3,8 +3,7 @@ package com.salazar.cheers.ui.main.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

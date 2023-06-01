@@ -1,8 +1,9 @@
 plugins {
     id("cheers.android.application")
+    id("cheers.android.application.compose")
+    id("cheers.android.room")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
-//    id("com.google.protobuf")
     id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.firebase-perf")
@@ -32,14 +33,6 @@ android {
         }
     }
 
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
-    }
-
     packaging {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
@@ -51,10 +44,15 @@ dependencies {
     implementation(project(":ads"))
     implementation(project(":common"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:map"))
+    implementation(project(":feature:search"))
     implementation(project(":core:protobuf"))
     implementation(project(":core:ui"))
     implementation(project(":core:util"))
     implementation(project(":core:model"))
+    implementation(project(":data:post"))
+    implementation(project(":data:user"))
+    implementation(project(":data:note"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -94,7 +92,6 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
 
     // Jetpack Compose BOM
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -104,10 +101,9 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
 
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.extensions)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+//    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // OkHttp BOM
     implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))
@@ -118,10 +114,6 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.moshi)
     ksp(libs.moshi.kotlin.codegen)
-
-    // Material design icons
-    implementation(libs.androidx.material.icons.core)
-    implementation(libs.androidx.material.icons.extended)
 
     // Accompanist System UI Controller
     implementation(libs.accompanist.systemuicontroller)
@@ -156,9 +148,6 @@ dependencies {
 
     // ExoPlayer 2
     implementation(libs.exoplayer)
-
-    // Datastore
-    implementation(libs.androidx.datastore.preferences)
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {
@@ -216,26 +205,12 @@ dependencies {
     // Serialization
     implementation(libs.kotlinx.serialization.json)
 
-    // Room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
     // optional - Paging 3 Integration
     implementation(libs.androidx.room.paging)
-
-    // Map Box SDK
-    implementation("com.mapbox.maps:android:10.12.1") {
-//        exclude group: "com.mapbox.android.core.location.LocationEngine"
-    }
-    implementation(libs.mapbox.sdk.services)
-    implementation(libs.mapbox.search.android)
 
     // Paging
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.paging.compose)
-
-    // Google"s Fused Location Provider
-    implementation(libs.play.services.location)
 
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)
@@ -253,6 +228,11 @@ dependencies {
     // User Messaging Platform
     implementation(libs.user.messaging.platform)
     implementation(libs.androidx.animation.graphics)
+
+    // Map Box SDK
+    implementation("com.mapbox.maps:android:10.12.1")
+    implementation(libs.mapbox.sdk.services)
+    implementation(libs.mapbox.search.android)
 
     // <!------ Debugging ------!>
     testImplementation(libs.junit)

@@ -3,8 +3,7 @@ package com.salazar.cheers.friendship.ui.manage_friendship
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.friendship.domain.usecase.remove_friend.RemoveFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,7 @@ data class ManageFriendshipUiState(
     val userId: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val post: Post? = null,
+    val post: com.salazar.cheers.data.post.repository.Post? = null,
 )
 
 @HiltViewModel

@@ -1,7 +1,15 @@
 package com.salazar.cheers.ui.main.detail
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +17,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -36,18 +52,16 @@ import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.Privacy
 import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
-import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.post.ui.item.LikeButton
 import com.salazar.cheers.post.ui.item.PostBody
 import com.salazar.cheers.post.ui.item.PostHeader
 import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.user.ui.FollowButton
-import java.util.*
+import java.util.Date
 
 @Composable
 fun PostDetailScreen(
@@ -58,7 +72,7 @@ fun PostDetailScreen(
     onLeave: () -> Unit,
     onMessageClicked: () -> Unit,
     onMapClick: () -> Unit,
-    onToggleLike: (Post) -> Unit,
+    onToggleLike: (com.salazar.cheers.data.post.repository.Post) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     val post = uiState.postFeed
@@ -197,7 +211,7 @@ fun PostDetails(
 
 @Composable
 fun Post(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     members: List<com.salazar.cheers.core.model.UserItem>?,
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
@@ -205,7 +219,7 @@ fun Post(
     onUserClick: (String) -> Unit,
     onMapClick: () -> Unit,
     onMessageClicked: () -> Unit,
-    onToggleLike: (Post) -> Unit,
+    onToggleLike: (com.salazar.cheers.data.post.repository.Post) -> Unit,
     isAuthor: Boolean,
 ) {
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -339,10 +353,10 @@ fun Buttons(
 
 @Composable
 fun PostFooter(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     isAuthor: Boolean,
     onDelete: () -> Unit,
-    onToggleLike: (Post) -> Unit,
+    onToggleLike: (com.salazar.cheers.data.post.repository.Post) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,

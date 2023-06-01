@@ -2,7 +2,17 @@ package com.salazar.cheers.ui.main.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,7 +26,13 @@ import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.Celebration
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material3.*
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,19 +49,22 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.R
-import com.salazar.cheers.feature.chat.ui.components.FunctionalityNotAvailablePanel
-import com.salazar.cheers.core.data.internal.*
+import com.salazar.cheers.core.data.internal.Counter
+import com.salazar.cheers.core.data.internal.Party
+import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.PrettyPanel
+import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.core.util.numberFormatter
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.feature.chat.ui.components.FunctionalityNotAvailablePanel
 import com.salazar.cheers.parties.ui.PartyItem
 import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.post.ui.item.PostBody
 import com.salazar.cheers.post.ui.item.PostFooter
 import com.salazar.cheers.post.ui.item.PostHeader
 import com.salazar.cheers.ui.compose.profile.ProfileItem
-import com.salazar.cheers.core.ui.ui.SwipeToRefresh
-import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.core.ui.theme.Roboto
-import com.salazar.cheers.core.util.numberFormatter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,7 +74,7 @@ fun ProfileScreen(
     onEditProfileClicked: () -> Unit,
     onDrinkingStatsClick: (String) -> Unit,
     onPostClicked: (postId: String) -> Unit,
-    onPostLike: (post: Post) -> Unit,
+    onPostLike: (post: com.salazar.cheers.data.post.repository.Post) -> Unit,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: (String) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
@@ -90,7 +109,7 @@ fun Profile(
     onSwipeRefresh: () -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onPostClicked: (postId: String) -> Unit,
-    onPostLike: (post: Post) -> Unit,
+    onPostLike: (post: com.salazar.cheers.data.post.repository.Post) -> Unit,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: (String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
@@ -201,9 +220,9 @@ fun Profile(
 
 @Composable
 fun PostTab(
-    posts: List<Post>?,
+    posts: List<com.salazar.cheers.data.post.repository.Post>?,
     onPostClicked: (postId: String) -> Unit,
-    onPostLike: (post: Post) -> Unit,
+    onPostLike: (post: com.salazar.cheers.data.post.repository.Post) -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
@@ -272,9 +291,9 @@ fun ProfileButtons(
 
 @Composable
 fun Post(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     onPostClicked: (postId: String) -> Unit,
-    onPostLike: (post: Post) -> Unit,
+    onPostLike: (post: com.salazar.cheers.data.post.repository.Post) -> Unit,
     onPostShare: (String) -> Unit = {},
     onPostMoreClicked: (String, String) -> Unit,
     onCommentClick: (String) -> Unit,
@@ -312,7 +331,7 @@ fun Post(
 
 @Composable
 fun GridViewPosts(
-    posts: List<Post>,
+    posts: List<com.salazar.cheers.data.post.repository.Post>,
     onPostClicked: (postId: String) -> Unit,
 ) {
     LazyVerticalGrid(
@@ -327,7 +346,7 @@ fun GridViewPosts(
 
 @Composable
 fun PostItem(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     onPostClicked: (postId: String) -> Unit,
 ) {
     if (post.photos.isEmpty()) return
@@ -335,7 +354,8 @@ fun PostItem(
         modifier = Modifier.padding(1.dp),
         contentAlignment = Alignment.TopEnd
     ) {
-        val url = if (post.type == PostType.VIDEO) post.videoThumbnailUrl else post.photos[0]
+        val url =
+            if (post.type == com.salazar.cheers.data.post.repository.PostType.VIDEO) post.videoThumbnailUrl else post.photos[0]
         com.salazar.cheers.core.share.ui.PrettyImage(
             data = url,
             contentDescription = "avatar",
@@ -349,7 +369,7 @@ fun PostItem(
                 }
         )
 
-        if (post.type == PostType.VIDEO)
+        if (post.type == com.salazar.cheers.data.post.repository.PostType.VIDEO)
             PlayIcon()
     }
 }

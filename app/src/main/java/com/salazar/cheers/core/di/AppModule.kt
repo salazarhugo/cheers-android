@@ -1,7 +1,6 @@
 package com.salazar.cheers.core.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
 import cheers.account.v1.AccountServiceGrpcKt
 import cheers.activity.v1.ActivityServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
@@ -16,20 +15,16 @@ import cheers.post.v1.PostServiceGrpcKt
 import cheers.story.v1.StoryServiceGrpcKt
 import cheers.ticket.v1.TicketServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.salazar.cheers.Settings
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.data.CommentRepositoryImpl
 import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.core.data.api.ApiService
 import com.salazar.cheers.core.data.db.CheersDatabase
-import com.salazar.cheers.core.data.location.DefaultLocationClient
 import com.salazar.cheers.core.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
-import com.salazar.cheers.core.data.serializer.settingsDataStore
 import com.salazar.cheers.core.data.util.Constants
 import com.salazar.cheers.data.db.*
+import com.salazar.cheers.data.post.repository.PostDao
 import com.salazar.cheers.data.repository.account.AccountRepository
 import com.salazar.cheers.data.repository.account.AccountRepositoryImpl
 import com.salazar.cheers.data.repository.activity.ActivityRepository
@@ -40,6 +35,9 @@ import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.repository.ticket.TicketRepository
 import com.salazar.cheers.data.repository.ticket.impl.TicketRepositoryImpl
+import com.salazar.cheers.data.user.UserDao
+import com.salazar.cheers.data.user.UserItemDao
+import com.salazar.cheers.data.user.UserStatsDao
 import com.salazar.cheers.drink.data.repository.DrinkRepository
 import com.salazar.cheers.drink.data.repository.DrinkRepositoryImpl
 import com.salazar.cheers.feature.chat.data.db.ChatDao
@@ -100,23 +98,6 @@ object AppModule {
             .build()
 
         return retrofit.create(ApiService::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideFusedLocationProviderClient(
-        @ApplicationContext context: Context
-    ): FusedLocationProviderClient {
-        return LocationServices.getFusedLocationProviderClient(context)
-    }
-
-    @Singleton
-    @Provides
-    fun provideDefaultLocationClient(
-        @ApplicationContext context: Context,
-        client: FusedLocationProviderClient,
-    ): DefaultLocationClient {
-        return DefaultLocationClient(context, client)
     }
 
 
@@ -397,11 +378,6 @@ object AppModule {
             .withInterceptors()
     }
 
-    @Singleton
-    @Provides
-    fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Settings> {
-        return context.settingsDataStore
-    }
 
     @Singleton
     @Provides

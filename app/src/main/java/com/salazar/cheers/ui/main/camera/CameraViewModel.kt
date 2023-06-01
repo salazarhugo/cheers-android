@@ -11,8 +11,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.workers.UploadStoryWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

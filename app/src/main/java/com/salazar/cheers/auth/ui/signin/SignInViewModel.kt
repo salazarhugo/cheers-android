@@ -13,10 +13,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.auth.data.AuthRepository
 import com.salazar.cheers.auth.domain.usecase.SignInUseCase
-import com.salazar.cheers.core.data.datastore.StoreUserEmail
 import com.salazar.cheers.core.data.util.Utils.isEmailValid
 import com.salazar.cheers.core.domain.model.ErrorMessage
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
@@ -44,7 +43,7 @@ data class SignInUiState(
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val storeUserEmail: StoreUserEmail,
+    private val storeUserEmail: com.salazar.cheers.data.user.datastore.StoreUserEmail,
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val signInUseCase: SignInUseCase,

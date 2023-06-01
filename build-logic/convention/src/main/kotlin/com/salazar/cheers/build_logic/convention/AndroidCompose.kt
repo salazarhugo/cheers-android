@@ -30,6 +30,8 @@ internal fun Project.configureAndroidCompose(
         dependencies {
             val bom = libs.findLibrary("androidx-compose-bom").get()
             add("implementation", platform(bom))
+            add("implementation", libs.findLibrary("androidx.material.icons.core").get())
+            add("implementation", libs.findLibrary("androidx.material.icons.extended").get())
             add("androidTestImplementation", platform(bom))
         }
     }
@@ -41,22 +43,12 @@ internal fun Project.configureAndroidCompose(
         compilerOptions {
             freeCompilerArgs.addAll(
                 listOf(
-//                    "-opt-in=kotlin.ExperimentalUnsignedTypes",
-//                    "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-//                    "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
                     "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
                     "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
                     "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
                     "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
                     "-opt-in=androidx.compose.runtime.ExperimentalComposeApi",
                     "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
-//                    "-opt-in=coil.annotation.ExperimentalCoilApi",
-//                    "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-//                    "-opt-in=com.google.accompanist.pager.ExperimentalPagerApi",
-//                    "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
-//                    "-opt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
-//                    "-opt-in=androidx.paging.ExperimentalPagingApi",
-//                    "-Xjvm-default=enable"
                 )
             )
         }

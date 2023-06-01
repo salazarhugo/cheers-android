@@ -8,6 +8,15 @@ import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.core.data.internal.*
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.*
+import com.salazar.cheers.data.post.repository.PostDao
+import com.salazar.cheers.data.user.RecentUser
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserDao
+import com.salazar.cheers.data.user.UserItemDao
+import com.salazar.cheers.data.user.UserPreference
+import com.salazar.cheers.data.user.UserStats
+import com.salazar.cheers.data.user.UserStatsDao
+import com.salazar.cheers.data.user.UserSuggestion
 import com.salazar.cheers.feature.chat.data.db.ChatDao
 import com.salazar.cheers.feature.chat.domain.models.ChatChannel
 import com.salazar.cheers.feature.chat.domain.models.ChatMessage
@@ -20,7 +29,7 @@ import com.salazar.cheers.notes.domain.models.Note
 @Database(
     entities = [
         RecentUser::class,
-        Post::class,
+        com.salazar.cheers.data.post.repository.Post::class,
         Party::class,
         com.salazar.cheers.core.model.UserItem::class,
         User::class,

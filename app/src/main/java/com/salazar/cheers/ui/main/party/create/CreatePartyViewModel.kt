@@ -12,12 +12,15 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.mapbox.search.*
+import com.mapbox.search.ResponseInfo
+import com.mapbox.search.SearchEngine
+import com.mapbox.search.SearchEngineSettings
+import com.mapbox.search.SearchOptions
+import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.internal.PostType
-import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.workers.CreatePartyWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +31,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 
@@ -125,7 +129,7 @@ class CreatePartyViewModel @Inject constructor(
         }
     }
     val caption = mutableStateOf("")
-    val postType = mutableStateOf(PostType.TEXT)
+    val postType = mutableStateOf(com.salazar.cheers.data.post.repository.PostType.TEXT)
 
 
     fun setPhoto(photo: Uri?) {

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.comment.domain.usecase.get_comment.GetCommentUseCase
-import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.data.user.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

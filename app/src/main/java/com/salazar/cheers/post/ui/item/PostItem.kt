@@ -9,14 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.post.ui.PostText
 import com.salazar.cheers.ui.main.home.HomeUIAction
 
 @Composable
 fun PostItem(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     modifier: Modifier = Modifier,
     onHomeUIAction: (HomeUIAction) -> Unit,
 ) {

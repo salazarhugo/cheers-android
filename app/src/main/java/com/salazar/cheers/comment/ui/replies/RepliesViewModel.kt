@@ -9,9 +9,9 @@ import com.salazar.cheers.comment.domain.usecase.create_comment.CreateCommentUse
 import com.salazar.cheers.comment.domain.usecase.get_comment.GetCommentUseCase
 import com.salazar.cheers.comment.domain.usecase.like_comment.LikeCommentUseCase
 import com.salazar.cheers.comment.domain.usecase.list_replies.ListRepliesUseCase
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.common.util.Resource
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

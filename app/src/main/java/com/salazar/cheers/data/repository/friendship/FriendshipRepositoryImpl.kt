@@ -1,14 +1,19 @@
 package com.salazar.cheers.data.repository.friendship
 
-import cheers.friendship.v1.*
+import cheers.friendship.v1.AcceptFriendRequestRequest
+import cheers.friendship.v1.CreateFriendRequestRequest
+import cheers.friendship.v1.DeleteFriendRequest2
+import cheers.friendship.v1.DeleteFriendRequestRequest
+import cheers.friendship.v1.FriendshipServiceGrpcKt
+import cheers.friendship.v1.ListFriendRequest
+import cheers.friendship.v1.ListFriendRequestsRequest
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.common.util.Resource
 import com.salazar.cheers.data.db.FriendRequestDao
-import com.salazar.cheers.data.db.UserDao
-import com.salazar.cheers.data.db.UserItemDao
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.mapper.toUserItem
+import com.salazar.cheers.data.user.UserDao
+import com.salazar.cheers.data.user.UserItemDao
+import com.salazar.cheers.data.user.toUserItem
 import com.salazar.cheers.friendship.domain.models.FriendRequest
+import com.salazar.common.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map

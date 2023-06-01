@@ -12,13 +12,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import cheers.story.v1.StoryOuterClass
 import cheers.type.PrivacyOuterClass
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.salazar.cheers.core.data.util.StorageUtil
 import com.salazar.cheers.data.repository.story.StoryRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 
 
@@ -29,12 +26,12 @@ class UploadStoryWorker @AssistedInject constructor(
     private val storyRepository: StoryRepository,
 ) : CoroutineWorker(appContext, params) {
 
-    private var mFusedLocationClient: FusedLocationProviderClient? = null
+//    private var mFusedLocationClient: FusedLocationProviderClient? = null
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val appContext = applicationContext
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
+//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
 
         val photoUri =
             inputData.getString("PHOTO") ?: return Result.failure()
@@ -70,11 +67,11 @@ class UploadStoryWorker @AssistedInject constructor(
             val downloadUrl = uri.toString()
 
             try {
-                mFusedLocationClient?.lastLocation?.await()?.let {
-                    longitude = it.longitude
-                    latitude = it.latitude
-                    altitude = it.altitude
-                }
+//                mFusedLocationClient?.lastLocation?.await()?.let {
+//                    longitude = it.longitude
+//                    latitude = it.latitude
+//                    altitude = it.altitude
+//                }
             } catch (e: Exception) {
                 Log.e("Location", "Couldn't get last location")
             }

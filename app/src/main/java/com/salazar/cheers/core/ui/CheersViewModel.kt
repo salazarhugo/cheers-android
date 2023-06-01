@@ -9,11 +9,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.messaging.FirebaseMessaging
-import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.core.data.util.Constants
-import com.salazar.cheers.data.db.entities.Theme
-import com.salazar.cheers.data.db.entities.UserPreference
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.Theme
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserPreference
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.feature.chat.data.repository.ChatRepository
 import com.salazar.cheers.feature.chat.data.websocket.ChatWebSocketListener
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.WebSocket
 import javax.inject.Inject
 
 data class CheersUiState(
@@ -93,7 +92,7 @@ class CheersViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            chatRepository.getInbox()
+//            chatRepository.getInbox()
         }
 
         viewModelScope.launch(Dispatchers.IO) {

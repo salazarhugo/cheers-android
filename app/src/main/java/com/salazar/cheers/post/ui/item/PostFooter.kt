@@ -3,7 +3,13 @@ package com.salazar.cheers.post.ui.item
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.WaterDrop
@@ -11,7 +17,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
@@ -21,14 +31,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.PostType
 import com.salazar.common.ui.extensions.noRippleClickable
 
 @Composable
 fun PostFooter(
-    post: Post,
-    onLike: (post: Post) -> Unit,
+    post: com.salazar.cheers.data.post.repository.Post,
+    onLike: (post: com.salazar.cheers.data.post.repository.Post) -> Unit,
     onCommentClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
     pagerState: PagerState,
@@ -55,7 +63,7 @@ fun PostFooter(
             onCommentClick = onCommentClick,
             onShareClick = onShareClick,
         )
-        if (post.type != PostType.TEXT) {
+        if (post.type != com.salazar.cheers.data.post.repository.PostType.TEXT) {
 //            LikedBy(post = postFeed.post)
 //            if (post.tagUsers.isNotEmpty())
 //                TagUsers(postFeed.tagUsers)
@@ -65,13 +73,13 @@ fun PostFooter(
             onCommentClick = { onCommentClick(post.id) },
         )
     }
-    if (post.type != PostType.TEXT)
+    if (post.type != com.salazar.cheers.data.post.repository.PostType.TEXT)
         Spacer(Modifier.height(12.dp))
 }
 
 @Composable
 fun PostComments(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     onCommentClick: () -> Unit,
 ) {
     if (post.lastCommentText.isBlank())
@@ -127,8 +135,8 @@ fun PostLastComment(
 
 @Composable
 fun PostFooterButtons(
-    post: Post,
-    onLike: (post: Post) -> Unit,
+    post: com.salazar.cheers.data.post.repository.Post,
+    onLike: (post: com.salazar.cheers.data.post.repository.Post) -> Unit,
     onCommentClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
 ) {

@@ -1,7 +1,7 @@
 package com.salazar.cheers.friendship.domain.usecase.accept_friend_request
 
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first

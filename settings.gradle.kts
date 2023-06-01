@@ -36,11 +36,22 @@ include(":app")
 include(":ads")
 include(":common")
 include(":auth")
-include(":feature:chat")
+
+// Core
 include(":core:protobuf")
 include(":core:ui")
 include(":core:util")
 include(":core:model")
+
+// Feature
+include(":feature:search")
+include(":feature:chat")
+include(":feature:map")
+
+// Data
+include(":data:user")
+include(":data:post")
+include(":data:note")
 
 project(":common").projectDir = File(settingsDir, "../common")
 project(":ads").projectDir = File(settingsDir, "../ads")

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.data.user.User
 import com.salazar.cheers.ui.main.profile.ProfileButtons
 
 @Composable

@@ -28,9 +28,35 @@ gradlePlugin {
             id = "cheers.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+
+        register("androidLibrary") {
+            id = "cheers.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+
+        register("androidFeature") {
+            id = "cheers.android.feature"
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
+
         register("androidApplicationCompose") {
             id = "cheers.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+
+        register("androidLibraryCompose") {
+            id = "cheers.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
+
+        register("androidHilt") {
+            id = "cheers.android.hilt"
+            implementationClass = "AndroidHiltConventionPlugin"
+        }
+
+        register("androidRoom") {
+            id = "cheers.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
     }
 }

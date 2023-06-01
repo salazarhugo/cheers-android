@@ -6,16 +6,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.party.v1.PartyServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.common.util.Resource
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.parties.data.repository.PartyRepository
-import com.salazar.cheers.post.data.repository.PostRepository
+import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,7 +35,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val posts: List<Post>?,
+        val posts: List<com.salazar.cheers.data.post.repository.Post>?,
         val parties: List<Party>?,
         override val sheetState: ModalBottomSheetState,
         override val isLoading: Boolean,
@@ -43,7 +45,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState(
     val user: User? = null,
-    val posts: List<Post>? = null,
+    val posts: List<com.salazar.cheers.data.post.repository.Post>? = null,
     val parties: List<Party>? = null,
     val isLoading: Boolean = false,
     val errorMessages: String = "",
@@ -70,7 +72,7 @@ private data class ProfileViewModelState(
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
     private val partyRepository: PartyRepository,
     private val partyStub: PartyServiceGrpcKt.PartyServiceCoroutineStub,
 ) : ViewModel() {
@@ -107,7 +109,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun toggleLike(
-        post: Post,
+        post: com.salazar.cheers.data.post.repository.Post,
     ) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
@@ -127,7 +129,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun updatePosts(posts: List<Post>) {
+    private fun updatePosts(posts: List<com.salazar.cheers.data.post.repository.Post>) {
         viewModelState.update {
             it.copy(posts = posts)
         }

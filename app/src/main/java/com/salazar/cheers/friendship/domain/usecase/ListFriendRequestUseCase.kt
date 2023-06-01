@@ -1,9 +1,9 @@
 package com.salazar.cheers.friendship.domain.usecase
 
-import com.salazar.common.di.IODispatcher
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.cheers.data.user.UserRepository
+import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

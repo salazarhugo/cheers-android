@@ -2,7 +2,7 @@ package com.salazar.cheers.data.mapper
 
 import cheers.party.v1.PartyItem
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.Privacy
+import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.parties.data.mapper.toWatchStatus
 
 fun PartyItem.toParty(accountId: String): Party {

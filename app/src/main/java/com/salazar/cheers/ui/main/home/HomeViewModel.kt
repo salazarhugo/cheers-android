@@ -7,21 +7,23 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.common.util.Resource
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.core.data.paging.DefaultPaginator
 import com.salazar.cheers.core.domain.model.UserWithStories
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.notes.data.repository.NoteRepository
 import com.salazar.cheers.notes.domain.models.Note
-import com.salazar.cheers.post.data.repository.PostRepository
+import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,7 +34,7 @@ import javax.inject.Inject
 
 
 data class HomeUiState(
-    val posts: List<Post> = emptyList(),
+    val posts: List<com.salazar.cheers.data.post.repository.Post> = emptyList(),
     val userWithStoriesList: List<UserWithStories> = emptyList(),
     val listState: LazyListState = LazyListState(),
     val likes: Set<String> = emptySet(),
@@ -57,7 +59,7 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
     private val noteRepository: NoteRepository,
     private val storyRepository: StoryRepository,
     private val userRepository: UserRepository,
@@ -237,7 +239,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun updatePosts(posts: List<Post>) {
+    private fun updatePosts(posts: List<com.salazar.cheers.data.post.repository.Post>) {
         viewModelState.update {
             it.copy(posts = posts)
         }
@@ -281,7 +283,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike(post: Post) {
+    fun toggleLike(post: com.salazar.cheers.data.post.repository.Post) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
         }
@@ -339,7 +341,7 @@ sealed class HomeUIAction {
     object OnCreateNoteClick : HomeUIAction()
     data class OnCommentClick(val postID: String) : HomeUIAction()
     data class OnShareClick(val postID: String) : HomeUIAction()
-    data class OnLikeClick(val post: Post) : HomeUIAction()
+    data class OnLikeClick(val post: com.salazar.cheers.data.post.repository.Post) : HomeUIAction()
     data class OnStoryFeedClick(val page: Int) : HomeUIAction()
     data class OnStoryClick(val userID: String) : HomeUIAction()
     data class OnUserClick(val userID: String) : HomeUIAction()

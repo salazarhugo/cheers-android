@@ -1,6 +1,12 @@
 package com.salazar.cheers.ui.compose.profile
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
@@ -15,8 +21,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.data.internal.User
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.data.user.User
 import com.salazar.cheers.ui.main.profile.ProfileStats
 
 @Composable

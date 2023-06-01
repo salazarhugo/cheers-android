@@ -22,7 +22,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.internal.User
+import com.salazar.cheers.data.user.User
 
 
 @Composable

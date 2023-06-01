@@ -9,22 +9,12 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
@@ -33,15 +23,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.Language
 import com.salazar.cheers.Settings
-import com.salazar.cheers.core.data.datastore.DataStoreRepository
 import com.salazar.cheers.core.data.util.StorageUtil
 import com.salazar.cheers.core.data.util.Utils.setLocale
 import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -51,12 +37,9 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     private val cheersViewModel: CheersViewModel by viewModels()
-    private var mInterstitialAd: InterstitialAd? = null
-    private lateinit var locationCallback: LocationCallback
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     @Inject
-    lateinit var dataStoreRepository: DataStoreRepository
+    lateinit var dataStoreRepository: com.salazar.cheers.data.user.datastore.DataStoreRepository
 
     @Inject
     lateinit var friendshipRepository: FriendshipRepository
@@ -83,15 +66,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(p0: LocationResult) {
-                for (location in p0.locations) {
-//                    GlobalScope.launch {
-//                        goApi.updateLocation(longitude = location.longitude, latitude = location.latitude)
-//                    }
-                }
-            }
-        }
         StorageUtil.getSnapchatBanner(this)
     }
 
@@ -150,10 +124,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
     override fun onStart() {
         super.onStart()
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -188,5 +158,4 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         Log.i("AUTH", p0.currentUser?.uid.toString())
         cheersViewModel.onAuthChange(p0)
     }
-
 }

@@ -2,12 +2,13 @@ package com.salazar.cheers.comment.domain.usecase.create_comment
 
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.domain.models.Comment
+import com.salazar.cheers.data.post.repository.PostRepository
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.common.di.IODispatcher
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.post.data.repository.PostRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 class CreateCommentUseCase @Inject constructor(

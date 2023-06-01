@@ -16,9 +16,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.core.data.Result
 import com.salazar.cheers.core.data.db.CheersDatabase
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.data.db.UserDao
-import com.salazar.cheers.data.mapper.toUser
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserDao
+import com.salazar.cheers.data.user.toUser
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow

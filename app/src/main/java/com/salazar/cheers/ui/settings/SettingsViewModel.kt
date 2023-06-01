@@ -2,11 +2,9 @@ package com.salazar.cheers.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.Language
 import com.salazar.cheers.Theme
 import com.salazar.cheers.auth.domain.usecase.SignOutUseCase
-import com.salazar.cheers.core.data.datastore.DataStoreRepository
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.UserPreferenceDao
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +30,7 @@ class SettingsViewModel @Inject constructor(
     private var cheersDao: CheersDao,
     private var preferenceDao: UserPreferenceDao,
     private val signOutUseCase: SignOutUseCase,
-    private val dataStoreRepository: DataStoreRepository,
+    private val dataStoreRepository: com.salazar.cheers.data.user.datastore.DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SettingsUiState(isLoading = true))

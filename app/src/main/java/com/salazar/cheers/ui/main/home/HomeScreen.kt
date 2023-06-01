@@ -3,15 +3,38 @@ package com.salazar.cheers.ui.main.home
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,18 +46,16 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.model.StoryState
-import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.notes.ui.NoteList
 import com.salazar.cheers.post.ui.item.PostItem
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.ads.NativeAdPost
 import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.post.NoPosts
-import com.salazar.cheers.core.ui.ui.SwipeToRefresh
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
-import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.story.Story
 import com.salazar.cheers.ui.compose.story.YourStory
 import com.salazar.cheers.user.ui.AddFriendButton
@@ -177,7 +198,7 @@ fun PostList(
 
 @Composable
 fun HomeLazyPagingListState(
-    lazyPagingItems: LazyPagingItems<Post>,
+    lazyPagingItems: LazyPagingItems<com.salazar.cheers.data.post.repository.Post>,
 ) {
     lazyPagingItems.apply {
         when {

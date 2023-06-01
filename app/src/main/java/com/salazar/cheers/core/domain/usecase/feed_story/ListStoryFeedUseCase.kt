@@ -1,9 +1,8 @@
 package com.salazar.cheers.core.domain.usecase.feed_story
 
 import com.salazar.cheers.core.domain.model.UserWithStories
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.repository.UserRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.data.user.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map

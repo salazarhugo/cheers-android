@@ -1,7 +1,13 @@
 package com.salazar.cheers.post.ui.item
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -17,12 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.StoryState
-import com.salazar.cheers.core.data.internal.Post
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun PostHeader(
-    post: Post,
+    post: com.salazar.cheers.data.post.repository.Post,
     public: Boolean,
     darkMode: Boolean = false,
     onHeaderClicked: (username: String) -> Unit = {},

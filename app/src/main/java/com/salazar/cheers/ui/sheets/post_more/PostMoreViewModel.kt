@@ -3,9 +3,7 @@ package com.salazar.cheers.ui.sheets.post_more
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.post.data.repository.PostRepository
+import com.salazar.cheers.data.user.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,13 +16,13 @@ data class PostMoreUiState(
     val user: User? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val post: Post? = null,
+    val post: com.salazar.cheers.data.post.repository.Post? = null,
 )
 
 @HiltViewModel
 class PostMoreViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PostMoreUiState(isLoading = true))
@@ -47,7 +45,7 @@ class PostMoreViewModel @Inject constructor(
         }
     }
 
-    private fun updatePost(post: Post?) {
+    private fun updatePost(post: com.salazar.cheers.data.post.repository.Post?) {
         viewModelState.update {
             it.copy(post = post)
         }

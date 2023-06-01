@@ -27,8 +27,6 @@ import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
-import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
-import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
 import com.salazar.cheers.comment.ui.comment_more.CommentMoreRoute
 import com.salazar.cheers.comment.ui.comments.CommentsRoute
 import com.salazar.cheers.comment.ui.delete.DeleteCommentDialog
@@ -38,27 +36,29 @@ import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.core.data.util.Utils.copyToClipboard
 import com.salazar.cheers.core.data.util.Utils.shareToSnapchat
 import com.salazar.cheers.core.share.ui.CheersDestinations
-import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
-import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
-import com.salazar.cheers.map.screens.map.MapRoute
-import com.salazar.cheers.map.screens.settings.MapSettingsRoute
-import com.salazar.cheers.map.ui.MapPostHistoryRoute
-import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
-import com.salazar.cheers.notes.ui.note.NoteRoute
-import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.core.share.ui.MainDestinations
-import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
-import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
-import com.salazar.cheers.core.share.ui.RequestPermission
-import com.salazar.cheers.ui.main.activity.ActivityRoute
-import com.salazar.cheers.ui.main.add.CreatePostRoute
-import com.salazar.cheers.ui.main.camera.CameraRoute
-import com.salazar.cheers.ui.main.camera.ChatCameraRoute
+import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
 import com.salazar.cheers.feature.chat.ui.chats.MessagesRoute
 import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
+import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
+import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
+import com.salazar.cheers.feature.map.screens.map.MapRoute
+import com.salazar.cheers.feature.map.screens.settings.MapSettingsRoute
+import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
+import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
+import com.salazar.cheers.map.ui.MapPostHistoryRoute
+import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
+import com.salazar.cheers.notes.ui.note.NoteRoute
+import com.salazar.cheers.ui.CheersAppState
+import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
+import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
+import com.salazar.cheers.ui.main.activity.ActivityRoute
+import com.salazar.cheers.ui.main.add.CreatePostRoute
+import com.salazar.cheers.ui.main.camera.CameraRoute
+import com.salazar.cheers.ui.main.camera.ChatCameraRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
@@ -75,7 +75,11 @@ import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
 import com.salazar.cheers.ui.main.party.detail.EventDetailRoute
 import com.salazar.cheers.ui.main.party.edit.EditEventRoute
 import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
-import com.salazar.cheers.ui.main.profile.*
+import com.salazar.cheers.ui.main.profile.ProfileMoreBottomSheet
+import com.salazar.cheers.ui.main.profile.ProfileRoute
+import com.salazar.cheers.ui.main.profile.ProfileSheetUIAction
+import com.salazar.cheers.ui.main.profile.ProfileStatsRoute
+import com.salazar.cheers.ui.main.profile.ProfileStatsViewModel
 import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
@@ -89,7 +93,6 @@ import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
-import com.salazar.cheers.core.ui.theme.CheersTheme
 
 
 fun NavGraphBuilder.mainNavGraph(
@@ -677,6 +680,6 @@ fun NavGraphBuilder.mainNavGraph(
                 }
             )
         else
-            com.salazar.cheers.core.share.ui.LoadingScreen()
+            LoadingScreen()
     }
 }

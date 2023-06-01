@@ -9,22 +9,31 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.google.accompanist.pager.PagerState
 import com.mapbox.geojson.Point
 import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.core.data.internal.PostType
-import com.salazar.cheers.core.data.internal.Privacy
-import com.salazar.cheers.core.data.location.DefaultLocationClient
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.drink.domain.models.Drink
 import com.salazar.cheers.drink.domain.usecase.ListDrinkUseCase
+import com.salazar.cheers.feature.map.location.DefaultLocationClient
 import com.salazar.cheers.workers.CreatePostWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 
 enum class CreatePostPage {
@@ -37,7 +46,7 @@ data class CreatePostUiState(
     val imageUri: Uri? = null,
     val drunkenness: Int = 0,
     val caption: String = "",
-    val postType: String = PostType.TEXT,
+    val postType: String = com.salazar.cheers.data.post.repository.PostType.TEXT,
     val photos: List<Uri> = emptyList(),
     val locationPoint: Point? = null,
     val location: String = "",
@@ -86,7 +95,7 @@ class CreatePostViewModel @Inject constructor(
 
         viewModelScope.launch {
             val location = locationClient.getLastKnownLocation() ?: return@launch
-            updateLocationPoint(Point.fromLngLat(location.longitude, location.latitude))
+//            updateLocationPoint(Point.fromLngLat(location.longitude, location.latitude))
         }
 
         viewModelScope.launch {
@@ -198,13 +207,19 @@ class CreatePostViewModel @Inject constructor(
 
     fun addPhoto(photo: Uri) {
         viewModelState.update {
-            it.copy(photos = it.photos + photo, postType = PostType.IMAGE)
+            it.copy(
+                photos = it.photos + photo,
+                postType = com.salazar.cheers.data.post.repository.PostType.IMAGE
+            )
         }
     }
 
     fun setPhotos(photos: List<Uri>) {
         viewModelState.update {
-            it.copy(photos = photos, postType = PostType.IMAGE)
+            it.copy(
+                photos = photos,
+                postType = com.salazar.cheers.data.post.repository.PostType.IMAGE
+            )
         }
     }
 

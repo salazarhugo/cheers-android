@@ -7,10 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.core.data.datastore.StoreUserEmail
 import com.salazar.cheers.core.data.util.Utils.isEmailValid
-import com.salazar.cheers.data.db.UserDao
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.UserDao
+import com.salazar.cheers.data.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,7 +37,7 @@ class SignUpViewModel @Inject constructor(
     val userDao: UserDao,
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
-    private val storeUserEmail: StoreUserEmail,
+    private val storeUserEmail: com.salazar.cheers.data.user.datastore.StoreUserEmail,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignUpUiState(isLoading = false))

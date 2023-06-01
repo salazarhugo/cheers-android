@@ -18,7 +18,7 @@ import com.salazar.cheers.core.data.notifications.newFollowerNotification
 import com.salazar.cheers.core.data.notifications.newPostNotification
 import com.salazar.cheers.core.data.util.Constants
 import com.salazar.cheers.core.data.util.Utils.getCircledBitmap
-import com.salazar.cheers.data.repository.UserRepository
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking

@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.db
 
 import androidx.room.*
-import com.salazar.cheers.data.db.entities.RecentUser
+import com.salazar.cheers.data.user.RecentUser
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -8,11 +8,9 @@ import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.comment.domain.usecase.create_comment.CreateCommentUseCase
 import com.salazar.cheers.comment.domain.usecase.like_comment.LikeCommentUseCase
+import com.salazar.cheers.data.user.User
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.common.util.Resource
-import com.salazar.cheers.core.data.internal.Post
-import com.salazar.cheers.core.data.internal.User
-import com.salazar.cheers.data.repository.UserRepository
-import com.salazar.cheers.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +28,7 @@ data class CommentsUiState(
     val isFollowing: Boolean = false,
     val shortLink: String? = null,
     val input: String = "",
-    val post: Post? = null,
+    val post: com.salazar.cheers.data.post.repository.Post? = null,
     val replyComment: Comment? = null,
 )
 
@@ -38,7 +36,7 @@ data class CommentsUiState(
 class CommentsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
     private val commentRepository: CommentRepository,
     private val createCommentUseCase: CreateCommentUseCase,
     private val likeCommentUseCase: LikeCommentUseCase,

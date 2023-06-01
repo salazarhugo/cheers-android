@@ -2,14 +2,13 @@ package com.salazar.cheers.comment.domain.usecase.delete_comment
 
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.common.di.IODispatcher
-import com.salazar.cheers.post.data.repository.PostRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DeleteCommentUseCase @Inject constructor(
     private val repository: CommentRepository,
-    private val postRepository: PostRepository,
+    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(

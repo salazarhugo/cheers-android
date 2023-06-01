@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.core.data.internal.Post
+import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.post.ui.PhotoCarousel
 import com.salazar.cheers.ui.compose.video.VideoPlayer
 
