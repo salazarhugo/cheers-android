@@ -53,6 +53,8 @@ dependencies {
     implementation(project(":data:post"))
     implementation(project(":data:user"))
     implementation(project(":data:note"))
+    implementation(project(":data:friendship"))
+    implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

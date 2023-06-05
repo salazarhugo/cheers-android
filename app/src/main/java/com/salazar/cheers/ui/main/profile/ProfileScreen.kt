@@ -52,6 +52,7 @@ import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.Counter
 import com.salazar.cheers.core.data.internal.Party
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.core.ui.PrettyPanel
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
@@ -83,7 +84,7 @@ fun ProfileScreen(
     onCommentClick: (String) -> Unit,
 ) {
     when (uiState) {
-        is ProfileUiState.Loading -> com.salazar.cheers.core.share.ui.LoadingScreen()
+        is ProfileUiState.Loading -> LoadingScreen()
         is ProfileUiState.HasUser -> Profile(
             uiState = uiState,
             onEditProfileClicked = onEditProfileClicked,

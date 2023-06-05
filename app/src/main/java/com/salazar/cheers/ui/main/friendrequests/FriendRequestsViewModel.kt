@@ -2,12 +2,9 @@ package com.salazar.cheers.ui.main.friendrequests
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.common.util.Resource
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
-import com.salazar.cheers.friendship.domain.usecase.ListFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.domain.ListFriendRequestUseCase
+import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +24,7 @@ data class FriendRequestsUiState(
 
 @HiltViewModel
 class FriendRequestsViewModel @Inject constructor(
-    private val friendshipRepository: FriendshipRepository,
+    private val friendshipRepository: com.salazar.cheers.data.friendship.FriendshipRepository,
     private val listFriendRequestUseCase: ListFriendRequestUseCase,
     private val listSuggestionsUseCase: ListSuggestionsUseCase,
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
@@ -53,13 +50,13 @@ class FriendRequestsViewModel @Inject constructor(
     fun onSwipeToRefresh() {
         refreshSuggestions()
         viewModelScope.launch {
-            friendshipRepository.fetchFriendRequest().collect {
-                when(it) {
-                    is Resource.Error -> updateErrorMessage(it.message)
-                    is Resource.Loading -> updateIsRefreshing(it.isLoading)
-                    is Resource.Success -> updateFriendRequests(users = it.data)
-                }
-            }
+//            friendshipRepository.fetchFriendRequest().collect {
+//                when(it) {
+//                    is Resource.Error -> updateErrorMessage(it.message)
+//                    is Resource.Loading -> updateIsRefreshing(it.isLoading)
+//                    is Resource.Success -> updateFriendRequests(users = it.data)
+//                }
+//            }
         }
     }
 

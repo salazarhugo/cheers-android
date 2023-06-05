@@ -24,13 +24,14 @@ import com.salazar.cheers.core.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
 import com.salazar.cheers.core.data.util.Constants
 import com.salazar.cheers.data.db.*
+import com.salazar.cheers.data.note.db.NoteDao
+import com.salazar.cheers.data.note.repository.NoteRepository
+import com.salazar.cheers.data.note.repository.NoteRepositoryImpl
 import com.salazar.cheers.data.post.repository.PostDao
 import com.salazar.cheers.data.repository.account.AccountRepository
 import com.salazar.cheers.data.repository.account.AccountRepositoryImpl
 import com.salazar.cheers.data.repository.activity.ActivityRepository
 import com.salazar.cheers.data.repository.activity.impl.ActivityRepositoryImpl
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
-import com.salazar.cheers.data.repository.friendship.FriendshipRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.repository.ticket.TicketRepository
@@ -44,9 +45,6 @@ import com.salazar.cheers.feature.chat.data.db.ChatDao
 import com.salazar.cheers.feature.chat.data.repository.ChatRepository
 import com.salazar.cheers.feature.chat.data.repository.ChatRepositoryImpl
 import com.salazar.cheers.feature.chat.data.websocket.ChatWebSocketListener
-import com.salazar.cheers.notes.data.db.NoteDao
-import com.salazar.cheers.notes.data.repository.NoteRepository
-import com.salazar.cheers.notes.data.repository.NoteRepositoryImpl
 import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.parties.data.repository.impl.PartyRepositoryImpl
 import com.squareup.moshi.Moshi
@@ -162,8 +160,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFriendshipRepository(
-        commentRepositoryImpl: FriendshipRepositoryImpl,
-    ): FriendshipRepository {
+        commentRepositoryImpl: com.salazar.cheers.data.friendship.FriendshipRepositoryImpl,
+    ): com.salazar.cheers.data.friendship.FriendshipRepository {
         return commentRepositoryImpl
     }
 
@@ -400,7 +398,7 @@ object AppModule {
     @Provides
     fun provideFriendRequestDao(
         cheersDatabase: CheersDatabase,
-    ): FriendRequestDao {
+    ): com.salazar.cheers.data.friendship.FriendRequestDao {
         return cheersDatabase.friendRequestDao()
     }
 

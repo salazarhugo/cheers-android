@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.material)
 
     implementation(project(":common"))
+    implementation(project(":domain"))
 
     // OkHttp BOM
     implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))

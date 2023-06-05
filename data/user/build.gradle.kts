@@ -20,6 +20,10 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:protobuf"))
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth-ktx")
+
     // Datastore
     implementation(libs.androidx.datastore.preferences)
 

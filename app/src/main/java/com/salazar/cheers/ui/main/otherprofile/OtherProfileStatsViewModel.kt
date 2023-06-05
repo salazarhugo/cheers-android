@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.friendship.domain.usecase.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -67,7 +67,7 @@ class OtherProfileStatsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val userId = userRepository.getUserFlow(username).first().id
-            listFriendUseCase(userId).collect(::updateFriends)
+            listFriendUseCase().collect(::updateFriends)
         }
     }
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.friendship.domain.usecase.remove_friend.RemoveFriendUseCase
+import com.salazar.cheers.domain.remove_friend.RemoveFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

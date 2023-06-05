@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.data.internal.Activity
 import com.salazar.cheers.data.repository.activity.ActivityRepository
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
-import com.salazar.cheers.friendship.domain.usecase.ListFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.domain.ListFriendRequestUseCase
+import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +28,7 @@ data class ActivityUiState(
 
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
-    private val friendshipRepository: FriendshipRepository,
+    private val friendshipRepository: com.salazar.cheers.data.friendship.FriendshipRepository,
     private val activityRepository: ActivityRepository,
     private val listFriendRequestUseCase: ListFriendRequestUseCase,
     private val listSuggestionsUseCase: ListSuggestionsUseCase,
@@ -69,9 +68,9 @@ class ActivityViewModel @Inject constructor(
     }
 
     private fun getFriendRequests() {
-        viewModelScope.launch {
-            friendshipRepository.fetchFriendRequest().collect {}
-        }
+//        viewModelScope.launch {
+//            friendshipRepository.fetchFriendRequest().collect {}
+//        }
     }
 
     fun getActivity() {

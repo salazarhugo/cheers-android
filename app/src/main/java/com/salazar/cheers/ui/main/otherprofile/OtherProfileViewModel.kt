@@ -7,10 +7,10 @@ import cheers.chat.v1.GetRoomIdReq
 import com.salazar.cheers.core.data.internal.Party
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.domain.accept_friend_request.AcceptFriendRequestUseCase
+import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.feature.chat.data.repository.ChatRepository
-import com.salazar.cheers.friendship.domain.usecase.accept_friend_request.AcceptFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.cancel_friend_request.CancelFriendRequestUseCase
-import com.salazar.cheers.friendship.domain.usecase.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.parties.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

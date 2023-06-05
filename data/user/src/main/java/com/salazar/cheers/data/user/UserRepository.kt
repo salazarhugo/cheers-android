@@ -1,13 +1,17 @@
 package com.salazar.cheers.data.user
 
 import android.util.Log
+import cheers.friendship.v1.FriendshipServiceGrpcKt
+import cheers.friendship.v1.ListFriendRequest
 import cheers.notification.v1.CreateRegistrationTokenRequest
 import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.user.v1.*
+import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -22,6 +26,7 @@ class UserRepository @Inject constructor(
     private val userItemDao: UserItemDao,
     private val userService: UserServiceGrpcKt.UserServiceCoroutineStub,
     private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
+    private val service: FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub,
 ) {
     suspend fun listSuggestions(): Result<List<UserItem>> {
         return try {
@@ -299,6 +304,10 @@ class UserRepository @Inject constructor(
         return@withContext userDao.getUsersWithListOfIds(ids = ids)
     }
 
+    fun getUsersIn(userIDs: List<String>): Flow<List<UserItem>> {
+        return userItemDao.listUsersIn(userIDs)
+    }
+
     suspend fun getCurrentUser(): User {
         return userDao.getUser(userIdOrUsername = "")
     }
@@ -329,8 +338,7 @@ class UserRepository @Inject constructor(
 
             if (remoteUser == null) {
                 emit(Resource.Error("Failed to get user"))
-            }
-            else {
+            } else {
                 userDao.insert(remoteUser.toUser())
                 emit(Resource.Success(userDao.getUser(userId)))
             }
@@ -338,15 +346,42 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun listFriend(): Flow<Resource<List<UserItem>>> =
+        flow {
+            emit(Resource.Loading(true))
+
+            val request = ListFriendRequest.newBuilder()
+                .setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+                .build()
+
+            val remoteFriendRequests = try {
+                val response = service.listFriend(request = request)
+                val users = response.itemsList.map {
+                    it.toUserItem()
+                }
+                users
+            } catch (e: Exception) {
+                emit(Resource.Error(e.localizedMessage ?: "Couldn't refresh friend requests"))
+                null
+            }
+
+            remoteFriendRequests?.let {
+                emit(Resource.Success(it))
+            }
+
+            emit(Resource.Loading(false))
+        }
+
     fun getCurrentUserFlow(): Flow<User> {
-        return userDao.getUserFlow(userIdOrUsername = "")
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return emptyFlow()
+        return userDao.getUserFlow(userIdOrUsername = uid)
     }
 
     fun listUser(userIdOrUsername: String): Flow<User> {
         return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
     }
 
-    fun getUserItem(userIdOrUsername: String): Flow<com.salazar.cheers.core.model.UserItem> {
+    fun getUserItem(userIdOrUsername: String): Flow<UserItem> {
         return userItemDao.getUserItem(userIdOrUsername = userIdOrUsername)
     }
 

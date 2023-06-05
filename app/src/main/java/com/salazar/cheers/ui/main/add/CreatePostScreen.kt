@@ -431,7 +431,7 @@ fun ShareButton(
         shape = MaterialTheme.shapes.medium,
         isLoading = isLoading,
         onClick = onClick,
-        valid = enabled,
+        enabled = enabled,
     )
 }
 

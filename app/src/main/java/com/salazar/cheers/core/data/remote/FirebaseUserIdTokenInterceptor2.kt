@@ -1,9 +1,14 @@
 package com.salazar.cheers.core.data.remote
 
 import com.google.firebase.auth.FirebaseAuth
-import io.grpc.*
+import io.grpc.CallOptions
+import io.grpc.Channel
+import io.grpc.ClientCall
+import io.grpc.ClientInterceptor
 import io.grpc.ClientInterceptors.CheckedForwardingClientCall
+import io.grpc.Metadata
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
+import io.grpc.MethodDescriptor
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import okhttp3.internal.format

@@ -18,11 +18,11 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.data.paging.DefaultPaginator
 import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.notes.data.repository.NoteRepository
-import com.salazar.cheers.notes.domain.models.Note
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

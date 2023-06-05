@@ -3,8 +3,8 @@ package com.salazar.cheers.notes.ui.note
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.notes.data.repository.NoteRepository
-import com.salazar.cheers.notes.domain.models.Note
+import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.data.note.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

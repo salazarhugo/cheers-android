@@ -1,8 +1,7 @@
 package com.salazar.cheers.core.domain.usecase.get_notification_counter
 
-import com.salazar.common.di.IODispatcher
 import com.salazar.cheers.data.repository.activity.ActivityRepository
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
+import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -12,7 +11,7 @@ import javax.inject.Inject
 class GetNotificationCounterUseCase @Inject constructor(
     @IODispatcher
     private val dispatcher: CoroutineDispatcher,
-    private val repository: FriendshipRepository,
+    private val repository: com.salazar.cheers.data.friendship.FriendshipRepository,
     private val activityRepository: ActivityRepository,
 ) {
     suspend operator fun invoke(): Flow<Int> = withContext(dispatcher) {

@@ -77,7 +77,9 @@ class CheersViewModel @Inject constructor(
             it.copy(isLoading = true)
         }
 
-        getAndSaveRegistrationToken()
+        viewModelScope.launch(Dispatchers.IO) {
+            getAndSaveRegistrationToken()
+        }
 
         viewModelScope.launch(Dispatchers.IO) {
             initWebSocket(auth.currentUser!!)
@@ -120,7 +122,7 @@ class CheersViewModel @Inject constructor(
         }
     }
 
-    private fun getAndSaveRegistrationToken() {
+    private suspend fun getAndSaveRegistrationToken() {
         if (FirebaseAuth.getInstance().currentUser == null)
             return
 
@@ -131,7 +133,7 @@ class CheersViewModel @Inject constructor(
             }
             // Get new FCM registration token
             val token = task.result
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 chatRepository.addToken(token = token)
                 userRepository.addTokenToNeo4j(token)
             }

@@ -26,7 +26,6 @@ import com.salazar.cheers.Settings
 import com.salazar.cheers.core.data.util.StorageUtil
 import com.salazar.cheers.core.data.util.Utils.setLocale
 import com.salazar.cheers.core.ui.CheersViewModel
-import com.salazar.cheers.data.repository.friendship.FriendshipRepository
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -42,7 +41,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     lateinit var dataStoreRepository: com.salazar.cheers.data.user.datastore.DataStoreRepository
 
     @Inject
-    lateinit var friendshipRepository: FriendshipRepository
+    lateinit var friendshipRepository: com.salazar.cheers.data.friendship.FriendshipRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

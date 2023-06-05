@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.notes.domain.models.Note
+import com.salazar.cheers.data.note.Note
 
 @Composable
 fun NoteList(

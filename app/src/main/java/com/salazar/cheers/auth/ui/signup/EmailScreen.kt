@@ -48,7 +48,7 @@ fun EmailScreen(
         ButtonWithLoading(
             text = "Next",
             isLoading = isLoading,
-            valid = email.isEmailValid(),
+            enabled = email.isEmailValid(),
             onClick = onNextClicked,
             modifier = Modifier.fillMaxWidth()
         )

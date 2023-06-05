@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.addOrRemove
+import com.salazar.cheers.domain.list_friend.ListFriendUseCase
 import com.salazar.cheers.feature.chat.data.repository.ChatRepository
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +28,7 @@ data class NewChatUiState(
 @HiltViewModel
 class NewChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-//    private val listFriendUseCase: ListFriendUseCase,
+    private val listFriendUseCase: ListFriendUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(NewChatUiState())
@@ -41,9 +42,9 @@ class NewChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            listFriendUseCase(FirebaseAuth.getInstance().currentUser?.uid!!).collect { users ->
-//                onRecentUsersChange(users = users)
-//            }
+            listFriendUseCase().collect { users ->
+                onRecentUsersChange(users = users)
+            }
         }
     }
 

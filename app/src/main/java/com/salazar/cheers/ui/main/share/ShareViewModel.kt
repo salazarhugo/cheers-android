@@ -3,10 +3,8 @@ package com.salazar.cheers.ui.main.share
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.friendship.domain.usecase.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListFriendUseCase
 import com.salazar.cheers.parties.domain.usecase.get_party.GetPartyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +54,7 @@ class ShareViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            listFriendUseCase(FirebaseAuth.getInstance().currentUser?.uid!!).collect(::updateUsers)
+            listFriendUseCase().collect(::updateUsers)
         }
     }
 
