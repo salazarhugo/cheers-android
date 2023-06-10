@@ -1,28 +1,31 @@
 package com.salazar.cheers.navigation
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.salazar.cheers.core.share.ui.CheersDestinations
 import com.salazar.cheers.core.share.ui.GreySheet
-import com.salazar.cheers.core.share.ui.MainDestinations
 import com.salazar.cheers.core.ui.CheersUiState
+import com.salazar.cheers.core.ui.ui.CheersDestinations
+import com.salazar.cheers.core.ui.ui.MainDestinations
+import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CheersNavGraph(
     uiState: CheersUiState,
@@ -32,7 +35,7 @@ fun CheersNavGraph(
 
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
     val currentRoute =
-        navBackStackEntry?.destination?.route ?: MainDestinations.HOME_ROUTE
+        navBackStackEntry?.destination?.route ?: homeNavigationRoute
     val navActions = appState.navActions
 
     LaunchedEffect(uiState.errorMessage) {
@@ -88,7 +91,7 @@ fun CheersNavGraph(
                 0.dp
             else
                 innerPadding.calculateBottomPadding()
-            AnimatedNavHost(
+            NavHost(
                 modifier = Modifier.padding(bottom = padding),
                 route = CheersDestinations.ROOT_ROUTE,
                 navController = appState.navController,
@@ -97,7 +100,10 @@ fun CheersNavGraph(
                 settingNavGraph(
                     navActions = navActions,
                 )
-                authNavGraph(navActions = navActions)
+                authNavGraph(
+                    navActions = navActions,
+                    navController = appState.navController,
+                )
                 mainNavGraph(
                     appState = appState,
                 )

@@ -25,18 +25,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.core.data.internal.Activity
-import com.salazar.cheers.core.data.internal.ActivityType
+import com.salazar.cheers.core.ui.CheersBadgeBox
+import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.UserItem
+import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.feature.chat.ui.components.messageFormatter
-import com.salazar.cheers.ui.compose.CheersBadgeBox
-import com.salazar.cheers.ui.compose.items.UserItem
 import com.salazar.cheers.ui.compose.text.MyText
 import com.salazar.cheers.ui.main.party.create.TopAppBar
 import com.salazar.cheers.user.ui.AddFriendButton
-import com.salazar.cheers.user.ui.FollowButton
 
 
 @Composable
@@ -74,7 +72,7 @@ fun ActivityScreen(
 @Composable
 fun ActivityList(
     uiState: ActivityUiState,
-    activities: List<Activity>?,
+    activities: List<com.salazar.cheers.data.activity.Activity>?,
     onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     val suggestions = uiState.suggestions
@@ -180,8 +178,8 @@ fun FriendRequests(
 
 @Composable
 fun ActivityItem(
-    activity: Activity,
-    onActivityClick: (Activity) -> Unit,
+    activity: com.salazar.cheers.data.activity.Activity,
+    onActivityClick: (com.salazar.cheers.data.activity.Activity) -> Unit,
     onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     Row(
@@ -226,7 +224,7 @@ fun ActivityItem(
                 softWrap = true,
             )
         }
-        if (activity.type == ActivityType.FRIEND_ADDED)
+        if (activity.type == com.salazar.cheers.data.activity.ActivityType.FRIEND_ADDED)
             FollowButton(
                 modifier = Modifier.padding(start = 16.dp),
                 isFollowing = true,

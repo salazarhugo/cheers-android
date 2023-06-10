@@ -26,8 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
-import com.salazar.cheers.feature.chat.ui.components.FunctionalityNotAvailablePanel
+import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
 /**
@@ -84,7 +84,7 @@ fun CameraRoute(
             imageCapture = imageCapture,
             onStoryClick = {
                 cameraViewModel.uploadStory()
-                navActions.navigateToHome()
+//                navActions.navigateToHome()
             },
             onPostClicked = {
                 if (uiState.imageUri != null)

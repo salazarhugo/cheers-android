@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.R
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import com.salazar.cheers.core.ui.ui.AppBar
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.delay
 
 /**

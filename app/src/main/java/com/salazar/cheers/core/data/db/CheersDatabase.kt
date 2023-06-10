@@ -7,11 +7,14 @@ import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.core.data.internal.*
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.data.activity.Activity
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.*
 import com.salazar.cheers.data.friendship.FriendRequest
 import com.salazar.cheers.data.note.Note
 import com.salazar.cheers.data.note.db.NoteDao
+import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.data.party.PartyDao
 import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.data.post.repository.PostDao
 import com.salazar.cheers.data.user.RecentUser
@@ -64,7 +67,7 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun userStatsDao(): UserStatsDao
     abstract fun chatDao(): ChatDao
     abstract fun userPreferenceDao(): UserPreferenceDao
-    abstract fun activityDao(): ActivityDao
+    abstract fun activityDao(): com.salazar.cheers.data.activity.ActivityDao
     abstract fun ticketDao(): TicketDao
     abstract fun commentDao(): CommentDao
     abstract fun friendRequestDao(): com.salazar.cheers.data.friendship.FriendRequestDao

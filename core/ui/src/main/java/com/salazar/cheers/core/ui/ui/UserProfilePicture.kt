@@ -1,7 +1,11 @@
 package com.salazar.cheers.core.ui.ui
 
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -19,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -37,7 +40,7 @@ fun UserProfilePicture(
     size: Dp = 54.dp,
     onClick: () -> Unit = {},
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
+    val infiniteTransition = rememberInfiniteTransition(label = "")
     val color by infiniteTransition.animateColor(
         initialValue = Color(0xFFFFA500),
         targetValue = Color.Transparent,
@@ -48,33 +51,36 @@ fun UserProfilePicture(
     )
 
     val border =
-//        when (storyState) {
-//            StoryState.LOADING -> BorderStroke(
-//                2.dp,
-//                color = color
-//            )
-//            StoryState.EMPTY -> BorderStroke(
-//                0.dp,
-//                color = Color.Transparent
-//            )
-//            StoryState.SEEN ->
-//                BorderStroke(
-//                    1.dp,
-//                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-//                )
-//            StoryState.NOT_SEEN ->
-        BorderStroke(
-            2.dp,
-            Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFEC01FB),
-                    Color(0xFF7f00ff),
-                )
+        when (storyState) {
+            StoryState.LOADING -> BorderStroke(
+                2.dp,
+                color = color
             )
-        )
-//            StoryState.UNKNOWN -> TODO()
-//            else -> {}
-//        }
+
+            StoryState.EMPTY -> BorderStroke(
+                0.dp,
+                color = Color.Transparent
+            )
+
+            StoryState.SEEN ->
+                BorderStroke(
+                    1.dp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
+
+            StoryState.NOT_SEEN ->
+                BorderStroke(
+                    2.dp,
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFEC01FB),
+                            Color(0xFF7f00ff),
+                        )
+                    )
+                )
+
+            StoryState.UNKNOWN -> TODO()
+        }
 
     Bounce(onBounce = onClick) {
         Image(

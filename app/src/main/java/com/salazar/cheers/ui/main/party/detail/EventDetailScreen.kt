@@ -23,9 +23,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.WatchStatus
 import com.salazar.cheers.core.util.numberFormatter
+import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.data.party.WatchStatus
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.event.*
 import kotlinx.coroutines.launch

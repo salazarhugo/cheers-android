@@ -1,13 +1,11 @@
 plugins {
     id("cheers.android.application")
     id("cheers.android.application.compose")
+    id("cheers.android.application.firebase")
     id("cheers.android.room")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.firebase-perf")
-    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -43,18 +41,29 @@ android {
 dependencies {
     implementation(project(":ads"))
     implementation(project(":common"))
-    implementation(project(":feature:chat"))
-    implementation(project(":feature:map"))
-    implementation(project(":feature:search"))
+
     implementation(project(":core:protobuf"))
     implementation(project(":core:ui"))
     implementation(project(":core:util"))
     implementation(project(":core:model"))
+
+    implementation(project(":feature:home"))
+    implementation(project(":feature:chat"))
+    implementation(project(":feature:map"))
+    implementation(project(":feature:search"))
+    implementation(project(":feature:profile"))
+    implementation(project(":feature:signin"))
+
+    implementation(project(":domain"))
+
     implementation(project(":data:post"))
     implementation(project(":data:user"))
     implementation(project(":data:note"))
+    implementation(project(":data:party"))
     implementation(project(":data:friendship"))
-    implementation(project(":domain"))
+    implementation(project(":data:activity"))
+    implementation(project(":data:story"))
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -148,18 +157,12 @@ dependencies {
     // Constraint layout
     implementation(libs.androidx.constraintlayout)
 
-    // ExoPlayer 2
-    implementation(libs.exoplayer)
-
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {
 //        exclude(group = "com.google.protobuf")
 //        exclude(group = "com.google.protobuf", module = "protobuf-javalite")
 //        exclude(group = "com.google.protobuf", module = "protobuf-java")
     }
-
-    // Firebase Analytics
-    implementation("com.google.firebase:firebase-analytics-ktx")
 
     // App Check Play Integrity
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
@@ -170,9 +173,6 @@ dependencies {
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation(libs.play.services.auth)
-
-    // Firebase Crashlytics
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     //Firebase Dynamic-Links
     implementation("com.google.firebase:firebase-dynamic-links-ktx")
@@ -188,9 +188,6 @@ dependencies {
 
     // Firebase Storage
     implementation("com.google.firebase:firebase-storage-ktx")
-
-    // Firebase Performance
-    implementation("com.google.firebase:firebase-perf-ktx")
 
     // Hilt
     implementation(libs.hilt.android)
@@ -232,7 +229,7 @@ dependencies {
     implementation(libs.androidx.animation.graphics)
 
     // Map Box SDK
-    implementation("com.mapbox.maps:android:10.12.1")
+    implementation(libs.android)
     implementation(libs.mapbox.sdk.services)
     implementation(libs.mapbox.search.android)
 

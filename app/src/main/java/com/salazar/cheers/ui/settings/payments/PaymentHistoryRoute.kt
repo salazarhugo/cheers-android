@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 @Composable
 fun PaymentHistoryRoute(

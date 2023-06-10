@@ -8,7 +8,23 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -28,7 +44,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDismissState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,21 +65,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.core.ui.SymbolAnnotationType
+import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.feature.chat.domain.models.ChatMessage
 import com.salazar.cheers.feature.chat.domain.models.ChatMessageStatus
 import com.salazar.cheers.feature.chat.domain.models.MessageType
 import com.salazar.cheers.feature.chat.domain.models.RoomStatus
 import com.salazar.cheers.feature.chat.domain.models.RoomType
+import com.salazar.cheers.feature.chat.ui.components.ChatBottomBar
 import com.salazar.cheers.feature.chat.ui.components.DirectChatBar
 import com.salazar.cheers.feature.chat.ui.components.GroupChatBar
-import com.salazar.cheers.feature.chat.ui.components.SwipeableMessage
-import com.salazar.cheers.feature.chat.ui.components.ChatBottomBar
 import com.salazar.cheers.feature.chat.ui.components.JumpToBottom
-import com.salazar.cheers.feature.chat.ui.components.SymbolAnnotationType
-import com.salazar.cheers.feature.chat.ui.components.messageFormatter
+import com.salazar.cheers.feature.chat.ui.components.SwipeableMessage
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 
 @Composable

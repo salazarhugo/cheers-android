@@ -2,11 +2,9 @@ package com.salazar.cheers.feature.map.screens.map
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.location.LocationServices
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -15,7 +13,6 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.flyTo
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.math.max
@@ -29,26 +26,13 @@ import kotlin.math.max
 @Composable
 fun MapRoute(
     mapViewModel: MapViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
+    navigateBack: () -> Unit,
+    navigateToMapSettings: () -> Unit,
+    navigateToCreatePost: () -> Unit,
 ) {
     val uiState by mapViewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    val systemUiController = rememberSystemUiController()
-
-    DisposableEffect(Unit) {
-        systemUiController.setNavigationBarColor(
-            color = Color.Black,
-            darkIcons = true,
-        )
-        onDispose {
-            systemUiController.setNavigationBarColor(
-                color = Color.Transparent,
-                darkIcons = true,
-            )
-        }
-    }
 
     val paris = Point.fromLngLat(2.3522, 48.8566)
     val mapView = remember {
@@ -68,18 +52,19 @@ fun MapRoute(
         mapView = mapView,
         onMapUIAction = { action ->
             when (action) {
-                MapUIAction.OnBackPressed -> navActions.navigateBack()
-                MapUIAction.OnCreatePostClick -> navActions.navigateToCreatePost()
+                MapUIAction.OnBackPressed -> navigateBack()
+                MapUIAction.OnCreatePostClick -> navigateToCreatePost()
                 MapUIAction.OnPublicToggle -> mapViewModel.onTogglePublic()
                 MapUIAction.OnSwipeRefresh -> TODO()
-                MapUIAction.OnSettingsClick -> navActions.navigateToMapSettings()
-                is MapUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userID)
+                MapUIAction.OnSettingsClick -> navigateToMapSettings()
+                is MapUIAction.OnUserClick -> {}//navigateToOtherProfile(action.userID)
                 is MapUIAction.OnMapReady -> {
                     mapViewModel.onMapReady(action.map)
                     scope.launch {
                         mapViewModel.mapRepository.onMapReady(action.map, action.ctx)
                     }
                 }
+
                 MapUIAction.OnMyLocationClick -> {
                     mapViewModel.onMyLocationClick()
                     scope.launch {
@@ -147,8 +132,9 @@ fun MapRoute(
                     )
                     mapViewModel.onUserViewAnnotationClick(userLocation = userLocation)
                 }
-                is MapUIAction.OnChatClick -> navActions.navigateToChatWithUserId(action.userID)
-                is MapUIAction.OnCommentClick -> navActions.navigateToComments(action.postID)
+
+                is MapUIAction.OnChatClick -> {}//navigateToChatWithUserId(action.userID)
+                is MapUIAction.OnCommentClick -> {} //navActions.navigateToComments(action.postID)
             }
         },
     )

@@ -13,7 +13,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
 /**

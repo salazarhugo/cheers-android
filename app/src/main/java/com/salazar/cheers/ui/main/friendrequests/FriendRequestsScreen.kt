@@ -17,9 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.ui.compose.buttons.CheersOutlinedButton
-import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.core.ui.CheersOutlinedButton
+import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.ui.compose.text.MyText

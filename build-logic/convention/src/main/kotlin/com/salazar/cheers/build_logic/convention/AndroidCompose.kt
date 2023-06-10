@@ -32,6 +32,7 @@ internal fun Project.configureAndroidCompose(
             add("implementation", platform(bom))
             add("implementation", libs.findLibrary("androidx.material.icons.core").get())
             add("implementation", libs.findLibrary("androidx.material.icons.extended").get())
+            add("implementation", libs.findLibrary("coil.compose").get())
             add("androidTestImplementation", platform(bom))
         }
     }

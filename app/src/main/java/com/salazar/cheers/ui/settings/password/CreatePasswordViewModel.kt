@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.settings.password
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.auth.data.AuthRepository
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +23,7 @@ data class CreatePasswordUiState(
 @HiltViewModel
 class CreatePasswordViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val authRepository: AuthRepository,
+    private val authRepository: com.salazar.cheers.data.auth.AuthRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CreatePasswordUiState())

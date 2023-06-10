@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the ChatCamera screen.

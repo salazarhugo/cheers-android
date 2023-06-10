@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Language
 import com.salazar.cheers.Theme
-import com.salazar.cheers.auth.domain.usecase.SignOutUseCase
 import com.salazar.cheers.data.db.CheersDao
 import com.salazar.cheers.data.db.UserPreferenceDao
+import com.salazar.cheers.domain.usecase.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

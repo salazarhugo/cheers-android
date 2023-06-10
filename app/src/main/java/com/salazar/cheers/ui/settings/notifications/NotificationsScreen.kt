@@ -6,9 +6,9 @@ import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.PrivateConnectivity
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.ui.compose.items.SettingItem
 import com.salazar.cheers.ui.compose.items.SettingTitle
-import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun NotificationsScreen(
@@ -17,6 +17,7 @@ fun NotificationsScreen(
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Notifications") },
     ) {
+        it
         Column {
             NotificationsSection()
         }

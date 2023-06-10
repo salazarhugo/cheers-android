@@ -14,7 +14,13 @@ import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material3.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -31,7 +37,11 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.ClearRippleTheme
 import com.salazar.cheers.core.data.internal.Screen
-import com.salazar.cheers.core.share.ui.MainDestinations
+import com.salazar.cheers.core.ui.ui.MainDestinations
+import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
+import com.salazar.cheers.feature.map.navigation.mapNavigationRoute
+import com.salazar.cheers.feature.profile.navigation.profileNavigationRoute
+import com.salazar.cheers.feature.search.navigation.searchNavigationRoute
 
 @Composable
 fun CheersBottomBar(
@@ -42,15 +52,39 @@ fun CheersBottomBar(
 ) {
     val items = listOf(
         Screen(
-            route = MainDestinations.HOME_ROUTE,
-            icon = { Icon(Icons.Outlined.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Rounded.Home, null, tint = MaterialTheme.colorScheme.onBackground) },
+            route = homeNavigationRoute,
+            icon = {
+                Icon(
+                    Icons.Outlined.Home,
+                    null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            selectedIcon = {
+                Icon(
+                    Icons.Rounded.Home,
+                    null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
             label = stringResource(id = R.string.menu_home),
         ),
         Screen(
-            route = MainDestinations.SEARCH_ROUTE,
-            icon = { Icon(Icons.Outlined.Search, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onBackground) },
+            route = searchNavigationRoute,
+            icon = {
+                Icon(
+                    Icons.Outlined.Search,
+                    null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            selectedIcon = {
+                Icon(
+                    Icons.Filled.Search,
+                    null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
             label = stringResource(id = R.string.search),
         ),
 //        Screen(
@@ -60,9 +94,21 @@ fun CheersBottomBar(
 //            label = "Events"
 //        ),
         Screen(
-            route = MainDestinations.MAP_ROUTE,
-            icon = { Icon(Icons.Outlined.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
-            selectedIcon = { Icon(Icons.Default.Map, null, tint = MaterialTheme.colorScheme.onBackground) },
+            route = mapNavigationRoute,
+            icon = {
+                Icon(
+                    Icons.Outlined.Map,
+                    null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            selectedIcon = {
+                Icon(
+                    Icons.Default.Map,
+                    null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
             label = stringResource(id = R.string.map)
         ),
 //        Screen(
@@ -152,8 +198,8 @@ fun CheersBottomBar(
                         contentDescription = null,
                     )
                 },
-                selected = currentRoute == MainDestinations.PROFILE_ROUTE,
-                onClick = { onNavigate(MainDestinations.PROFILE_ROUTE) },
+                selected = currentRoute == profileNavigationRoute,
+                onClick = { onNavigate(profileNavigationRoute) },
             )
         }
     }

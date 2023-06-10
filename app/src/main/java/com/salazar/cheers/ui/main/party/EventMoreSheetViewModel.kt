@@ -3,7 +3,6 @@ package com.salazar.cheers.ui.main.party
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.parties.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +17,7 @@ data class EventMoreSheetUiState(
 @HiltViewModel
 class EventMoreSheetViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val partyRepository: PartyRepository,
+    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EventMoreSheetUiState(isLoading = true))

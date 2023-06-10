@@ -13,10 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.data.internal.Party
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.ui.compose.buttons.CheersOutlinedButton
-import com.salazar.cheers.ui.compose.items.UserItem
+import com.salazar.cheers.core.ui.CheersOutlinedButton
+import com.salazar.cheers.core.ui.UserItem
+import com.salazar.cheers.data.party.Party
 import com.salazar.cheers.ui.main.add.CaptionSection
 
 @Composable

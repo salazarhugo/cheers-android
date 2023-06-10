@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.map.ui.ChooseOnMapScreen
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Add post screen.

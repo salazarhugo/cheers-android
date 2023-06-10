@@ -6,7 +6,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
 @Composable

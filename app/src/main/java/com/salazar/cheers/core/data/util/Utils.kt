@@ -1,16 +1,19 @@
 package com.salazar.cheers.core.data.util
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -23,7 +26,8 @@ import com.snap.creativekit.models.SnapPhotoContent
 import java.io.File
 import java.lang.Math.min
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 
 object Utils {
@@ -84,13 +88,6 @@ object Utils {
         return isLowerCase(this) && hasValidChars(this) && matches(regex)
     }
 
-    fun Context.copyToClipboard(text: CharSequence) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("label", text)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(this, "Link copied", Toast.LENGTH_SHORT).show()
-    }
-
     fun Context.getActivity(): AppCompatActivity? = when (this) {
         is AppCompatActivity -> this
         is ContextWrapper -> baseContext.getActivity()
@@ -106,8 +103,8 @@ object Utils {
         )
         val canvas = Canvas(dstBitmap)
         val paint = Paint()
-        paint.isAntiAlias = true
         val rect = Rect(0, 0, squareBitmapWidth, squareBitmapWidth)
+        paint.isAntiAlias = true
         val rectF = RectF(rect)
         canvas.drawOval(rectF, paint)
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)

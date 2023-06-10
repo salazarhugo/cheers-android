@@ -8,7 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.CoreDialog
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 @Composable
 fun DeleteAccountDialog(

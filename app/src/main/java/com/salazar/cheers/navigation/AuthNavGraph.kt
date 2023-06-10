@@ -1,27 +1,30 @@
 package com.salazar.cheers.navigation
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.salazar.cheers.auth.ui.register.RegisterRoute
-import com.salazar.cheers.auth.ui.signin.SignInRoute
 import com.salazar.cheers.auth.ui.signup.SignUpRoute
-import com.salazar.cheers.core.share.ui.AuthDestinations
-import com.salazar.cheers.core.share.ui.CheersDestinations
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.AuthDestinations
+import com.salazar.cheers.core.ui.ui.CheersDestinations
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.feature.home.navigation.navigateToHome
+import com.salazar.cheers.feature.signin.signInNavigationRoute
+import com.salazar.cheers.feature.signin.signInScreen
 
 fun NavGraphBuilder.authNavGraph(
     navActions: CheersNavigationActions,
+    navController: NavController,
 ) {
     val uri = "https://cheers-a275e.web.app"
 
     navigation(
         route = CheersDestinations.AUTH_ROUTE,
-        startDestination = AuthDestinations.SIGN_IN_ROUTE,
+        startDestination = signInNavigationRoute,
     ) {
-
         composable(
             route = "${AuthDestinations.SIGN_UP_ROUTE}?email={email}&displayName={displayName}",
             arguments = listOf(
@@ -43,13 +46,13 @@ fun NavGraphBuilder.authNavGraph(
             )
         }
 
-        composable(
-            route = AuthDestinations.SIGN_IN_ROUTE,
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/signIn/{emailLink}" }),
-        ) {
-            SignInRoute(
-                navActions = navActions,
-            )
-        }
+        signInScreen(
+            navigateToHome = {
+                navController.navigateToHome()
+            },
+            navigateToSignUp = {},
+            navigateToRegister = {},
+            navigateToPhone = {},
+        )
     }
 }

@@ -2,12 +2,12 @@ package com.salazar.cheers.ui.main.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.internal.Activity
-import com.salazar.cheers.data.repository.activity.ActivityRepository
+import com.salazar.cheers.data.activity.Activity
+import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.domain.ListFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.list_suggestions.ListSuggestionsUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
-import com.salazar.cheers.user.domain.usecase.list_suggestions.ListSuggestionsUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +28,6 @@ data class ActivityUiState(
 
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
-    private val friendshipRepository: com.salazar.cheers.data.friendship.FriendshipRepository,
     private val activityRepository: ActivityRepository,
     private val listFriendRequestUseCase: ListFriendRequestUseCase,
     private val listSuggestionsUseCase: ListSuggestionsUseCase,

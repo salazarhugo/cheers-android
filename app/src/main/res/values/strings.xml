@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Cheers</string>
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoic2FsYXphcmJyb2NrIiwiYSI6ImNqd3hxaDBleTFobGQ0Y2sxc3lpdnNwYXMifQ.TgYFgyclmL6pGXXANhnlsw</string>
+
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="nav_header_title" translatable="false">Composer</string>
@@ -68,8 +70,6 @@
     <string name="lorem">Lorem or Ipsum</string>
     <!-- Accessibility descriptions -->
 
-    <string name="not_available">Functionality currently not available</string>
-    <string name="not_available_subtitle">Grab a beverage and check back later!</string>
     <string name="attached_image">Attached image</string>
     <string name="search">Search</string>
     <string name="info">Information</string>
@@ -109,7 +109,6 @@
     <string name="delete">Delete</string>
     <string name="accept">Accept</string>
     <string name="tickets">Tickets</string>
-    <string name="profile_empty_post" translatable="false">When you share photos and videos,\n they\'ll appear on your profile.</string>
     <string name="post">Post</string>
     <string name="replies">Replies</string>
     <string name="comments">Comments</string>

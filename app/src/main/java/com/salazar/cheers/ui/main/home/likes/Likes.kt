@@ -28,10 +28,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.core.ui.FollowButton
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.data.user.User
-import com.salazar.cheers.user.ui.FollowButton
 
 @Composable
 fun LikesScreen(

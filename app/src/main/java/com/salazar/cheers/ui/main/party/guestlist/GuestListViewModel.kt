@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.parties.data.repository.PartyRepository
+import com.salazar.cheers.data.party.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,8 +16,8 @@ import javax.inject.Inject
 data class GuestListUiState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val interested: List<com.salazar.cheers.core.model.UserItem>? = null,
-    val going: List<com.salazar.cheers.core.model.UserItem>? = null,
+    val interested: List<UserItem>? = null,
+    val going: List<UserItem>? = null,
 )
 
 @HiltViewModel

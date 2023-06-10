@@ -4,7 +4,7 @@ package com.salazar.cheers.auth.ui.components.delete_account
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.auth.domain.usecase.DeleteAccountUseCase
+import com.salazar.cheers.domain.usecase.DeleteAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

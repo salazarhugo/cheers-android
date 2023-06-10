@@ -3,8 +3,7 @@ package com.salazar.cheers.ui.main.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.parties.data.repository.PartyRepository
+import com.salazar.cheers.data.party.Party
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +28,7 @@ data class TicketingUiState(
 @HiltViewModel
 class TicketingViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val partyRepository: PartyRepository,
+    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(TicketingUiState(isLoading = true))

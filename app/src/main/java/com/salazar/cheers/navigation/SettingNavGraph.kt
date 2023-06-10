@@ -8,9 +8,9 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
-import com.salazar.cheers.core.share.ui.CheersDestinations
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
-import com.salazar.cheers.core.share.ui.SettingDestinations
+import com.salazar.cheers.core.ui.ui.CheersDestinations
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.SettingDestinations
 import com.salazar.cheers.ui.settings.SettingsRoute
 import com.salazar.cheers.ui.settings.SettingsViewModel
 import com.salazar.cheers.ui.settings.language.LanguageRoute

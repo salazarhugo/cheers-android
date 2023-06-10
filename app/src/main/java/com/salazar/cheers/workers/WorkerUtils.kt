@@ -16,7 +16,10 @@
 
 @file:JvmName("WorkerUtils")
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.salazar.cheers.R
@@ -39,5 +42,12 @@ fun makeStatusNotification(
         .setVibrate(LongArray(0))
 
     // Show the notification
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return
+    }
     NotificationManagerCompat.from(context).notify(1, builder.build())
 }

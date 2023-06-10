@@ -6,9 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.auth.GoogleAuthProvider
-import com.salazar.cheers.auth.ui.signin.AuthResultContract
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Security screen.
@@ -23,7 +21,7 @@ fun SecurityRoute(
     val uiState by securityViewModel.uiState.collectAsStateWithLifecycle()
     val authResultLauncher =
         rememberLauncherForActivityResult(
-            contract = AuthResultContract(),
+            contract = com.salazar.cheers.data.auth.AuthResultContract(),
             securityViewModel::onResult
         )
 

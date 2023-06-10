@@ -16,8 +16,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.data.internal.Party
 import com.salazar.cheers.core.util.numberFormatter
+import com.salazar.cheers.data.party.Party
 import com.salazar.common.ui.extensions.noRippleClickable
 
 @Composable

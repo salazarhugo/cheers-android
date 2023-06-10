@@ -14,7 +14,6 @@ import cheers.type.PrivacyOuterClass
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.parties.data.repository.PartyRepository
 import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -24,7 +23,7 @@ import makeStatusNotification
 class CreatePartyWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val partyRepository: PartyRepository,
+    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
     private val userRepository: UserRepository,
 ) : CoroutineWorker(appContext, params) {
 

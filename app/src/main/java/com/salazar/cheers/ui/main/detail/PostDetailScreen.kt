@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,15 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
-import com.google.accompanist.pager.rememberPagerState
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
 import com.mapbox.api.staticmap.v1.StaticMapCriteria
@@ -54,13 +45,13 @@ import com.mapbox.geojson.Point
 import com.salazar.cheers.R
 import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.PostText
+import com.salazar.cheers.core.ui.UserItem
+import com.salazar.cheers.core.ui.item.LikeButton
+import com.salazar.cheers.core.ui.item.PostBody
+import com.salazar.cheers.core.ui.item.PostHeader
 import com.salazar.cheers.core.ui.theme.Roboto
-import com.salazar.cheers.post.ui.PostText
-import com.salazar.cheers.post.ui.item.LikeButton
-import com.salazar.cheers.post.ui.item.PostBody
-import com.salazar.cheers.post.ui.item.PostHeader
-import com.salazar.cheers.ui.compose.items.UserItem
-import com.salazar.cheers.user.ui.FollowButton
 import java.util.Date
 
 @Composable
@@ -242,7 +233,7 @@ fun Post(
                     post = post,
                     onPostClicked = {},
                     onLike = {},
-                    pagerState = rememberPagerState()
+                    pagerState = androidx.compose.foundation.pager.rememberPagerState()
                 )
                 PostFooter(
                     post = post,
@@ -382,48 +373,5 @@ fun PostFooter(
                 modifier = Modifier.clickable { onDelete() },
                 tint = MaterialTheme.colorScheme.error,
             )
-    }
-}
-
-@Composable
-fun VideoPlayer(
-    uri: String,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-
-    // Create media item
-    val mediaItem = MediaItem.fromUri(uri)
-
-    // Create the player
-    val player = remember {
-        ExoPlayer.Builder(context).build().apply {
-            this.setMediaItem(mediaItem)
-            this.prepare()
-            this.playWhenReady = true
-            this.repeatMode = Player.REPEAT_MODE_ALL
-            this.volume = 0f
-            this.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-        }
-    }
-
-    DisposableEffect(
-        AndroidView(
-            factory = {
-                StyledPlayerView(context).apply {
-                    this.player = player
-                }
-            },
-            modifier = modifier.clickable {
-                if (player.volume == 0f) player.volume = 1f else player.volume = 0f
-            }
-        ) {
-            it.useController = false
-            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-        }
-    ) {
-        onDispose {
-            player.release()
-        }
     }
 }

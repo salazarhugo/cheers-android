@@ -3,10 +3,10 @@ package com.salazar.cheers.auth.ui.register
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.auth.domain.usecase.RegisterUseCase
-import com.salazar.cheers.auth.domain.usecase.SignInUseCase
 import com.salazar.cheers.core.data.util.Utils.validateUsername
 import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.domain.usecase.RegisterUseCase
+import com.salazar.cheers.domain.usecase.SignInWithEmailLinkUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +30,7 @@ class RegisterViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val registerUseCase: RegisterUseCase,
-    private val signInUseCase: SignInUseCase,
+    private val signInWithEmailLinkUseCase: SignInWithEmailLinkUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RegisterUiState(isLoading = false))
@@ -50,7 +50,7 @@ class RegisterViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val signInResult = signInUseCase(
+            val signInResult = signInWithEmailLinkUseCase(
                 emailLink = emailLink,
             )
 

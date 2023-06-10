@@ -20,11 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.core.share.ui.LoadingScreen
-import com.salazar.cheers.core.share.ui.Green
-import com.salazar.cheers.core.share.ui.GreenSurface
 import kotlinx.coroutines.delay
 
 /**

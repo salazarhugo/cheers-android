@@ -3,9 +3,8 @@ package com.salazar.cheers.ui.main.party.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.internal.Party
-import com.salazar.cheers.core.data.internal.WatchStatus
-import com.salazar.cheers.parties.data.repository.PartyRepository
+import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.data.party.WatchStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -51,7 +50,7 @@ private data class EventDetailViewModelState(
 @HiltViewModel
 class EventDetailViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val partyRepository: PartyRepository,
+    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EventDetailViewModelState(isLoading = true))

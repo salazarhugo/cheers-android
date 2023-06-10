@@ -6,9 +6,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.core.data.util.Utils.copyToClipboard
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.common.util.copyToClipboard
 
 /**
  * Stateful composable that displays the Navigation route for the Event detail screen.

@@ -2,6 +2,7 @@
 accompanistPagerIndicators = "0.28.0"
 accompanistPager = "0.28.0"
 accompanistSwiperefresh = "0.24.8-beta"
+android = "10.12.1"
 androidGradlePlugin = "8.0.2"
 accompanistPermissions = "0.24.8-beta"
 accompanistPlaceholderMaterial = "0.24.8-beta"
@@ -12,7 +13,7 @@ activityCompose = "1.7.2"
 androidx-lifecycleRuntimeKtx = "2.6.1"
 androidxComposeBom = "2023.05.01"
 exoplayer = "2.18.7"
-firebaseBom = "32.0.0"
+firebaseBom = "32.1.0"
 androidxComposeCompiler = "1.4.5"
 androidxComposeMaterial = "1.1.0"
 androidxComposeMaterial3 = "1.1.0"
@@ -60,7 +61,7 @@ moshiKotlinCodegen = "1.14.0"
 moshi = "1.14.0"
 materialIconsExtended = "1.4.3"
 materialIconsCore = "1.4.3"
-pagingCompose = "1.0.0-alpha20"
+pagingCompose = "3.2.0-beta01"
 pagingRuntimeKtx = "3.1.1"
 playServicesAds = "22.1.0"
 playServicesAuth = "20.5.0"
@@ -88,6 +89,7 @@ org-jetbrains-kotlin-jvm = "1.8.20"
 
 [libraries]
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
+android = { module = "com.mapbox.maps:android", version.ref = "android" }
 androidx-animation-graphics = { module = "androidx.compose.animation:animation-graphics", version.ref = "animationGraphics" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraLifecycle" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraView" }
@@ -168,6 +170,9 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "symbolProcessingApi" }
 user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "userMessagingPlatform" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-performance = { group = "com.google.firebase", name = "firebase-perf-ktx" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

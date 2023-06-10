@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Settings screen.
@@ -27,7 +27,9 @@ fun SettingsRoute(
     }
     SettingsScreen(
         uiState = uiState,
-        onBackPressed = { navActions.navigateToProfile() },
+        onBackPressed = {
+//            navActions.navigateToProfile()
+        },
         onSignOut = {
             settingsViewModel.onSignOut {
                 navActions.navigateToSignIn()

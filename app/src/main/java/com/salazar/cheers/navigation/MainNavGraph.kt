@@ -1,8 +1,6 @@
 package com.salazar.cheers.navigation
 
-import android.Manifest
 import android.content.Intent
-import android.os.Build
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -16,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
@@ -33,20 +30,29 @@ import com.salazar.cheers.comment.ui.delete.DeleteCommentDialog
 import com.salazar.cheers.comment.ui.replies.RepliesRoute
 import com.salazar.cheers.core.data.util.Constants.URI
 import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.core.data.util.Utils.copyToClipboard
 import com.salazar.cheers.core.data.util.Utils.shareToSnapchat
-import com.salazar.cheers.core.share.ui.CheersDestinations
 import com.salazar.cheers.core.share.ui.LoadingScreen
-import com.salazar.cheers.core.share.ui.MainDestinations
 import com.salazar.cheers.core.ui.theme.CheersTheme
+import com.salazar.cheers.core.ui.ui.CheersDestinations
+import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
 import com.salazar.cheers.feature.chat.ui.chats.MessagesRoute
 import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
-import com.salazar.cheers.feature.map.screens.map.MapRoute
+import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
+import com.salazar.cheers.feature.home.navigation.homeScreen
+import com.salazar.cheers.feature.map.navigation.mapScreen
 import com.salazar.cheers.feature.map.screens.settings.MapSettingsRoute
+import com.salazar.cheers.feature.profile.OtherProfileRoute
+import com.salazar.cheers.feature.profile.OtherProfileStatsRoute
+import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
+import com.salazar.cheers.feature.profile.ProfileSheetUIAction
+import com.salazar.cheers.feature.profile.ProfileStatsRoute
+import com.salazar.cheers.feature.profile.ProfileStatsViewModel
+import com.salazar.cheers.feature.profile.navigation.profileScreen
+import com.salazar.cheers.feature.search.navigation.searchScreen
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
 import com.salazar.cheers.map.ui.MapPostHistoryRoute
@@ -63,11 +69,7 @@ import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
 import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.main.friendrequests.FriendRequestsRoute
-import com.salazar.cheers.ui.main.home.HomeRoute
-import com.salazar.cheers.ui.main.home.HomeViewModel
 import com.salazar.cheers.ui.main.nfc.NfcRoute
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileRoute
-import com.salazar.cheers.ui.main.otherprofile.OtherProfileStatsRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
 import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
 import com.salazar.cheers.ui.main.party.EventsRoute
@@ -75,12 +77,6 @@ import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
 import com.salazar.cheers.ui.main.party.detail.EventDetailRoute
 import com.salazar.cheers.ui.main.party.edit.EditEventRoute
 import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
-import com.salazar.cheers.ui.main.profile.ProfileMoreBottomSheet
-import com.salazar.cheers.ui.main.profile.ProfileRoute
-import com.salazar.cheers.ui.main.profile.ProfileSheetUIAction
-import com.salazar.cheers.ui.main.profile.ProfileStatsRoute
-import com.salazar.cheers.ui.main.profile.ProfileStatsViewModel
-import com.salazar.cheers.ui.main.search.SearchRoute
 import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
@@ -93,14 +89,17 @@ import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
+import com.salazar.common.util.copyToClipboard
 
 
 fun NavGraphBuilder.mainNavGraph(
     appState: CheersAppState,
 ) {
+    val navController = appState.navController
+
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
-        startDestination = MainDestinations.HOME_ROUTE,
+        startDestination = homeNavigationRoute,
     ) {
         bottomSheet(
             route = MainDestinations.MAP_SETTINGS_ROUTE,
@@ -271,29 +270,41 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.HOME_ROUTE,
-        ) { back ->
-            val parentEntry = remember(back) {
-                appState.navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
-            }
-            val homeViewModel = hiltViewModel<HomeViewModel>(parentEntry)
+        homeScreen(
+            onActivityClick = {
+                navController.navigate(MainDestinations.ACTIVITY_ROUTE)
+            },
+            onPostClick = {
+                navController.navigate("")
+            },
+        )
+//        composable(
+//            route = MainDestinations.HOME_ROUTE,
+//        ) { back ->
+//            val parentEntry = remember(back) {
+//                appState.navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
+//            }
+//            val homeViewModel = hiltViewModel<com.salazar.cheers.feature.home.navigation.HomeViewModel>(parentEntry)
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                com.salazar.cheers.core.share.ui.RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
+//            }
+//            com.salazar.cheers.feature.home.navigation.HomeRoute(
+//                appState = appState,
+//                navActions = appState.navActions,
+//                homeViewModel = homeViewModel,
+//            )
+//        }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                com.salazar.cheers.core.share.ui.RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
+        mapScreen(
+            navigateBack = {
+                navController.popBackStack()
+            },
+            navigateToMapSettings = {
+            },
+            navigateToCreatePost = {
             }
-            HomeRoute(
-                appState = appState,
-                navActions = appState.navActions,
-                homeViewModel = homeViewModel,
-            )
-        }
-
-        composable(MainDestinations.MAP_ROUTE) {
-            MapRoute(
-                navActions = appState.navActions
-            )
-        }
+        )
 
         composable(MainDestinations.MAP_POST_HISTORY_ROUTE) {
             MapPostHistoryRoute(
@@ -319,11 +330,10 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(MainDestinations.SEARCH_ROUTE) {
-            SearchRoute(
-                navActions = appState.navActions,
-            )
-        }
+        searchScreen(
+            navigateToOtherProfile = {
+            },
+        )
 
         composable(
             route = "${MainDestinations.POST_COMMENTS}/{postId}",
@@ -507,22 +517,7 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.PROFILE_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = {
-                if (targetState.destination.hierarchy.any { it.route == CheersDestinations.SETTING_ROUTE })
-                    slideOutHorizontally(targetOffsetX = { -1000 })
-                else
-                    slideOutHorizontally(targetOffsetX = { 1000 })
-            }
-        ) {
-            ProfileRoute(
-                navActions = appState.navActions,
-                showSnackBar = appState::showSnackBar,
-                appState = appState,
-            )
-        }
+        profileScreen()
 
         bottomSheet(
             route = "${MainDestinations.STORY_MORE_SHEET}/{storyID}",

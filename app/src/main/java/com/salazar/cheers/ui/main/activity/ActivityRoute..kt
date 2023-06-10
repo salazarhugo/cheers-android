@@ -5,8 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.data.internal.ActivityType
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.ui.CheersAppState
 
 /**
@@ -34,17 +33,26 @@ fun ActivityRoute(
         onActivityUIAction = { action ->
             when(action) {
                 is ActivityUIAction.OnActivityClick -> {
-                    when(action.activity.type) {
-                        ActivityType.NONE -> {}
-                        ActivityType.FRIEND_ADDED -> navActions.navigateToOtherProfile(action.activity.username)
-                        ActivityType.POST_LIKE -> navActions.navigateToPostDetail(action.activity.mediaId)
-                        ActivityType.STORY_LIKE -> {}
-                        ActivityType.COMMENT -> {}
-                        ActivityType.MENTION -> navActions.navigateToComments(action.activity.mediaId)
-                        ActivityType.CREATE_POST -> {}
-                        ActivityType.CREATE_EVENT -> {}
-                        ActivityType.CREATE_STORY -> {}
-                        ActivityType.COMMENT_LIKED -> {}
+                    when (action.activity.type) {
+                        com.salazar.cheers.data.activity.ActivityType.NONE -> {}
+                        com.salazar.cheers.data.activity.ActivityType.FRIEND_ADDED -> navActions.navigateToOtherProfile(
+                            action.activity.username
+                        )
+
+                        com.salazar.cheers.data.activity.ActivityType.POST_LIKE -> navActions.navigateToPostDetail(
+                            action.activity.mediaId
+                        )
+
+                        com.salazar.cheers.data.activity.ActivityType.STORY_LIKE -> {}
+                        com.salazar.cheers.data.activity.ActivityType.COMMENT -> {}
+                        com.salazar.cheers.data.activity.ActivityType.MENTION -> navActions.navigateToComments(
+                            action.activity.mediaId
+                        )
+
+                        com.salazar.cheers.data.activity.ActivityType.CREATE_POST -> {}
+                        com.salazar.cheers.data.activity.ActivityType.CREATE_EVENT -> {}
+                        com.salazar.cheers.data.activity.ActivityType.CREATE_STORY -> {}
+                        com.salazar.cheers.data.activity.ActivityType.COMMENT_LIKED -> {}
                     }
                 }
                 ActivityUIAction.OnBackPressed -> navActions.navigateBack()

@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.auth.data.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +29,7 @@ data class SecurityUiState(
 
 @HiltViewModel
 class SecurityViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val authRepository: com.salazar.cheers.data.auth.AuthRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SecurityUiState(isLoading = true))

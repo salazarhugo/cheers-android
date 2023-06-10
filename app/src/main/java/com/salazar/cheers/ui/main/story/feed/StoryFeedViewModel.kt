@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.salazar.cheers.core.domain.model.UserWithStories
-import com.salazar.cheers.core.domain.usecase.feed_story.ListStoryFeedUseCase
 import com.salazar.cheers.data.repository.story.StoryRepository
+import com.salazar.cheers.domain.feed_story.ListStoryFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -60,11 +60,11 @@ class StoryFeedViewModel @Inject constructor(
             updatePage(it)
         }
 
-        viewModelScope.launch {
-            listStoryFeedUseCase().collect {
-                updateUsersWithStories(usersWithStories = it)
-            }
-        }
+//        viewModelScope.launch {
+//            listStoryFeedUseCase().collect {
+//                updateUsersWithStories(usersWithStories = it)
+//            }
+//        }
     }
 
     private fun updateError(message: String?) {

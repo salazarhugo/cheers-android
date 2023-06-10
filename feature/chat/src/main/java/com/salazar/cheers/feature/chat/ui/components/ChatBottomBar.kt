@@ -3,7 +3,6 @@
 package com.salazar.cheers.feature.chat.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
@@ -70,7 +68,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
@@ -88,6 +85,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.feature.chat.R
 import com.salazar.cheers.feature.chat.domain.models.ChatMessage
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatUIAction
@@ -308,32 +306,6 @@ private fun SelectorExpanded(
             else -> {
                 throw NotImplementedError()
             }
-        }
-    }
-}
-
-@Composable
-fun FunctionalityNotAvailablePanel() {
-    AnimatedVisibility(
-        visibleState = remember { MutableTransitionState(false).apply { targetState = true } },
-    ) {
-        Column(
-            modifier = Modifier
-                .height(320.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(id = R.string.not_available),
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = stringResource(id = R.string.not_available_subtitle),
-                modifier = Modifier.paddingFrom(FirstBaseline, before = 32.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

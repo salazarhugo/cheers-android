@@ -5,11 +5,10 @@ import cheers.chat.v1.MessageType
 import cheers.chat.v1.RoomStatus
 import cheers.chat.v1.RoomType
 import com.google.protobuf.Timestamp
-import com.salazar.cheers.core.data.internal.ActivityType
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.*
+import java.util.Date
 
 class Converters {
     @TypeConverter
@@ -21,12 +20,12 @@ class Converters {
         ?: com.salazar.cheers.core.model.StoryState.UNKNOWN
 
     @TypeConverter
-    fun fromActivityType(value: ActivityType) = value.name
+    fun fromActivityType(value: com.salazar.cheers.data.activity.ActivityType) = value.name
 
     @TypeConverter
-    fun toActivityType(name: String) = ActivityType.values()
-            .firstOrNull { it.name.equals(name, ignoreCase = true) }
-            ?: ActivityType.NONE
+    fun toActivityType(name: String) = com.salazar.cheers.data.activity.ActivityType.values()
+        .firstOrNull { it.name.equals(name, ignoreCase = true) }
+        ?: com.salazar.cheers.data.activity.ActivityType.NONE
 
     @TypeConverter
     fun fromMessageType(value: MessageType) = value.name

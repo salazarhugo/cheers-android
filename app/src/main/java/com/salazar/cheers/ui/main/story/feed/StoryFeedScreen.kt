@@ -60,8 +60,8 @@ import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.ui.item.PostHeader
 import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.post.ui.item.PostHeader
 import com.salazar.cheers.ui.carousel
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import kotlinx.coroutines.launch

@@ -18,10 +18,10 @@ import com.mapbox.search.SearchEngineSettings
 import com.mapbox.search.SearchOptions
 import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.result.SearchResult
-import com.mapbox.search.result.SearchSuggestion
 import com.salazar.cheers.R
 import com.salazar.cheers.core.model.Privacy
-import com.salazar.cheers.parties.data.repository.PartyRepository
+import com.salazar.cheers.core.model.SearchSuggestion
+import com.salazar.cheers.core.model.toSearchSuggestion
 import com.salazar.cheers.workers.CreatePartyWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -75,7 +75,7 @@ data class CreatePartyUiState(
 @HiltViewModel
 class CreatePartyViewModel @Inject constructor(
     application: Application,
-    private val partyRepository: PartyRepository,
+    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CreatePartyUiState(isLoading = false))
@@ -94,7 +94,7 @@ class CreatePartyViewModel @Inject constructor(
         )
     val searchCallback = object : SearchSelectionCallback {
         override fun onCategoryResult(
-            suggestion: SearchSuggestion,
+            suggestion: com.mapbox.search.result.SearchSuggestion,
             results: List<SearchResult>,
             responseInfo: ResponseInfo
         ) {
@@ -106,7 +106,7 @@ class CreatePartyViewModel @Inject constructor(
         }
 
         override fun onResult(
-            suggestion: SearchSuggestion,
+            suggestion: com.mapbox.search.result.SearchSuggestion,
             result: SearchResult,
             responseInfo: ResponseInfo
         ) {
@@ -122,10 +122,10 @@ class CreatePartyViewModel @Inject constructor(
         }
 
         override fun onSuggestions(
-            suggestions: List<SearchSuggestion>,
+            suggestions: List<com.mapbox.search.result.SearchSuggestion>,
             responseInfo: ResponseInfo
         ) {
-            updateResults(suggestions)
+            updateResults(suggestions.map { it.toSearchSuggestion() })
         }
     }
     val caption = mutableStateOf("")
@@ -152,7 +152,7 @@ class CreatePartyViewModel @Inject constructor(
     }
 
     fun onLocationClick(result: SearchSuggestion) {
-        searchEngine.select(result, searchCallback)
+//        searchEngine.select(result, searchCallback)
     }
 
     fun onDescriptionChange(description: String) {

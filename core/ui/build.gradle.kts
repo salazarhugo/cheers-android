@@ -12,12 +12,19 @@ android {
 }
 
 dependencies {
+    implementation(project(":common"))
     implementation(project(":core:util"))
     implementation(project(":core:model"))
+
+    implementation(project(":data:party"))
+    implementation(project(":data:post"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    // ExoPlayer 2
+    implementation(libs.exoplayer)
 
     // Jetpack Compose
     implementation(libs.androidx.compose.ui.util)

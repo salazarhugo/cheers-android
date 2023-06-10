@@ -44,8 +44,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.user.User
+import com.salazar.cheers.feature.search.UserCard
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.main.search.UserCard
 import kotlin.math.absoluteValue
 
 @Composable

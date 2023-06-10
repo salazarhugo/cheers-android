@@ -7,8 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.share.ui.CheersNavigationActions
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 /**
  * Stateful composable that displays the Navigation route for the Comments screen.

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_empty_post" translatable="false">When you share photos and videos,\n they\'ll appear on your profile.</string>
+    <string name="profile">Profile</string>
+</resources>

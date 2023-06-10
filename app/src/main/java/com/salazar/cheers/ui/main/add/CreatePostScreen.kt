@@ -46,7 +46,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -62,14 +61,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
-import com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.PlayerView
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.ReverseGeoOptions
 import com.mapbox.search.SearchCallback
@@ -698,47 +690,6 @@ private fun singleImageResultLauncher(
 //                onSetPostVideo(imageOrVideoUri)
 //        }
 //    }
-}
-
-@Composable
-fun VideoPlayer(
-    uri: Uri,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-
-    // Create media item
-    val mediaItem = MediaItem.fromUri(uri)
-
-    // Create the player
-    val player = remember {
-        ExoPlayer.Builder(context).build().apply {
-            this.setMediaItem(mediaItem)
-            this.prepare()
-            this.playWhenReady = true
-            this.repeatMode = Player.REPEAT_MODE_ALL
-            this.volume = 0f
-            this.videoScalingMode = VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-        }
-    }
-
-    DisposableEffect(
-        AndroidView(
-            factory = {
-                PlayerView(context).apply {
-                    this.player = player
-                }
-            },
-            modifier = modifier
-        ) {
-            it.useController = false
-            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-        }
-    ) {
-        onDispose {
-            player.release()
-        }
-    }
 }
 
 @Composable

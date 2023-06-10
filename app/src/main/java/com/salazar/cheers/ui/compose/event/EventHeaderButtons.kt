@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.data.internal.WatchStatus
+import com.salazar.cheers.data.party.WatchStatus
 
 @Composable
 fun EventHeaderButtons(

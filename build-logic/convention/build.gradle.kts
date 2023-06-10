@@ -58,5 +58,10 @@ gradlePlugin {
             id = "cheers.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
         }
+
+        register("androidFirebase") {
+            id = "cheers.android.application.firebase"
+            implementationClass = "AndroidApplicationFirebaseConventionPlugin"
+        }
     }
 }
