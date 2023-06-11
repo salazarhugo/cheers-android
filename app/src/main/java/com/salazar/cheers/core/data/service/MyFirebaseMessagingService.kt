@@ -16,8 +16,8 @@ import com.salazar.cheers.core.data.notifications.chatNotification
 import com.salazar.cheers.core.data.notifications.defaultNotification
 import com.salazar.cheers.core.data.notifications.newFollowerNotification
 import com.salazar.cheers.core.data.notifications.newPostNotification
-import com.salazar.cheers.core.data.util.Constants
-import com.salazar.cheers.core.data.util.Utils.getCircledBitmap
+import com.salazar.cheers.core.util.Constants
+import com.salazar.cheers.core.util.Utils.getCircledBitmap
 import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint

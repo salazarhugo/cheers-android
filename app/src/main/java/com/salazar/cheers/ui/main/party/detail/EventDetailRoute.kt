@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
 import com.salazar.common.util.copyToClipboard
 
 /**

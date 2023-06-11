@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.core.data.util.Utils.isEmailValid
+import com.salazar.cheers.core.util.Utils.isEmailValid
 import com.salazar.cheers.data.user.UserDao
 import com.salazar.cheers.data.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

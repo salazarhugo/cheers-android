@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":data:party"))
     implementation(project(":common"))
     implementation(project(":domain"))
+    implementation(project(":core:ui"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

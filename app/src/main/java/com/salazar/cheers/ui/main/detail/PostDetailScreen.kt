@@ -43,7 +43,6 @@ import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.util.Utils.isDarkModeOn
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.FollowButton
 import com.salazar.cheers.core.ui.PostText
@@ -52,6 +51,7 @@ import com.salazar.cheers.core.ui.item.LikeButton
 import com.salazar.cheers.core.ui.item.PostBody
 import com.salazar.cheers.core.ui.item.PostHeader
 import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.util.Utils.isDarkModeOn
 import java.util.Date
 
 @Composable

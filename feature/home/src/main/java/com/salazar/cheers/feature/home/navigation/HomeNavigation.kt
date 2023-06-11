@@ -16,6 +16,7 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.homeScreen(
     onActivityClick: () -> Unit,
+    navigateToSearch: () -> Unit,
     onPostClick: (String) -> Unit,
 ) {
     composable(

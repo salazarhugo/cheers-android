@@ -24,6 +24,21 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
 
+    // Firebase BOM
+    implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-dynamic-links-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+
+    // Snapchat
+    implementation(libs.creativekit)
+    implementation(libs.loginkit)
+
+    // Camera X
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.lifecycle)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

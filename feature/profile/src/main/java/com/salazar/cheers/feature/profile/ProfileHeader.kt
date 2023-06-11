@@ -1,65 +1,129 @@
-package com.salazar.cheers.ui.compose.profile
+package com.salazar.cheers.feature.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.salazar.cheers.core.ui.ProfileBanner
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.data.user.User
-import com.salazar.cheers.feature.profile.ProfileStats
 
 @Composable
 fun ProfileHeader(
     user: User,
+    isEditable: Boolean,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
-    onStoryClick: (String) -> Unit,
     onWebsiteClick: (String) -> Unit,
+    onEditProfileClick: () -> Unit,
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
+            .fillMaxWidth(),
     ) {
-        UserProfilePicture(
+        ProfileBannerAndAvatar(
             picture = user.picture,
+            isEditable = isEditable,
+            onEditProfileClick = onEditProfileClick,
+        )
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            ProfileName(
+                name = user.name,
+                isBusinessAccount = user.isBusinessAccount,
+            )
+            ProfileBio(
+                bio = user.bio,
+            )
+            ProfileWebsite(
+                website = user.website,
+                onClick = onWebsiteClick,
+            )
+            ProfileStats(
+                user = user,
+                onStatClicked = onStatClicked,
+            )
+            Spacer(Modifier.height(18.dp))
+        }
+    }
+}
+
+@Composable
+fun ProfileBannerAndAvatar(
+    isEditable: Boolean,
+    picture: String?,
+    onEditProfileClick: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.BottomStart,
+    ) {
+        Column {
+            ProfileBanner()
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(3f),
+                model = "https://pbs.twimg.com/profile_banners/44196397/1576183471/1500x500",
+                contentDescription = null,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                if (isEditable)
+                    OutlinedButton(
+                        onClick = onEditProfileClick,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.edit_profile),
+                        )
+                    }
+                else {
+                    IconButton(
+                        onClick = {},
+                    ) {
+                        Icon(Icons.Default.MoreHoriz, contentDescription = null)
+                    }
+                }
+            }
+        }
+        UserProfilePicture(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background, CircleShape),
+            picture = picture,
             size = 110.dp,
-            storyState = user.storyState,
-            onClick = { onStoryClick(user.username) },
+//            storyState = user.storyState,
+            onClick = {},
         )
-        ProfileName(
-            name = user.name,
-            isBusinessAccount = user.isBusinessAccount,
-        )
-        ProfileBio(
-            bio = user.bio,
-        )
-        ProfileWebsite(
-            website = user.website,
-            onClick = onWebsiteClick,
-        )
-        ProfileStats(
-            user = user,
-            onStatClicked = onStatClicked,
-        )
-        Spacer(Modifier.height(18.dp))
     }
 }
 
@@ -84,7 +148,7 @@ fun ProfileName(
         }
         Text(
             text = name,
-            style = MaterialTheme.typography.titleMedium.copy(),
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
         )
     }
 }
@@ -95,10 +159,10 @@ fun ProfileBio(
 ) {
     if (bio.isBlank())
         return
-    Spacer(Modifier.height(4.dp))
+    Spacer(Modifier.height(8.dp))
     Text(
         text = bio,
-        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
         textAlign = TextAlign.Center,
     )
 }

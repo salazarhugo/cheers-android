@@ -47,7 +47,7 @@ fun PostFooter(
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
 
-        if (post.photos.size > 1)
+//        if (post.photos.size > 1)
 //            HorizontalPagerIndicator(
 //                pagerState = pagerState,
 //                modifier = Modifier

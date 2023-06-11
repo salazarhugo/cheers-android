@@ -19,9 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersOutlinedButton
 import com.salazar.cheers.core.ui.UserItem
+import com.salazar.cheers.core.ui.text.MyText
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.text.MyText
 import com.salazar.cheers.ui.main.party.create.TopAppBar
 import com.salazar.cheers.user.ui.AddFriendButton
 

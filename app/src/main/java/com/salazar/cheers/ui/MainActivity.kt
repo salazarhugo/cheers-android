@@ -23,9 +23,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.Language
 import com.salazar.cheers.Settings
-import com.salazar.cheers.core.data.util.StorageUtil
-import com.salazar.cheers.core.data.util.Utils.setLocale
 import com.salazar.cheers.core.ui.CheersViewModel
+import com.salazar.cheers.core.util.StorageUtil
+import com.salazar.cheers.core.util.Utils.setLocale
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets

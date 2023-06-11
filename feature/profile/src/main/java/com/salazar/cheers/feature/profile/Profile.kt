@@ -1,12 +1,8 @@
 package com.salazar.cheers.feature.profile
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.salazar.cheers.data.user.User
-import com.salazar.cheers.ui.compose.profile.ProfileHeader
 
 @Composable
 fun ProfileItem(
@@ -17,17 +13,15 @@ fun ProfileItem(
     onEditProfileClicked: () -> Unit,
     onDrinkingStatsClick: (String) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
-    ) {
+    Column() {
         ProfileHeader(
             user = user,
+            isEditable = true,
             onStatClicked = onStatClicked,
-            onStoryClick = onStoryClick,
             onWebsiteClick = onWebsiteClick,
+            onEditProfileClick = onEditProfileClicked,
         )
         ProfileButtons(
-            onEditProfileClicked = onEditProfileClicked,
             onDrinkingStatsClick = { onDrinkingStatsClick(user.username) },
         )
     }

@@ -22,7 +22,7 @@ import com.salazar.cheers.core.data.api.ApiService
 import com.salazar.cheers.core.data.db.CheersDatabase
 import com.salazar.cheers.core.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
-import com.salazar.cheers.core.data.util.Constants
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.data.activity.impl.ActivityRepositoryImpl
 import com.salazar.cheers.data.db.*

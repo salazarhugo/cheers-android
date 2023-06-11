@@ -15,7 +15,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import cheers.type.PostOuterClass
 import com.salazar.cheers.R
-import com.salazar.cheers.core.data.util.StorageUtil
+import com.salazar.cheers.core.util.StorageUtil
 import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

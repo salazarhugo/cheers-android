@@ -12,7 +12,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import cheers.story.v1.StoryOuterClass
 import cheers.type.PrivacyOuterClass
-import com.salazar.cheers.core.data.util.StorageUtil
+import com.salazar.cheers.core.util.StorageUtil
 import com.salazar.cheers.data.repository.story.StoryRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

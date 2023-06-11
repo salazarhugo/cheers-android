@@ -3,7 +3,7 @@ package com.salazar.cheers.auth.ui.register
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.data.util.Utils.validateUsername
+import com.salazar.cheers.core.util.Utils.validateUsername
 import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.domain.usecase.RegisterUseCase
 import com.salazar.cheers.domain.usecase.SignInWithEmailLinkUseCase

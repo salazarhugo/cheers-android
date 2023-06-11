@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Celebration
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -260,7 +259,6 @@ fun PartyList(
 
 @Composable
 fun ProfileButtons(
-    onEditProfileClicked: () -> Unit,
     onDrinkingStatsClick: () -> Unit,
 ) {
     Row(
@@ -268,15 +266,6 @@ fun ProfileButtons(
             .fillMaxWidth()
             .padding(top = 16.dp),
     ) {
-        FilledTonalButton(
-            onClick = onEditProfileClicked,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier
-                .weight(0.9f)
-                .height(34.dp)
-        ) {
-            Text("Edit Profile")
-        }
 //        IconButton(onClick = onDrinkingStatsClick) {
 //            Icon(Icons.Outlined.QueryStats, null)
 //        }

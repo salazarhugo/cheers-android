@@ -28,30 +28,36 @@ import com.salazar.cheers.comment.ui.comment_more.CommentMoreRoute
 import com.salazar.cheers.comment.ui.comments.CommentsRoute
 import com.salazar.cheers.comment.ui.delete.DeleteCommentDialog
 import com.salazar.cheers.comment.ui.replies.RepliesRoute
-import com.salazar.cheers.core.data.util.Constants.URI
-import com.salazar.cheers.core.data.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.core.data.util.Utils.shareToSnapchat
 import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
+import com.salazar.cheers.core.util.Constants.URI
+import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
+import com.salazar.cheers.core.util.Utils.shareToSnapchat
 import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
 import com.salazar.cheers.feature.chat.ui.chats.MessagesRoute
 import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
+import com.salazar.cheers.feature.edit_profile.navigation.editProfileScreen
+import com.salazar.cheers.feature.edit_profile.navigation.navigateToEditProfile
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.feature.home.navigation.homeScreen
 import com.salazar.cheers.feature.map.navigation.mapScreen
 import com.salazar.cheers.feature.map.screens.settings.MapSettingsRoute
-import com.salazar.cheers.feature.profile.OtherProfileRoute
+import com.salazar.cheers.feature.notifications.navigation.navigateToNotifications
+import com.salazar.cheers.feature.notifications.navigation.notificationsScreen
 import com.salazar.cheers.feature.profile.OtherProfileStatsRoute
 import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
 import com.salazar.cheers.feature.profile.ProfileSheetUIAction
 import com.salazar.cheers.feature.profile.ProfileStatsRoute
 import com.salazar.cheers.feature.profile.ProfileStatsViewModel
+import com.salazar.cheers.feature.profile.navigation.navigateToOtherProfile
+import com.salazar.cheers.feature.profile.navigation.otherProfileScreen
 import com.salazar.cheers.feature.profile.navigation.profileScreen
+import com.salazar.cheers.feature.search.navigation.navigateToSearch
 import com.salazar.cheers.feature.search.navigation.searchScreen
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
@@ -61,13 +67,10 @@ import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
-import com.salazar.cheers.ui.main.activity.ActivityRoute
 import com.salazar.cheers.ui.main.add.CreatePostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
-import com.salazar.cheers.ui.main.editprofile.EditProfileRoute
-import com.salazar.cheers.ui.main.editprofile.EditProfileViewModel
 import com.salazar.cheers.ui.main.friendrequests.FriendRequestsRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
@@ -150,21 +153,24 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.ACTIVITY_ROUTE,
-        ) {
-            ActivityRoute(
-                appState = appState,
-                navActions = appState.navActions,
-            )
-        }
+        notificationsScreen(
+            navigateBack = {
+                navController.popBackStack()
+            },
+            navigateToPostDetail = {},
+            navigateToFriendRequests = {},
+            navigateToComments = {},
+            navigateToOtherProfile = {
+                navController.navigateToOtherProfile(it)
+            },
+        )
 
         composable(
             route = "${MainDestinations.CHAT_ROUTE}?channelId={channelId}&userId={userID}",
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" }),
             enterTransition = {
                 slideInHorizontally(initialOffsetX = { 1000 })
-                              },
+            },
             exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             ChatRoute(
@@ -271,30 +277,15 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         homeScreen(
-            onActivityClick = {
-                navController.navigate(MainDestinations.ACTIVITY_ROUTE)
-            },
+            onActivityClick = navController::navigateToNotifications,
             onPostClick = {
                 navController.navigate("")
             },
+            navigateToSearch = navController::navigateToSearch,
         )
-//        composable(
-//            route = MainDestinations.HOME_ROUTE,
-//        ) { back ->
-//            val parentEntry = remember(back) {
-//                appState.navController.getBackStackEntry(CheersDestinations.MAIN_ROUTE)
-//            }
-//            val homeViewModel = hiltViewModel<com.salazar.cheers.feature.home.navigation.HomeViewModel>(parentEntry)
-//
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 //                com.salazar.cheers.core.share.ui.RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
 //            }
-//            com.salazar.cheers.feature.home.navigation.HomeRoute(
-//                appState = appState,
-//                navActions = appState.navActions,
-//                homeViewModel = homeViewModel,
-//            )
-//        }
 
         mapScreen(
             navigateBack = {
@@ -331,8 +322,7 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         searchScreen(
-            navigateToOtherProfile = {
-            },
+            navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
         composable(
@@ -393,18 +383,14 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = "${MainDestinations.OTHER_PROFILE_ROUTE}/{username}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/u/{username}" })
-        ) {
-
-            val username = it.arguments?.getString("username")!!
-
-            OtherProfileRoute(
-                navActions = appState.navActions,
-                username = username,
-            )
-        }
+        otherProfileScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfileStats = {
+            },
+            navigateToManageFriendship = {},
+            navigateToPostDetail = {},
+            navigateToComments = {},
+        )
 
         composable(
             route = "${MainDestinations.GUEST_LIST_ROUTE}/{eventId}",
@@ -507,17 +493,13 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.EDIT_PROFILE_ROUTE,
-        ) {
-            val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
-            EditProfileRoute(
-                editProfileViewModel = editProfileViewModel,
-                navActions = appState.navActions,
-            )
-        }
+        editProfileScreen(
+            navigateBack = navController::popBackStack,
+        )
 
-        profileScreen()
+        profileScreen(
+            navigateToEditProfile = navController::navigateToEditProfile,
+        )
 
         bottomSheet(
             route = "${MainDestinations.STORY_MORE_SHEET}/{storyID}",
@@ -525,7 +507,7 @@ fun NavGraphBuilder.mainNavGraph(
             val storyID = it.arguments?.getString("storyID")!!
 
             StoryMoreBottomSheet(onStorySheetUIAction = { action ->
-                when(action) {
+                when (action) {
                     StorySheetUIAction.OnAddSnapchatFriends -> {}
                     StorySheetUIAction.OnCopyStoryClick -> {}
                     StorySheetUIAction.OnNfcClick -> {}

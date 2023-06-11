@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core:model"))
     implementation(project(":core:protobuf"))
+    implementation(project(":core:util"))
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -26,6 +27,11 @@ dependencies {
 
     // Datastore
     implementation(libs.androidx.datastore.preferences)
+
+    // Work Manager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.work.multiprocess)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

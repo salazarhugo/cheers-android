@@ -2,4 +2,5 @@
 <resources>
     <string name="profile_empty_post" translatable="false">When you share photos and videos,\n they\'ll appear on your profile.</string>
     <string name="profile">Profile</string>
+    <string name="edit_profile">Edit Profile</string>
 </resources>

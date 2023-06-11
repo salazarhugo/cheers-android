@@ -41,7 +41,6 @@ import com.salazar.cheers.core.ui.PartyItem
 import com.salazar.cheers.core.ui.item.PostItem
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.data.post.repository.Post
-import com.salazar.cheers.ui.compose.profile.ProfileHeader
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,14 +71,13 @@ fun OtherProfileScreen(
 
     LazyColumn {
         item {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
+            Column() {
                 ProfileHeader(
                     user = user,
+                    isEditable = false,
                     onStatClicked = onStatClicked,
-                    onStoryClick = onStoryClick,
                     onWebsiteClick = onWebsiteClick,
+                    onEditProfileClick = {},
                 )
 //                AdminButtons(
 //                    modifier = Modifier.fillMaxWidth(),

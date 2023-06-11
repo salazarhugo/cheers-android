@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun ProfileRoute(
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    navigateToEditProfile: () -> Unit,
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -35,9 +36,7 @@ fun ProfileRoute(
 //            navActions.navigateToPostDetail(it)
         },
         onPostLike = profileViewModel::toggleLike,
-        onEditProfileClicked = {
-//            navActions.navigateToEditProfile()
-        },
+        onEditProfileClicked = navigateToEditProfile,
         onDrinkingStatsClick = {
 //            navActions.navigateToDrinkingStats(it)
         },

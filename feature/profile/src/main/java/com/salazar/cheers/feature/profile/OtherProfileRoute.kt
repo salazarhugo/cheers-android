@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 
@@ -21,8 +20,12 @@ import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 @Composable
 fun OtherProfileRoute(
     otherProfileViewModel: OtherProfileViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
     username: String,
+    navigateBack: () -> Unit,
+    navigateToComments: (String) -> Unit,
+    navigateToPostDetail: (String) -> Unit,
+    navigateToOtherProfileStats: () -> Unit,
+    navigateToManageFriendship: () -> Unit,
 ) {
     val uiState by otherProfileViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -33,10 +36,12 @@ fun OtherProfileRoute(
             Toolbar(
                 username = username,
                 verified = if (uiState is OtherProfileUiState.HasUser) (uiState as OtherProfileUiState.HasUser).user.verified else false,
-                onBackPressed = { navActions.navigateBack() },
+                onBackPressed = {
+                    navigateBack()
+                },
                 onManageFriendship = {
-                    if (uiState is OtherProfileUiState.HasUser)
-                        navActions.navigateToManageFriendship((uiState as OtherProfileUiState.HasUser).user.id)
+//                    if (uiState is OtherProfileUiState.HasUser)
+//                        navigateToManageFriendship((uiState as OtherProfileUiState.HasUser).user.id)
                 },
                 onCopyUrl = {
 //                    if (uiState is OtherProfileUiState.HasUser)
@@ -58,27 +63,27 @@ fun OtherProfileRoute(
 
                 OtherProfileScreen(
                     uiState = uiState,
-                    onPostClicked = { navActions.navigateToPostDetail(it) },
+                    onPostClicked = { navigateToPostDetail(it) },
                     onPostLike = otherProfileViewModel::toggleLike,
                     onSendFriendRequest = otherProfileViewModel::sendFriendRequest,
                     onCancelFriendRequest = otherProfileViewModel::cancelFriendRequest,
                     onAcceptFriendRequest = otherProfileViewModel::acceptFriendRequest,
                     onPostMoreClicked = { postId, authorId ->
-                        navActions.navigateToPostMoreSheet(postId)
+//                        navigateToPostMoreSheet(postId)
                     },
                     onGiftClick = {
                         val receiverId = uiState.user.id
-                        navActions.navigateToSendGift(receiverId)
+//                        navigateToSendGift(receiverId)
                     },
                     onStatClicked = { statName, username, verified ->
-                        navActions.navigateToOtherProfileStats(
-                            statName,
-                            username,
-                            verified,
-                        )
+//                        navigateToOtherProfileStats(
+//                            statName,
+//                            username,
+//                            verified,
+//                        )
                     },
                     onMessageClicked = {
-                        navActions.navigateToChatWithUserId(uiState.user.id)
+//                        navigateToChatWithUserId(uiState.user.id)
                     },
                     onWebsiteClick = { website ->
                         var url = website
@@ -89,10 +94,10 @@ fun OtherProfileRoute(
                         uriHandler.openUri(url)
                     },
                     onStoryClick = { username ->
-                        navActions.navigateToStoryWithUserId(username)
+//                        navigateToStoryWithUserId(username)
                     },
                     onCommentClick = {
-                        navActions.navigateToComments(it)
+                        navigateToComments(it)
                     },
                 )
             }

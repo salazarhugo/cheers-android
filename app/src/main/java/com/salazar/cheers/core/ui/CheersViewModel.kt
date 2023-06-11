@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.messaging.FirebaseMessaging
-import com.salazar.cheers.core.data.util.Constants
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.data.user.Theme
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserPreference

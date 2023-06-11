@@ -52,7 +52,9 @@ dependencies {
     implementation(project(":feature:map"))
     implementation(project(":feature:search"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:edit_profile"))
     implementation(project(":feature:signin"))
+    implementation(project(":feature:notifications"))
 
     implementation(project(":domain"))
 
