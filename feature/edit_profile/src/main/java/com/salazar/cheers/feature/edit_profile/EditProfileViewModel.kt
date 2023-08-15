@@ -5,14 +5,8 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import androidx.work.workDataOf
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.data.user.workers.UploadProfilePicture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +24,7 @@ sealed interface EditProfileUiState {
     val done: Boolean
     val user: User
     val profilePictureUri: Uri?
+    val bannerUri: Uri?
 
     data class HasPosts(
         override val isLoading: Boolean,
@@ -38,6 +33,7 @@ sealed interface EditProfileUiState {
         override val user: User,
         override val done: Boolean,
         override val profilePictureUri: Uri?,
+        override val bannerUri: Uri?,
     ) : EditProfileUiState
 }
 
@@ -48,6 +44,7 @@ private data class EditProfileViewModelState(
     val isFollowing: Boolean = false,
     val done: Boolean = false,
     val profilePictureUri: Uri? = null,
+    val bannerUri: Uri? = null,
 ) {
     fun toUiState(): EditProfileUiState =
         EditProfileUiState.HasPosts(
@@ -57,17 +54,16 @@ private data class EditProfileViewModelState(
             isFollowing = isFollowing,
             done = done,
             profilePictureUri = profilePictureUri,
+            bannerUri = bannerUri,
         )
 }
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     val userRepository: UserRepository,
-    application: Application,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EditProfileViewModelState(isLoading = true))
-    private val workManager = WorkManager.getInstance(application)
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -90,9 +86,19 @@ class EditProfileViewModel @Inject constructor(
     val currentUser = mutableStateOf(User())
 
 
-    fun onSelectPicture(pictureUri: Uri) {
+    fun onSelectPicture(pictureUri: Uri?) {
+        if (pictureUri == null)
+            return
         viewModelState.update {
             it.copy(profilePictureUri = pictureUri)
+        }
+    }
+
+    fun onSelectBanner(bannerUri: Uri?) {
+        if (bannerUri == null)
+            return
+        viewModelState.update {
+            it.copy(bannerUri = bannerUri)
         }
     }
 
@@ -142,16 +148,8 @@ class EditProfileViewModel @Inject constructor(
     private fun uploadProfilePicture() {
         val profilePicture = viewModelState.value.profilePictureUri ?: return
 
-        val uploadWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadProfilePicture>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(
-                    workDataOf(
-                        "PHOTO_URI" to profilePicture.toString(),
-                    )
-                )
-            }
-                .build()
-        workManager.enqueue(uploadWorkRequest)
+        viewModelScope.launch {
+            userRepository.uploadUserPicture(profilePicture)
+        }
     }
 }

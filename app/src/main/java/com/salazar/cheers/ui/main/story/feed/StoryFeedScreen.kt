@@ -60,9 +60,9 @@ import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.ui.carousel
 import com.salazar.cheers.core.ui.item.PostHeader
 import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.ui.carousel
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -108,8 +108,7 @@ fun StoryFeedCarousel(
 
         UserWithStories(
             isCurrentPage = currentPage == page,
-            modifier = Modifier
-                .carousel(pageOffset),
+            modifier = Modifier.carousel(pageOffset),
             userWithStories = userWithStories,
             onStoryFeedUIAction = onStoryFeedUIAction,
             onNextPage = {
@@ -309,7 +308,7 @@ fun StoryFeedHeader(
             post = post,
             darkMode = true,
             public = false,
-            onHeaderClicked = onUserClick,
+            onUserClick = onUserClick,
             onMoreClicked = {},
         )
     }

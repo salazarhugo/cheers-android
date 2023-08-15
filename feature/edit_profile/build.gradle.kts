@@ -27,11 +27,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     // Jetpack Compose
-    implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit)

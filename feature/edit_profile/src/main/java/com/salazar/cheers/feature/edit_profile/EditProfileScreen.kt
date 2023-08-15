@@ -2,14 +2,22 @@ package com.salazar.cheers.feature.edit_profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -23,11 +31,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.core.ui.MyTopAppBar
 import com.salazar.cheers.core.ui.ProfileBanner
+import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.util.Utils.conditional
 import com.salazar.cheers.data.user.User
 
 @Composable
@@ -37,7 +49,8 @@ fun EditProfileScreen(
     onNameChanged: (String) -> Unit,
     onUsernameChanged: (String) -> Unit,
     onWebsiteChanged: (String) -> Unit,
-    onSelectImage: (Uri) -> Unit,
+    onSelectImage: (Uri?) -> Unit,
+    onSelectBanner: (Uri?) -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
 ) {
@@ -61,7 +74,9 @@ fun EditProfileScreen(
                 EditProfileHeader(
                     user = uiState.user,
                     onSelectImage = onSelectImage,
+                    onSelectBanner = onSelectBanner,
                     photoUri = uiState.profilePictureUri,
+                    bannerUri = uiState.bannerUri,
                 )
                 EditProfileBody(
                     user = uiState.user,
@@ -79,15 +94,23 @@ fun EditProfileScreen(
 fun EditProfileHeader(
     user: User,
     photoUri: Uri?,
-    onSelectImage: (Uri) -> Unit,
+    bannerUri: Uri?,
+    onSelectImage: (Uri?) -> Unit,
+    onSelectBanner: (Uri?) -> Unit,
 ) {
     val openDialog = remember { mutableStateOf(false) }
 
     val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-            if (it != null)
-                onSelectImage(it)
-        }
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri -> onSelectImage(uri) }
+        )
+
+    val bannerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri -> onSelectBanner(uri) }
+        )
 
     if (openDialog.value)
         EditProfilePhotoDialog(openDialog)
@@ -97,18 +120,53 @@ fun EditProfileHeader(
     ) {
 
         val photo = photoUri?.toString() ?: user.picture
+        val banner = bannerUri?.toString() ?: user.banner
 
-        Box(
-            contentAlignment = Alignment.BottomStart,
-        ) {
-            ProfileBanner()
-            UserProfilePicture(
-                picture = photo,
-                size = 96.dp,
-            )
-        }
+        EditProfileBannerAndAvatar(
+            banner = banner,
+            picture = photo,
+            onAvatarClick = {
+                launcher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+            onBannerClick = {
+                bannerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+        )
     }
 
+}
+
+@Composable
+fun EditProfileBannerAndAvatar(
+    banner: String?,
+    picture: String?,
+    onAvatarClick: () -> Unit,
+    onBannerClick: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.BottomStart,
+    ) {
+        Column {
+            ProfileBanner(
+                banner = banner,
+                clickable = true,
+                onClick = onBannerClick,
+            )
+            Spacer(Modifier.height(48.dp))
+        }
+        UserProfilePicture(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background, CircleShape),
+            picture = picture,
+            size = 110.dp,
+            onClick = onAvatarClick,
+        )
+    }
 }
 
 @Composable

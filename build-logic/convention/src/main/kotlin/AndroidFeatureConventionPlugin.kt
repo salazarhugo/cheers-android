@@ -20,6 +20,8 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", project(":core:ui"))
                 add("implementation", project(":core:util"))
                 add("implementation", project(":core:protobuf"))
+                add("implementation", project(":domain"))
+
                 add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
                 add(
                     "implementation",

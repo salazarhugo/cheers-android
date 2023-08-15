@@ -117,7 +117,7 @@ class ProfileViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = userRepository.getCurrentUser()
+            val result = userRepository.fetchCurrentUser()
             viewModelState.update { it.copy(isLoading = false) }
         }
     }

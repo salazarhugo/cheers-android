@@ -46,7 +46,7 @@ fun NfcScreen() {
     var tap by remember { mutableStateOf(false) }
 
     LaunchedEffect(nfc) {
-        nfc?.setNdefPushMessage(createNdefMessage(), context.getActivity())
+//        nfc?.setNdefPushMessage(createNdefMessage(), context.getActivity())
     }
 
     Column(

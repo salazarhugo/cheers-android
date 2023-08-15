@@ -67,7 +67,9 @@ fun Tabs(
 
     val pages = listOf(friendsTitle)
 
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(
+        pageCount = { pages.size },
+    )
     val scope = rememberCoroutineScope()
 
     TabRow(
@@ -102,7 +104,6 @@ fun Tabs(
     }
 //    SearchBar()
     HorizontalPager(
-        pageCount = pages.size,
         state = pagerState,
     ) { page ->
         Column(modifier = Modifier.fillMaxSize()) {

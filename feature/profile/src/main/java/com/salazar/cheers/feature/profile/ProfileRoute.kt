@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun ProfileRoute(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     navigateToEditProfile: () -> Unit,
+    navigateToProfileMore: (String) -> Unit,
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -40,9 +41,7 @@ fun ProfileRoute(
         onDrinkingStatsClick = {
 //            navActions.navigateToDrinkingStats(it)
         },
-        navigateToProfileMoreSheet = {
-//            navActions.navigateToProfileMoreSheet(it)
-        },
+        navigateToProfileMoreSheet = navigateToProfileMore,
         onStoryClick = { username ->
 //            navActions.navigateToStoryWithUserId(username)
         },

@@ -17,6 +17,9 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.homeScreen(
     onActivityClick: () -> Unit,
     navigateToSearch: () -> Unit,
+    navigateToCreatePost: () -> Unit,
+    navigateToCreateNote: () -> Unit,
+    navigateToNote: (String) -> Unit,
     onPostClick: (String) -> Unit,
 ) {
     composable(
@@ -28,6 +31,9 @@ fun NavGraphBuilder.homeScreen(
         HomeRoute(
             onActivityClick = onActivityClick,
             onPostClick = onPostClick,
+            navigateToCreatePost = navigateToCreatePost,
+            navigateToCreateNote = navigateToCreateNote,
+            navigateToNote = navigateToNote,
         )
     }
 }

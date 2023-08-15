@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,11 +40,15 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.google.android.gms.ads.nativead.NativeAd
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.item.PostItem
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.feature.home.navigation.ads.NativeAdPost
 import com.salazar.cheers.user.ui.AddFriendButton
 
@@ -122,27 +127,13 @@ fun PostList(
             UploadingSection()
         }
 
-        items(
-            count = uiState.posts.size,
-            key = { uiState.posts[it].id },
-        ) { i ->
-            NativeAdPost(
-                index = i,
-                ad = uiState.nativeAd,
-            )
-
-            val post = uiState.posts[i]
-            if (i >= uiState.posts.size - 1 && !uiState.endReached && !uiState.isLoading) {
-                LaunchedEffect(Unit) {
-                    onHomeUIAction(HomeUIAction.OnLoadNextItems)
-                }
-            }
-            PostItem(
-                post = post,
-                onHomeUIAction = {},
-                modifier = Modifier.animateItemPlacement(),
-            )
-        }
+        posts(
+            posts = uiState.posts,
+            isLoading = uiState.isLoading,
+            endReached = uiState.endReached,
+            nativeAd = uiState.nativeAd,
+            onHomeUIAction = onHomeUIAction,
+        )
 
         item {
             if (uiState.isLoading) {
@@ -157,41 +148,90 @@ fun PostList(
             }
         }
 
-        if (uiState.suggestions != null)
-            items(items = uiState.suggestions) { user ->
-                UserItem(
-                    userItem = user,
-                    onClick = {
-    //                    onFriendRequestsUIAction(FriendRequestsUIAction.OnUserClick(user.username))
+        suggestions(
+            suggestions = uiState.suggestions,
+            onHomeUIAction = onHomeUIAction,
+        )
+    }
+}
+
+private fun LazyListScope.emptyPosts(isEmpty: Boolean) {
+    if (!isEmpty)
+        return
+    item {
+        FunctionalityNotAvailablePanel()
+    }
+}
+
+private fun LazyListScope.suggestions(
+    suggestions: List<UserItem>?,
+    onHomeUIAction: (HomeUIAction) -> Unit,
+) {
+    if (suggestions == null)
+        return
+
+    items(
+        items = suggestions,
+    ) { user ->
+        UserItem(
+            userItem = user,
+            onClick = {},
+            content = {
+                AddFriendButton(
+                    requestedByViewer = user.requested,
+                    onAddFriendClick = {
+                        onHomeUIAction(HomeUIAction.OnAddFriendClick(user.id))
                     },
-                    content = {
-                        AddFriendButton(
-                            requestedByViewer = user.requested,
-                            onAddFriendClick = {
-                                onHomeUIAction(HomeUIAction.OnAddFriendClick(user.id))
-                            },
-                            onCancelFriendRequestClick = {
-    //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnCancelFriendRequestClick(user.id))
-                            },
-                            onDelete = {
-    //                            onFriendRequestsUIAction(FriendRequestsUIAction.OnRemoveSuggestion(user))
-                            }
-                        )
-                    }
+                    onCancelFriendRequestClick = {},
+                    onDelete =  {},
                 )
             }
+        )
+    }
+}
+
+private fun LazyListScope.posts(
+    posts: List<Post>,
+    nativeAd: NativeAd?,
+    isLoading: Boolean,
+    endReached: Boolean,
+    onHomeUIAction: (HomeUIAction) -> Unit,
+) {
+    emptyPosts(
+        isEmpty = posts.isEmpty(),
+    )
+
+    items(
+        count = posts.size,
+        key = { posts[it].id },
+    ) { i ->
+        NativeAdPost(
+            index = i,
+            ad = nativeAd,
+        )
+        val post = posts[i]
+        if (i >= posts.size - 1 && !endReached && !isLoading) {
+            LaunchedEffect(Unit) {
+                onHomeUIAction(HomeUIAction.OnLoadNextItems)
+            }
+        }
+        PostItem(
+            post = post,
+            modifier = Modifier.animateItemPlacement(),
+        )
     }
 }
 
 @Composable
 fun HomeLazyPagingListState(
-    lazyPagingItems: LazyPagingItems<com.salazar.cheers.data.post.repository.Post>,
+    lazyPagingItems: LazyPagingItems<Post>,
 ) {
     lazyPagingItems.apply {
         when {
             loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && itemCount < 1 -> {
 //                NoPosts()
             }
+
             loadState.refresh is LoadState.Loading -> {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -200,6 +240,7 @@ fun HomeLazyPagingListState(
                         .wrapContentSize(Alignment.Center)
                 )
             }
+
             loadState.append is LoadState.Loading -> {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -207,6 +248,7 @@ fun HomeLazyPagingListState(
                         .wrapContentWidth(Alignment.CenterHorizontally)
                 )
             }
+
             loadState.append is LoadState.Error -> {
                 val e = lazyPagingItems.loadState.append as LoadState.Error
                 Text(
@@ -227,7 +269,7 @@ fun UploadingSection() {
     val uploadInfo = workInfos?.firstOrNull()
 
     if (uploadInfo?.state?.isFinished == false)
-        Column() {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -241,6 +283,7 @@ fun UploadingSection() {
                             text = "Will automatically post when possible",
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                         )
+
                     WorkInfo.State.RUNNING ->
                         LinearProgressIndicator(
                             modifier = Modifier
@@ -248,6 +291,7 @@ fun UploadingSection() {
                                 .weight(1f)
                                 .clip(RoundedCornerShape(22.dp)),
                         )
+
                     else -> {}
                 }
                 Spacer(Modifier.width(8.dp))

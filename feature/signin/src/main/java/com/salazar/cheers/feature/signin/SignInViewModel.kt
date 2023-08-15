@@ -166,7 +166,14 @@ class SignInViewModel @Inject constructor(
             when (result) {
                 is Resource.Error -> updateErrorMessage(result.message)
                 is Resource.Loading -> updateIsLoading(result.isLoading)
-                is Resource.Success -> updateIsSignedIn(true)
+                is Resource.Success -> {
+                    val newUser = result.data ?: return@launch
+                    if (newUser) {
+                        navigateToRegister()
+                    } else {
+                        updateIsSignedIn(true)
+                    }
+                }
             }
         }
     }

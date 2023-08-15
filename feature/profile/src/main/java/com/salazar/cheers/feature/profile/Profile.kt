@@ -21,8 +21,5 @@ fun ProfileItem(
             onWebsiteClick = onWebsiteClick,
             onEditProfileClick = onEditProfileClicked,
         )
-        ProfileButtons(
-            onDrinkingStatsClick = { onDrinkingStatsClick(user.username) },
-        )
     }
 }

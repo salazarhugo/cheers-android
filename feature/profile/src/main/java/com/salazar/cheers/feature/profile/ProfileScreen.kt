@@ -1,6 +1,7 @@
 package com.salazar.cheers.feature.profile
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -43,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -117,11 +120,13 @@ fun Profile(
         }
     ) {
         val posts = uiState.posts
-        val pagerState = rememberPagerState()
         val tabs = listOf(
             Icons.Outlined.ViewList,
             Icons.Default.GridView,
             Icons.Outlined.Celebration
+        )
+        val pagerState = rememberPagerState(
+            pageCount = { tabs.size },
         )
 
         SwipeToRefresh(
@@ -179,7 +184,6 @@ fun Profile(
 
                 item {
                     HorizontalPager(
-                        pageCount = tabs.size,
                         state = pagerState,
                     ) { page ->
                         Column(
@@ -230,7 +234,6 @@ fun PostTab(
     posts.forEach { postFeed ->
         PostItem(
             post = postFeed,
-            onHomeUIAction = {},
 //            onPostClicked,
 //            onPostLike = onPostLike,
 //            onPostMoreClicked = onPostMoreClicked,
@@ -255,21 +258,6 @@ fun PartyList(
         }
     else
         LoadingScreen()
-}
-
-@Composable
-fun ProfileButtons(
-    onDrinkingStatsClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-    ) {
-//        IconButton(onClick = onDrinkingStatsClick) {
-//            Icon(Icons.Outlined.QueryStats, null)
-//        }
-    }
 }
 
 @Composable
@@ -369,7 +357,7 @@ fun ProfileStats(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         val items = listOf(
             Counter("Posts", user.postCount, null),
@@ -378,8 +366,8 @@ fun ProfileStats(
         )
 
         items.forEach { item ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }) {
@@ -387,12 +375,10 @@ fun ProfileStats(
                 }
             ) {
                 Text(
-                    text = numberFormatter(value = item.value),
-                    fontWeight = FontWeight.Bold,
+                    text = "${numberFormatter(value = item.value)} ${item.name}",
                     fontFamily = Roboto,
-                    fontSize = 18.sp,
+//                    fontSize = 18.sp,
                 )
-                Text(text = item.name, fontSize = 14.sp, fontFamily = Roboto)
             }
         }
     }

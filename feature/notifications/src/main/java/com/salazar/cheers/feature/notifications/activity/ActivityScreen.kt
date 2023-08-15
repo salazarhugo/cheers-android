@@ -12,14 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +31,7 @@ import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.core.ui.text.MyText
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.user.ui.AddFriendButton
@@ -48,19 +44,9 @@ fun ActivityScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Activity",
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onActivityUIAction(ActivityUIAction.OnBackPressed) },
-                    ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                }
+            Toolbar(
+                title = "Activity",
+                onBackPressed = { onActivityUIAction(ActivityUIAction.OnBackPressed) },
             )
         }
     ) {
@@ -176,7 +162,7 @@ fun FriendRequests(
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Column() {
+            Column {
                 Text(
                     text = "Friend requests",
                     style = MaterialTheme.typography.bodyMedium,
@@ -212,7 +198,7 @@ fun ActivityItem(
                 picture = activity.avatar,
                 size = 46.dp,
                 onClick = {
-                  onActivityUIAction(ActivityUIAction.OnUserClick(userId = activity.username))
+                    onActivityUIAction(ActivityUIAction.OnUserClick(userId = activity.username))
                 },
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -249,8 +235,7 @@ fun ActivityItem(
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .clickable { onActivityUIAction(ActivityUIAction.OnPostClick(activity.mediaId)) }
-                    .size(50.dp)
-                ,
+                    .size(50.dp),
                 painter = rememberAsyncImagePainter(model = activity.photoUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop

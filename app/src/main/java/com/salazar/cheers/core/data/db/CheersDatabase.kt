@@ -53,7 +53,7 @@ import com.salazar.cheers.feature.chat.domain.models.ChatMessage
         FriendRequest::class,
         Note::class,
     ],
-    version = 26,
+    version = 27,
     exportSchema = false,
     autoMigrations = []
 )

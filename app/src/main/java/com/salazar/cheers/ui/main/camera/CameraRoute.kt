@@ -87,8 +87,8 @@ fun CameraRoute(
 //                navActions.navigateToHome()
             },
             onPostClicked = {
-                if (uiState.imageUri != null)
-                    navActions.navigateToCreatePostSheetWithPhotoUri(uiState.imageUri.toString())
+//                if (uiState.imageUri != null)
+//                    navActions.navigateToCreatePostSheetWithPhotoUri(uiState.imageUri.toString())
             },
             onCameraUIAction = { cameraUIAction ->
                 when (cameraUIAction) {

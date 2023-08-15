@@ -5,7 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.location.LocationServices
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapInitOptions
@@ -68,15 +67,15 @@ fun MapRoute(
                 MapUIAction.OnMyLocationClick -> {
                     mapViewModel.onMyLocationClick()
                     scope.launch {
-                        val location =
-                            LocationServices.getFusedLocationProviderClient(context).lastLocation.await()
-                                ?: return@launch
-                        val mapbox = mapView.getMapboxMap()
-                        val cameraOptions = CameraOptions.Builder()
-                            .center(Point.fromLngLat(location.longitude, location.latitude))
-                            .zoom(13.0)
-                            .build()
-                        mapbox.flyTo(cameraOptions)
+//                        val location =
+//                            LocationServices.getFusedLocationProviderClient(context).lastLocation.await()
+//                                ?: return@launch
+//                        val mapbox = mapView.getMapboxMap()
+//                        val cameraOptions = CameraOptions.Builder()
+//                            .center(Point.fromLngLat(location.longitude, location.latitude))
+//                            .zoom(13.0)
+//                            .build()
+//                        mapbox.flyTo(cameraOptions)
                     }
                 }
 //                is MapUIAction.OnPostClick -> {

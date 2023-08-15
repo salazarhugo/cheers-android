@@ -10,10 +10,10 @@ import com.mapbox.maps.MapboxMap
 import com.salazar.cheers.Settings
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.domain.get_last_known_location.GetLastKnownLocationUseCase
 import com.salazar.cheers.feature.map.data.repository.MapRepositoryImpl
 import com.salazar.cheers.feature.map.domain.models.UserLocation
 import com.salazar.cheers.feature.map.domain.usecase.update_location.UpdateLocationUseCase
-import com.salazar.cheers.feature.map.location.DefaultLocationClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,11 +49,10 @@ data class MapUiState(
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-//    private val postRepository: PostRepository,
     val mapRepository: MapRepositoryImpl,
-    private val locationClient: DefaultLocationClient,
     private val updateLocationUseCase: UpdateLocationUseCase,
     private val dataStoreRepository: DataStoreRepository,
+    private val lastKnownLocationUseCase: GetLastKnownLocationUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapUiState(isLoading = true))
@@ -85,7 +84,7 @@ class MapViewModel @Inject constructor(
 
     private fun initUserLocation() {
         viewModelScope.launch {
-            val location = locationClient.getLastKnownLocation() ?: return@launch
+            val location = lastKnownLocationUseCase() ?: return@launch
             val userLocation = UserLocation(
                 id = "",
                 latitude = location.latitude,
@@ -112,7 +111,6 @@ class MapViewModel @Inject constructor(
     private fun refreshFriendsLocation() {
         viewModelScope.launch {
             mapRepository.listFriendLocation().onSuccess {
-                Log.d("SURE", it.toString())
                 updateUserLocation(it)
             }
         }

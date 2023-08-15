@@ -7,6 +7,7 @@ import com.salazar.cheers.data.user.UserRepository
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ class SignInWithEmailAndPasswordUseCase @Inject constructor(
         return@withContext try {
             val authResult = authRepository.signInWithEmailAndPassword(email, password)
                 ?: return@withContext Resource.Error("Error signing in with email and password")
+            val idToken = authResult.user?.getIdToken(false)?.await()
             userRepository.getUserSignIn(authResult.user?.uid ?: "")
             Resource.Success(null)
         } catch (e: java.lang.Exception) {

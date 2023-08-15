@@ -2,10 +2,10 @@ package com.salazar.cheers.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.navigation
+import androidx.navigation.navigation
 import com.salazar.cheers.auth.ui.register.RegisterRoute
 import com.salazar.cheers.auth.ui.signup.SignUpRoute
 import com.salazar.cheers.core.ui.ui.AuthDestinations
@@ -50,8 +50,12 @@ fun NavGraphBuilder.authNavGraph(
             navigateToHome = {
                 navController.navigateToHome()
             },
-            navigateToSignUp = {},
-            navigateToRegister = {},
+            navigateToSignUp = {
+                navActions.navigateToSignUp()
+            },
+            navigateToRegister = {
+                navActions.navigateToRegister()
+            },
             navigateToPhone = {},
         )
     }

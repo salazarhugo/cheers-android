@@ -46,16 +46,6 @@ class ActivityViewModel @Inject constructor(
 
     init {
         onSwipeRefresh()
-        viewModelScope.launch {
-            listFriendRequestUseCase().collect { requests ->
-                viewModelState.update {
-                    it.copy(
-                        friendRequestCounter = requests.size,
-                        friendRequestPicture = requests.firstOrNull()?.picture
-                    )
-                }
-            }
-        }
     }
 
     private fun refreshSuggestions() {
@@ -67,9 +57,16 @@ class ActivityViewModel @Inject constructor(
     }
 
     private fun getFriendRequests() {
-//        viewModelScope.launch {
-//            friendshipRepository.fetchFriendRequest().collect {}
-//        }
+        viewModelScope.launch {
+            listFriendRequestUseCase().collect { requests ->
+                viewModelState.update {
+                    it.copy(
+                        friendRequestCounter = requests.size,
+                        friendRequestPicture = requests.firstOrNull()?.picture
+                    )
+                }
+            }
+        }
     }
 
     fun getActivity() {

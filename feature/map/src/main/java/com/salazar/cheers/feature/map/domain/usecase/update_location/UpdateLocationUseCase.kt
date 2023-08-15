@@ -1,8 +1,8 @@
 package com.salazar.cheers.feature.map.domain.usecase.update_location
 
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.domain.get_last_known_location.GetLastKnownLocationUseCase
 import com.salazar.cheers.feature.map.data.repository.MapRepositoryImpl
-import com.salazar.cheers.feature.map.location.DefaultLocationClient
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class UpdateLocationUseCase @Inject constructor(
     private val mapRepository: MapRepositoryImpl,
     private val dataStoreRepository: DataStoreRepository,
-    private val locationClient: DefaultLocationClient,
+    private val lastKnownLocationUseCase: GetLastKnownLocationUseCase,
     @IODispatcher private val dispatcher: CoroutineDispatcher
 ){
     suspend operator fun invoke() = withContext(dispatcher) {
@@ -21,7 +21,7 @@ class UpdateLocationUseCase @Inject constructor(
         if (preferences.ghostMode)
             return@withContext
 
-        val lastKnownLocation = locationClient.getLastKnownLocation() ?: return@withContext
+        val lastKnownLocation = lastKnownLocationUseCase() ?: return@withContext
 
         mapRepository.updateLocation(
             longitude = lastKnownLocation.longitude,

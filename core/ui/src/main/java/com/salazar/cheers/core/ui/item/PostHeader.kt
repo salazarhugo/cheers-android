@@ -30,7 +30,7 @@ fun PostHeader(
     post: com.salazar.cheers.data.post.repository.Post,
     public: Boolean,
     darkMode: Boolean = false,
-    onHeaderClicked: (username: String) -> Unit = {},
+    onUserClick: (username: String) -> Unit = {},
     onMoreClicked: () -> Unit = {},
 ) {
     val color = if (darkMode) Color.White else MaterialTheme.colorScheme.onBackground
@@ -38,7 +38,6 @@ fun PostHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onHeaderClicked(post.username) }
             .padding(16.dp, 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -51,6 +50,9 @@ fun PostHeader(
                 picture = post.profilePictureUrl,
                 storyState = StoryState.EMPTY,
                 size = 33.dp,
+                onClick = {
+                    onUserClick(post.username)
+                },
             )
             Spacer(Modifier.width(8.dp))
             Column(

@@ -1,6 +1,7 @@
 package com.salazar.cheers.core.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import cheers.account.v1.AccountServiceGrpcKt
 import cheers.activity.v1.ActivityServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
@@ -18,21 +19,21 @@ import cheers.user.v1.UserServiceGrpcKt
 import com.salazar.cheers.comment.data.CommentRepository
 import com.salazar.cheers.comment.data.CommentRepositoryImpl
 import com.salazar.cheers.comment.data.db.CommentDao
-import com.salazar.cheers.core.data.api.ApiService
 import com.salazar.cheers.core.data.db.CheersDatabase
 import com.salazar.cheers.core.data.remote.ErrorHandleInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.data.activity.impl.ActivityRepositoryImpl
+import com.salazar.cheers.data.billing.api.ApiService
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.note.db.NoteDao
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.data.note.repository.NoteRepositoryImpl
 import com.salazar.cheers.data.party.PartyDao
 import com.salazar.cheers.data.post.repository.PostDao
-import com.salazar.cheers.data.repository.account.AccountRepository
-import com.salazar.cheers.data.repository.account.AccountRepositoryImpl
+import com.salazar.cheers.data.user.account.AccountRepository
+import com.salazar.cheers.data.user.account.AccountRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.repository.ticket.TicketRepository
@@ -40,8 +41,6 @@ import com.salazar.cheers.data.repository.ticket.impl.TicketRepositoryImpl
 import com.salazar.cheers.data.user.UserDao
 import com.salazar.cheers.data.user.UserItemDao
 import com.salazar.cheers.data.user.UserStatsDao
-import com.salazar.cheers.drink.data.repository.DrinkRepository
-import com.salazar.cheers.drink.data.repository.DrinkRepositoryImpl
 import com.salazar.cheers.feature.chat.data.db.ChatDao
 import com.salazar.cheers.feature.chat.data.repository.ChatRepository
 import com.salazar.cheers.feature.chat.data.repository.ChatRepositoryImpl
@@ -65,6 +64,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Singleton
+    @Provides
+    fun provideWorkManager(
+        @ApplicationContext context: Context,
+    ): WorkManager {
+        return WorkManager.getInstance(context)
+    }
 
     @Singleton
     @Provides
@@ -94,7 +100,7 @@ object AppModule {
             .client(okHttpClient)
             .build()
 
-        return retrofit.create(ApiService::class.java)
+        return retrofit.create(com.salazar.cheers.data.billing.api.ApiService::class.java)
     }
 
 
@@ -138,14 +144,6 @@ object AppModule {
         noteRepositoryImpl: NoteRepositoryImpl,
     ): NoteRepository {
         return noteRepositoryImpl
-    }
-
-    @Provides
-    @Singleton
-    fun provideDrinkRepository(
-        drinkRepositoryImpl: DrinkRepositoryImpl,
-    ): DrinkRepository {
-        return drinkRepositoryImpl
     }
 
     @Provides

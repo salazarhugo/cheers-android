@@ -1,29 +1,33 @@
 package com.salazar.cheers.navigation
 
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.navigation
+import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.core.ui.ui.SettingDestinations
-import com.salazar.cheers.ui.settings.SettingsRoute
-import com.salazar.cheers.ui.settings.SettingsViewModel
-import com.salazar.cheers.ui.settings.language.LanguageRoute
-import com.salazar.cheers.ui.settings.notifications.NotificationsRoute
-import com.salazar.cheers.ui.settings.password.CreatePasswordRoute
-import com.salazar.cheers.ui.settings.payments.PaymentHistoryRoute
-import com.salazar.cheers.ui.settings.payments.RechargeRoute
-import com.salazar.cheers.ui.settings.security.SecurityRoute
-import com.salazar.cheers.ui.settings.theme.ThemeRoute
+import com.salazar.cheers.feature.settings.SettingsRoute
+import com.salazar.cheers.feature.settings.SettingsViewModel
+import com.salazar.cheers.feature.settings.language.LanguageRoute
+import com.salazar.cheers.feature.settings.navigation.settingsScreen
+import com.salazar.cheers.feature.settings.notifications.NotificationsRoute
+import com.salazar.cheers.feature.settings.password.CreatePasswordRoute
+import com.salazar.cheers.feature.settings.payments.PaymentHistoryRoute
+import com.salazar.cheers.feature.settings.payments.RechargeRoute
+import com.salazar.cheers.feature.settings.security.SecurityRoute
+import com.salazar.cheers.feature.settings.theme.ThemeRoute
+import com.salazar.cheers.feature.signin.navigateToSignIn
+import com.salazar.cheers.ui.CheersAppState
 
 fun NavGraphBuilder.settingNavGraph(
-    navActions: CheersNavigationActions,
+    appState: CheersAppState,
 ) {
+    val navActions = appState.navActions
+    val navController = appState.navController
+
     navigation(
         route = CheersDestinations.SETTING_ROUTE,
         startDestination = SettingDestinations.SETTINGS_ROUTE,
@@ -36,18 +40,14 @@ fun NavGraphBuilder.settingNavGraph(
                     type = NavType.BoolType
                 }
             ),
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            CreatePasswordRoute(
+            com.salazar.cheers.feature.settings.password.CreatePasswordRoute(
                 navActions = navActions,
             )
         }
 
         composable(
             route = SettingDestinations.SECURITY_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             SecurityRoute(
                 navActions = navActions,
@@ -56,28 +56,22 @@ fun NavGraphBuilder.settingNavGraph(
 
         composable(
             route = SettingDestinations.PAYMENT_HISTORY_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            PaymentHistoryRoute(
+            com.salazar.cheers.feature.settings.payments.PaymentHistoryRoute(
                 navActions = navActions,
             )
         }
 
         composable(
             route = SettingDestinations.RECHARGE_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            RechargeRoute(
+            com.salazar.cheers.feature.settings.payments.RechargeRoute(
                 navActions = navActions,
             )
         }
 
         composable(
             route = SettingDestinations.ADD_PAYMENT_METHOD_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
 //            AddPaymentMethod(
 //                addPaymentViewModel = addPaymentViewModel,
@@ -88,10 +82,9 @@ fun NavGraphBuilder.settingNavGraph(
 
         composable(
             route = SettingDestinations.LANGUAGE_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
+            val settingsViewModel = hiltViewModel<com.salazar.cheers.feature.settings.SettingsViewModel>()
+
             LanguageRoute(
                 navActions = navActions,
                 settingsViewModel = settingsViewModel,
@@ -100,8 +93,6 @@ fun NavGraphBuilder.settingNavGraph(
 
         composable(
             route = SettingDestinations.NOTIFICATIONS_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             NotificationsRoute(
                 navActions = navActions,
@@ -110,20 +101,14 @@ fun NavGraphBuilder.settingNavGraph(
 
         composable(
             route = SettingDestinations.THEME_ROUTE,
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             ThemeRoute(
                 navActions = navActions,
             )
         }
 
-        composable(
-            route = SettingDestinations.SETTINGS_ROUTE,
-        ) {
-            SettingsRoute(
-                navActions = navActions,
-            )
-        }
+        settingsScreen(
+            navigateToSignIn = navController::navigateToSignIn,
+        )
     }
 }

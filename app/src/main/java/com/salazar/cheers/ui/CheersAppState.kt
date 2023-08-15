@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 fun rememberCheersAppState(
     snackBarHostState: SnackbarHostState = SnackbarHostState(),
     bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(),
-    navController: NavHostController = rememberAnimatedNavController(bottomSheetNavigator),
+    navController: NavHostController = rememberNavController(bottomSheetNavigator),
     cheersNavigationActions: CheersNavigationActions = CheersNavigationActions(navController),
     snackbarScope: CoroutineScope = rememberCoroutineScope(),
     context: Context = LocalContext.current,
@@ -42,6 +42,10 @@ class CheersAppState(
     val snackbarScope: CoroutineScope,
     private val context: Context
 ) {
+//    fun isLoggedIn(): Boolean {
+//        navController.popBackStack()
+//    }
+
     fun navigateBack() {
         navController.popBackStack()
     }

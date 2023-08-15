@@ -43,27 +43,37 @@ include(":core:ui")
 include(":core:util")
 include(":core:model")
 
-// Feature
-include(":feature:search")
-include(":feature:chat")
-include(":feature:map")
-
 // Data
 include(":data:user")
 include(":data:post")
 include(":data:note")
+include(":data:auth")
+include(":data:story")
+include(":data:activity")
+include(":data:party")
+include(":data:friendship")
+include(":data:billing")
+include(":data:account")
+
+// Domain
+include(":domain")
+
+// Feature
+include(":feature:search")
+include(":feature:chat")
+include(":feature:map")
+include(":feature:profile")
+include(":feature:home")
+include(":feature:signin")
+include(":feature:notifications")
+include(":feature:edit_profile")
+include(":feature:settings")
+include(":core:shared")
 
 project(":common").projectDir = File(settingsDir, "../common")
 project(":ads").projectDir = File(settingsDir, "../ads")
 project(":auth").projectDir = File(settingsDir, "../auth")
-include(":domain")
-include(":data:friendship")
-include(":feature:profile")
-include(":data:party")
-include(":feature:signin")
-include(":data:auth")
-include(":feature:home")
-include(":data:story")
-include(":data:activity")
-include(":feature:notifications")
-include(":feature:edit_profile")
+
+include(":feature:create_post")
+include(":data:drink")
+include(":feature:create_note")

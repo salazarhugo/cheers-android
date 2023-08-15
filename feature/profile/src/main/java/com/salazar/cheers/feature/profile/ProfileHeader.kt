@@ -10,11 +10,15 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Web
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,15 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.salazar.cheers.core.ui.ProfileBanner
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.data.user.User
 
 @Composable
@@ -47,9 +47,24 @@ fun ProfileHeader(
             .fillMaxWidth(),
     ) {
         ProfileBannerAndAvatar(
+            banner = user.banner,
             picture = user.picture,
-            isEditable = isEditable,
-            onEditProfileClick = onEditProfileClick,
+            content = {
+                if (isEditable)
+                    OutlinedButton(
+                        onClick = onEditProfileClick,
+                    ) {
+                        Text(
+                            text = "Edit Profile",
+                        )
+                    }
+                else
+                    IconButton(
+                        onClick = {},
+                    ) {
+                        Icon(Icons.Default.MoreHoriz, contentDescription = null)
+                    }
+            }
         )
         Column(
             modifier = Modifier.padding(16.dp),
@@ -74,58 +89,6 @@ fun ProfileHeader(
     }
 }
 
-@Composable
-fun ProfileBannerAndAvatar(
-    isEditable: Boolean,
-    picture: String?,
-    onEditProfileClick: () -> Unit,
-) {
-    Box(
-        contentAlignment = Alignment.BottomStart,
-    ) {
-        Column {
-            ProfileBanner()
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(3f),
-                model = "https://pbs.twimg.com/profile_banners/44196397/1576183471/1500x500",
-                contentDescription = null,
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                if (isEditable)
-                    OutlinedButton(
-                        onClick = onEditProfileClick,
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.edit_profile),
-                        )
-                    }
-                else {
-                    IconButton(
-                        onClick = {},
-                    ) {
-                        Icon(Icons.Default.MoreHoriz, contentDescription = null)
-                    }
-                }
-            }
-        }
-        UserProfilePicture(
-            modifier = Modifier
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background, CircleShape),
-            picture = picture,
-            size = 110.dp,
-//            storyState = user.storyState,
-            onClick = {},
-        )
-    }
-}
 
 @Composable
 fun ProfileName(
@@ -163,7 +126,6 @@ fun ProfileBio(
     Text(
         text = bio,
         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
-        textAlign = TextAlign.Center,
     )
 }
 
@@ -175,12 +137,23 @@ fun ProfileWebsite(
     if (website.isBlank())
         return
     Spacer(Modifier.height(4.dp))
-    ClickableText(
-        text = AnnotatedString(website),
-        style = TextStyle(
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Normal
-        ),
-        onClick = { onClick(website) },
-    )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(ButtonDefaults.IconSize),
+            imageVector = Icons.Default.Public,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.surfaceVariant,
+        )
+        ClickableText(
+            text = AnnotatedString(website),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Normal
+            ),
+            onClick = { onClick(website) },
+        )
+    }
 }

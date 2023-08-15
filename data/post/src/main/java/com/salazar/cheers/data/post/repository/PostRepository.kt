@@ -1,5 +1,13 @@
 package com.salazar.cheers.data.post.repository
 
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import cheers.post.v1.CreatePostRequest
 import cheers.post.v1.DeletePostRequest
 import cheers.post.v1.FeedPostRequest
@@ -23,6 +31,7 @@ import javax.inject.Singleton
 class PostRepository @Inject constructor(
     private val postService: PostServiceGrpcKt.PostServiceCoroutineStub,
     private val postDao: PostDao,
+    private val workManager: WorkManager,
 ) {
 
     suspend fun getPostFeed(page: Int, pageSize: Int): Result<List<Post>> {
@@ -101,6 +110,25 @@ class PostRepository @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    suspend fun uploadPost(vararg pairs: Pair<String, Any?>) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val uploadWorkRequest =
+            OneTimeWorkRequestBuilder<CreatePostWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(workDataOf(*pairs))
+                .setConstraints(constraints)
+                .build()
+
+        workManager.enqueueUniqueWork(
+            "post_upload",
+            ExistingWorkPolicy.REPLACE,
+            uploadWorkRequest,
+        )
     }
 
     suspend fun createPost(

@@ -12,11 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import com.salazar.cheers.core.ui.ShareButton
+import com.salazar.cheers.feature.create_post.LocationSection
 import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.ui.compose.event.EventDetails
-import com.salazar.cheers.ui.main.add.LocationSection
-import com.salazar.cheers.ui.main.add.ShareButton
 import com.salazar.cheers.ui.main.party.create.CategorySection
 import com.salazar.cheers.ui.main.party.create.Description
 import com.salazar.cheers.ui.main.party.create.TopAppBar

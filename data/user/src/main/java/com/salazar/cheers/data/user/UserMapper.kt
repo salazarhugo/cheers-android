@@ -31,6 +31,7 @@ fun cheers.type.UserOuterClass.User.toUser(): User {
         name = name,
         username = username,
         picture = picture,
+        banner = banner,
         verified = verified,
         phoneNumber = phoneNumber,
         email = email,

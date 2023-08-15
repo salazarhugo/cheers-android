@@ -25,6 +25,7 @@ data class User(
     val email: String = "",
     val bio: String = "",
     val picture: String? = null,
+    val banner: String? = null,
     val website: String = "",
     val online: Boolean = false,
     val darkMode: Boolean = false,

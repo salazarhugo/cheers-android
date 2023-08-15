@@ -29,7 +29,6 @@ import com.salazar.cheers.core.share.ui.Permission
 import com.salazar.cheers.feature.map.domain.models.UserLocation
 import com.salazar.cheers.feature.map.ui.dialogs.PostMapDialog
 import com.salazar.cheers.map.ui.annotations.FriendAnnotation
-import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
 import com.salazar.cheers.map.ui.dialogs.UserMapDialog
 import com.salazar.common.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
@@ -51,29 +50,27 @@ fun MapScreen(
         sheetPeekHeight = 0.dp,
         scaffoldState = scaffoldState,
         sheetContent =  {
-            BottomSheetM3 {
-                when(uiState.selected) {
-                    MapAnnotationType.POST -> PostMapDialog(
-                        uiState = uiState,
+            when(uiState.selected) {
+                MapAnnotationType.POST -> PostMapDialog(
+                    uiState = uiState,
 //                        onHomeUIAction = {
 //                            onMapUIAction(MapUIAction.OnCommentClick(it.postID))
 //                            onMapUIAction(MapUIAction.OnUserClick(it.userID))
 //                        }
-                    )
-                    MapAnnotationType.USER -> UserMapDialog(
-                            userLocation = uiState.selectedUser,
-                            onClose = {
-                                scope.launch {
-                                    uiState.sheetState.show()
-                                }
-                            },
-                        onChatClick = {
-                            onMapUIAction(MapUIAction.OnChatClick(it))
-                        }
-                    )
+                )
+                MapAnnotationType.USER -> UserMapDialog(
+                        userLocation = uiState.selectedUser,
+                        onClose = {
+                            scope.launch {
+                                uiState.sheetState.show()
+                            }
+                        },
+                    onChatClick = {
+                        onMapUIAction(MapUIAction.OnChatClick(it))
+                    }
+                )
 
-                    null -> {}
-                }
+                null -> {}
             }
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),

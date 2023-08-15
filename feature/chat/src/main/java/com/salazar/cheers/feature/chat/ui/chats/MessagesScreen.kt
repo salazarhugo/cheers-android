@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
@@ -85,7 +86,7 @@ fun Tabs(
         if (uiState.isLoading)
             com.salazar.cheers.core.share.ui.LoadingScreen()
 
-        SearchBar(
+        CheersSearchBar(
             modifier = Modifier.padding(horizontal = 16.dp),
             searchInput = uiState.searchInput,
             onSearchInputChanged = { onRoomsUIAction(RoomsUIAction.OnSearchInputChange(it)) },

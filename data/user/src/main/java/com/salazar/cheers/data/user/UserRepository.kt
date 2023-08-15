@@ -1,6 +1,13 @@
 package com.salazar.cheers.data.user
 
+import android.app.Application
+import android.net.Uri
 import android.util.Log
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.workDataOf
 import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.friendship.v1.ListFriendRequest
 import cheers.notification.v1.CreateRegistrationTokenRequest
@@ -8,7 +15,9 @@ import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.data.user.workers.UploadProfilePicture
 import com.salazar.common.util.Resource
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -21,6 +30,7 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor(
+    application: Application,
     private val userDao: UserDao,
     private val userStatsDao: UserStatsDao,
     private val userItemDao: UserItemDao,
@@ -28,6 +38,8 @@ class UserRepository @Inject constructor(
     private val notificationService: NotificationServiceGrpcKt.NotificationServiceCoroutineStub,
     private val service: FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub,
 ) {
+    private val workManager = WorkManager.getInstance(application)
+
     suspend fun listSuggestions(): Result<List<UserItem>> {
         return try {
             val request = ListSuggestionsRequest.newBuilder().build()
@@ -309,7 +321,8 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getCurrentUser(): User {
-        return userDao.getUser(userIdOrUsername = "")
+        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+        return userDao.getUser(userIdOrUsername = uid)
     }
 
     suspend fun getUserSignIn(userId: String): Flow<Resource<User>> {
@@ -389,6 +402,11 @@ class UserRepository @Inject constructor(
         return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
     }
 
+    suspend fun fetchCurrentUser() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        fetchUser(uid)
+    }
+
     suspend fun fetchUser(
         userIDorUsername: String,
     ): Resource<Unit> {
@@ -439,6 +457,21 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun uploadUserPicture(
+        picture: Uri,
+    ) {
+        val uploadWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<UploadProfilePicture>().apply {
+                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                setInputData(
+                    workDataOf(
+                        "PHOTO_URI" to picture.toString(),
+                    )
+                )
+            }
+                .build()
+        workManager.enqueue(uploadWorkRequest)
+    }
     suspend fun saveUserPicture(
         picture: String,
     ) {

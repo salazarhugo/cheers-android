@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.salazar.cheers"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.salazar.cheers"
         minSdk = 28
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 64
         versionName = "1.0.0-064"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -55,6 +55,9 @@ dependencies {
     implementation(project(":feature:edit_profile"))
     implementation(project(":feature:signin"))
     implementation(project(":feature:notifications"))
+    implementation(project(":feature:settings"))
+    implementation(project(":feature:create_post"))
+    implementation(project(":feature:create_note"))
 
     implementation(project(":domain"))
 
@@ -65,6 +68,7 @@ dependencies {
     implementation(project(":data:friendship"))
     implementation(project(":data:activity"))
     implementation(project(":data:story"))
+    implementation(project(":data:billing"))
 
 
     implementation(libs.androidx.core.ktx)
@@ -194,7 +198,6 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.android.compiler)
 

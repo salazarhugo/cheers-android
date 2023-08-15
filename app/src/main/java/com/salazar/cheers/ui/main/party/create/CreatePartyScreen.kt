@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -18,6 +19,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,6 +46,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,19 +66,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerScope
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.SearchSuggestion
 import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.feature.create_post.LocationSection
+import com.salazar.cheers.feature.create_post.PrivacyBottomSheet
+import com.salazar.cheers.feature.create_post.SwitchPreference
 import com.salazar.cheers.feature.search.SearchLocation
 import com.salazar.cheers.ui.compose.DividerM3
 import com.salazar.cheers.ui.compose.event.EventDetails
-import com.salazar.cheers.ui.main.add.LocationSection
-import com.salazar.cheers.ui.main.add.PrivacyBottomSheet
-import com.salazar.cheers.ui.main.add.SwitchPreference
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -93,50 +97,52 @@ fun CreatePartyScreen(
 ) {
     PrivacyBottomSheet(
         privacy = uiState.privacy,
-        privacyState = uiState.privacyState,
+        privacyState = rememberModalBottomSheetState(),
         onSelectPrivacy = onPrivacyChange,
+    )
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                onDismiss = { onCreatePartyUIAction(CreatePartyUIAction.OnDismiss) },
+                title = "New Party"
+            )
+        },
     ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    onDismiss = { onCreatePartyUIAction(CreatePartyUIAction.OnDismiss) },
-                    title = "New Party"
-                )
-            },
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it),
-            ) {
-                val pagerState = rememberPagerState()
-                val scope = rememberCoroutineScope()
-                Tabs(
-                    uiState = uiState,
-                    modifier = Modifier.weight(1f),
-                    pagerState = pagerState,
-                    onCreatePartyUIAction = onCreatePartyUIAction,
-                    onNameChange = onNameChange,
-                    onDescriptionChange = onDescriptionChange,
-                    onStartTimeSecondsChange = onStartTimeSecondsChange,
-                    onEndTimeSecondsChange = onEndTimeSecondsChange,
-                    onQueryChange = onQueryChange,
-                    onLocationClick = onLocationClick,
-                    onShowGuestListToggle = onShowGuestListToggle,
-                )
-                ShareButton(
-                    page = pagerState.currentPage,
-                    uiState = uiState,
-                    onClick = {
-                        if (pagerState.currentPage == 3)
-                            onCreatePartyUIAction(CreatePartyUIAction.OnUploadParty)
-                        else
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
-                    }
-                )
+            val pagerState = rememberPagerState {
+                4
             }
+            val scope = rememberCoroutineScope()
+            Tabs(
+                uiState = uiState,
+                modifier = Modifier.weight(1f),
+                pagerState = pagerState,
+                onCreatePartyUIAction = onCreatePartyUIAction,
+                onNameChange = onNameChange,
+                onDescriptionChange = onDescriptionChange,
+                onStartTimeSecondsChange = onStartTimeSecondsChange,
+                onEndTimeSecondsChange = onEndTimeSecondsChange,
+                onQueryChange = onQueryChange,
+                onLocationClick = onLocationClick,
+                onShowGuestListToggle = onShowGuestListToggle,
+            )
+            ShareButton(
+                page = pagerState.currentPage,
+                uiState = uiState,
+                onClick = {
+                    if (pagerState.currentPage == 3)
+                        onCreatePartyUIAction(CreatePartyUIAction.OnUploadParty)
+                    else
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                }
+            )
         }
     }
 }
@@ -171,57 +177,63 @@ fun Tabs(
     val tabs = 4
     val scope = rememberCoroutineScope()
 
-    HorizontalPager(
-        modifier = modifier,
-        count = tabs,
-        state = pagerState,
-        userScrollEnabled = false,
-    ) { page ->
-        Column(modifier = Modifier.fillMaxHeight()) {
-            when (page) {
-                0 -> EventDetailsPage(
-                    uiState = uiState,
-                    onEventNameChange = onNameChange,
-                    onStartDateChanged = onStartTimeSecondsChange,
-                    onEndTimeSecondsChange = onEndTimeSecondsChange,
-                    onHasEndDateToggle = { onCreatePartyUIAction(CreatePartyUIAction.OnHasEndDateToggle) },
-                    onShowGuestListToggle = onShowGuestListToggle,
-                )
-                1 -> DescriptionPage(
-                    description = uiState.description,
-                    onDescriptionChange = onDescriptionChange,
-                )
-                2 -> LocationPage(
-                    locationName = uiState.locationName,
-                    query = uiState.locationQuery,
-                    results = uiState.locationResults,
-                    onQueryChange = onQueryChange,
-                    onLocationClick = onLocationClick,
-                )
-                3 -> FirstScreen(
-                    uiState = uiState,
-                    onCreatePartyUIAction = {
-                        when (it) {
-                            CreatePartyUIAction.OnPartyDetailsClick ->
-                                scope.launch {
-                                    pagerState.animateScrollToPage(0)
-                                }
-                            CreatePartyUIAction.OnDescriptionClick ->
-                                scope.launch {
-                                    pagerState.animateScrollToPage(1)
-                                }
-                            CreatePartyUIAction.OnLocationClick ->
-                                scope.launch {
-                                    pagerState.animateScrollToPage(2)
-                                }
-                            else -> {}
-                        }
-                        onCreatePartyUIAction(it)
-                    },
-                )
-            }
-        }
-    }
+//    PaddingValues(0.dp)
+//    PagerDefaults.flingBehavior(
+//        state = state,
+//        endContentPadding = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
+//    )
+//    fun(page: Int) {
+//        Column(modifier = Modifier.fillMaxHeight()) {
+//            when (page) {
+//                0 -> EventDetailsPage(
+//                    uiState = uiState,
+//                    onEventNameChange = onNameChange,
+//                    onStartDateChanged = onStartTimeSecondsChange,
+//                    onEndTimeSecondsChange = onEndTimeSecondsChange,
+//                    onHasEndDateToggle = { onCreatePartyUIAction(CreatePartyUIAction.OnHasEndDateToggle) },
+//                    onShowGuestListToggle = onShowGuestListToggle,
+//                )
+//
+//                1 -> DescriptionPage(
+//                    description = uiState.description,
+//                    onDescriptionChange = onDescriptionChange,
+//                )
+//
+//                2 -> LocationPage(
+//                    locationName = uiState.locationName,
+//                    query = uiState.locationQuery,
+//                    results = uiState.locationResults,
+//                    onQueryChange = onQueryChange,
+//                    onLocationClick = onLocationClick,
+//                )
+//
+//                3 -> FirstScreen(
+//                    uiState = uiState,
+//                    onCreatePartyUIAction = {
+//                        when (it) {
+//                            CreatePartyUIAction.OnPartyDetailsClick ->
+//                                scope.launch {
+//                                    pagerState.animateScrollToPage(0)
+//                                }
+//
+//                            CreatePartyUIAction.OnDescriptionClick ->
+//                                scope.launch {
+//                                    pagerState.animateScrollToPage(1)
+//                                }
+//
+//                            CreatePartyUIAction.OnLocationClick ->
+//                                scope.launch {
+//                                    pagerState.animateScrollToPage(2)
+//                                }
+//
+//                            else -> {}
+//                        }
+//                        onCreatePartyUIAction(it)
+//                    },
+//                )
+//            }
+//        }
+//    }
 }
 
 @Composable
@@ -479,7 +491,7 @@ fun NameTextField(
 }
 
 @Composable
-fun ShareButton(
+private fun ShareButton(
     modifier: Modifier = Modifier,
     page: Int,
     uiState: CreatePartyUiState,

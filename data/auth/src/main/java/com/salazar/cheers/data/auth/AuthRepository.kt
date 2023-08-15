@@ -13,20 +13,25 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.cheers.shared.data.BffApiService
+import com.salazar.cheers.shared.data.request.LoginRequest
+import com.salazar.cheers.shared.data.response.LoginResponse
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
+    private val bffApiService: BffApiService,
     private val auth: FirebaseAuth,
 ) {
-    fun checkIfAlreadySignedIn(): String? {
-        return FirebaseAuth.getInstance().currentUser?.uid
+    fun checkIfAlreadySignedIn(): Boolean {
+        return FirebaseAuth.getInstance().currentUser?.uid != null
     }
 
     private fun getFirebaseCredentialFromIdToken(
@@ -35,6 +40,22 @@ class AuthRepository @Inject constructor(
     ): AuthCredential {
         return GoogleAuthProvider.getCredential(idToken, accessToken)
     }
+
+    suspend fun signIn(idToken: String): Result<LoginResponse> {
+        val request = LoginRequest(idToken = idToken)
+
+        return try {
+            val response = bffApiService.login(request = request)
+            Result.success(response)
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            if (e.code() == 404) {
+                return Result.failure(NotRegisteredException(""))
+            }
+            Result.failure(e)
+        }
+    }
+    class NotRegisteredException(message: String) : Exception(message)
 
     suspend fun signInWithOneTap(
         idToken: String?,
@@ -68,7 +89,6 @@ class AuthRepository @Inject constructor(
 
     suspend fun signOut() {
         FirebaseAuth.getInstance().signOut()
-//        database.clearAllTables()
     }
 
     suspend fun deleteAccount(): Task<Void> {

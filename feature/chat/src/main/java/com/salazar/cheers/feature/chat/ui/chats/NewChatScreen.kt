@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,9 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.GroupAdd
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -33,13 +30,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +47,7 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.share.ui.Username
+import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.feature.chat.R
@@ -95,7 +89,7 @@ fun NewChatScreen(
                 .padding(it)
                 .animateContentSize(),
         ) {
-            SearchBar(
+            CheersSearchBar(
                 searchInput = uiState.query,
                 modifier = Modifier.padding(16.dp),
                 onSearchInputChanged = onQueryChange,
@@ -269,69 +263,6 @@ fun NewGroupNameInput(
                 Text(
                     text = "New Group Name"
                 )
-            },
-        )
-    }
-}
-
-@Composable
-fun SearchBar(
-    searchInput: String,
-    modifier: Modifier = Modifier,
-    onSearchInputChanged: (String) -> Unit,
-    placeholder: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    autoFocus: Boolean = false,
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center,
-    ) {
-        Card(
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(46.dp),
-        ) {}
-
-        val focusManager = LocalFocusManager.current
-
-        val focusRequester = remember { FocusRequester() }
-
-        LaunchedEffect(Unit) {
-            if (autoFocus)
-                focusRequester.requestFocus()
-        }
-
-        TextField(
-            value = searchInput,
-            leadingIcon = leadingIcon,
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
-            onValueChange = { onSearchInputChanged(it) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Search
-            ),
-            textStyle = TextStyle(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                    fontSize = 13.sp
-            ),
-            keyboardActions = KeyboardActions(onSearch = {
-                focusManager.clearFocus()
-            }),
-            placeholder = placeholder,
-            trailingIcon = {
-                if (searchInput.isNotBlank())
-                    Icon(Icons.Filled.Close, null,
-                        Modifier.clickable { onSearchInputChanged("") })
             },
         )
     }

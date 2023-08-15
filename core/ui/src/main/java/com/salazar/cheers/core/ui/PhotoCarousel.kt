@@ -5,9 +5,11 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,10 +28,9 @@ fun PhotoCarousel(
     onPostClick: () -> Unit,
 ) {
     HorizontalPager(
-        pageCount = photos.size,
         state = pagerState,
     ) { page ->
-        var scale by remember { mutableStateOf(1f) }
+        var scale by remember { mutableFloatStateOf(1f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
 
         val state = rememberTransformableState { zoomChange, offsetChange, _ ->

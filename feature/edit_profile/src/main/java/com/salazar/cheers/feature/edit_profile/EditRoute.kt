@@ -19,6 +19,7 @@ fun EditProfileRoute(
         onBioChanged = editProfileViewModel::onBioChanged,
         onUsernameChanged = editProfileViewModel::onUsernameChange,
         onSelectImage = editProfileViewModel::onSelectPicture,
+        onSelectBanner = editProfileViewModel::onSelectBanner,
         onDismiss = { navigateBack() },
         onSave = {
             editProfileViewModel.updateUser()

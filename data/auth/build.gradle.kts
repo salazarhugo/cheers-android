@@ -17,6 +17,8 @@ android {
 dependencies {
     implementation(project(":common"))
     implementation(project(":auth"))
+
+    implementation(project(":core:shared"))
     implementation(project(":core:model"))
     implementation(project(":core:protobuf"))
 
@@ -33,6 +35,11 @@ dependencies {
 
     // Datastore
     implementation(libs.androidx.datastore.preferences)
+
+    // Moshi
+    implementation(libs.converter.moshi)
+    implementation(libs.moshi)
+    ksp(libs.moshi.kotlin.codegen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

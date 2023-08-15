@@ -6,6 +6,7 @@ plugins {
 
 android {
     namespace = "com.salazar.cheers.feature.profile"
+
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

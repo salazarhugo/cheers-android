@@ -18,12 +18,14 @@ import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
@@ -95,6 +97,9 @@ fun SheetItem(
     onClick: () -> Unit = {}
 ) {
     ListItem(
+        colors = ListItemDefaults.colors(
+            containerColor = Color.Transparent,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },

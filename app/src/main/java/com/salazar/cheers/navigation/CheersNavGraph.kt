@@ -11,6 +11,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -21,6 +22,8 @@ import com.salazar.cheers.core.share.ui.GreySheet
 import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
+import com.salazar.cheers.feature.create_note.createNoteNavigationRoute
+import com.salazar.cheers.feature.create_post.createPostNavigationRoute
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
@@ -31,7 +34,8 @@ fun CheersNavGraph(
     uiState: CheersUiState,
     appState: CheersAppState,
 ) {
-    val startDestination = CheersDestinations.AUTH_ROUTE
+    val startDestination =
+        remember { if (uiState.user != null) CheersDestinations.MAIN_ROUTE else CheersDestinations.AUTH_ROUTE }
 
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
     val currentRoute =
@@ -56,8 +60,8 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.COMMENT_MORE_SHEET)
                 || currentRoute.contains(MainDestinations.COMMENT_DELETE)
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
-                || currentRoute.contains(MainDestinations.CREATE_POST_ROUTE)
-                || currentRoute.contains(MainDestinations.CREATE_NOTE_ROUTE)
+                || currentRoute.contains(createPostNavigationRoute)
+                || currentRoute.contains(createNoteNavigationRoute)
                 || currentRoute.contains(MainDestinations.EDIT_PROFILE_ROUTE)
                 || currentRoute.contains(MainDestinations.CAMERA_ROUTE)
 
@@ -98,7 +102,7 @@ fun CheersNavGraph(
                 startDestination = startDestination,
             ) {
                 settingNavGraph(
-                    navActions = navActions,
+                    appState = appState,
                 )
                 authNavGraph(
                     navActions = navActions,

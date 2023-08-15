@@ -17,9 +17,10 @@ import com.salazar.cheers.data.post.repository.Post
 fun PostItem(
     post: Post,
     modifier: Modifier = Modifier,
-    onHomeUIAction: () -> Unit,
 ) {
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(
+        pageCount = { post.photos.size },
+    )
 
     Column(
         modifier = modifier.fillMaxWidth()
@@ -27,7 +28,7 @@ fun PostItem(
         PostHeader(
             post = post,
             public = post.privacy == Privacy.PUBLIC.name,
-            onHeaderClicked = {
+            onUserClick = {
 //                onHomeUIAction(HomeUIAction.OnUserClick(it))
             },
             onMoreClicked = {

@@ -29,9 +29,6 @@ dependencies {
     // Accompanist System UI Controller
     implementation(libs.accompanist.systemuicontroller)
 
-    // Google"s Fused Location Provider
-    implementation(libs.play.services.location)
-
     // Kotlinx Coroutines Play Services
     implementation(libs.kotlinx.coroutines.play.services)
 

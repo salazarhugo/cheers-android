@@ -20,14 +20,17 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":common"))
     implementation(project(":core:model"))
+    implementation(project(":core:shared"))
 
     implementation(project(":data:user"))
+    implementation(project(":data:account"))
     implementation(project(":data:auth"))
     implementation(project(":data:post"))
     implementation(project(":data:note"))
     implementation(project(":data:activity"))
     implementation(project(":data:story"))
     implementation(project(":data:friendship"))
+    implementation(project(":data:drink"))
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom))

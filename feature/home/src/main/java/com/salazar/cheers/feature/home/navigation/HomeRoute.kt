@@ -18,6 +18,9 @@ fun HomeRoute(
     homeViewModel: HomeViewModel = hiltViewModel(),
     onActivityClick: () -> Unit,
     onPostClick: (String) -> Unit,
+    navigateToNote: (String) -> Unit,
+    navigateToCreatePost: () -> Unit,
+    navigateToCreateNote: () -> Unit,
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
@@ -48,14 +51,14 @@ fun HomeRoute(
                 is HomeUIAction.OnUserClick -> {}
                 is HomeUIAction.OnPostClick -> onPostClick(action.postID)
                 is HomeUIAction.OnSwipeRefresh -> homeViewModel.onSwipeRefresh()
-                is HomeUIAction.OnCreatePostClick -> {}//navActions.navigateToCreatePost()
+                is HomeUIAction.OnCreatePostClick -> navigateToCreatePost()
                 is HomeUIAction.OnAddStoryClick -> {}//navActions.navigateToCamera()
                 is HomeUIAction.OnPostMoreClick -> {}// navActions.navigateToPostMoreSheet(action.postID)
                 is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextPosts()
                 is HomeUIAction.OnChatClick -> {}// navActions.navigateToMessages()
                 is HomeUIAction.OnShareClick -> {}// navActions.navigateToShare(action.postID)
-                HomeUIAction.OnCreateNoteClick -> {}// navActions.navigateToCreateNote()
-                is HomeUIAction.OnNoteClick -> {}// navActions.navigateToNote(action.userID)
+                HomeUIAction.OnCreateNoteClick -> navigateToCreateNote()
+                is HomeUIAction.OnNoteClick -> navigateToNote(action.userID)
                 is HomeUIAction.OnAddFriendClick -> homeViewModel.onAddFriendClick(action.userID)
             }
         }

@@ -4,17 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
 
-/**
- * Stateful composable that displays the Navigation route for the Note screen.
- *
- * @param viewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun NoteRoute(
-    navActions: CheersNavigationActions,
+    navigateBack: () -> Unit,
+    navigateToCreateNote: () -> Unit,
     viewModel: NoteViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -24,13 +20,13 @@ fun NoteRoute(
             uiState = uiState,
             onNoteUIAction = { action ->
                 when(action) {
-                    NoteUIAction.OnBackPressed -> navActions.navigateBack()
+                    NoteUIAction.OnBackPressed -> navigateBack()
                     NoteUIAction.OnSwipeRefresh -> TODO()
                     is NoteUIAction.OnTextChange -> viewModel.onTextChange(action.text)
-                    NoteUIAction.OnCreateNewNoteClick -> navActions.navigateToCreateNote()
+                    NoteUIAction.OnCreateNewNoteClick -> navigateToCreateNote()
                     NoteUIAction.OnDeleteNoteClick -> {
                         viewModel.onDeleteNote {
-                            navActions.navigateBack()
+                            navigateBack()
                         }
                     }
                 }

@@ -61,11 +61,13 @@ fun OtherProfileScreen(
 ) {
     val posts = uiState.posts
     val parties = uiState.parties
-    val pagerState = rememberPagerState()
     val tabs = listOf(
         Icons.Outlined.ViewList,
         Icons.Default.GridView,
         Icons.Outlined.Celebration
+    )
+    val pagerState = rememberPagerState(
+        pageCount = { tabs.size },
     )
     val user = uiState.user
 
@@ -128,7 +130,6 @@ fun OtherProfileScreen(
         if (user.friend || user.isBusinessAccount)
         item {
             HorizontalPager(
-                pageCount = tabs.size,
                 state = pagerState,
             ) { page ->
                 Column(
@@ -138,7 +139,6 @@ fun OtherProfileScreen(
                         0 -> posts?.forEach { postFeed ->
                             PostItem(
                                 post = postFeed,
-                                onHomeUIAction = {},
 //                                onPostLike = onPostLike,
 //                                onPostClicked = onPostClicked,
 //                                onPostMoreClicked = onPostMoreClicked,

@@ -1,11 +1,6 @@
 package com.salazar.cheers.navigation
 
 import android.content.Intent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,8 +14,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.navigation
+import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
@@ -41,6 +36,10 @@ import com.salazar.cheers.feature.chat.ui.chats.MessagesRoute
 import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
+import com.salazar.cheers.feature.create_note.createNoteScreen
+import com.salazar.cheers.feature.create_note.navigateToCreateNote
+import com.salazar.cheers.feature.create_post.createPostScreen
+import com.salazar.cheers.feature.create_post.navigateToCreatePost
 import com.salazar.cheers.feature.edit_profile.navigation.editProfileScreen
 import com.salazar.cheers.feature.edit_profile.navigation.navigateToEditProfile
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
@@ -59,15 +58,14 @@ import com.salazar.cheers.feature.profile.navigation.otherProfileScreen
 import com.salazar.cheers.feature.profile.navigation.profileScreen
 import com.salazar.cheers.feature.search.navigation.navigateToSearch
 import com.salazar.cheers.feature.search.navigation.searchScreen
+import com.salazar.cheers.feature.settings.navigation.navigateToSettings
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
 import com.salazar.cheers.map.ui.MapPostHistoryRoute
-import com.salazar.cheers.notes.ui.create_note.CreateNoteRoute
 import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
-import com.salazar.cheers.ui.main.add.CreatePostRoute
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
@@ -168,10 +166,6 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = "${MainDestinations.CHAT_ROUTE}?channelId={channelId}&userId={userID}",
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" }),
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 })
-            },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             ChatRoute(
                 navActions = appState.navActions,
@@ -190,8 +184,6 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = "${MainDestinations.ROOM_DETAILS}/{roomId}",
-            enterTransition = { scaleIn(animationSpec = tween(500)) },
-            exitTransition = { scaleOut(animationSpec = tween(500)) },
         ) {
             RoomRoute(
                 navActions = appState.navActions,
@@ -202,8 +194,6 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = "${MainDestinations.STORY_FEED_ROUTE}/{page}",
             arguments = listOf(navArgument("page") { type = NavType.IntType }),
-            enterTransition = { scaleIn(animationSpec = tween(200)) },
-            exitTransition = { scaleOut(animationSpec = tween(200)) },
         ) {
                 StoryFeedRoute(
                     appState = appState,
@@ -214,8 +204,6 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = "${MainDestinations.STORY_ROUTE}?username={username}",
             arguments = listOf(navArgument("username") { nullable = true }),
-            enterTransition = { scaleIn(animationSpec = tween(200)) },
-            exitTransition = { scaleOut(animationSpec = tween(200)) },
         ) {
             CheersTheme(darkTheme = true) {
                 StoryRoute(
@@ -234,22 +222,15 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.CREATE_NOTE_ROUTE,
-        ) {
-            CreateNoteRoute(
-                navActions = appState.navActions,
-            )
-        }
+        createNoteScreen(
+            navigateBack = navController::popBackStack,
+        )
 
-        composable(
-            route = "${MainDestinations.CREATE_POST_ROUTE}?photoUri={photoUri}",
-            arguments = listOf(navArgument("photoUri") { nullable = true })
-        ) {
-            CreatePostRoute(
-                navActions = appState.navActions,
-            )
-        }
+        createPostScreen(
+            navigateBack = navController::popBackStack,
+            navigateToCamera = {
+            },
+        )
 
         composable(
             route = MainDestinations.EVENTS_ROUTE,
@@ -278,10 +259,11 @@ fun NavGraphBuilder.mainNavGraph(
 
         homeScreen(
             onActivityClick = navController::navigateToNotifications,
-            onPostClick = {
-                navController.navigate("")
-            },
+            onPostClick = { },
             navigateToSearch = navController::navigateToSearch,
+            navigateToCreatePost = navController::navigateToCreatePost,
+            navigateToCreateNote = navController::navigateToCreateNote,
+            navigateToNote = appState.navActions.navigateToNote,
         )
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 //                com.salazar.cheers.core.share.ui.RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
@@ -328,8 +310,6 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = "${MainDestinations.POST_COMMENTS}/{postId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{postId}" }),
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             CommentsRoute(
                 navActions = appState.navActions,
@@ -339,8 +319,6 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = "${MainDestinations.COMMENT_REPLIES}/{commentId}",
             deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{commentId}/replies" }),
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             RepliesRoute(
                 navActions = appState.navActions,
@@ -471,14 +449,6 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(
             route = MainDestinations.MESSAGES_ROUTE,
-            enterTransition = {
-                val dir = if (this.initialState.destination.route?.contains(MainDestinations.CHAT_ROUTE) == true)
-                    -1000
-                else
-                    1000
-                slideInHorizontally(initialOffsetX = { dir })
-                              },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
             MessagesRoute(
                 navActions = appState.navActions,
@@ -499,6 +469,9 @@ fun NavGraphBuilder.mainNavGraph(
 
         profileScreen(
             navigateToEditProfile = navController::navigateToEditProfile,
+            navigateToProfileMore = {
+                navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$it")
+            }
         )
 
         bottomSheet(
@@ -536,7 +509,8 @@ fun NavGraphBuilder.mainNavGraph(
             )
         ) {
             NoteRoute(
-                navActions = appState.navActions,
+                navigateBack = navController::popBackStack,
+                navigateToCreateNote = navController::navigateToCreateNote,
             )
         }
 
@@ -609,7 +583,7 @@ fun NavGraphBuilder.mainNavGraph(
             onProfileSheetUIAction = { action ->
                 when (action) {
                     is ProfileSheetUIAction.OnNfcClick -> appState.navActions.navigateToNfc()
-                    is ProfileSheetUIAction.OnSettingsClick -> appState.navActions.navigateToSettings()
+                    is ProfileSheetUIAction.OnSettingsClick -> navController.navigateToSettings()
                     is ProfileSheetUIAction.OnCopyProfileClick -> {
                         FirebaseDynamicLinksUtil.createShortLink("u/$username")
                             .addOnSuccessListener { shortLink ->

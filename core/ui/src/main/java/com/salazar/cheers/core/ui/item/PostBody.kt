@@ -19,7 +19,9 @@ fun PostBody(
     onPostClicked: (postId: String) -> Unit,
     modifier: Modifier = Modifier,
     onLike: (post: Post) -> Unit,
-    pagerState: PagerState = rememberPagerState(),
+    pagerState: PagerState = rememberPagerState(
+        pageCount = { post.photos.size },
+    ),
 ) {
     if (post.videoUrl.isBlank() && post.photos.isEmpty())
         return
