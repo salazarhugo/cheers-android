@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package cheers.claim.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/claim/v1;claim";
+
+message ClaimEvent {
+  oneof event {
+    CreatedClaim created = 1;
+    DeletedClaim deleted = 2;
+  };
+}
+
+message CreatedClaim {
+  string user_id = 1;
+  string claim = 2;
+}
+
+message DeletedClaim {
+  string user_id = 1;
+  string claim = 2;
+}

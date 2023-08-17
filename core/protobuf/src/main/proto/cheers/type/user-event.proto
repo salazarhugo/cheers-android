@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/type";
+
+enum UserEventType {
+  FOLLOW = 0;
+  STORY_LIKE = 1;
+  POST_LIKE = 2;
+  COMMENT = 3;
+  MENTION = 4;
+  CREATE_POST = 5;
+  CREATE_EVENT = 6;
+  CREATE_STORY = 7;
+}
+
+message UserEvent {
+  UserEventType type = 1;
+  string userId = 2;
+  int64 time = 3;
+  string otherUserId = 4;
+  string postId = 5;
+  string eventId = 6;
+  string storyId = 7;
+}

@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+package cheers.party.v1;
+
+import "cheers/type/party/party.proto";
+import "cheers/type/user/user.proto";
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/party/v1;party";
+
+service PartyService {
+  rpc CreateParty (CreatePartyRequest) returns (CreatePartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties"
+      body: "*"
+    };
+  }
+
+  rpc GetParty (GetPartyRequest) returns (GetPartyResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}"
+    };
+  }
+
+  rpc UpdateParty (UpdatePartyRequest) returns (UpdatePartyResponse) {
+    option (google.api.http) = {
+      patch: "/v1/parties"
+      body: "*"
+    };
+  }
+
+  rpc DeleteParty (DeletePartyRequest) returns (DeletePartyResponse) {
+    option (google.api.http) = {
+      delete: "/v1/parties/{party_id}"
+    };
+  }
+
+  rpc GetPartyItem (GetPartyItemRequest) returns (GetPartyItemResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}/item"
+    };
+  }
+
+  rpc FeedParty (FeedPartyRequest) returns (FeedPartyResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/feed"
+    };
+  }
+
+  /*
+    List parties of a specific user
+   */
+  rpc ListParty (ListPartyRequest) returns (ListPartyResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{user_id}/list"
+    };
+  }
+
+  rpc AnswerParty (AnswerPartyRequest) returns (AnswerPartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties/{party_id}/answer"
+      body: "*"
+    };
+  }
+
+  rpc ListGoing (ListGoingRequest) returns (ListGoingResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}/going"
+    };
+  }
+
+  rpc TransferParty (TransferPartyRequest) returns (TransferPartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties/{party_id}/transfer"
+      body: "*"
+    };
+  }
+
+  rpc DuplicateParty (DuplicatePartyRequest) returns (DuplicatePartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/parties/{party_id}/duplicate"
+      body: "*"
+    };
+  }
+}
+
+message DuplicatePartyRequest {
+  string party_id = 1;
+}
+
+message DuplicatePartyResponse {
+}
+
+message TransferPartyRequest {
+  string user_id = 1;
+  string party_id = 2;
+}
+
+message TransferPartyResponse {
+}
+
+message ListPartyRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string user_id = 3;
+}
+
+message ListPartyResponse {
+  repeated PartyItem items = 1;
+  string next_page_token = 2;
+}
+
+message ListGoingRequest {
+  string party_id = 1;
+}
+
+message ListGoingResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message AnswerPartyRequest {
+  string party_id = 1;
+  WatchStatus watch_status = 2;
+}
+
+message AnswerPartyResponse {
+}
+
+message CreatePartyRequest {
+  cheers.type.Party party = 1;
+}
+
+message CreatePartyResponse {
+  cheers.type.Party party = 1;
+}
+
+message GetPartyRequest {
+  string party_id = 1;
+}
+
+message GetPartyResponse {
+  cheers.type.Party party = 1;
+}
+
+message GetPartyItemRequest {
+  string party_id = 1;
+}
+
+message GetPartyItemResponse {
+  PartyItem item = 1;
+}
+
+message UpdatePartyRequest {
+  cheers.type.Party party = 1;
+}
+
+message UpdatePartyResponse {
+  cheers.type.Party party = 1;
+}
+
+message DeletePartyRequest {
+  string party_id = 1;
+}
+
+message DeletePartyResponse {
+}
+
+message FeedPartyRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message FeedPartyResponse {
+  repeated PartyItem items = 1;
+  string next_page_token = 2;
+}
+
+message PartyItem {
+  cheers.type.Party party = 1;
+  cheers.type.User user = 2;
+  int64 going_count = 3;
+  int64 interested_count = 4;
+  int64 invited_count = 5;
+  bool is_creator = 8;
+  WatchStatus viewer_watch_status = 9;
+  repeated string mutual_usernames = 10;
+  repeated string mutual_pictures = 11;
+}
+
+enum WatchStatus {
+  UNWATCHED = 0;
+  GOING = 1;
+  INTERESTED = 2;
+  MAYBE = 3;
+}

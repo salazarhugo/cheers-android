@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package cheers.activity.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/activity/v1;activity";
+
+import "google/api/annotations.proto";
+
+service ActivityService {
+  rpc ListActivity (ListActivityRequest) returns (ListActivityResponse) {
+    option (google.api.http) = {
+      get: "/v1/activities"
+    };
+  };
+}
+
+message ListActivityRequest {
+  string user_id = 1;
+}
+
+message ListActivityResponse {
+  repeated Activity activities = 1;
+}
+
+message Activity {
+  string id = 8;
+  enum ActivityType {
+    POST_LIKED = 0;
+    STORY_LIKED = 1;
+    POST_COMMENTED = 2;
+    MENTION_POST_CAPTION = 3;
+    MENTION_POST_COMMENT = 4;
+    FRIEND_ADDED = 5;
+    COMMENT_LIKED = 6;
+  }
+  ActivityType type = 1;
+  string text = 2;
+  string picture = 3;
+  string user_id  = 4;
+  int64 timestamp  = 5;
+  string media_picture = 6;
+  string media_id = 7;
+  string username = 9;
+}

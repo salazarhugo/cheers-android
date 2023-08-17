@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package cheers.post.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/post/v1;post";
+
+import "cheers/post/v1/post_service.proto";
+import "cheers/type/user/user.proto";
+import "cheers/type/post/post.proto";
+
+message PostEvent {
+  oneof event {
+    CreatePost create = 1;
+    LikePost like = 2;
+    DeletePost delete = 3;
+  };
+}
+
+message CreatePost {
+  cheers.type.Post post = 1;
+  cheers.type.UserItem user = 2;
+  bool send_notification_to_friends = 3;
+}
+
+message LikePost {
+  string post_id = 1;
+  string user_id = 2;
+}
+
+message DeletePost {
+  cheers.type.UserItem sender = 2;
+}

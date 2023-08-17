@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package cheers.notification.v1;
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/notification/v1;notification";
+
+service NotificationService {
+  rpc CreateRegistrationToken (CreateRegistrationTokenRequest) returns (CreateRegistrationTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/token"
+      body: "*"
+    };
+  }
+}
+
+message CreateRegistrationTokenRequest {
+  string token = 1;
+}
+
+message CreateRegistrationTokenResponse {
+}

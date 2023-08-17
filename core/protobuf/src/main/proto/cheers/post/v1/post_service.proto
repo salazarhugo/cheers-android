@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package cheers.post.v1;
+
+import "cheers/type/post/post.proto";
+import "cheers/type/user/user.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/post/v1;post";
+
+service PostService {
+  /*
+    Create a new post
+   */
+  rpc CreatePost (CreatePostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts"
+      body: "*"
+    };
+  };
+
+  rpc GetPost (GetPostRequest) returns (GetPostResponse);
+  rpc GetPostItem (GetPostItemRequest) returns (PostResponse);
+  rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
+
+  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/posts"
+    };
+  }
+
+  /*
+    List posts of a specific user
+   */
+  rpc ListPost (ListPostRequest) returns (ListPostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/list"
+    };
+  };
+
+  /*
+    Friends post feed
+   */
+  rpc FeedPost (FeedPostRequest) returns (FeedPostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/feed"
+    };
+  };
+
+  /*
+    Map post feed
+   */
+  rpc ListMapPost (ListMapPostRequest) returns (ListMapPostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/map"
+    };
+  };
+
+  rpc LikePost (LikePostRequest) returns (LikePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/like"
+    };
+  };
+
+  rpc UnlikePost (UnlikePostRequest) returns (UnlikePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/unlike"
+    };
+  };
+
+  rpc SavePost (SavePostRequest) returns (SavePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/save"
+    };
+  };
+
+  rpc UnsavePost (UnsavePostRequest) returns (UnsavePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/unsave"
+    };
+  };
+}
+
+message ListMapPostRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListMapPostResponse {
+  repeated PostResponse posts = 1;
+}
+
+message CreatePostRequest {
+  cheers.type.Post post = 1;
+  bool send_notification_to_friends = 2;
+}
+
+message GetPostRequest {
+  string post_id = 1;
+}
+
+message GetPostResponse {
+  cheers.type.Post post = 1;
+}
+
+message GetPostItemRequest {
+  string post_id = 1;
+}
+
+message UpdatePostRequest {
+  cheers.type.Post post = 1;
+}
+
+message DeletePostRequest {
+  string id = 1;
+}
+
+message ListPostRequest {
+  string username = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListPostResponse {
+  repeated PostResponse posts = 1;
+  string next_page_token = 2;
+}
+
+message FeedPostRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message FeedPostResponse {
+  repeated PostResponse posts = 1;
+  string next_page_token = 2;
+}
+
+message LikePostRequest {
+  string post_id = 1;
+}
+
+message LikePostResponse {
+  bool success = 1;
+}
+
+message UnlikePostRequest {
+  string post_id = 1;
+}
+
+message UnlikePostResponse {
+  bool success = 1;
+}
+
+message SavePostRequest {
+  string post_id = 1;
+}
+
+message SavePostResponse {
+  bool success = 1;
+}
+
+message UnsavePostRequest {
+  string post_id = 1;
+}
+
+message UnsavePostResponse {
+  bool success = 1;
+}
+
+message PostResponse {
+  cheers.type.Post post = 1;
+  cheers.type.User user = 2;
+  int64 like_count = 3;
+  int64 comment_count = 4;
+  bool has_liked = 5;
+  bool is_creator = 6;
+}

@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package cheers.story.v1;
+
+import "cheers/story/v1/story.proto";
+import "cheers/type/user/user.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/story/v1;story";
+
+service StoryService {
+  rpc CreateStory (CreateStoryRequest) returns (StoryResponse);
+  rpc GetStory (GetStoryRequest) returns (StoryResponse);
+  rpc UpdateStory (UpdateStoryRequest) returns (StoryResponse);
+  rpc DeleteStory (DeleteStoryRequest) returns (google.protobuf.Empty);
+
+  rpc FeedStory (FeedStoryRequest) returns (FeedStoryResponse) {
+    option (google.api.http) = {
+      get: "/v1/stories/feed"
+    };
+  };
+  /*
+    Return stories of a specific user
+   */
+  rpc ListUserStory (ListUserStoryRequest) returns (ListUserStoryResponse);
+
+  rpc ViewStory (ViewStoryRequest) returns (ViewStoryResponse);
+  rpc LikeStory (LikeStoryRequest) returns (LikeStoryResponse);
+  rpc UnlikeStory (UnlikeStoryRequest) returns (UnlikeStoryResponse);
+  rpc SaveStory (SaveStoryRequest) returns (SaveStoryResponse);
+  rpc UnsaveStory (UnsaveStoryRequest) returns (UnsaveStoryResponse);
+}
+
+message ListUserStoryRequest {
+  string user_id = 1;
+}
+
+message ListUserStoryResponse {
+  cheers.type.User user = 1;
+  repeated StoryResponse stories = 2;
+}
+
+message CreateStoryRequest {
+  cheers.story.v1.Story story = 1;
+}
+
+message GetStoryRequest {
+  string id = 1;
+}
+
+message UpdateStoryRequest {
+  cheers.story.v1.Story story = 1;
+}
+
+message DeleteStoryRequest {
+  string id = 1;
+}
+
+message FeedStoryRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message FeedStoryResponse {
+  repeated UserWithStories items = 1;
+  string next_page_token = 2;
+}
+
+message ViewStoryRequest {
+  string id = 1;
+}
+
+message ViewStoryResponse {
+  bool success = 1;
+}
+
+message LikeStoryRequest {
+  string id = 1;
+}
+
+message LikeStoryResponse {
+  bool success = 1;
+}
+
+message UnlikeStoryRequest {
+  string id = 1;
+}
+
+message UnlikeStoryResponse {
+  bool success = 1;
+}
+
+message SaveStoryRequest {
+  string id = 1;
+}
+
+message SaveStoryResponse {
+  bool success = 1;
+}
+
+message UnsaveStoryRequest {
+  string id = 1;
+}
+
+message UnsaveStoryResponse {
+  bool success = 1;
+}
+
+message ListStoryResponse {
+  cheers.type.User user = 1;
+  repeated UserWithStories items = 2;
+}
+
+message UserWithStories {
+  cheers.type.User user = 1;
+  repeated StoryResponse stories = 2;
+}
+
+message StoryResponse {
+  cheers.story.v1.Story story = 2;
+  bool has_liked = 5;
+  bool has_viewed = 6;
+}

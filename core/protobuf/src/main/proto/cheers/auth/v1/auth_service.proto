@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package cheers.auth.v1;
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/auth/v1;auth";
+
+service AuthService {
+  rpc CreateModerator(CreateModeratorRequest) returns (CreateModeratorResponse) {
+    option (google.api.http) = {
+      post: "/v1/auths/moderator"
+      body: "*"
+    };
+  }
+
+  rpc CreateBusinessAccount(CreateBusinessAccountRequest) returns (CreateBusinessAccountResponse) {
+    option (google.api.http) = {
+      post: "/v1/auths/business"
+      body: "*"
+    };
+  }
+
+  rpc VerifyUser(VerifyUserRequest) returns (VerifyUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/auths/verify"
+      body: "*"
+    };
+  }
+}
+
+message VerifyUserRequest {
+  string user_id = 1;
+}
+
+message VerifyUserResponse {
+}
+
+message CreateModeratorRequest {
+  string user_id = 1;
+}
+
+message CreateModeratorResponse {
+}
+
+message CreateBusinessAccountRequest {
+  string user_id = 1;
+}
+
+message CreateBusinessAccountResponse {
+}

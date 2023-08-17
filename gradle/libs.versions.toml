@@ -12,6 +12,7 @@ accompanistNavigationMaterial = "0.33.0-alpha"
 activityCompose = "1.7.2"
 androidx-lifecycleRuntimeKtx = "2.6.1"
 androidxComposeBom = "2023.08.00"
+biometricKtx = "1.1.0"
 exoplayer = "2.19.0"
 firebaseBom = "32.2.2"
 androidxComposeCompiler = "1.4.5"
@@ -89,6 +90,7 @@ workRuntimeKtx = "2.8.1"
 org-jetbrains-kotlin-jvm = "1.8.20"
 
 [libraries]
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometricKtx" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit_converter_gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }

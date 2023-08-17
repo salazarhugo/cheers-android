@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package cheers.story.v1;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/story/v1;story";
+
+import "cheers/type/privacy/privacy.proto";
+
+message Story {
+  string id = 1;
+  string photo = 2;
+  string address = 3;
+  cheers.type.Privacy privacy = 4;
+  bool is_reaction_enabled = 5;
+  string location_name = 6;
+  enum StoryType {
+    IMAGE = 0;
+    VIDEO = 1;
+  }
+  StoryType type = 7;
+  int64 create_time = 8;
+  bool share_enabled = 9;
+}

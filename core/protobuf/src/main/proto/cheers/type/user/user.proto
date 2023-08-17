@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/user;user";
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  bool verified = 4;
+  string username = 5;
+  string picture = 6;
+  string bio = 7;
+  string website = 8;
+  string birthday = 12;
+  Gender gender = 13;
+  string phone_number = 9;
+  int64 create_time = 10;
+  repeated string registration_tokens = 11;
+  bool is_business_account = 14;
+  bool is_admin = 15;
+  bool is_moderator = 16;
+  string banner = 17;
+}
+
+message UserItem {
+  string id = 1;
+  string name = 2;
+  string username = 3;
+  bool verified = 4;
+  string picture = 5;
+  bool has_followed = 6;
+  StoryState story_state = 7;
+  bool friend = 8;
+  bool requested = 9;
+  bool has_requested_viewer = 10;
+  string banner = 11;
+}
+
+enum StoryState {
+  EMPTY = 0;
+  SEEN = 1;
+  NOT_SEEN = 2;
+  LOADING = 3;
+}
+
+enum Gender {
+  MALE = 0;
+  FEMALE = 1;
+}

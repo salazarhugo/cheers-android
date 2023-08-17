@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package cheers.user.v1;
+
+import "cheers/type/user/user.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/user/v1;user";
+
+message UserEvent {
+  oneof event {
+    CreateUser create = 1;
+    FollowUser follow = 2;
+    UpdateUser update = 3;
+  };
+}
+
+message CreateUser {
+  cheers.type.User user = 1;
+}
+
+message UpdateUser {
+  cheers.type.User user = 1;
+}
+
+message FollowUser {
+  cheers.type.User user = 1;
+  cheers.type.User followed_user = 2;
+}

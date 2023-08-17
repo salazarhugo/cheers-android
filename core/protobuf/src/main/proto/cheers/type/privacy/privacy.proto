@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/privacy;privacy";
+
+enum Privacy {
+  FRIENDS = 0;
+  PRIVATE = 1;
+  PUBLIC = 2;
+  GROUP = 3;
+}

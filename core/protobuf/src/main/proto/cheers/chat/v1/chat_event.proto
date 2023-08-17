@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package cheers.chat.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/chat/v1;chat";
+
+import "cheers/chat/v1/chat_service.proto";
+import "cheers/type/user/user.proto";
+
+message ChatEvent {
+  oneof event {
+    CreateMessage create = 1;
+  };
+}
+
+message CreateMessage {
+  cheers.chat.v1.Message message = 1;
+  cheers.type.UserItem sender = 2;
+  repeated cheers.type.UserItem members = 3;
+  cheers.chat.v1.Room room = 4;
+}

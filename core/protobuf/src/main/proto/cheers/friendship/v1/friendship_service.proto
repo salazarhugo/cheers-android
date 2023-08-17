@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package cheers.friendship.v1;
+
+
+import "google/api/annotations.proto";
+import "cheers/type/user/user.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/friendship/v1;friendship";
+
+service FriendshipService {
+  /*
+    Send a friend request
+   */
+  rpc CreateFriendRequest(CreateFriendRequestRequest) returns (CreateFriendRequestResponse) {
+    option (google.api.http) = {
+      post: "/v1/friendships"
+      body: "*"
+    };
+  }
+
+  /*
+    Accept a friend request
+   */
+  rpc AcceptFriendRequest(AcceptFriendRequestRequest) returns (AcceptFriendRequestResponse) {
+    option (google.api.http) = {
+      post: "/v1/friendships/accept"
+      body: "*"
+    };
+  }
+
+  /*
+    Get friend list of a specific user
+   */
+  rpc ListFriend(ListFriendRequest) returns (ListFriendResponse) {
+    option (google.api.http) = {
+      get: "/v1/friendships"
+    };
+  }
+
+  /*
+    Get friend requests list of a specific user
+   */
+  rpc ListFriendRequests(ListFriendRequestsRequest) returns (ListFriendRequestsResponse) {
+    option (google.api.http) = {
+      get: "/v1/friendships/pending"
+    };
+  }
+
+  /*
+    Refuse a friend request
+   */
+  rpc DeleteFriendRequest(DeleteFriendRequestRequest) returns (DeleteFriendRequestResponse) {
+    option (google.api.http) = {
+      delete: "/v1/friendships/request"
+    };
+  }
+
+  /*
+    Delete a friend
+   */
+  rpc DeleteFriend(DeleteFriendRequest2) returns (DeleteFriendResponse) {
+    option (google.api.http) = {
+      delete: "/v1/friendships"
+    };
+  }
+}
+
+message AcceptFriendRequestRequest {
+  string user_id = 1;
+}
+
+message AcceptFriendRequestResponse {
+}
+
+message DeleteFriendRequestRequest {
+  string user_id = 1;
+}
+
+message DeleteFriendRequestResponse {
+}
+
+message ListFriendResponse {
+  repeated cheers.type.UserItem items = 1;
+}
+
+message DeleteFriendRequest2 {
+  string user_id = 1;
+  string friendship_id = 2;
+}
+
+message DeleteFriendResponse {
+}
+
+message ListFriendRequest {
+  string user_id = 1;
+}
+
+message ListFriendRequestsRequest {
+  string user_id = 1;
+}
+
+message ListFriendRequestsResponse {
+  repeated cheers.type.UserItem items = 1;
+}
+
+message CreateFriendRequestRequest {
+  string user_id = 1;
+}
+
+message CreateFriendRequestResponse {
+}

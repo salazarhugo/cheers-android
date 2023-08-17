@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package cheers.drink.v1;
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/drink/v1;drink";
+
+service DrinkService {
+  rpc CreateDrink (CreateDrinkRequest) returns (CreateDrinkResponse) {
+    option (google.api.http) = {
+      post: "/v1/drinks"
+      body: "*"
+    };
+  }
+
+  rpc GetDrink (GetDrinkRequest) returns (GetDrinkResponse) {
+    option (google.api.http) = {
+      get: "/v1/drinks/{drink_id}"
+    };
+  }
+
+  rpc UpdateDrink (UpdateDrinkRequest) returns (UpdateDrinkResponse) {
+    option (google.api.http) = {
+      patch: "/v1/drinks/{drink_id}"
+      body: "*"
+    };
+  }
+
+  rpc ListDrink (ListDrinkRequest) returns (ListDrinkResponse) {
+    option (google.api.http) = {
+      get: "/v1/drinks"
+    };
+  }
+
+  rpc DeleteDrink (DeleteDrinkRequest) returns (DeleteDrinkResponse) {
+    option (google.api.http) = {
+      delete: "/v1/drinks/{drink_id}"
+    };
+  }
+}
+
+message CreateDrinkRequest {
+  string name = 1;
+  string icon = 2;
+  string category = 3;
+}
+
+message CreateDrinkResponse {
+  Drink drink = 1;
+}
+
+message GetDrinkRequest {
+  string drink_id = 1;
+}
+
+message GetDrinkResponse {
+  Drink drink = 1;
+}
+
+message ListDrinkRequest {
+}
+
+message DeleteDrinkRequest {
+  string drink_id = 1;
+}
+
+message DeleteDrinkResponse {
+}
+
+message ListDrinkResponse {
+  repeated Drink items = 1;
+}
+
+message Drink {
+  string id = 1;
+  string creator_id = 2;
+  string name = 3;
+  string icon = 4;
+  string category = 5;
+}
+
+message UpdateDrinkRequest {
+  string drink_id = 1;
+  string name = 2;
+  string icon = 3;
+  string category = 4;
+}
+
+message UpdateDrinkResponse {
+}

@@ -1,0 +1,211 @@
+syntax = "proto3";
+
+package cheers.user.v1;
+
+import "cheers/type/user/user.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/user/v1;user";
+
+service UserService {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  };
+
+  rpc GetUserNode (GetUserNodeRequest) returns (GetUserNodeResponse);
+
+  rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}"
+    };
+  };
+
+  rpc UpdateUser (UpdateUserRequest) returns (cheers.type.User) {
+    option (google.api.http) = {
+      patch: "/v1/users"
+      body: "*"
+    };
+  };
+
+  rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty);
+
+  rpc GetUsersIn (GetUsersInRequest) returns (GetUsersInResponse);
+  rpc GetUserItemsIn (GetUserItemsInRequest) returns (GetUserItemsInResponse);
+  rpc SearchUser (SearchUserRequest) returns (SearchUserResponse);
+
+  rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/follow"
+      body: "*"
+    };
+  };
+
+  rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/users/{user_id}/unfollow"
+    };
+  };
+
+  rpc BlockUser (BlockUserRequest) returns (BlockUserResponse);
+  rpc UnblockUser (UnblockUserRequest) returns (UnblockUserResponse);
+
+  rpc ListFollowers (ListFollowersRequest) returns (ListFollowersResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/followers"
+    };
+  };
+
+  rpc ListFollowing (ListFollowingRequest) returns (ListFollowingResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/following"
+    };
+  };
+
+  rpc CheckUsername (CheckUsernameRequest) returns (CheckUsernameResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{username}/check"
+    };
+  };
+
+  rpc ListSuggestions(ListSuggestionsRequest) returns (ListSuggestionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/suggestions"
+    };
+  };
+}
+
+message ListSuggestionsRequest {
+  string user_id = 1;
+}
+
+message ListSuggestionsResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message CheckUsernameRequest {
+  string username = 1;
+}
+
+message CheckUsernameResponse {
+  bool valid = 1;
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string name = 2;
+  string picture = 4;
+  string username = 5;
+}
+
+message CreateUserResponse {
+  cheers.type.User user = 1;
+}
+
+message BlockUserResponse {
+}
+
+message UnblockUserResponse {
+}
+
+message GetUsersInRequest {
+  repeated string user_ids = 1;
+}
+
+message GetUsersInResponse {
+  repeated cheers.type.User users = 1;
+}
+
+message GetUserItemsInRequest {
+  repeated string user_ids = 1;
+}
+
+message GetUserItemsInResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message SearchUserResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message ListFollowersRequest {
+  string user_id = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListFollowingRequest {
+  string user_id = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListFollowersResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message ListFollowingResponse {
+  repeated cheers.type.UserItem users = 1;
+}
+
+message GetUserNodeResponse {
+  cheers.type.User user = 1;
+}
+
+message GetUserResponse {
+  cheers.type.User user = 1;
+  int32 post_count = 2;
+  int32 followers_count = 3;
+  int32 following_count = 4;
+  bool has_followed = 5;
+  cheers.type.StoryState story_state = 6;
+  bool friend = 7;
+  bool requested = 8;
+  bool has_requested_viewer = 9;
+  int32 friends_count = 10;
+}
+
+message BlockUserRequest {
+  string user_id = 1;
+}
+
+message UnblockUserRequest {
+  string user_id = 1;
+}
+
+message UnfollowUserRequest {
+  string user_id = 1;
+}
+
+message FollowUserRequest {
+  string user_id = 1;
+}
+
+message SearchUserRequest {
+  string query = 1;
+}
+
+message GetUserNodeRequest {
+  string user_id = 1;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message UpdateUserRequest {
+  string name = 1;
+  string picture = 2;
+  string bio = 3;
+  string website = 4;
+  string birthday = 5;
+  string phone_number = 6;
+}
+
+message DeleteUserRequest {
+  string user_id = 1;
+}

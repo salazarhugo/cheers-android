@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package cheers.location.v1;
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/location/v1;location";
+
+service LocationService {
+  rpc UpdateLocation (UpdateLocationRequest) returns (UpdateLocationResponse) {
+    option (google.api.http) = {
+      patch: "/v1/locations/{user_id}"
+      body: "*"
+    };
+  }
+  rpc UpdateGhostMode (UpdateGhostModeRequest) returns (UpdateGhostModeResponse) {
+    option (google.api.http) = {
+      patch: "/v1/locations/ghost"
+      body: "*"
+    };
+  }
+  rpc ListFriendLocation (ListFriendLocationRequest) returns (ListFriendLocationResponse) {
+    option (google.api.http) = {
+      get: "/v1/locations/friends"
+    };
+  }
+}
+
+message ListFriendLocationRequest {
+}
+
+message ListFriendLocationResponse {
+  repeated Location items = 1;
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+  string user_id = 3;
+  string name = 4;
+  string username = 5;
+  string picture = 6;
+  bool verified = 7;
+  string location_name = 8;
+  int64 last_updated = 9;
+}
+
+message UpdateGhostModeRequest {
+  bool ghost_mode = 1;
+}
+
+message UpdateGhostModeResponse {
+}
+
+message UpdateLocationRequest {
+  string user_id = 1;
+  // The latitude in degrees. It must be in the range [-90.0, +90.0].
+  double latitude = 2;
+  // The longitude in degrees. It must be in the range [-180.0, +180.0].
+  double longitude = 3;
+}
+
+message UpdateLocationResponse {
+}

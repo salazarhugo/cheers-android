@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/post;postpb";
+
+
+import "cheers/type/privacy/privacy.proto";
+
+message Post {
+  string id = 1;
+  string creator_id = 2;
+  string caption = 3;
+  string address = 4;
+  Privacy privacy = 5;
+  repeated string photos = 6;
+  string location_name = 8;
+  string drink = 9;
+  int64 drunkenness = 10;
+  PostType type = 11;
+  int64 create_time = 12;
+  bool can_comment = 13;
+  bool can_share = 14;
+  PostRatio ratio = 15;
+  // The latitude in degrees. It must be in the range [-90.0, +90.0].
+  double latitude = 16;
+  // The longitude in degrees. It must be in the range [-180.0, +180.0].
+  double longitude = 17;
+  string last_comment_text = 18;
+  string last_comment_username = 19;
+  int64 last_comment_create_time = 20;
+}
+
+enum PostRatio {
+  RATIO_16_9 = 0;
+  RATIO_1_1 = 1;
+  RATIO_4_5 = 2;
+}
+
+enum PostType {
+  TEXT = 0;
+  IMAGE = 1;
+  VIDEO = 2;
+}
