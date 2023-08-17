@@ -7,7 +7,9 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Gamepad
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -15,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.item.SettingItem
 import com.salazar.cheers.core.ui.item.SettingTitle
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.ui.ui.Toolbar
@@ -27,6 +31,7 @@ fun SecurityScreen(
     onUnlink: (String) -> Unit,
     onLink: (String) -> Unit,
     onAddPassword: (Boolean) -> Unit,
+    onPasscodeClick: () -> Unit,
 ) {
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Security") },
@@ -53,6 +58,21 @@ fun SecurityScreen(
             val hasGoogle =
                 true
 //                signInMethods.contains(GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
+
+            val passcodeLockEnabled = true
+            SettingItem(
+                title = "Passcode Lock",
+                icon = Icons.Outlined.Lock,
+                onClick = onPasscodeClick,
+                trailingContent = {
+                    val text = if (passcodeLockEnabled) "On" else "Off"
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
 
             SignInMethodItem(
                 method = "Password",

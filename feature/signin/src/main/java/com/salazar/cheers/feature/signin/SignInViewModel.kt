@@ -54,22 +54,6 @@ class SignInViewModel @Inject constructor(
         checkIfAlreadySignedIn()
     }
 
-    fun onGoogleSignInResult(task: String?) {
-        if (task == null) {
-            updateIsLoading(false)
-            return
-        }
-
-        viewModelScope.launch {
-            val result = authRepository.signInWithGoogle(task)
-            when (result) {
-                is Resource.Error -> updateErrorMessage(result.message)
-                is Resource.Loading -> updateIsLoading(result.isLoading)
-                is Resource.Success -> viewModelState.update { it.copy(isSignedIn = true) }
-            }
-        }
-    }
-
     private fun checkIfAlreadySignedIn() {
         viewModelScope.launch {
             val signedIn = signInUseCases.checkAlreadySignedInUseCase()
@@ -161,6 +145,10 @@ class SignInViewModel @Inject constructor(
     }
 
     fun signInWithOneTap(idToken: String?) {
+        if (idToken == null)
+            return
+
+        updateIsLoading(true)
         viewModelScope.launch {
             val result = signInUseCases.signInWithOneTapUseCase(idToken = idToken)
             when (result) {
@@ -175,6 +163,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
             }
+            updateIsLoading(false)
         }
     }
 

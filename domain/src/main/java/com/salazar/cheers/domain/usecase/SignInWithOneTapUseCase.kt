@@ -19,7 +19,7 @@ class SignInWithOneTapUseCase @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
 ) {
     suspend operator fun invoke(
-        idToken: String?,
+        idToken: String,
     ): Resource<Boolean> = withContext(ioDispatcher) {
         return@withContext try {
             val authResult = authRepository.signInWithOneTap(idToken = idToken)

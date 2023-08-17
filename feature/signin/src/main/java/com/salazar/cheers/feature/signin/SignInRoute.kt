@@ -36,7 +36,7 @@ fun SignInRoute(
             contract = AuthResultContract(),
             onResult = {
                 val idToken = getIdToken(it)
-                viewModel.onGoogleSignInResult(idToken)
+                viewModel.signInWithOneTap(idToken)
             },
         )
 

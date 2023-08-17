@@ -160,12 +160,11 @@ fun SignInScreen(
                     Text(text = text)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                GoogleButton {
-                    signInWithGoogle()
+                AnimatedVisibility(visible = !uiState.isLoading) {
+                    GoogleButton(onClicked = signInWithGoogle)
                 }
             }
             Footer(
-//                modifier = Modifier.weight(1f),
                 navigateToSignUp = navigateToSignUp,
             )
         }

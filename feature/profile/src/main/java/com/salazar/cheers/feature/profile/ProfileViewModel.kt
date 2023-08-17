@@ -116,7 +116,7 @@ class ProfileViewModel @Inject constructor(
     private fun refreshUser() {
         viewModelState.update { it.copy(isLoading = true) }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = userRepository.fetchCurrentUser()
             viewModelState.update { it.copy(isLoading = false) }
         }

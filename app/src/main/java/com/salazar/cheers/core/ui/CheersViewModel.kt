@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -82,7 +83,7 @@ class CheersViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            initWebSocket(auth.currentUser!!)
+//            initWebSocket(auth.currentUser!!)
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -104,7 +105,7 @@ class CheersViewModel @Inject constructor(
 
     private suspend fun initWebSocket(user: FirebaseUser) = withContext(Dispatchers.IO) {
         val task: Task<GetTokenResult> = user.getIdToken(false)
-        val tokenResult = Tasks.await(task)
+        val tokenResult = task.await()
         val idToken = tokenResult.token ?: return@withContext
 
         val request = Request.Builder()

@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":feature:settings"))
     implementation(project(":feature:create_post"))
     implementation(project(":feature:create_note"))
+    implementation(project(":feature:passcode"))
 
     implementation(project(":domain"))
 

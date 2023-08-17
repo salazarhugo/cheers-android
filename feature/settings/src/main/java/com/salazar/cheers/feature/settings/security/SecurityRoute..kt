@@ -6,15 +6,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
-/**
- * Stateful composable that displays the Navigation route for the Security screen.
- *
- * @param securityViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun SecurityRoute(
     securityViewModel: SecurityViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
+    navigateBack: () -> Unit,
+    navigateToPassword: (Boolean) -> Unit,
+    navigateToPasscode: () -> Unit,
 ) {
     val uiState by securityViewModel.uiState.collectAsStateWithLifecycle()
 //    val authResultLauncher =
@@ -23,17 +20,15 @@ fun SecurityRoute(
 //            securityViewModel::onResult
 //        )
 
-//    if (uiState.firebaseUser == null)
-//        com.salazar.cheers.core.share.ui.LoadingScreen()
-//    else
-        SecurityScreen(
-            uiState = uiState,
-            onBackPressed = { navActions.navigateBack() },
-            onUnlink = {},
-            onAddPassword = { navActions.navigateToPassword(it) },
-            onLink = {
+    SecurityScreen(
+        uiState = uiState,
+        onBackPressed = navigateBack,
+        onUnlink = {},
+        onAddPassword = navigateToPassword,
+        onLink = {
 //                if (it == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
 //                    authResultLauncher.launch(1)
-            },
-        )
+        },
+        onPasscodeClick = navigateToPasscode,
+    )
 }

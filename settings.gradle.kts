@@ -42,6 +42,7 @@ include(":core:protobuf")
 include(":core:ui")
 include(":core:util")
 include(":core:model")
+include(":core:shared")
 
 // Data
 include(":data:user")
@@ -54,6 +55,7 @@ include(":data:party")
 include(":data:friendship")
 include(":data:billing")
 include(":data:account")
+include(":data:drink")
 
 // Domain
 include(":domain")
@@ -68,12 +70,11 @@ include(":feature:signin")
 include(":feature:notifications")
 include(":feature:edit_profile")
 include(":feature:settings")
-include(":core:shared")
+include(":feature:create_post")
+include(":feature:create_note")
+include(":feature:passcode")
 
 project(":common").projectDir = File(settingsDir, "../common")
 project(":ads").projectDir = File(settingsDir, "../ads")
 project(":auth").projectDir = File(settingsDir, "../auth")
 
-include(":feature:create_post")
-include(":data:drink")
-include(":feature:create_note")

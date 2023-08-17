@@ -402,8 +402,8 @@ class UserRepository @Inject constructor(
         return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
     }
 
-    suspend fun fetchCurrentUser() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    suspend fun fetchCurrentUser() = withContext(Dispatchers.IO) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@withContext
         fetchUser(uid)
     }
 

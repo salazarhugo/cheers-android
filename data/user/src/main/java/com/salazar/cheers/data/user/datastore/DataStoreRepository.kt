@@ -10,6 +10,7 @@ import com.salazar.cheers.Settings
 import com.salazar.cheers.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
 
@@ -31,6 +32,14 @@ class DataStoreRepository @Inject constructor(
                 throw exception
             }
         }
+
+    fun getPasscodeEnabled(): Flow<Boolean> {
+        return userPreferencesFlow.map { true }
+    }
+
+    suspend fun getPasscode(): Flow<String> {
+        return userPreferencesFlow.map { "123456" }
+    }
 
     suspend fun updateTheme(theme: Theme) {
         settingsStore.updateData { currentPreferences ->

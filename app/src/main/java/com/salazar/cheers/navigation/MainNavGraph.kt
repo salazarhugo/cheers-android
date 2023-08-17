@@ -58,7 +58,7 @@ import com.salazar.cheers.feature.profile.navigation.otherProfileScreen
 import com.salazar.cheers.feature.profile.navigation.profileScreen
 import com.salazar.cheers.feature.search.navigation.navigateToSearch
 import com.salazar.cheers.feature.search.navigation.searchScreen
-import com.salazar.cheers.feature.settings.navigation.navigateToSettings
+import com.salazar.cheers.feature.settings.navigateToSettings
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
 import com.salazar.cheers.map.ui.MapPostHistoryRoute

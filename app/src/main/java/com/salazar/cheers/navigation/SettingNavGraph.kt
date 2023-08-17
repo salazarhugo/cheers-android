@@ -2,25 +2,19 @@ package com.salazar.cheers.navigation
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.salazar.cheers.core.ui.ui.CheersDestinations
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.core.ui.ui.SettingDestinations
-import com.salazar.cheers.feature.settings.SettingsRoute
-import com.salazar.cheers.feature.settings.SettingsViewModel
 import com.salazar.cheers.feature.settings.language.LanguageRoute
-import com.salazar.cheers.feature.settings.navigation.settingsScreen
 import com.salazar.cheers.feature.settings.notifications.NotificationsRoute
-import com.salazar.cheers.feature.settings.password.CreatePasswordRoute
-import com.salazar.cheers.feature.settings.payments.PaymentHistoryRoute
-import com.salazar.cheers.feature.settings.payments.RechargeRoute
-import com.salazar.cheers.feature.settings.security.SecurityRoute
+import com.salazar.cheers.feature.settings.security.navigateToSecurity
+import com.salazar.cheers.feature.settings.security.securityScreen
+import com.salazar.cheers.feature.settings.settingsScreen
 import com.salazar.cheers.feature.settings.theme.ThemeRoute
-import com.salazar.cheers.feature.signin.navigateToSignIn
 import com.salazar.cheers.ui.CheersAppState
+import com.softimpact.feature.passcode.settings.navigateToPasscodeSettings
+import com.softimpact.feature.passcode.settings.passcodeSettingsScreen
 
 fun NavGraphBuilder.settingNavGraph(
     appState: CheersAppState,
@@ -33,26 +27,29 @@ fun NavGraphBuilder.settingNavGraph(
         startDestination = SettingDestinations.SETTINGS_ROUTE,
     ) {
 
-        composable(
-            route = "${SettingDestinations.PASSWORD_ROUTE}/{hasPassword}",
-            arguments = listOf(
-                navArgument("hasPassword") {
-                    type = NavType.BoolType
-                }
-            ),
-        ) {
-            com.salazar.cheers.feature.settings.password.CreatePasswordRoute(
-                navActions = navActions,
-            )
-        }
+        settingsScreen(
+            navigateBack = navController::popBackStack,
+            navigateToAddPaymentMethod = {},
+            navigateToLanguage = {},
+            navigateToNotifications = {},
+            navigateToTheme = {},
+            navigateToRecharge = {},
+            navigateToSecurity = navController::navigateToSecurity,
+            navigateToPaymentHistory = {},
+            navigateToSignIn = {},
+            navigateToDeleteAccount = {},
+        )
 
-        composable(
-            route = SettingDestinations.SECURITY_ROUTE,
-        ) {
-            SecurityRoute(
-                navActions = navActions,
-            )
-        }
+        passcodeSettingsScreen(
+            navigateBack = navController::popBackStack,
+            navigateToSetPasscode = {},
+        )
+
+        securityScreen(
+            navigateBack = navController::popBackStack,
+            navigateToPassword = {},
+            navigateToPasscode = navController::navigateToPasscodeSettings,
+        )
 
         composable(
             route = SettingDestinations.PAYMENT_HISTORY_ROUTE,
@@ -106,9 +103,5 @@ fun NavGraphBuilder.settingNavGraph(
                 navActions = navActions,
             )
         }
-
-        settingsScreen(
-            navigateToSignIn = navController::navigateToSignIn,
-        )
     }
 }

@@ -20,6 +20,7 @@ fun SettingsRoute(
     navigateToPaymentHistory: () -> Unit,
     navigateToSignIn: () -> Unit,
     navigateToDeleteAccount: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -30,9 +31,7 @@ fun SettingsRoute(
     }
     SettingsScreen(
         uiState = uiState,
-        onBackPressed = {
-//            navActions.navigateToProfile()
-        },
+        onBackPressed = navigateBack,
         onSignOut = {
             settingsViewModel.onSignOut {
                 navigateToSignIn()
