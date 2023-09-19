@@ -16,7 +16,7 @@ fun NavController.navigateToPasscodeSettings(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.passcodeSettingsScreen(
     navigateBack: () -> Unit,
-    navigateToSetPasscode: () -> Unit,
+    navigateToChangePasscode: () -> Unit,
 ) {
     composable(
         route = passcodeSettingsNavigationRoute,
@@ -24,9 +24,9 @@ fun NavGraphBuilder.passcodeSettingsScreen(
             navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
         ),
     ) {
-        PasscodeLockSettingRoute(
+        PasscodeSettingRoute(
             navigateBack = navigateBack,
-            navigateToSetPasscode = navigateToSetPasscode,
+            navigateToChangePasscode = navigateToChangePasscode,
         )
     }
 }

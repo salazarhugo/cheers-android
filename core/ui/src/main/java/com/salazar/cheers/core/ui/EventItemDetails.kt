@@ -17,13 +17,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.salazar.cheers.core.ui.theme.StrongRed
 import com.salazar.cheers.core.util.dateTimeFormatter
 
 @Composable
 fun EventItemDetails(
     name: String,
     hostName: String,
-    price: Int,
+    price: Int?,
     startTimeSeconds: Long,
 ) {
     Row(
@@ -52,9 +53,10 @@ fun EventItemDetails(
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
                     color = MaterialTheme.colorScheme.error,
                 )
-                PriceTag(
-                    price = price,
-                )
+                if (price != null)
+                    PriceTag(
+                        price = price,
+                    )
             }
         }
         Icon(Icons.Outlined.Star, null)
@@ -75,7 +77,7 @@ fun PriceTag(
         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
         modifier = Modifier
             .clip(RoundedCornerShape(22.dp))
-            .background(com.salazar.cheers.core.share.ui.StrongRed)
+            .background(StrongRed)
             .padding(horizontal = 8.dp),
         color = Color.White,
     )

@@ -8,11 +8,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-/**
- * Stateful composable that displays the Navigation route for the Interests screen.
- *
- * @param homeViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun HomeRoute(
     homeViewModel: HomeViewModel = hiltViewModel(),
@@ -21,6 +16,7 @@ fun HomeRoute(
     navigateToNote: (String) -> Unit,
     navigateToCreatePost: () -> Unit,
     navigateToCreateNote: () -> Unit,
+    navigateToParties: () -> Unit,
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
@@ -60,6 +56,7 @@ fun HomeRoute(
                 HomeUIAction.OnCreateNoteClick -> navigateToCreateNote()
                 is HomeUIAction.OnNoteClick -> navigateToNote(action.userID)
                 is HomeUIAction.OnAddFriendClick -> homeViewModel.onAddFriendClick(action.userID)
+                HomeUIAction.OnPartiesClick -> navigateToParties()
             }
         }
     )

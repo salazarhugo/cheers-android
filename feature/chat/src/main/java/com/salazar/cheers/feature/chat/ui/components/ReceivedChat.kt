@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.share.ui.BlueCheers
+import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.feature.chat.domain.models.MessageType
 
 @Preview

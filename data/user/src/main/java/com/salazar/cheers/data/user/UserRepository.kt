@@ -16,8 +16,8 @@ import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.user.workers.UploadProfilePicture
+import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.common.util.Resource
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -215,7 +215,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun updateLocalUserItem(userItem: com.salazar.cheers.core.model.UserItem) {
+    suspend fun updateLocalUserItem(userItem: UserItem) {
         userItemDao.update(userItem)
     }
 
@@ -472,6 +472,7 @@ class UserRepository @Inject constructor(
                 .build()
         workManager.enqueue(uploadWorkRequest)
     }
+
     suspend fun saveUserPicture(
         picture: String,
     ) {

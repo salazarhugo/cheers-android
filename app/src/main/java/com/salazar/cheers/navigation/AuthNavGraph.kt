@@ -12,18 +12,20 @@ import com.salazar.cheers.core.ui.ui.AuthDestinations
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.feature.home.navigation.navigateToHome
+import com.salazar.cheers.feature.parties.navigateToParties
 import com.salazar.cheers.feature.signin.signInNavigationRoute
 import com.salazar.cheers.feature.signin.signInScreen
 
 fun NavGraphBuilder.authNavGraph(
     navActions: CheersNavigationActions,
     navController: NavController,
+    startDestination: String,
 ) {
     val uri = "https://cheers-a275e.web.app"
 
     navigation(
         route = CheersDestinations.AUTH_ROUTE,
-        startDestination = signInNavigationRoute,
+        startDestination = startDestination,
     ) {
         composable(
             route = "${AuthDestinations.SIGN_UP_ROUTE}?email={email}&displayName={displayName}",
@@ -48,7 +50,7 @@ fun NavGraphBuilder.authNavGraph(
 
         signInScreen(
             navigateToHome = {
-                navController.navigateToHome()
+                navController.navigateToParties()
             },
             navigateToSignUp = {
                 navActions.navigateToSignUp()

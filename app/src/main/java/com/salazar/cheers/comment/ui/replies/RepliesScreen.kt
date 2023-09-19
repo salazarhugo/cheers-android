@@ -56,11 +56,12 @@ import com.salazar.cheers.R
 import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.comment.ui.CommentItem
 import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.compose.DividerM3
+import androidx.compose.material3.Divider
 
 @Composable
 fun RepliesScreen(
@@ -129,7 +130,7 @@ fun Replies(
                     onRepliesUIAction(RepliesUIAction.OnCommentLongClick(parentComment.id))
                 },
             )
-            DividerM3()
+            Divider()
         }
         items(comments, key = { it.id }) { comment ->
             CommentItem(
@@ -239,7 +240,7 @@ fun CommentBottomBar(
     onRepliesUIAction: (RepliesUIAction) -> Unit,
 ) {
     val color =
-        if (isSystemInDarkTheme()) com.salazar.cheers.core.share.ui.GreySheet else MaterialTheme.colorScheme.background
+        if (isSystemInDarkTheme()) GreySheet else MaterialTheme.colorScheme.background
     val focusRequester = remember { FocusRequester() }
     val input = uiState.input
 
@@ -250,7 +251,7 @@ fun CommentBottomBar(
             .navigationBarsPadding()
             .background(color = color)
     ) {
-        DividerM3()
+        Divider()
         Row(
             modifier = Modifier
                 .fillMaxWidth()

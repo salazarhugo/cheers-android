@@ -48,6 +48,7 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.share.ui.Username
 import com.salazar.cheers.core.ui.CheersSearchBar
+import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.feature.chat.R
@@ -174,7 +175,7 @@ fun UserCard(
     onUserCheckedChange: (UserItem) -> Unit,
 ) {
     val color =
-        if (selected) com.salazar.cheers.core.share.ui.BlueCheers else MaterialTheme.colorScheme.onBackground
+        if (selected) BlueCheers else MaterialTheme.colorScheme.onBackground
 
     Row(
         modifier = Modifier

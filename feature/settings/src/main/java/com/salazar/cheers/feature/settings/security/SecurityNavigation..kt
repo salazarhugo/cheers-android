@@ -18,7 +18,8 @@ fun NavController.navigateToSecurity(
 fun NavGraphBuilder.securityScreen(
     navigateBack: () -> Unit,
     navigateToPassword: (Boolean) -> Unit,
-    navigateToPasscode: () -> Unit,
+    navigateToPasscodeSettings: () -> Unit,
+    navigateToCreatePasscode: () -> Unit,
 ) {
     composable(
         route = securityNavigationRoute,
@@ -29,7 +30,8 @@ fun NavGraphBuilder.securityScreen(
         SecurityRoute(
             navigateBack = navigateBack,
             navigateToPassword = navigateToPassword,
-            navigateToPasscode = navigateToPasscode,
+            navigateToPasscodeSettings = navigateToPasscodeSettings,
+            navigateToCreatePasscode = navigateToCreatePasscode,
         )
     }
 }

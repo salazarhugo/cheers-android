@@ -17,7 +17,7 @@ data class Party(
     val createTime: Long = 0,
     val hostId: String = "",
     val hostName: String = "",
-    val price: Int = 0,
+    val price: Int? = null,
     val participants: List<String> = emptyList(),
     val showGuestList: Boolean = false,
     val showOnMap: Boolean = false,

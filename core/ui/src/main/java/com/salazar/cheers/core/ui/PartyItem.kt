@@ -32,12 +32,12 @@ import com.salazar.cheers.data.party.Party
 fun PartyItem(
     modifier: Modifier = Modifier,
     party: Party,
-    onEventClicked: (String) -> Unit,
+    onPartyClicked: (String) -> Unit,
     onMoreClick: (String) -> Unit,
 ) {
     Column(
         modifier = modifier
-            .clickable { onEventClicked(party.id) },
+            .clickable { onPartyClicked(party.id) },
     ) {
         Box(contentAlignment = Alignment.TopEnd) {
             AsyncImage(
@@ -67,7 +67,7 @@ fun PartyItem(
             price = party.price,
             startTimeSeconds = party.startDate,
         )
-        EventMutualFriends(
+        PartyMutualFriends(
             profilePictureUrls = party.mutualProfilePictureUrls,
             usernames = party.mutualUsernames,
             mutualCount = party.mutualCount,
@@ -76,7 +76,7 @@ fun PartyItem(
 }
 
 @Composable
-fun EventMutualFriends(
+fun PartyMutualFriends(
     profilePictureUrls: List<String>,
     usernames: List<String>,
     mutualCount: Int,

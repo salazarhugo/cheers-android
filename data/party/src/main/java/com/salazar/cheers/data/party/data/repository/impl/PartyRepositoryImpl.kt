@@ -33,11 +33,10 @@ class PartyRepositoryImpl @Inject constructor(
             .setPageToken(page.toString())
             .build()
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
         val response = service.feedParty(request)
 
         val parties = response.itemsList.map {
-            it.toParty(uid)
+            it.toParty()
         }
 
         return Result.success(parties)
@@ -75,8 +74,6 @@ class PartyRepositoryImpl @Inject constructor(
         page: Int,
         pageSize: Int
     ): Result<List<Party>> {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-
         val request = FeedPartyRequest.newBuilder()
             .setPageSize(pageSize)
             .setPageToken("")
@@ -85,8 +82,9 @@ class PartyRepositoryImpl @Inject constructor(
         return try {
             val response = service.feedParty(request)
             val parties = response.itemsList.map {
-                it.toParty(uid)
+                it.toParty()
             }
+            partyDao.clearAll()
             partyDao.insertAll(parties)
 
             Result.success(parties)
@@ -101,8 +99,6 @@ class PartyRepositoryImpl @Inject constructor(
         pageSize: Int,
         userId: String,
     ): Flow<List<Party>> = flow {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-
         val request = ListPartyRequest.newBuilder()
             .setPage(page)
             .setPageSize(pageSize)
@@ -115,7 +111,7 @@ class PartyRepositoryImpl @Inject constructor(
         try {
             val response = service.listParty(request)
             val parties = response.itemsList.map {
-                it.toParty(uid)
+                it.toParty()
             }
             partyDao.insertAll(parties)
         } catch (e: Exception) {

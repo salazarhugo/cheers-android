@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Celebration
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -73,13 +74,26 @@ fun ProfileScreen(
     onPostLike: (post: Post) -> Unit,
     onStatClicked: (statName: String, username: String, verified: Boolean) -> Unit,
     navigateToProfileMoreSheet: (String) -> Unit,
+    navigateToSignIn: () -> Unit,
     onPostMoreClicked: (String, String) -> Unit,
     onWebsiteClicked: (String) -> Unit,
     onStoryClick: (String) -> Unit = {},
     onCommentClick: (String) -> Unit,
 ) {
     when (uiState) {
-        is ProfileUiState.Loading -> LoadingScreen()
+        is ProfileUiState.NoAccount -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("Not connected")
+                Button(
+                    onClick = navigateToSignIn,
+                ) {
+                    Text("Sign In")
+                }
+            }
+        }
         is ProfileUiState.HasUser -> Profile(
             uiState = uiState,
             onEditProfileClicked = onEditProfileClicked,
@@ -200,7 +214,7 @@ fun Profile(
                                 1 -> uiState.parties?.forEach {
                                     PartyItem(
                                         party = it,
-                                        onEventClicked = {},
+                                        onPartyClicked = {},
                                         onMoreClick = {},
                                     )
                                 }
@@ -251,7 +265,7 @@ fun PartyList(
             items(parties, key = { it.id }) { event ->
                 PartyItem(
                     party = event,
-                    onEventClicked = {},
+                    onPartyClicked = {},
                     onMoreClick = {},
                 )
             }
@@ -392,7 +406,7 @@ fun ProfileStats(
 //    LazyColumn(Modifier.height(800.dp)) {
 //        items(tweets) { tweet ->
 //            Tweet(tweet, onLikeClicked = onLikeClicked)
-//            DividerM3()
+//            Divider()
 //        }
 //    }
 //}

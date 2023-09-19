@@ -9,6 +9,7 @@ import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.domain.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,7 @@ class OtherProfileViewModel @Inject constructor(
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
     private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
     private val acceptFriendRequestUseCase: AcceptFriendRequestUseCase,
+    private val listPostUseCase: ListPostUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = false))
@@ -167,8 +169,8 @@ class OtherProfileViewModel @Inject constructor(
     }
 
     private fun refreshUserPosts() {
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.listPost(userIdOrUsername = username).collect {
+        viewModelScope.launch {
+            listPostUseCase(username).collect {
                 updatePosts(it)
             }
         }

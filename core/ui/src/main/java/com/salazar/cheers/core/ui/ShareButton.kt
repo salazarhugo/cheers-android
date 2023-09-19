@@ -13,7 +13,7 @@ import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 fun ShareButton(
     modifier: Modifier = Modifier,
     text: String,
-    isLoading: Boolean,
+    isLoading: Boolean = false,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {

@@ -42,6 +42,7 @@ import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListen
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.Permission
 
 @Composable
 fun ChooseOnMapScreen(
@@ -66,7 +67,7 @@ fun ChooseOnMapScreen(
             }
         }
     ) {
-        com.salazar.cheers.core.share.ui.Permission(Manifest.permission.ACCESS_COARSE_LOCATION) {
+        Permission(Manifest.permission.ACCESS_COARSE_LOCATION) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.padding(bottom = it.calculateBottomPadding())

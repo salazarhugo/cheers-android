@@ -5,6 +5,10 @@ import cheers.friendship.v1.CreateFriendRequestRequest
 import cheers.friendship.v1.DeleteFriendRequest2
 import cheers.friendship.v1.DeleteFriendRequestRequest
 import cheers.friendship.v1.FriendshipServiceGrpcKt
+import cheers.friendship.v1.ListFriendRequestsRequest
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.shared.data.mapper.toUserItem
+import com.salazar.common.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -40,37 +44,30 @@ class FriendshipRepositoryImpl @Inject constructor(
         return friendRequestDao.listFriendRequests()
     }
 
-//    override suspend fun fetchFriendRequest(): Flow<Resource<List<com.salazar.cheers.core.model.UserItem>>> =
-//        flow {
-//            emit(Resource.Loading(true))
-//            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@flow
-//            val request = ListFriendRequestsRequest.newBuilder()
-//                .setUserId(uid)
-//                .build()
-//
-//            val remoteFriendRequests = try {
-//                val response = service.listFriendRequests(request = request)
-//                val users = response.itemsList.map {
-//                    it.toUserItem()
-//                }
+    override suspend fun fetchFriendRequest(userId: String): Result<List<UserItem>> {
+        val request = ListFriendRequestsRequest.newBuilder()
+            .setUserId(userId)
+            .build()
+
+        val remoteFriendRequests = try {
+            val response = service.listFriendRequests(request = request)
+            val users = response.itemsList.map {
+                it.toUserItem()
+            }
 //                userItemDao.insertAll(users)
-//                friendRequestDao.insertFriendRequests(
-//                    friendRequests = response.itemsList.map {
-//                        FriendRequest(id = it.id)
-//                    }
-//                )
-//                users
-//            } catch (e: Exception) {
-//                emit(Resource.Error(e.localizedMessage ?: "Couldn't refresh friend requests"))
-//                null
-//            }
-//
-//            remoteFriendRequests?.let {
-//                emit(Resource.Success(it))
-//            }
-//
-//            emit(Resource.Loading(false))
-//        }
+            friendRequestDao.insertFriendRequests(
+                friendRequests = response.itemsList.map {
+                    FriendRequest(id = it.id)
+                }
+            )
+            users
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Result.failure(e)
+        }
+
+        return Result.success(remoteFriendRequests)
+    }
 
     override suspend fun acceptFriendRequest(userId: String): Result<Unit> {
         val request = AcceptFriendRequestRequest.newBuilder()

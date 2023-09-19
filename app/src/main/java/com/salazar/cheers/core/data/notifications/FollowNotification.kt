@@ -4,7 +4,7 @@ import android.app.Service
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import com.salazar.cheers.R
-import com.salazar.cheers.core.share.ui.Purple200
+import com.salazar.cheers.core.ui.theme.Purple200
 
 
 fun Service.defaultNotification(
@@ -14,7 +14,7 @@ fun Service.defaultNotification(
     return NotificationCompat.Builder(this, getString(R.string.default_notification_channel_id))
         .setSmallIcon(R.drawable.ic_cheers_logo)
         .setContentTitle(title)
-        .setColor(com.salazar.cheers.core.share.ui.Purple200.toArgb())
+        .setColor(Purple200.toArgb())
         .setGroup(getString(R.string.general_group_id))
         .setContentText(body)
         .setChannelId(getString(R.string.default_notification_channel_id))
@@ -29,7 +29,7 @@ fun Service.chatNotification(
     return NotificationCompat.Builder(this, getString(R.string.chat_notification_channel_id))
         .setSmallIcon(R.drawable.ic_cheers_logo)
         .setContentTitle(title)
-        .setColor(com.salazar.cheers.core.share.ui.Purple200.toArgb())
+        .setColor(Purple200.toArgb())
         .setGroup(getString(R.string.general_group_id))
         .setContentText(body)
         .setVibrate(longArrayOf(1000))
@@ -44,7 +44,7 @@ fun Service.newPostNotification(
     return NotificationCompat.Builder(this, getString(R.string.new_post_notification_channel_id))
         .setSmallIcon(R.drawable.ic_cheers_logo)
         .setContentTitle(title)
-        .setColor(com.salazar.cheers.core.share.ui.Purple200.toArgb())
+        .setColor(Purple200.toArgb())
         .setGroup(getString(R.string.general_group_id))
         .setContentText(body)
         .setVibrate(longArrayOf(1000))
@@ -63,7 +63,7 @@ fun Service.newFollowerNotification(
     )
         .setSmallIcon(R.drawable.ic_cheers_logo)
         .setContentTitle(title)
-        .setColor(com.salazar.cheers.core.share.ui.Purple200.toArgb())
+        .setColor(Purple200.toArgb())
         .setVibrate(longArrayOf(1000))
         .setGroup(getString(R.string.general_group_id))
         .setContentText(body)

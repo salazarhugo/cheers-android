@@ -10,6 +10,7 @@ object CheersDestinations {
     const val AUTH_ROUTE = "auth"
     const val MAIN_ROUTE = "main"
     const val SETTING_ROUTE = "setting"
+    const val PASSCODE_ROUTE = "passcode"
 }
 
 /**
@@ -18,7 +19,6 @@ object CheersDestinations {
 object MainDestinations {
     const val ROOM_DETAILS = "roomDetails"
     const val MAP_POST_HISTORY_ROUTE = "posts/history"
-    const val EVENTS_ROUTE = "events"
     const val DIALOG_DELETE_POST = "dialogDeletePost"
     const val DIALOG_DELETE_STORY = "dialogDeleteStory"
     const val EDIT_EVENT_ROUTE = "event/edit"
@@ -28,7 +28,6 @@ object MainDestinations {
     const val NEW_CHAT_ROUTE = "newChat"
     const val TICKETING_ROUTE = "ticketing"
     const val TICKETS_ROUTE = "tickets"
-    const val TICKET_DETAILS_ROUTE = "ticket"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
     const val OTHER_PROFILE_STATS_ROUTE = "otherProfileStats"
@@ -39,13 +38,10 @@ object MainDestinations {
     const val ACCOUNT_DELETE = "deleteAccount"
     const val CAMERA_ROUTE = "camera"
     const val CHAT_CAMERA_ROUTE = "chatCamera"
-    const val OTHER_PROFILE_ROUTE = "otherProfile"
-    const val ACTIVITY_ROUTE = "activity"
     const val LIKES_ROUTE = "likes"
     const val STORY_STATS_ROUTE = "storyStats"
     const val CHAT_ROUTE = "chat"
     const val POST_DETAIL_ROUTE = "postDetail"
-    const val EVENT_DETAIL_ROUTE = "eventDetail"
     const val GUEST_LIST_ROUTE = "guestList"
     const val ADD_EVENT_SHEET = "addEventSheet"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
@@ -57,7 +53,6 @@ object MainDestinations {
     const val DRINKING_STATS = "drinkingStats"
     const val NFC_ROUTE = "nfc"
     const val SHARE_ROUTE = "share"
-    const val FRIEND_REQUESTS = "friendRequests"
     const val MAP_SETTINGS_ROUTE = "mapSettings"
     const val MANAGE_FRIENDSHIP_SHEET = "manageFriendship"
     const val NOTE_SHEET = "note"
@@ -79,7 +74,6 @@ object AuthDestinations {
  * Destinations used in [Settings].
  */
 object SettingDestinations {
-    const val SETTINGS_ROUTE = "settings"
     const val THEME_ROUTE = "theme"
     const val NOTIFICATIONS_ROUTE = "notifications"
     const val LANGUAGE_ROUTE = "language"
@@ -116,30 +110,6 @@ class CheersNavigationActions(
 
     val navigateToManageFriendship: (String) -> Unit = { friendId ->
         navController.navigate("${MainDestinations.MANAGE_FRIENDSHIP_SHEET}/$friendId") {
-            launchSingleTop = true
-        }
-    }
-
-    val navigateToMapSettings: () -> Unit = {
-        navController.navigate(MainDestinations.MAP_SETTINGS_ROUTE) {
-            launchSingleTop = true
-        }
-    }
-
-    val navigateToFriendRequests: () -> Unit = {
-        navController.navigate(MainDestinations.FRIEND_REQUESTS) {
-            launchSingleTop = true
-        }
-    }
-
-    val navigateToShare: (String) -> Unit = { partyId ->
-        navController.navigate("${MainDestinations.SHARE_ROUTE}/${partyId}") {
-            launchSingleTop = true
-        }
-    }
-
-    val navigateToTicketDetails: (String) -> Unit = { ticketId ->
-        navController.navigate("${MainDestinations.TICKET_DETAILS_ROUTE}/${ticketId}") {
             launchSingleTop = true
         }
     }
@@ -182,12 +152,6 @@ class CheersNavigationActions(
 
     val navigateToRoomDetails: (String) -> Unit = { roomId ->
         navController.navigate("${MainDestinations.ROOM_DETAILS}/$roomId") {
-            launchSingleTop = true
-        }
-    }
-
-    val navigateToEvents: () -> Unit = {
-        navController.navigate(route = MainDestinations.EVENTS_ROUTE) {
             launchSingleTop = true
         }
     }
@@ -284,13 +248,6 @@ class CheersNavigationActions(
         }
     }
 
-    val navigateToPhone: () -> Unit = {
-        navController.navigate(AuthDestinations.PHONE_ROUTE) {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
     val navigateToSignIn: () -> Unit = {
         navController.navigate(AuthDestinations.SIGN_IN_ROUTE) {
             val a = navController.popBackStack(route = AuthDestinations.SIGN_IN_ROUTE, inclusive = true)
@@ -373,13 +330,6 @@ class CheersNavigationActions(
         }
     }
 
-    val navigateToDeleteAccount: () -> Unit = {
-        navController.navigate(MainDestinations.ACCOUNT_DELETE) {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
     val navigateToDeleteCommentDialog: (commentID: String) -> Unit = { commentID ->
         navController.navigate("${MainDestinations.COMMENT_DELETE}/$commentID") {
             launchSingleTop = true
@@ -439,22 +389,8 @@ class CheersNavigationActions(
         }
     }
 
-    val navigateToEventDetail: (eventId: String) -> Unit = { eventId ->
-        navController.navigate("${MainDestinations.EVENT_DETAIL_ROUTE}/$eventId") {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
     val navigateToLikes: (postId: String) -> Unit = { postId ->
         navController.navigate("${MainDestinations.LIKES_ROUTE}/$postId") {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
-    val navigateToSettings: () -> Unit = {
-        navController.navigate(CheersDestinations.SETTING_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
@@ -489,13 +425,6 @@ class CheersNavigationActions(
                 restoreState = true
             }
         }
-
-    val navigateToCamera: () -> Unit = {
-        navController.navigate(MainDestinations.CAMERA_ROUTE) {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
 
     val navigateToChatCamera: (String) -> Unit = { roomId ->
         navController.navigate("${MainDestinations.CHAT_CAMERA_ROUTE}/$roomId") {

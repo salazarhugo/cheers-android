@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalPermissionsApi::class)
 
-package com.salazar.cheers.core.share.ui
+package com.salazar.cheers.core.ui.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button

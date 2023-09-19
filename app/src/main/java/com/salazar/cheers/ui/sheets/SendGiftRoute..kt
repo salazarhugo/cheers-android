@@ -20,8 +20,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.salazar.cheers.R
+import com.salazar.cheers.core.ui.theme.Green
+import com.salazar.cheers.core.ui.theme.GreenSurface
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
-import com.salazar.cheers.ui.compose.DividerM3
+import androidx.compose.material3.Divider
 import kotlinx.coroutines.delay
 
 /**
@@ -117,7 +119,7 @@ fun ConfirmTransactionScreen(
         modifier = Modifier.padding(16.dp),
         color = MaterialTheme.colorScheme.onBackground,
     )
-    DividerM3()
+    Divider()
     Button(
         onClick = onConfirm,
         modifier = Modifier
@@ -211,12 +213,12 @@ fun SuccessSplashView(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(com.salazar.cheers.core.share.ui.GreenSurface)
+                    .background(GreenSurface)
                     .clickable {
                         atEnd = !atEnd
                     }
                     .padding(8.dp),
-                tint = com.salazar.cheers.core.share.ui.Green
+                tint = Green
             )
         }
     }

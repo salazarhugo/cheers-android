@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.SheetItem
 
 
 sealed class ProfileSheetUIAction {
@@ -90,24 +91,3 @@ fun ProfileMoreBottomSheet(
     }
 }
 
-@Composable
-fun SheetItem(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit = {}
-) {
-    ListItem(
-        colors = ListItemDefaults.colors(
-            containerColor = Color.Transparent,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        headlineContent = {
-            Text(text = text)
-        },
-        leadingContent = {
-            Icon(imageVector = icon, contentDescription = null)
-        },
-    )
-}

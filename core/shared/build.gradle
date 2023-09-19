@@ -2,7 +2,7 @@ plugins {
     id("cheers.android.library")
     id("cheers.android.hilt")
     id("cheers.android.room")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -20,6 +20,7 @@ dependencies {
 
     implementation(project(":common"))
     implementation(project(":core:model"))
+    implementation(project(":core:protobuf"))
 
     // Moshi
     implementation(libs.converter.moshi)

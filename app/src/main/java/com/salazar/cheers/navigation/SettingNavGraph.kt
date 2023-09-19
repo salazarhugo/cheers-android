@@ -5,14 +5,21 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.salazar.cheers.core.ui.ui.CheersDestinations
+import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.ui.ui.SettingDestinations
 import com.salazar.cheers.feature.settings.language.LanguageRoute
 import com.salazar.cheers.feature.settings.notifications.NotificationsRoute
 import com.salazar.cheers.feature.settings.security.navigateToSecurity
 import com.salazar.cheers.feature.settings.security.securityScreen
+import com.salazar.cheers.feature.settings.settingsNavigationRoute
 import com.salazar.cheers.feature.settings.settingsScreen
 import com.salazar.cheers.feature.settings.theme.ThemeRoute
+import com.salazar.cheers.feature.signin.navigateToSignIn
 import com.salazar.cheers.ui.CheersAppState
+import com.softimpact.feature.passcode.change.changePasscodeScreen
+import com.softimpact.feature.passcode.change.navigateToChangePasscode
+import com.softimpact.feature.passcode.create.createPasscodeScreen
+import com.softimpact.feature.passcode.create.navigateToCreatePasscode
 import com.softimpact.feature.passcode.settings.navigateToPasscodeSettings
 import com.softimpact.feature.passcode.settings.passcodeSettingsScreen
 
@@ -24,7 +31,7 @@ fun NavGraphBuilder.settingNavGraph(
 
     navigation(
         route = CheersDestinations.SETTING_ROUTE,
-        startDestination = SettingDestinations.SETTINGS_ROUTE,
+        startDestination = settingsNavigationRoute,
     ) {
 
         settingsScreen(
@@ -36,19 +43,29 @@ fun NavGraphBuilder.settingNavGraph(
             navigateToRecharge = {},
             navigateToSecurity = navController::navigateToSecurity,
             navigateToPaymentHistory = {},
-            navigateToSignIn = {},
-            navigateToDeleteAccount = {},
+            navigateToSignIn = navController::navigateToSignIn,
+            navigateToDeleteAccount = { navController.navigate(MainDestinations.ACCOUNT_DELETE) },
+        )
+
+        createPasscodeScreen(
+            navigateBack = navController::popBackStack,
+            navigateToPasscodeSettings = navController::navigateToPasscodeSettings,
         )
 
         passcodeSettingsScreen(
             navigateBack = navController::popBackStack,
-            navigateToSetPasscode = {},
+            navigateToChangePasscode = navController::navigateToChangePasscode,
+        )
+
+        changePasscodeScreen(
+            navigateBack = navController::popBackStack,
         )
 
         securityScreen(
             navigateBack = navController::popBackStack,
             navigateToPassword = {},
-            navigateToPasscode = navController::navigateToPasscodeSettings,
+            navigateToPasscodeSettings = navController::navigateToPasscodeSettings,
+            navigateToCreatePasscode = navController::navigateToCreatePasscode,
         )
 
         composable(
@@ -80,7 +97,8 @@ fun NavGraphBuilder.settingNavGraph(
         composable(
             route = SettingDestinations.LANGUAGE_ROUTE,
         ) {
-            val settingsViewModel = hiltViewModel<com.salazar.cheers.feature.settings.SettingsViewModel>()
+            val settingsViewModel =
+                hiltViewModel<com.salazar.cheers.feature.settings.SettingsViewModel>()
 
             LanguageRoute(
                 navActions = navActions,

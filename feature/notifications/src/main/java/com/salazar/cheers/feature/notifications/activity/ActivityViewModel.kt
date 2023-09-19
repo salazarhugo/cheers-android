@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.activity.Activity
 import com.salazar.cheers.data.activity.ActivityRepository
-import com.salazar.cheers.domain.ListFriendRequestUseCase
+import com.salazar.cheers.domain.list_friend_request.ListFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.domain.list_suggestions.ListSuggestionsUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase

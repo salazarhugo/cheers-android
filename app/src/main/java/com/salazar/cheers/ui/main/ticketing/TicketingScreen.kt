@@ -39,7 +39,7 @@ import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.data.party.Party
-import com.salazar.cheers.ui.compose.DividerM3
+import androidx.compose.material3.Divider
 
 @Composable
 fun TicketingScreen(
@@ -97,7 +97,7 @@ fun Tickets(
                         .padding(16.dp),
                     ticket = ticket
                 )
-                DividerM3()
+                Divider()
             }
         }
     }

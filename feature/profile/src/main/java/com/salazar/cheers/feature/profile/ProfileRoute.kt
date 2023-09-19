@@ -6,15 +6,11 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-/**
- * Stateful composable that displays the Navigation route for the Profile screen.
- *
- * @param profileViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun ProfileRoute(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     navigateToEditProfile: () -> Unit,
+    navigateToSignIn: () -> Unit,
     navigateToProfileMore: (String) -> Unit,
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
@@ -23,6 +19,7 @@ fun ProfileRoute(
     ProfileScreen(
         uiState = uiState,
         onSwipeRefresh = profileViewModel::onSwipeRefresh,
+        navigateToSignIn = navigateToSignIn,
         onPostMoreClicked = { postId, authorId ->
 //            navActions.navigateToPostMoreSheet(postId)
         },

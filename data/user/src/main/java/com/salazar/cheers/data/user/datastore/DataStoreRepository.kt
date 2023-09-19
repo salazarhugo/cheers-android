@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.user.datastore
 
 import android.content.Context
+import android.hardware.biometrics.BiometricPrompt
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -33,12 +34,36 @@ class DataStoreRepository @Inject constructor(
             }
         }
 
-    fun getPasscodeEnabled(): Flow<Boolean> {
-        return userPreferencesFlow.map { true }
+    fun getBiometricEnabled(): Flow<Boolean> {
+        return userPreferencesFlow.map { it.hasBiometric }
     }
 
-    suspend fun getPasscode(): Flow<String> {
-        return userPreferencesFlow.map { "123456" }
+    fun getPasscode(): Flow<String> {
+        return userPreferencesFlow.map { it.passcode }
+    }
+
+    suspend fun updatePasscode(passcode: String) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setPasscode(passcode).build()
+        }
+    }
+
+    suspend fun updateHideContent(hideContent: Boolean) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setHideContent(hideContent).build()
+        }
+    }
+
+    suspend fun toggleHideContent() {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setHideContent(!currentPreferences.hideContent).build()
+        }
+    }
+
+    suspend fun toggleBiometric() {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setHasBiometric(!currentPreferences.hasBiometric).build()
+        }
     }
 
     suspend fun updateTheme(theme: Theme) {

@@ -74,9 +74,9 @@ import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.feature.create_post.LocationSection
 import com.salazar.cheers.feature.create_post.PrivacyBottomSheet
 import com.salazar.cheers.feature.create_post.SwitchPreference
+import com.salazar.cheers.feature.parties.ui.PartyDetails
 import com.salazar.cheers.feature.search.SearchLocation
-import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.event.EventDetails
+import androidx.compose.material3.Divider
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -246,23 +246,23 @@ fun FirstScreen(
             photo = uiState.photo,
             onAddPhotoClick = { onCreatePartyUIAction(CreatePartyUIAction.OnAddPhoto) },
         )
-        EventDetails(
+        PartyDetails(
             name = uiState.name,
             privacy = uiState.privacy,
             startTimeSeconds = uiState.startTimeSeconds,
-            onEventDetailsClick = { onCreatePartyUIAction(CreatePartyUIAction.OnPartyDetailsClick) }
+            onPartyDetailsClick = { onCreatePartyUIAction(CreatePartyUIAction.OnPartyDetailsClick) }
         )
-        DividerM3()
+        Divider()
         Description(
             description = uiState.description,
             onDescriptionClick = { onCreatePartyUIAction(CreatePartyUIAction.OnDescriptionClick) }
         )
-        DividerM3()
+        Divider()
         CategorySection(
             category = "",
             onClick = {},
         )
-        DividerM3()
+        Divider()
         LocationSection("", navigateToChooseOnMap = {})
 //        NameTextField(uiState = uiState)
     }
@@ -502,7 +502,7 @@ private fun ShareButton(
         modifier = modifier,
         verticalArrangement = Arrangement.Bottom,
     ) {
-        DividerM3()
+        Divider()
         Button(
             onClick = onClick,
             modifier = Modifier
@@ -710,12 +710,12 @@ fun EventDetailsPage(
         onEndDateChanged = onEndTimeSecondsChange,
         onHasEndDateToggle = onHasEndDateToggle,
     )
-    DividerM3()
+    Divider()
 //    Privacy(
 //        privacyState = uiState.privacyState,
 //        privacy = uiState.privacy,
 //    )
-    DividerM3()
+    Divider()
     SwitchPreference(
         checked = uiState.showGuestList,
         text = "Show Guest List",

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Language
 import com.salazar.cheers.Theme
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.domain.delete_account.DeleteAccountUseCase
 import com.salazar.cheers.domain.usecase.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,15 +29,13 @@ data class SettingsUiState(
 class SettingsViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val dataStoreRepository: DataStoreRepository,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SettingsUiState(isLoading = true))
 
-    val uiState = viewModelState
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            viewModelState.value
+    val uiState = viewModelState.stateIn(
+            viewModelScope, SharingStarted.Eagerly, viewModelState.value
         )
 
     init {
@@ -59,23 +58,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-//    fun onDeleteAccount() {
-//        FirebaseAuth.getInstance().currentUser!!.delete()
-//            .addOnSuccessListener {
-//                viewModelState.update {
-//                    it.copy(signedOut = true)
-//                }
-//            }
-//            .addOnFailureListener {
-//                updateMessage(it.message.toString())
-//            }
-//    }
-//
-fun updateTheme(theme: Theme) {
-    viewModelScope.launch {
-        dataStoreRepository.updateTheme(theme)
+    fun updateTheme(theme: Theme) {
+        viewModelScope.launch {
+            dataStoreRepository.updateTheme(theme)
+        }
     }
-}
 
     private fun updateMessage(message: String) {
         viewModelState.update {

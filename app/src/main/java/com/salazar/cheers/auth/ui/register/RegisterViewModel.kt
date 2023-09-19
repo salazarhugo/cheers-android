@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.util.Utils.validateUsername
 import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.domain.usecase.RegisterUseCase
+import com.salazar.cheers.domain.register.RegisterUseCase
 import com.salazar.cheers.domain.usecase.SignInWithEmailLinkUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

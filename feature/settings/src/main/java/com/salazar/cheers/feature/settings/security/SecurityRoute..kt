@@ -8,12 +8,13 @@ import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 @Composable
 fun SecurityRoute(
-    securityViewModel: SecurityViewModel = hiltViewModel(),
+    viewModel: SecurityViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
     navigateToPassword: (Boolean) -> Unit,
-    navigateToPasscode: () -> Unit,
+    navigateToPasscodeSettings: () -> Unit,
+    navigateToCreatePasscode: () -> Unit,
 ) {
-    val uiState by securityViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 //    val authResultLauncher =
 //        rememberLauncherForActivityResult(
 //            contract = com.salazar.cheers.data.auth.AuthResultContract(),
@@ -29,6 +30,11 @@ fun SecurityRoute(
 //                if (it == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
 //                    authResultLauncher.launch(1)
         },
-        onPasscodeClick = navigateToPasscode,
+        onPasscodeClick = {
+            if (uiState.passcodeEnabled)
+                navigateToPasscodeSettings()
+            else
+                navigateToCreatePasscode()
+        },
     )
 }

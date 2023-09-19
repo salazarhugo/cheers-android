@@ -18,13 +18,11 @@ interface PartyDao{
 
     @Query("""
         SELECT * FROM events 
-        WHERE accountId = :accountId 
-        AND startDate > :now
-        ORDER BY events.startDate ASC
         """)
+//        AND startDate > :now
+//        ORDER BY events.startDate ASC
     fun feedParty(
-        accountId: String = FirebaseAuth.getInstance().currentUser?.uid!!,
-        now: Long = Date().time / 1000,
+//        now: Long = Date().time / 1000,
     ): Flow<List<Party>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

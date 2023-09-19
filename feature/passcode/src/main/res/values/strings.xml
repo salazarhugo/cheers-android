@@ -4,4 +4,26 @@
     <string name="prompt_info_subtitle">Please login to get access</string>
     <string name="prompt_info_description"></string>
     <string name="prompt_info_use_app_pin">Use app PIN</string>
+
+    <string name="application_access">Application Access</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_passcode">Change Passcode</string>
+    <string name="set_passcode">Create a passcode</string>
+    <string name="remove_pin">Remove Pin</string>
+    <string name="biometric">Biometric</string>
+
+    <string name="passcode" translatable="false">Passcode</string>
+    <string name="pin_lock">PIN Lock</string>
+    <string name="set_pin_code">Set PIN Code</string>
+    <string name="skip">Skip</string>
+    <string name="set_pin_description">
+        Pin authentication allows you to use a simple 6-digit PIN to enter the application.
+        Skipping this step will disable this notification on the application start. Setting or changing the PIN can only be done from the settings section.PIN Lock
+    </string>
+    <string name="enable_passcode" translatable="false">Enable Passcode</string>
+    <string name="passcode_lock" translatable="false">Passcode Lock</string>
+    <string name="unlock_with_fingerprint" translatable="false">Unlock with Fingerprint</string>
+    <string name="turn_passcode_off" translatable="false">Turn Passcode Off</string>
+
+    <string name="hide_content" translatable="false">Hide Content</string>
 </resources>

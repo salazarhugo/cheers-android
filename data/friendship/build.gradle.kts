@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core:model"))
     implementation(project(":core:protobuf"))
+    implementation(project(":core:shared"))
 
     // Firebase
     implementation(platform(libs.firebase.bom))

@@ -40,6 +40,7 @@ import com.salazar.cheers.core.data.internal.Screen
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.feature.map.navigation.mapNavigationRoute
+import com.salazar.cheers.feature.parties.partiesNavigationRoute
 import com.salazar.cheers.feature.profile.navigation.profileNavigationRoute
 import com.salazar.cheers.feature.search.navigation.searchNavigationRoute
 
@@ -52,7 +53,7 @@ fun CheersBottomBar(
 ) {
     val items = listOf(
         Screen(
-            route = homeNavigationRoute,
+            route = partiesNavigationRoute,
             icon = {
                 Icon(
                     Icons.Outlined.Home,
@@ -118,7 +119,7 @@ fun CheersBottomBar(
 //            label = "Tickets"
 //        ),
         Screen(
-            route = MainDestinations.MESSAGES_ROUTE,
+            route = homeNavigationRoute,
             icon = {
                 BadgedBox(badge = {
                     if (unreadChatCount > 0)

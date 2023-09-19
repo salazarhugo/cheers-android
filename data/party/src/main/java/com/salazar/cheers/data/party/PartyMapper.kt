@@ -4,7 +4,7 @@ import cheers.party.v1.PartyItem
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.data.party.data.mapper.toWatchStatus
 
-fun PartyItem.toParty(accountId: String): Party {
+fun PartyItem.toParty(): Party {
  return Party().copy(
      id = party.id,
      name = party.name,
@@ -15,7 +15,7 @@ fun PartyItem.toParty(accountId: String): Party {
      hostId = party.hostId,
      hostName = user.name,
      watchStatus = viewerWatchStatus.toWatchStatus(),
-     price = party.minimumPrice.toInt(),
+     price = null,
      participants = emptyList(),
      showGuestList = false,
      showOnMap = false,
@@ -30,6 +30,5 @@ fun PartyItem.toParty(accountId: String): Party {
      latitude= party.latitude,
      longitude= party.longitude,
      privacy  = Privacy.PUBLIC,
-     accountId = accountId,
     )
 }

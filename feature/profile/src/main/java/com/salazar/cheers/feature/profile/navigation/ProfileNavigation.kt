@@ -18,6 +18,7 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.profileScreen(
     navigateToEditProfile: () -> Unit,
     navigateToProfileMore: (String) -> Unit,
+    navigateToSignIn: () -> Unit,
 ) {
     composable(
         route = profileNavigationRoute,
@@ -28,6 +29,7 @@ fun NavGraphBuilder.profileScreen(
         ProfileRoute(
             navigateToEditProfile = navigateToEditProfile,
             navigateToProfileMore = navigateToProfileMore,
+            navigateToSignIn = navigateToSignIn,
         )
     }
 }

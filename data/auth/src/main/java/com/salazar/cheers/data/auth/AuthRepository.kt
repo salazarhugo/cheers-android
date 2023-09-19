@@ -30,6 +30,10 @@ class AuthRepository @Inject constructor(
     private val bffApiService: BffApiService,
     private val auth: FirebaseAuth,
 ) {
+    fun isConnected(): Boolean {
+        return FirebaseAuth.getInstance().currentUser?.uid != null
+    }
+
     fun checkIfAlreadySignedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser?.uid != null
     }
@@ -91,8 +95,14 @@ class AuthRepository @Inject constructor(
         FirebaseAuth.getInstance().signOut()
     }
 
-    suspend fun deleteAccount(): Task<Void> {
-        return FirebaseAuth.getInstance().currentUser!!.delete()
+    suspend fun deleteAccount(): Result<Unit> {
+        return try {
+            FirebaseAuth.getInstance().currentUser!!.delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
     }
 
     fun sendSignInLink(email: String): Task<Void> {

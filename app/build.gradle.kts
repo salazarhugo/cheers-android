@@ -16,8 +16,8 @@ android {
         applicationId = "com.salazar.cheers"
         minSdk = 28
         targetSdk = 34
-        versionCode = 64
-        versionName = "1.0.0-064"
+        versionCode = 65
+        versionName = "1.0.0-065"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:util"))
     implementation(project(":core:model"))
+    implementation(project(":core:shared"))
 
     implementation(project(":feature:home"))
     implementation(project(":feature:chat"))
@@ -59,6 +60,9 @@ dependencies {
     implementation(project(":feature:create_post"))
     implementation(project(":feature:create_note"))
     implementation(project(":feature:passcode"))
+    implementation(project(":feature:friend_request"))
+    implementation(project(":feature:parties"))
+    implementation(project(":feature:ticket"))
 
     implementation(project(":domain"))
 
@@ -70,6 +74,7 @@ dependencies {
     implementation(project(":data:activity"))
     implementation(project(":data:story"))
     implementation(project(":data:billing"))
+    implementation(project(":data:ticket"))
 
 
     implementation(libs.androidx.core.ktx)
@@ -102,9 +107,6 @@ dependencies {
 
     // Compose-State-Events
     implementation(libs.compose.state.events)
-
-    // QR Code
-    implementation(libs.composed.barcodes)
 
     // Compose BOM
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))

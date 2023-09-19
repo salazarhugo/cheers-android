@@ -45,7 +45,7 @@ import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.feature.search.UserCard
-import com.salazar.cheers.ui.compose.DividerM3
+import androidx.compose.material3.Divider
 import kotlin.math.absoluteValue
 
 @Composable
@@ -170,7 +170,7 @@ fun Views(
             onDeleteStory = onDeleteStory,
         )
 
-        DividerM3()
+        Divider()
 
         LazyColumn(
             modifier = Modifier.animateContentSize()

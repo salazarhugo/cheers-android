@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.chat.ui.screens.room
 
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,7 +22,7 @@ import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.salazar.cheers.core.share.ui.BlueCheers
+import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.share.ui.Username
 import com.salazar.cheers.feature.chat.BuildConfig
 import com.salazar.cheers.feature.chat.R

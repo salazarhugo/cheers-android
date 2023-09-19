@@ -1,9 +1,10 @@
-package com.salazar.cheers.core.share.ui
+package com.salazar.cheers.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
 val Purple200 = Color(0xFFBB86FC)
 val BlueCheers = Color(0xFF0095F6)
+val CheersBlueSecondary = Color(0xFF2B3748)
 val GreenGoogle = Color(0xFF0F9D58)
 val GreySheet = Color(0xFF262626)
 val GreenSurface = Color(0xFFD7F7C2)

@@ -29,6 +29,7 @@ fun SettingsRoute(
         if (uiState.signedOut)
             navigateToSignIn()
     }
+
     SettingsScreen(
         uiState = uiState,
         onBackPressed = navigateBack,
@@ -51,7 +52,7 @@ fun SettingsRoute(
             }
         },
         navigateToBecomeVip = {},
-        onDeleteAccount = { navigateToDeleteAccount() },
+        onDeleteAccount = navigateToDeleteAccount,
     )
 }
 

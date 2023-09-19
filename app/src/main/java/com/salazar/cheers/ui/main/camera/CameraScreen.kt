@@ -44,6 +44,7 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.animations.Bounce
+import com.salazar.cheers.core.ui.ui.Permission
 import com.salazar.cheers.core.util.Utils.createFile
 import com.salazar.cheers.core.util.Utils.getOutputDirectory
 import com.salazar.cheers.core.util.Utils.getOutputFileOptions
@@ -89,7 +90,7 @@ fun CameraScreen(
         }
     ) {
         it
-        com.salazar.cheers.core.share.ui.Permission(Manifest.permission.CAMERA) {
+        Permission(Manifest.permission.CAMERA) {
             CameraPreview(
 //                modifier = Modifier.padding(it),
                 imageCapture = imageCapture,

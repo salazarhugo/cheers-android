@@ -30,6 +30,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.salazar.cheers.data.post.repository.Post
 import com.salazar.common.ui.extensions.noRippleClickable
 
@@ -47,14 +48,15 @@ fun PostFooter(
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
 
-//        if (post.photos.size > 1)
-//            HorizontalPagerIndicator(
-//                pagerState = pagerState,
-//                modifier = Modifier
-//                    .padding(top = 8.dp)
-//                    .align(Alignment.CenterHorizontally),
-//                activeColor = MaterialTheme.colorScheme.primary,
-//            )
+        if (post.photos.size > 1)
+            HorizontalPagerIndicator(
+                pageCount = post.photos.size,
+                pagerState = pagerState,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .align(Alignment.CenterHorizontally),
+                activeColor = MaterialTheme.colorScheme.primary,
+            )
 //        Text(postFeed.post.tagUsersId.toString())
 //        Text(postFeed.tagUsers.toString())
             PostFooterButtons(

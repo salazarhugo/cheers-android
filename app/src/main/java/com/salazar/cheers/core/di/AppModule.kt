@@ -36,8 +36,8 @@ import com.salazar.cheers.data.user.account.AccountRepository
 import com.salazar.cheers.data.user.account.AccountRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
-import com.salazar.cheers.data.repository.ticket.TicketRepository
-import com.salazar.cheers.data.repository.ticket.impl.TicketRepositoryImpl
+import com.salazar.cheers.data.ticket.TicketRepository
+import com.salazar.cheers.data.ticket.impl.TicketRepositoryImpl
 import com.salazar.cheers.data.user.UserDao
 import com.salazar.cheers.data.user.UserItemDao
 import com.salazar.cheers.data.user.UserStatsDao
@@ -411,7 +411,7 @@ object AppModule {
     @Provides
     fun provideTicketDao(
         cheersDatabase: CheersDatabase,
-    ): TicketDao {
+    ): com.salazar.cheers.data.ticket.TicketDao {
         return cheersDatabase.ticketDao()
     }
 

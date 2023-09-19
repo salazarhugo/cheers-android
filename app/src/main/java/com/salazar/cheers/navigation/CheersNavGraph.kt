@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -18,34 +17,36 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.salazar.cheers.core.share.ui.GreySheet
 import com.salazar.cheers.core.ui.CheersUiState
+import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.feature.create_note.createNoteNavigationRoute
 import com.salazar.cheers.feature.create_post.createPostNavigationRoute
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
+import com.salazar.cheers.feature.parties.partiesNavigationRoute
+import com.salazar.cheers.feature.signin.signInNavigationRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.CheersBottomBar
 
 
 @Composable
 fun CheersNavGraph(
-    uiState: CheersUiState,
+    uiState: CheersUiState.Initialized,
     appState: CheersAppState,
 ) {
     val startDestination =
-        remember { if (uiState.user != null) CheersDestinations.MAIN_ROUTE else CheersDestinations.AUTH_ROUTE }
+        remember {
+            if (uiState.settings.passcode.isNotBlank())
+                CheersDestinations.PASSCODE_ROUTE
+            else
+                CheersDestinations.MAIN_ROUTE
+        }
 
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
     val currentRoute =
-        navBackStackEntry?.destination?.route ?: homeNavigationRoute
+        navBackStackEntry?.destination?.route ?: partiesNavigationRoute
     val navActions = appState.navActions
-
-    LaunchedEffect(uiState.errorMessage) {
-        if (uiState.errorMessage.isNotBlank())
-            appState.snackBarHostState.showSnackbar(uiState.errorMessage)
-    }
 
     val hide =
         navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
@@ -64,6 +65,7 @@ fun CheersNavGraph(
                 || currentRoute.contains(createNoteNavigationRoute)
                 || currentRoute.contains(MainDestinations.EDIT_PROFILE_ROUTE)
                 || currentRoute.contains(MainDestinations.CAMERA_ROUTE)
+                || currentRoute.contains(CheersDestinations.PASSCODE_ROUTE)
 
     ModalBottomSheetLayout(
         bottomSheetNavigator = appState.bottomSheetNavigator,
@@ -82,7 +84,7 @@ fun CheersNavGraph(
                 ) {
                     CheersBottomBar(
                         unreadChatCount = uiState.unreadChatCount,
-                        picture = uiState.user?.picture ?: "",
+                        picture = uiState.account?.picture ?: "",
                         currentRoute = currentRoute,
                         onNavigate = { route ->
                             appState.navController.navigate(route)
@@ -104,12 +106,19 @@ fun CheersNavGraph(
                 settingNavGraph(
                     appState = appState,
                 )
+
                 authNavGraph(
                     navActions = navActions,
                     navController = appState.navController,
+                    startDestination = signInNavigationRoute,
                 )
+
                 mainNavGraph(
                     appState = appState,
+                )
+
+                passcodeNavGraph(
+                    navController = appState.navController,
                 )
             }
         }

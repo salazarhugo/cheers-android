@@ -102,61 +102,61 @@ fun OtherProfileScreen(
             }
         }
         if (user.friend || user.isBusinessAccount)
-        stickyHeader {
-            val scope = rememberCoroutineScope()
-            TabRow(
-                selectedTabIndex = pagerState.currentPage,
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-//                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-                    )
-                },
-                contentColor = MaterialTheme.colorScheme.onBackground,
-            ) {
-                tabs.forEachIndexed { index, icon ->
-                    Tab(
-                        icon = { Icon(icon, contentDescription = null) },
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                    )
-                }
-            }
-        }
-
-        if (user.friend || user.isBusinessAccount)
-        item {
-            HorizontalPager(
-                state = pagerState,
-            ) { page ->
-                Column(
-                    modifier = Modifier.fillMaxSize(),
+            stickyHeader {
+                val scope = rememberCoroutineScope()
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    indicator = { tabPositions ->
+//                        TabRowDefaults.Indicator(
+    //                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+//                        )
+                    },
+                    contentColor = MaterialTheme.colorScheme.onBackground,
                 ) {
-                    when (page) {
-                        0 -> posts?.forEach { postFeed ->
-                            PostItem(
-                                post = postFeed,
-//                                onPostLike = onPostLike,
-//                                onPostClicked = onPostClicked,
-//                                onPostMoreClicked = onPostMoreClicked,
-//                                onCommentClick = { onCommentClick(postFeed.id) },
-                            )
-                        }
-                        1 -> parties?.forEach { party ->
-                            PartyItem(
-                                party = party,
-                                onEventClicked = {},
-                                onMoreClick = {},
-                            )
-                        }
-                        2 -> FunctionalityNotAvailablePanel()
+                    tabs.forEachIndexed { index, icon ->
+                        Tab(
+                            icon = { Icon(icon, contentDescription = null) },
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                        )
                     }
                 }
             }
-        }
+
+        if (user.friend || user.isBusinessAccount)
+            item {
+                HorizontalPager(
+                    state = pagerState,
+                ) { page ->
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        when (page) {
+                            0 -> posts?.forEach { postFeed ->
+                                PostItem(
+                                    post = postFeed,
+    //                                onPostLike = onPostLike,
+    //                                onPostClicked = onPostClicked,
+    //                                onPostMoreClicked = onPostMoreClicked,
+    //                                onCommentClick = { onCommentClick(postFeed.id) },
+                                )
+                            }
+                            1 -> parties?.forEach { party ->
+                                PartyItem(
+                                    party = party,
+                                    onPartyClicked = {},
+                                    onMoreClick = {},
+                                )
+                            }
+                            2 -> FunctionalityNotAvailablePanel()
+                        }
+                    }
+                }
+            }
     }
 }
 

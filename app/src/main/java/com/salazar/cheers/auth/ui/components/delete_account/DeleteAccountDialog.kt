@@ -12,8 +12,9 @@ import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 @Composable
 fun DeleteAccountDialog(
-    navActions: CheersNavigationActions,
     viewModel: DeleteAccountViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
+    navigateToSignIn: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val text = uiState.errorMessage.ifBlank {
@@ -24,14 +25,12 @@ fun DeleteAccountDialog(
             title = "Failed to delete account",
             text = text,
             dismissButton = stringResource(id = R.string.dismiss),
-            onDismiss = {
-                navActions.navigateBack()
-            },
+            onDismiss = navigateBack,
             confirmButton = "",
             onConfirm = {
                 viewModel.deleteAccount { success ->
                     if (success) {
-                        navActions.navigateToSignIn()
+                        navigateToSignIn()
                     }
                 }
             },
@@ -41,14 +40,12 @@ fun DeleteAccountDialog(
             title = "Delete account?",
             text = text,
             dismissButton = stringResource(id = R.string.cancel),
-            onDismiss = {
-                navActions.navigateBack()
-            },
+            onDismiss = navigateBack,
             confirmButton = stringResource(id = R.string.delete),
             onConfirm = {
                 viewModel.deleteAccount { success ->
                     if (success) {
-                        navActions.navigateToSignIn()
+                        navigateToSignIn()
                     }
                 }
             },

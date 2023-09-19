@@ -24,7 +24,7 @@ fun NavGraphBuilder.passcodeScreen(
             navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
         ),
     ) {
-        PinRoute(
+        PasscodeRoute(
             banner = banner,
             navigateToHome = navigateToHome,
         )

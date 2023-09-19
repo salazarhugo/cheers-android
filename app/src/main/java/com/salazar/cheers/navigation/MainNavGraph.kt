@@ -42,12 +42,16 @@ import com.salazar.cheers.feature.create_post.createPostScreen
 import com.salazar.cheers.feature.create_post.navigateToCreatePost
 import com.salazar.cheers.feature.edit_profile.navigation.editProfileScreen
 import com.salazar.cheers.feature.edit_profile.navigation.navigateToEditProfile
+import com.salazar.cheers.feature.friend_request.friendRequestsScreen
+import com.salazar.cheers.feature.friend_request.navigateToFriendRequests
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.feature.home.navigation.homeScreen
 import com.salazar.cheers.feature.map.navigation.mapScreen
 import com.salazar.cheers.feature.map.screens.settings.MapSettingsRoute
 import com.salazar.cheers.feature.notifications.navigation.navigateToNotifications
 import com.salazar.cheers.feature.notifications.navigation.notificationsScreen
+import com.salazar.cheers.feature.parties.navigateToParties
+import com.salazar.cheers.feature.parties.partiesScreen
 import com.salazar.cheers.feature.profile.OtherProfileStatsRoute
 import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
 import com.salazar.cheers.feature.profile.ProfileSheetUIAction
@@ -69,13 +73,15 @@ import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
 import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
-import com.salazar.cheers.ui.main.friendrequests.FriendRequestsRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
 import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
-import com.salazar.cheers.ui.main.party.EventsRoute
 import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
-import com.salazar.cheers.ui.main.party.detail.EventDetailRoute
+import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
+import com.salazar.cheers.feature.parties.detail.partyDetailScreen
+import com.salazar.cheers.feature.parties.partiesNavigationRoute
+import com.salazar.cheers.feature.signin.navigateToSignIn
+import com.salazar.cheers.feature.ticket.ticketsScreen
 import com.salazar.cheers.ui.main.party.edit.EditEventRoute
 import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
 import com.salazar.cheers.ui.main.share.ShareRoute
@@ -84,8 +90,10 @@ import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
-import com.salazar.cheers.ui.main.tickets.TicketsRoute
-import com.salazar.cheers.ui.main.tickets.details.TicketDetailsRoute
+import com.salazar.cheers.feature.ticket.details.TicketDetailsRoute
+import com.salazar.cheers.feature.ticket.details.navigateToTicketDetails
+import com.salazar.cheers.feature.ticket.details.ticketDetailsScreen
+import com.salazar.cheers.feature.ticket.navigateToTickets
 import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
@@ -100,7 +108,7 @@ fun NavGraphBuilder.mainNavGraph(
 
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
-        startDestination = homeNavigationRoute,
+        startDestination = partiesNavigationRoute,
     ) {
         bottomSheet(
             route = MainDestinations.MAP_SETTINGS_ROUTE,
@@ -110,13 +118,10 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.FRIEND_REQUESTS,
-        ) {
-            FriendRequestsRoute(
-                navActions = appState.navActions,
-            )
-        }
+        friendRequestsScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+        )
 
         bottomSheet(
             route = "${MainDestinations.SHARE_ROUTE}/{partyId}",
@@ -127,21 +132,14 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.TICKETS_ROUTE,
-        ) {
-            TicketsRoute(
-                navActions = appState.navActions
-            )
-        }
+        ticketsScreen(
+            navigateBack = navController::popBackStack,
+            navigateToTicketDetails = navController::navigateToTicketDetails,
+        )
 
-        composable(
-            route = "${MainDestinations.TICKET_DETAILS_ROUTE}/{ticketId}",
-        ) {
-            TicketDetailsRoute(
-                navActions = appState.navActions
-            )
-        }
+        ticketDetailsScreen(
+            navigateBack = navController::popBackStack,
+        )
 
         composable(
             route = MainDestinations.NFC_ROUTE,
@@ -152,15 +150,11 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         notificationsScreen(
-            navigateBack = {
-                navController.popBackStack()
-            },
+            navigateBack = navController::popBackStack,
             navigateToPostDetail = {},
-            navigateToFriendRequests = {},
+            navigateToFriendRequests = navController::navigateToFriendRequests,
             navigateToComments = {},
-            navigateToOtherProfile = {
-                navController.navigateToOtherProfile(it)
-            },
+            navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
         composable(
@@ -232,13 +226,12 @@ fun NavGraphBuilder.mainNavGraph(
             },
         )
 
-        composable(
-            route = MainDestinations.EVENTS_ROUTE,
-        ) {
-            EventsRoute(
-                navActions = appState.navActions,
-            )
-        }
+        partiesScreen(
+            navigateBack = navController::popBackStack,
+            navigateToPartyMoreSheet = {},
+            navigateToPartyDetail = navController::navigateToPartyDetail,
+            navigateToTickets = navController::navigateToTickets,
+        )
 
         dialog(
             route = "${MainDestinations.DIALOG_DELETE_STORY}/{storyID}",
@@ -259,15 +252,13 @@ fun NavGraphBuilder.mainNavGraph(
 
         homeScreen(
             onActivityClick = navController::navigateToNotifications,
-            onPostClick = { },
+            navigateToParties = navController::navigateToParties,
+            onPostClick = {},
             navigateToSearch = navController::navigateToSearch,
             navigateToCreatePost = navController::navigateToCreatePost,
             navigateToCreateNote = navController::navigateToCreateNote,
             navigateToNote = appState.navActions.navigateToNote,
         )
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                com.salazar.cheers.core.share.ui.RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
-//            }
 
         mapScreen(
             navigateBack = {
@@ -340,7 +331,8 @@ fun NavGraphBuilder.mainNavGraph(
             route = MainDestinations.ACCOUNT_DELETE,
         ) {
             DeleteAccountDialog(
-                navActions = appState.navActions
+                navigateBack = navController::popBackStack,
+                navigateToSignIn = navController::navigateToSignIn,
             )
         }
 
@@ -379,14 +371,14 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = "${MainDestinations.EVENT_DETAIL_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/{eventId}" })
-        ) {
-            EventDetailRoute(
-                navActions = appState.navActions,
-            )
-        }
+        partyDetailScreen(
+            navigateBack = navController::popBackStack,
+            navigateToTicketing = {},
+            navigateToMap = {},
+            navigateToGuestList = {},
+            navigateToEditParty = {},
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+        )
 
         composable(
             route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
@@ -468,6 +460,7 @@ fun NavGraphBuilder.mainNavGraph(
         )
 
         profileScreen(
+            navigateToSignIn = navController::navigateToSignIn,
             navigateToEditProfile = navController::navigateToEditProfile,
             navigateToProfileMore = {
                 navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$it")
@@ -544,7 +537,7 @@ fun NavGraphBuilder.mainNavGraph(
             EventMoreBottomSheet(
                 modifier = Modifier.navigationBarsPadding(),
                 isAuthor = false,
-                onDetails = { appState.navActions.navigateToEventDetail(eventId) },
+                onDetails = { navController.navigateToPartyDetail(eventId) },
                 onDelete = { },
                 onReport = { /*TODO*/ },
                 onShare = {

@@ -1,10 +1,13 @@
 package com.salazar.cheers.feature.home.navigation
 
+import android.Manifest
+import android.os.Build
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.ui.ui.RequestPermission
 
 const val homeNavigationRoute = "home_route"
 private const val DEEP_LINK_URI_PATTERN =
@@ -19,6 +22,7 @@ fun NavGraphBuilder.homeScreen(
     navigateToSearch: () -> Unit,
     navigateToCreatePost: () -> Unit,
     navigateToCreateNote: () -> Unit,
+    navigateToParties: () -> Unit,
     navigateToNote: (String) -> Unit,
     onPostClick: (String) -> Unit,
 ) {
@@ -28,12 +32,16 @@ fun NavGraphBuilder.homeScreen(
             navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
         ),
     ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RequestPermission(permission = Manifest.permission.POST_NOTIFICATIONS)
+        }
         HomeRoute(
             onActivityClick = onActivityClick,
             onPostClick = onPostClick,
             navigateToCreatePost = navigateToCreatePost,
             navigateToCreateNote = navigateToCreateNote,
             navigateToNote = navigateToNote,
+            navigateToParties = navigateToParties,
         )
     }
 }

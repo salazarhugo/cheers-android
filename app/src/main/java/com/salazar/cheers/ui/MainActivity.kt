@@ -7,9 +7,13 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.os.StrictMode
 import android.util.Log
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
@@ -26,6 +30,7 @@ import com.salazar.cheers.Settings
 import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.core.util.StorageUtil
 import com.salazar.cheers.core.util.Utils.setLocale
+import com.salazar.common.util.LocalActivity
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -49,16 +54,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val appSettings by dataStoreRepository.userPreferencesFlow.collectAsState(
-                initial = Settings.getDefaultInstance(),
-            )
-
-            val locale = if (appSettings.language == Language.FRENCH) "fr" else "en"
-            setLocale(locale)
-
-            CheersApp(
-                appSettings = appSettings,
-            )
+            CompositionLocalProvider(LocalActivity provides this) {
+                CheersApp()
+            }
         }
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()

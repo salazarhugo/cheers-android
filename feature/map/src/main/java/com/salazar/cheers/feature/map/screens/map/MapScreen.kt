@@ -25,7 +25,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
-import com.salazar.cheers.core.share.ui.Permission
+import com.salazar.cheers.core.ui.ui.Permission
 import com.salazar.cheers.feature.map.domain.models.UserLocation
 import com.salazar.cheers.feature.map.ui.dialogs.PostMapDialog
 import com.salazar.cheers.map.ui.annotations.FriendAnnotation
@@ -74,7 +74,7 @@ fun MapScreen(
             }
         },
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-//        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else com.salazar.cheers.core.share.ui.GreySheet,
+//        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else com.salazar.cheers.core.ui.theme.getGreySheet,
 //        sheetElevation = 0.dp,
 //        floatingActionButton = {
 //            FloatingActionButton(

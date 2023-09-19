@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.R
+import com.salazar.cheers.core.ui.theme.Green
+import com.salazar.cheers.core.ui.theme.GreenSurface
 import com.salazar.cheers.core.ui.ui.AppBar
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.delay
@@ -104,12 +106,12 @@ fun SentSignInLinkToEmailScreen() {
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(com.salazar.cheers.core.share.ui.GreenSurface)
+                    .background(GreenSurface)
                     .clickable {
                         atEnd = !atEnd
                     }
                     .padding(8.dp),
-                tint = com.salazar.cheers.core.share.ui.Green
+                tint = Green
             )
             Spacer(Modifier.height(32.dp))
             Text("A sign in link has been sent to your email account")

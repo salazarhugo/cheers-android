@@ -8,7 +8,7 @@ package com.salazar.cheers.feature.map.ui.annotations
 //    onClick: () -> Unit,
 //) {
 //    val color = when(isSelected) {
-//        true -> com.salazar.cheers.core.share.ui.BlueCheers
+//        true -> com.salazar.cheers.core.ui.theme.getBlueCheers
 //        false -> Color.White
 //    }
 //

@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core:model"))
     implementation(project(":core:protobuf"))
+    implementation(project(":core:shared"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

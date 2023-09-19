@@ -14,8 +14,8 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.salazar.cheers.core.ui.ShareButton
 import com.salazar.cheers.feature.create_post.LocationSection
-import com.salazar.cheers.ui.compose.DividerM3
-import com.salazar.cheers.ui.compose.event.EventDetails
+import com.salazar.cheers.feature.parties.ui.PartyDetails
+import androidx.compose.material3.Divider
 import com.salazar.cheers.ui.main.party.create.CategorySection
 import com.salazar.cheers.ui.main.party.create.Description
 import com.salazar.cheers.ui.main.party.create.TopAppBar
@@ -50,23 +50,23 @@ fun EditEventScreen(
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.Center
                 )
-                EventDetails(
+                PartyDetails(
                     name = event.name,
                     privacy = event.privacy,
                     startTimeSeconds = event.startDate,
-                    onEventDetailsClick = {}
+                    onPartyDetailsClick = {}
                 )
-                DividerM3()
+                Divider()
                 Description(
                     description = event.description,
                     onDescriptionClick = {}
                 )
-                DividerM3()
+                Divider()
                 CategorySection(
                     category = "",
                     onClick = {},
                 )
-                DividerM3()
+                Divider()
                 LocationSection("", navigateToChooseOnMap = {})
                 ShareButton(
                     onClick = onSave,

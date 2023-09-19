@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.salazar.cheers.core.model.StoryState
+import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
@@ -64,7 +64,7 @@ fun YourStory(
                         .size(22.dp)
                         .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
                         .clip(CircleShape)
-                        .background(com.salazar.cheers.core.share.ui.BlueCheers)
+                        .background(BlueCheers)
                 ) {
                     Icon(
                         Icons.Rounded.Add,

@@ -18,7 +18,7 @@ import com.salazar.cheers.data.mapper.toStory
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.user.UserDao
 import com.salazar.cheers.data.user.UserItemDao
-import com.salazar.cheers.data.user.toUserItem
+import com.salazar.cheers.shared.data.mapper.toUserItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow

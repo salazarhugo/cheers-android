@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,7 +51,7 @@ class ChatRepositoryImpl @Inject constructor(
         return try {
             chatDao.getUnreadChatCount()
         } catch (e: Exception) {
-            flow { emit(0) }
+            flowOf(0)
         }
     }
 

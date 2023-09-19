@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core:util"))
     implementation(project(":core:model"))
+    implementation(project(":core:shared"))
 
     implementation(project(":data:party"))
     implementation(project(":data:post"))
@@ -37,6 +38,11 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.navigation.material)
     implementation(libs.accompanist.navigation.animation)
+    implementation(libs.accompanist.pager.indicators)
+
+    // Map Box SDK
+    implementation(libs.android)
+    implementation(libs.mapbox.sdk.services)
 
     // Coil
     implementation(libs.coil.compose)

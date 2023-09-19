@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -112,7 +114,7 @@ fun PostList(
                 onStoryClick = { onHomeUIAction(HomeUIAction.OnStoryFeedClick(it)) },
                 onAddStoryClick = { onHomeUIAction(HomeUIAction.OnAddStoryClick) },
             )
-            DividerM3()
+            Divider()
         } */
 
         item {
@@ -152,6 +154,21 @@ fun PostList(
             suggestions = uiState.suggestions,
             onHomeUIAction = onHomeUIAction,
         )
+    }
+}
+
+private fun LazyListScope.partiesBanner(onClick: () -> Unit) {
+    item {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            onClick = onClick,
+        ) {
+            TextButton(onClick = onClick) {
+                Text(text = "Parties")
+            }
+        }
     }
 }
 

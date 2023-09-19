@@ -1,9 +1,9 @@
 package com.salazar.cheers.feature.settings.security
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.auth.AuthRepository
+import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,11 +17,13 @@ data class SecurityUiState(
     val errorMessage: String = "",
 //    val firebaseUser: FirebaseUser? = null,
     val signInMethods: List<String> = emptyList(),
+    val passcodeEnabled: Boolean = false,
 )
 
 @HiltViewModel
 class SecurityViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SecurityUiState(isLoading = true))
@@ -35,16 +37,10 @@ class SecurityViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            authRepository.getUserIdToken().collect { user ->
-//                viewModelState.update {
-//                    it.copy(firebaseUser = user)
-//                }
-//                if (user == null) return@collect
-//
-//                val email = user.email
-
-//                if (email != null && email.isNotBlank())
-//                    getSignInMethods(email)
+            dataStoreRepository.getPasscode().collect { passcode ->
+                viewModelState.update {
+                    it.copy(passcodeEnabled = passcode.isNotBlank())
+                }
             }
         }
     }

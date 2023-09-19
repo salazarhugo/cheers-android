@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AirplaneTicket
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 fun PartiesTopBar(
     query: String,
     onQueryChange: (String) -> Unit,
+    onTicketsClick: () -> Unit,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val icon = when (isDarkTheme) {
@@ -54,6 +56,12 @@ fun PartiesTopBar(
                 }
             },
             actions = {
+                IconButton(onClick = onTicketsClick) {
+                    Icon(
+                        imageVector = Icons.Default.AirplaneTicket,
+                        contentDescription = "Ticket icon",
+                    )
+                }
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.Default.Search,

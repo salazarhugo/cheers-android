@@ -8,6 +8,7 @@ import com.salazar.cheers.data.party.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.domain.list_post.ListPostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ sealed interface ProfileUiState {
     val errorMessages: String
     val sheetState: SheetState
 
-    data class Loading(
+    data class NoAccount(
         override val isLoading: Boolean,
         override val errorMessages: String,
         override val sheetState: SheetState,
@@ -59,7 +60,7 @@ private data class ProfileViewModelState(
                 sheetState = sheetState,
             )
         else
-            ProfileUiState.Loading(
+            ProfileUiState.NoAccount(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 sheetState = sheetState,
@@ -70,8 +71,7 @@ private data class ProfileViewModelState(
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
-    private val partyRepository: PartyRepository,
-    private val partyStub: PartyServiceGrpcKt.PartyServiceCoroutineStub,
+    private val listPostUseCase: ListPostUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
@@ -129,8 +129,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun refreshUserPosts() {
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.listPost("").collect {
+        viewModelScope.launch {
+            listPostUseCase().collect {
                 updatePosts(it)
             }
         }

@@ -78,3 +78,7 @@ project(":common").projectDir = File(settingsDir, "../common")
 project(":ads").projectDir = File(settingsDir, "../ads")
 project(":auth").projectDir = File(settingsDir, "../auth")
 
+include(":feature:friend_request")
+include(":feature:parties")
+include(":feature:ticket")
+include(":data:ticket")

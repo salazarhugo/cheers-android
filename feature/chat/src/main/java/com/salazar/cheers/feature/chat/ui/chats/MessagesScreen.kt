@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersSearchBar
+import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
@@ -232,7 +233,7 @@ fun DirectConversation(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(com.salazar.cheers.core.share.ui.BlueCheers)
+                        .background(BlueCheers)
                 )
                 Spacer(Modifier.width(12.dp))
             }

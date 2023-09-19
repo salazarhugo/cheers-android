@@ -17,10 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.item.SettingItem
 import com.salazar.cheers.core.ui.item.SettingTitle
+import com.salazar.cheers.core.ui.theme.GreenGoogle
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.ui.ui.Toolbar
 
@@ -43,6 +43,7 @@ fun SecurityScreen(
 //            val user = uiState.firebaseUser!!
 //            val verified = user.isEmailVerified
 
+            val passcodeEnabled = uiState.passcodeEnabled
             val signInMethods = uiState.signInMethods
 
             SettingTitle(title = "Sign in methods")
@@ -59,13 +60,12 @@ fun SecurityScreen(
                 true
 //                signInMethods.contains(GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
 
-            val passcodeLockEnabled = true
             SettingItem(
                 title = "Passcode Lock",
                 icon = Icons.Outlined.Lock,
                 onClick = onPasscodeClick,
                 trailingContent = {
-                    val text = if (passcodeLockEnabled) "On" else "Off"
+                    val text = if (passcodeEnabled) "On" else "Off"
                     Text(
                         text = text,
                         style = MaterialTheme.typography.labelLarge,
@@ -125,51 +125,37 @@ fun SignInMethodItem(
     onUnlink: () -> Unit,
     onLink: () -> Unit = {},
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = method,
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (linked) {
-                if (unlinkable) {
-                    Text(
-                        modifier = Modifier.clickable { onUnlink() },
-                        text = "Unlink",
+    SettingItem(
+        title = method,
+        icon = icon,
+        onClick = onClick,
+        trailingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (linked) {
+                    if (unlinkable) {
+                        Text(
+                            modifier = Modifier.clickable { onUnlink() },
+                            text = "Unlink",
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = GreenGoogle,
                     )
-                    Spacer(Modifier.width(8.dp))
-                }
-                Icon(
-                    Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = com.salazar.cheers.core.share.ui.GreenGoogle,
-                )
-            } else {
-                TextButton(
-                    onClick = { onLink() }
-                ) {
-                    Text(
-                        text = "Link",
-                    )
+                } else {
+                    TextButton(
+                        onClick = { onLink() }
+                    ) {
+                        Text(
+                            text = "Link",
+                        )
+                    }
                 }
             }
         }
-    }
+    )
 }

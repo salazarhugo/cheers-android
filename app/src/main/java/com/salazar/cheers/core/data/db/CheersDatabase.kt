@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.comment.domain.models.Comment
 import com.salazar.cheers.core.data.internal.*
+import com.salazar.cheers.core.model.Ticket
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.activity.Activity
 import com.salazar.cheers.data.db.*
@@ -17,6 +18,7 @@ import com.salazar.cheers.data.party.Party
 import com.salazar.cheers.data.party.PartyDao
 import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.data.post.repository.PostDao
+import com.salazar.cheers.data.ticket.TicketDao
 import com.salazar.cheers.data.user.RecentUser
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserDao
@@ -53,7 +55,7 @@ import com.salazar.cheers.feature.chat.domain.models.ChatMessage
         FriendRequest::class,
         Note::class,
     ],
-    version = 27,
+    version = 28,
     exportSchema = false,
     autoMigrations = []
 )

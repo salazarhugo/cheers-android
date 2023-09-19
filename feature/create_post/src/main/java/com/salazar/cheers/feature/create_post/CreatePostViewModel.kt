@@ -68,7 +68,7 @@ class CreatePostViewModel @Inject constructor(
         viewModelScope.launch {
             val account = createPostUseCases.getAccountUseCase().first()
             viewModelState.update {
-                it.copy(profilePictureUrl = account.picture)
+                it.copy(profilePictureUrl = account?.picture)
             }
         }
 

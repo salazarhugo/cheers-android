@@ -62,6 +62,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.domain.model.UserWithStories
 import com.salazar.cheers.core.ui.carousel
 import com.salazar.cheers.core.ui.item.PostHeader
+import com.salazar.cheers.core.ui.theme.StrongRed
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import kotlinx.coroutines.launch
@@ -349,7 +350,7 @@ fun StoryFeedFooter(
                 Icons.Default.FavoriteBorder
 
             val tint = when (hasLiked) {
-                true -> com.salazar.cheers.core.share.ui.StrongRed
+                true -> StrongRed
                 false -> Color.White
             }
 

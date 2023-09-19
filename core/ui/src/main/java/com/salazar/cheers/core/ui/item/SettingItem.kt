@@ -39,32 +39,37 @@ fun SettingRadioButtonItem(
 @Composable
 fun SettingItem(
     title: String,
-    icon: ImageVector,
+    icon: ImageVector? = null,
     onClick: () -> Unit = {},
+    color: Color = Color.Unspecified,
     trailingContent: @Composable () -> Unit = {},
 ) {
+    val leadingContent: (@Composable () -> Unit)? = when(icon) {
+        null -> null
+        else -> { { Icon(imageVector = icon, contentDescription = null) } }
+    }
+
     ListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
         headlineContent = {
-            Text(text = title)
+            Text(text = title, color = color)
         },
-        leadingContent = {
-            Icon(imageVector = icon, contentDescription = null)
-        },
+        leadingContent = leadingContent,
         trailingContent = trailingContent,
     )
 }
 
 @Composable
 fun SettingTitle(
+    modifier: Modifier = Modifier,
     title: String
 ) {
     Text(
         text = title,
         color = MaterialTheme.colorScheme.primary,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(16.dp),
+        modifier = modifier.padding(16.dp),
     )
 }

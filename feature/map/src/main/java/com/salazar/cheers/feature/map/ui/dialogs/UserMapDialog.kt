@@ -23,6 +23,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.theme.GreenGoogle
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.feature.map.domain.models.UserLocation
 
@@ -76,7 +77,7 @@ fun UserLocationItem(
                         val timestamp =
                             com.salazar.cheers.core.util.relativeTimeFormatter(epoch = userLocation.lastUpdated).text
                         if (timestamp == "just now") {
-                            withStyle(style = SpanStyle(color = com.salazar.cheers.core.share.ui.GreenGoogle)) {
+                            withStyle(style = SpanStyle(color = GreenGoogle)) {
                                 append(timestamp)
                             }
                         } else {

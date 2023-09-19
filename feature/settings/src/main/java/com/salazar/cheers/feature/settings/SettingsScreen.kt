@@ -1,10 +1,25 @@
 package com.salazar.cheers.feature.settings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Computer
+import androidx.compose.material.icons.outlined.CreditCard
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Policy
+import androidx.compose.material.icons.outlined.QuestionAnswer
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -102,15 +117,13 @@ fun HelpSection(
         SettingItem(
             title = stringResource(id = R.string.privacy_policy),
             icon = Icons.Outlined.Policy,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnPrivacyPolicyClick)
-        }
+            onClick = { onSettingsUIAction(SettingsUIAction.OnPrivacyPolicyClick) },
+        )
         SettingItem(
             title = stringResource(id = R.string.terms_of_use),
             icon = Icons.Outlined.Policy,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnTermsOfUseClick)
-        }
+            onClick = { onSettingsUIAction(SettingsUIAction.OnTermsOfUseClick) },
+        )
     }
 }
 
@@ -122,7 +135,11 @@ fun AccountSection(
         SettingTitle(
             title = stringResource(id = R.string.account),
         )
-        SettingItem("Become VIP", Icons.Outlined.WorkspacePremium, navigateToBecomeVip)
+        SettingItem(
+            title = "Become VIP",
+            icon = Icons.Outlined.WorkspacePremium,
+            onClick = navigateToBecomeVip,
+        )
     }
 }
 
@@ -135,27 +152,31 @@ fun SettingsSection(
             title = stringResource(id = R.string.settings),
         )
         SettingItem(
-            "Notifications and Sounds",
-            Icons.Outlined.Notifications,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
-        }
+            title = "Notifications and Sounds",
+            icon = Icons.Outlined.Notifications,
+            onClick = {
+                onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
+            },
+        )
         SettingItem(
-            "Chat Settings",
-            Icons.Outlined.ChatBubbleOutline,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
-        }
+            title  = "Chat Settings",
+            icon = Icons.Outlined.ChatBubbleOutline,
+            onClick = {
+                onSettingsUIAction(SettingsUIAction.OnNotificationsClick)
+            },
+        )
         SettingItem(
-            stringResource(id = R.string.security),
-            Icons.Outlined.Security,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnSecurityClick)
-        }
+            title = stringResource(id = R.string.security),
+            icon = Icons.Outlined.Security,
+            onClick = {
+                onSettingsUIAction(SettingsUIAction.OnSecurityClick)
+            },
+        )
         SettingItem(
-            stringResource(id = R.string.devices),
-            Icons.Outlined.Computer,
-            {},
+            title = stringResource(id = R.string.devices),
+            icon = Icons.Outlined.Computer,
+            onClick = {
+            },
         )
 //        SettingItem("Payment Methods", Icons.Outlined.CreditCard) {
 //            onSettingsUIAction(SettingsUIAction.OnAddPaymentClick)
@@ -163,28 +184,31 @@ fun SettingsSection(
         SettingItem(
             stringResource(id = R.string.recharge_coins),
             Icons.Outlined.CreditCard,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnRechargeClick)
-        }
+            onClick = {
+                onSettingsUIAction(SettingsUIAction.OnRechargeClick)
+            },
+        )
 //        SettingItem("Payment History", Icons.Outlined.CreditCard) {
 //            onSettingsUIAction(SettingsUIAction.OnPaymentHistoryClick)
 //        }
         SettingItem(
-            stringResource(id = R.string.language),
+            title = stringResource(id = R.string.language),
             Icons.Outlined.Language,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnLanguageClick)
-        }
+            onClick = {
+                onSettingsUIAction(SettingsUIAction.OnLanguageClick)
+            },
+        )
         SettingItem(
-            stringResource(id = R.string.theme),
-            Icons.Outlined.Palette,
-        ) {
-            onSettingsUIAction(SettingsUIAction.OnThemeClick)
-        }
+            title = stringResource(id = R.string.theme),
+            icon = Icons.Outlined.Palette,
+            onClick = {
+                onSettingsUIAction(SettingsUIAction.OnThemeClick)
+            },
+        )
         SettingItem(
-            stringResource(id = R.string.about),
-            Icons.Outlined.Info,
-            {}
+            title = stringResource(id = R.string.about),
+            icon = Icons.Outlined.Info,
+            onClick = { },
         )
     }
 }

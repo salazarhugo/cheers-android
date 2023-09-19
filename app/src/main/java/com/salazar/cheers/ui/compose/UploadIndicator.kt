@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,5 +22,5 @@ fun UploadIndicator(progress: Double) {
     ) {
         LinearProgressIndicator(progress = progress.toFloat() / 100f)
     }
-    DividerM3()
+    Divider()
 }
