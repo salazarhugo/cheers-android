@@ -54,7 +54,7 @@ class ShareViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            listFriendUseCase().collect(::updateUsers)
+            //listFriendUseCase().collect(::updateUsers)
         }
     }
 

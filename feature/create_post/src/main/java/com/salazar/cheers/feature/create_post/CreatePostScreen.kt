@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -63,68 +64,62 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.mapbox.search.ResponseInfo
-import com.mapbox.search.ReverseGeoOptions
-import com.mapbox.search.SearchCallback
-import com.mapbox.search.SearchEngine
-import com.mapbox.search.SearchEngineSettings
-import com.mapbox.search.result.SearchResult
+import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.CarouselDrinks
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.ChipGroup
 import com.salazar.cheers.core.ui.MultipleAnnotation
 import com.salazar.cheers.core.ui.ShareButton
+import com.salazar.cheers.core.ui.annotations.ScreenPreviews
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.ErrorMessage
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
-fun CreatePostScreen(
+fun CreatePostScreenStateful(
     uiState: CreatePostUiState,
-    onUploadPost: () -> Unit,
+    onUploadPost: (Int) -> Unit,
     interactWithChooseOnMap: () -> Unit,
     interactWithDrunkennessLevel: () -> Unit,
-    navigateToCamera: () -> Unit,
     navigateToTagUser: () -> Unit,
-    onSelectLocation: (SearchResult) -> Unit,
+//    onSelectLocation: (SearchResult) -> Unit,
     onSelectMedia: (Uri) -> Unit,
     onCaptionChanged: (String) -> Unit,
-    onNotifyChange: (Boolean) -> Unit,
     unselectLocation: () -> Unit,
     updateLocationName: (String) -> Unit,
-    updateLocationResults: (List<SearchResult>) -> Unit,
-    onMediaSelectorClicked: () -> Unit,
+//    updateLocationResults: (List<SearchResult>) -> Unit,
     onSelectPrivacy: (Privacy) -> Unit,
     onCreatePostUIAction: (CreatePostUIAction) -> Unit,
 ) {
-    val searchCallback = object : SearchCallback {
-        override fun onResults(
-            results: List<SearchResult>,
-            responseInfo: ResponseInfo
-        ) {
-            if (results.isNotEmpty()) {
-                updateLocationResults(results)
-                updateLocationName("On Pin")
-            }
-        }
-
-        override fun onError(e: Exception) {}
-    }
+//    val searchCallback = object : SearchCallback {
+//        override fun onResults(
+//            results: List<SearchResult>,
+//            responseInfo: ResponseInfo
+//        ) {
+//            if (results.isNotEmpty()) {
+//                updateLocationResults(results)
+//                updateLocationName("On Pin")
+//            }
+//        }
+//
+//        override fun onError(e: Exception) {}
+//    }
 
     if (uiState.locationPoint != null) {
-        val options = ReverseGeoOptions(
-            center = uiState.locationPoint,
-        )
+//        val options = ReverseGeoOptions(
+//            center = uiState.locationPoint,
+//        )
         val context = LocalContext.current
-        val reverseGeocoding = remember {
-            SearchEngine.createSearchEngine(
-                SearchEngineSettings(context.getString(R.string.mapbox_access_token))
-            )
-        }
-        reverseGeocoding.search(options, searchCallback)
+//        val reverseGeocoding = remember {
+//            SearchEngine.createSearchEngine(
+//                SearchEngineSettings(context.getString(R.string.mapbox_access_token))
+//            )
+//        }
+//        reverseGeocoding.search(options, searchCallback)
     }
 
     if (uiState.privacyState.isVisible)
@@ -134,91 +129,129 @@ fun CreatePostScreen(
             onSelectPrivacy = onSelectPrivacy,
         )
 
-    val enabled = uiState.caption.isNotEmpty() || uiState.photos.isNotEmpty() // || uiState.drinkState.currentPage > 0
+    CreatePostScreen(
+        avatar = uiState.profilePictureUrl,
+        caption = uiState.caption,
+        errorMessage = uiState.errorMessage,
+        onCreatePostUIAction = onCreatePostUIAction,
+        location = uiState.location,
+//        locationResults = uiState.locationResults.map { it.name },
+        drinks = uiState.drinks,
+        onUploadPost = onUploadPost,
+        photos = uiState.photos,
+        notificationEnabled = uiState.notify,
+        isLoading = uiState.isLoading,
+    )
+}
+
+@Composable
+fun CreatePostScreen(
+    caption: String,
+    modifier: Modifier = Modifier,
+    errorMessage: String? = null,
+    location: String? = null,
+    locationResults: List<String> = emptyList(),
+    avatar: String? = null,
+    photos: List<Uri> = emptyList(),
+    drinks: List<Drink> = emptyList(),
+    notificationEnabled: Boolean = true,
+    isLoading: Boolean = false,
+    onUploadPost: (Int) -> Unit = {},
+    onCreatePostUIAction: (CreatePostUIAction) -> Unit = {},
+) {
+    val enabled = caption.isNotEmpty() || photos.isNotEmpty() // || uiState.drinkState.currentPage > 0
+    val drinkState = rememberPagerState {
+        drinks.size
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 onDismiss = { onCreatePostUIAction(CreatePostUIAction.OnBackPressed) },
                 onShare = {
-                    onUploadPost()
+                    val drinkID = drinks[drinkState.currentPage]
+                    onUploadPost(drinkID.id)
                     onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
                 },
-                isLoading = uiState.isLoading,
+                isLoading = isLoading,
             )
         },
         bottomBar = {
             ShareButton(
                 modifier = Modifier.navigationBarsPadding(),
                 text = stringResource(id = R.string.share),
-                isLoading = uiState.isLoading,
+                isLoading = isLoading,
                 onClick = {
-                    onUploadPost()
+                    val drinkID = drinks[drinkState.currentPage]
+                    onUploadPost(drinkID.id)
                     onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
                 },
                 enabled = enabled,
             )
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
         ) {
-            AnimatedVisibility(visible = uiState.photos.isEmpty()) {
+            AnimatedVisibility(visible = photos.isEmpty()) {
                 AddPhotoOrVideo(
-                    navigateToCamera = navigateToCamera,
-                    onMediaSelectorClicked = onMediaSelectorClicked,
+                    navigateToCamera = {
+                        onCreatePostUIAction(CreatePostUIAction.OnCameraClick)
+                    },
+                    onMediaSelectorClicked = {
+                        onCreatePostUIAction(CreatePostUIAction.OnGalleryClick)
+                    },
                 )
             }
             ErrorMessage(
-                errorMessage = uiState.errorMessage,
+                errorMessage = errorMessage,
                 paddingValues = PaddingValues(16.dp),
             )
             CaptionSection(
                 modifier = Modifier
                     .padding(start = 15.dp, end = 15.dp)
                     .fillMaxWidth(),
-                profilePictureUrl = uiState.profilePictureUrl,
-                caption = uiState.caption,
-                onCaptionChanged = onCaptionChanged,
-                photos = uiState.photos,
-                onImageClick = onMediaSelectorClicked,
+                avatar = avatar,
+                caption = caption,
+                onCaptionChanged = {
+                    onCreatePostUIAction(CreatePostUIAction.OnCaptionChange(it))
+                },
+                photos = photos,
+                onImageClick = {
+                    onCreatePostUIAction(CreatePostUIAction.OnGalleryClick)
+                },
             )
             Divider()
             AddPeople(
-                selectedTagUsers = uiState.selectedTagUsers,
-                navigateToTagUser = navigateToTagUser,
+                users = emptyList(),
+                navigateToTagUser = {},
             )
             Divider()
-            if (uiState.selectedLocation != null)
+            if (location != null)
                 SelectedLocation(
-                    location = uiState.selectedLocation,
-                    navigateToChooseOnMap = interactWithChooseOnMap,
-                    unselectLocation = unselectLocation,
+                    location = location,
+                    navigateToChooseOnMap = {},//interactWithChooseOnMap,
+                    unselectLocation = {}, //unselectLocation,
                 )
             else
                 LocationSection(
-                    location = uiState.location,
-                    navigateToChooseOnMap = interactWithChooseOnMap
+                    location = location,
+                    navigateToChooseOnMap = {},
                 )
             LocationResultsSection(
-                results = uiState.locationResults,
-                onSelectLocation = onSelectLocation,
+                results = locationResults,
+                onSelectLocation = {},
             )
             Divider()
             BeverageSection(
-                uiState = uiState,
+                pagerState = drinkState,
+                drinks = drinks,
                 onCreatePostUIAction = onCreatePostUIAction,
             )
-            Divider()
-            DrunkennessLevelSection(
-                drunkenness = uiState.drunkenness,
-                interactWithChooseBeverage = interactWithDrunkennessLevel
-            )
-            Divider()
 //                Privacy(
-//                    privacyState = uiState.privacyState,
-//                    privacy = uiState.privacy,
+//                    privacyState = privacyState,
+//                    privacy = privacy,
 //                )
             Divider()
             EndDateSection(
@@ -228,10 +261,22 @@ fun CreatePostScreen(
             Divider()
             SwitchPreference(
                 text = "Send notification to friends",
-                checked = uiState.notify,
-                onCheckedChange = onNotifyChange
+                checked = notificationEnabled,
+                onCheckedChange = {
+                    onCreatePostUIAction(CreatePostUIAction.OnNotificationChange(it))
+                },
             )
         }
+    }
+}
+
+@ScreenPreviews
+@Composable
+private fun CreatePostScreenPreview() {
+    CheersPreview {
+        CreatePostScreen(
+            caption = "Geneva is one of the most famous city in the world.",
+        )
     }
 }
 
@@ -352,23 +397,18 @@ fun DrunkennessLevelSection(
 
 @Composable
 fun BeverageSection(
-    uiState: CreatePostUiState,
+    pagerState: PagerState,
+    drinks: List<Drink>,
     onCreatePostUIAction: (CreatePostUIAction) -> Unit,
 ) {
-    Column(
+    CarouselDrinks(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
-    ) {
-        CarouselDrinks(
-            pagerState = rememberPagerState {
-                uiState.drinks.size
-            },
-            drinks = uiState.drinks,
-            onBeverageClick = {
-            },
-        )
-    }
+            .padding(vertical = 16.dp),
+        pagerState = pagerState,
+        drinks = drinks,
+        onBeverageClick = { },
+    )
 }
 
 @Composable
@@ -477,7 +517,7 @@ fun AddPhotoOrVideo(
 
 @Composable
 fun LocationSection(
-    location: String,
+    location: String?,
     navigateToChooseOnMap: () -> Unit
 ) {
     Row(
@@ -497,7 +537,7 @@ fun LocationSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(Icons.Outlined.MyLocation, null)
-            if (location.isNotBlank())
+            if (location?.isNotBlank() == true)
                 Text(
                     text = location,
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
@@ -508,22 +548,26 @@ fun LocationSection(
 
 @Composable
 fun LocationResultsSection(
-    results: List<SearchResult>,
-    onSelectLocation: (SearchResult) -> Unit,
+    results: List<String>,
+    onSelectLocation: (String) -> Unit,
 ) {
-    if (results.isNotEmpty())
-        LocationResult(results = results, onSelectLocation = onSelectLocation)
+    if (results.isNotEmpty()) {
+        LocationResult(
+            results = results,
+            onSelectLocation = onSelectLocation,
+        )
+    }
 }
 
 @Composable
 fun LocationResult(
-    results: List<SearchResult>,
-    onSelectLocation: (SearchResult) -> Unit,
+    results: List<String>,
+    onSelectLocation: (String) -> Unit,
 ) {
     ChipGroup(
-        users = results.map { it.name },
+        users = results,
         onSelectedChanged = { name ->
-            val location = results.find { it.name == name }
+            val location = results.find { it == name }
             if (location != null)
                 onSelectLocation(location)
         },
@@ -532,7 +576,7 @@ fun LocationResult(
 
 @Composable
 fun SelectedLocation(
-    location: SearchResult,
+    location: String,
     navigateToChooseOnMap: () -> Unit,
     unselectLocation: () -> Unit,
 ) {
@@ -548,11 +592,11 @@ fun SelectedLocation(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.tertiary)
-            Text(text = location.name, fontSize = 14.sp)
+            Text(text = location, fontSize = 14.sp)
         }
         Icon(
-            Icons.Outlined.Close,
-            null,
+            imageVector = Icons.Outlined.Close,
+            contentDescription = null,
             tint = MaterialTheme.colorScheme.tertiary,
             modifier = Modifier.clickable { unselectLocation() }
         )
@@ -561,7 +605,7 @@ fun SelectedLocation(
 
 @Composable
 fun AddPeople(
-    selectedTagUsers: List<com.salazar.cheers.core.model.UserItem>,
+    users: List<com.salazar.cheers.core.model.UserItem>,
     navigateToTagUser: () -> Unit,
 ) {
     Row(
@@ -576,11 +620,11 @@ fun AddPeople(
             text = "Add friends",
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
         )
-        if (selectedTagUsers.size == 1)
-            Text(text = selectedTagUsers[0].username, style = MaterialTheme.typography.labelLarge)
-        else if (selectedTagUsers.size > 1)
+        if (users.size == 1)
+            Text(text = users[0].username, style = MaterialTheme.typography.labelLarge)
+        else if (users.size > 1)
             Text(
-                text = "${selectedTagUsers.size} friends",
+                text = "${users.size} friends",
                 style = MaterialTheme.typography.labelLarge
             )
         else
@@ -591,7 +635,7 @@ fun AddPeople(
 @Composable
 fun CaptionSection(
     modifier: Modifier = Modifier,
-    profilePictureUrl: String?,
+    avatar: String?,
     photos: List<Uri>,
     caption: String,
     onCaptionChanged: (String) -> Unit,
@@ -601,8 +645,8 @@ fun CaptionSection(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        UserProfilePicture(
-            picture = profilePictureUrl,
+        AvatarComponent(
+            avatar = avatar,
             size = 40.dp,
         )
 

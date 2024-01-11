@@ -16,17 +16,22 @@ import cheers.post.v1.PostServiceGrpcKt
 import cheers.story.v1.StoryServiceGrpcKt
 import cheers.ticket.v1.TicketServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
-import com.salazar.cheers.comment.data.CommentRepository
-import com.salazar.cheers.comment.data.CommentRepositoryImpl
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.salazar.cheers.BuildConfig
 import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.core.data.db.CheersDatabase
-import com.salazar.cheers.core.data.remote.ErrorHandleInterceptor
+import com.salazar.cheers.core.data.remote.TokenInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
+import com.salazar.cheers.core.data.remote.LoggerInterceptor
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.data.activity.impl.ActivityRepositoryImpl
 import com.salazar.cheers.data.billing.api.ApiService
+import com.salazar.cheers.data.comment.CommentRepository
+import com.salazar.cheers.data.comment.CommentRepositoryImpl
 import com.salazar.cheers.data.db.*
+import com.salazar.cheers.data.drink.db.DrinkDao
 import com.salazar.cheers.data.note.db.NoteDao
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.data.note.repository.NoteRepositoryImpl
@@ -100,7 +105,7 @@ object AppModule {
             .client(okHttpClient)
             .build()
 
-        return retrofit.create(com.salazar.cheers.data.billing.api.ApiService::class.java)
+        return retrofit.create(ApiService::class.java)
     }
 
 
@@ -116,11 +121,6 @@ object AppModule {
         val client = OkHttpClient()
         return client.newWebSocket(request, chatWebSocketListener)
     }
-
-    @Provides
-    @Singleton
-    fun provideErrorHandlerInterceptor(): ErrorHandleInterceptor =
-        ErrorHandleInterceptor()
 
     @Provides
     @Singleton
@@ -206,44 +206,44 @@ object AppModule {
     @Singleton
     fun provideNoteServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): NoteServiceGrpcKt.NoteServiceCoroutineStub {
         return NoteServiceGrpcKt
             .NoteServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
     }
 
     @Provides
     @Singleton
     fun provideDrinkServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): DrinkServiceGrpcKt.DrinkServiceCoroutineStub {
         return DrinkServiceGrpcKt
             .DrinkServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
     }
 
     @Provides
     @Singleton
     fun provideLocationServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): LocationServiceGrpcKt.LocationServiceCoroutineStub {
         return LocationServiceGrpcKt
             .LocationServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
     }
 
     @Provides
     @Singleton
     fun provideAccountServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): AccountServiceGrpcKt.AccountServiceCoroutineStub {
         return AccountServiceGrpcKt
             .AccountServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
@@ -251,11 +251,13 @@ object AppModule {
     @Singleton
     fun provideFriendshipServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub {
         return FriendshipServiceGrpcKt
             .FriendshipServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(loggerInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
@@ -263,11 +265,11 @@ object AppModule {
     @Singleton
     fun provideCommentServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): CommentServiceGrpcKt.CommentServiceCoroutineStub {
         return CommentServiceGrpcKt
             .CommentServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
@@ -275,53 +277,63 @@ object AppModule {
     @Singleton
     fun provideStoryServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): StoryServiceGrpcKt.StoryServiceCoroutineStub {
         return StoryServiceGrpcKt
             .StoryServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
     @Provides
     @Singleton
     fun provideTicketServiceCoroutineStub(
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): TicketServiceGrpcKt.TicketServiceCoroutineStub {
         val a = ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
         return TicketServiceGrpcKt
             .TicketServiceCoroutineStub(a)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
     @Provides
     @Singleton
     fun provideActivityServiceCoroutineStub(
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): ActivityServiceGrpcKt.ActivityServiceCoroutineStub {
         val a = ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
         return ActivityServiceGrpcKt
             .ActivityServiceCoroutineStub(a)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
+            .apply {
+                if (BuildConfig.DEBUG)
+                    return withInterceptors(loggerInterceptor)
+            }
             .withInterceptors()
     }
 
     @Provides
     @Singleton
     fun provideChatServiceCoroutineStub(
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): ChatServiceGrpcKt.ChatServiceCoroutineStub {
         val a = ManagedChannelBuilder
             .forAddress(Constants.GATEWAY_HOST, 443)
             .build()
         return ChatServiceGrpcKt
             .ChatServiceCoroutineStub(a)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
+            .apply {
+                if (BuildConfig.DEBUG)
+                    return withInterceptors(loggerInterceptor)
+            }
             .withInterceptors()
     }
 
@@ -329,11 +341,11 @@ object AppModule {
     @Singleton
     fun provideNotificationServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): NotificationServiceGrpcKt.NotificationServiceCoroutineStub {
         return NotificationServiceGrpcKt
             .NotificationServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
@@ -341,11 +353,11 @@ object AppModule {
     @Singleton
     fun provideUserServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
     ): UserServiceGrpcKt.UserServiceCoroutineStub {
         return UserServiceGrpcKt
             .UserServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
 
@@ -353,11 +365,16 @@ object AppModule {
     @Singleton
     fun providePartyServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): PartyServiceGrpcKt.PartyServiceCoroutineStub {
         return PartyServiceGrpcKt
             .PartyServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
+            .apply {
+                if (BuildConfig.DEBUG)
+                    return withInterceptors(loggerInterceptor)
+            }
             .withInterceptors()
     }
 
@@ -365,14 +382,24 @@ object AppModule {
     @Singleton
     fun providePostServiceCoroutineStub(
         managedChannel: ManagedChannel,
-        errorHandleInterceptor: ErrorHandleInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): PostServiceGrpcKt.PostServiceCoroutineStub {
         return PostServiceGrpcKt
             .PostServiceCoroutineStub(managedChannel)
-            .withInterceptors(errorHandleInterceptor)
+            .withInterceptors(tokenInterceptor)
+            .apply {
+                if (BuildConfig.DEBUG)
+                    return withInterceptors(loggerInterceptor)
+            }
             .withInterceptors()
     }
 
+    @Singleton
+    @Provides
+    fun provideAppUpdateManager(@ApplicationContext applicationContext: Context): AppUpdateManager {
+        return AppUpdateManagerFactory.create(applicationContext)
+    }
 
     @Singleton
     @Provides
@@ -389,6 +416,14 @@ object AppModule {
         cheersDatabase: CheersDatabase,
     ): NoteDao {
         return cheersDatabase.noteDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideDrinkDao(
+        cheersDatabase: CheersDatabase,
+    ): DrinkDao {
+        return cheersDatabase.drinkDao()
     }
 
     @Singleton

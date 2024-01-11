@@ -5,6 +5,7 @@ import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -53,7 +54,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -139,24 +146,27 @@ fun ChatScreen(
                     onChatUIAction = onChatUIAction,
                 )
             }
-            if (channel?.type == RoomType.DIRECT)
-                DirectChatBar(
-                    name = channel.name,
-                    verified = channel.verified,
-                    picture = channel.picture,
-                    onNavIconPressed = {
-                        onChatUIAction(ChatUIAction.OnBackPressed)
-                    },
-                    onTitleClick = {
-                        onChatUIAction(ChatUIAction.OnUserClick(it))
-                    },
-                    scrollBehavior = scrollBehavior,
-                    onInfoClick = {
-                        onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
-                    },
-                )
-            else if (channel?.type == RoomType.GROUP)
-                GroupChatBar(
+            when (channel?.type) {
+                RoomType.DIRECT -> {
+                    Box {
+                        DirectChatBar(
+                            name = channel.name,
+                            verified = channel.verified,
+                            picture = channel.picture,
+                            onNavIconPressed = {
+                                onChatUIAction(ChatUIAction.OnBackPressed)
+                            },
+                            onTitleClick = {
+                                onChatUIAction(ChatUIAction.OnUserClick(it))
+                            },
+                            scrollBehavior = scrollBehavior,
+                            onInfoClick = {
+                                onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
+                            },
+                        )
+                    }
+                }
+                RoomType.GROUP -> GroupChatBar(
                     name = channel.name,
                     members = channel.members.size,
                     picture = channel.picture,
@@ -169,6 +179,8 @@ fun ChatScreen(
                     },
                     scrollBehavior = scrollBehavior,
                 )
+                else -> {}
+            }
         }
     }
 

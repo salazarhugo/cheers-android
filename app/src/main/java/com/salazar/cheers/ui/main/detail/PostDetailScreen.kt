@@ -38,15 +38,14 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.core.model.Privacy
-import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.PostText
 import com.salazar.cheers.core.ui.StaticMap
 import com.salazar.cheers.core.ui.UserItem
+import com.salazar.cheers.core.ui.components.post.PostBody
+import com.salazar.cheers.core.ui.components.post.PostHeader
 import com.salazar.cheers.core.ui.item.LikeButton
-import com.salazar.cheers.core.ui.item.PostBody
-import com.salazar.cheers.core.ui.item.PostHeader
 import com.salazar.cheers.core.ui.theme.Roboto
-import com.salazar.cheers.core.util.Utils.isDarkModeOn
 import java.util.Date
 
 @Composable
@@ -175,8 +174,14 @@ fun Post(
 
             item {
                 PostHeader(
-                    post = post,
-                    public = post.privacy == Privacy.PUBLIC.name,
+                    isPublic = post.privacy == Privacy.PUBLIC.name,
+                    username = post.username,
+                    verified = post.verified,
+                    avatar = post.profilePictureUrl,
+                    locationName = post.locationName,
+                    createTime = post.createTime,
+                    onUserClick = { },
+                    onMoreClick = {},
                 )
                 PostText(
                     caption = post.caption,
@@ -185,8 +190,7 @@ fun Post(
                 )
                 PostBody(
                     post = post,
-                    onPostClicked = {},
-                    onLike = {},
+                    onPostClick = {},
                 )
                 PostFooter(
                     post = post,
@@ -203,12 +207,18 @@ fun Post(
                 )
             }
             if (members != null)
-                items(members, key = { it.id }) { user ->
+                items(
+                    items = members,
+                    key = { it.id },
+                ) { user ->
                     UserItem(
                         userItem = user,
                         onClick = { onUserClick(user.username) },
                     ) {
-                        FollowButton(isFollowing = user.has_followed, onClick = {})
+                        FriendButton(
+                            isFriend = user.friend,
+                            onClick = {},
+                        )
                     }
                 }
             if (post.locationName.isNotBlank())
@@ -314,8 +324,8 @@ fun PostFooter(
         ) {
             LikeButton(
                 like = post.liked,
-                likes = post.likes,
-                onToggle = { onToggleLike(post) })
+                onToggle = { onToggleLike(post) },
+            )
             Icon(painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon), "")
             Icon(Icons.Outlined.Share, null)
         }

@@ -46,7 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.core.share.ui.Username
+import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading

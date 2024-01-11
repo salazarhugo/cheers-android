@@ -18,13 +18,18 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.homeScreen(
-    onActivityClick: () -> Unit,
-    navigateToSearch: () -> Unit,
-    navigateToCreatePost: () -> Unit,
-    navigateToCreateNote: () -> Unit,
-    navigateToParties: () -> Unit,
-    navigateToNote: (String) -> Unit,
-    onPostClick: (String) -> Unit,
+    onActivityClick: () -> Unit = {},
+    navigateToSearch: () -> Unit = {},
+    navigateToCreatePost: () -> Unit = {},
+    navigateToCreateNote: () -> Unit = {},
+    navigateToParties: () -> Unit = {},
+    navigateToNote: (String) -> Unit = {},
+    navigateToMessages: () -> Unit = {},
+    navigateToPostMoreSheet: (String) -> Unit = {},
+    navigateToPostComments: (String) -> Unit = {},
+    navigateToPostLikes: (String) -> Unit = {},
+    navigateToUser: (String) -> Unit,
+    onPostClick: (String) -> Unit = {},
 ) {
     composable(
         route = homeNavigationRoute,
@@ -42,6 +47,11 @@ fun NavGraphBuilder.homeScreen(
             navigateToCreateNote = navigateToCreateNote,
             navigateToNote = navigateToNote,
             navigateToParties = navigateToParties,
+            navigateToMessages = navigateToMessages,
+            navigateToPostMoreSheet = navigateToPostMoreSheet,
+            navigateToPostComments = navigateToPostComments,
+            navigateToPostLikes = navigateToPostLikes,
+            navigateToUser = navigateToUser,
         )
     }
 }

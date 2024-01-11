@@ -33,11 +33,17 @@ dependencies {
     implementation(project(":data:friendship"))
     implementation(project(":data:drink"))
     implementation(project(":data:ticket"))
+    implementation(project(":data:comment"))
 
     // Firebase BOM
-    implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.firebase.bom)) {
+        exclude(group = "com.google.protobuf")
+    }
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation(libs.play.services.auth)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

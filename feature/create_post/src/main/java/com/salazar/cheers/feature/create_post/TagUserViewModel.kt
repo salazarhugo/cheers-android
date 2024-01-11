@@ -48,7 +48,7 @@ class AddPeopleViewModel @Inject constructor(
 
     private fun refreshFriends(query: String = "") {
         viewModelScope.launch {
-            listFriendUseCase().collect(::updateUsers)
+            //listFriendUseCase().collect(::updateUsers)
         }
     }
 

@@ -4,13 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
 @Composable
 fun SecurityRoute(
     viewModel: SecurityViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
-    navigateToPassword: (Boolean) -> Unit,
+    navigateToPassword: () -> Unit,
     navigateToPasscodeSettings: () -> Unit,
     navigateToCreatePasscode: () -> Unit,
 ) {
@@ -25,7 +24,9 @@ fun SecurityRoute(
         uiState = uiState,
         onBackPressed = navigateBack,
         onUnlink = {},
-        onAddPassword = navigateToPassword,
+        onAddPassword = {
+            navigateToPassword()
+        },
         onLink = {
 //                if (it == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
 //                    authResultLauncher.launch(1)

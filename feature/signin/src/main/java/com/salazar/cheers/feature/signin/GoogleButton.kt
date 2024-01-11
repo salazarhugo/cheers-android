@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun GoogleButton(
+    modifier: Modifier = Modifier,
     text: String = "Continue with Google",
     loadingText: String = "Fetching data...",
     onClicked: () -> Unit
@@ -43,8 +43,7 @@ fun GoogleButton(
     var clicked by remember { mutableStateOf(false) }
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clickable {
                 clicked = !clicked
                 onClicked()

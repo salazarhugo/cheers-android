@@ -15,16 +15,7 @@ import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.plugin.locationcomponent.location2
 import com.mapbox.maps.plugin.scalebar.scalebar
-import com.mapbox.search.QueryType
-import com.mapbox.search.ReverseGeoOptions
-import com.mapbox.search.SearchCallback
-import com.mapbox.search.SearchEngine
-import com.mapbox.search.SearchEngineSettings
-import com.mapbox.search.common.AsyncOperationTask
-import com.mapbox.search.result.SearchResult
-import com.salazar.cheers.feature.map.R
 import com.salazar.cheers.feature.map.data.mapper.toUserLocation
 import com.salazar.cheers.feature.map.domain.models.UserLocation
 import kotlinx.coroutines.Dispatchers
@@ -88,39 +79,39 @@ class MapRepositoryImpl @Inject constructor(
 
 
 
-    private lateinit var reverseGeocoding: SearchEngine
-    private lateinit var searchRequestTask: AsyncOperationTask
-
-    val searchCallback = object : SearchCallback {
-        override fun onError(e: Exception) {
-            Log.i("SearchApiExample", "Reverse geocoding error", e)
-        }
-
-        override fun onResults(
-            results: List<SearchResult>,
-            responseInfo: com.mapbox.search.ResponseInfo
-        ) {
-            if (results.isEmpty()) {
-                Log.i("SearchApiExample", "No reverse geocoding results")
-            } else {
-//                updateCity(results[0].name)
-                Log.i("SearchApiExample", "Reverse geocoding results: $results")
-            }
-        }
-    }
+//    private lateinit var reverseGeocoding: SearchEngine
+//    private lateinit var searchRequestTask: AsyncOperationTask
+//
+//    val searchCallback = object : SearchCallback {
+//        override fun onError(e: Exception) {
+//            Log.i("SearchApiExample", "Reverse geocoding error", e)
+//        }
+//
+//        override fun onResults(
+//            results: List<SearchResult>,
+//            responseInfo: com.mapbox.search.ResponseInfo
+//        ) {
+//            if (results.isEmpty()) {
+//                Log.i("SearchApiExample", "No reverse geocoding results")
+//            } else {
+////                updateCity(results[0].name)
+//                Log.i("SearchApiExample", "Reverse geocoding results: $results")
+//            }
+//        }
+//    }
 
     override suspend fun onMapReady(
         mapView: MapView,
         context: Context
     ) = withContext(Dispatchers.Main) {
-        reverseGeocoding = SearchEngine.createSearchEngine(
-            SearchEngineSettings(context.getString(R.string.mapbox_access_token))
-        )
+//        reverseGeocoding = SearchEngine.createSearchEngine(
+//            SearchEngineSettings(context.getString(R.string.mapbox_access_token))
+//        )
         mapView.gestures.rotateEnabled = false
         mapView.attribution.enabled = false
         mapView.scalebar.enabled = false
 
-        mapView.getMapboxMap().flyTo(
+        mapView.mapboxMap.flyTo(
             CameraOptions.Builder()
                 .zoom(1.0)
                 .build()
@@ -132,8 +123,8 @@ class MapRepositoryImpl @Inject constructor(
 //            else
 //                "mapbox://styles/salazarbrock/ckzsmluho004114lmeb8rl2zi"
 
-        mapView.getMapboxMap().loadStyle(
-            com.mapbox.maps.extension.style.style(styleUri = style) {}
+        mapView.mapboxMap.loadStyle(
+            com.mapbox.maps.extension.style.style(style = style) {}
         ) {
             val positionChangedListener = onIndicatorPositionChangedListener(mapView)
             initLocationComponent(mapView, context, positionChangedListener)
@@ -154,20 +145,20 @@ class MapRepositoryImpl @Inject constructor(
         }
 
         override fun onMoveEnd(detector: MoveGestureDetector) {
-            val cameraState = mapView.getMapboxMap().cameraState
+            val cameraState = mapView.mapboxMap.cameraState
             val center = cameraState.center
 
-            val queryType = when {
-                cameraState.zoom < 5.0 -> QueryType.COUNTRY
-                cameraState.zoom < 10.0 -> QueryType.REGION
-                else -> QueryType.PLACE
-            }
-
-            val options = ReverseGeoOptions(
-                center = center,
-                types = listOf(queryType)
-            )
-            searchRequestTask = reverseGeocoding.search(options, searchCallback)
+//            val queryType = when {
+//                cameraState.zoom < 5.0 -> QueryType.COUNTRY
+//                cameraState.zoom < 10.0 -> QueryType.REGION
+//                else -> QueryType.PLACE
+//            }
+//
+//            val options = ReverseGeoOptions(
+//                center = center,
+//                types = listOf(queryType)
+//            )
+//            searchRequestTask = reverseGeocoding.search(options, searchCallback)
         }
     }
 
@@ -195,8 +186,8 @@ class MapRepositoryImpl @Inject constructor(
     private fun onIndicatorPositionChangedListener(
         mapView: MapView,
     ) = OnIndicatorPositionChangedListener {
-        mapView.getMapboxMap().flyTo(CameraOptions.Builder().center(it).zoom(13.0).build())
-        mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
+        mapView.mapboxMap.flyTo(CameraOptions.Builder().center(it).zoom(13.0).build())
+        mapView.gestures.focalPoint = mapView.mapboxMap.pixelForCoordinate(it)
     }
 
     private fun onCameraTrackingDismissed(
@@ -214,7 +205,7 @@ class MapRepositoryImpl @Inject constructor(
         context: Context,
         onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener,
     ) {
-        val locationComponentPlugin = mapView.location2
+        val locationComponentPlugin = mapView.location
         locationComponentPlugin.puckBearingEnabled = false
 
         locationComponentPlugin.updateSettings {

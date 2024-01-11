@@ -4,13 +4,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.salazar.cheers.comment.data.db.CommentDao
-import com.salazar.cheers.comment.domain.models.Comment
-import com.salazar.cheers.core.data.internal.*
+import com.salazar.cheers.core.model.Comment
+import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Ticket
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.activity.Activity
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.*
+import com.salazar.cheers.data.drink.db.DrinkDao
 import com.salazar.cheers.data.friendship.FriendRequest
 import com.salazar.cheers.data.note.Note
 import com.salazar.cheers.data.note.db.NoteDao
@@ -54,8 +55,9 @@ import com.salazar.cheers.feature.chat.domain.models.ChatMessage
         Comment::class,
         FriendRequest::class,
         Note::class,
+        Drink::class,
     ],
-    version = 28,
+    version = 34,
     exportSchema = false,
     autoMigrations = []
 )
@@ -74,4 +76,5 @@ abstract class CheersDatabase : RoomDatabase() {
     abstract fun commentDao(): CommentDao
     abstract fun friendRequestDao(): com.salazar.cheers.data.friendship.FriendRequestDao
     abstract fun noteDao(): NoteDao
+    abstract fun drinkDao(): DrinkDao
 }

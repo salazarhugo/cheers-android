@@ -3,4 +3,48 @@
     <string name="not_available">Functionality currently not available</string>
     <string name="not_available_subtitle">Grab a beverage and check back later!</string>
     <string name="dismiss">Dismiss</string>
+    <string name="message_component_title">Hmm… Petit problème de chargement</string>
+    <string name="message_component_subtitle">Log in or create an account to get custom recommendations and buy tickets for the best parties.</string>
+
+    <!--    Pull To Refresh Component-->
+    <string name="header_idle">Pull down to refresh</string>
+    <string name="header_pulling">Release to refresh</string>
+    <string name="header_refreshing">Refreshing…</string>
+    <string name="header_complete">Refresh success</string>
+    <string name="header_failed">Refresh failed</string>
+    <string name="footer_idle">Pull up to load more</string>
+    <string name="footer_pulling">Release to load more</string>
+    <string name="footer_refreshing">Loading…</string>
+    <string name="footer_complete">Load success</string>
+    <string name="footer_failed">Load failed</string>
+    <string name="footer_no_more">No more data</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="replies">Replies</string>
+    <plurals name="comments">
+        <item quantity="zero">comment</item>
+        <item quantity="one">comment</item>
+        <item quantity="other">comments</item>
+    </plurals>
+    <plurals name="likes">
+        <item quantity="zero">like</item>
+        <item quantity="one">like</item>
+        <item quantity="other">likes</item>
+    </plurals>
+    <plurals name="friends">
+        <item quantity="zero">friend</item>
+        <item quantity="one">friend</item>
+        <item quantity="other">friends</item>
+    </plurals>
+    <plurals name="posts">
+        <item quantity="zero">post</item>
+        <item quantity="one">post</item>
+        <item quantity="other">posts</item>
+    </plurals>
+    <plurals name="parties">
+        <item quantity="zero">party</item>
+        <item quantity="one">party</item>
+        <item quantity="other">parties</item>
+    </plurals>
 </resources>

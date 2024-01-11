@@ -21,6 +21,7 @@ import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
+import com.salazar.cheers.feature.chat.ui.screens.messages.messagesNavigationRoute
 import com.salazar.cheers.feature.create_note.createNoteNavigationRoute
 import com.salazar.cheers.feature.create_post.createPostNavigationRoute
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
@@ -52,7 +53,7 @@ fun CheersNavGraph(
         navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
                 || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
                 || currentRoute.contains(MainDestinations.STORY_ROUTE)
-                || currentRoute.contains(MainDestinations.MESSAGES_ROUTE)
+                || currentRoute.contains(messagesNavigationRoute)
                 || currentRoute.contains(MainDestinations.CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.NEW_CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
@@ -79,12 +80,9 @@ fun CheersNavGraph(
         Scaffold(
             snackbarHost = { SnackbarHost(appState.snackBarHostState) },
             bottomBar = {
-                AnimatedVisibility(
-                    visible = !hide,
-                ) {
+                val visible = !hide
+                if (visible) {
                     CheersBottomBar(
-                        unreadChatCount = uiState.unreadChatCount,
-                        picture = uiState.account?.picture ?: "",
                         currentRoute = currentRoute,
                         onNavigate = { route ->
                             appState.navController.navigate(route)

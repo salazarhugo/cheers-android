@@ -14,6 +14,7 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.core.util.StorageUtil
+import com.salazar.cheers.core.util.Utils.extractImage
 import com.salazar.cheers.data.user.R
 import com.salazar.cheers.data.user.UserRepository
 import dagger.assisted.Assisted
@@ -33,8 +34,7 @@ class UploadProfilePicture @AssistedInject constructor(
             inputData.getString("PHOTO_URI") ?: return Result.failure()
 
         try {
-
-            val photoBytes = extractImage(Uri.parse(photoUriInput))
+            val photoBytes = extractImage(Uri.parse(photoUriInput), applicationContext)
 
             val task: Task<Uri> = StorageUtil.uploadProfilePhoto(photoBytes)
             val downloadUrl = Tasks.await(task)
@@ -54,14 +54,6 @@ class UploadProfilePicture @AssistedInject constructor(
             applicationContext,
             "DEFAULT_CHANNEL"
         )
-//            .setContentIntent(
-//                PendingIntent.getActivity(
-//                    applicationContext,
-//                    0,
-//                    Intent(applicationContext, MainActivity::class.java),
-//                    PendingIntent.FLAG_IMMUTABLE
-//                )
-//            )
             .setOngoing(false)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.cheers_logo)
@@ -72,16 +64,5 @@ class UploadProfilePicture @AssistedInject constructor(
             .setContentText("Updating widget")
             .build()
         return ForegroundInfo(1337, notification)
-    }
-
-    private fun extractImage(path: Uri): ByteArray {
-        val source: ImageDecoder.Source =
-            ImageDecoder.createSource(applicationContext.contentResolver, path)
-        val selectedImageBmp: Bitmap = ImageDecoder.decodeBitmap(source)
-
-        val outputStream = ByteArrayOutputStream()
-        selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-
-        return outputStream.toByteArray()
     }
 }

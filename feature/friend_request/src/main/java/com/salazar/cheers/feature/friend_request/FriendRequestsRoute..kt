@@ -19,8 +19,8 @@ fun FriendRequestsRoute(
             when(action) {
                 FriendRequestsUIAction.OnBackPressed -> navigateBack()
                 FriendRequestsUIAction.OnSwipeRefresh -> viewModel.onSwipeToRefresh()
-                is FriendRequestsUIAction.OnAcceptFriendRequest -> viewModel.onAcceptFriendRequest(action.userId)
-                is FriendRequestsUIAction.OnRefuseFriendRequest -> viewModel.onRefuseFriendRequest(action.userId)
+                is FriendRequestsUIAction.OnAcceptFriendRequest -> viewModel.onAcceptFriendRequest(action.userID)
+                is FriendRequestsUIAction.OnRefuseFriendRequest -> viewModel.onRefuseFriendRequest(action.userID)
                 is FriendRequestsUIAction.OnUserClick -> navigateToOtherProfile(action.userId)
                 is FriendRequestsUIAction.OnAddFriendClick -> viewModel.onAddFriendClick(action.userID)
                 is FriendRequestsUIAction.OnCancelFriendRequestClick -> viewModel.onCancelFriendRequestClick(userID = action.userID)

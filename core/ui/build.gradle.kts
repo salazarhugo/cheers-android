@@ -9,6 +9,10 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -16,6 +20,8 @@ dependencies {
     implementation(project(":core:util"))
     implementation(project(":core:model"))
     implementation(project(":core:shared"))
+
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
 
     implementation(project(":data:party"))
     implementation(project(":data:post"))
@@ -41,7 +47,8 @@ dependencies {
     implementation(libs.accompanist.pager.indicators)
 
     // Map Box SDK
-    implementation(libs.android)
+    implementation(libs.mapbox)
+    implementation("com.mapbox.extension:maps-compose:11.0.0")
     implementation(libs.mapbox.sdk.services)
 
     // Coil

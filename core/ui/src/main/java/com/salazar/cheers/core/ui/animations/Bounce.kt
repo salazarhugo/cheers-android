@@ -15,16 +15,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.salazar.common.ui.extensions.noRippleClickable
 
 enum class BounceState { Pressed, Released }
 
 @Composable
 fun Bounce(
     modifier: Modifier = Modifier,
+    hapticEnabled: Boolean = true,
     onBounce: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     var currentState: BounceState by remember { mutableStateOf(BounceState.Released) }
     val transition = updateTransition(targetState = currentState, label = "animation")
     val scale: Float by transition.animateFloat(
@@ -45,21 +50,26 @@ fun Bounce(
     ) {
         Column(
             modifier = Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(onPress = {
-                        currentState = BounceState.Pressed
-                        val wasConsumedByOtherGesture = !tryAwaitRelease()
-                        currentState = BounceState.Released
-                        if (wasConsumedByOtherGesture) return@detectTapGestures
-                        onBounce()
-                    })
+                .noRippleClickable {
+                    if (hapticEnabled) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                    onBounce()
                 }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onPress = {
+//                        currentState = BounceState.Pressed
+//                        val wasConsumedByOtherGesture = !tryAwaitRelease()
+//                        currentState = BounceState.Released
+//                        if (wasConsumedByOtherGesture)
+//                            return@detectTapGestures
+//                    })
+//                }
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                 },
-        ) {
-            content()
-        }
+            content = content,
+        )
     }
 }

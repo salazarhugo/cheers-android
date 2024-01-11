@@ -2,17 +2,17 @@ package com.salazar.cheers.feature.parties
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.CategoryTitle
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.EmptyFeed
 import com.salazar.cheers.core.ui.PartiesTopBar
-import com.salazar.cheers.core.ui.PartyItem
+import com.salazar.cheers.core.ui.item.party.PartyItem
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.data.party.Party
@@ -26,6 +26,7 @@ fun PartiesScreen(
     onMoreClick: (String) -> Unit,
     onSwipeToRefresh: () -> Unit,
     navigateToTickets: () -> Unit,
+    onCreatePartyClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -33,13 +34,14 @@ fun PartiesScreen(
                 query = uiState.query,
                 onQueryChange = onQueryChange,
                 onTicketsClick = navigateToTickets,
+                onCreatePartyClick = onCreatePartyClick,
             )
         },
     ) {
         val parties = uiState.parties
 
         if (parties == null)
-            com.salazar.cheers.core.share.ui.LoadingScreen()
+            LoadingScreen()
         else
             SwipeToRefresh(
                 onRefresh = onSwipeToRefresh,
@@ -89,6 +91,8 @@ fun PartyList(
 //                text = stringResource(id = R.string.on_display),
 //            )
 //        }
+        emptyParties(events.isEmpty())
+
         items(events, key = { it.id }) { event ->
             PartyItem(
                 party = event,
@@ -96,5 +100,13 @@ fun PartyList(
                 onMoreClick = onMoreClick,
             )
         }
+    }
+}
+
+private fun LazyListScope.emptyParties(isEmpty: Boolean) {
+    if (!isEmpty)
+        return
+    item {
+        EmptyFeed()
     }
 }

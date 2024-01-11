@@ -34,10 +34,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.data.user.RecentUser
 import com.salazar.cheers.data.user.User
@@ -58,6 +59,7 @@ fun SearchScreen(
             SearchBar(
                 modifier = Modifier
                     .statusBarsPadding()
+                    .fillMaxWidth()
                     .padding(16.dp),
                 query = uiState.searchInput,
                 onQueryChange = onSearchInputChanged,
@@ -194,7 +196,7 @@ fun RecentUserCard(
             Column {
                 if (user.fullName.isNotBlank())
                     Text(text = user.fullName, style = Typography.bodyMedium)
-                com.salazar.cheers.core.share.ui.Username(
+                Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium
@@ -241,14 +243,17 @@ fun UserSuggestionCard(
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                com.salazar.cheers.core.share.ui.Username(
+                Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium
                 )
             }
         }
-        FollowButton(isFollowing = user.followBack, onClick = { onFollowToggle(user.username) })
+        FriendButton(
+            isFriend = user.followBack,
+            onClick = { onFollowToggle(user.username) },
+        )
     }
 }
 
@@ -285,7 +290,7 @@ fun UserCard(
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                com.salazar.cheers.core.share.ui.Username(
+                Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium

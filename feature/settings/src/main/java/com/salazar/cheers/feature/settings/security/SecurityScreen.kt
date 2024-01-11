@@ -50,8 +50,7 @@ fun SecurityScreen(
 
 //            if (user.isAnonymous)
 //                SignInMethodItem(method = "Anonymous")
-            val hasEmailPassword =
-                true
+            val hasEmailPassword = true
 //                signInMethods.contains(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD)
             val hasEmailLink =
                 true

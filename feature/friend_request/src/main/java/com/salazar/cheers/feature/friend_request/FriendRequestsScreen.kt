@@ -23,7 +23,7 @@ import com.salazar.cheers.core.ui.text.MyText
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.user.ui.AddFriendButton
+import com.salazar.cheers.core.ui.AddFriendButton
 
 @Composable
 fun FriendRequestsScreen(

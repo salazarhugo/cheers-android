@@ -1,0 +1,144 @@
+package com.salazar.cheers.domain.usecase
+
+import android.content.Context
+import android.util.Log
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.PasswordCredential
+import androidx.credentials.PublicKeyCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.salazar.cheers.data.account.AccountRepository
+import com.salazar.cheers.data.account.toAccount
+import com.salazar.cheers.data.auth.AuthRepository
+import com.salazar.cheers.data.auth.mapper.toPasskey
+import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.shared.data.response.BeginLoginResponse
+import com.salazar.common.di.IODispatcher
+import com.salazar.common.util.Resource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+
+class SignInWithCredentialManagerFlowUseCase @Inject constructor(
+    @IODispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    private val authRepository: AuthRepository,
+    private val signInWithEmailAndPasswordUseCase: SignInWithEmailAndPasswordUseCase,
+    private val signInWithOneTapUseCase: SignInWithOneTapUseCase,
+    private val dataStoreRepository: DataStoreRepository,
+    private val accountRepository: AccountRepository,
+) {
+    suspend operator fun invoke(
+        activityContext: Context,
+        username: String?,
+    ): Flow<Resource<Throwable>> = withContext(ioDispatcher) {
+        return@withContext flow {
+
+            // Get the username from the data store.
+            val username1 = username ?: dataStoreRepository.getUsername().firstOrNull() ?: return@flow
+
+            // Get the challenge from the server.
+            val beginLoginResponse = authRepository.beginLogin(username = username1).getOrNull()
+                ?: return@flow
+
+            val result = authRepository.showSigninOptions(
+                activityContext = activityContext,
+                beginLoginResponse,
+            )
+
+            result.fold(
+                onSuccess = {
+                    emit(Resource.Loading(isLoading = true))
+                    emit(
+                        handleSignIn(username1, beginLoginResponse, it)
+                            .fold(
+                                onSuccess = { Resource.Success(Throwable()) },
+                                onFailure = { Resource.Error(it.localizedMessage, it) },
+                            )
+                    )
+                    emit(Resource.Loading(isLoading = false))
+                },
+                onFailure = {
+                    emit(Resource.Error(it.localizedMessage))
+                }
+            )
+        }
+    }
+
+    private suspend fun handleSignIn(
+        username: String,
+        beginLoginResponse: BeginLoginResponse,
+        result: GetCredentialResponse,
+    ): Result<Unit> {
+        val credential = result.credential
+
+        return when (credential) {
+            // Passkey
+            is PublicKeyCredential -> {
+                val response = authRepository.parseGetPasskeyResponse(credential)
+                    ?: return Result.failure(Exception("failed to parse get passkey response"))
+
+                authRepository.finishLogin(
+                    username = username,
+                    passkey = response.toPasskey(),
+                    challenge = beginLoginResponse.challenge,
+                ).fold(
+                    onSuccess = { response ->
+                        accountRepository.putAccount(
+                            account = response.user.toAccount(),
+                        )
+                        // Save username in data store
+                        dataStoreRepository.updateUsername(username)
+                        return authRepository.signInWithCustomToken(response.token)
+                    },
+                    onFailure = {
+                        return Result.failure(it)
+                    }
+                )
+            }
+
+            is PasswordCredential -> {
+                val username = credential.id
+                val password = credential.password
+                signInWithEmailAndPasswordUseCase(
+                    email = username,
+                    password = password,
+                )
+            }
+
+            is CustomCredential -> {
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    try {
+                        val googleIdTokenCredential = GoogleIdTokenCredential
+                            .createFrom(credential.data)
+                        signInWithOneTapUseCase(
+                            idToken = googleIdTokenCredential.idToken
+                        ).fold(
+                            onSuccess = {
+                                return Result.success(Unit)
+                            },
+                            onFailure = {
+                                return Result.failure(it)
+                            }
+                        )
+                    } catch (e: GoogleIdTokenParsingException) {
+                        Log.e("Passkeys", "Received an invalid google id token response", e)
+                        Result.failure(e)
+                    }
+                } else {
+                    // Catch any unrecognized custom credential type here.
+                    Log.e("Passkeys", "Unexpected type of credential")
+                    Result.failure(Exception("Unexpected type of credential"))
+                }
+            }
+
+            else -> {
+                Result.failure(Exception("Unexpected type of credential"))
+            }
+        }
+    }
+}

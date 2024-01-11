@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -43,9 +45,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import kotlinx.coroutines.launch
 
@@ -62,7 +68,7 @@ fun ProfileStatsScreen(
 ) {
     Scaffold(
         topBar = {
-            Toolbar(
+            ProfileTopBar(
                 username = username,
                 verified = verified,
                 onBackPressed = onBackPressed
@@ -110,7 +116,7 @@ fun Tabs(
         // Override the indicator, using the provided pagerTabIndicatorOffset modifier
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-//                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
             )
         },
 //        backgroundColor = MaterialTheme.colorScheme.background,
@@ -189,22 +195,28 @@ fun Followers(
 
 @Composable
 fun Following(
-    following: List<com.salazar.cheers.core.model.UserItem>?,
+    following: List<UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
     onFollowToggle: (String) -> Unit,
 ) {
     if (following == null) {
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
     } else
         LazyColumn {
-            items(following, key = { it.id }) { user ->
+            items(
+                items = following,
+                key = { it.id },
+            ) { user ->
                 UserItem(
                     userItem = user,
                     onClick = onUserClicked,
                     onStoryClick = onStoryClick,
                 ) {
-//                    FollowButton(isFollowing = user.has_followed, onClick = { onFollowToggle(user.id)})
+                    FriendButton(
+                        isFriend = user.friend,
+                        onClick = { onFollowToggle(user.id) },
+                    )
                 }
             }
         }
@@ -262,14 +274,15 @@ fun SearchBar() {
 }
 
 @Composable
-fun Toolbar(
+fun ProfileTopBar(
     username: String,
     verified: Boolean,
     onBackPressed: () -> Unit,
+    onMenuClick: () -> Unit = {},
 ) {
-    Column {
-        TopAppBar(title = {
-            com.salazar.cheers.core.share.ui.Username(
+    TopAppBar(
+        title = {
+            Username(
                 username = username,
                 verified = verified,
                 textStyle = MaterialTheme.typography.titleLarge.copy(
@@ -278,11 +291,16 @@ fun Toolbar(
                 ),
             )
         },
-            navigationIcon = {
-                IconButton(onClick = onBackPressed) {
-                    Icon(Icons.Outlined.ArrowBack, "")
-                }
-            })
-    }
+        navigationIcon = {
+            IconButton(onClick = onBackPressed) {
+                Icon(Icons.Outlined.ArrowBack, "")
+            }
+        },
+        actions = {
+            IconButton(onClick = onMenuClick) {
+                Icon(Icons.Outlined.Menu, null)
+            }
+        }
+    )
 }
 

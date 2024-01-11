@@ -21,6 +21,7 @@ service PostService {
     };
   };
 
+
   rpc GetPost (GetPostRequest) returns (GetPostResponse);
   rpc GetPostItem (GetPostItemRequest) returns (PostResponse);
   rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
@@ -39,6 +40,12 @@ service PostService {
       get: "/v1/posts/list"
     };
   };
+
+  rpc ListPostLikes (ListPostLikesRequest) returns (ListPostLikesResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/{post_id}/likes"
+    };
+  }
 
   /*
     Friends post feed
@@ -94,8 +101,16 @@ message ListMapPostResponse {
 }
 
 message CreatePostRequest {
-  cheers.type.Post post = 1;
-  bool send_notification_to_friends = 2;
+  string caption = 1;
+  string location_name = 2;
+  int64 drink_id = 3;
+  int64 drunkenness = 4;
+  bool can_comment = 5;
+  bool can_share = 6;
+  double latitude = 7;
+  double longitude = 8;
+  bool send_notification_to_friends = 9;
+  repeated string photos = 10;
 }
 
 message GetPostRequest {
@@ -127,6 +142,17 @@ message ListPostRequest {
 message ListPostResponse {
   repeated PostResponse posts = 1;
   string next_page_token = 2;
+}
+
+message ListPostLikesRequest {
+  string post_id = 1;
+  int32 page_size = 2;
+  int32 page = 3;
+}
+
+message ListPostLikesResponse {
+  repeated cheers.type.UserItem users = 1;
+  int64 like_total = 2;
 }
 
 message FeedPostRequest {

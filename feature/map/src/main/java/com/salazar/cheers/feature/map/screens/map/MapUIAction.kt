@@ -11,6 +11,7 @@ sealed class MapUIAction {
     object OnSettingsClick : MapUIAction()
     object OnPublicToggle : MapUIAction()
     object OnMyLocationClick : MapUIAction()
+    object OnDismissBottomSheet : MapUIAction()
     data class OnMapReady(val map: MapView, val ctx: Context) : MapUIAction()
     data class OnUserClick(val userID: String) : MapUIAction()
 

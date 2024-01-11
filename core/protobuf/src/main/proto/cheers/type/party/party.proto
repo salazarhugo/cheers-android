@@ -27,4 +27,6 @@ message Party {
   double longitude = 15;
   // The minimum price
   int64 minimum_price = 16;
+  string slug = 17;
+  string city = 18;
 }

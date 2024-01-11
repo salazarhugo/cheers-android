@@ -1,3 +1,5 @@
+@file:OptIn(MapboxExperimental::class)
+
 package com.salazar.cheers.feature.map.screens.map
 
 import android.annotation.SuppressLint
@@ -7,76 +9,72 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapInitOptions
-import com.mapbox.maps.MapView
-import com.mapbox.maps.dsl.cameraOptions
+import com.mapbox.maps.MapboxExperimental
+import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import com.mapbox.maps.plugin.animation.flyTo
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlin.math.max
 
-/**
- * Stateful composable that displays the Navigation route for the Map screen.
- *
- * @param mapViewModel ViewModel that handles the business logic of this screen
- */
 @SuppressLint("MissingPermission")
 @Composable
 fun MapRoute(
-    mapViewModel: MapViewModel = hiltViewModel(),
+    viewModel: MapViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
 ) {
-    val uiState by mapViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val paris = Point.fromLngLat(2.3522, 48.8566)
-    val mapView = remember {
-        MapView(
-            context = context,
-            mapInitOptions = MapInitOptions(
-                context,
-                cameraOptions = cameraOptions {
-                    center(paris)
-                }
-            )
-        )
+
+    val mapViewportState = rememberMapViewportState {
+//        gestures.rotateEnabled = false
+//        attribution.enabled = false
+//        scalebar.enabled = false
+        setCameraOptions {
+            center(paris)
+            zoom(1.0)
+            pitch(0.0)
+        }
     }
 
     MapScreen(
         uiState = uiState,
-        mapView = mapView,
+        mapViewportState = mapViewportState,
         onMapUIAction = { action ->
             when (action) {
                 MapUIAction.OnBackPressed -> navigateBack()
                 MapUIAction.OnCreatePostClick -> navigateToCreatePost()
-                MapUIAction.OnPublicToggle -> mapViewModel.onTogglePublic()
+                MapUIAction.OnPublicToggle -> viewModel.onTogglePublic()
                 MapUIAction.OnSwipeRefresh -> TODO()
                 MapUIAction.OnSettingsClick -> navigateToMapSettings()
                 is MapUIAction.OnUserClick -> {}//navigateToOtherProfile(action.userID)
                 is MapUIAction.OnMapReady -> {
-                    mapViewModel.onMapReady(action.map)
+                    viewModel.onMapReady(action.map)
                     scope.launch {
-                        mapViewModel.mapRepository.onMapReady(action.map, action.ctx)
+                        viewModel.mapRepository.onMapReady(action.map, action.ctx)
                     }
                 }
 
                 MapUIAction.OnMyLocationClick -> {
-                    mapViewModel.onMyLocationClick()
-                    scope.launch {
-//                        val location =
-//                            LocationServices.getFusedLocationProviderClient(context).lastLocation.await()
-//                                ?: return@launch
-//                        val mapbox = mapView.getMapboxMap()
-//                        val cameraOptions = CameraOptions.Builder()
-//                            .center(Point.fromLngLat(location.longitude, location.latitude))
-//                            .zoom(13.0)
-//                            .build()
-//                        mapbox.flyTo(cameraOptions)
-                    }
+                    viewModel.onMyLocationClick()
+
+                    val point = Point.fromLngLat(
+                        uiState.userLocation?.longitude ?: 0.0,
+                        uiState.userLocation?.latitude ?: 0.0,
+                    )
+
+                    mapViewportState.flyTo(
+                        cameraOptions = CameraOptions.Builder()
+                            .center(point)
+                            .zoom(13.0)
+                            .build(),
+                        animationOptions = MapAnimationOptions.mapAnimationOptions {
+                            duration(1000)
+                        }
+                    )
                 }
 //                is MapUIAction.OnPostClick -> {
 //                    val post = action.post
@@ -107,7 +105,6 @@ fun MapRoute(
 //                }
                 is MapUIAction.OnUserViewAnnotationClick -> {
                     val userLocation = action.userLocation
-                    val mapbox = mapView.getMapboxMap()
 
                     scope.launch {
                         uiState.sheetState.expand()
@@ -118,9 +115,9 @@ fun MapRoute(
                         userLocation.latitude,
                     )
 
-                    val zoom = max(14.0, mapbox.cameraState.zoom)
+                    val zoom = max(14.0, mapViewportState.cameraState.zoom)
 
-                    mapbox.flyTo(
+                    mapViewportState.flyTo(
                         cameraOptions = CameraOptions.Builder()
                             .center(point)
                             .zoom(zoom)
@@ -129,11 +126,12 @@ fun MapRoute(
                             duration(1000)
                         }
                     )
-                    mapViewModel.onUserViewAnnotationClick(userLocation = userLocation)
+                    viewModel.onUserViewAnnotationClick(userLocation = userLocation)
                 }
 
                 is MapUIAction.OnChatClick -> {}//navigateToChatWithUserId(action.userID)
                 is MapUIAction.OnCommentClick -> {} //navActions.navigateToComments(action.postID)
+                MapUIAction.OnDismissBottomSheet -> viewModel.onDismissBottomSheet()
             }
         },
     )

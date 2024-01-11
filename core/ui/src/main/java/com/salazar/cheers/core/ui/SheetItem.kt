@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.salazar.cheers.core.ui.theme.Roboto
 
 @Composable
 fun SheetItem(
@@ -25,7 +26,9 @@ fun SheetItem(
             .fillMaxWidth()
             .clickable { onClick() },
         headlineContent = {
-            Text(text = text)
+            Text(
+                text = text,
+            )
         },
         leadingContent = {
             Icon(imageVector = icon, contentDescription = null)

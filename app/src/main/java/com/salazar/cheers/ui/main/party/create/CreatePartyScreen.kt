@@ -95,17 +95,17 @@ fun CreatePartyScreen(
     onLocationClick: (SearchSuggestion) -> Unit,
     onShowGuestListToggle: () -> Unit,
 ) {
-    PrivacyBottomSheet(
-        privacy = uiState.privacy,
-        privacyState = rememberModalBottomSheetState(),
-        onSelectPrivacy = onPrivacyChange,
-    )
+//    PrivacyBottomSheet(
+//        privacy = uiState.privacy,
+//        privacyState = rememberModalBottomSheetState(),
+//        onSelectPrivacy = onPrivacyChange,
+//    )
 
     Scaffold(
         topBar = {
             TopAppBar(
                 onDismiss = { onCreatePartyUIAction(CreatePartyUIAction.OnDismiss) },
-                title = "New Party"
+                title = "New Party",
             )
         },
     ) {
@@ -174,66 +174,66 @@ fun Tabs(
     onLocationClick: (SearchSuggestion) -> Unit,
     onShowGuestListToggle: () -> Unit,
 ) {
-    val tabs = 4
     val scope = rememberCoroutineScope()
 
-//    PaddingValues(0.dp)
+    PaddingValues(0.dp)
+
 //    PagerDefaults.flingBehavior(
 //        state = state,
 //        endContentPadding = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
 //    )
-//    fun(page: Int) {
-//        Column(modifier = Modifier.fillMaxHeight()) {
-//            when (page) {
-//                0 -> EventDetailsPage(
-//                    uiState = uiState,
-//                    onEventNameChange = onNameChange,
-//                    onStartDateChanged = onStartTimeSecondsChange,
-//                    onEndTimeSecondsChange = onEndTimeSecondsChange,
-//                    onHasEndDateToggle = { onCreatePartyUIAction(CreatePartyUIAction.OnHasEndDateToggle) },
-//                    onShowGuestListToggle = onShowGuestListToggle,
-//                )
-//
-//                1 -> DescriptionPage(
-//                    description = uiState.description,
-//                    onDescriptionChange = onDescriptionChange,
-//                )
-//
-//                2 -> LocationPage(
-//                    locationName = uiState.locationName,
-//                    query = uiState.locationQuery,
-//                    results = uiState.locationResults,
-//                    onQueryChange = onQueryChange,
-//                    onLocationClick = onLocationClick,
-//                )
-//
-//                3 -> FirstScreen(
-//                    uiState = uiState,
-//                    onCreatePartyUIAction = {
-//                        when (it) {
-//                            CreatePartyUIAction.OnPartyDetailsClick ->
-//                                scope.launch {
-//                                    pagerState.animateScrollToPage(0)
-//                                }
-//
-//                            CreatePartyUIAction.OnDescriptionClick ->
-//                                scope.launch {
-//                                    pagerState.animateScrollToPage(1)
-//                                }
-//
-//                            CreatePartyUIAction.OnLocationClick ->
-//                                scope.launch {
-//                                    pagerState.animateScrollToPage(2)
-//                                }
-//
-//                            else -> {}
-//                        }
-//                        onCreatePartyUIAction(it)
-//                    },
-//                )
-//            }
-//        }
-//    }
+    HorizontalPager(state = pagerState) { page ->
+        Column(modifier = Modifier.fillMaxHeight()) {
+            when (page) {
+                0 -> EventDetailsPage(
+                    uiState = uiState,
+                    onEventNameChange = onNameChange,
+                    onStartDateChanged = onStartTimeSecondsChange,
+                    onEndTimeSecondsChange = onEndTimeSecondsChange,
+                    onHasEndDateToggle = { onCreatePartyUIAction(CreatePartyUIAction.OnHasEndDateToggle) },
+                    onShowGuestListToggle = onShowGuestListToggle,
+                )
+
+                1 -> DescriptionPage(
+                    description = uiState.description,
+                    onDescriptionChange = onDescriptionChange,
+                )
+
+                2 -> LocationPage(
+                    locationName = uiState.locationName,
+                    query = uiState.locationQuery,
+                    results = uiState.locationResults,
+                    onQueryChange = onQueryChange,
+                    onLocationClick = onLocationClick,
+                )
+
+                3 -> FirstScreen(
+                    uiState = uiState,
+                    onCreatePartyUIAction = {
+                        when (it) {
+                            CreatePartyUIAction.OnPartyDetailsClick ->
+                                scope.launch {
+                                    pagerState.animateScrollToPage(0)
+                                }
+
+                            CreatePartyUIAction.OnDescriptionClick ->
+                                scope.launch {
+                                    pagerState.animateScrollToPage(1)
+                                }
+
+                            CreatePartyUIAction.OnLocationClick ->
+                                scope.launch {
+                                    pagerState.animateScrollToPage(2)
+                                }
+
+                            else -> {}
+                        }
+                        onCreatePartyUIAction(it)
+                    },
+                )
+            }
+        }
+    }
 }
 
 @Composable

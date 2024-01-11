@@ -5,12 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
 import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
-import com.salazar.cheers.core.share.ui.PrettyImage
+import com.salazar.cheers.core.ui.ui.PrettyImage
 import com.salazar.cheers.core.util.Utils.isDarkModeOn
 import com.salazar.cheers.shared.data.AppConstants
 

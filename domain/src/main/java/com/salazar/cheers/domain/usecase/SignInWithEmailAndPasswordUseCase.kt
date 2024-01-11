@@ -4,6 +4,7 @@ import com.salazar.auth.validators.ValidateEmail
 import com.salazar.auth.validators.ValidatePassword
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,28 +17,30 @@ class SignInWithEmailAndPasswordUseCase @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository,
 ) {
     suspend operator fun invoke(
         email: String,
         password: String,
-    ): Resource<Unit> = withContext(ioDispatcher) {
+    ): Result<Unit> = withContext(ioDispatcher) {
         val emailValidator = ValidateEmail().invoke(email)
         val passwordValidator = ValidatePassword().invoke(password)
 
         if (!emailValidator.successful)
-            return@withContext Resource.Error(emailValidator.errorMessage)
+            return@withContext Result.failure(Exception(emailValidator.errorMessage))
 
         if (!passwordValidator.successful)
-            return@withContext Resource.Error(passwordValidator.errorMessage)
+            return@withContext Result.failure(Exception(passwordValidator.errorMessage))
 
         return@withContext try {
             val authResult = authRepository.signInWithEmailAndPassword(email, password)
-                ?: return@withContext Resource.Error("Error signing in with email and password")
+                ?: return@withContext Result.failure(Exception("Error signing in with email and password"))
             val idToken = authResult.user?.getIdToken(false)?.await()
+            dataStoreRepository.updateIdToken(idToken?.token.orEmpty())
             userRepository.getUserSignIn(authResult.user?.uid ?: "")
-            Resource.Success(null)
-        } catch (e: java.lang.Exception) {
-            Resource.Error("Error signing in with email and password")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }

@@ -27,9 +27,9 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     // Map Box SDK
-    implementation(libs.android)
+    implementation(libs.mapbox)
     implementation(libs.mapbox.sdk.services)
-    implementation(libs.mapbox.search.android)
+//    implementation(libs.mapbox.search.android)
 
 
     testImplementation(libs.junit)

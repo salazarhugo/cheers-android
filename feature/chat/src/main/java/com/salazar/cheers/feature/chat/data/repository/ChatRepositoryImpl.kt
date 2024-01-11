@@ -237,6 +237,7 @@ class ChatRepositoryImpl @Inject constructor(
                 chatDao.insertMessages(messages)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Log.e("GRPC", e.toString())
         }
     }

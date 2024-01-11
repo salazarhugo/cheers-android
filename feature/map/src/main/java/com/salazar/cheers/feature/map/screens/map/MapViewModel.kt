@@ -10,6 +10,7 @@ import com.mapbox.maps.MapboxMap
 import com.salazar.cheers.Settings
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.cheers.domain.get_last_known_location.GetLastKnownLocationUseCase
 import com.salazar.cheers.feature.map.data.repository.MapRepositoryImpl
 import com.salazar.cheers.feature.map.domain.models.UserLocation
@@ -17,6 +18,7 @@ import com.salazar.cheers.feature.map.domain.usecase.update_location.UpdateLocat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,6 +55,7 @@ class MapViewModel @Inject constructor(
     private val updateLocationUseCase: UpdateLocationUseCase,
     private val dataStoreRepository: DataStoreRepository,
     private val lastKnownLocationUseCase: GetLastKnownLocationUseCase,
+    private val getAccountUseCase: GetAccountUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapUiState(isLoading = true))
@@ -85,15 +88,16 @@ class MapViewModel @Inject constructor(
     private fun initUserLocation() {
         viewModelScope.launch {
             val location = lastKnownLocationUseCase() ?: return@launch
+            val account = getAccountUseCase().first() ?: return@launch
             val userLocation = UserLocation(
                 id = "",
                 latitude = location.latitude,
                 longitude = location.longitude,
-                name = "",
+                name = account.name,
                 locationName = "",
-                lastUpdated = Date().time,
-                username = "",
-                picture = "",
+                lastUpdated = Date().time / 1000,
+                username = account.username,
+                picture = account.picture,
                 verified = false,
             )
             viewModelState.update {
@@ -153,6 +157,12 @@ class MapViewModel @Inject constructor(
     fun updateCity(city: String) {
         viewModelState.update {
             it.copy(city = city)
+        }
+    }
+
+    fun onDismissBottomSheet() {
+        viewModelState.update {
+            it.copy(selected = null)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.salazar.cheers.map.ui.dialogs
+package com.salazar.cheers.feature.map.ui.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.GreenGoogle
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.feature.map.domain.models.UserLocation
@@ -31,13 +34,15 @@ import com.salazar.cheers.feature.map.domain.models.UserLocation
 @Composable
 fun UserMapDialog(
     userLocation: UserLocation?,
-    onClose: () -> Unit,
-    onChatClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit = {},
+    onChatClick: (String) -> Unit = {},
 ) {
     if (userLocation == null)
         return
 
     UserLocationItem(
+        modifier = modifier,
         userLocation = userLocation,
         onClose = onClose,
         onChatClick = onChatClick,
@@ -60,9 +65,8 @@ fun UserLocationItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                UserProfilePicture(
-                    picture = userLocation.picture,
-                    onClick = {},
+                AvatarComponent(
+                    avatar = userLocation.picture,
                     size = 64.dp,
                 )
                 Spacer(modifier = Modifier.width(12.dp))
@@ -117,5 +121,26 @@ fun UserLocationItem(
 //                )
             }
         }
+    }
+}
+
+@ComponentPreviews
+@Composable
+private fun UserMapDialogPreview() {
+    CheersPreview {
+        UserMapDialog(
+            userLocation = UserLocation(
+                id = "",
+                picture = "",
+                username = "cheers",
+                verified = true,
+                name = "Cheers Social",
+                locationName = "Aulnay Sous-Bois",
+                lastUpdated = 0L,
+                latitude = 0.0,
+                longitude = 0.0,
+            ),
+            modifier = Modifier,
+        )
     }
 }

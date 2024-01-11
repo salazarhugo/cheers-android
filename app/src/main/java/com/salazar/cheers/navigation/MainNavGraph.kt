@@ -19,10 +19,9 @@ import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
-import com.salazar.cheers.comment.ui.comment_more.CommentMoreRoute
-import com.salazar.cheers.comment.ui.comments.CommentsRoute
-import com.salazar.cheers.comment.ui.delete.DeleteCommentDialog
-import com.salazar.cheers.comment.ui.replies.RepliesRoute
+import com.salazar.cheers.feature.comment.comment_more.CommentMoreRoute
+import com.salazar.cheers.feature.comment.delete.DeleteCommentDialog
+import com.salazar.cheers.feature.comment.replies.RepliesRoute
 import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.core.ui.ui.CheersDestinations
@@ -32,27 +31,32 @@ import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.core.util.Utils.shareToSnapchat
 import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
-import com.salazar.cheers.feature.chat.ui.chats.MessagesRoute
 import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
-import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
+import com.salazar.cheers.feature.chat.ui.screens.chat.chatScreen
+import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChat
+import com.salazar.cheers.feature.chat.ui.screens.messages.messagesScreen
+import com.salazar.cheers.feature.chat.ui.screens.messages.navigateToMessages
 import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
+import com.salazar.cheers.feature.comment.navigateToPostComments
+import com.salazar.cheers.feature.comment.postCommentsScreen
 import com.salazar.cheers.feature.create_note.createNoteScreen
 import com.salazar.cheers.feature.create_note.navigateToCreateNote
 import com.salazar.cheers.feature.create_post.createPostScreen
 import com.salazar.cheers.feature.create_post.navigateToCreatePost
 import com.salazar.cheers.feature.edit_profile.navigation.editProfileScreen
 import com.salazar.cheers.feature.edit_profile.navigation.navigateToEditProfile
+import com.salazar.cheers.feature.friend_list.friendListScreen
+import com.salazar.cheers.feature.friend_list.navigateToFriendList
 import com.salazar.cheers.feature.friend_request.friendRequestsScreen
 import com.salazar.cheers.feature.friend_request.navigateToFriendRequests
-import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.feature.home.navigation.homeScreen
 import com.salazar.cheers.feature.map.navigation.mapScreen
-import com.salazar.cheers.feature.map.screens.settings.MapSettingsRoute
+import com.salazar.cheers.feature.map.navigation.mapSettingsScreen
+import com.salazar.cheers.feature.map.navigation.navigateToMapSettings
 import com.salazar.cheers.feature.notifications.navigation.navigateToNotifications
 import com.salazar.cheers.feature.notifications.navigation.notificationsScreen
 import com.salazar.cheers.feature.parties.navigateToParties
 import com.salazar.cheers.feature.parties.partiesScreen
-import com.salazar.cheers.feature.profile.OtherProfileStatsRoute
 import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
 import com.salazar.cheers.feature.profile.ProfileSheetUIAction
 import com.salazar.cheers.feature.profile.ProfileStatsRoute
@@ -80,7 +84,11 @@ import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
 import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
 import com.salazar.cheers.feature.parties.detail.partyDetailScreen
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
+import com.salazar.cheers.feature.post_likes.navigateToPostLikes
+import com.salazar.cheers.feature.post_likes.postLikesScreen
+import com.salazar.cheers.feature.profile.other_profile.OtherProfileStatsRoute
 import com.salazar.cheers.feature.signin.navigateToSignIn
+import com.salazar.cheers.feature.signup.navigateToSignUp
 import com.salazar.cheers.feature.ticket.ticketsScreen
 import com.salazar.cheers.ui.main.party.edit.EditEventRoute
 import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
@@ -90,7 +98,6 @@ import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
-import com.salazar.cheers.feature.ticket.details.TicketDetailsRoute
 import com.salazar.cheers.feature.ticket.details.navigateToTicketDetails
 import com.salazar.cheers.feature.ticket.details.ticketDetailsScreen
 import com.salazar.cheers.feature.ticket.navigateToTickets
@@ -110,14 +117,6 @@ fun NavGraphBuilder.mainNavGraph(
         route = CheersDestinations.MAIN_ROUTE,
         startDestination = partiesNavigationRoute,
     ) {
-        bottomSheet(
-            route = MainDestinations.MAP_SETTINGS_ROUTE,
-        ) {
-            MapSettingsRoute(
-                navActions = appState.navActions,
-            )
-        }
-
         friendRequestsScreen(
             navigateBack = navController::popBackStack,
             navigateToOtherProfile = navController::navigateToOtherProfile,
@@ -156,16 +155,6 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToComments = {},
             navigateToOtherProfile = navController::navigateToOtherProfile,
         )
-
-        composable(
-            route = "${MainDestinations.CHAT_ROUTE}?channelId={channelId}&userId={userID}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/chat/{channelId}" }),
-        ) {
-            ChatRoute(
-                navActions = appState.navActions,
-                showSnackBar = appState::showSnackBar,
-            )
-        }
 
         bottomSheet(
             route = "${MainDestinations.SEND_GIFT_SHEET}/{receiverId}",
@@ -207,8 +196,8 @@ fun NavGraphBuilder.mainNavGraph(
             }
         }
 
-        dialog(
-            route = "${MainDestinations.ADD_EVENT_SHEET}?photoUri={photoUri}",
+        composable(
+            route = "${MainDestinations.CREATE_PARTY_ROUTE}?photoUri={photoUri}",
             arguments = listOf(navArgument("photoUri") { nullable = true })
         ) {
             CreatePartyRoute(
@@ -231,6 +220,9 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToPartyMoreSheet = {},
             navigateToPartyDetail = navController::navigateToPartyDetail,
             navigateToTickets = navController::navigateToTickets,
+            navigateToCreateParty = {
+                navController.navigate(MainDestinations.CREATE_PARTY_ROUTE)
+            }
         )
 
         dialog(
@@ -257,18 +249,32 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToSearch = navController::navigateToSearch,
             navigateToCreatePost = navController::navigateToCreatePost,
             navigateToCreateNote = navController::navigateToCreateNote,
+            navigateToUser = navController::navigateToOtherProfile,
             navigateToNote = appState.navActions.navigateToNote,
+            navigateToMessages = navController::navigateToMessages,
+            navigateToPostMoreSheet = { postID ->
+                navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postID") {
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            navigateToPostComments = navController::navigateToPostComments,
+            navigateToPostLikes = navController::navigateToPostLikes,
         )
 
         mapScreen(
             navigateBack = {
                 navController.popBackStack()
             },
-            navigateToMapSettings = {
-            },
+            navigateToMapSettings = navController::navigateToMapSettings,
             navigateToCreatePost = {
             }
         )
+
+        mapSettingsScreen(
+            navigateBack = navController::popBackStack,
+        )
+
 
         composable(MainDestinations.MAP_POST_HISTORY_ROUTE) {
             MapPostHistoryRoute(
@@ -298,14 +304,16 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
-        composable(
-            route = "${MainDestinations.POST_COMMENTS}/{postId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{postId}" }),
-        ) {
-            CommentsRoute(
-                navActions = appState.navActions,
-            )
-        }
+        postCommentsScreen(
+            navigateBack = navController::popBackStack,
+            navigateToCommentMoreSheet = {},
+            navigateToCommentReplies = {},
+        )
+
+        postLikesScreen(
+            navigateBack = navController::popBackStack,
+            navigateToProfile = navController::navigateToOtherProfile,
+        )
 
         composable(
             route = "${MainDestinations.COMMENT_REPLIES}/{commentId}",
@@ -355,9 +363,17 @@ fun NavGraphBuilder.mainNavGraph(
 
         otherProfileScreen(
             navigateBack = navController::popBackStack,
-            navigateToOtherProfileStats = {
+            navigateToOtherProfileStats = { user ->
+                navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/${user.username}/${user.verified}") {
+                    launchSingleTop = true
+                    restoreState = true
+                }
             },
-            navigateToManageFriendship = {},
+            navigateToManageFriendship = { userID ->
+                navController.navigate("${MainDestinations.MANAGE_FRIENDSHIP_SHEET}/$userID") {
+                    launchSingleTop = true
+                }
+            },
             navigateToPostDetail = {},
             navigateToComments = {},
         )
@@ -439,13 +455,20 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = MainDestinations.MESSAGES_ROUTE,
-        ) {
-            MessagesRoute(
-                navActions = appState.navActions,
-            )
-        }
+        messagesScreen(
+            navigateBack = navController::popBackStack,
+            navigateToChatCamera = {},
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+            navigateToChatWithChannelId = { navController.navigateToChat(channelId = it) },
+            navigateToNewChat = {},
+            navigateToChatsMoreSheet = {},
+        )
+
+        chatScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+            navigateToRoomDetails = {},
+        )
 
         composable(
             route = MainDestinations.NEW_CHAT_ROUTE,
@@ -461,10 +484,18 @@ fun NavGraphBuilder.mainNavGraph(
 
         profileScreen(
             navigateToSignIn = navController::navigateToSignIn,
+            navigateToSignUp = navController::navigateToSignUp,
             navigateToEditProfile = navController::navigateToEditProfile,
             navigateToProfileMore = {
                 navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$it")
-            }
+            },
+            navigateToFriendList = navController::navigateToFriendList,
+            navigateBack = navController::popBackStack,
+        )
+
+        friendListScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
         bottomSheet(

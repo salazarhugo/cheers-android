@@ -13,6 +13,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import cheers.post.v1.CreatePostRequest
 import cheers.type.PostOuterClass
 import com.salazar.cheers.core.util.StorageUtil
 import com.salazar.cheers.data.post.R
@@ -31,49 +32,38 @@ class CreatePostWorker @AssistedInject constructor(
 
 
     override suspend fun doWork(): Result {
-        val appContext = applicationContext
-
         val photos =
             inputData.getStringArray("PHOTOS") ?: emptyArray()
-
-        if (photos.size > 5) return Result.failure()
+        if (photos.size > 8)
+            return Result.failure()
 
         val postType =
             inputData.getString("POST_TYPE") ?: return Result.failure()
-
-        val beverage =
-            inputData.getString("BEVERAGE") ?: return Result.failure()
-
+        val drinkID =
+            inputData.getLong("DRINK_ID", -1)
         val drunkenness =
             inputData.getInt("DRUNKENNESS", 0)
-
         val photoCaption =
             inputData.getString("PHOTO_CAPTION") ?: ""
-
         val locationName =
             inputData.getString("LOCATION_NAME") ?: ""
-
         val latitude =
             inputData.getDouble("LOCATION_LATITUDE", 0.0)
-
         val longitude =
             inputData.getDouble("LOCATION_LONGITUDE", 0.0)
-
         val privacy =
             inputData.getString("PRIVACY") ?: return Result.failure()
-
         val tagUserIds =
             inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
-
         val notify =
             inputData.getBoolean("NOTIFY", true)
 
-        val postBuilder = PostOuterClass.Post.newBuilder()
+        val postBuilder = CreatePostRequest.newBuilder()
             .setCaption(photoCaption)
             .setLatitude(latitude)
             .setLongitude(longitude)
             .setDrunkenness(drunkenness.toLong())
-            .setDrink(beverage)
+            .setDrinkId(drinkID)
             .setLocationName(locationName)
 
         try {
@@ -92,26 +82,23 @@ class CreatePostWorker @AssistedInject constructor(
                         }
                     }
 
-
-                    val post = postBuilder
-                        .setType(PostOuterClass.PostType.IMAGE)
+                    val request = postBuilder
+//                        .setType(PostOuterClass.PostType.IMAGE)
                         .addAllPhotos(downloadUrls)
                         .build()
 
                     postRepository.createPost(
-                        post = post,
-                        sendNotificationToFriends = notify,
+                        request = request,
                     )
                 }
 
                 PostType.TEXT -> {
-                    val post = postBuilder
-                        .setType(PostOuterClass.PostType.TEXT)
+                    val request = postBuilder
+//                        .setType(PostOuterClass.PostType.TEXT)
                         .build()
 
                     postRepository.createPost(
-                        post = post,
-                        sendNotificationToFriends = notify,
+                        request = request,
                     )
                 }
             }

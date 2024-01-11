@@ -16,14 +16,14 @@ android {
         applicationId = "com.salazar.cheers"
         minSdk = 28
         targetSdk = 34
-        versionCode = 65
-        versionName = "1.0.0-065"
+        versionCode = 67
+        versionName = "1.0.0-067"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":feature:profile"))
     implementation(project(":feature:edit_profile"))
     implementation(project(":feature:signin"))
+    implementation(project(":feature:signup"))
     implementation(project(":feature:notifications"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:create_post"))
@@ -63,6 +64,9 @@ dependencies {
     implementation(project(":feature:friend_request"))
     implementation(project(":feature:parties"))
     implementation(project(":feature:ticket"))
+    implementation(project(":feature:friend_list"))
+    implementation(project(":feature:comment"))
+    implementation(project(":feature:post_likes"))
 
     implementation(project(":domain"))
 
@@ -75,7 +79,8 @@ dependencies {
     implementation(project(":data:story"))
     implementation(project(":data:billing"))
     implementation(project(":data:ticket"))
-
+    implementation(project(":data:comment"))
+    implementation(project(":data:drink"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -83,13 +88,13 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.play.services)
 
-    implementation(libs.grpc.okhttp)
-    implementation(libs.grpc.protobuf.lite) {
-        exclude(group = "com.google.firebase", module = "protolite-well-known-types")
-    }
-    implementation(libs.grpc.stub)
-    implementation(libs.grpc.kotlin.stub)
-    compileOnly(libs.annotations.api) // necessary for Java 9+
+//    implementation(libs.grpc.okhttp)
+//    implementation(libs.grpc.protobuf.lite) {
+//        exclude(group = "com.google.firebase", module = "protolite-well-known-types")
+//    }
+//    implementation(libs.grpc.stub)
+//    implementation(libs.grpc.kotlin.stub)
+//    compileOnly(libs.annotations.api) // necessary for Java 9+
 
 //    implementation("com.google.protobuf:protobuf-javalite:3.21.12")
 
@@ -168,16 +173,18 @@ dependencies {
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {
-//        exclude(group = "com.google.protobuf")
-//        exclude(group = "com.google.protobuf", module = "protobuf-javalite")
-//        exclude(group = "com.google.protobuf", module = "protobuf-java")
+        exclude(group = "com.google.protobuf")
+        exclude(group = "com.google.protobuf", module = "protobuf-javalite")
+        exclude(group = "com.google.protobuf", module = "protobuf-java")
     }
 
     // App Check Play Integrity
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
 
     // App Check Debug
-    implementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.appcheck.debug) {
+        exclude(group = "com.google.protobuf")
+    }
 
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -190,13 +197,19 @@ dependencies {
 //    implementation("com.google.firebase:firebase-firestore-ktx"
 
     // Firebase Functions
-    implementation("com.google.firebase:firebase-functions-ktx")
+    implementation("com.google.firebase:firebase-functions-ktx") {
+        exclude(group = "com.google.protobuf")
+    }
 
     // Firebase Messaging
-    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx") {
+        exclude(group = "com.google.protobuf")
+    }
 
     // Firebase Storage
-    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx") {
+        exclude(group = "com.google.protobuf")
+    }
 
     // Hilt
     implementation(libs.hilt.android)
@@ -236,10 +249,9 @@ dependencies {
     implementation(libs.user.messaging.platform)
     implementation(libs.androidx.animation.graphics)
 
-    // Map Box SDK
-    implementation(libs.android)
-    implementation(libs.mapbox.sdk.services)
-    implementation(libs.mapbox.search.android)
+    // Play In-App Update:
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 
     // <!------ Debugging ------!>
     testImplementation(libs.junit)

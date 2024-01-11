@@ -15,6 +15,7 @@ import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.user.v1.*
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.data.user.workers.UploadProfileBanner
 import com.salazar.cheers.data.user.workers.UploadProfilePicture
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.common.util.Resource
@@ -229,6 +230,7 @@ class UserRepository @Inject constructor(
 
             val request = UpdateUserRequest.newBuilder()
                 .setPicture(user.picture)
+                .setBanner(user.banner)
                 .setBio(user.bio)
                 .setName(user.name)
                 .setWebsite(user.website)
@@ -374,6 +376,7 @@ class UserRepository @Inject constructor(
                 }
                 users
             } catch (e: Exception) {
+                e.printStackTrace()
                 emit(Resource.Error(e.localizedMessage ?: "Couldn't refresh friend requests"))
                 null
             }
@@ -419,6 +422,7 @@ class UserRepository @Inject constructor(
             userDao.insert(remoteUser)
             Resource.Success(Unit)
         } catch (e: Exception) {
+            println("HUGO ${e.localizedMessage}")
             e.printStackTrace()
             Resource.Error("Oups, something went wrong. Please try again later.")
         }
@@ -457,11 +461,27 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun uploadUserPicture(
+    suspend fun uploadProfilePicture(
         picture: Uri,
     ) {
         val uploadWorkRequest: WorkRequest =
             OneTimeWorkRequestBuilder<UploadProfilePicture>().apply {
+                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                setInputData(
+                    workDataOf(
+                        "PHOTO_URI" to picture.toString(),
+                    )
+                )
+            }
+                .build()
+        workManager.enqueue(uploadWorkRequest)
+    }
+
+    suspend fun uploadProfileBanner(
+        picture: Uri,
+    ) {
+        val uploadWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<UploadProfileBanner>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(
                     workDataOf(

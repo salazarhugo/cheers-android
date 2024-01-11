@@ -199,6 +199,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun loadNextPosts() {
+        println("LOAD NEXT POSTS")
+        updateIsLoading(true)
         viewModelScope.launch {
             paginator.loadNextItems()
         }
@@ -212,13 +214,6 @@ class HomeViewModel @Inject constructor(
 
     fun onSwipeRefresh() {
         updateIsLoading(true)
-//        viewModelScope.launch {
-//            userRepository.getUserSignIn(userId = FirebaseAuth.getInstance().currentUser?.uid!!)
-//                .collect {
-//                    if (it is Resource.Success)
-//                        updateUser(user = it.data)
-//                }
-//        }
         viewModelScope.launch {
             paginator.reset()
             paginator.loadNextItems()
@@ -301,7 +296,8 @@ sealed class HomeUIAction {
     object OnPartiesClick : HomeUIAction()
     object OnLoadNextItems : HomeUIAction()
     object OnCreateNoteClick : HomeUIAction()
-    data class OnCommentClick(val postID: String) : HomeUIAction()
+    data class OnPostCommentClick(val postID: String) : HomeUIAction()
+    data class OnPostLikesClick(val postID: String) : HomeUIAction()
     data class OnShareClick(val postID: String) : HomeUIAction()
     data class OnLikeClick(val post: com.salazar.cheers.data.post.repository.Post) : HomeUIAction()
     data class OnStoryFeedClick(val page: Int) : HomeUIAction()

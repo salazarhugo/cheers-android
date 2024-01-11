@@ -12,15 +12,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.auth.ui.signin.username.ChooseUsernameScreen
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
-/**
- * Stateful composable that displays the Navigation route for the Register screen.
- *
- * @param registerViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun RegisterRoute(
     registerViewModel: RegisterViewModel = hiltViewModel(),
@@ -50,24 +44,6 @@ fun RegisterRoute(
                 })
 
                 1 -> {
-                    ChooseUsernameScreen(username = uiState.username,
-                        errorMessage = uiState.errorMessage,
-                        isLoading = uiState.isLoading,
-                        isUsernameAvailable = uiState.isUsernameAvailable,
-                        onClearUsername = registerViewModel::onClearUsername,
-                        onUsernameChanged = registerViewModel::onUsernameChanged,
-                        onNextClicked = {
-                            registerViewModel.checkUsername {
-                                if (it) scope.launch {
-                                    pagerState.animateScrollToPage(2)
-                                }
-                            }
-                        },
-                        onBackPressed = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(0)
-                            }
-                        })
                 }
 
                 2 -> RegisterScreen(uiState = uiState,

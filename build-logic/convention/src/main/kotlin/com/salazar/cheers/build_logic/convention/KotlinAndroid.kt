@@ -50,7 +50,6 @@ private fun Project.configureKotlin() {
                     "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
                     "-opt-in=coil.annotation.ExperimentalCoilApi",
                     "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-                    "-opt-in=com.google.accompanist.pager.ExperimentalPagerApi",
                     "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
                     "-opt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
                     "-opt-in=androidx.paging.ExperimentalPagingApi",

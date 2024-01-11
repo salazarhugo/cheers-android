@@ -204,6 +204,7 @@ message UpdateUserRequest {
   string website = 4;
   string birthday = 5;
   string phone_number = 6;
+  string banner = 7;
 }
 
 message DeleteUserRequest {

@@ -12,16 +12,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.mapbox.search.ResponseInfo
-import com.mapbox.search.SearchEngine
-import com.mapbox.search.SearchEngineSettings
-import com.mapbox.search.SearchOptions
-import com.mapbox.search.SearchSelectionCallback
-import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.R
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.SearchSuggestion
-import com.salazar.cheers.core.model.toSearchSuggestion
 import com.salazar.cheers.workers.CreatePartyWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -89,45 +82,45 @@ class CreatePartyViewModel @Inject constructor(
             viewModelState.value
         )
 
-    val searchEngine = SearchEngine.createSearchEngine(
-            SearchEngineSettings(application.applicationContext.getString(R.string.mapbox_access_token))
-        )
-    val searchCallback = object : SearchSelectionCallback {
-        override fun onCategoryResult(
-            suggestion: com.mapbox.search.result.SearchSuggestion,
-            results: List<SearchResult>,
-            responseInfo: ResponseInfo
-        ) {
-//                updateResults(results)
-        }
-
-        override fun onError(e: Exception) {
-            Log.e("GEOCODING", e.toString())
-        }
-
-        override fun onResult(
-            suggestion: com.mapbox.search.result.SearchSuggestion,
-            result: SearchResult,
-            responseInfo: ResponseInfo
-        ) {
-            val location = result.coordinate!!
-            viewModelState.update {
-                it.copy(
-                    locationName = result.name,
-                    latitude = location.latitude(),
-                    longitude = location.longitude(),
-                    address = result.address?.formattedAddress() ?: "",
-                )
-            }
-        }
-
-        override fun onSuggestions(
-            suggestions: List<com.mapbox.search.result.SearchSuggestion>,
-            responseInfo: ResponseInfo
-        ) {
-            updateResults(suggestions.map { it.toSearchSuggestion() })
-        }
-    }
+//    val searchEngine = SearchEngine.createSearchEngine(
+//            SearchEngineSettings(application.applicationContext.getString(R.string.mapbox_access_token))
+//        )
+//    val searchCallback = object : SearchSelectionCallback {
+//        override fun onCategoryResult(
+//            suggestion: com.mapbox.search.result.SearchSuggestion,
+//            results: List<SearchResult>,
+//            responseInfo: ResponseInfo
+//        ) {
+////                updateResults(results)
+//        }
+//
+//        override fun onError(e: Exception) {
+//            Log.e("GEOCODING", e.toString())
+//        }
+//
+//        override fun onResult(
+//            suggestion: com.mapbox.search.result.SearchSuggestion,
+//            result: SearchResult,
+//            responseInfo: ResponseInfo
+//        ) {
+//            val location = result.coordinate!!
+//            viewModelState.update {
+//                it.copy(
+//                    locationName = result.name,
+//                    latitude = location.latitude(),
+//                    longitude = location.longitude(),
+//                    address = result.address?.formattedAddress() ?: "",
+//                )
+//            }
+//        }
+//
+//        override fun onSuggestions(
+//            suggestions: List<com.mapbox.search.result.SearchSuggestion>,
+//            responseInfo: ResponseInfo
+//        ) {
+//            updateResults(suggestions.map { it.toSearchSuggestion() })
+//        }
+//    }
     val caption = mutableStateOf("")
     val postType = mutableStateOf(com.salazar.cheers.data.post.repository.PostType.TEXT)
 
@@ -230,10 +223,10 @@ class CreatePartyViewModel @Inject constructor(
     }
 
     fun getLocations(query: String) {
-        val options = SearchOptions(
-            limit = 10
-        )
-        searchEngine.search(query, options, searchCallback)
+//        val options = SearchOptions(
+//            limit = 10
+//        )
+//        searchEngine.search(query, options, searchCallback)
     }
 
     fun updateResults(results: List<SearchSuggestion>) {

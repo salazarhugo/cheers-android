@@ -17,7 +17,7 @@ fun NavController.navigateToSecurity(
 
 fun NavGraphBuilder.securityScreen(
     navigateBack: () -> Unit,
-    navigateToPassword: (Boolean) -> Unit,
+    navigateToPassword: () -> Unit,
     navigateToPasscodeSettings: () -> Unit,
     navigateToCreatePasscode: () -> Unit,
 ) {

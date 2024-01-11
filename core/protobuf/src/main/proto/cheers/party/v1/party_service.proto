@@ -185,8 +185,8 @@ message PartyItem {
   int64 invited_count = 5;
   bool is_creator = 8;
   WatchStatus viewer_watch_status = 9;
-  repeated string mutual_usernames = 10;
-  repeated string mutual_pictures = 11;
+  repeated cheers.type.User mutual_going = 10;
+  repeated cheers.type.User mutual_interested = 11;
 }
 
 enum WatchStatus {

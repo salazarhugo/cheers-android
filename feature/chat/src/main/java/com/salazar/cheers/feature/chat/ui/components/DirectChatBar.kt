@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.salazar.cheers.core.share.ui.Username
+import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.feature.chat.R
 import com.salazar.common.ui.extensions.noRippleClickable
 

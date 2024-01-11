@@ -21,77 +21,63 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.AnimatedLogo
+import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 
-@Preview
+@ScreenPreviews
 @Composable
 fun SignInScreenPreview() {
     SignInScreen(
         uiState = SignInUiState(isLoading = false),
-        onSignInClick = { /*TODO*/ },
-        signInWithGoogle = { /*TODO*/ },
-        navigateToPhone = { /*TODO*/ },
-        onPasswordLessChange = { /*TODO*/ },
+        onSignInClick = { _ -> },
         navigateToSignUp = { /*TODO*/ },
-        onEmailChanged = {},
-        onPasswordChanged = {},
+        onUsernameChanged = { _ -> },
+
     )
 }
 
 @Composable
 fun SignInScreen(
     uiState: SignInUiState,
-    onSignInClick: () -> Unit,
-    signInWithGoogle: () -> Unit,
-    navigateToPhone: () -> Unit,
-    onPasswordLessChange: () -> Unit,
+    onSignInClick: (username: String) -> Unit,
     navigateToSignUp: () -> Unit,
-    onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
+    onUsernameChanged: (String) -> Unit,
+    onGoogleClick: () -> Unit = {},
 ) {
     val state = remember {
         MutableTransitionState(false).apply {
@@ -136,32 +122,30 @@ fun SignInScreen(
                 )
                 AnimatedLogo()
                 Spacer(modifier = Modifier.height(30.dp))
-                EmailTextField(uiState, onEmailChanged = onEmailChanged)
-                AnimatedVisibility(
-                    visible = !uiState.isPasswordless,
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    PasswordTextField(uiState, onPasswordChanged = onPasswordChanged)
-                }
+                UsernameTextField(uiState, onUsernameChanged = onUsernameChanged)
                 Spacer(Modifier.height(8.dp))
                 LoginButton(
                     isLoading = uiState.isLoading,
-                    signInWithEmailPassword = onSignInClick,
+                    signInWithEmailPassword = {
+                        onSignInClick(uiState.username)
+                    },
                 )
                 ErrorMessage(
                     errorMessage = uiState.errorMessage,
                     paddingValues = PaddingValues(vertical = 8.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                TextDivider(dayString = "OR")
-                val text =
-                    if (uiState.isPasswordless) "Sign in with password" else "Sign in with email link"
-                TextButton(onClick = onPasswordLessChange) {
-                    Text(text = text)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                AnimatedVisibility(visible = !uiState.isLoading) {
-                    GoogleButton(onClicked = signInWithGoogle)
+                GoogleButton(
+                    onClicked = {},
+                )
+                TextDivider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    dayString = "OR",
+                )
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = navigateToSignUp,
+                ) {
+                    Text(text = "Register")
                 }
             }
             Footer(
@@ -172,76 +156,14 @@ fun SignInScreen(
 }
 
 @Composable
-fun PhoneButton(
-    navigateToPhone: () -> Unit,
-) {
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        onClick = navigateToPhone,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF27814E),
-        ),
-        shape = MaterialTheme.shapes.small,
-    ) {
-        Icon(Icons.Default.Phone, "", tint = Color.White)
-        Spacer(Modifier.width(12.dp))
-        Text("Sign in with Phone", color = Color.White)
-    }
-}
-
-@Composable
-fun PasswordTextField(
+fun UsernameTextField(
     uiState: SignInUiState,
-    onPasswordChanged: (String) -> Unit,
+    onUsernameChanged: (String) -> Unit,
 ) {
-    val password = uiState.password
-    var passwordVisibility by remember { mutableStateOf(false) }
-    TextField(
-        value = password,
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium),
-        onValueChange = { onPasswordChanged(it) },
-        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
-        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-        keyboardActions = KeyboardActions(onSearch = {
-        }),
-        placeholder = { Text("Password") },
-        enabled = !uiState.isLoading,
-        trailingIcon = {
-            val image = if (passwordVisibility)
-                Icons.Filled.Visibility
-            else Icons.Filled.VisibilityOff
-
-            IconButton(onClick = {
-                passwordVisibility = !passwordVisibility
-            }) {
-                Icon(imageVector = image, "")
-            }
-        }
-    )
-}
-
-@Composable
-fun EmailTextField(
-    uiState: SignInUiState,
-    onEmailChanged: (String) -> Unit,
-) {
-    val email = uiState.email
+    val username = uiState.username
     val focusManager = LocalFocusManager.current
     TextField(
-        value = email,
+        value = username,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
@@ -249,17 +171,17 @@ fun EmailTextField(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium),
-        onValueChange = { onEmailChanged(it) },
+        onValueChange = { onUsernameChanged(it) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
+            keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next
         ),
         textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus()
         }),
-        placeholder = { Text("Email address") },
+        placeholder = { Text("Username") },
         enabled = !uiState.isLoading,
     )
 }
@@ -271,10 +193,11 @@ fun LoginButton(
 ) {
     ButtonWithLoading(
         modifier = Modifier.fillMaxWidth(),
-        text = "Sign In",
+        text = "Sign in with passkey",
         isLoading = isLoading,
         onClick = signInWithEmailPassword,
         shape = MaterialTheme.shapes.medium,
+        icon = Icons.Filled.Fingerprint,
     )
 }
 
@@ -293,29 +216,25 @@ fun Footer(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
-            Text(
-                buildAnnotatedString {
-                    append("Don't have an account? ")
-
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        append("Sign up.")
-                    }
-                },
-                style = MaterialTheme.typography.bodySmall,
+            val image = when(isSystemInDarkTheme()) {
+                true -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_white
+                false -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_black
+            }
+            Image(
+                painter = painterResource(id = image),
+                contentDescription = "fido alliance",
             )
         }
     }
 }
 
 @Composable
-fun TextDivider(dayString: String) {
+fun TextDivider(
+    modifier: Modifier = Modifier,
+    dayString: String,
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .height(16.dp)
     ) {

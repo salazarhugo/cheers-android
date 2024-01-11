@@ -1,7 +1,6 @@
 package com.salazar.cheers.data.post.repository
 
 import androidx.work.Constraints
-import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
@@ -12,11 +11,13 @@ import cheers.post.v1.CreatePostRequest
 import cheers.post.v1.DeletePostRequest
 import cheers.post.v1.FeedPostRequest
 import cheers.post.v1.LikePostRequest
+import cheers.post.v1.ListPostLikesRequest
 import cheers.post.v1.ListPostRequest
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.post.v1.UnlikePostRequest
-import cheers.type.PostOuterClass
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +34,6 @@ class PostRepository @Inject constructor(
     private val postDao: PostDao,
     private val workManager: WorkManager,
 ) {
-
     suspend fun getPostFeed(page: Int, pageSize: Int): Result<List<Post>> {
         val request = FeedPostRequest.newBuilder()
             .setPageSize(pageSize)
@@ -43,8 +43,6 @@ class PostRepository @Inject constructor(
         return try {
             val remotePosts = postService.feedPost(request)
             val posts = remotePosts.postsList.map { it.toPost() }
-//            val userItems = remotePosts.postsList.map { it.user.toUserItem() }
-//            database.userItemDao().insertAll(users = userItems)
             postDao.insertAll(posts)
             Result.success(posts)
         } catch (e: Exception) {
@@ -66,7 +64,7 @@ class PostRepository @Inject constructor(
 
             val remoteUserPosts = try {
                 val request = ListPostRequest.newBuilder()
-                    .setPage(0)
+                    .setPage(1)
                     .setPageSize(9)
                     .setUsername(userIdOrUsername)
                     .build()
@@ -84,6 +82,31 @@ class PostRepository @Inject constructor(
             remoteUserPosts?.let {
                 postDao.insertUserPosts(it)
                 emitAll(postDao.getUserPosts(userIdOrUsername))
+            }
+        }
+    }
+
+    suspend fun listPostLikes(postID: String): Flow<List<UserItem>> {
+        return flow {
+            val remoteUserPosts = try {
+                val request = ListPostLikesRequest.newBuilder()
+                    .setPage(0)
+                    .setPageSize(10)
+                    .setPostId(postID)
+                    .build()
+
+                val response = postService.listPostLikes(request)
+                val users = response.usersList.map {
+                    it.toUserItem()
+                }
+                users
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+
+            remoteUserPosts?.let { users ->
+                emit(users)
             }
         }
     }
@@ -132,14 +155,9 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun createPost(
-        post: PostOuterClass.Post,
-        sendNotificationToFriends: Boolean,
+        request: CreatePostRequest,
     ): Resource<Unit> {
-        val request = CreatePostRequest.newBuilder()
-            .setPost(post)
-            .setSendNotificationToFriends(sendNotificationToFriends)
-            .build()
-
+        println("HUGO ${request.drinkId}")
         val response = try {
             postService.createPost(request)
         } catch (e: Exception) {
@@ -147,13 +165,18 @@ class PostRepository @Inject constructor(
             return Resource.Error(e.localizedMessage)
         }
 
-        postDao.insert(response.toPost())
+        val post = response.toPost()
+        postDao.insert(post)
 
         return Resource.Success(Unit)
     }
 
     suspend fun getPostsWithAuthorId(authorId: String): List<Post> {
         return postDao.getPostsWithAuthorId(authorId = authorId)
+    }
+
+    suspend fun clearPosts() {
+        postDao.clearAll()
     }
 
     suspend fun deletePost(postId: String) {

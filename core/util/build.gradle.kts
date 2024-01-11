@@ -25,10 +25,18 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     // Firebase BOM
-    implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-dynamic-links-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation(platform(libs.firebase.bom)) {
+        exclude(group = "com.google.protobuf")
+    }
+    implementation("com.google.firebase:firebase-auth-ktx") {
+        exclude(group = "com.google.protobuf")
+    }
+    implementation("com.google.firebase:firebase-dynamic-links-ktx") {
+        exclude(group = "com.google.protobuf")
+    }
+    implementation("com.google.firebase:firebase-storage-ktx") {
+        exclude(group = "com.google.protobuf")
+    }
 
     // Snapchat
     implementation(libs.creativekit)

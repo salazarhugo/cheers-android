@@ -21,4 +21,6 @@ message Settings {
   string passcode = 4;
   bool has_biometric = 5;
   bool hide_content = 6;
+  string idToken = 7;
+  string username = 8;
 }

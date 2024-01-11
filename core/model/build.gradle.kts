@@ -24,9 +24,9 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     // Map Box SDK
-    implementation("com.mapbox.maps:android:10.12.1")
+    implementation(libs.mapbox)
     implementation(libs.mapbox.sdk.services)
-    implementation(libs.mapbox.search.android)
+//    implementation(libs.mapbox.search.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -19,16 +19,13 @@ import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.common.ui.NoScreenshot
 
 
-/**
- * Stateful composable that displays the Navigation route for the Chat screen.
- *
- * @param chatViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun ChatRoute(
     chatViewModel: ChatViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
     showSnackBar: (String) -> Unit,
+    navigateBack: () -> Unit,
+    navigateToOtherProfile: (String) -> Unit,
+    navigateToRoomDetails: (String) -> Unit,
 ) {
     val uiState by chatViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -76,14 +73,14 @@ fun ChatRoute(
                     is ChatUIAction.OnLikeClick -> chatViewModel.likeMessage(action.messageId)
                     is ChatUIAction.OnUnLikeClick -> chatViewModel.unlikeMessage(action.messageId)
                     is ChatUIAction.OnSwipeRefresh -> TODO()
-                    is ChatUIAction.OnUserClick -> navActions.navigateToOtherProfile(action.userId)
-                    is ChatUIAction.OnBackPressed -> navActions.navigateBack()
+                    is ChatUIAction.OnUserClick -> navigateToOtherProfile(action.userId)
+                    is ChatUIAction.OnBackPressed -> navigateBack()
                     is ChatUIAction.OnUnSendMessage -> chatViewModel.unsendMessage(action.messageId)
                     is ChatUIAction.OnSendTextMessage -> chatViewModel.sendTextMessage(action.text)
                     is ChatUIAction.OnImageSelectorClick -> launcher.launch("image/*")
                     is ChatUIAction.OnCopyText -> TODO()
                     is ChatUIAction.OnTextInputChange -> chatViewModel.onTextChanged(action.text)
-                    is ChatUIAction.OnRoomInfoClick -> navActions.navigateToRoomDetails(action.roomId)
+                    is ChatUIAction.OnRoomInfoClick -> navigateToRoomDetails(action.roomId)
                 }
             },
         )

@@ -1,5 +1,6 @@
 package com.salazar.cheers.core.data.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -68,6 +69,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         )
     }
 
+    @SuppressLint("MissingPermission")
     private fun makeNotification(
         title: String,
         body: String,
@@ -114,11 +116,11 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             }
 
             with(NotificationManagerCompat.from(this)) {
-//                notify(1, builder.build())
+                notify(1, builder.build())
             }
         } else {
             with(NotificationManagerCompat.from(this)) {
-//                notify(1, builder.build())
+                notify(1, builder.build())
             }
         }
     }

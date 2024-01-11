@@ -55,6 +55,15 @@ object StorageUtil {
             }
     }
 
+    fun uploadProfileBanner(imageBytes: ByteArray): Task<Uri> {
+        val ref =
+            currentUserRef.child("profileBanners/${FirebaseAuth.getInstance().currentUser?.uid!!}")
+        return ref.putBytes(imageBytes)
+            .continueWithTask {
+                ref.downloadUrl
+            }
+    }
+
     fun uploadMessageImage(
         imageBytes: ByteArray,
     ): Task<Uri> {
@@ -114,7 +123,7 @@ object StorageUtil {
             val storageRef = storageInstance.reference
             val pathReference = storageRef.child("snapchat/add-friend.jpg")
             val file = File("${context.filesDir}/snapchat-add-friend.jpg")
-            pathReference.getFile(file)
+            pathReference.getFile(file) // Not safe
         } catch (e: Exception) {
         }
     }

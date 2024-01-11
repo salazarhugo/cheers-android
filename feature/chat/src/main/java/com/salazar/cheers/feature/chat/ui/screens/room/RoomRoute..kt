@@ -33,7 +33,7 @@ fun RoomRoute(
                 uiState = uiState as RoomUiState.HasRoom,
                 onLeaveChat = {
                     roomViewModel.onLeaveRoom()
-                    navActions.navigateToMessages()
+//                    navigateToMessages()
                 },
                 onBackPressed = { navActions.navigateBack() },
                 onUserClick = { navActions.navigateToOtherProfile(it) },

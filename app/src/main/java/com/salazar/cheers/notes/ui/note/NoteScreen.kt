@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
@@ -34,8 +35,8 @@ fun NoteScreen(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            UserProfilePicture(
-                picture = note.picture,
+            AvatarComponent(
+                avatar = note.picture,
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {

@@ -14,6 +14,7 @@ fun PartyItem.toParty(): Party {
      createTime = party.createTime,
      hostId = party.hostId,
      hostName = user.name,
+     isHost = isCreator,
      watchStatus = viewerWatchStatus.toWatchStatus(),
      price = null,
      participants = emptyList(),
@@ -23,12 +24,10 @@ fun PartyItem.toParty(): Party {
      goingCount = goingCount.toInt(),
      bannerUrl = party.bannerUrl,
      address = party.address,
-     mutualProfilePictureUrls= mutualPicturesList,
-     mutualUsernames= mutualUsernamesList,
-     mutualCount = 2,
      locationName = party.locationName,
      latitude= party.latitude,
      longitude= party.longitude,
      privacy  = Privacy.PUBLIC,
+     mutualGoing = mutualGoingList.associate { it.picture to it.username },
     )
 }

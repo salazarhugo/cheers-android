@@ -8,11 +8,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
-/**
- * Stateful composable that displays the Navigation route for the manage friendship bottom sheet.
- *
- * @param viewModel that handles the business logic of this screen
- */
 @Composable
 fun ManageFriendshipRoute(
     viewModel: ManageFriendshipViewModel = hiltViewModel(),

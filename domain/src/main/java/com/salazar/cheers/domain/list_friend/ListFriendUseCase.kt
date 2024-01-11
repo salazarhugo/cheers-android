@@ -14,10 +14,7 @@ class ListFriendUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val friendshipRepository: FriendshipRepository,
 ) {
-    suspend operator fun invoke(): Flow<List<UserItem>> {
+    suspend operator fun invoke(): Flow<Resource<List<UserItem>>> {
         return userRepository.listFriend()
-            .filter { it is Resource.Success }
-            .map { it.data }
-            .filterNotNull()
     }
 }

@@ -1,55 +1,46 @@
 package com.salazar.cheers.core.ui.item
 
-import android.content.res.Configuration.UI_MODE_NIGHT_NO
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 import com.salazar.cheers.core.ui.animations.Bounce
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
 fun CommentButton(
-    comments: Int,
-    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
-    Bounce(onBounce = onClick) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Bounce(onBounce = onClick) {
             Icon(
-                imageVector = Icons.Default.Message,
-                contentDescription = null
+                modifier = Modifier.size(26.dp),
+                painter = painterResource(id = R.drawable.comment),
+                contentDescription = null,
             )
-            if (comments > 0) {
-                Spacer(modifier = Modifier.width(6.dp))
-                AnimatedTextCounter(
-                    targetState = comments,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                )
-            }
         }
     }
 }
 
+@ComponentPreviews
 @Composable
-@Preview(uiMode = UI_MODE_NIGHT_YES)
 private fun CommentButtonDarkPreview() {
-    CommentButton(comments = 643) { }
-}
-
-@Composable
-@Preview(uiMode = UI_MODE_NIGHT_NO)
-private fun CommentButtonPreview() {
-    CommentButton(comments = 643) { }
+    CheersPreview {
+        CommentButton()
+    }
 }

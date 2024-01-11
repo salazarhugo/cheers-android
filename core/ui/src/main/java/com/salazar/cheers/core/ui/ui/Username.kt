@@ -1,4 +1,4 @@
-package com.salazar.cheers.core.share.ui
+package com.salazar.cheers.core.ui.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -16,24 +16,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.common.ui.extensions.noRippleClickable
 
-@Preview(showBackground = true)
-@Composable
-fun UsernamePreview() {
-    Username(username = "hugolsalazar", verified = true)
-}
 
 @Composable
 fun Username(
+    modifier: Modifier = Modifier,
     username: String,
     verified: Boolean = false,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     color: Color = Color.Unspecified,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.noRippleClickable {
+            onClick()
+        },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -50,5 +51,16 @@ fun Username(
                 modifier = Modifier.size(textStyle.fontSize.value.dp),
             )
         }
+    }
+}
+
+@ComponentPreviews
+@Composable
+fun UsernamePreview() {
+    CheersPreview {
+        Username(
+            username = "hugolsalazar",
+            verified = true,
+        )
     }
 }

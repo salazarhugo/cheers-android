@@ -61,18 +61,18 @@ class FriendRequestsViewModel @Inject constructor(
         }
     }
 
-    fun onAcceptFriendRequest(userId: String) {
+    fun onAcceptFriendRequest(username: String) {
         viewModelScope.launch {
-            friendshipRepository.acceptFriendRequest(userId = userId)
+            friendshipRepository.acceptFriendRequest(userId = username)
         }
         viewModelState.update {
-            it.copy(friendRequests = it.friendRequests?.filter { it.id != userId })
+            it.copy(friendRequests = it.friendRequests?.filter { it.id != username })
         }
     }
 
-    fun onRefuseFriendRequest(userId: String) {
+    fun onRefuseFriendRequest(username: String) {
         viewModelScope.launch {
-            friendshipRepository.cancelFriendRequest(userId = userId)
+            friendshipRepository.cancelFriendRequest(userId = username)
         }
     }
 
@@ -140,8 +140,8 @@ class FriendRequestsViewModel @Inject constructor(
 sealed class FriendRequestsUIAction {
     object OnBackPressed : FriendRequestsUIAction()
     object OnSwipeRefresh : FriendRequestsUIAction()
-    data class OnAcceptFriendRequest(val userId: String) : FriendRequestsUIAction()
-    data class OnRefuseFriendRequest(val userId: String) : FriendRequestsUIAction()
+    data class OnAcceptFriendRequest(val userID: String) : FriendRequestsUIAction()
+    data class OnRefuseFriendRequest(val userID: String) : FriendRequestsUIAction()
     data class OnUserClick(val userId: String) : FriendRequestsUIAction()
     data class OnCancelFriendRequestClick(val userID: String) : FriendRequestsUIAction()
     data class OnAddFriendClick(val userID: String) : FriendRequestsUIAction()

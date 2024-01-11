@@ -1,8 +1,9 @@
-package com.salazar.cheers.user.ui
+package com.salazar.cheers.core.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -23,14 +24,15 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersOutlinedButton
-import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.FriendButton
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
 fun AddFriendButton(
-    modifier: Modifier = Modifier,
     requestedByViewer: Boolean,
-    onAddFriendClick: () -> Unit,
-    onCancelFriendRequestClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onAddFriendClick: () -> Unit = {},
+    onCancelFriendRequestClick: () -> Unit = {},
     onDelete: () -> Unit = {},
     enabled: Boolean = true,
     shape: Shape = MaterialTheme.shapes.medium,
@@ -41,7 +43,7 @@ fun AddFriendButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        if (requested)
+        if (requested) {
             CheersOutlinedButton(
                 onClick = {
                     requested = false
@@ -53,7 +55,8 @@ fun AddFriendButton(
             ) {
                 Text("Requested")
             }
-        else
+        }
+        else {
             Button(
                 modifier = modifier.height(34.dp),
                 onClick = {
@@ -64,8 +67,9 @@ fun AddFriendButton(
             ) {
                 Text("Add")
             }
+        }
 
-        if (!requested)
+        if (!requested) {
             IconButton(
                 modifier = Modifier.size(ButtonDefaults.IconSize),
                 onClick = {
@@ -79,23 +83,28 @@ fun AddFriendButton(
                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
+        }
     }
 }
 
 @Composable
-@Preview
+@ComponentPreviews
 private fun FollowButtonPreview() {
-    FollowButton(
-        isFollowing = false,
-        onClick = {}
-    )
+    CheersPreview {
+        AddFriendButton(
+            modifier = Modifier.padding(16.dp),
+            requestedByViewer = false,
+        )
+    }
 }
 
 @Composable
-@Preview
+@ComponentPreviews
 private fun FollowButtonOutlinedPreview() {
-    FollowButton(
-        isFollowing = true,
-        onClick = {}
-    )
+    CheersPreview {
+        AddFriendButton(
+            modifier = Modifier.padding(16.dp),
+            requestedByViewer = true,
+        )
+    }
 }

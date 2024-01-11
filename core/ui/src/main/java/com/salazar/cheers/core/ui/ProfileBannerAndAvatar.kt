@@ -1,60 +1,76 @@
 package com.salazar.cheers.core.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.ui.Username
+import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun ProfileBannerAndAvatar(
+    modifier: Modifier = Modifier,
+    fraction: Float = 1f,
     picture: String?,
     banner: String?,
+    username: String,
+    verified: Boolean,
     content: @Composable RowScope.() -> Unit
 ) {
+    val padding = 12 * fraction + 8
+
     Box(
+        modifier = modifier,
         contentAlignment = Alignment.BottomStart,
     ) {
         Column {
             ProfileBanner(
                 banner = banner,
+                alpha = fraction,
             )
             Row(
                 modifier = Modifier
-                    .heightIn(32.dp, 64.dp)
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.End,
                 content = content,
             )
         }
-        UserProfilePicture(
-            modifier = Modifier
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background, CircleShape),
-            picture = picture,
-            size = 110.dp,
-//            storyState = user.storyState,
-            onClick = {},
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            UserProfilePicture(
+                modifier = Modifier
+                    .padding(padding.dp)
+                    .border((fraction * 5).dp, MaterialTheme.colorScheme.background, CircleShape),
+                picture = picture,
+                size = (fraction * 70 + 40).dp,
+                onClick = {},
+            )
+            Username(
+                modifier = Modifier.alpha(-1 * fraction + 1),
+                username = username,
+                verified = verified,
+                textStyle = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto,
+                ),
+            )
+        }
     }
 }

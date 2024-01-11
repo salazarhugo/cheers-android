@@ -1,6 +1,5 @@
 package com.salazar.cheers.core.ui
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
@@ -8,12 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
 fun PostText(
     caption: String,
-    onUserClicked: (username: String) -> Unit,
-    onPostClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    onUserClicked: (username: String) -> Unit = {},
+    onPostClicked: () -> Unit = {},
 ) {
     if (caption.isBlank())
         return
@@ -27,9 +28,7 @@ fun PostText(
     ClickableText(
         text = styledCaption,
         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 16.dp, start = 16.dp),
+        modifier = modifier,
         onClick = {
             styledCaption
                 .getStringAnnotations(start = it, end = it)
@@ -46,4 +45,15 @@ fun PostText(
                 }
         }
     )
+}
+
+@ComponentPreviews
+@Composable
+private fun PostTextPreview() {
+    CheersPreview {
+        PostText(
+            caption = "\uD83D\uDCE2 Invest in a warehouse with showroom in Agios Nicolaos, Larnaka!",
+            modifier = Modifier.padding(16.dp),
+        )
+    }
 }

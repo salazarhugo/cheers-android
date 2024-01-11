@@ -14,18 +14,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
 fun PostMoreBottomSheet(
-    modifier: Modifier = Modifier,
     isAuthor: Boolean,
-    onDetails: () -> Unit,
-    onDelete: () -> Unit,
-    onReport: () -> Unit,
-    onBlock: () -> Unit,
-    onShare: () -> Unit,
-    onLinkClick: () -> Unit,
-    onUnfollow: () -> Unit,
+    modifier: Modifier = Modifier,
+    onDetails: () -> Unit = {},
+    onDelete: () -> Unit = {},
+    onReport: () -> Unit = {},
+    onBlock: () -> Unit = {},
+    onShare: () -> Unit = {},
+    onLinkClick: () -> Unit = {},
+    onUnfollow: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -74,6 +76,17 @@ fun Item(
             text,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+@ComponentPreviews
+@Composable
+private fun PostMoreBottomSheetPreview() {
+    CheersPreview {
+        PostMoreBottomSheet(
+            isAuthor = true,
+            modifier = Modifier,
         )
     }
 }

@@ -22,7 +22,9 @@ dependencies {
     implementation(libs.material)
 
     // Firebase
-    implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.firebase.bom)) {
+        exclude(group = "com.google.protobuf")
+    }
     implementation("com.google.firebase:firebase-auth-ktx")
 
     // Datastore

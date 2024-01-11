@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":core:protobuf"))
     implementation(project(":core:model"))
     implementation(project(":core:util"))
+    implementation(project(":core:shared"))
 
     // Room
     implementation(libs.androidx.room.runtime)

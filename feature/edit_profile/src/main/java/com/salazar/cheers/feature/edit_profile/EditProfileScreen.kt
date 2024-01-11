@@ -38,6 +38,7 @@ import com.salazar.cheers.core.share.ui.LoadingScreen
 import com.salazar.cheers.core.ui.MyTopAppBar
 import com.salazar.cheers.core.ui.ProfileBanner
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.util.Utils.conditional
 import com.salazar.cheers.data.user.User
@@ -158,11 +159,11 @@ fun EditProfileBannerAndAvatar(
             )
             Spacer(Modifier.height(48.dp))
         }
-        UserProfilePicture(
+        AvatarComponent(
             modifier = Modifier
                 .padding(16.dp)
                 .background(MaterialTheme.colorScheme.background, CircleShape),
-            picture = picture,
+            avatar = picture,
             size = 110.dp,
             onClick = onAvatarClick,
         )

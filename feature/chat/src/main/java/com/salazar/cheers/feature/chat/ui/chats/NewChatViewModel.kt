@@ -42,13 +42,17 @@ class NewChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            listFriendUseCase().collect { users ->
-                onRecentUsersChange(users = users)
+            listFriendUseCase().collect { result ->
+                when(result) {
+                    is Resource.Error -> {}
+                    is Resource.Loading -> updateIsLoading(isLoading = result.isLoading)
+                    is Resource.Success -> onRecentUsersChange(users = result.data)
+                }
             }
         }
     }
 
-    private fun onRecentUsersChange(users: List<UserItem>) {
+    private fun onRecentUsersChange(users: List<UserItem>?) {
         viewModelState.update {
             it.copy(users = users)
         }

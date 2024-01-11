@@ -9,8 +9,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -23,12 +27,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.animations.Bounce
+import com.salazar.cheers.core.util.Utils.conditional
 
 
 @Composable
@@ -82,23 +88,25 @@ fun UserProfilePicture(
             StoryState.UNKNOWN -> TODO()
         }
 
-    Bounce(onBounce = onClick) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = picture)
-                    .apply(block = fun ImageRequest.Builder.() {
-                        transformations(CircleCropTransformation())
-                        error(placeHolder)
-                        fallback(placeHolder)
-                    }).build()
-            ),
-            contentDescription = "Profile picture",
-            modifier = modifier
-                .border(border, CircleShape)
-                .padding(5.dp)
-                .size(size)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-    }
+//    AsyncImage(
+//        model = ,
+//        contentDescription =
+//    )
+    Image(
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = picture)
+                .apply(block = fun ImageRequest.Builder.() {
+                    transformations(CircleCropTransformation())
+                    error(placeHolder)
+                    fallback(placeHolder)
+                }).build()
+        ),
+        contentDescription = "Profile picture",
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .clickable { onClick() }
+        ,
+        contentScale = ContentScale.Crop,
+    )
 }

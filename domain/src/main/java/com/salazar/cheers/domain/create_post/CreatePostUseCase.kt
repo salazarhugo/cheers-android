@@ -1,10 +1,8 @@
 package com.salazar.cheers.domain.create_post
 
-import com.salazar.cheers.data.account.AccountRepository
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

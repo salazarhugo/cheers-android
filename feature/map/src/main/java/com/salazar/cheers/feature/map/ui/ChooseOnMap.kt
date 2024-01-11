@@ -1,8 +1,7 @@
-package com.salazar.cheers.map.ui
+package com.salazar.cheers.feature.map.ui
 
 import android.Manifest
 import android.content.Context
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -95,7 +94,7 @@ private fun onMapReady(
     mapView.scalebar.enabled = false
 
 
-    mapView.getMapboxMap().setCamera(
+    mapView.mapboxMap.setCamera(
         CameraOptions.Builder()
             .zoom(1.0)
             .build()
@@ -107,7 +106,7 @@ private fun onMapReady(
 //    else
 //        "mapbox://styles/salazarbrock/ckzsmluho004114lmeb8rl2zi"
 
-    mapView.getMapboxMap().loadStyleUri(style) {
+    mapView.mapboxMap.loadStyleUri(style) {
         val positionChangedListener = onIndicatorPositionChangedListener(mapView)
         initLocationComponent(mapView, context, positionChangedListener)
         setupGesturesListener(mapView, positionChangedListener)
@@ -155,14 +154,6 @@ private fun initLocationComponent(
     locationComponentPlugin.updateSettings {
         this.enabled = true
         this.locationPuck = LocationPuck2D(
-            topImage = AppCompatResources.getDrawable(
-                context,
-                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_icon
-            ),
-            bearingImage = AppCompatResources.getDrawable(
-                context,
-                com.mapbox.maps.plugin.locationcomponent.R.drawable.mapbox_user_bearing_icon
-            ),
             scaleExpression = interpolate {
                 linear()
                 zoom()
@@ -185,8 +176,8 @@ private fun initLocationComponent(
 private fun onIndicatorPositionChangedListener(
     mapView: MapView,
 ) = OnIndicatorPositionChangedListener {
-    mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).zoom(13.0).build())
-    mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
+    mapView.mapboxMap.setCamera(CameraOptions.Builder().center(it).zoom(13.0).build())
+    mapView.gestures.focalPoint = mapView.mapboxMap.pixelForCoordinate(it)
 }
 
 @Composable
@@ -216,7 +207,7 @@ fun ChooseOnMapAppBar(
         },
         actions = {
             TextButton(onClick = {
-                val center = mapView.getMapboxMap().cameraState.center
+                val center = mapView.mapboxMap.cameraState.center
                 onSelectLocation(center)
             }) {
                 Text("DONE")

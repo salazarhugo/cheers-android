@@ -116,6 +116,11 @@ class CheersViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            val idToken = auth.currentUser?.getIdToken(false)?.await()
+            dataStoreRepository.updateIdToken(idToken?.token.orEmpty())
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
             getAndSaveRegistrationToken()
         }
 

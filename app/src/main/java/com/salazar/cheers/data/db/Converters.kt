@@ -4,6 +4,8 @@ import androidx.room.TypeConverter
 import cheers.chat.v1.MessageType
 import cheers.chat.v1.RoomStatus
 import cheers.chat.v1.RoomType
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.google.protobuf.Timestamp
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -11,6 +13,17 @@ import kotlinx.serialization.json.Json
 import java.util.Date
 
 class Converters {
+    @TypeConverter
+    fun fromString(value: String): Map<String, String> {
+        val mapType = object : TypeToken<Map<String, String>>() {}.type
+        return Gson().fromJson(value, mapType)
+    }
+    @TypeConverter
+    fun fromStringMap(map: Map<String, String>): String {
+        val gson = Gson()
+        return gson.toJson(map)
+    }
+
     @TypeConverter
     fun fromStoryState(value: com.salazar.cheers.core.model.StoryState) = value.name
 

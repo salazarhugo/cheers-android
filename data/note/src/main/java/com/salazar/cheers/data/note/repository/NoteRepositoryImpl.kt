@@ -10,6 +10,7 @@ import com.salazar.cheers.data.note.db.NoteDao
 import com.salazar.cheers.data.note.mapper.toNote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -43,11 +44,12 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override fun listFriendNotes(): Flow<List<Note>>  {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-        return dao.listNotes()
-            .map {
-                it.filter { it.userId != uid }
-            }
+//        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+//        return dao.listNotes()
+//            .map {
+//                it.filter { it.userId != uid }
+//            }
+        return emptyFlow()
     }
 
     override suspend fun refreshFriendNotes(): Result<Unit> = withContext(Dispatchers.IO) {

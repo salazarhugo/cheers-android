@@ -45,6 +45,7 @@ import com.salazar.cheers.core.ui.ChipGroup
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.ui.Username
 
 @Composable
 fun AddPeopleScreen(
@@ -143,7 +144,7 @@ fun UserCard(
             Column {
                 if (user.name.isNotBlank())
                     Text(text = user.name, style = Typography.bodyMedium)
-                com.salazar.cheers.core.share.ui.Username(
+                Username(
                     username = user.username,
                     verified = user.verified,
                     textStyle = Typography.bodyMedium

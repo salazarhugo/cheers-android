@@ -5,22 +5,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PeopleOutline
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.outlined.Map
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -28,8 +25,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -37,7 +34,8 @@ import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.ClearRippleTheme
 import com.salazar.cheers.core.data.internal.Screen
-import com.salazar.cheers.core.ui.ui.MainDestinations
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.feature.map.navigation.mapNavigationRoute
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
@@ -46,25 +44,26 @@ import com.salazar.cheers.feature.search.navigation.searchNavigationRoute
 
 @Composable
 fun CheersBottomBar(
-    unreadChatCount: Int,
-    picture: String,
     currentRoute: String,
-    onNavigate: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    onNavigate: (String) -> Unit = {},
 ) {
     val items = listOf(
         Screen(
             route = partiesNavigationRoute,
             icon = {
                 Icon(
-                    Icons.Outlined.Home,
-                    null,
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_home),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             },
             selectedIcon = {
                 Icon(
-                    Icons.Rounded.Home,
-                    null,
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_home),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             },
@@ -74,16 +73,18 @@ fun CheersBottomBar(
             route = searchNavigationRoute,
             icon = {
                 Icon(
-                    Icons.Outlined.Search,
-                    null,
-                    tint = MaterialTheme.colorScheme.onBackground
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground,
                 )
             },
             selectedIcon = {
                 Icon(
-                    Icons.Filled.Search,
-                    null,
-                    tint = MaterialTheme.colorScheme.onBackground
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground,
                 )
             },
             label = stringResource(id = R.string.search),
@@ -121,42 +122,38 @@ fun CheersBottomBar(
         Screen(
             route = homeNavigationRoute,
             icon = {
-                BadgedBox(badge = {
-                    if (unreadChatCount > 0)
-                        Badge {
-                            Text(
-                                text = unreadChatCount.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            )
-                        }
-                }
-                ) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.PeopleOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             },
             selectedIcon = {
-                BadgedBox(badge = {
-                    if (unreadChatCount > 0)
-                        Badge {
-                            Text(
-                                text = unreadChatCount.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            )
-                        }
-                }
-                ) {
-                    Icon(
-                        painter = rememberAsyncImagePainter(R.drawable.ic_bubble_icon),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.People,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             },
-            label = "Messages"
+            label = "Friends"
+        ),
+        Screen(
+            route = profileNavigationRoute,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.PersonOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            selectedIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            label = "Profile"
         ),
     )
 
@@ -165,7 +162,7 @@ fun CheersBottomBar(
     ) {
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.background.compositeOver(Color.White),
-            modifier = Modifier
+            modifier = modifier
                 .navigationBarsPadding()
                 .height(52.dp),
             windowInsets = BottomAppBarDefaults.windowInsets,
@@ -182,26 +179,17 @@ fun CheersBottomBar(
                     onClick = {onNavigate(screen.route)},
                 )
             }
-            NavigationBarItem(
-                icon = {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = picture)
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    transformations(CircleCropTransformation())
-                                    error(R.drawable.default_profile_picture)
-                                }).build()
-                        ),
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clip(CircleShape),
-                        contentDescription = null,
-                    )
-                },
-                selected = currentRoute == profileNavigationRoute,
-                onClick = { onNavigate(profileNavigationRoute) },
-            )
         }
+    }
+}
+
+@ComponentPreviews
+@Composable
+private fun CheersBottomBarPreview() {
+    CheersPreview {
+        CheersBottomBar(
+            currentRoute = "",
+            modifier = Modifier,
+        )
     }
 }

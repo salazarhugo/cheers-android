@@ -32,8 +32,13 @@ dependencies {
     // Kotlinx Coroutines Play Services
     implementation(libs.kotlinx.coroutines.play.services)
 
+    // Accompanist
+    implementation(libs.accompanist.navigation.material)
+    implementation(libs.accompanist.navigation.animation)
+
     // Map Box SDK
-    implementation("com.mapbox.maps:android:10.12.1")
-    implementation(libs.mapbox.sdk.services)
-    implementation(libs.mapbox.search.android)
+    implementation(libs.mapbox)
+    implementation(libs.mapbox.compose)
+//    implementation(libs.mapbox.sdk.services)
+//    implementation(libs.mapbox.search.android)
 }

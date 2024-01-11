@@ -9,6 +9,8 @@ import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.ui.ui.SettingDestinations
 import com.salazar.cheers.feature.settings.language.LanguageRoute
 import com.salazar.cheers.feature.settings.notifications.NotificationsRoute
+import com.salazar.cheers.feature.settings.password.createPasswordScreen
+import com.salazar.cheers.feature.settings.password.navigateToCreatePassword
 import com.salazar.cheers.feature.settings.security.navigateToSecurity
 import com.salazar.cheers.feature.settings.security.securityScreen
 import com.salazar.cheers.feature.settings.settingsNavigationRoute
@@ -63,9 +65,13 @@ fun NavGraphBuilder.settingNavGraph(
 
         securityScreen(
             navigateBack = navController::popBackStack,
-            navigateToPassword = {},
+            navigateToPassword = navController::navigateToCreatePassword,
             navigateToPasscodeSettings = navController::navigateToPasscodeSettings,
             navigateToCreatePasscode = navController::navigateToCreatePasscode,
+        )
+
+        createPasswordScreen(
+            navigateBack = navController::popBackStack,
         )
 
         composable(

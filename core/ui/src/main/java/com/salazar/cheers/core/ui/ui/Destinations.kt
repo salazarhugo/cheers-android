@@ -23,11 +23,9 @@ object MainDestinations {
     const val DIALOG_DELETE_STORY = "dialogDeleteStory"
     const val EDIT_EVENT_ROUTE = "event/edit"
     const val EVENT_MORE_SHEET = "eventMoreSheet"
-    const val MESSAGES_ROUTE = "messages"
     const val MESSAGES_MORE_SHEET = "messagesMoreSheet"
     const val NEW_CHAT_ROUTE = "newChat"
     const val TICKETING_ROUTE = "ticketing"
-    const val TICKETS_ROUTE = "tickets"
     const val EDIT_PROFILE_ROUTE = "editProfile"
     const val PROFILE_STATS_ROUTE = "profileStats"
     const val OTHER_PROFILE_STATS_ROUTE = "otherProfileStats"
@@ -43,7 +41,7 @@ object MainDestinations {
     const val CHAT_ROUTE = "chat"
     const val POST_DETAIL_ROUTE = "postDetail"
     const val GUEST_LIST_ROUTE = "guestList"
-    const val ADD_EVENT_SHEET = "addEventSheet"
+    const val CREATE_PARTY_ROUTE = "create_party_route"
     const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
     const val STORY_MORE_SHEET = "storyMoreSheet"
@@ -53,7 +51,6 @@ object MainDestinations {
     const val DRINKING_STATS = "drinkingStats"
     const val NFC_ROUTE = "nfc"
     const val SHARE_ROUTE = "share"
-    const val MAP_SETTINGS_ROUTE = "mapSettings"
     const val MANAGE_FRIENDSHIP_SHEET = "manageFriendship"
     const val NOTE_SHEET = "note"
     const val DIALOG_REMOVE_FRIEND = "dialogRemoveFriend"
@@ -66,8 +63,6 @@ object AuthDestinations {
     const val SIGN_IN_ROUTE = "signIn"
     const val SIGN_UP_ROUTE = "signUp"
     const val REGISTER_ROUTE = "register"
-    const val CHOOSE_USERNAME = "chooseUsername"
-    const val PHONE_ROUTE = "phone"
 }
 
 /**
@@ -265,7 +260,7 @@ class CheersNavigationActions(
     }
 
     val navigateToAddEvent: () -> Unit = {
-        navController.navigate(MainDestinations.ADD_EVENT_SHEET) {
+        navController.navigate(MainDestinations.CREATE_PARTY_ROUTE) {
             launchSingleTop = true
             restoreState = true
         }
@@ -300,13 +295,6 @@ class CheersNavigationActions(
     }
 
     val navigateToMap: () -> Unit = {
-    }
-
-    val navigateToMessages: () -> Unit = {
-        navController.navigate(MainDestinations.MESSAGES_ROUTE) {
-            launchSingleTop = true
-            restoreState = true
-        }
     }
 
     val navigateToComments: (postId: String) -> Unit = { postId ->
@@ -410,13 +398,6 @@ class CheersNavigationActions(
         }
     }
 
-    val navigateToOtherProfileStats: (statName: String, username: String, verified: Boolean) -> Unit =
-        { s, username, verified ->
-            navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/$username/$verified") {
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
 
     val navigateToProfileStats: (statName: String, username: String, verified: Boolean) -> Unit =
         { s, username, verified ->

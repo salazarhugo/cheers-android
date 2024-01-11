@@ -1,7 +1,5 @@
 package com.salazar.cheers.core.ui.item
 
-import android.content.res.Configuration.UI_MODE_NIGHT_NO
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
@@ -10,6 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,26 +21,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.animations.Bounce
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
 fun LikeButton(
     like: Boolean,
-    likes: Int,
-    onToggle: () -> Unit,
+    onToggle: () -> Unit = {},
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val icon = if (like)
-            R.drawable.ic_glass_icon_full
+            Icons.Rounded.Favorite
         else
-            R.drawable.ic_glass_icon
+            Icons.Rounded.FavoriteBorder
 
         val transition = updateTransition(
             targetState = like, label = ""
@@ -50,37 +56,26 @@ fun LikeButton(
             }
         }
 
-        Icon(
-            rememberAsyncImagePainter(icon),
-            null,
-            modifier = Modifier
-                .size(22.dp)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }) {
-                    onToggle()
-                },
-            tint = color
-        )
-        if (likes > 0) {
-            Spacer(modifier = Modifier.width(6.dp))
-            AnimatedTextCounter(
-                targetState = likes,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = color
+        Bounce(onBounce = onToggle) {
+            Icon(
+                imageVector = icon,
+                modifier = Modifier,
+                contentDescription = null,
+                tint = color
             )
         }
     }
 }
 
+@ComponentPreviews
 @Composable
-@Preview(uiMode = UI_MODE_NIGHT_YES)
-private fun LikeButtonPreview() {
-    LikeButton(like = true, likes = 643) { }
-}
-
-@Composable
-@Preview(uiMode = UI_MODE_NIGHT_NO)
-private fun UnLikeButtonOutlinedPreview() {
-    LikeButton(like = false, likes = 643) { }
+private fun CommentButtonDarkPreview() {
+    CheersPreview {
+        LikeButton(
+            like = false,
+        )
+        LikeButton(
+            like = true,
+        )
+    }
 }

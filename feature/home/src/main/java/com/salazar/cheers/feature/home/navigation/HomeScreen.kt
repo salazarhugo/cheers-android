@@ -32,6 +32,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,15 +45,17 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.gms.ads.nativead.NativeAd
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
+import com.salazar.cheers.core.ui.EmptyFeed
 import com.salazar.cheers.core.ui.UserItem
-import com.salazar.cheers.core.ui.item.PostItem
-import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.components.post.PostComponent
+import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
+import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
-import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.feature.home.navigation.ads.NativeAdPost
-import com.salazar.cheers.user.ui.AddFriendButton
+import com.salazar.cheers.core.ui.AddFriendButton
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -71,8 +74,17 @@ fun HomeScreen(
             )
         },
     ) {
-        SwipeToRefresh(
-            state = rememberSwipeToRefreshState(uiState.isLoading),
+        val state = rememberRefreshLayoutState()
+        val scope  = rememberCoroutineScope()
+        LaunchedEffect(uiState.isLoading) {
+            if (!uiState.isLoading) {
+                scope.launch {
+                    state.finishRefresh(true)
+                }
+            }
+        }
+        PullToRefreshComponent(
+            state = state,
             onRefresh = { onHomeUIAction(HomeUIAction.OnSwipeRefresh) },
             modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
@@ -172,11 +184,14 @@ private fun LazyListScope.partiesBanner(onClick: () -> Unit) {
     }
 }
 
-private fun LazyListScope.emptyPosts(isEmpty: Boolean) {
-    if (!isEmpty)
-        return
+private fun LazyListScope.emptyPosts(
+    onClick: () -> Unit = {},
+) {
     item {
-        FunctionalityNotAvailablePanel()
+        EmptyFeed(
+            modifier = Modifier.padding(vertical = 60.dp),
+            onClick = onClick,
+        )
     }
 }
 
@@ -214,9 +229,13 @@ private fun LazyListScope.posts(
     endReached: Boolean,
     onHomeUIAction: (HomeUIAction) -> Unit,
 ) {
-    emptyPosts(
-        isEmpty = posts.isEmpty(),
-    )
+    if (posts.isEmpty() && isLoading.not()) {
+        emptyPosts(
+            onClick = {
+                onHomeUIAction(HomeUIAction.OnCreatePostClick)
+            },
+        )
+    }
 
     items(
         count = posts.size,
@@ -232,9 +251,24 @@ private fun LazyListScope.posts(
                 onHomeUIAction(HomeUIAction.OnLoadNextItems)
             }
         }
-        PostItem(
+        PostComponent(
             post = post,
             modifier = Modifier.animateItemPlacement(),
+            onUserClick = { userID ->
+                onHomeUIAction(HomeUIAction.OnUserClick(userID))
+            },
+            onMoreClick = {
+                onHomeUIAction(HomeUIAction.OnPostMoreClick(post.id))
+            },
+            onLikeClick = {
+                onHomeUIAction(HomeUIAction.OnLikeClick(post))
+            },
+            onLikeCountClick = {
+                onHomeUIAction(HomeUIAction.OnPostLikesClick(post.id))
+            },
+            onCommentClick = {
+                onHomeUIAction(HomeUIAction.OnPostCommentClick(post.id))
+            },
         )
     }
 }
@@ -332,8 +366,8 @@ fun WhatsUpSection(
             .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        UserProfilePicture(
-            picture = avatar,
+        AvatarComponent(
+            avatar = avatar,
             size = 36.dp,
         )
         Spacer(Modifier.width(8.dp))

@@ -15,8 +15,13 @@ fun HomeRoute(
     onPostClick: (String) -> Unit,
     navigateToNote: (String) -> Unit,
     navigateToCreatePost: () -> Unit,
+    navigateToUser: (String) -> Unit,
     navigateToCreateNote: () -> Unit,
     navigateToParties: () -> Unit,
+    navigateToMessages: () -> Unit,
+    navigateToPostMoreSheet: (String) -> Unit,
+    navigateToPostComments: (String) -> Unit,
+    navigateToPostLikes: (String) -> Unit = {},
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
@@ -40,18 +45,19 @@ fun HomeRoute(
             when (action) {
                 is HomeUIAction.OnActivityClick -> onActivityClick()
                 is HomeUIAction.OnLikeClick -> homeViewModel.toggleLike(action.post)
-                is HomeUIAction.OnCommentClick -> {}
+                is HomeUIAction.OnPostCommentClick -> navigateToPostComments(action.postID)
+                is HomeUIAction.OnPostLikesClick -> navigateToPostLikes(action.postID)
                 is HomeUIAction.OnSearchClick -> {}
                 is HomeUIAction.OnStoryClick -> {}
                 is HomeUIAction.OnStoryFeedClick -> {}
-                is HomeUIAction.OnUserClick -> {}
+                is HomeUIAction.OnUserClick -> navigateToUser(action.userID)
                 is HomeUIAction.OnPostClick -> onPostClick(action.postID)
                 is HomeUIAction.OnSwipeRefresh -> homeViewModel.onSwipeRefresh()
                 is HomeUIAction.OnCreatePostClick -> navigateToCreatePost()
                 is HomeUIAction.OnAddStoryClick -> {}//navActions.navigateToCamera()
-                is HomeUIAction.OnPostMoreClick -> {}// navActions.navigateToPostMoreSheet(action.postID)
+                is HomeUIAction.OnPostMoreClick -> navigateToPostMoreSheet(action.postID)
                 is HomeUIAction.OnLoadNextItems -> homeViewModel.loadNextPosts()
-                is HomeUIAction.OnChatClick -> {}// navActions.navigateToMessages()
+                is HomeUIAction.OnChatClick -> navigateToMessages()
                 is HomeUIAction.OnShareClick -> {}// navActions.navigateToShare(action.postID)
                 HomeUIAction.OnCreateNoteClick -> navigateToCreateNote()
                 is HomeUIAction.OnNoteClick -> navigateToNote(action.userID)

@@ -17,8 +17,7 @@ fun NavController.navigateToSignIn(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.signInScreen(
     navigateToHome: () -> Unit,
     navigateToRegister: () -> Unit,
-    navigateToPhone: () -> Unit,
-    navigateToSignUp: () -> Unit,
+    navigateToSignUp: (String?) -> Unit,
 ) {
     composable(
         route = signInNavigationRoute,
@@ -28,7 +27,6 @@ fun NavGraphBuilder.signInScreen(
     ) {
         SignInRoute(
             navigateToHome = navigateToHome,
-            navigateToPhone = navigateToPhone,
             navigateToRegister = navigateToRegister,
             navigateToSignUp = navigateToSignUp,
         )

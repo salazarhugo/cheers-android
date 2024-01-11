@@ -16,6 +16,7 @@ data class Party(
     val endDate: Long = 0,
     val createTime: Long = 0,
     val hostId: String = "",
+    val isHost: Boolean = false,
     val hostName: String = "",
     val price: Int? = null,
     val participants: List<String> = emptyList(),
@@ -26,15 +27,13 @@ data class Party(
     val watchStatus: WatchStatus = WatchStatus.UNWATCHED,
     val bannerUrl: String = "",
     val address: String = "",
-    val mutualProfilePictureUrls: List<String> = emptyList(),
-    val mutualUsernames: List<String> = emptyList(),
-    val mutualCount: Int = 0,
     val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val privacy: Privacy = Privacy.PUBLIC,
     val type: String = Privacy.PUBLIC.name,
     val accountId: String = "",
+    val mutualGoing: Map<String, String> = emptyMap(),
 )
 
 enum class WatchStatus {

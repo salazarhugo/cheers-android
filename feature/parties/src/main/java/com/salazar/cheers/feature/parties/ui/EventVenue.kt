@@ -27,7 +27,7 @@ fun PartyVenue(
         modifier = modifier,
     ) {
         Text(
-            "About the venue",
+            text = "About the venue",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )
@@ -46,11 +46,11 @@ fun PartyVenue(
             text = address,
             modifier = Modifier.padding(vertical = 8.dp),
         )
-        PartyHeaderItem(
-            icon = Icons.Default.DirectionsCarFilled,
-            text = "Parking: Street",
-            modifier = Modifier.padding(vertical = 8.dp),
-        )
+//        PartyHeaderItem(
+//            icon = Icons.Default.DirectionsCarFilled,
+//            text = "Parking: Street",
+//            modifier = Modifier.padding(vertical = 8.dp),
+//        )
     }
 }
 

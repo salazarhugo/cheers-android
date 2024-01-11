@@ -5,32 +5,26 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
-/**
- * Stateful composable that displays the Navigation route for the CreatePassword screen.
- *
- * @param createPasswordViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun CreatePasswordRoute(
     createPasswordViewModel: CreatePasswordViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions
+    navigateBack: () -> Unit,
 ) {
     val uiState by createPasswordViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.done) {
         if (uiState.done)
-            navActions.navigateBack()
+            navigateBack()
     }
 
     CreatePasswordScreen(
         uiState = uiState,
-        onBackPressed = { navActions.navigateBack() },
+        onBackPressed = { navigateBack() },
         onPasswordChange = createPasswordViewModel::onPasswordChange,
         onCreatePassword = {
             createPasswordViewModel.onCreatePassword {
-                navActions.navigateBack()
+                navigateBack()
             }
         },
     )

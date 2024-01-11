@@ -19,6 +19,7 @@ fun NavGraphBuilder.partiesScreen(
     navigateToPartyDetail: (String) -> Unit,
     navigateToPartyMoreSheet: (String) -> Unit,
     navigateToTickets: () -> Unit,
+    navigateToCreateParty: () -> Unit,
 ) {
     composable(
         route = partiesNavigationRoute,
@@ -30,6 +31,7 @@ fun NavGraphBuilder.partiesScreen(
             navigateToPartyDetail = navigateToPartyDetail,
             navigateToPartyMoreSheet = navigateToPartyMoreSheet,
             navigateToTickets = navigateToTickets,
+            navigateToCreateParty = navigateToCreateParty,
         )
     }
 }

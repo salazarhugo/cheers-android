@@ -59,12 +59,12 @@ class ChatViewModel @Inject constructor(
         )
 
     init {
-        val channelID = statsHandle.get<String>("channelId")
+        val channelID = statsHandle.get<String>(CHANNEL_ID)
 
         if (channelID != null)
             loadChannel(channelID)
         else {
-            val userId = statsHandle.get<String>("userID")!!
+            val userId = statsHandle.get<String>(USER_ID)!!
             runBlocking {
                 userID = userId
                 val channel = chatRepository.getChatWithUser(userId)

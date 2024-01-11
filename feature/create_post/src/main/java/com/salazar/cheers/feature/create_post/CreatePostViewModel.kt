@@ -1,12 +1,13 @@
 package com.salazar.cheers.feature.create_post
 
 import android.net.Uri
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.SheetState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mapbox.geojson.Point
-import com.mapbox.search.result.SearchResult
 import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Privacy
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,8 +33,8 @@ data class CreatePostUiState(
     val photos: List<Uri> = emptyList(),
     val locationPoint: Point? = null,
     val location: String = "",
-    val locationResults: List<SearchResult> = emptyList(),
-    val selectedLocation: SearchResult? = null,
+//    val locationResults: List<SearchResult> = emptyList(),
+//    val selectedLocation: SearchResult? = null,
     val selectedTagUsers: List<com.salazar.cheers.core.model.UserItem> = emptyList(),
     val privacyState: SheetState = SheetState(true),
     val privacy: Privacy = Privacy.FRIENDS,
@@ -78,8 +79,12 @@ class CreatePostViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            createPostUseCases.listDrinkUseCase().onSuccess {
-                updateDrinks(it)
+            createPostUseCases.listDrinkUseCase().collect { result ->
+                result.onSuccess { drinks ->
+                    updateDrinks(drinks)
+                }.onFailure {
+                    updateErrorMessage(it.localizedMessage)
+                }
             }
         }
     }
@@ -87,7 +92,7 @@ class CreatePostViewModel @Inject constructor(
     private fun updateDrinks(drinks: List<Drink>) {
         val emptyDrink = listOf(
             Drink(
-                id = "",
+                id = 0,
                 name = "",
                 icon = "",
                 category = "",
@@ -113,9 +118,9 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun unselectLocation() {
-        viewModelState.update {
-            it.copy(selectedLocation = null)
-        }
+//        viewModelState.update {
+//            it.copy(selectedLocation = null)
+//        }
     }
 
     fun onDrunkennessChange(drunkenness: Int) {
@@ -124,11 +129,11 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun selectLocation(location: SearchResult) {
-        viewModelState.update {
-            it.copy(selectedLocation = location)
-        }
-    }
+//    fun selectLocation(location: SearchResult) {
+//        viewModelState.update {
+//            it.copy(selectedLocation = location)
+//        }
+//    }
 
     fun toggleNotify(notify: Boolean) {
         viewModelState.update {
@@ -166,11 +171,11 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun updateLocationResults(results: List<SearchResult>) {
-        viewModelState.update {
-            it.copy(locationResults = results)
-        }
-    }
+//    fun updateLocationResults(results: List<SearchResult>) {
+//        viewModelState.update {
+//            it.copy(locationResults = results)
+//        }
+//    }
 
     fun onCaptionChanged(caption: String) {
         viewModelState.update {
@@ -196,11 +201,9 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun uploadPost() {
+    fun uploadPost(drinkID: Int) {
         val uiState = viewModelState.value
         updateIsLoading(true)
-
-        val drink = uiState.drinks[uiState.currentDrink].name
 
         viewModelScope.launch {
             createPostUseCases.createPostUseCase(
@@ -208,8 +211,8 @@ class CreatePostViewModel @Inject constructor(
                 "POST_TYPE" to uiState.postType,
                 "PHOTO_CAPTION" to uiState.caption,
                 "DRUNKENNESS" to uiState.drunkenness,
-                "BEVERAGE" to drink,
-                "LOCATION_NAME" to uiState.selectedLocation?.name,
+                "DRINK_ID" to drinkID.toLong(),
+                "LOCATION_NAME" to "",
                 "LOCATION_LATITUDE" to uiState.locationPoint?.latitude(),
                 "LOCATION_LONGITUDE" to uiState.locationPoint?.longitude(),
                 "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),
@@ -223,6 +226,10 @@ class CreatePostViewModel @Inject constructor(
 }
 
 sealed class CreatePostUIAction {
+    object OnCameraClick : CreatePostUIAction()
+    object OnGalleryClick : CreatePostUIAction()
     object OnBackPressed : CreatePostUIAction()
     object OnSwipeRefresh : CreatePostUIAction()
+    data class OnCaptionChange(val text: String) : CreatePostUIAction()
+    data class OnNotificationChange(val enabled: Boolean) : CreatePostUIAction()
 }

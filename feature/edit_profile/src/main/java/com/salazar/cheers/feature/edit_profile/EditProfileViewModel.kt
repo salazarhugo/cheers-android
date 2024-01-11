@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.edit_profile
 
-import android.app.Application
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -130,7 +129,7 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateUser() {
+    fun onSave() {
         viewModelState.update { it.copy(isLoading = true) }
 
         val user = viewModelState.value.user ?: return
@@ -142,14 +141,22 @@ class EditProfileViewModel @Inject constructor(
             }
         }
         uploadProfilePicture()
+        uploadBanner()
     }
 
+    private fun uploadBanner() {
+        val banner = viewModelState.value.bannerUri ?: return
+
+        viewModelScope.launch {
+            userRepository.uploadProfileBanner(banner)
+        }
+    }
 
     private fun uploadProfilePicture() {
         val profilePicture = viewModelState.value.profilePictureUri ?: return
 
         viewModelScope.launch {
-            userRepository.uploadUserPicture(profilePicture)
+            userRepository.uploadProfilePicture(profilePicture)
         }
     }
 }

@@ -7,29 +7,24 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.os.StrictMode
 import android.util.Log
-import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.Language
-import com.salazar.cheers.Settings
 import com.salazar.cheers.core.ui.CheersViewModel
-import com.salazar.cheers.core.util.StorageUtil
-import com.salazar.cheers.core.util.Utils.setLocale
 import com.salazar.common.util.LocalActivity
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
@@ -48,10 +43,16 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     @Inject
     lateinit var friendshipRepository: com.salazar.cheers.data.friendship.FriendshipRepository
 
+    @Inject
+    lateinit var appUpdateManager: AppUpdateManager
+
+    private val updateType = AppUpdateType.IMMEDIATE
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        checkForAppUpdates()
 
         setContent {
             CompositionLocalProvider(LocalActivity provides this) {
@@ -62,8 +63,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
-
-        StorageUtil.getSnapchatBanner(this)
     }
 
     override fun onResume() {
@@ -87,6 +86,22 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         )
 
         startActivity(deepLinkIntent)
+    }
+
+    private fun checkForAppUpdates() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            val isUpdateAvailable = appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            val isUpdateAllowed = appUpdateInfo.isUpdateTypeAllowed(updateType)
+
+            if (isUpdateAvailable && isUpdateAllowed) {
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    this,
+                    AppUpdateOptions.defaultOptions(updateType),
+                    1,
+                )
+            }
+        }
     }
 
     private fun userConsentPolicy() {

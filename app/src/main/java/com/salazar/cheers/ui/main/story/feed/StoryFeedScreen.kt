@@ -60,9 +60,11 @@ import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.domain.model.UserWithStories
+import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.carousel
-import com.salazar.cheers.core.ui.item.PostHeader
+import com.salazar.cheers.core.ui.components.post.PostHeader
 import com.salazar.cheers.core.ui.theme.StrongRed
+import com.salazar.cheers.core.ui.ui.PrettyImage
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import kotlinx.coroutines.launch
@@ -242,7 +244,7 @@ fun StoryPage(
         onViewed(story.id)
     }
 
-    com.salazar.cheers.core.share.ui.PrettyImage(
+    PrettyImage(
         data = story.photo,
         contentDescription = null,
         alignment = Alignment.Center,
@@ -301,16 +303,20 @@ fun StoryFeedHeader(
                 username = user.username,
                 verified = user.verified,
                 createTime = story.createTime,
-                beverage = "",
+                drinkName = "",
                 locationName = "",
                 profilePictureUrl = user.picture ?: "",
             )
         PostHeader(
-            post = post,
+            username = post.username,
+            verified = post.verified,
+            avatar = post.profilePictureUrl,
+            locationName = post.locationName,
+            createTime = post.createTime,
+            isPublic = post.privacy == Privacy.PUBLIC.name,
             darkMode = true,
-            public = false,
-            onUserClick = onUserClick,
-            onMoreClicked = {},
+            onUserClick = { onUserClick(post.authorId) } ,
+            onMoreClick = {},
         )
     }
 }

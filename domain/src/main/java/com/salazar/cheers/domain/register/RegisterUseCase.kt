@@ -2,8 +2,8 @@ package com.salazar.cheers.domain.register
 
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,8 +12,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RegisterUseCase @Inject constructor(
-    private val storeUserEmail: com.salazar.cheers.data.user.datastore.StoreUserEmail,
-    private val authRepository: AuthRepository,
+    private val storeUserEmail: StoreUserEmail,
     private val userRepository: UserRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {

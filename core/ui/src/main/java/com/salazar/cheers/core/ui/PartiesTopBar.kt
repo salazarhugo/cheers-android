@@ -2,11 +2,13 @@ package com.salazar.cheers.core.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AirplaneTicket
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
@@ -19,6 +21,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
@@ -27,6 +31,7 @@ fun PartiesTopBar(
     query: String,
     onQueryChange: (String) -> Unit,
     onTicketsClick: () -> Unit,
+    onCreatePartyClick: () -> Unit,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val icon = when (isDarkTheme) {
@@ -38,13 +43,23 @@ fun PartiesTopBar(
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
             colors = TopAppBarDefaults.mediumTopAppBarColors(),
             navigationIcon = {
-                Image(
-                    painter = painterResource(icon),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .size(34.dp),
-                    contentDescription = null,
-                )
+                Box() {
+                    Image(
+                        painter = painterResource(icon),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .size(34.dp)
+                            .blur(radius = 10.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
+                        contentDescription = null,
+                    )
+                    Image(
+                        painter = painterResource(icon),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .size(34.dp),
+                        contentDescription = null,
+                    )
+                }
             },
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -56,6 +71,12 @@ fun PartiesTopBar(
                 }
             },
             actions = {
+                IconButton(onClick = onCreatePartyClick) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add icon",
+                    )
+                }
                 IconButton(onClick = onTicketsClick) {
                     Icon(
                         imageVector = Icons.Default.AirplaneTicket,

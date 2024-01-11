@@ -5,6 +5,7 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.ImageDecoder
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
@@ -12,6 +13,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import com.snap.creativekit.SnapCreative
 import com.snap.creativekit.exceptions.SnapMediaSizeException
 import com.snap.creativekit.models.SnapPhotoContent
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Math.min
 import java.text.SimpleDateFormat
@@ -189,17 +192,18 @@ object Utils {
         return output
     }
 
-//    fun Timestamp.isToday(): Boolean {
-//        val c = Calendar.getInstance()
-//
-//        c[Calendar.HOUR_OF_DAY] = 0
-//        c[Calendar.MINUTE] = 0
-//        c[Calendar.SECOND] = 0
-//        c[Calendar.MILLISECOND] = 0
-//
-//        val today = c.time
-//
-//        return this.seconds > today.time
-//    }
+    public fun extractImage(
+        path: Uri,
+        applicationContext: Context,
+    ): ByteArray {
+        val source: ImageDecoder.Source =
+            ImageDecoder.createSource(applicationContext.contentResolver, path)
+        val selectedImageBmp: Bitmap = ImageDecoder.decodeBitmap(source)
+
+        val outputStream = ByteArrayOutputStream()
+        selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+
+        return outputStream.toByteArray()
+    }
 
 }

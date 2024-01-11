@@ -5,20 +5,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
@@ -57,19 +57,18 @@ fun Tabs(
         if (uiState.interested != null) "${uiState.interested.size} interested" else "Interested"
     val going = if (uiState.going != null) "${uiState.going.size} going" else "Interested"
     val pages = listOf(interested, going, "Invited")
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState {
+        pages.size
+    }
     val scope = rememberCoroutineScope()
 
     TabRow(
-        // Our selected tab is our current page
         selectedTabIndex = pagerState.currentPage,
-        // Override the indicator, using the provided pagerTabIndicatorOffset modifier
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
             )
         },
-        backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         // Add tabs for all of our pages
@@ -86,10 +85,7 @@ fun Tabs(
             )
         }
     }
-    HorizontalPager(
-        count = pages.size,
-        state = pagerState,
-    ) { page ->
+    HorizontalPager(state = pagerState) { page ->
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
                 0 -> InterestedList(
@@ -117,7 +113,10 @@ fun InterestedList(
                     userItem = user,
                     onClick = { onUserClick(user.username) },
                 ) {
-                    FollowButton(isFollowing = user.has_followed, onClick = {})
+                    FriendButton(
+                        isFriend = user.friend,
+                        onClick = {},
+                    )
                 }
             }
         }

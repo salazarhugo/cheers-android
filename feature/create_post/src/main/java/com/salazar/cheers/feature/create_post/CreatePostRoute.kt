@@ -12,54 +12,55 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /**
  * Stateful composable that displays the Navigation route for the Add post screen.
  *
- * @param addPostViewModel ViewModel that handles the business logic of this screen
+ * @param viewModel ViewModel that handles the business logic of this screen
  */
 @Composable
 fun CreatePostRoute(
     navigateBack: () -> Unit,
     navigateToCamera: () -> Unit,
-    addPostViewModel: CreatePostViewModel = hiltViewModel(),
+    viewModel: CreatePostViewModel = hiltViewModel(),
 ) {
-    val uiState by addPostViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 8),
-            onResult = addPostViewModel::setPhotos,
+            onResult = viewModel::setPhotos,
         )
 
     BackHandler {
         if (uiState.page == CreatePostPage.CreatePost)
             navigateBack()
         else
-            addPostViewModel.updatePage(CreatePostPage.CreatePost)
+            viewModel.updatePage(CreatePostPage.CreatePost)
     }
 
     when (uiState.page) {
         CreatePostPage.CreatePost ->
-            CreatePostScreen(
+            CreatePostScreenStateful(
                 uiState = uiState,
-                onCaptionChanged = addPostViewModel::onCaptionChanged,
-                onSelectLocation = addPostViewModel::selectLocation,
-                onUploadPost = addPostViewModel::uploadPost,
-                interactWithChooseOnMap = { addPostViewModel.updatePage(CreatePostPage.ChooseOnMap) },
-                interactWithDrunkennessLevel = { addPostViewModel.updatePage(CreatePostPage.DrunkennessLevel) },
-                navigateToTagUser = { addPostViewModel.updatePage(CreatePostPage.AddPeople) },
-                navigateToCamera = { navigateToCamera() },
-                unselectLocation = addPostViewModel::unselectLocation,
-                updateLocationName = addPostViewModel::updateLocation,
-                updateLocationResults = addPostViewModel::updateLocationResults,
-                onSelectMedia = addPostViewModel::addPhoto,
-                onMediaSelectorClicked = {
-                    launcher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
-                    )
-                 },
-                onSelectPrivacy = addPostViewModel::selectPrivacy,
-                onNotifyChange = addPostViewModel::toggleNotify,
+                onCaptionChanged = viewModel::onCaptionChanged,
+//                onSelectLocation = viewModel::selectLocation,
+                onUploadPost = viewModel::uploadPost,
+                interactWithChooseOnMap = { viewModel.updatePage(CreatePostPage.ChooseOnMap) },
+                interactWithDrunkennessLevel = { viewModel.updatePage(CreatePostPage.DrunkennessLevel) },
+                navigateToTagUser = { viewModel.updatePage(CreatePostPage.AddPeople) },
+                unselectLocation = viewModel::unselectLocation,
+                updateLocationName = viewModel::updateLocation,
+//                updateLocationResults = viewModel::updateLocationResults,
+                onSelectMedia = viewModel::addPhoto,
+                onSelectPrivacy = viewModel::selectPrivacy,
                 onCreatePostUIAction = {
                     when(it) {
                         CreatePostUIAction.OnBackPressed -> navigateBack()
                         CreatePostUIAction.OnSwipeRefresh -> {}
+                        CreatePostUIAction.OnCameraClick -> navigateToCamera()
+                        is CreatePostUIAction.OnCaptionChange -> viewModel.onCaptionChanged(it.text)
+                        CreatePostUIAction.OnGalleryClick -> {
+                            launcher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
+                            )
+                        }
+                        is CreatePostUIAction.OnNotificationChange -> viewModel.toggleNotify(it.enabled)
                     }
                 }
             )
@@ -73,20 +74,20 @@ fun CreatePostRoute(
 //            )
         CreatePostPage.ChooseBeverage ->
             BeverageScreen(
-                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
+                onBackPressed = { viewModel.updatePage(CreatePostPage.CreatePost) },
             )
         CreatePostPage.AddPeople ->
             AddPeopleScreen(
-                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
-                onSelectUser = addPostViewModel::selectTagUser,
+                onBackPressed = { viewModel.updatePage(CreatePostPage.CreatePost) },
+                onSelectUser = viewModel::selectTagUser,
                 selectedUsers = uiState.selectedTagUsers,
-                onDone = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
+                onDone = { viewModel.updatePage(CreatePostPage.CreatePost) },
             )
         CreatePostPage.DrunkennessLevel ->
             DrunkennessLevelScreen(
-                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
-                onDone = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
-                onSelectDrunkenness = addPostViewModel::onDrunkennessChange,
+                onBackPressed = { viewModel.updatePage(CreatePostPage.CreatePost) },
+                onDone = { viewModel.updatePage(CreatePostPage.CreatePost) },
+                onSelectDrunkenness = viewModel::onDrunkennessChange,
                 drunkenness = uiState.drunkenness,
             )
     }

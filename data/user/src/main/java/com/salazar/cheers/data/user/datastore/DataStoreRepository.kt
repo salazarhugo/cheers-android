@@ -34,12 +34,32 @@ class DataStoreRepository @Inject constructor(
             }
         }
 
+    fun getIdToken(): Flow<String> {
+        return userPreferencesFlow.map { it.idToken }
+    }
+
     fun getBiometricEnabled(): Flow<Boolean> {
         return userPreferencesFlow.map { it.hasBiometric }
     }
 
     fun getPasscode(): Flow<String> {
         return userPreferencesFlow.map { it.passcode }
+    }
+
+    fun getUsername(): Flow<String> {
+        return userPreferencesFlow.map { it.username }
+    }
+
+    suspend fun updateUsername(username: String) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setUsername(username).build()
+        }
+    }
+
+    suspend fun updateIdToken(idToken: String) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setIdToken(idToken).build()
+        }
     }
 
     suspend fun updatePasscode(passcode: String) {

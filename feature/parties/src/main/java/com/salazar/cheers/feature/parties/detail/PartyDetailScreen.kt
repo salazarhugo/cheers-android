@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
@@ -106,7 +107,6 @@ fun PartyDetail(
     onInterestedCountClick: () -> Unit,
     onTicketingClick: (String) -> Unit,
 ) {
-    val uid = ""//remember { FirebaseAuth.getInstance().currentUser?.uid!! }
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -127,15 +127,7 @@ fun PartyDetail(
             )
         }
 
-        if (party.hostId == uid || party.showGuestList)
-            item {
-                PartyResponses(
-                    party = party,
-                    onGoingCountClick = onGoingCountClick,
-                    onInterestedCountClick = onInterestedCountClick,
-                )
-                Divider()
-            }
+        guestList(party)
 
         item {
             PartyDescription(
@@ -148,7 +140,7 @@ fun PartyDetail(
 
         item {
             PartyVenue(
-                address = "Avenue Darcel, 75019",
+                address = party.address,
                 latitude = party.latitude,
                 longitude = party.longitude,
                 modifier = Modifier.padding(16.dp),
@@ -158,9 +150,25 @@ fun PartyDetail(
     }
 }
 
+fun LazyListScope.guestList(party: Party) {
+    if (!party.isHost || !party.showGuestList)
+        return
+
+    item {
+        PartyResponses(
+            goingCount = party.goingCount,
+            interestedCount = party.interestedCount,
+            onGoingCountClick = {},
+            onInterestedCountClick = {},
+        )
+        Divider()
+    }
+}
+
 @Composable
 fun PartyResponses(
-    party: Party,
+    interestedCount: Int,
+    goingCount: Int,
     onInterestedCountClick: () -> Unit,
     onGoingCountClick: () -> Unit,
 ) {
@@ -168,7 +176,7 @@ fun PartyResponses(
         modifier = Modifier.padding(16.dp),
     ) {
         Text(
-            "Guest list",
+            text = "Guest list",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )
@@ -190,7 +198,7 @@ fun PartyResponses(
                     modifier = Modifier.padding(top = 16.dp)
                 )
                 Text(
-                    text = numberFormatter(value = party.interestedCount),
+                    text = numberFormatter(value = interestedCount),
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
@@ -208,7 +216,7 @@ fun PartyResponses(
                     modifier = Modifier.padding(top = 16.dp)
                 )
                 Text(
-                    text = numberFormatter(value = party.goingCount),
+                    text = numberFormatter(value = goingCount),
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
@@ -234,7 +242,8 @@ fun PartyHeader(
                 .blur(
                     radius = 150.dp,
                     edgeTreatment = BlurredEdgeTreatment.Unbounded
-                ),
+                )
+                .aspectRatio(16 / 11f),
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
         )
@@ -259,7 +268,7 @@ fun PartyHeader(
             onPartyDetailsClick = {},
         )
         PartyHeaderButtons(
-            isHost = false,
+            isHost = party.isHost,
             onManageClick = onManageClick,
             onWatchStatusChange = onWatchStatusChange,
             onInviteClick = {},

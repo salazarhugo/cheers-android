@@ -26,7 +26,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.core.ui.CheersBadgeBox
-import com.salazar.cheers.core.ui.FollowButton
+import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.core.ui.text.MyText
@@ -34,7 +34,10 @@ import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.user.ui.AddFriendButton
+import com.salazar.cheers.core.ui.AddFriendButton
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import com.salazar.cheers.core.util.relativeTimeFormatter
+import com.salazar.cheers.data.activity.ActivityType
 
 
 @Composable
@@ -84,7 +87,7 @@ fun ActivityList(
                 onClick = { onActivityUIAction(ActivityUIAction.OnFriendRequestsClick) },
             )
         }
-        if (suggestions != null && activities?.isEmpty() == true) {
+        if (!suggestions.isNullOrEmpty()) {
             item {
                 MyText(
                     text = "Suggested for you",
@@ -115,7 +118,7 @@ fun ActivityList(
                 )
             }
         }
-        if (activities != null)
+        if (!activities.isNullOrEmpty()) {
             item {
                 MyText(
                     text = "This week",
@@ -123,7 +126,6 @@ fun ActivityList(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-        if (activities != null)
             items(activities, key = { it.id }) {
                 ActivityItem(
                     activity = it,
@@ -131,6 +133,7 @@ fun ActivityList(
                     onActivityUIAction = onActivityUIAction,
                 )
             }
+        }
     }
 }
 
@@ -156,8 +159,8 @@ fun FriendRequests(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             CheersBadgeBox(count = count) {
-                UserProfilePicture(
-                    picture = picture,
+                AvatarComponent(
+                    avatar = picture,
                     size = 40.dp,
                 )
             }
@@ -194,8 +197,8 @@ fun ActivityItem(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            UserProfilePicture(
-                picture = activity.avatar,
+            AvatarComponent(
+                avatar = activity.avatar,
                 size = 46.dp,
                 onClick = {
                     onActivityUIAction(ActivityUIAction.OnUserClick(userId = activity.username))
@@ -215,7 +218,7 @@ fun ActivityItem(
                         ), fontWeight = FontWeight.Normal
                     )
                 ) {
-                    append(com.salazar.cheers.core.util.relativeTimeFormatter(epoch = activity.createTime))
+                    append(relativeTimeFormatter(epoch = activity.createTime))
                 }
             }
             Text(
@@ -224,10 +227,10 @@ fun ActivityItem(
                 softWrap = true,
             )
         }
-        if (activity.type == com.salazar.cheers.data.activity.ActivityType.FRIEND_ADDED)
-            FollowButton(
+        if (activity.type == ActivityType.FRIEND_ADDED)
+            FriendButton(
                 modifier = Modifier.padding(start = 16.dp),
-                isFollowing = true,
+                isFriend = true,
                 onClick = {},
             )
         if (activity.photoUrl.isNotBlank()) {

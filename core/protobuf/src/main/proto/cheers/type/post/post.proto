@@ -15,7 +15,7 @@ message Post {
   Privacy privacy = 5;
   repeated string photos = 6;
   string location_name = 8;
-  string drink = 9;
+  Drink drink = 9;
   int64 drunkenness = 10;
   PostType type = 11;
   int64 create_time = 12;
@@ -29,6 +29,12 @@ message Post {
   string last_comment_text = 18;
   string last_comment_username = 19;
   int64 last_comment_create_time = 20;
+}
+
+message Drink {
+  int64 id = 1;
+  string name = 2;
+  string icon = 3;
 }
 
 enum PostRatio {

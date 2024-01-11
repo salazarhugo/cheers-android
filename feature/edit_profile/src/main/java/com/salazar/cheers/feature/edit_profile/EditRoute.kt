@@ -22,7 +22,7 @@ fun EditProfileRoute(
         onSelectBanner = editProfileViewModel::onSelectBanner,
         onDismiss = { navigateBack() },
         onSave = {
-            editProfileViewModel.updateUser()
+            editProfileViewModel.onSave()
             navigateBack()
         },
     )
