@@ -14,7 +14,7 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable, AnnotationDefault, *Annotation*
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
@@ -38,3 +38,21 @@
     public <init>(android.content.Context,androidx.work.WorkerParameters);
 }
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+
+
+# OhHttp 3
+-dontwarn javax.annotation.**
+
+# Mapbox
+-keep class com.mapbox.android.telemetry.**
+-keep class com.mapbox.android.core.location.**
+-keep class android.arch.lifecycle.** { *; }
+-keep class com.mapbox.android.core.location.** { *; }
+-dontnote com.mapbox.mapboxsdk.**
+-dontnote com.mapbox.android.gestures.**
+-dontnote com.mapbox.mapboxsdk.plugins.**
+
+-dontwarn okhttp3.internal.platform.** -dontwarn org.conscrypt.** -dontwarn org.bouncycastle.** -dontwarn org.openjsse.**
+-dontwarn com.google.protobuf.java_com_google_android_gmscore_sdk_target_granule__proguard_group_gtm_N1281923064GeneratedExtensionRegistryLite**
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+-keep class com.tobrun.datacompat.annotation.**

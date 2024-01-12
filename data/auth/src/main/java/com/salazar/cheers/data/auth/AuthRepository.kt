@@ -198,7 +198,7 @@ class AuthRepository @Inject constructor(
 
     fun updatePassword(
         password: String,
-    )  = flow {
+    )  = flow<Resource<Unit>> {
         emit(Resource.Loading(true))
         try {
             Firebase.auth.currentUser!!.updatePassword(password).await()

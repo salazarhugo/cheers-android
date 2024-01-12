@@ -23,7 +23,8 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -31,10 +32,9 @@ android {
         }
     }
 
-    packaging {
-        resources {
-            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-        }
+    packaging.resources {
+        excludes.add("/META-INF/AL2.0")
+        excludes.add("/META-INF/LGPL2.1")
     }
 }
 
