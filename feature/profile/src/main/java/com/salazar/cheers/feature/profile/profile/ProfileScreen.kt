@@ -24,11 +24,9 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,23 +38,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.PrettyPanel
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
+import com.salazar.cheers.core.ui.components.login_message.LoginMessageScreen
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.core.ui.item.party.PartyItem
 import com.salazar.cheers.core.ui.ui.PrettyImage
-import com.salazar.cheers.core.ui.ui.SwipeToRefresh
-import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.data.party.Party
 import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.data.user.User
-import com.salazar.cheers.feature.profile.NoAccountScreen
 import com.salazar.cheers.feature.profile.ProfileItem
 import com.salazar.cheers.feature.profile.ProfileTopBar
 import com.salazar.cheers.feature.profile.R
@@ -72,7 +68,7 @@ fun ProfileScreen(
 ) {
     when (uiState) {
         is ProfileUiState.NoAccount -> {
-            NoAccountScreen(
+            LoginMessageScreen(
                 onSignInClick = navigateToSignIn,
                 onRegisterClick = navigateToSignUp,
             )
@@ -134,6 +130,7 @@ fun ProfileList(
     parties: List<Party>?,
     onProfileUIAction: (ProfileUIAction) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val tabs = listOf(
         Icons.Outlined.ViewList,
@@ -150,11 +147,9 @@ fun ProfileList(
 
         item {
             ProfileBannerAndAvatar(
-                username = user.username,
-                verified = user.verified,
-                fraction = 1f,
+                modifier = Modifier.padding(16.dp),
                 banner = user.banner,
-                picture = user.picture,
+                avatar = user.picture,
                 content = {
                     OutlinedButton(
                         onClick = { onProfileUIAction(ProfileUIAction.OnEditProfileClick) },
@@ -183,14 +178,8 @@ fun ProfileList(
         }
 
         stickyHeader {
-            val scope = rememberCoroutineScope()
-            TabRow(
+            PrimaryTabRow(
                 selectedTabIndex = pagerState.currentPage,
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                    )
-                },
                 contentColor = MaterialTheme.colorScheme.onBackground,
             ) {
                 tabs.forEachIndexed { index, icon ->

@@ -1,6 +1,7 @@
 plugins {
     id("cheers.android.library")
     id("cheers.android.library.compose")
+    id("cheers.android.hilt")
 }
 
 android {
@@ -12,6 +13,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":common"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -20,7 +23,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
 
@@ -41,6 +43,10 @@ dependencies {
     // Snapchat
     implementation(libs.creativekit)
     implementation(libs.loginkit)
+
+    // Amplituda
+    implementation("com.github.lincollincol:compose-audiowaveform:1.1.1")
+    implementation("com.github.lincollincol:amplituda:2.2.2")
 
     // Camera X
     implementation(libs.androidx.camera.camera2)

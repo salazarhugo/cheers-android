@@ -36,7 +36,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.salazar.cheers.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -126,13 +126,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="maparty.fr"
+                    android:host="cheers.social"
                     android:scheme="https" />
                 <data
                     android:host="maparty.app"
-                    android:scheme="https" />
-                <data
-                    android:host="web-cheers.web.app"
                     android:scheme="https" />
                 <data
                     android:host="cheers-a275e.firebaseapp.com"

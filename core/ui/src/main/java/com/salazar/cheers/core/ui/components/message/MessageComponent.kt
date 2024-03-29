@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.theme.CheersTheme
@@ -39,14 +40,16 @@ fun MessageComponent(
     onSecondaryButtonClick: () -> Unit = {},
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             painter = painterResource(id = image),
             contentDescription = null,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(24.dp),
+        )
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
@@ -54,7 +57,9 @@ fun MessageComponent(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
 
         if (subtitle != null) {
             Text(
@@ -123,15 +128,13 @@ fun MessageScreenComponent(
 @ComponentPreviews
 @Composable
 private fun MessageComponentDarkPreview() {
-    CheersTheme {
-        Surface {
-            MessageComponent(
-                modifier = Modifier.padding(16.dp),
-                title = stringResource(id = R.string.message_component_title),
-                subtitle = stringResource(id = R.string.message_component_subtitle),
-                primaryButtonText = "Sign in",
-                secondaryButtonText = "Register",
-            )
-        }
+    CheersPreview {
+        MessageComponent(
+            modifier = Modifier.padding(16.dp),
+            title = stringResource(id = R.string.message_component_title),
+            subtitle = stringResource(id = R.string.message_component_subtitle),
+            primaryButtonText = "Sign in",
+            secondaryButtonText = "Register",
+        )
     }
 }

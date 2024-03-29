@@ -9,6 +9,7 @@ import cheers.comment.v1.CommentServiceGrpcKt
 import cheers.drink.v1.DrinkServiceGrpcKt
 import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.location.v1.LocationServiceGrpcKt
+import cheers.media.v1.MediaServiceGrpcKt
 import cheers.note.v1.NoteServiceGrpcKt
 import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.party.v1.PartyServiceGrpcKt
@@ -46,10 +47,11 @@ import com.salazar.cheers.data.ticket.impl.TicketRepositoryImpl
 import com.salazar.cheers.data.user.UserDao
 import com.salazar.cheers.data.user.UserItemDao
 import com.salazar.cheers.data.user.UserStatsDao
-import com.salazar.cheers.feature.chat.data.db.ChatDao
-import com.salazar.cheers.feature.chat.data.repository.ChatRepository
-import com.salazar.cheers.feature.chat.data.repository.ChatRepositoryImpl
-import com.salazar.cheers.feature.chat.data.websocket.ChatWebSocketListener
+import com.salazar.cheers.data.chat.db.ChatDao
+import com.salazar.cheers.data.chat.repository.ChatRepository
+import com.salazar.cheers.data.chat.repository.ChatRepositoryImpl
+import com.salazar.cheers.data.chat.websocket.ChatWebSocketListener
+import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -79,8 +81,10 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseUserIdTokenInterceptor(): FirebaseUserIdTokenInterceptor {
-       return FirebaseUserIdTokenInterceptor()
+    fun provideFirebaseUserIdTokenInterceptor(
+        getIdTokenUseCase: GetIdTokenUseCase,
+    ): FirebaseUserIdTokenInterceptor {
+       return FirebaseUserIdTokenInterceptor(getIdTokenUseCase)
     }
 
     @Singleton
@@ -111,7 +115,7 @@ object AppModule {
 
     @Provides
     fun provideWebSocket(
-        chatWebSocketListener: ChatWebSocketListener,
+        chatWebSocketListener: com.salazar.cheers.data.chat.websocket.ChatWebSocketListener,
     ): WebSocket {
         val authToken = "55FEvHawinQCa9jgH7ZdWESR3ri2"
         val request = Request.Builder()
@@ -200,6 +204,17 @@ object AppModule {
         storyRepositoryImpl: StoryRepositoryImpl,
     ): StoryRepository {
         return storyRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideMediaServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        tokenInterceptor: TokenInterceptor,
+    ): MediaServiceGrpcKt.MediaServiceCoroutineStub {
+        return MediaServiceGrpcKt
+            .MediaServiceCoroutineStub(managedChannel)
+            .withInterceptors(tokenInterceptor)
     }
 
     @Provides
@@ -502,7 +517,7 @@ object AppModule {
     @Provides
     fun provideChatDao(
         cheersDatabase: CheersDatabase,
-    ): ChatDao {
+    ): com.salazar.cheers.data.chat.db.ChatDao {
         return cheersDatabase.chatDao()
     }
 

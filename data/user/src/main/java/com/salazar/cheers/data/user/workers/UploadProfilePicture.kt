@@ -2,8 +2,6 @@ package com.salazar.cheers.data.user.workers
 
 import android.content.ContentValues.TAG
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -19,7 +17,6 @@ import com.salazar.cheers.data.user.R
 import com.salazar.cheers.data.user.UserRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.ByteArrayOutputStream
 
 @HiltWorker
 class UploadProfilePicture @AssistedInject constructor(
@@ -40,7 +37,7 @@ class UploadProfilePicture @AssistedInject constructor(
             val downloadUrl = Tasks.await(task)
 
             val user = userRepository.getCurrentUser()
-            userRepository.updateUser(user.copy(picture = downloadUrl.toString()))
+            userRepository.updateUserProfile(user.copy(picture = downloadUrl.toString()))
 
             return Result.success()
         } catch (throwable: Throwable) {

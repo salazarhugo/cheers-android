@@ -1,24 +1,21 @@
 package com.salazar.cheers.feature.map.screens.map
 
-import android.util.Log
-import androidx.compose.material3.SheetState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.maps.MapView
-import com.mapbox.maps.MapboxMap
 import com.salazar.cheers.Settings
-import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.data.post.repository.Post
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
-import com.salazar.cheers.domain.get_last_known_location.GetLastKnownLocationUseCase
-import com.salazar.cheers.feature.map.data.repository.MapRepositoryImpl
-import com.salazar.cheers.feature.map.domain.models.UserLocation
+import com.salazar.cheers.domain.get_location_updates.GetLocationUpdatesUseCase
+import com.salazar.cheers.domain.list_map_post.ListMapPostUseCase
+import com.salazar.cheers.data.map.MapRepositoryImpl
+import com.salazar.cheers.data.map.UserLocation
 import com.salazar.cheers.feature.map.domain.usecase.update_location.UpdateLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,51 +23,40 @@ import java.util.Date
 import javax.inject.Inject
 
 
-enum class MapAnnotationType {
-    POST,
-    USER
-}
+sealed class MapAnnotation {
+    data class PostAnnotation(
+        val post: Post,
+    ) : MapAnnotation()
 
-data class MapUiState(
-    val geojson: FeatureCollection? = null,
-    val users: List<UserLocation> = emptyList(),
-//    val posts: List<Post>? = null,
-    val city: String = "",
-//    val selectedPost: Post? = null,
-    val selectedUser: UserLocation? = null,
-    val selected: MapAnnotationType? = null,
-    val isLoading: Boolean = false,
-    val isPublic: Boolean = false,
-    val sheetState: SheetState = SheetState(skipPartiallyExpanded = true),
-    val errorMessages: List<String> = emptyList(),
-    val searchInput: String = "",
-    val mapboxMap: MapboxMap? = null,
-    val userLocation: UserLocation? = null,
-    val ghostMode: Boolean = false,
-)
+    data class UserAnnotation(
+        val user: com.salazar.cheers.data.map.UserLocation
+    ): MapAnnotation()
+}
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    val mapRepository: MapRepositoryImpl,
+    val mapRepository: com.salazar.cheers.data.map.MapRepositoryImpl,
     private val updateLocationUseCase: UpdateLocationUseCase,
     private val dataStoreRepository: DataStoreRepository,
-    private val lastKnownLocationUseCase: GetLastKnownLocationUseCase,
-    private val getAccountUseCase: GetAccountUseCase,
+    private val locationUpdatesUseCase: GetLocationUpdatesUseCase,
+    private val accountUseCase: GetAccountUseCase,
+    private val listMapPostUseCase: ListMapPostUseCase,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(MapUiState(isLoading = true))
+    private val viewModelState = MutableStateFlow(MapViewModelState(isLoading = true))
 
     val uiState = viewModelState
+        .map { it.toUiState() }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value
+            viewModelState.value.toUiState(),
         )
 
     init {
         initUserLocation()
         updateLocation()
-        refreshPosts()
+        listenPosts()
         refreshFriendsLocation()
         viewModelScope.launch {
             dataStoreRepository.userPreferencesFlow.collect(::updateSettings)
@@ -87,23 +73,28 @@ class MapViewModel @Inject constructor(
 
     private fun initUserLocation() {
         viewModelScope.launch {
-            val location = lastKnownLocationUseCase() ?: return@launch
-            val account = getAccountUseCase().first() ?: return@launch
-            val userLocation = UserLocation(
-                id = "",
-                latitude = location.latitude,
-                longitude = location.longitude,
-                name = account.name,
-                locationName = "",
-                lastUpdated = Date().time / 1000,
-                username = account.username,
-                picture = account.picture,
-                verified = false,
-            )
-            viewModelState.update {
-                it.copy(userLocation = userLocation)
+            val account = accountUseCase().firstOrNull() ?: return@launch
+            locationUpdatesUseCase(interval = 2000).collect { location ->
+                val userLocation = com.salazar.cheers.data.map.UserLocation(
+                    id = "",
+                    latitude = location.latitude,
+                    longitude = location.longitude,
+                    name = account.name,
+                    locationName = "",
+                    lastUpdated = Date().time / 1000,
+                    username = account.username,
+                    picture = account.picture,
+                    verified = false,
+                )
+                viewModelState.update {
+                    it.copy(userLocation = userLocation)
+                }
             }
         }
+    }
+
+    fun onPermissionGranted() {
+        initUserLocation()
     }
 
     private fun updateLocation() {
@@ -111,6 +102,19 @@ class MapViewModel @Inject constructor(
             updateLocationUseCase()
         }
     }
+
+    private fun listenPosts() {
+        viewModelScope.launch {
+            listMapPostUseCase().collect(::updatePosts)
+        }
+    }
+
+    private fun updatePosts(posts: List<Post>?) {
+        viewModelState.update {
+            it.copy(posts = posts)
+        }
+    }
+
 
     private fun refreshFriendsLocation() {
         viewModelScope.launch {
@@ -120,39 +124,11 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateUserLocation(userLocation: List<UserLocation>) {
+    private fun updateUserLocation(userLocation: List<com.salazar.cheers.data.map.UserLocation>) {
         viewModelState.update {
             it.copy(users = userLocation)
         }
     }
-
-    fun onMapReady(map: MapView) {
-        viewModelState.update {
-            it.copy(mapboxMap = map.getMapboxMap())
-        }
-    }
-
-    private fun refreshPosts() {
-        viewModelState.update {
-            it.copy(isLoading = true)
-        }
-
-        val privacy = if (uiState.value.isPublic)
-            Privacy.PUBLIC
-        else
-            Privacy.FRIENDS
-
-        viewModelScope.launch {
-//            postRepository.listMapPost(privacy = privacy)
-//                .collect(::updateMapPosts)
-        }
-    }
-
-//    private fun updateMapPosts(mapPosts: List<Post>) {
-//        viewModelState.update {
-//            it.copy(posts = mapPosts, isLoading = false)
-//        }
-//    }
 
     fun updateCity(city: String) {
         viewModelState.update {
@@ -166,23 +142,22 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun onUserViewAnnotationClick(userLocation: UserLocation) {
+    fun onUserViewAnnotationClick(userLocation: com.salazar.cheers.data.map.UserLocation) {
         viewModelState.update {
-            it.copy(selectedUser = userLocation, selected = MapAnnotationType.USER)
+            it.copy(selected = MapAnnotation.UserAnnotation(userLocation))
         }
     }
 
-//    fun selectPost(post: Post) {
-//        viewModelState.update {
-//            it.copy(selectedPost = post, selected = MapAnnotationType.POST)
-//        }
-//    }
+    fun onPostViewAnnotationClick(post: Post) {
+        viewModelState.update {
+            it.copy(selected = MapAnnotation.PostAnnotation(post))
+        }
+    }
 
     fun onTogglePublic() {
         viewModelState.update {
             it.copy(isPublic = !it.isPublic)
         }
-        refreshPosts()
     }
 
     fun onMyLocationClick() {

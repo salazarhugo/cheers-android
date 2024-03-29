@@ -4,6 +4,7 @@ package cheers.post.v1;
 
 import "cheers/type/post/post.proto";
 import "cheers/type/user/user.proto";
+import "cheers/type/audio/audio.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
@@ -110,7 +111,8 @@ message CreatePostRequest {
   double latitude = 7;
   double longitude = 8;
   bool send_notification_to_friends = 9;
-  repeated string photos = 10;
+  repeated string media_ids = 10;
+  cheers.type.Audio audio = 11;
 }
 
 message GetPostRequest {
@@ -205,4 +207,7 @@ message PostResponse {
   int64 comment_count = 4;
   bool has_liked = 5;
   bool is_creator = 6;
+  bool can_viewer_reshare = 7;
+  bool can_viewer_save = 8;
+  bool is_paid_partnership = 9;
 }

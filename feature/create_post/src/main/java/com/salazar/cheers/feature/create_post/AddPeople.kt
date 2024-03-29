@@ -44,6 +44,7 @@ import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.ChipGroup
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.theme.Typography
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.Username
 
@@ -58,7 +59,7 @@ fun AddPeopleScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.isLoading)
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
 
     Scaffold(
         topBar = {

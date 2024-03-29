@@ -5,8 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
-import com.salazar.common.util.copyToClipboard
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 
 @Composable
 fun PartyDetailRoute(
@@ -56,5 +55,5 @@ fun PartyDetailRoute(
             },
         )
     else
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
 }

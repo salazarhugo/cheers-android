@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.note.Note
 import com.salazar.cheers.data.note.repository.NoteRepository
+import com.salazar.cheers.domain.delete_note.DeleteNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,6 +25,7 @@ data class NoteUiState(
 class NoteViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(NoteUiState(isLoading = false))
@@ -69,16 +71,16 @@ class NoteViewModel @Inject constructor(
 
     fun onDeleteNote(onComplete: () -> Unit) {
         viewModelScope.launch {
-            noteRepository.deleteNote()
+            deleteNoteUseCase()
             onComplete()
         }
     }
 }
 
 sealed class NoteUIAction {
-    object OnBackPressed : NoteUIAction()
-    object OnSwipeRefresh : NoteUIAction()
-    object OnCreateNewNoteClick : NoteUIAction()
-    object OnDeleteNoteClick : NoteUIAction()
+    data object OnBackPressed : NoteUIAction()
+    data object OnSwipeRefresh : NoteUIAction()
+    data object OnCreateNewNoteClick : NoteUIAction()
+    data object OnDeleteNoteClick : NoteUIAction()
     data class OnTextChange(val text: String) : NoteUIAction()
 }

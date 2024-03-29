@@ -11,6 +11,8 @@ import cheers.post.v1.CreatePostRequest
 import cheers.post.v1.DeletePostRequest
 import cheers.post.v1.FeedPostRequest
 import cheers.post.v1.LikePostRequest
+import cheers.post.v1.ListMapPostRequest
+import cheers.post.v1.ListMapPostResponse
 import cheers.post.v1.ListPostLikesRequest
 import cheers.post.v1.ListPostRequest
 import cheers.post.v1.PostServiceGrpcKt
@@ -34,7 +36,10 @@ class PostRepository @Inject constructor(
     private val postDao: PostDao,
     private val workManager: WorkManager,
 ) {
-    suspend fun getPostFeed(page: Int, pageSize: Int): Result<List<Post>> {
+    suspend fun fetchPostFeed(
+        page: Int,
+        pageSize: Int,
+    ): Result<List<Post>> {
         val request = FeedPostRequest.newBuilder()
             .setPageSize(pageSize)
             .setPage(page)
@@ -200,8 +205,27 @@ class PostRepository @Inject constructor(
         }
     }
 
-    fun listMapPost(privacy: Privacy): Flow<List<Post>> {
-        return postDao.listMapPost(privacy = privacy)
+    suspend fun listMapPost(): Result<List<Post>> {
+        return try {
+            val request = ListMapPostRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(10)
+                .build()
+
+            val response = postService.listMapPost(request)
+            val posts = response.postsList.map { it.toPost() }
+            postDao.insertAll(posts)
+
+            Result.success(posts)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getMapPostFlow(privacy: Privacy): Flow<List<Post>> {
+        listMapPost()
+        return postDao.listMapPost()
     }
 
     fun postFlow(postId: String) = postDao.postFlow(postId = postId)

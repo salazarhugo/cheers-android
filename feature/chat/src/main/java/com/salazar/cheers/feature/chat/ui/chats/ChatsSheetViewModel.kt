@@ -3,8 +3,7 @@ package com.salazar.cheers.feature.chat.ui.chats
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.feature.chat.data.repository.ChatRepository
-import com.salazar.cheers.feature.chat.domain.models.ChatChannel
+import com.salazar.cheers.data.chat.models.ChatChannel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +20,7 @@ data class ChatsSheetUiState(
 
 @HiltViewModel
 class ChatsSheetViewModel @Inject constructor(
-    private val chatRepository: ChatRepository,
+    private val chatRepository: com.salazar.cheers.data.chat.repository.ChatRepository,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -34,39 +33,24 @@ class ChatsSheetViewModel @Inject constructor(
             viewModelState.value
         )
 
-    lateinit var channelId: String
 
-    init {
-        stateHandle.get<String>("channelId")?.let { roomId ->
-            channelId = roomId
-
-            viewModelScope.launch {
-                chatRepository.getChannel(roomId).collect { room ->
-                    viewModelState.update {
-                        it.copy(room = room)
-                    }
-                }
-            }
-        }
-    }
-
-    fun leaveChannel(onComplete: () -> Unit) {
+    fun leaveChannel(chatID: String, onComplete: () -> Unit) {
         viewModelScope.launch {
-            chatRepository.leaveRoom(roomId = channelId)
+            chatRepository.leaveRoom(roomId = chatID)
             onComplete()
         }
     }
 
-    fun deleteChats(onComplete: () -> Unit) {
+    fun deleteChats(chatID: String, onComplete: () -> Unit) {
         viewModelScope.launch {
-            chatRepository.deleteChats(channelId = channelId)
+            chatRepository.deleteChats(channelId = chatID)
             onComplete()
         }
     }
 
-    fun deleteChannel(onComplete: () -> Unit) {
+    fun deleteChannel(chatID: String, onComplete: () -> Unit) {
         viewModelScope.launch {
-            chatRepository.deleteRoom(channelId = channelId)
+            chatRepository.deleteRoom(channelId = chatID)
             onComplete()
         }
     }

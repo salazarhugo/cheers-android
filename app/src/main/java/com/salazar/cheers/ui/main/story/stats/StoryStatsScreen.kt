@@ -46,6 +46,7 @@ import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.feature.search.UserCard
 import androidx.compose.material3.Divider
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import kotlin.math.absoluteValue
 
 @Composable
@@ -96,7 +97,7 @@ fun StoryStatsScreen(
             )
         }
     } else
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
 }
 
 @Composable

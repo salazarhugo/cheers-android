@@ -41,6 +41,13 @@ service ChatService {
   rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {}
   rpc LeaveRoom(RoomId) returns (Empty) {}
 
+  rpc SendReadReceipt(SendReadReceiptRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/chats/{room_id}/read"
+      body: "*"
+    };
+  }
+
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
     option (google.api.http) = {
       post: "/v1/chats/{room_id}/send"
@@ -64,9 +71,7 @@ service ChatService {
 
   rpc LikeMessage(LikeMessageReq) returns (Empty) {}
   rpc UnlikeMessage(LikeMessageReq) returns (Empty) {}
-
   rpc TypingChannel(stream TypingEvent) returns (stream TypingEvent) {}
-
   rpc TypingStart(TypingReq) returns (Empty) {}
   rpc TypingEnd(TypingReq) returns (Empty) {}
 
@@ -85,6 +90,10 @@ message UnPinRoomResponse {
 }
 
 message UnPinRoomRequest {
+  string room_id = 1;
+}
+
+message SendReadReceiptRequest {
   string room_id = 1;
 }
 
@@ -207,7 +216,7 @@ enum RoomType {
 
 message RoomWithMessages {
   Room room = 1;
-  repeated Message messages = 2;
+  repeated MessageItem messages = 2;
 }
 
 message Room {
@@ -225,8 +234,10 @@ message Room {
   MessageType last_message_type = 13;
   int64 create_time = 14;
   int64 last_message_time = 15;
-  bool last_message_seen = 17;
   bool archived = 16;
+  bool last_message_seen = 17;
+  int64 unread_message_count = 18;
+  bool admin = 19;
 }
 
 enum MessageType {

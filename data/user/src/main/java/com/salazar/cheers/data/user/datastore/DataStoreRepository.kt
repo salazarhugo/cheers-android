@@ -34,10 +34,6 @@ class DataStoreRepository @Inject constructor(
             }
         }
 
-    fun getIdToken(): Flow<String> {
-        return userPreferencesFlow.map { it.idToken }
-    }
-
     fun getBiometricEnabled(): Flow<Boolean> {
         return userPreferencesFlow.map { it.hasBiometric }
     }
@@ -53,12 +49,6 @@ class DataStoreRepository @Inject constructor(
     suspend fun updateUsername(username: String) {
         settingsStore.updateData { currentPreferences ->
             currentPreferences.toBuilder().setUsername(username).build()
-        }
-    }
-
-    suspend fun updateIdToken(idToken: String) {
-        settingsStore.updateData { currentPreferences ->
-            currentPreferences.toBuilder().setIdToken(idToken).build()
         }
     }
 

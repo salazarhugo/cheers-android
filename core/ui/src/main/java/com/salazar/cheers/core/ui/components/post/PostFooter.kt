@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Icon
@@ -28,16 +26,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.common.ui.extensions.noRippleClickable
 
 @Composable
 fun PostFooter(
-    photoCount: Int,
     likeCount: Int,
-    drunkenness: Int,
     commentCount: Int,
     hasViewerLiked: Boolean,
     modifier: Modifier = Modifier,
@@ -45,23 +40,10 @@ fun PostFooter(
     onLikeCountClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
-    pagerState: PagerState = rememberPagerState {
-       3
-    },
 ) {
     Column(
         modifier = modifier
     ) {
-        if (photoCount > 1) {
-            HorizontalPagerIndicator(
-                pageCount = photoCount,
-                pagerState = pagerState,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .align(Alignment.CenterHorizontally),
-                activeColor = MaterialTheme.colorScheme.primary,
-            )
-        }
         PostFooterButtons(
             hasViewerLiked = hasViewerLiked,
             onLike = onLikeClick,
@@ -198,10 +180,8 @@ fun DrunkennessLevelIndicator(
 fun PostFooterPreview() {
     CheersPreview {
         PostFooter(
-            photoCount = 5,
             commentCount = 56035,
             likeCount = 89000,
-            drunkenness = 0,
             hasViewerLiked = true,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )

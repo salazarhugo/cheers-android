@@ -20,10 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.theme.BlueCheers
-import com.salazar.cheers.feature.chat.domain.models.MessageType
+import com.salazar.cheers.data.chat.models.MessageType
 
-@Preview
 @Composable
 fun OpenedChat() {
     Row(
@@ -68,11 +68,10 @@ fun OpenedChat() {
     }
 }
 
-@Preview
 @Composable
 fun DeliveredChat(
     @PreviewParameter(MessageTypeProvider::class)
-    messageType: MessageType
+    messageType: MessageType,
 ) {
     val color = messageType.toColor()
 
@@ -108,11 +107,10 @@ fun DeliveredChat(
     }
 }
 
-@Preview
 @Composable
 fun ReceivedChat(
     @PreviewParameter(MessageTypeProvider::class)
-    messageType: MessageType
+    messageType: MessageType,
 ) {
     val color = messageType.toColor()
 
@@ -135,7 +133,6 @@ fun ReceivedChat(
     }
 }
 
-@Preview
 @Composable
 fun SendingChat() {
     Row(
@@ -164,7 +161,6 @@ fun MessageType.toColor(): Color {
 
 @Composable
 fun NewChat(messageType: MessageType) {
-
     val text = when (messageType) {
         MessageType.TEXT -> "New Chat"
         MessageType.IMAGE -> "New Flash"
@@ -193,7 +189,6 @@ fun NewChat(messageType: MessageType) {
     }
 }
 
-@Preview
 @Composable
 fun EmptyChat() {
     val color = MaterialTheme.colorScheme.onBackground
@@ -216,10 +211,25 @@ fun EmptyChat() {
     }
 }
 
+@Preview
+@Composable
+private fun Previews() {
+    CheersPreview(
+        modifier = Modifier.padding(16.dp),
+        maxItemsInEachRow = 1,
+    ) {
+        OpenedChat()
+        DeliveredChat(messageType = MessageType.TEXT)
+        ReceivedChat(messageType = MessageType.TEXT)
+        NewChat(messageType = MessageType.TEXT)
+        EmptyChat()
+    }
+}
+
 class MessageTypeProvider : PreviewParameterProvider<MessageType> {
     override val values = sequenceOf(
         MessageType.TEXT,
         MessageType.IMAGE,
-        MessageType.VIDEO
+        MessageType.VIDEO,
     )
 }

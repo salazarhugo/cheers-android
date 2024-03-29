@@ -3,11 +3,7 @@ package com.salazar.cheers.feature.chat.ui.screens.chat
 import OnMessageLongClickDialog
 import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,36 +11,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,32 +38,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.core.ui.SymbolAnnotationType
 import com.salazar.cheers.core.ui.messageFormatter
-import com.salazar.cheers.feature.chat.domain.models.ChatMessage
-import com.salazar.cheers.feature.chat.domain.models.ChatMessageStatus
-import com.salazar.cheers.feature.chat.domain.models.MessageType
-import com.salazar.cheers.feature.chat.domain.models.RoomStatus
-import com.salazar.cheers.feature.chat.domain.models.RoomType
+import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.data.chat.models.ChatMessageStatus
+import com.salazar.cheers.data.chat.models.ChatStatus
+import com.salazar.cheers.data.chat.models.ChatType
 import com.salazar.cheers.feature.chat.ui.components.ChatBottomBar
+import com.salazar.cheers.feature.chat.ui.components.ChatPresenceIndicator
 import com.salazar.cheers.feature.chat.ui.components.DirectChatBar
 import com.salazar.cheers.feature.chat.ui.components.GroupChatBar
 import com.salazar.cheers.feature.chat.ui.components.JumpToBottom
@@ -109,8 +83,8 @@ fun ChatScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 Messages(
-                    seen = uiState.channel?.status == RoomStatus.OPENED,
-                    isGroup = uiState.channel?.type == RoomType.GROUP,
+                    seen = uiState.channel?.status == ChatStatus.OPENED,
+                    isGroup = uiState.channel?.type == ChatType.GROUP,
                     messages = uiState.messages,
                     navigateToProfile = {
                         onChatUIAction(ChatUIAction.OnUserClick(it))
@@ -124,6 +98,10 @@ fun ChatScreen(
                         onChatUIAction(ChatUIAction.OnLikeClick(it))
                     },
                     onChatUIAction = onChatUIAction,
+                )
+                ChatPresenceIndicator(
+                    isPresent = uiState.channel?.isOtherUserPresent ?: false,
+                    modifier = Modifier.padding(16.dp),
                 )
                 ChatBottomBar(
                     modifier = Modifier.navigationBarsPadding(),
@@ -147,38 +125,41 @@ fun ChatScreen(
                 )
             }
             when (channel?.type) {
-                RoomType.DIRECT -> {
-                    Box {
-                        DirectChatBar(
-                            name = channel.name,
-                            verified = channel.verified,
-                            picture = channel.picture,
-                            onNavIconPressed = {
-                                onChatUIAction(ChatUIAction.OnBackPressed)
-                            },
-                            onTitleClick = {
-                                onChatUIAction(ChatUIAction.OnUserClick(it))
-                            },
-                            scrollBehavior = scrollBehavior,
-                            onInfoClick = {
-                                onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
-                            },
-                        )
-                    }
+                ChatType.DIRECT -> {
+                    DirectChatBar(
+                        name = channel.name,
+                        verified = channel.verified,
+                        picture = channel.picture,
+                        isTyping = channel.isOtherUserTyping,
+                        onNavIconPressed = {
+                            onChatUIAction(ChatUIAction.OnBackPressed)
+                        },
+                        onTitleClick = {
+                            onChatUIAction(ChatUIAction.OnUserClick(channel.otherUserId))
+                        },
+                        scrollBehavior = scrollBehavior,
+                        onInfoClick = {
+                            onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
+                        },
+                    )
                 }
-                RoomType.GROUP -> GroupChatBar(
-                    name = channel.name,
-                    members = channel.members.size,
-                    picture = channel.picture,
-                    onNavIconPressed = {
-                        onChatUIAction(ChatUIAction.OnBackPressed)
-                    },
-                    onTitleClick = {},
-                    onInfoClick = {
-                        onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
+
+                ChatType.GROUP -> {
+                    GroupChatBar(
+                        name = channel.name,
+                        members = channel.members.size,
+                        picture = channel.picture,
+                        onNavIconPressed = {
+                            onChatUIAction(ChatUIAction.OnBackPressed)
+                        },
+                        onTitleClick = {},
+                        onInfoClick = {
+                            onChatUIAction(ChatUIAction.OnRoomInfoClick(channel.id))
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
+                }
+
                 else -> {}
             }
         }
@@ -235,8 +216,8 @@ fun Messages(
                 val isFirstMessageByAuthor = prevAuthor != message.senderId
                 val isLastMessageByAuthor = nextAuthor != message.senderId
 
-                if (!DateUtils.isToday(message.createTime * 1000) &&
-                    DateUtils.isToday((prevMessage?.createTime ?: 0) * 1000)
+                if (!DateUtils.isToday(message.createTime) &&
+                    DateUtils.isToday((prevMessage?.createTime ?: 0))
                 ) {
                     item {
                         DayHeader("Today")
@@ -244,25 +225,23 @@ fun Messages(
                 }
 
                 item {
-                    val dismissState = rememberDismissState(
+                    val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = {
-                            if (it == DismissValue.DismissedToStart) {
+                            if (it == SwipeToDismissBoxValue.EndToStart) {
                                 onChatUIAction(ChatUIAction.OnReplyMessage(message))
-                                return@rememberDismissState false
+                                return@rememberSwipeToDismissBoxState false
                             }
                             true
                         }
                     )
-                    SwipeableMessage(dismissState = dismissState) {
+                    SwipeableMessage(state = dismissState) {
                         Message(
+                            message = message,
+                            isGroup = isGroup,
+                            seen = index == 0 && seen,
                             onAuthorClick = { name -> navigateToProfile(name) },
                             onLongClickMessage = onLongClickMessage,
                             onDoubleTapMessage = onDoubleTapMessage,
-                            message = message,
-                            isUserMe = true,
-//                            isUserMe = message.senderId == FirebaseAuth.getInstance().currentUser?.uid!!,
-                            isGroup = isGroup,
-                            seen = index == 0 && seen,
                             isFirstMessageByAuthor = isFirstMessageByAuthor,
                             isLastMessageByAuthor = isLastMessageByAuthor,
                         )
@@ -298,127 +277,6 @@ fun Messages(
 }
 
 @Composable
-fun Message(
-    modifier: Modifier = Modifier,
-    onAuthorClick: (String) -> Unit,
-    onLongClickMessage: (String) -> Unit,
-    onDoubleTapMessage: (String) -> Unit,
-    isUserMe: Boolean,
-    isGroup: Boolean,
-    seen: Boolean,
-    message: ChatMessage,
-    isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean
-) {
-    val spaceBetweenAuthors = if (isLastMessageByAuthor) modifier.padding(top = 8.dp) else modifier
-    val horizontalAlignment = if (isUserMe) Arrangement.End else Arrangement.Start
-    Row(
-        modifier = spaceBetweenAuthors.fillMaxWidth(),
-        horizontalArrangement = horizontalAlignment
-    ) {
-        if (isLastMessageByAuthor && !isUserMe && isGroup) {
-            // Avatar
-            Image(
-                painter = rememberAsyncImagePainter(model = message.senderProfilePictureUrl),
-                modifier = Modifier
-                    .clickable(onClick = { onAuthorClick(message.senderUsername) })
-                    .padding(horizontal = 16.dp)
-                    .size(42.dp)
-                    .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
-                    .clip(CircleShape)
-                    .align(Alignment.Top),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-            )
-        } else {
-            // Space under avatar
-//            Spacer(modifier = Modifier.width(74.dp))
-        }
-        AuthorAndTextMessage(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            msg = message,
-            isUserMe = isUserMe,
-            seen = seen,
-            isFirstMessageByAuthor = isFirstMessageByAuthor,
-            isLastMessageByAuthor = isLastMessageByAuthor,
-            authorClicked = onAuthorClick,
-            onLongClickMessage = onLongClickMessage,
-            onDoubleTapMessage = onDoubleTapMessage,
-        )
-    }
-}
-
-@Composable
-fun AuthorAndTextMessage(
-    msg: ChatMessage,
-    isUserMe: Boolean,
-    seen: Boolean,
-    isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean,
-    authorClicked: (String) -> Unit,
-    onLongClickMessage: (String) -> Unit,
-    onDoubleTapMessage: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val isGroup = false
-    Column(modifier = modifier) {
-        if (isLastMessageByAuthor && !isUserMe && isGroup) {
-            AuthorNameTimestamp(msg)
-        }
-        if (msg.type == MessageType.TEXT)
-            ChatItemBubble(
-                msg,
-                isUserMe = isUserMe,
-                seen = seen,
-                authorClicked = authorClicked,
-                onLongClickMessage = onLongClickMessage,
-                onDoubleTapMessage = onDoubleTapMessage
-            )
-        else if (msg.type == MessageType.IMAGE)
-            ImageMessageBubble(
-                msg,
-                onLongClickMessage = onLongClickMessage,
-                onDoubleTapMessage = onDoubleTapMessage,
-            )
-        if (isFirstMessageByAuthor) {
-            // Last bubble before next author
-            Spacer(modifier = Modifier.height(8.dp))
-        } else {
-            // Between bubbles
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-    }
-}
-
-@Composable
-private fun AuthorNameTimestamp(msg: ChatMessage) {
-    // Combine author and timestamp for a11y.
-    Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
-        Text(
-            text = msg.senderUsername,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier
-                .alignBy(LastBaseline)
-                .paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        val formatter = SimpleDateFormat("HH:mm")
-        val date = Date(msg.createTime * 1000)
-
-        Text(
-            text = formatter.format(date),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.alignBy(LastBaseline),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-private val ChatBubbleStartShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
-private val ChatBubbleEndShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
-
-@Composable
 fun DayHeader(dayString: String) {
     Row(
         modifier = Modifier
@@ -438,7 +296,7 @@ fun DayHeader(dayString: String) {
 
 @Composable
 private fun RowScope.DayHeaderLine() {
-    Divider(
+    HorizontalDivider(
         modifier = Modifier
             .weight(1f)
             .align(Alignment.CenterVertically),
@@ -475,85 +333,6 @@ fun ImageMessageBubble(
     }
 }
 
-@Composable
-fun ChatItemBubble(
-    message: ChatMessage,
-    isUserMe: Boolean,
-    seen: Boolean,
-    authorClicked: (String) -> Unit,
-    onLongClickMessage: (String) -> Unit,
-    onDoubleTapMessage: (String) -> Unit,
-) {
-
-    val backgroundBubbleColor = if (isUserMe)
-        MaterialTheme.colorScheme.primary
-    else
-        MaterialTheme.colorScheme.surfaceVariant
-
-    val shape = if (isUserMe) ChatBubbleEndShape else ChatBubbleStartShape
-
-    Column {
-        Surface(
-            color = backgroundBubbleColor,
-            shape = shape,
-            modifier = Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { onLongClickMessage(message.id) },
-                        onDoubleTap = { onDoubleTapMessage(message.id) }
-                    )
-                }
-        ) {
-            Row(
-                modifier = Modifier.padding(start = 12.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                ClickableMessage(
-                    message = message,
-                    isUserMe = isUserMe,
-                    authorClicked = authorClicked
-                )
-                TimestampAndStatus(
-                    isUserMe = isUserMe,
-                    timestamp = message.createTime,
-                    status = message.status,
-                )
-            }
-        }
-        if (isUserMe && seen)
-            Text(
-                text = "\uD83D\uDC40",
-                textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-//        if (message.likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid!!)) {
-//            AnimateHeart {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            modifier = Modifier.offset(y = (-4).dp)
-        ) {
-            Text("❤", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
-        }
-//            }
-        }
-
-//            message.senderProfilePicturePath.let {
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Surface(
-//                    color = backgroundBubbleColor,
-//                    shape = ChatBubbleShape
-//                ) {
-//                    Image(
-//                        painter = rememberImagePainter(data = photo.value),
-//                        contentScale = ContentScale.Fit,
-//                        modifier = Modifier.size(160.dp),
-//                        contentDescription = null
-//                    )
-//                }
-//            }
-}
 
 @Composable
 fun TimestampAndStatus(
@@ -562,7 +341,7 @@ fun TimestampAndStatus(
     status: ChatMessageStatus,
 ) {
     val formatter = SimpleDateFormat("HH:mm")
-    val date = Date(timestamp * 1000)
+    val date = Date(timestamp)
     val color = if (isUserMe)
         MaterialTheme.colorScheme.onPrimary
     else
@@ -581,7 +360,7 @@ fun TimestampAndStatus(
         )
 
         if (isUserMe) {
-            MessageStatus(
+            ChatMessageStatus(
                 modifier = Modifier.size(14.dp),
                 status = status,
             )
@@ -590,78 +369,22 @@ fun TimestampAndStatus(
 }
 
 @Composable
-fun MessageStatus(
-    modifier: Modifier = Modifier,
-    status: ChatMessageStatus,
-) {
-    when (status) {
-        ChatMessageStatus.EMPTY -> {}
-        ChatMessageStatus.SCHEDULED -> {
-            Icon(
-                modifier = modifier,
-                imageVector = Icons.Default.Schedule,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-            )
-        }
-        ChatMessageStatus.SENT -> {
-            Icon(
-                modifier = modifier,
-                imageVector = Icons.Default.Done,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-            )
-        }
-        ChatMessageStatus.DELIVERED -> {
-            Icon(
-                modifier = modifier,
-                imageVector = Icons.Default.DoneAll,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-            )
-        }
-        ChatMessageStatus.READ -> {
-            Icon(
-                modifier = modifier,
-                imageVector = Icons.Default.DoneAll,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
-        }
-        ChatMessageStatus.FAILED -> {
-            Icon(
-                modifier = modifier,
-                imageVector = Icons.Outlined.Error,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error,
-            )
-        }
-        ChatMessageStatus.UNRECOGNIZED -> {}
-    }
-}
-
-@Composable
 fun ClickableMessage(
-    message: ChatMessage,
-    isUserMe: Boolean,
+    text: String?,
+    isSender: Boolean,
+    status: ChatMessageStatus,
     authorClicked: (String) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
 
-    val chatMessage =
-        if (message.type == MessageType.TEXT)
-            message
-        else
-            null
-
     val styledMessage = messageFormatter(
-        text = chatMessage?.text ?: "Not a text message",
-        primary = isUserMe
+        text = text ?: "Not a text message",
+        primary = isSender,
     )
 
-    val color = if (message.status == ChatMessageStatus.FAILED)
+    val color = if (status == ChatMessageStatus.FAILED)
         MaterialTheme.colorScheme.onError
-    else if (isUserMe)
+    else if (isSender)
         MaterialTheme.colorScheme.onPrimary
     else
         MaterialTheme.colorScheme.onSurfaceVariant

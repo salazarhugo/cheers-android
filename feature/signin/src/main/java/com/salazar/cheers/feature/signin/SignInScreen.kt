@@ -68,7 +68,7 @@ fun SignInScreenPreview() {
         navigateToSignUp = { /*TODO*/ },
         onUsernameChanged = { _ -> },
 
-    )
+        )
 }
 
 @Composable
@@ -122,31 +122,37 @@ fun SignInScreen(
                 )
                 AnimatedLogo()
                 Spacer(modifier = Modifier.height(30.dp))
-                UsernameTextField(uiState, onUsernameChanged = onUsernameChanged)
-                Spacer(Modifier.height(8.dp))
-                LoginButton(
-                    isLoading = uiState.isLoading,
-                    signInWithEmailPassword = {
-                        onSignInClick(uiState.username)
-                    },
+
+                if (uiState.isPasskeyEnabled) {
+                    UsernameTextField(uiState, onUsernameChanged = onUsernameChanged)
+                    Spacer(Modifier.height(8.dp))
+                    LoginButton(
+                        isLoading = uiState.isLoading,
+                        signInWithEmailPassword = {
+                            onSignInClick(uiState.username)
+                        },
+                    )
+                }
+                GoogleButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    onClicked = onGoogleClick,
                 )
                 ErrorMessage(
                     errorMessage = uiState.errorMessage,
                     paddingValues = PaddingValues(vertical = 8.dp)
                 )
-                GoogleButton(
-                    onClicked = {},
-                )
-                TextDivider(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    dayString = "OR",
-                )
-                OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = navigateToSignUp,
-                ) {
-                    Text(text = "Register")
-                }
+//                TextDivider(
+//                    modifier = Modifier.padding(vertical = 16.dp),
+//                    dayString = "OR",
+//                )
+//                OutlinedButton(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    onClick = navigateToSignUp,
+//                ) {
+//                    Text(text = "Register")
+//                }
             }
             Footer(
                 navigateToSignUp = navigateToSignUp,
@@ -216,7 +222,7 @@ fun Footer(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
-            val image = when(isSystemInDarkTheme()) {
+            val image = when (isSystemInDarkTheme()) {
                 true -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_white
                 false -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_black
             }

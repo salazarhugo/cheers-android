@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -16,15 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.cheersUserItemList
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
-import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
-import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import kotlinx.coroutines.launch
 
 
@@ -85,6 +84,10 @@ fun FriendList(
         LazyColumn(
             modifier = modifier,
         ) {
+            if (friends.isEmpty()) {
+                emptyFriendList()
+            }
+
             items(
                 items = friends,
                 key = { it.id },
@@ -106,6 +109,17 @@ fun FriendList(
                 }
             }
         }
+}
+
+private fun LazyListScope.emptyFriendList(
+    onClick: () -> Unit = {},
+) {
+    item {
+        EmptyFriendListMessage(
+            modifier = Modifier.fillParentMaxHeight(),
+            onClick = onClick,
+        )
+    }
 }
 
 @ScreenPreviews

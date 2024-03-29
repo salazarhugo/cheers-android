@@ -22,6 +22,7 @@ import cheers.type.UserOuterClass
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.feature.chat.BuildConfig
@@ -64,7 +65,7 @@ fun RoomScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Group Members",
+                        text = "Members",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     )
                     Spacer(Modifier.width(8.dp))
@@ -75,11 +76,15 @@ fun RoomScreen(
                 }
             }
 
-            items(uiState.members, key = { it.id }) { user ->
-                UserCardItem(
-                    user = user,
-                    isOwner = user.id == room.ownerId,
-                ) { onUserClick(user.username) }
+            items(
+                items = uiState.members,
+            ) { user ->
+                UserItem(
+                    userItem = user,
+                    onClick = {
+                        onUserClick(user.username)
+                    },
+                )
             }
 
             item {
@@ -159,43 +164,6 @@ fun HeaderButtons(
             )
             Spacer(Modifier.width(8.dp))
             Text("Invite Via Link")
-        }
-    }
-}
-
-@Composable
-fun UserCardItem(
-    user: UserOuterClass.UserItem,
-    isOwner: Boolean = false,
-    onUserClick: (String) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onUserClick(user.username) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-//            UserProfilePicture(picture = user.picture)
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = MaterialTheme.typography.bodyMedium)
-                Username(
-                    username = user.username,
-                    verified = user.verified,
-                    textStyle = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-        if (isOwner) {
-            Text(
-                text = "Owner",
-                color = BlueCheers,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-            )
         }
     }
 }

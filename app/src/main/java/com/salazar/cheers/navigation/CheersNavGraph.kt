@@ -1,6 +1,5 @@
 package com.salazar.cheers.navigation
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -24,7 +23,6 @@ import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.feature.chat.ui.screens.messages.messagesNavigationRoute
 import com.salazar.cheers.feature.create_note.createNoteNavigationRoute
 import com.salazar.cheers.feature.create_post.createPostNavigationRoute
-import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
 import com.salazar.cheers.feature.signin.signInNavigationRoute
 import com.salazar.cheers.ui.CheersAppState

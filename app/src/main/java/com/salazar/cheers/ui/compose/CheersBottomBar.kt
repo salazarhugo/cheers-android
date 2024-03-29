@@ -1,10 +1,8 @@
 package com.salazar.cheers.ui.compose
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.People
@@ -21,22 +19,17 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.salazar.cheers.R
 import com.salazar.cheers.core.data.internal.ClearRippleTheme
 import com.salazar.cheers.core.data.internal.Screen
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.feature.home.navigation.homeNavigationRoute
+import com.salazar.cheers.feature.home.navigation.home.homeNavigationRoute
 import com.salazar.cheers.feature.map.navigation.mapNavigationRoute
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
 import com.salazar.cheers.feature.profile.navigation.profileNavigationRoute
@@ -50,7 +43,7 @@ fun CheersBottomBar(
 ) {
     val items = listOf(
         Screen(
-            route = partiesNavigationRoute,
+            route = homeNavigationRoute,
             icon = {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -120,7 +113,7 @@ fun CheersBottomBar(
 //            label = "Tickets"
 //        ),
         Screen(
-            route = homeNavigationRoute,
+            route = partiesNavigationRoute,
             icon = {
                 Icon(
                     imageVector = Icons.Default.PeopleOutline,

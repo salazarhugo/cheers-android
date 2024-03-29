@@ -4,19 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 
-/**
- * Stateful composable that displays the Navigation route for the Room screen.
- *
- * @param roomViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun RoomRoute(
     roomViewModel: RoomViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
     showSnackBar: (String) -> Unit,
+    navigateBack: () -> Unit = {},
+    navigateToUserProfile: (String) -> Unit,
 ) {
     val uiState by roomViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -35,8 +31,8 @@ fun RoomRoute(
                     roomViewModel.onLeaveRoom()
 //                    navigateToMessages()
                 },
-                onBackPressed = { navActions.navigateBack() },
-                onUserClick = { navActions.navigateToOtherProfile(it) },
+                onBackPressed = navigateBack,
+                onUserClick = navigateToUserProfile,
             )
         }
     }

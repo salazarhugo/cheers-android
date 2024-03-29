@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 
 @Composable
 fun CommentMoreRoute(
@@ -19,7 +20,7 @@ fun CommentMoreRoute(
     val uid = ""
 
     if (comment == null)
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
     else
         CommentMoreSheet(
             modifier = Modifier.navigationBarsPadding(),

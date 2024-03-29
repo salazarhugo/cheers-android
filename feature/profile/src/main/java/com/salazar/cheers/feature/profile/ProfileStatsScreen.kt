@@ -46,7 +46,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.theme.Roboto
@@ -170,7 +170,7 @@ fun Followers(
     onStoryClick: (username: String) -> Unit,
 ) {
     if (followers == null) {
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
     } else
         LazyColumn {
             items(followers, key = { it.id }) { follower ->

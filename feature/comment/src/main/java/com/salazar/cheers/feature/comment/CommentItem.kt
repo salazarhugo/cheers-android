@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.comment
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -25,29 +23,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
+import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.model.Comment
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.Utils.conditional
 import com.salazar.common.ui.extensions.noRippleClickable
-
-@Preview
-@Composable
-fun CommentItemPreview() {
-    CommentItem(
-        comment = Comment(),
-        onLike = { /*TODO*/ },
-        onReply = { /*TODO*/ },
-        onCommentClicked = { /*TODO*/ })
-}
+import java.util.Date
 
 @Composable
 fun CommentItem(
@@ -55,9 +42,9 @@ fun CommentItem(
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     readOnly: Boolean = false,
-    onLike: () -> Unit,
-    onReply: () -> Unit,
-    onCommentClicked: () -> Unit,
+    onLike: () -> Unit = {},
+    onReply: () -> Unit = {},
+    onCommentClicked: () -> Unit = {},
     onLongClick: () -> Unit = {},
 ) {
 
@@ -78,25 +65,15 @@ fun CommentItem(
         Row(
             modifier = Modifier.weight(1f),
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = comment.avatar)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            transformations(CircleCropTransformation())
-                            error(com.salazar.cheers.core.ui.R.drawable.default_profile_picture)
-                        }).build()
-                ),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .size(36.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
+            AvatarComponent(
+                modifier = Modifier.padding(top = 4.dp),
+                avatar = comment.avatar,
+                size = 36.dp
             )
             Spacer(Modifier.width(8.dp))
             Column(
                 modifier = Modifier.padding(top = 2.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -108,37 +85,39 @@ fun CommentItem(
                         textStyle = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = com.salazar.cheers.core.util.relativeTimeFormatter(epoch = comment.createTime),
+                        text = com.salazar.cheers.core.util.relativeTimeFormatter(seconds = comment.createTime),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
+
                 Text(
                     text = comment.text,
                     style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal,
                 )
+
                 val replyCount = comment.replyCount
-                if (comment.posting)
+
+                if (comment.posting) {
                     Text(
                         text = "Posting...",
                     )
+                }
 
-                if (!readOnly) {
-                    if (replyCount > 0)
-                        TextButton(
-                            onClick = { onReply() },
-                            modifier = Modifier.offset(x = (-12).dp)
-                        ) {
-                            Text(
-                                text = "$replyCount ${if (replyCount > 1) "replies" else "reply"}",
-                            )
-                        }
-                    else if (comment.replyToCommentId == null)
-                        TextButton(
-                            onClick = { onReply() },
-                            contentPadding = PaddingValues(horizontal = 0.dp)
-                        ) {
-                            Text(text = "Reply")
-                        }
+                if (!readOnly && comment.replyToCommentId == null) {
+                    val text = when(replyCount > 0) {
+                        true ->  "$replyCount ${if (replyCount > 1) "replies" else "reply"}"
+                        false -> "Reply"
+                    }
+                    TextButton(
+                        onClick = { onReply() },
+                        modifier = Modifier.offset(x = (-12).dp, y = -(12).dp)
+                    ) {
+                        Text(
+                            text = text,
+                            fontSize = 14.sp,
+                        )
+                    }
                 }
             }
         }
@@ -168,3 +147,20 @@ fun CommentItem(
         }
     }
 }
+
+@ComponentPreviews
+@Composable
+fun CommentItemPreview() {
+    CheersPreview {
+        CommentItem(
+            comment = Comment(
+                username = "cheers",
+                verified = true,
+                hasLiked = true,
+                text = "this is my very interesting comment!",
+                createTime = Date().time / 1000 - 3600 * 4
+            ),
+        )
+    }
+}
+

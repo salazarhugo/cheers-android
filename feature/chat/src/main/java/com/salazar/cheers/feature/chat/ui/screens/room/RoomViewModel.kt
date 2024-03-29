@@ -3,11 +3,17 @@ package com.salazar.cheers.feature.chat.ui.screens.room
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.type.UserOuterClass
-import com.salazar.cheers.feature.chat.data.repository.ChatRepository
-import com.salazar.cheers.feature.chat.domain.models.ChatChannel
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.domain.list_chat_members.ListChatMembersUseCase
+import com.salazar.common.util.result.Result.Error
+import com.salazar.common.util.result.Result.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +28,7 @@ sealed interface RoomUiState {
 
     data class HasRoom(
         val room: ChatChannel,
-        val members: List<UserOuterClass.UserItem> = emptyList(),
+        val members: List<UserItem> = emptyList(),
         override val isLoading: Boolean,
         override val errorMessage: String,
     ) : RoomUiState
@@ -31,7 +37,7 @@ sealed interface RoomUiState {
 data class RoomViewModelState(
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val members: List<UserOuterClass.UserItem> = emptyList(),
+    val members: List<UserItem> = emptyList(),
     val room: ChatChannel? = null,
 ) {
     fun toUiState(): RoomUiState =
@@ -53,8 +59,8 @@ data class RoomViewModelState(
 @HiltViewModel
 class RoomViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-//    val userRepository: UserRepository,
-    val chatRepository: ChatRepository,
+    val chatRepository: com.salazar.cheers.data.chat.repository.ChatRepository,
+    val listChatMembersUseCase: ListChatMembersUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RoomViewModelState(isLoading = true))
@@ -65,11 +71,11 @@ class RoomViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            viewModelState.value
+            viewModelState.value.toUiState()
         )
 
     init {
-        stateHandle.get<String>("roomId")?.let { roomId ->
+        stateHandle.get<String>(CHAT_ID)?.let { roomId ->
             this.roomId = roomId
         }
 
@@ -80,11 +86,14 @@ class RoomViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-//            val result = chatRepository.getRoomMembers(roomId = roomId)
-//            when(result) {
-//                is Result.Success -> onMembersChange(members = result.data)
-//                is Result.Error -> updateError(message = result.message)
-//            }
+            when(val result = listChatMembersUseCase(roomId)) {
+                is Success -> {
+                    onMembersChange(members = result.data)
+                }
+                is Error -> {
+                    updateError(message = result.error.name)
+                }
+            }
         }
     }
 
@@ -100,7 +109,7 @@ class RoomViewModel @Inject constructor(
         }
     }
 
-    private fun onMembersChange(members: List<UserOuterClass.UserItem>) {
+    private fun onMembersChange(members: List<UserItem>) {
         viewModelState.update {
             it.copy(members = members)
         }

@@ -18,17 +18,20 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.salazar.ads.initializeAds
 import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.common.util.LocalActivity
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 
@@ -48,6 +51,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     private val updateType = AppUpdateType.IMMEDIATE
 
+    private lateinit var consentInformation: ConsentInformation
+    private var isMobileAdsInitializeCalled = AtomicBoolean(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,6 +69,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         userConsentPolicy()
+        if (consentInformation.canRequestAds()) {
+            initializeMobileAdsSdk()
+        }
     }
 
     override fun onResume() {
@@ -105,35 +114,36 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     }
 
     private fun userConsentPolicy() {
+        val debugSettings = ConsentDebugSettings.Builder(this)
+            .addTestDeviceHashedId("8DB645BA1C4E36F115428DBFA0C0CAFE")
+            .build()
+
         // Set tag for underage of consent. false means users are not underage.
         val params = ConsentRequestParameters.Builder()
+            .setConsentDebugSettings(debugSettings)
             .setTagForUnderAgeOfConsent(false)
             .build()
 
-        val consentInformation = UserMessagingPlatform.getConsentInformation(this)
-        consentInformation.requestConsentInfoUpdate(this, params, {
-            if (consentInformation.isConsentFormAvailable)
-                loadForm(consentInformation = consentInformation)
-        },
-            {
-            })
-    }
-
-    private fun loadForm(consentInformation: ConsentInformation) {
-        UserMessagingPlatform.loadConsentForm(
+        consentInformation = UserMessagingPlatform.getConsentInformation(this)
+        consentInformation.requestConsentInfoUpdate(
             this,
-            { consentForm ->
-                val consentForm = consentForm
-                if (consentInformation.consentStatus === ConsentInformation.ConsentStatus.REQUIRED) {
-                    consentForm.show(
-                        this@MainActivity
-                    ) {
-                        loadForm(consentInformation)
+            params,
+            {
+                UserMessagingPlatform.loadAndShowConsentFormIfRequired(this@MainActivity) { loadAndShowError ->
+                    // Consent has been gathered.
+                    if (consentInformation.canRequestAds()) {
+                        initializeMobileAdsSdk()
                     }
                 }
-            }
-        ) {
-        }
+            },
+            { requestConsentError ->
+                // Consent gathering failed.
+                Log.w(
+                    "MainActivity",
+                    String.format("%s: %s", requestConsentError.errorCode, requestConsentError.message),
+                )
+            },
+        )
     }
 
     override fun onStart() {
@@ -164,6 +174,13 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         ) {
             cheersViewModel.onNewMessage()
         }
+    }
+
+    private fun initializeMobileAdsSdk() {
+        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+            return
+        }
+        initializeAds(this)
     }
 
     override fun onAuthStateChanged(p0: FirebaseAuth) {

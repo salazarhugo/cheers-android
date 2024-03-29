@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.ui.CheersDestinations
-import com.salazar.cheers.feature.home.navigation.navigateToHome
+import com.salazar.cheers.feature.home.navigation.home.navigateToHome
 import com.softimpact.feature.passcode.passcode.passcodeNavigationRoute
 import com.softimpact.feature.passcode.passcode.passcodeScreen
 

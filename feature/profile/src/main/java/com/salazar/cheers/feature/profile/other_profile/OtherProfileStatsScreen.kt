@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -71,16 +72,8 @@ fun Tabs(
     )
     val scope = rememberCoroutineScope()
 
-    TabRow(
-        // Our selected tab is our current page
+    PrimaryTabRow(
         selectedTabIndex = pagerState.currentPage,
-        // Override the indicator, using the provided pagerTabIndicatorOffset modifier
-        indicator = { tabPositions ->
-//            TabRowDefaults.Indicator(
-//                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-//            )
-        },
-//        backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         // Add tabs for all of our pages

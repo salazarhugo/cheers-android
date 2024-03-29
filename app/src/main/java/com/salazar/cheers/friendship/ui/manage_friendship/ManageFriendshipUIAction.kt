@@ -1,8 +1,8 @@
 package com.salazar.cheers.friendship.ui.manage_friendship
 
 sealed class ManageFriendshipUIAction {
-    object OnReportClick : ManageFriendshipUIAction()
-    object OnBlockClick : ManageFriendshipUIAction()
-    object OnRemoveFriendClick : ManageFriendshipUIAction()
-    object OnDoneClick : ManageFriendshipUIAction()
+    data object OnReportClick : ManageFriendshipUIAction()
+    data object OnBlockClick : ManageFriendshipUIAction()
+    data object OnRemoveFriendClick : ManageFriendshipUIAction()
+    data object OnDoneClick : ManageFriendshipUIAction()
 }

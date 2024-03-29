@@ -18,13 +18,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun RegisterRoute(
     registerViewModel: RegisterViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
+    navigateToHome: () -> Unit,
 ) {
     val uiState by registerViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.success) {
         if (!uiState.success) return@LaunchedEffect
-        navActions.navigateToMain()
+        navigateToHome()
     }
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })

@@ -43,6 +43,7 @@ fun AnimatedTextCounter(
     style: TextStyle = LocalTextStyle.current
 ) {
     AnimatedContent(
+        modifier = modifier,
         targetState = targetState,
         transitionSpec = {
             if (targetState > initialState) {
@@ -58,7 +59,6 @@ fun AnimatedTextCounter(
     ) { targetCount ->
         Text(
             text = numberFormatter(value = targetCount),
-            modifier = modifier,
             style = style,
             color = color,
             fontSize = fontSize,

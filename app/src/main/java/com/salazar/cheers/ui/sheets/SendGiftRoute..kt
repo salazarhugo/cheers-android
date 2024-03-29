@@ -24,6 +24,7 @@ import com.salazar.cheers.core.ui.theme.Green
 import com.salazar.cheers.core.ui.theme.GreenSurface
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import androidx.compose.material3.Divider
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import kotlinx.coroutines.delay
 
 /**
@@ -82,7 +83,7 @@ fun SendGiftRoute(
                 if (uiState.isLoading) {
 //                    val y = bottomSheetNavigator.navigatorSheetState.offset.value
                     val y = 0f
-                    com.salazar.cheers.core.share.ui.LoadingScreen(
+                    LoadingScreen(
                         modifier = Modifier.offset(y = -LocalDensity.current.run { y.toDp() } / 2),
                     )
                 } else if (uiState.isConfirmationScreen) {

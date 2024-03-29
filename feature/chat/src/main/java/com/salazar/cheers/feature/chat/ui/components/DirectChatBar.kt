@@ -22,10 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.feature.chat.R
 import com.salazar.common.ui.extensions.noRippleClickable
@@ -35,10 +38,11 @@ fun DirectChatBar(
     name: String,
     verified: Boolean,
     picture: String?,
+    isTyping: Boolean,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    onNavIconPressed: () -> Unit,
-    onInfoClick: () -> Unit,
+    onNavIconPressed: () -> Unit = {},
+    onInfoClick: () -> Unit = {},
     onTitleClick: (username: String) -> Unit = { },
 ) {
     CheersAppBar(
@@ -76,11 +80,16 @@ fun DirectChatBar(
                 )
                 Spacer(Modifier.width(8.dp))
                 Column {
-                    if (name.isNotBlank())
+                    if (name.isNotBlank()) {
                         Username(
                             username = name,
                             verified = verified,
                         )
+                    }
+                    ChatTypingComponent(
+                        isTyping = isTyping,
+                        modifier = Modifier,
+                    )
                 }
             }
         },
@@ -107,4 +116,17 @@ fun DirectChatBar(
             )
         }
     )
+}
+
+@ComponentPreviews
+@Composable
+private fun DirectChatBarPreview() {
+    CheersPreview {
+        DirectChatBar(
+            name = "Yuliia Maiorova",
+            verified = true,
+            picture = "",
+            isTyping = true,
+        )
+    }
 }

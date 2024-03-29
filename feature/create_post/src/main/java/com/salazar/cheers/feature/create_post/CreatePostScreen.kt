@@ -1,98 +1,84 @@
 package com.salazar.cheers.feature.create_post
 
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.outlined.Bloodtype
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.People
-import androidx.compose.material.icons.outlined.PhotoAlbum
-import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
-import com.salazar.cheers.core.ui.CarouselDrinks
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.ChipGroup
-import com.salazar.cheers.core.ui.MultipleAnnotation
-import com.salazar.cheers.core.ui.ShareButton
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
-import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.core.ui.theme.GreySheet
+import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
+import com.salazar.cheers.core.ui.components.post.PostMedia
+import com.salazar.cheers.core.ui.components.post.PostDrink
+import com.salazar.cheers.core.ui.components.post.PostHeader
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.ErrorMessage
+import com.salazar.cheers.core.util.audio.LocalAudio
+import com.salazar.cheers.data.account.Account
+import com.salazar.cheers.feature.create_post.drink.SelectDrinkBottomSheet
+import com.salazar.common.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
 fun CreatePostScreenStateful(
     uiState: CreatePostUiState,
-    onUploadPost: (Int) -> Unit,
-    interactWithChooseOnMap: () -> Unit,
-    interactWithDrunkennessLevel: () -> Unit,
+    onUploadPost: () -> Unit,
     navigateToTagUser: () -> Unit,
 //    onSelectLocation: (SearchResult) -> Unit,
-    onSelectMedia: (Uri) -> Unit,
-    onCaptionChanged: (String) -> Unit,
-    unselectLocation: () -> Unit,
-    updateLocationName: (String) -> Unit,
 //    updateLocationResults: (List<SearchResult>) -> Unit,
-    onSelectPrivacy: (Privacy) -> Unit,
     onCreatePostUIAction: (CreatePostUIAction) -> Unit,
 ) {
 //    val searchCallback = object : SearchCallback {
@@ -122,69 +108,83 @@ fun CreatePostScreenStateful(
 //        reverseGeocoding.search(options, searchCallback)
     }
 
-    if (uiState.privacyState.isVisible)
-        PrivacyBottomSheet(
-            privacy = uiState.privacy,
-            privacyState = uiState.privacyState,
-            onSelectPrivacy = onSelectPrivacy,
-        )
-
     CreatePostScreen(
-        avatar = uiState.profilePictureUrl,
+        account = uiState.account,
+        audio = uiState.audio,
         caption = uiState.caption,
+        privacy = uiState.privacy,
         errorMessage = uiState.errorMessage,
+        selectedDrink = uiState.currentDrink,
         onCreatePostUIAction = onCreatePostUIAction,
-        location = uiState.location,
-//        locationResults = uiState.locationResults.map { it.name },
         drinks = uiState.drinks,
+        isAudioPlaying = uiState.isAudioPlaying,
+        audioProgress = uiState.audioProgress,
         onUploadPost = onUploadPost,
-        photos = uiState.photos,
+        medias = uiState.medias,
         notificationEnabled = uiState.notify,
         isLoading = uiState.isLoading,
+        locationResults = uiState.locationResults,
+//        location = uiState.location,
     )
 }
 
 @Composable
 fun CreatePostScreen(
     caption: String,
+    privacy: Privacy,
     modifier: Modifier = Modifier,
     errorMessage: String? = null,
-    location: String? = null,
-    locationResults: List<String> = emptyList(),
-    avatar: String? = null,
-    photos: List<Uri> = emptyList(),
+    selectedDrink: Drink? = null,
+    locationResults: List<String>? = null,
+    audio: LocalAudio? = null,
+    isAudioPlaying: Boolean = false,
+    audioProgress: Float = 0f,
+    account: Account? = null,
+    medias: List<Media> = emptyList(),
     drinks: List<Drink> = emptyList(),
     notificationEnabled: Boolean = true,
     isLoading: Boolean = false,
-    onUploadPost: (Int) -> Unit = {},
+    onUploadPost: () -> Unit = {},
     onCreatePostUIAction: (CreatePostUIAction) -> Unit = {},
 ) {
-    val enabled = caption.isNotEmpty() || photos.isNotEmpty() // || uiState.drinkState.currentPage > 0
+    val enabled = caption.isNotEmpty() || medias.isNotEmpty() // || uiState.drinkState.currentPage > 0
     val drinkState = rememberPagerState {
         drinks.size
     }
+    var showSelectDrinkSheet by remember { mutableStateOf(false) }
+    var showAudioRecorderDialog by remember { mutableStateOf(false) }
+    val drinkSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val audioSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
     Scaffold(
+        modifier = modifier,
         topBar = {
-            TopAppBar(
+            CreatePostTopBar(
                 onDismiss = { onCreatePostUIAction(CreatePostUIAction.OnBackPressed) },
                 onShare = {
-                    val drinkID = drinks[drinkState.currentPage]
-                    onUploadPost(drinkID.id)
+                    onUploadPost()
                     onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
                 },
                 isLoading = isLoading,
             )
         },
         bottomBar = {
-            ShareButton(
-                modifier = Modifier.navigationBarsPadding(),
-                text = stringResource(id = R.string.share),
-                isLoading = isLoading,
+            CreatePostBottomBar(
+                privacy = privacy,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .background(MaterialTheme.colorScheme.background)
+                    .shadow(8.dp, spotColor = Color.Transparent)
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
                 onClick = {
-                    val drinkID = drinks[drinkState.currentPage]
-                    onUploadPost(drinkID.id)
+                    onUploadPost()
                     onCreatePostUIAction(CreatePostUIAction.OnBackPressed)
+                },
+                onSelectPrivacy = {
+                    onCreatePostUIAction(CreatePostUIAction.OnSelectPrivacy(it))
                 },
                 enabled = enabled,
             )
@@ -193,72 +193,95 @@ fun CreatePostScreen(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
-            AnimatedVisibility(visible = photos.isEmpty()) {
-                AddPhotoOrVideo(
-                    navigateToCamera = {
-                        onCreatePostUIAction(CreatePostUIAction.OnCameraClick)
-                    },
-                    onMediaSelectorClicked = {
-                        onCreatePostUIAction(CreatePostUIAction.OnGalleryClick)
-                    },
-                )
-            }
             ErrorMessage(
                 errorMessage = errorMessage,
                 paddingValues = PaddingValues(16.dp),
             )
+            if (account != null) {
+                PostHeader(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    username = account.username,
+                    verified = account.verified,
+                    avatar = account.picture,
+                )
+            }
             CaptionSection(
                 modifier = Modifier
-                    .padding(start = 15.dp, end = 15.dp)
-                    .fillMaxWidth(),
-                avatar = avatar,
+                    .fillMaxWidth()
+                    .padding(end = 16.dp),
                 caption = caption,
                 onCaptionChanged = {
                     onCreatePostUIAction(CreatePostUIAction.OnCaptionChange(it))
                 },
-                photos = photos,
-                onImageClick = {
+            )
+            PostMedia(
+                medias = medias,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            if (audio != null) {
+                PlaybackComponent(
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .padding(16.dp),
+                    isPlaying = isAudioPlaying,
+                    progress = audioProgress,
+                    amplitudes = audio.amplitudes,
+                    onClick = {
+                        onCreatePostUIAction(CreatePostUIAction.OnAudioClick)
+                    }
+                )
+            }
+            CreatePostButtons(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onAddImageClick = {
                     onCreatePostUIAction(CreatePostUIAction.OnGalleryClick)
                 },
+                onAddDrinkClick = {
+                    scope.launch {
+                        showSelectDrinkSheet = true
+                        drinkSheetState.expand()
+                    }
+                },
+                onMicrophoneClick = {
+                    scope.launch {
+                        showAudioRecorderDialog = true
+                        audioSheetState.expand()
+                    }
+                }
             )
-            Divider()
-            AddPeople(
-                users = emptyList(),
-                navigateToTagUser = {},
-            )
-            Divider()
-            if (location != null)
-                SelectedLocation(
-                    location = location,
-                    navigateToChooseOnMap = {},//interactWithChooseOnMap,
-                    unselectLocation = {}, //unselectLocation,
+            if (selectedDrink != null) {
+                PostDrink(
+                    drink = selectedDrink.name,
+                    picture = selectedDrink.icon,
+                    modifier = Modifier.padding(16.dp),
                 )
-            else
-                LocationSection(
-                    location = location,
-                    navigateToChooseOnMap = {},
-                )
-            LocationResultsSection(
-                results = locationResults,
-                onSelectLocation = {},
-            )
-            Divider()
-            BeverageSection(
-                pagerState = drinkState,
-                drinks = drinks,
-                onCreatePostUIAction = onCreatePostUIAction,
-            )
-//                Privacy(
-//                    privacyState = privacyState,
-//                    privacy = privacy,
-//                )
-            Divider()
+            }
+            HorizontalDivider()
             EndDateSection(
                 endDate = Date(),
                 onEndDateChange = {},
             )
-            Divider()
+            HorizontalDivider()
+            LocationSection(
+                location = "",
+                navigateToChooseOnMap = {
+                    onCreatePostUIAction(CreatePostUIAction.OnLocationClick)
+                },
+            )
+            if (locationResults != null) {
+                LocationResultsSection(
+                    results = locationResults,
+                    onSelectLocation = {
+                    },
+                )
+            }
+            HorizontalDivider()
             SwitchPreference(
                 text = "Send notification to friends",
                 checked = notificationEnabled,
@@ -268,6 +291,39 @@ fun CreatePostScreen(
             )
         }
     }
+
+    if (showAudioRecorderDialog) {
+        AudioRecorderDialog(
+            sheetState = audioSheetState,
+            onDismiss = {
+                scope.launch {
+                    audioSheetState.hide()
+                }.invokeOnCompletion {
+                    showAudioRecorderDialog = false
+                }
+            },
+            onDone = {
+                onCreatePostUIAction(CreatePostUIAction.OnAddAudio(it))
+            }
+        )
+    }
+
+    if (showSelectDrinkSheet) {
+        SelectDrinkBottomSheet(
+            drinks = drinks,
+            sheetState = drinkSheetState,
+            onClick = { drink ->
+                onCreatePostUIAction(CreatePostUIAction.OnSelectDrink(drink))
+            },
+            onDismiss = {
+                scope.launch {
+                    drinkSheetState.hide()
+                }.invokeOnCompletion {
+                    showSelectDrinkSheet = false
+                }
+            },
+        )
+    }
 }
 
 @ScreenPreviews
@@ -276,6 +332,16 @@ private fun CreatePostScreenPreview() {
     CheersPreview {
         CreatePostScreen(
             caption = "Geneva is one of the most famous city in the world.",
+            modifier = Modifier,
+            medias = List(4) {
+                Media.Image(uri = Uri.parse(""))
+             },
+            account = Account(
+                username = "cheers",
+                verified = true,
+                name = "Cheers Social",
+            ),
+            privacy = Privacy.FRIENDS,
         )
     }
 }
@@ -310,29 +376,51 @@ fun EndDateSection(
 }
 
 @Composable
-fun Privacy(
-    onClick: () -> Unit,
+fun PrivacyComponent(
     privacy: Privacy,
+    onSelectPrivacy: (Privacy) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
+    var showPrivacySheet by remember { mutableStateOf(false) }
+    val state = rememberModalBottomSheetState()
+
+    if (showPrivacySheet) {
+        PrivacyBottomSheet(
+            privacy = privacy,
+            privacyState = state,
+            onSelectPrivacy = onSelectPrivacy,
+            onDismiss = {
+                scope.launch {
+                    state.hide()
+                }.invokeOnCompletion {
+                    showPrivacySheet = false
+                }
+            }
+        )
+    }
+
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                scope.launch { onClick() }
-            }
-            .padding(16.dp),
+            .noRippleClickable {
+                scope.launch {
+                    showPrivacySheet = true
+                    state.show()
+                }
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(privacy.icon, null)
-            Column(modifier = Modifier.padding(start = 16.dp)) {
-                Text(privacy.title)
-                Text(privacy.subtitle)
-            }
+        Icon(
+            imageVector = privacy.icon,
+            contentDescription = null,
+        )
+        Column(
+            modifier = Modifier.padding(start = 16.dp),
+        ) {
+            Text(
+                text = privacy.subtitle,
+            )
         }
-        Icon(Icons.Filled.KeyboardArrowRight, null)
     }
 }
 
@@ -396,23 +484,7 @@ fun DrunkennessLevelSection(
 }
 
 @Composable
-fun BeverageSection(
-    pagerState: PagerState,
-    drinks: List<Drink>,
-    onCreatePostUIAction: (CreatePostUIAction) -> Unit,
-) {
-    CarouselDrinks(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        pagerState = pagerState,
-        drinks = drinks,
-        onBeverageClick = { },
-    )
-}
-
-@Composable
-fun TopAppBar(
+fun CreatePostTopBar(
     onDismiss: () -> Unit,
     onShare: () -> Unit,
     isLoading: Boolean,
@@ -432,19 +504,7 @@ fun TopAppBar(
                 Icon(Icons.Default.Close, null)
             }
         },
-        actions = {
-            if (isLoading)
-                CircularProgressIndicator()
-            else
-                TextButton(
-                    modifier = Modifier.padding(end = 16.dp),
-                    onClick = onShare,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.share),
-                    )
-                }
-        }
+        actions = {}
     )
 }
 
@@ -477,41 +537,6 @@ fun SwitchPreference(
                 }
             }
         )
-    }
-}
-
-@Composable
-fun AddPhotoOrVideo(
-    navigateToCamera: () -> Unit,
-    onMediaSelectorClicked: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    )
-    {
-        FilledTonalButton(
-            onClick = onMediaSelectorClicked,
-            modifier = Modifier.weight(1f),
-        ) {
-            Icon(Icons.Outlined.PhotoAlbum, null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Gallery")
-        }
-        Spacer(Modifier.width(8.dp))
-        FilledTonalButton(
-            onClick = {
-                navigateToCamera()
-//                takePictureLauncher.launch()
-            },
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(Icons.Outlined.PhotoCamera, "")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Take photo")
-        }
     }
 }
 
@@ -634,22 +659,14 @@ fun AddPeople(
 
 @Composable
 fun CaptionSection(
-    modifier: Modifier = Modifier,
-    avatar: String?,
-    photos: List<Uri>,
     caption: String,
-    onCaptionChanged: (String) -> Unit,
-    onImageClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onCaptionChanged: (String) -> Unit = {},
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        AvatarComponent(
-            avatar = avatar,
-            size = 40.dp,
-        )
-
         TextField(
             value = caption,
             colors = TextFieldDefaults.colors(
@@ -659,8 +676,7 @@ fun CaptionSection(
                 unfocusedIndicatorColor = Color.Transparent
             ),
             modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = 4.dp),
+                .fillMaxWidth(),
             onValueChange = { onCaptionChanged(it) },
             singleLine = false,
             keyboardOptions = KeyboardOptions(
@@ -671,83 +687,7 @@ fun CaptionSection(
             placeholder = {
                 Text(text = "Write a caption...", fontSize = 13.sp)
             },
-            trailingIcon = {
-                if (photos.isEmpty()) return@TextField
-                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
-                    Image(
-                        modifier = Modifier
-                            .clickable(onClick = onImageClick)
-                            .size(50.dp),
-                        painter = rememberAsyncImagePainter(model = photos[0]),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
-                    if (photos.size > 1)
-                        MultipleAnnotation(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(0.dp),
-                            onClick = onImageClick,
-                        )
-                }
-            }
         )
     }
 }
 
-@Composable
-fun PrivacyBottomSheet(
-    privacy: Privacy,
-    privacyState: SheetState,
-    onSelectPrivacy: (Privacy) -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-
-    ModalBottomSheet(
-        sheetState = privacyState,
-        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
-        shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-        onDismissRequest = {},
-        content = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            ) {
-                Text(
-                    "Event privacy",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(12.dp)
-                )
-                Divider()
-                Text(
-                    "Choose who can see and join this event. You'll be able to invite people later.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-            }
-
-            Privacy.values().forEach {
-//                Item(it, it == privacy, onSelectPrivacy = {
-//                    onSelectPrivacy(it)
-//                    scope.launch {
-//                        privacyState.show()
-//                    }
-//                })
-            }
-
-            Button(
-                onClick = {
-                    scope.launch {
-                        privacyState.hide()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = MaterialTheme.shapes.medium,
-            ) {
-                Text("Done")
-            }
-        }
-    )
-}

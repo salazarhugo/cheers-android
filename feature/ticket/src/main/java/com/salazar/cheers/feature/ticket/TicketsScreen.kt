@@ -12,12 +12,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Ticket
-import com.salazar.cheers.core.share.ui.LoadingScreen
-import com.salazar.cheers.core.ui.R
-import com.salazar.cheers.core.ui.components.message.MessageComponent
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState

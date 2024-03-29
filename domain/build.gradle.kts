@@ -34,6 +34,8 @@ dependencies {
     implementation(project(":data:drink"))
     implementation(project(":data:ticket"))
     implementation(project(":data:comment"))
+    implementation(project(":data:map"))
+    implementation(project(":data:chat"))
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {

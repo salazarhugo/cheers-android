@@ -1,6 +1,7 @@
 plugins {
     id("cheers.android.library")
     id("cheers.android.library.compose")
+    id("cheers.android.hilt")
 }
 
 android {
@@ -30,16 +31,21 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    // ExoPlayer 2
-    implementation(libs.exoplayer)
+    // ExoPlayer 3
+    implementation("androidx.media3:media3-exoplayer:1.2.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
+    implementation("androidx.media3:media3-ui:1.2.1")
 
     // Jetpack Compose
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
+
+    // Amplituda
+    implementation("com.github.lincollincol:compose-audiowaveform:1.1.1")
+    implementation("com.github.lincollincol:amplituda:2.2.2")
 
     // Accompanist
     implementation(libs.accompanist.navigation.material)

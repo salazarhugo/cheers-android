@@ -9,21 +9,14 @@ import com.salazar.common.util.LocalActivity
 @Composable
 fun SignUpRoute(
     viewModel: SignUpViewModel = hiltViewModel(),
-    navigateBack: () -> Unit,
-    navigateToSignIn: () -> Unit,
+    navigateToHome: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val activity = LocalActivity.current
 
     LaunchedEffect(uiState.isSignedIn) {
         if (uiState.isSignedIn)
-            navigateToSignIn()
-    }
-
-    if (uiState.withGoogle) {
-        Text(
-            text = "Signing up with Google",
-        )
+            navigateToHome()
     }
 
     ChooseUsernameScreen(

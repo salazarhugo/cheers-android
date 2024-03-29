@@ -15,12 +15,15 @@ fun NavController.navigateToSignUp(
     email: String? = null,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("sign_up_route?$EMAIL=$email", navOptions)
+    val route = if (email != null)
+        "sign_up_route?$EMAIL=$email"
+    else
+        "sign_up_route"
+    this.navigate(route, navOptions)
 }
 
 fun NavGraphBuilder.signUpScreen(
-    navigateBack: () -> Unit,
-    navigateToSignIn: () -> Unit,
+    navigateToHome: () -> Unit,
 ) {
     composable(
         route = signUpNavigationRoute,
@@ -29,8 +32,7 @@ fun NavGraphBuilder.signUpScreen(
         ),
     ) {
         SignUpRoute(
-            navigateToSignIn = navigateToSignIn,
-            navigateBack = navigateBack,
+            navigateToHome = navigateToHome,
         )
     }
 }

@@ -4,6 +4,7 @@ import com.salazar.cheers.data.account.AccountRepository
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -12,7 +13,6 @@ import javax.inject.Inject
 class SignOutUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
-    private val dataStoreRepository: DataStoreRepository,
     private val postRepository: PostRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -20,6 +20,5 @@ class SignOutUseCase @Inject constructor(
         postRepository.clearPosts()
         accountRepository.deleteAccount()
         authRepository.signOut()
-        dataStoreRepository.updateIdToken("")
     }
 }

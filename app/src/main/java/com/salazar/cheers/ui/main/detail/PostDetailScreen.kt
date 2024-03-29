@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.detail
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
+import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.FriendButton
-import com.salazar.cheers.core.ui.PostText
+import com.salazar.cheers.core.ui.PostCaption
 import com.salazar.cheers.core.ui.StaticMap
 import com.salazar.cheers.core.ui.UserItem
-import com.salazar.cheers.core.ui.components.post.PostBody
+import com.salazar.cheers.core.ui.components.post.PostMedia
 import com.salazar.cheers.core.ui.components.post.PostHeader
 import com.salazar.cheers.core.ui.item.LikeButton
 import com.salazar.cheers.core.ui.theme.Roboto
@@ -183,13 +185,13 @@ fun Post(
                     onUserClick = { },
                     onMoreClick = {},
                 )
-                PostText(
+                PostCaption(
                     caption = post.caption,
                     onUserClicked = onUserClick,
                     onPostClicked = {},
                 )
-                PostBody(
-                    post = post,
+                PostMedia(
+                    medias = post.photos.map { Media.Image(uri = Uri.parse(it)) },
                     onPostClick = {},
                 )
                 PostFooter(

@@ -20,7 +20,6 @@ fun NavGraphBuilder.messagesScreen(
     navigateToOtherProfile: (String) -> Unit,
     navigateToChatWithChannelId: (String) -> Unit,
     navigateToNewChat: () -> Unit,
-    navigateToChatsMoreSheet: (String) -> Unit,
 ) {
     composable(
         route = messagesNavigationRoute,
@@ -34,7 +33,6 @@ fun NavGraphBuilder.messagesScreen(
             navigateToOtherProfile = navigateToOtherProfile,
             navigateToChatWithChannelId = navigateToChatWithChannelId,
             navigateToNewChat = navigateToNewChat,
-            navigateToChatsMoreSheet = navigateToChatsMoreSheet,
         )
     }
 }

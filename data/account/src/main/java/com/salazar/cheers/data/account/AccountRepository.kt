@@ -12,7 +12,6 @@ class AccountRepository @Inject constructor(
 
     suspend fun getAccount(): Account? = localAccountDataSource.getAccount()
     suspend fun getAccountFlow(): Flow<Account?> = localAccountDataSource.getAccountFlow()
-
     suspend fun deleteAccount(): Unit = localAccountDataSource.clear()
 }
 

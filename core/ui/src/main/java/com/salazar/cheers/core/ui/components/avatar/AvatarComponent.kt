@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
@@ -30,6 +31,7 @@ fun AvatarComponent(
     val painter = ImageRequest.Builder(LocalContext.current)
         .data(avatar)
         .error(placeHolder)
+        .decoderFactory(SvgDecoder.Factory())
         .fallback(placeHolder)
         .crossfade(true)
         .build()

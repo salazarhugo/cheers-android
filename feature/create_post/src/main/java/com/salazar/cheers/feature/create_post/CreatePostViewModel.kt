@@ -1,16 +1,23 @@
 package com.salazar.cheers.feature.create_post
 
+import android.content.Context
 import android.net.Uri
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.SheetState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mapbox.geojson.Point
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.model.toMedia
+import com.salazar.cheers.core.util.audio.LocalAudio
+import com.salazar.cheers.core.util.playback.AndroidAudioPlayer
+import com.salazar.cheers.data.account.Account
+import com.salazar.cheers.data.post.repository.PostType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -19,37 +26,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class CreatePostPage {
-    CreatePost, ChooseOnMap, ChooseBeverage, AddPeople, DrunkennessLevel
-}
-
-data class CreatePostUiState(
-    val isLoading: Boolean,
-    val errorMessage: String? = null,
-    val imageUri: Uri? = null,
-    val drunkenness: Int = 0,
-    val caption: String = "",
-    val postType: String = com.salazar.cheers.data.post.repository.PostType.TEXT,
-    val photos: List<Uri> = emptyList(),
-    val locationPoint: Point? = null,
-    val location: String = "",
-//    val locationResults: List<SearchResult> = emptyList(),
-//    val selectedLocation: SearchResult? = null,
-    val selectedTagUsers: List<com.salazar.cheers.core.model.UserItem> = emptyList(),
-    val privacyState: SheetState = SheetState(true),
-    val privacy: Privacy = Privacy.FRIENDS,
-    val allowJoin: Boolean = true,
-    val notify: Boolean = true,
-    val page: CreatePostPage = CreatePostPage.CreatePost,
-    val profilePictureUrl: String? = null,
-    val drinks: List<Drink> = emptyList(),
-    val currentDrink: Int = 0,
-)
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val createPostUseCases: CreatePostUseCases,
+    private val audioPlayer: AndroidAudioPlayer,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CreatePostUiState(isLoading = false))
@@ -63,13 +45,21 @@ class CreatePostViewModel @Inject constructor(
 
     init {
         stateHandle.get<String>("photoUri")?.let {
-            addPhoto(Uri.parse(it))
+//            addPhoto(Uri.parse(it))
+        }
+
+        viewModelScope.launch {
+            audioPlayer.isPlayingFlow.collect(::updateIsAudioPlaying)
+        }
+
+        viewModelScope.launch {
+            audioPlayer.currentPositionFlow().collect(::updateAudioProgress)
         }
 
         viewModelScope.launch {
             val account = createPostUseCases.getAccountUseCase().first()
             viewModelState.update {
-                it.copy(profilePictureUrl = account?.picture)
+                it.copy(account = account)
             }
         }
 
@@ -89,6 +79,14 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+
+    fun onAudioClick() {
+        val audio = uiState.value.audio ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            audioPlayer.playLocalAudio(audio)
+        }
+    }
+
     private fun updateDrinks(drinks: List<Drink>) {
         val emptyDrink = listOf(
             Drink(
@@ -103,17 +101,41 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    fun selectDrink(drink: Drink) {
+        viewModelState.update {
+            it.copy(currentDrink = drink)
+        }
+    }
+
     fun selectPrivacy(privacy: Privacy) {
         viewModelState.update {
             it.copy(privacy = privacy)
         }
     }
 
-    fun selectTagUser(user: com.salazar.cheers.core.model.UserItem) {
+    fun selectTagUser(user: UserItem) {
         val l = viewModelState.value.selectedTagUsers.toMutableList()
         if (l.contains(user)) l.remove(user) else l.add(user)
         viewModelState.update {
             it.copy(selectedTagUsers = l.toList())
+        }
+    }
+
+    fun getLocationName(
+        longitude: Double,
+        latitude: Double,
+        zoom: Double,
+    ) {
+        viewModelScope.launch {
+            createPostUseCases.getLocationNameUseCase(
+                longitude = longitude,
+                latitude = latitude,
+                zoom = zoom,
+            ).collect { names ->
+                viewModelState.update {
+                    it.copy(locationResults = names)
+                }
+            }
         }
     }
 
@@ -141,7 +163,19 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun updateErrorMessage(errorMessage: String) {
+    private fun updateIsAudioPlaying(isAudioPlaying: Boolean) {
+        viewModelState.update {
+            it.copy(isAudioPlaying = isAudioPlaying)
+        }
+    }
+
+    private fun updateAudioProgress(progress: Float) {
+        viewModelState.update {
+            it.copy(audioProgress = progress)
+        }
+    }
+
+    private fun updateErrorMessage(errorMessage: String) {
         viewModelState.update {
             it.copy(errorMessage = errorMessage)
         }
@@ -183,31 +217,46 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addPhoto(photo: Uri) {
+    fun addAudio(audio: LocalAudio?) {
         viewModelState.update {
             it.copy(
-                photos = it.photos + photo,
-                postType = com.salazar.cheers.data.post.repository.PostType.IMAGE
+                audio = audio,
             )
         }
     }
 
-    fun setPhotos(photos: List<Uri>) {
+    fun addPhoto(context: Context, photo: Uri) {
         viewModelState.update {
             it.copy(
-                photos = photos,
-                postType = com.salazar.cheers.data.post.repository.PostType.IMAGE
+                medias = it.medias + photo.toMedia(context),
+                postType = PostType.IMAGE
             )
         }
     }
 
-    fun uploadPost(drinkID: Int) {
+    fun setMedia(
+        context: Context,
+        photos: List<Uri>,
+    ) {
+        viewModelState.update {
+            it.copy(
+                medias = photos.toMedia(context),
+                postType = PostType.IMAGE
+            )
+        }
+    }
+
+    fun uploadPost() {
         val uiState = viewModelState.value
+        val drinkID = uiState.currentDrink?.id ?: 0
+        val localAudio = uiState.audio
         updateIsLoading(true)
 
         viewModelScope.launch {
             createPostUseCases.createPostUseCase(
-                "PHOTOS" to uiState.photos.map { it.toString() }.toTypedArray(),
+                "PHOTOS" to uiState.medias.filterIsInstance(Media.Image::class.java).map { it.uri.toString() }.toTypedArray(),
+                "AUDIO_URI" to localAudio?.uri.toString(),
+                "AUDIO_AMPLITUDES" to localAudio?.amplitudes?.toTypedArray(),
                 "POST_TYPE" to uiState.postType,
                 "PHOTO_CAPTION" to uiState.caption,
                 "DRUNKENNESS" to uiState.drunkenness,
@@ -223,13 +272,4 @@ class CreatePostViewModel @Inject constructor(
 
         updateIsLoading(false)
     }
-}
-
-sealed class CreatePostUIAction {
-    object OnCameraClick : CreatePostUIAction()
-    object OnGalleryClick : CreatePostUIAction()
-    object OnBackPressed : CreatePostUIAction()
-    object OnSwipeRefresh : CreatePostUIAction()
-    data class OnCaptionChange(val text: String) : CreatePostUIAction()
-    data class OnNotificationChange(val enabled: Boolean) : CreatePostUIAction()
 }

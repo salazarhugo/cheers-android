@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GoogleButton(
     modifier: Modifier = Modifier,
-    text: String = "Continue with Google",
+    text: String = "Sign in with Google",
     loadingText: String = "Fetching data...",
     onClicked: () -> Unit
 ) {

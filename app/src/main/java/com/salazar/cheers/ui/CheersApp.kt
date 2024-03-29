@@ -10,9 +10,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.Language
-import com.salazar.cheers.Settings
 import com.salazar.cheers.Theme
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.navigation.CheersNavGraph
@@ -75,11 +74,12 @@ fun SetStatusBars(
     val systemUiController = rememberSystemUiController()
     val darkIcons = !darkTheme
 
-//    val color = if (darkIcons) Color.White else Color(0xFF101010)
+//    val color = MaterialTheme.colorScheme.background
+    val color = if (darkIcons) Color.White else Color(0xFF101010)
 
     LaunchedEffect(Unit) {
         systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
+            color = color,
             darkIcons = darkIcons,
         )
     }

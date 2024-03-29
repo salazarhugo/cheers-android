@@ -1,80 +1,107 @@
 package com.salazar.cheers.feature.chat.ui.chats
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.feature.chat.domain.models.RoomType
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.theme.GreySheet
+import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.data.chat.models.ChatType
 
 @Composable
-fun ChatsMoreBottomSheet(
+internal fun ChatsMoreBottomSheet(
+    chat: ChatChannel,
     modifier: Modifier = Modifier,
-    name: String,
-    isAdmin: Boolean,
-    roomType: RoomType,
-    onDeleteClick: () -> Unit,
-    onDeleteChats: () -> Unit,
-    onLeaveClick: () -> Unit,
+    viewModel: ChatsSheetViewModel = hiltViewModel(),
+    sheetState: SheetState = rememberModalBottomSheetState(),
+    onDismissRequest: () -> Unit = {},
 ) {
-    Column(
+    ModalBottomSheet(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        sheetState = sheetState,
+        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+        shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        onDismissRequest = onDismissRequest,
+        windowInsets = WindowInsets(0, WindowInsets.statusBars.getTop(LocalDensity.current), 0, 0),
     ) {
-        Box(
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .width(36.dp)
-                .height(4.dp)
-                .clip(MaterialTheme.shapes.small)
-                .background(MaterialTheme.colorScheme.outline)
-        )
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(16.dp),
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Divider()
-        if (roomType == RoomType.GROUP)
-            Item(
-                text = "Leave",
-                icon = Icons.Outlined.ExitToApp,
-                red = true,
-                onClick = onLeaveClick,
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = chat.name,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.onBackground,
             )
-        if (isAdmin)
+            HorizontalDivider()
+            if (chat.type == ChatType.GROUP)
+                Item(
+                    text = "Leave",
+                    icon = Icons.AutoMirrored.Outlined.ExitToApp,
+                    red = true,
+                    onClick = {
+                        viewModel.leaveChannel(chat.id) {
+                            onDismissRequest()
+                        }
+                    },
+                )
+            if (chat.admin)
+                Item(
+                    text = "Delete Group",
+                    icon = Icons.Outlined.Delete,
+                    red = true,
+                    onClick = {
+                        viewModel.deleteChannel(chat.id) {
+                            onDismissRequest()
+                        }
+                    },
+                )
             Item(
-                text = "Delete Group",
+                text = "Delete Chats",
                 icon = Icons.Outlined.Delete,
-                red = true,
-                onClick = onDeleteClick,
+                red = false,
+                onClick = {
+                    viewModel.deleteChats(chat.id) {
+                        onDismissRequest()
+                    }
+                },
             )
-        Item(
-            text = "Delete Chats",
-            icon = Icons.Outlined.Delete,
-            red = false,
-            onClick = onDeleteChats,
-        )
-        Item(text = "Mute messages", icon = Icons.Outlined.NotificationsOff)
-        Item(text = "Mute call notifications", icon = Icons.Outlined.NotificationsOff)
+            Item(text = "Mute messages", icon = Icons.Outlined.NotificationsOff)
+            Item(text = "Mute call notifications", icon = Icons.Outlined.NotificationsOff)
+        }
     }
 }
 
 @Composable
-fun Item(
+private fun Item(
     text: String,
     icon: ImageVector,
     red: Boolean = false,
@@ -100,6 +127,17 @@ fun Item(
             text = text,
             style = MaterialTheme.typography.titleMedium,
             color = color,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ChatsMorePreview() {
+    CheersPreview {
+        ChatsMoreBottomSheet(
+            chat = ChatChannel(),
+            modifier = Modifier,
         )
     }
 }

@@ -1,20 +1,21 @@
 package com.salazar.cheers.core.ui.components.post
 
+import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.core.ui.PostText
+import com.salazar.cheers.core.ui.PostCaption
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
+import com.salazar.cheers.core.util.playback.AudioState
 import com.salazar.cheers.data.post.repository.Post
 import java.util.Date
 
@@ -22,6 +23,8 @@ import java.util.Date
 fun PostComponent(
     post: Post,
     modifier: Modifier = Modifier,
+    audioState: AudioState? = null,
+    onAudioClick: () -> Unit = {},
     onUserClick: (String) -> Unit = {},
     onMoreClick: () -> Unit = {},
     onLikeClick: () -> Unit = {},
@@ -48,19 +51,24 @@ fun PostComponent(
             onUserClick = { onUserClick(post.authorId) },
             onMoreClick = onMoreClick,
         )
-        PostText(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+        }
+        PostCaption(
             caption = post.caption,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, end = 16.dp, start = 16.dp),
-            onUserClicked = { },
-            onPostClicked = { },
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            onUserClicked = onUserClick,
+            onPostClicked = {},
         )
-        PostBody(
-            post = post,
+        PostMedia(
+            medias = post.photos.map { Media.Image(uri = Uri.parse(it)) },
             pagerState = pagerState,
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+                .padding(top = 8.dp),
             onPostClick = { },
             onDoubleTap = {
                 if (post.liked.not()) {
@@ -68,22 +76,28 @@ fun PostComponent(
                 }
             },
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        if (post.audioWaveform.isNotEmpty()) {
+            PlaybackComponent(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .padding(16.dp),
+                audioState = audioState,
+                amplitudes = post.audioWaveform,
+                onClick = onAudioClick,
+            )
+        }
         PostDrink(
             drink = post.drinkName,
             picture = post.drinkPicture,
             modifier = Modifier.padding(horizontal = 16.dp),
         )
         PostFooter(
-            photoCount = post.photos.size,
-            likeCount = post.likes,
-            drunkenness = post.drunkenness,
-            commentCount = post.comments,
-            hasViewerLiked = post.liked,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            pagerState = pagerState,
+            likeCount = post.likes,
+            commentCount = post.comments,
+            hasViewerLiked = post.liked,
             onLikeClick = onLikeClick,
             onLikeCountClick = onLikeCountClick,
             onCommentClick = onCommentClick,
@@ -106,7 +120,7 @@ private fun PostComponentPreview() {
                 createTime = Date().time / 1000,
                 likes = 346334,
                 comments = 325,
-//                photos = listOf("https://scontent.cdninstagram.com/v/t51.2885-15/405504793_330833509699453_1944996773569160338_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMzQ5eDE2ODcuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=1&_nc_ohc=vlLRm-duywYAX9m_2aj&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzI0NjgxMzMxMDYwNjc0MDQ1Mg%3D%3D.2-ccb7-5&oh=00_AfDB7QL18GNUxiNeNkW5GKme6HSRMPEhlzY5MFkZr6UVBw&oe=656E951B&_nc_sid=10d13b")
+                audioWaveform = listOf(4, 5, 3, 7, 2, 3, 5, 2, 5, 3, 5, 6, 7, 8, 9),
             ),
         )
     }

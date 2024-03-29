@@ -5,15 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.party.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
+import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.domain.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.feature.profile.navigation.USERNAME
+import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -22,29 +25,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface OtherProfileUiState {
-
-    val isLoading: Boolean
-    val errorMessages: List<String>
-
-    data class NoUser(
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-    ) : OtherProfileUiState
-
-    data class HasUser(
-        val user: User,
-        val posts: List<com.salazar.cheers.data.post.repository.Post>? = null,
-        val parties: List<Party>? = null,
-        val isRefreshing: Boolean = false,
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-    ) : OtherProfileUiState
-}
-
 private data class OtherProfileViewModelState(
+    val username: String = String(),
     val user: User? = null,
-    val posts: List<com.salazar.cheers.data.post.repository.Post>? = null,
+    val posts: List<Post>? = null,
     val parties: List<Party>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
@@ -60,11 +44,17 @@ private data class OtherProfileViewModelState(
                 isLoading = isLoading,
                 errorMessages = errorMessages,
                 isRefreshing = isRefreshing,
+                username = user.username,
+            )
+        } else if (isLoading) {
+            OtherProfileUiState.Loading(
+                username = username,
+                isRefreshing = isRefreshing,
             )
         } else {
-            OtherProfileUiState.NoUser(
-                isLoading = isLoading,
-                errorMessages = errorMessages,
+            OtherProfileUiState.NotFound(
+                username = username,
+                isRefreshing = isRefreshing,
             )
         }
 }
@@ -73,8 +63,7 @@ private data class OtherProfileViewModelState(
 class OtherProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
-    private val postRepository: com.salazar.cheers.data.post.repository.PostRepository,
-//    private val chatRepository: ChatRepository,
+    private val postRepository: PostRepository,
     private val partyRepository: PartyRepository,
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
     private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
@@ -82,7 +71,7 @@ class OtherProfileViewModel @Inject constructor(
     private val listPostUseCase: ListPostUseCase,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = false))
+    private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))
     lateinit var username: String
 
     val uiState = viewModelState
@@ -94,8 +83,9 @@ class OtherProfileViewModel @Inject constructor(
         )
 
     init {
-        savedStateHandle.get<String>("username")?.let { username ->
+        savedStateHandle.get<String>(USERNAME)?.let { username ->
             this.username = username
+            updateUsername(username)
         }
         viewModelScope.launch {
             userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
@@ -108,7 +98,13 @@ class OtherProfileViewModel @Inject constructor(
 
     private fun refreshUser() {
         viewModelScope.launch {
-            userRepository.fetchUser(username)
+            val result = userRepository.fetchUser(username)
+            when(result) {
+                is Resource.Error -> {}
+                is Resource.Loading -> updateIsLoading(result.isLoading)
+                is Resource.Success -> {}
+            }
+            updateIsLoading(false)
         }
     }
 
@@ -131,6 +127,18 @@ class OtherProfileViewModel @Inject constructor(
             refreshUserPosts()
             refreshUserParties()
             updateIsRefreshing(false)
+        }
+    }
+
+    private fun updateUsername(username: String) {
+        viewModelState.update {
+            it.copy(username = username)
+        }
+    }
+
+    private fun updateIsLoading(isLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isLoading = isLoading)
         }
     }
 
@@ -176,7 +184,7 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    private fun updatePosts(posts: List<com.salazar.cheers.data.post.repository.Post>) {
+    private fun updatePosts(posts: List<Post>) {
         viewModelState.update {
             it.copy(posts = posts)
         }

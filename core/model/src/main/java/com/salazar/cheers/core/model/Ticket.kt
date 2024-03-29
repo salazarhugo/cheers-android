@@ -1,9 +1,11 @@
 package com.salazar.cheers.core.model
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "tickets")
+@Immutable
 data class Ticket(
     @PrimaryKey
     val id: String = "",

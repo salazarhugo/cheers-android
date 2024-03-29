@@ -9,17 +9,21 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
-/*
- *  epoch in seconds
- */
+@Composable
+fun relativeTimeFormatterMilli(
+    milliSeconds: Long,
+): AnnotatedString {
+    return relativeTimeFormatter(seconds = milliSeconds / 1000)
+}
+
 @Composable
 fun relativeTimeFormatter(
-    epoch: Long,
+    seconds: Long,
 ): AnnotatedString {
 
     return buildAnnotatedString {
 
-        val elapsedSeconds = abs(System.currentTimeMillis() / 1000 - epoch)
+        val elapsedSeconds = abs(System.currentTimeMillis() / 1000 - seconds)
 
         val res = when {
             elapsedSeconds < 60 -> "just now"

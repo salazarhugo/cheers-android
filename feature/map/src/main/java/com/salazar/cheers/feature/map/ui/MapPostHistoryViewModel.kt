@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.map.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.feature.map.data.repository.MapRepositoryImpl
+import com.salazar.cheers.data.map.MapRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +19,7 @@ data class MapPostHistoryUiState(
 @HiltViewModel
 class MapPostHistoryViewModel @Inject constructor(
 //    postRepository: PostRepository,
-    val mapRepository: MapRepositoryImpl,
+    val mapRepository: com.salazar.cheers.data.map.MapRepositoryImpl,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapPostHistoryUiState(isLoading = true))

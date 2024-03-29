@@ -16,6 +16,7 @@ import java.util.UUID
 
 object StorageUtil {
     private val storageInstance: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
+    private val postBucket: FirebaseStorage by lazy { FirebaseStorage.getInstance("gs://cheers-posts") }
     private val storyBucket: FirebaseStorage by lazy { FirebaseStorage.getInstance("gs://cheers-stories") }
     private val chatBucket: FirebaseStorage by lazy { FirebaseStorage.getInstance("gs://cheers-chat-bucket") }
 
@@ -24,6 +25,8 @@ object StorageUtil {
 
     // 4 GB
     private const val VIDEO_SIZE_LIMIT = 4000000000
+
+    val postBucketRef = postBucket.reference
 
     val currentUserRefChat: StorageReference
         get() = storyBucket.reference
@@ -88,11 +91,11 @@ object StorageUtil {
             .await()
     }
 
-    suspend fun uploadPostImage(
-        imageBytes: ByteArray,
+    suspend fun uploadPostAudio(
+        bytes: ByteArray,
     ): Uri {
-        val ref = currentUserRef.child("posts/${UUID.randomUUID()}")
-        return ref.putBytes(imageBytes).continueWithTask { ref.downloadUrl }.await()
+        val ref = currentUserRef.child("posts/audio/${UUID.randomUUID()}")
+        return ref.putBytes(bytes).continueWithTask { ref.downloadUrl }.await()
     }
 
     fun uploadPostVideo(

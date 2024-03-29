@@ -19,6 +19,9 @@ fun NavController.navigateToOtherProfile(
     username: String,
     navOptions: NavOptions? = null,
 ) {
+    if (username.isBlank()) {
+        return
+    }
     this.navigate("other_profile_route/$username", navOptions)
 }
 
@@ -28,6 +31,7 @@ fun NavGraphBuilder.otherProfileScreen(
     navigateToPostDetail: (String) -> Unit,
     navigateToOtherProfileStats: (User) -> Unit,
     navigateToManageFriendship: (String) -> Unit,
+    navigateToChat: (String) -> Unit,
 ) {
     composable(
         route = otherProfileNavigationRoute,
@@ -38,15 +42,13 @@ fun NavGraphBuilder.otherProfileScreen(
             navArgument(USERNAME) { type = NavType.StringType },
         ),
     ) {
-        val username = it.arguments?.getString("username")!!
-
         OtherProfileRoute(
-            username = username,
             navigateBack = navigateBack,
             navigateToComments = navigateToComments,
             navigateToPostDetail = navigateToPostDetail,
             navigateToManageFriendship = navigateToManageFriendship,
             navigateToOtherProfileStats = navigateToOtherProfileStats,
+            navigateToChat = navigateToChat,
         )
     }
 }

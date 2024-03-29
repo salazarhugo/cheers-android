@@ -1,11 +1,13 @@
 package com.salazar.cheers.data.party
 
+import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.salazar.cheers.core.model.Privacy
 
 @Entity(tableName = "events")
+@Immutable
 data class Party(
     @PrimaryKey
     @ColumnInfo(name = "eventId")

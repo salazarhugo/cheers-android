@@ -7,30 +7,42 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.ui.Username
-import com.salazar.cheers.core.ui.theme.Roboto
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import com.salazar.cheers.core.ui.dialogs.AvatarDialog
 
 @Composable
 fun ProfileBannerAndAvatar(
-    modifier: Modifier = Modifier,
-    fraction: Float = 1f,
-    picture: String?,
     banner: String?,
-    username: String,
-    verified: Boolean,
-    content: @Composable RowScope.() -> Unit
+    avatar: String?,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit = {},
 ) {
-    val padding = 12 * fraction + 8
+    var openAlertDialog by remember { mutableStateOf(false) }
+
+    if (openAlertDialog) {
+        AvatarDialog(
+            avatar = avatar,
+            onDismissRequest = {
+                openAlertDialog = false
+            }
+        )
+    }
 
     Box(
         modifier = modifier,
@@ -38,39 +50,44 @@ fun ProfileBannerAndAvatar(
     ) {
         Column {
             ProfileBanner(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp)),
                 banner = banner,
-                alpha = fraction,
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .height(69.dp),
                 horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
                 content = content,
             )
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            UserProfilePicture(
-                modifier = Modifier
-                    .padding(padding.dp)
-                    .border((fraction * 5).dp, MaterialTheme.colorScheme.background, CircleShape),
-                picture = picture,
-                size = (fraction * 70 + 40).dp,
-                onClick = {},
-            )
-            Username(
-                modifier = Modifier.alpha(-1 * fraction + 1),
-                username = username,
-                verified = verified,
-                textStyle = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto,
-                ),
-            )
-        }
+        AvatarComponent(
+            avatar = avatar,
+            modifier = Modifier
+                .border(5.dp, MaterialTheme.colorScheme.background, CircleShape),
+            size = 110.dp,
+            onClick = {
+                openAlertDialog = true
+            },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileBannerAndAvatarPreview() {
+    CheersPreview {
+        ProfileBannerAndAvatar(
+            modifier = Modifier.padding(16.dp),
+            avatar = "",
+            banner = "",
+            content = {
+                CheersOutlinedButton(onClick = { /*TODO*/ }) {
+                    Text("Follow")
+                }
+            }
+        )
     }
 }

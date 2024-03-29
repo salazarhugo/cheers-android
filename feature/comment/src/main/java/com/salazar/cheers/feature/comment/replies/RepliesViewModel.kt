@@ -3,9 +3,10 @@ package com.salazar.cheers.feature.comment.replies
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.type.UserOuterClass
 import com.salazar.cheers.core.model.Comment
+import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.domain.create_comment.CreateCommentUseCase
+import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.cheers.domain.get_comment.GetCommentUseCase
 import com.salazar.cheers.domain.like_comment.LikeCommentUseCase
 import com.salazar.cheers.domain.list_replies.ListRepliesUseCase
@@ -13,13 +14,14 @@ import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RepliesUiState(
-    val user: UserOuterClass.User? = null,
+    val account: Account? = null,
     val replies: List<Comment>? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
@@ -36,6 +38,7 @@ class RepliesViewModel @Inject constructor(
     private val getCommentUseCase: GetCommentUseCase,
     private val listRepliesUseCase: ListRepliesUseCase,
     private val likeCommentUseCase: LikeCommentUseCase,
+    private val getAccountUseCase: GetAccountUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(RepliesUiState(isLoading = true))
@@ -49,15 +52,15 @@ class RepliesViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>("commentId")?.let {
+        stateHandle.get<String>(COMMENT_ID)?.let {
             commentId = it
         }
 
         viewModelScope.launch {
-//            val user = userRepository.getCurrentUser()
-//            viewModelState.update {
-//                it.copy(user = user)
-//            }
+            val account = getAccountUseCase().first()
+            viewModelState.update {
+                it.copy(account = account)
+            }
         }
 
         viewModelScope.launch {
@@ -128,10 +131,10 @@ class RepliesViewModel @Inject constructor(
 }
 
 sealed class RepliesUIAction {
-    object OnBackPressed : RepliesUIAction()
-    object OnSwipeRefresh : RepliesUIAction()
-    object OnFriendRequestsClick : RepliesUIAction()
-    object OnRemoveReplyComment : RepliesUIAction()
+    data object OnBackPressed : RepliesUIAction()
+    data object OnSwipeRefresh : RepliesUIAction()
+    data object OnFriendRequestsClick : RepliesUIAction()
+    data object OnRemoveReplyComment : RepliesUIAction()
     data class OnReplyClick(val comment: Comment) : RepliesUIAction()
     data class OnCommentLongClick(val commentID: String) : RepliesUIAction()
     data class OnUserClick(val userId: String) : RepliesUIAction()

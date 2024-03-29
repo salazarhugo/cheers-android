@@ -8,6 +8,7 @@ import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.domain.list_post.ListPostUseCase
+import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -133,6 +134,11 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             val result = userRepository.fetchCurrentUser()
+            when(result) {
+                is Resource.Error -> updateError(result.message)
+                is Resource.Loading -> {}
+                is Resource.Success -> {}
+            }
             viewModelState.update { it.copy(isLoading = false) }
         }
     }

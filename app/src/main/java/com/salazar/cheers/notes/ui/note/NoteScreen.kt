@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
 
 @Composable
 fun NoteScreen(
@@ -47,7 +46,7 @@ fun NoteScreen(
                     withStyle(MaterialTheme.typography.labelMedium.toSpanStyle()) {
                         append(
                             "\" shared a note.\" " + com.salazar.cheers.core.util.relativeTimeFormatter(
-                                epoch = note.createTime
+                                seconds = note.createTime
                             )
                         )
                     }

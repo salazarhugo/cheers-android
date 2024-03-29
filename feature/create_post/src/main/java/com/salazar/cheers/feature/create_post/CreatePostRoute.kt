@@ -6,26 +6,27 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.common.util.LocalActivity
 
-/**
- * Stateful composable that displays the Navigation route for the Add post screen.
- *
- * @param viewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun CreatePostRoute(
     navigateBack: () -> Unit,
     navigateToCamera: () -> Unit,
     viewModel: CreatePostViewModel = hiltViewModel(),
 ) {
+    val activity = LocalActivity.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 8),
-            onResult = viewModel::setPhotos,
-        )
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 8),
+        onResult = {
+            viewModel.setMedia(context, it)
+        },
+    )
 
     BackHandler {
         if (uiState.page == CreatePostPage.CreatePost)
@@ -38,19 +39,10 @@ fun CreatePostRoute(
         CreatePostPage.CreatePost ->
             CreatePostScreenStateful(
                 uiState = uiState,
-                onCaptionChanged = viewModel::onCaptionChanged,
-//                onSelectLocation = viewModel::selectLocation,
                 onUploadPost = viewModel::uploadPost,
-                interactWithChooseOnMap = { viewModel.updatePage(CreatePostPage.ChooseOnMap) },
-                interactWithDrunkennessLevel = { viewModel.updatePage(CreatePostPage.DrunkennessLevel) },
                 navigateToTagUser = { viewModel.updatePage(CreatePostPage.AddPeople) },
-                unselectLocation = viewModel::unselectLocation,
-                updateLocationName = viewModel::updateLocation,
-//                updateLocationResults = viewModel::updateLocationResults,
-                onSelectMedia = viewModel::addPhoto,
-                onSelectPrivacy = viewModel::selectPrivacy,
                 onCreatePostUIAction = {
-                    when(it) {
+                    when (it) {
                         CreatePostUIAction.OnBackPressed -> navigateBack()
                         CreatePostUIAction.OnSwipeRefresh -> {}
                         CreatePostUIAction.OnCameraClick -> navigateToCamera()
@@ -60,22 +52,43 @@ fun CreatePostRoute(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
                             )
                         }
+
                         is CreatePostUIAction.OnNotificationChange -> viewModel.toggleNotify(it.enabled)
+                        is CreatePostUIAction.OnSelectPrivacy -> viewModel.selectPrivacy(it.privacy)
+                        is CreatePostUIAction.OnSelectDrink -> viewModel.selectDrink(it.drink)
+                        is CreatePostUIAction.OnAddAudio -> viewModel.addAudio(it.localAudio)
+                        CreatePostUIAction.OnAudioClick -> viewModel.onAudioClick()
+                        CreatePostUIAction.OnLocationClick -> {
+                            viewModel.updatePage(CreatePostPage.ChooseOnMap)
+                        }
+
+                        else -> {}
                     }
                 }
             )
-        CreatePostPage.ChooseOnMap -> {}
-//            ChooseOnMapScreen(
-//                onSelectLocation = {
-//                    addPostViewModel.updateLocationPoint(it)
-//                    addPostViewModel.updatePage(CreatePostPage.CreatePost)
-//                },
-//                onBackPressed = { addPostViewModel.updatePage(CreatePostPage.CreatePost) },
-//            )
+
+        CreatePostPage.ChooseOnMap -> {
+            ChooseOnMapScreen(
+                onSelectLocation = { point, zoom ->
+                    viewModel.updateLocationPoint(point)
+                    viewModel.getLocationName(
+                        point.longitude(),
+                        point.latitude(),
+                        zoom,
+                    )
+                    viewModel.updatePage(CreatePostPage.CreatePost)
+                },
+                onBackPressed = {
+                    viewModel.updatePage(CreatePostPage.CreatePost)
+                },
+            )
+        }
+
         CreatePostPage.ChooseBeverage ->
             BeverageScreen(
                 onBackPressed = { viewModel.updatePage(CreatePostPage.CreatePost) },
             )
+
         CreatePostPage.AddPeople ->
             AddPeopleScreen(
                 onBackPressed = { viewModel.updatePage(CreatePostPage.CreatePost) },
@@ -83,6 +96,7 @@ fun CreatePostRoute(
                 selectedUsers = uiState.selectedTagUsers,
                 onDone = { viewModel.updatePage(CreatePostPage.CreatePost) },
             )
+
         CreatePostPage.DrunkennessLevel ->
             DrunkennessLevelScreen(
                 onBackPressed = { viewModel.updatePage(CreatePostPage.CreatePost) },
@@ -92,3 +106,11 @@ fun CreatePostRoute(
             )
     }
 }
+//                onCaptionChanged = viewModel::onCaptionChanged,
+//                onSelectLocation = viewModel::selectLocation,
+//                interactWithChooseOnMap = { viewModel.updatePage(CreatePostPage.ChooseOnMap) },
+//                interactWithDrunkennessLevel = { viewModel.updatePage(CreatePostPage.DrunkennessLevel) },
+//                unselectLocation = viewModel::unselectLocation,
+//                updateLocationName = viewModel::updateLocation,
+//                updateLocationResults = viewModel::updateLocationResults,
+//                onSelectMedia = viewModel::addPhoto,

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.components.circular_progress.CircularProgressComponent
 
 @Composable
 fun ButtonWithLoading(
@@ -35,12 +36,10 @@ fun ButtonWithLoading(
         enabled = !isLoading && enabled,
     ) {
         if (isLoading) {
-            CircularProgressIndicator(
+            CircularProgressComponent(
                 modifier = Modifier
                     .size(ButtonDefaults.IconSize)
                     .align(Alignment.CenterVertically),
-                color = MaterialTheme.colorScheme.onSurface,
-                strokeWidth = 1.dp
             )
         }
         else {

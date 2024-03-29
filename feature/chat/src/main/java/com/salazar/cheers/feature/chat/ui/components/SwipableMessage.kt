@@ -7,15 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Reply
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,26 +27,23 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 fun SwipeableMessage(
-    dismissState: DismissState,
+    state: SwipeToDismissBoxState,
     content: @Composable RowScope.() -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
-    SwipeToDismiss(
-        state = dismissState,
+    SwipeToDismissBox(
+        state = state,
         modifier = Modifier
             .padding(vertical = Dp(1f)),
-        directions = setOf(DismissDirection.EndToStart),
-//        dismissThresholds = {
-//            FractionalThreshold(0.1f)
-//        },
-        background = {
+        enableDismissFromEndToStart = true,
+        backgroundContent = {
             val alignment = Alignment.CenterEnd
 
             val scale by animateFloatAsState(
-                if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f, label = "",
+                if (state.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f, label = "",
             )
 
-            if (dismissState.targetValue != DismissValue.Default) {
+            if (state.targetValue != SwipeToDismissBoxValue.Settled) {
                 LaunchedEffect(Unit) {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
@@ -66,6 +61,6 @@ fun SwipeableMessage(
                 }
             }
         },
-        dismissContent = content,
+        content = content,
     )
 }

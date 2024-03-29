@@ -1,43 +1,30 @@
 package com.salazar.cheers.feature.chat.ui.screens.messages
 
+import RoomsUIAction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.components.message.MessageComponent
-import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
-import com.salazar.cheers.core.ui.ui.Toolbar
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
-import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.core.util.relativeTimeFormatter
-import com.salazar.cheers.feature.chat.ui.components.SwipeableChatItem
-import com.salazar.cheers.feature.chat.domain.models.ChatChannel
-import com.salazar.cheers.feature.chat.domain.models.RoomStatus
+import com.salazar.cheers.data.chat.models.ChatChannel
 import com.salazar.cheers.feature.chat.ui.chats.EmptyChatsMessage
-import com.salazar.cheers.feature.chat.ui.components.DeliveredChat
-import com.salazar.cheers.feature.chat.ui.components.EmptyChat
-import com.salazar.cheers.feature.chat.ui.components.NewChat
-import com.salazar.cheers.feature.chat.ui.components.OpenedChat
-import com.salazar.cheers.feature.chat.ui.components.ReceivedChat
+import com.salazar.cheers.feature.chat.ui.components.SwipeableChatItem
 
 
 @Composable
@@ -48,13 +35,11 @@ fun MessagesScreen(
 ) {
     Scaffold(
         topBar = {
-            Toolbar(
-                title = "Chat",
-                onBackPressed = { onRoomsUIAction(RoomsUIAction.OnBackPressed) },
-                actions = {
-                    IconButton(onClick = onNewChatClicked) {
-                        Icon(Icons.Default.Add, null)
-                    }
+            MessagesTopBar(
+                websocketState = uiState.websocketState,
+                onNewChatClicked = onNewChatClicked,
+                onBackPressed = {
+                    onRoomsUIAction(RoomsUIAction.OnBackPressed)
                 },
             )
         },
@@ -85,8 +70,9 @@ fun Tabs(
         modifier = Modifier.fillMaxSize(),
     ) {
 
-        if (uiState.isLoading)
-            com.salazar.cheers.core.share.ui.LoadingScreen()
+        if (uiState.isLoading) {
+            LoadingScreen()
+        }
 
         CheersSearchBar(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -122,20 +108,25 @@ fun ConversationList(
     LazyColumn(
         modifier = Modifier.fillMaxHeight()
     ) {
-        items(items = channels, key = { it.id }) { channel ->
-            val dismissState = rememberDismissState(
+        items(
+            items = channels,
+            key = { it.id },
+        ) { channel ->
+            val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = {
-                    if (it == DismissValue.DismissedToStart) {
+                    if (it == SwipeToDismissBoxValue.EndToStart) {
                         onRoomsUIAction(RoomsUIAction.OnPinRoom(channel.id))
-                        return@rememberDismissState false
+                        return@rememberSwipeToDismissBoxState false
                     }
                     true
                 }
             )
 
             SwipeableChatItem(
-                modifier = Modifier.animateItemPlacement(),
-                dismissState = dismissState,
+                modifier = Modifier
+                    .animateItemPlacement()
+                    .clip(RoundedCornerShape(8.dp)),
+                state = dismissState,
             ) {
                 DirectConversation(
                     channel = channel,
@@ -153,112 +144,6 @@ fun LinkContactsItem() {
     }
 }
 
-@Composable
-fun DirectConversation(
-    modifier: Modifier = Modifier,
-    channel: ChatChannel,
-    onRoomsUIAction: (RoomsUIAction) -> Unit,
-) {
-    val backgroundColor = if (channel.pinned)
-        MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
-    else
-        MaterialTheme.colorScheme.background
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .combinedClickable(
-                onClick = { onRoomsUIAction(RoomsUIAction.OnRoomClick(channel.id)) },
-                onLongClick = {
-                    onRoomsUIAction(RoomsUIAction.OnRoomLongPress(channel.id))
-                })
-            .padding(15.dp, 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            UserProfilePicture(
-                picture = channel.picture,
-                size = 50.dp,
-            )
-            Spacer(modifier = Modifier.width(14.dp))
-            Column {
-                val subtitle = buildAnnotatedString {
-                    append("  •  ")
-                    append(relativeTimeFormatter(epoch = channel.lastMessageTime))
-                }
-
-                val fontWeight =
-                    if (channel.status == RoomStatus.NEW) FontWeight.Bold else FontWeight.Normal
-
-                Username(
-                    username = channel.name,
-                    verified = channel.verified
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    with(channel.lastMessageType) {
-                        when (channel.status) {
-                            RoomStatus.NEW -> NewChat(this)
-                            RoomStatus.EMPTY -> EmptyChat()
-                            RoomStatus.OPENED -> OpenedChat()
-                            RoomStatus.SENT -> DeliveredChat(this)
-                            RoomStatus.RECEIVED -> ReceivedChat(this)
-//                            RoomStatus.SENDING -> SendingChat()
-                            RoomStatus.UNRECOGNIZED -> {}
-                        }
-                    }
-                    if (channel.status != RoomStatus.EMPTY)
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = fontWeight,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-                }
-            }
-        }
-        val tint = MaterialTheme.colorScheme.outline
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (channel.status == RoomStatus.NEW) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(BlueCheers)
-                )
-                Spacer(Modifier.width(12.dp))
-            }
-
-            val icon =
-                if (channel.pinned)
-                    Icons.Outlined.PinDrop
-                else if (channel.status == RoomStatus.NEW)
-                    Icons.Outlined.Sms
-                else
-                    Icons.Outlined.PhotoCamera
-
-            IconButton(
-                onClick = { onRoomsUIAction(RoomsUIAction.OnCameraClick(channel.id)) },
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = "Camera Icon",
-                    tint = tint,
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun GroupConversation(

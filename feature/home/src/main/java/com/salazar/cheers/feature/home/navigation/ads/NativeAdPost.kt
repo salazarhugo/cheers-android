@@ -1,94 +1,115 @@
 package com.salazar.cheers.feature.home.navigation.ads
 
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import android.net.Uri
+import android.view.View
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
+import com.salazar.cheers.core.model.Media
+import com.salazar.cheers.core.ui.MediaCarouselComponent
 
 
 @Composable
-fun NativeAdPost(
-    index: Int,
-    ad: NativeAd?,
+fun NativeAdView(
+    modifier: Modifier = Modifier,
+    ad: NativeAd,
 ) {
-    if (index == 0 || index % 4 != 0 || ad == null)
-        return
+    val context = LocalContext.current
+    val bodyViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    val headlineViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    val callToActionViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    val adViewId by remember { mutableIntStateOf(View.generateViewId()) }
 
-    Column {
+    AndroidView(
+        modifier = modifier,
+        factory = {
+            val bodyView = ComposeView(context).apply {
+                id = bodyViewId
+            }
+            val headlineView = ComposeView(context).apply {
+                id = headlineViewId
+            }
+            val callToActionView = ComposeView(context).apply {
+                id = callToActionViewId
+            }
+            NativeAdView(context).apply {
+                id = adViewId
+                addView(bodyView)
+                addView(headlineView)
+                addView(callToActionView)
+            }
+        },
+        update = { view ->
+            val bodyView = view.findViewById<ComposeView>(bodyViewId)
+            val headlineView = view.findViewById<ComposeView>(headlineViewId)
+            val callToActionView = view.findViewById<ComposeView>(callToActionViewId)
+
+            view.setNativeAd(ad)
+
+            view.callToActionView = callToActionView
+            view.headlineView = headlineView
+
+            headlineView.setContent {
+                NativeAdHeader(
+                    icon = ad.icon?.uri,
+                    headline = ad.headline.orEmpty(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp, 11.dp),
+                )
+            }
+            callToActionView.setContent {
+                NativeAdPost(
+                    ad = ad,
+                    onCallToActionClick = {
+                        callToActionView.performClick()
+                    }
+                )
+            }
+        },
+    )
+}
+
+@Composable
+private fun NativeAdPost(
+    modifier: Modifier = Modifier,
+    ad: NativeAd,
+    onCallToActionClick: () -> Unit,
+) {
+    val callToAction = ad.callToAction
+    Column(
+        modifier = modifier,
+    ) {
         Divider()
-        Row(
+        NativeAdHeader(
+            icon = ad.icon?.uri,
+            headline = ad.headline.orEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(14.dp, 11.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (ad.icon != null) {
-                Image(
-                    rememberAsyncImagePainter(model = ad.icon!!.uri),
-                    null,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            val headline = ad.headline
-            if (headline != null)
-                Text(text = headline, style = MaterialTheme.typography.bodyMedium)
-            Spacer(Modifier.width(12.dp))
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.tertiaryContainer,
-            ) {
-                Text(
-                    text = "Ad",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                )
-            }
-        }
-        Divider()
-        val context = LocalContext.current
-        AndroidView(
-            factory = {
-                val adView = NativeAdView(it)
-                adView.setNativeAd(ad)
-                adView.addView(TextView(it).apply {
-                    text = ad.headline
-                })
-
-                ad.images.forEach {
-                    adView.addView(ImageView(context).apply {
-                        scaleType = ImageView.ScaleType.CENTER_CROP
-                        setImageDrawable(it.drawable)
-                    })
-                }
-                adView
-            },
-            modifier = Modifier.clickable {
-            }
         )
-        Spacer(Modifier.height(32.dp))
+        Divider()
+        MediaCarouselComponent(
+            medias = ad.images.map { Media.Image(uri = it.uri ?: Uri.EMPTY) }
+        )
+        if (callToAction != null) {
+            NativeAdButton(
+                text = callToAction,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onCallToActionClick,
+            )
+        }
     }
 }
-

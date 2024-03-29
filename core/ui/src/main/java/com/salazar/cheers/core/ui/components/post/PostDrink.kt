@@ -27,7 +27,7 @@ import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.image.InspectionAwareComponent
 
 @Composable
-internal fun PostDrink(
+fun PostDrink(
     drink: String,
     picture: String,
     modifier: Modifier = Modifier,

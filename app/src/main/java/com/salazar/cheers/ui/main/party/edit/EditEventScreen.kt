@@ -16,6 +16,7 @@ import com.salazar.cheers.core.ui.ShareButton
 import com.salazar.cheers.feature.create_post.LocationSection
 import com.salazar.cheers.feature.parties.ui.PartyDetails
 import androidx.compose.material3.Divider
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.ui.main.party.create.CategorySection
 import com.salazar.cheers.ui.main.party.create.Description
 import com.salazar.cheers.ui.main.party.create.TopAppBar
@@ -29,7 +30,7 @@ fun EditEventScreen(
     val event = uiState.party
 
     if (event == null)
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
     else
         Scaffold(
             topBar = {

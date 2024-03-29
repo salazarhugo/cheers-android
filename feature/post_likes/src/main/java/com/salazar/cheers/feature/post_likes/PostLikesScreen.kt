@@ -18,9 +18,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.model.cheersUserItemList
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem

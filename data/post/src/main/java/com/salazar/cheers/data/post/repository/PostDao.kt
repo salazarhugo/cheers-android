@@ -31,9 +31,9 @@ interface PostDao {
     @Query("SELECT * FROM posts WHERE posts.postId = :postId")
     suspend fun getPost(postId: String): Post?
 
-    @Query("SELECT * FROM posts WHERE privacy = :privacy AND createTime > :yesterday")
+    @Query("SELECT * FROM posts WHERE createTime > :yesterday")
     fun listMapPost(
-        privacy: Privacy, yesterday: Long = (Date().time / 1000) - 24 * 60 * 60
+        yesterday: Long = (Date().time / 1000) - 24 * 60 * 60,
     ): Flow<List<Post>>
 
 //    @Query("SELECT * FROM posts ORDER BY createTime DESC")

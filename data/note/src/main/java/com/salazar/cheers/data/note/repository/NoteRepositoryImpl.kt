@@ -6,12 +6,12 @@ import cheers.note.v1.ListFriendNoteRequest
 import cheers.note.v1.NoteServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.data.note.NoteType
 import com.salazar.cheers.data.note.db.NoteDao
 import com.salazar.cheers.data.note.mapper.toNote
+import com.salazar.cheers.data.note.mapper.toNoteTypePb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -19,12 +19,23 @@ class NoteRepositoryImpl @Inject constructor(
     private val dao: NoteDao,
     private val service: NoteServiceGrpcKt.NoteServiceCoroutineStub,
 ): NoteRepository {
-    override suspend fun createNote(text: String): Result<Note> {
+    override suspend fun createNote(
+        text: String?,
+        type: NoteType,
+        drinkId: String?,
+    ): Result<Note> {
         return try {
-            val request = CreateNoteRequest.newBuilder()
-                .setText(text)
-                .build()
-            val response = service.createNote(request = request)
+            var request = CreateNoteRequest.newBuilder()
+                .setType(type.toNoteTypePb())
+
+            if (text != null) {
+                request.setText(text)
+            }
+            if (drinkId != null) {
+                request.setDrinkId(drinkId)
+            }
+
+            val response = service.createNote(request = request.build())
             val note = response.note.toNote()
             dao.insert(note)
             Result.success(note)
@@ -44,12 +55,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override fun listFriendNotes(): Flow<List<Note>>  {
-//        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-//        return dao.listNotes()
-//            .map {
-//                it.filter { it.userId != uid }
-//            }
-        return emptyFlow()
+        return dao.listNotes()
     }
 
     override suspend fun refreshFriendNotes(): Result<Unit> = withContext(Dispatchers.IO) {
@@ -68,12 +74,13 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteNote(): Result<Unit> {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+    override suspend fun deleteNote(
+        userID: String,
+    ): Result<Unit> {
         return try {
             val request = DeleteNoteRequest.newBuilder().build()
             service.deleteNote(request = request)
-            dao.deleteNote(userID = uid)
+            dao.deleteNote(userID = userID)
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()

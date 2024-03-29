@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.data.user.User
 import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.domain.update_profile.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -60,6 +61,7 @@ private data class EditProfileViewModelState(
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     val userRepository: UserRepository,
+    val updateProfileUseCase: UpdateProfileUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EditProfileViewModelState(isLoading = true))
@@ -135,7 +137,13 @@ class EditProfileViewModel @Inject constructor(
         val user = viewModelState.value.user ?: return
 
         viewModelScope.launch {
-            userRepository.updateUser(user = user)
+            updateProfileUseCase(
+                picture = user.picture,
+                name = user.name,
+                banner = user.banner,
+                website = user.website,
+                bio = user.bio,
+            )
             viewModelState.update {
                 it.copy(done = true, isLoading = false)
             }

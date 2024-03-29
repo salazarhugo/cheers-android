@@ -61,9 +61,10 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.domain.model.UserWithStories
 import com.salazar.cheers.core.model.Privacy
-import com.salazar.cheers.core.ui.carousel
 import com.salazar.cheers.core.ui.components.post.PostHeader
+import com.salazar.cheers.core.ui.modifier.carousel
 import com.salazar.cheers.core.ui.theme.StrongRed
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.PrettyImage
 import com.salazar.cheers.data.db.entities.Story
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
@@ -79,7 +80,7 @@ fun StoryFeedScreen(
     val usersWithStories = uiState.usersWithStories
 
     if (usersWithStories == null)
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
     else
         StoryFeedCarousel(
             initialPage = uiState.page,

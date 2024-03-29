@@ -22,12 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.SheetItem
 
 sealed class StorySheetUIAction {
-    object OnNfcClick : StorySheetUIAction()
-    object OnCopyStoryClick : StorySheetUIAction()
-    object OnSettingsClick : StorySheetUIAction()
-    object OnDeleteClick : StorySheetUIAction()
-    object OnAddSnapchatFriends : StorySheetUIAction()
-    object OnPostHistoryClick : StorySheetUIAction()
+    data object OnNfcClick : StorySheetUIAction()
+    data object OnCopyStoryClick : StorySheetUIAction()
+    data object OnSettingsClick : StorySheetUIAction()
+    data object OnDeleteClick : StorySheetUIAction()
+    data object OnAddSnapchatFriends : StorySheetUIAction()
+    data object OnPostHistoryClick : StorySheetUIAction()
 }
 
 @Composable

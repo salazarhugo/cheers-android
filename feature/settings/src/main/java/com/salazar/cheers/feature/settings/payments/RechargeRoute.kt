@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.util.Utils.getActivity
 import kotlinx.coroutines.delay
 
@@ -26,7 +27,7 @@ fun RechargeRoute(
     }
 
     if (recharges == null)
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
     else
         RechargeScreen(
             onRecharge = {

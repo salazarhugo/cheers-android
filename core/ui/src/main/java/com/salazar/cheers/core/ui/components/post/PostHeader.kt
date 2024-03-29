@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -32,9 +31,9 @@ fun PostHeader(
     username: String,
     verified: Boolean,
     avatar: String,
-    locationName: String,
-    createTime: Long,
     modifier: Modifier = Modifier,
+    createTime: Long = Date().time / 1000,
+    locationName: String? = null,
     darkMode: Boolean = false,
     isPublic: Boolean = false,
     onUserClick: () -> Unit = {},
@@ -70,15 +69,16 @@ fun PostHeader(
                         onClick = onUserClick,
                     )
                 }
-                if (locationName.isNotBlank())
+                if (!locationName.isNullOrBlank()) {
                     Text(text = locationName, style = MaterialTheme.typography.labelSmall)
+                }
             }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = com.salazar.cheers.core.util.relativeTimeFormatter(epoch = createTime),
+                text = com.salazar.cheers.core.util.relativeTimeFormatter(seconds = createTime),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(end = 8.dp),
                 color = color,

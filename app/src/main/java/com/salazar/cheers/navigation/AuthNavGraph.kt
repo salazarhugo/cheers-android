@@ -9,8 +9,7 @@ import com.salazar.cheers.auth.ui.register.RegisterRoute
 import com.salazar.cheers.core.ui.ui.AuthDestinations
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
-import com.salazar.cheers.feature.parties.navigateToParties
-import com.salazar.cheers.feature.signin.navigateToSignIn
+import com.salazar.cheers.feature.home.navigation.home.navigateToHome
 import com.salazar.cheers.feature.signin.signInScreen
 import com.salazar.cheers.feature.signup.navigateToSignUp
 import com.salazar.cheers.feature.signup.signUpScreen
@@ -32,17 +31,16 @@ fun NavGraphBuilder.authNavGraph(
             deepLinks = listOf(navDeepLink { uriPattern = "$uri/register/{emailLink}" }),
         ) {
             RegisterRoute(
-                navActions = navActions,
+                navigateToHome = navController::navigateToHome,
             )
         }
 
         signUpScreen(
-            navigateToSignIn = navController::navigateToSignIn,
-            navigateBack = navController::popBackStack,
+            navigateToHome = navController::navigateToHome,
         )
 
         signInScreen(
-            navigateToHome = navController::navigateToParties,
+            navigateToHome = navController::navigateToHome,
             navigateToSignUp = navController::navigateToSignUp,
             navigateToRegister = navActions.navigateToRegister,
         )

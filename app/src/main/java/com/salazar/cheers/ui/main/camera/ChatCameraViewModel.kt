@@ -6,8 +6,7 @@ import androidx.camera.core.ImageCapture
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.feature.chat.data.repository.ChatRepository
-import com.salazar.cheers.feature.chat.domain.models.ChatChannel
+import com.salazar.cheers.data.chat.models.ChatChannel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +28,7 @@ data class ChatCameraUiState(
 @HiltViewModel
 class ChatCameraViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val chatRepository: ChatRepository,
+    private val chatRepository: com.salazar.cheers.data.chat.repository.ChatRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ChatCameraUiState(isLoading = true))
@@ -60,10 +59,10 @@ class ChatCameraViewModel @Inject constructor(
         val uri = uiState.value.imageUri ?: return
 
         viewModelScope.launch {
-            chatRepository.sendImage(
-                channelId = roomId,
-                images = listOf(uri),
-            )
+//            chatRepository.sendImage(
+//                channelId = roomId,
+//                images = listOf(uri),
+//            )
         }
     }
 

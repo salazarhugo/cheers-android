@@ -36,7 +36,6 @@ class SignInWithEmailAndPasswordUseCase @Inject constructor(
             val authResult = authRepository.signInWithEmailAndPassword(email, password)
                 ?: return@withContext Result.failure(Exception("Error signing in with email and password"))
             val idToken = authResult.user?.getIdToken(false)?.await()
-            dataStoreRepository.updateIdToken(idToken?.token.orEmpty())
             userRepository.getUserSignIn(authResult.user?.uid ?: "")
             Result.success(Unit)
         } catch (e: Exception) {

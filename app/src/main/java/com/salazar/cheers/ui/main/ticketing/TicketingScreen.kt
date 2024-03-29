@@ -33,7 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.PriceTag
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh

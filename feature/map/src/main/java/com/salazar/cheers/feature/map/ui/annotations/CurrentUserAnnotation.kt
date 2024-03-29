@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import com.salazar.cheers.core.ui.modifier.animatedBorder
 import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.feature.map.R
@@ -79,7 +80,14 @@ internal fun CurrentUserAnnotation(
             AvatarComponent(
                 modifier = Modifier
                     .shadow(elevation = 9.dp, shape = CircleShape)
-                    .border(2.dp, color, CircleShape),
+                    .animatedBorder(
+                        initialColor = Color(0xFF45CA6C),
+                        targetColor = Color(0xFF0AB7AE),
+                        shape = CircleShape,
+                        borderWidth = 2.dp,
+                    )
+                    .padding(4.dp)
+                ,
                 avatar = pictureUrl,
                 onClick = onClick,
             )

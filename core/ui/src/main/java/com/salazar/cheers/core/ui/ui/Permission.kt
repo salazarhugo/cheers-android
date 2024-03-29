@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun RequestPermission(
@@ -41,7 +42,8 @@ fun RequestPermission(
 @Composable
 fun Permission(
     permission: String,
-    content: @Composable () -> Unit,
+    onGranted: suspend CoroutineScope.() -> Unit = {},
+    content: @Composable () -> Unit = {},
 ) {
     val permissionState = rememberPermissionState(
         permission
@@ -50,6 +52,7 @@ fun Permission(
     when (permissionState.status) {
         // If the  permission is granted, then show screen with the feature enabled
         PermissionStatus.Granted -> {
+            LaunchedEffect(Unit, onGranted)
             content()
         }
 

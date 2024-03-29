@@ -4,10 +4,9 @@ import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.auth.AuthRepository
-import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.cheers.domain.RegisterPasskeyUseCase
 import com.salazar.cheers.domain.register.RegisterUseCase
+import com.salazar.cheers.domain.usecase.SignInUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +23,7 @@ data class SignUpUiState(
     val email: String = "",
     val username: String = "",
     val sentSignInLinkToEmail: Boolean = false,
-    val withGoogle: Boolean = false,
+    val googleIdToken: String? = null,
     val isSignedIn: Boolean = false,
     val acceptTerms: Boolean = false,
     val page: Int = 0,
@@ -35,6 +34,7 @@ class SignUpViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val registerUseCase: RegisterUseCase,
     private val registerPasskeyUseCase: RegisterPasskeyUseCase,
+    private val signInUseCase: SignInUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignUpUiState(isLoading = false))
@@ -48,17 +48,16 @@ class SignUpViewModel @Inject constructor(
 
     init {
         stateHandle.get<String>("email")?.let {
-            onEmailChange(email = it)
-            updateWithGoogle(withGoogle = true)
+            updateWithGoogle(idToken = it)
         }
         stateHandle.get<String>("displayName")?.let {
 //            onNameChange(name = it)
         }
     }
 
-    private fun updateWithGoogle(withGoogle: Boolean) {
+    private fun updateWithGoogle(idToken: String) {
         viewModelState.update {
-            it.copy(withGoogle = withGoogle)
+            it.copy(googleIdToken = idToken)
         }
     }
 
@@ -113,18 +112,23 @@ class SignUpViewModel @Inject constructor(
     fun onNextClick(activity: Activity) {
         val email = uiState.value.email
         val username = uiState.value.username
-        val withGoogle = uiState.value.withGoogle
+        val idToken = uiState.value.googleIdToken
 
         updateIsLoading(true)
 
-        if (withGoogle) {
+        if (!idToken.isNullOrBlank()) {
             viewModelScope.launch {
                 val result = registerUseCase(username)
                 when(result) {
                     is Resource.Error -> updateErrorMessage(result.message)
                     is Resource.Loading -> {}//
-                    is Resource.Success -> updateIsSignedIn(true)
+                    is Resource.Success -> {
+                        signInUseCase().onSuccess {
+                            updateIsSignedIn(true)
+                        }
+                    }
                 }
+                updateIsLoading(false)
             }
         } else {
             viewModelScope.launch {

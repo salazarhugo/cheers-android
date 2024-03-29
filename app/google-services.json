@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "988221557023-68gsd84f6ebj2k0h3c9gen1a3cqlkmhj.apps.googleusercontent.com",
+          "client_id": "988221557023-dfu5gih6v07bhur00ig9737tk6erqejq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.salazar.cheers",
@@ -22,27 +22,11 @@
           }
         },
         {
-          "client_id": "988221557023-bmpo3ceq7gpfisu0ovfaggahdml7uaea.apps.googleusercontent.com",
+          "client_id": "988221557023-imkpht7c8fule8bug4lnjlbinujofm9e.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.salazar.cheers",
-            "certificate_hash": "38c1701d5e46bbcf40d3335905e01ca52e250c1f"
-          }
-        },
-        {
-          "client_id": "988221557023-mrhup764vh2nb61op5hctr4qhr3vro45.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.salazar.cheers",
-            "certificate_hash": "43d1cee78fd4ddba75478b88504dd7a728b5cb1c"
-          }
-        },
-        {
-          "client_id": "988221557023-tesorgnkjtn6k87fapu859qedstt4jci.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.salazar.cheers",
-            "certificate_hash": "860d3a4a4c342a55e4fcb1d6e6dc3bc3e4c85d92"
+            "certificate_hash": "457503e66b9e68ef2bad8bd96fec90aee2344d18"
           }
         },
         {
@@ -66,6 +50,35 @@
         }
       },
       "admob_app_id": "ca-app-pub-7182026441345500~5053837395"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988221557023:android:174c2cd4bb2f46370a482a",
+        "android_client_info": {
+          "package_name": "com.salazar.cheers.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "988221557023-pm398iukhbqb3i6g6vs6bl6q4887r4nk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0bUAODoUA6ap-4u8N1fvwtDZXH23VXRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "988221557023-pm398iukhbqb3i6g6vs6bl6q4887r4nk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

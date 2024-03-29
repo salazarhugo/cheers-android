@@ -1,5 +1,6 @@
 package com.salazar.cheers.core.ui
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,21 +10,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.StyledPlayerView
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
-@Composable
+@OptIn(UnstableApi::class) @Composable
 fun VideoPlayer(
     uri: String,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     // Create media item
     val mediaItem = MediaItem.fromUri(uri)
@@ -42,26 +47,42 @@ fun VideoPlayer(
 
     DisposableEffect(
         AndroidView(
-            factory = {
-                StyledPlayerView(context).apply {
-                    this.player = player
-                }
-            },
             modifier = modifier
                 .padding(16.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    if (player.volume == 0f) player.volume = 1f else player.volume = 0f
+                    when (player.volume) {
+                        0f -> player.volume = 1f
+                        else -> player.volume = 0f
+                    }
+                },
+            factory = {
+                PlayerView(it).apply {
+                    this.player = player
                 }
-        ) {
-            it.useController = false
-            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-//                it.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
-        }
+            },
+            update = {
+                it.useController = false
+                it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                it.setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+            }
+        )
     ) {
         onDispose {
             player.release()
         }
+    }
+}
+
+
+@ComponentPreviews
+@Composable
+private fun VideoPlayerPreview() {
+    CheersPreview {
+        VideoPlayer(
+            uri = "",
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }
 

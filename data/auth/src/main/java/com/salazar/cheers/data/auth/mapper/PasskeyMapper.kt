@@ -92,7 +92,7 @@ fun BeginRegistrationResponse.toCreatePasskeyRequest(username: String): CreatePa
             authenticatorAttachment = "platform",
             requireResidentKey = false,
             residentKey = "required",
-            userVerification = "required"
+            userVerification = "preferred"
         )
     )
 }

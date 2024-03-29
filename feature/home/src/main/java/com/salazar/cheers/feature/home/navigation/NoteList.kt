@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.data.note.Note
@@ -16,10 +17,17 @@ import com.salazar.cheers.data.note.Note
 fun NoteList(
     picture: String?,
     notes: List<Note>,
-    yourNote: Note?,
     onCreateNoteClick: () -> Unit,
     onNoteClick: (String) -> Unit,
 ) {
+    val viewerNote = remember(notes) {
+        notes.firstOrNull { it.isViewer }
+    }
+
+    val friendNotes = remember(notes) {
+        notes.filterNot { it.isViewer }
+    }
+
     LazyRow(
         state = rememberLazyListState(),
         modifier = Modifier.padding(bottom = 8.dp),
@@ -27,23 +35,24 @@ fun NoteList(
         contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
         item {
-            if (yourNote == null)
+            if (viewerNote == null) {
                 CreateNoteItem(
                     picture = picture,
                     onClick = onCreateNoteClick,
                 )
-            else
+            } else {
                 NoteItem(
-                    note = yourNote.copy(name = "Your note"),
+                    note = viewerNote.copy(name = "Me"),
                     onClick = onNoteClick,
                 )
+            }
         }
         items(
-            items = notes,
+            items = friendNotes,
         ) { note ->
             NoteItem(
-                modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
                 note = note,
+                modifier = Modifier.animateItemPlacement(animationSpec = tween(durationMillis = 500)),
                 onClick = onNoteClick,
             )
         }

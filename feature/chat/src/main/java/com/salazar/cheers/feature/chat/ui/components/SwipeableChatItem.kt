@@ -7,11 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.Card
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,41 +27,42 @@ import com.salazar.cheers.core.ui.theme.GreenGoogle
 @Composable
 fun SwipeableChatItem(
     modifier: Modifier = Modifier,
-    dismissState: DismissState,
-    content: @Composable () -> Unit,
+    state: SwipeToDismissBoxState,
+    content: @Composable RowScope.() -> Unit,
 ) {
-    SwipeToDismiss(
-        state = dismissState,
+    SwipeToDismissBox(
+        state = state,
         modifier = modifier
             .padding(vertical = Dp(1f)),
-        directions = setOf(DismissDirection.EndToStart, DismissDirection.StartToEnd),
-//        dismissThresholds = {
-//            FractionalThreshold(0.2f)
-//        },
-        background = {
-            val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+        enableDismissFromEndToStart = true,
+        enableDismissFromStartToEnd = true,
+        backgroundContent = {
+            val direction = state.dismissDirection
 
             val color = when (direction) {
-                DismissDirection.StartToEnd -> GreenGoogle
-                DismissDirection.EndToStart -> androidx.compose.material3.MaterialTheme.colorScheme.primary
+                SwipeToDismissBoxValue.StartToEnd -> GreenGoogle
+                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primary
+                else -> { GreenGoogle }
             }
 
             val alignment = when (direction) {
-                DismissDirection.StartToEnd -> Alignment.CenterStart
-                DismissDirection.EndToStart -> Alignment.CenterEnd
+                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                else -> {Alignment.CenterEnd }
             }
 
             val icon = when (direction) {
-                DismissDirection.StartToEnd -> Icons.Outlined.Archive
-                DismissDirection.EndToStart -> Icons.Outlined.PushPin
+                SwipeToDismissBoxValue.StartToEnd -> Icons.Outlined.Archive
+                SwipeToDismissBoxValue.EndToStart -> Icons.Outlined.PushPin
+                else -> { Icons.Outlined.Archive }
             }
 
             val scale by animateFloatAsState(
-                if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f, label = ""
+                if (state.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f, label = ""
             )
 
             val haptic = LocalHapticFeedback.current
-            if (dismissState.targetValue != DismissValue.Default)
+            if (state.targetValue != SwipeToDismissBoxValue.Settled)
                 LaunchedEffect(Unit) {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
@@ -71,7 +72,7 @@ fun SwipeableChatItem(
                     .fillMaxSize()
                     .background(color)
                     .padding(horizontal = Dp(20f)),
-                contentAlignment = alignment
+                contentAlignment = alignment,
             ) {
                 Icon(
                     imageVector = icon,
@@ -80,18 +81,6 @@ fun SwipeableChatItem(
                 )
             }
         },
-        dismissContent = {
-            Card(
-//                elevation = animateDpAsState(
-//                    if (dismissState.dismissDirection != null) 4.dp else 0.dp
-//                ).value,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(alignment = Alignment.CenterVertically),
-                content = {
-                    content()
-                },
-            )
-        },
+        content = content,
     )
 }

@@ -1,4 +1,4 @@
-package com.salazar.cheers.core.share.ui
+package com.salazar.cheers.core.ui.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

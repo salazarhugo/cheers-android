@@ -8,7 +8,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.*
-import com.salazar.cheers.feature.chat.data.repository.ChatRepository
+import com.salazar.cheers.data.chat.repository.ChatRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream
 class UploadImageMessage @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val chatRepository: ChatRepository,
+    private val chatRepository: com.salazar.cheers.data.chat.repository.ChatRepository,
 ) : CoroutineWorker(appContext, params), CoroutineScope {
 
     override suspend fun doWork(): Result {

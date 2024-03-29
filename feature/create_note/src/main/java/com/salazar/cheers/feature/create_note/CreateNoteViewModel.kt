@@ -2,7 +2,9 @@ package com.salazar.cheers.feature.create_note
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.data.note.NoteType
 import com.salazar.cheers.data.note.repository.NoteRepository
+import com.salazar.cheers.domain.create_note.CreateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +21,7 @@ data class CreateNoteUiState(
 
 @HiltViewModel
 class CreateNoteViewModel @Inject constructor(
-    private val noteRepository: NoteRepository,
+    private val createNoteUseCase: CreateNoteUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CreateNoteUiState(isLoading = false))
@@ -38,7 +40,10 @@ class CreateNoteViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateIsLoading(true)
-            noteRepository.createNote(text = text).onSuccess {
+            createNoteUseCase(
+                text = text,
+                type = NoteType.NOTHING,
+            ).onSuccess {
                 onComplete()
             }
             updateIsLoading(false)

@@ -23,7 +23,6 @@ dependencies {
     implementation(libs.material)
 
     // Jetpack Compose
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit)

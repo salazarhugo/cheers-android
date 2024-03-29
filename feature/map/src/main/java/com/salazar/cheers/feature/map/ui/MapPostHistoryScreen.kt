@@ -1,4 +1,4 @@
-package com.salazar.cheers.map.ui
+package com.salazar.cheers.feature.map.ui
 
 import android.Manifest
 import androidx.compose.foundation.layout.Box

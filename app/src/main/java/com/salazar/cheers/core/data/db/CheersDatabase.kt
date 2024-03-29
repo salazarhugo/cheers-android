@@ -9,6 +9,7 @@ import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Ticket
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.activity.Activity
+import com.salazar.cheers.data.chat.db.ChatDao
 import com.salazar.cheers.data.db.*
 import com.salazar.cheers.data.db.entities.*
 import com.salazar.cheers.data.drink.db.DrinkDao
@@ -28,9 +29,8 @@ import com.salazar.cheers.data.user.UserPreference
 import com.salazar.cheers.data.user.UserStats
 import com.salazar.cheers.data.user.UserStatsDao
 import com.salazar.cheers.data.user.UserSuggestion
-import com.salazar.cheers.feature.chat.data.db.ChatDao
-import com.salazar.cheers.feature.chat.domain.models.ChatChannel
-import com.salazar.cheers.feature.chat.domain.models.ChatMessage
+import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.data.chat.models.ChatMessage
 
 
 @TypeConverters(Converters::class)
@@ -57,7 +57,7 @@ import com.salazar.cheers.feature.chat.domain.models.ChatMessage
         Note::class,
         Drink::class,
     ],
-    version = 34,
+    version = 37,
     exportSchema = false,
     autoMigrations = []
 )

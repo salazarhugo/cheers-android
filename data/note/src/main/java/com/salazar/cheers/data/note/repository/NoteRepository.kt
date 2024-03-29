@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.note.repository
 
 import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.data.note.NoteType
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,7 +12,11 @@ interface NoteRepository {
     /**
      * Create a new note
      */
-    suspend fun createNote(text: String): Result<Note>
+    suspend fun createNote(
+        text: String?,
+        type: NoteType,
+        drinkId: String?,
+    ): Result<Note>
 
     /**
      * Get the note of a specific user
@@ -36,5 +41,5 @@ interface NoteRepository {
     /**
      * Delete a note
      */
-    suspend fun deleteNote(): Result<Unit>
+    suspend fun deleteNote(userID: String): Result<Unit>
 }

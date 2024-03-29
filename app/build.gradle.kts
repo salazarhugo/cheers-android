@@ -16,8 +16,8 @@ android {
         applicationId = "com.salazar.cheers"
         minSdk = 28
         targetSdk = 34
-        versionCode = 67
-        versionName = "1.0.0-067"
+        versionCode = 72
+        versionName = "1.0.0-072"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -29,6 +29,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        getByName("debug") {
+            isDebuggable = true
+            isMinifyEnabled = false
+            versionNameSuffix = "_dev_debug"
+            applicationIdSuffix = ".dev"
         }
     }
 
@@ -81,6 +88,10 @@ dependencies {
     implementation(project(":data:ticket"))
     implementation(project(":data:comment"))
     implementation(project(":data:drink"))
+    implementation(project(":data:remote_config"))
+    implementation(project(":data:search"))
+    implementation(project(":data:map"))
+    implementation(project(":data:chat"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -114,13 +125,12 @@ dependencies {
     implementation(libs.compose.state.events)
 
     // Compose BOM
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation(libs.androidx.compose.bom)
 
     // Jetpack Compose BOM
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.runtime:runtime-livedata")
@@ -258,7 +268,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 }
 
 apply(plugin = "com.google.gms.google-services")

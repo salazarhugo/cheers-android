@@ -224,22 +224,41 @@ class UserRepository @Inject constructor(
         userDao.update(user)
     }
 
-    suspend fun updateUser(user: User) = withContext(Dispatchers.IO) {
-        try {
-            userDao.update(user)
+    suspend fun updateUserProfile(
+        user: User,
+    ): Result<User> {
+        return updateUserProfile(
+            picture = user.picture,
+            banner = user.banner,
+            bio = user.bio,
+            name = user.name,
+            website = user.website,
+        )
+    }
 
+    suspend fun updateUserProfile(
+        picture: String? = null,
+        banner: String? = null,
+        bio: String? = null,
+        name: String? = null,
+        website: String? = null,
+    ): Result<User> {
+        return try {
             val request = UpdateUserRequest.newBuilder()
-                .setPicture(user.picture)
-                .setBanner(user.banner)
-                .setBio(user.bio)
-                .setName(user.name)
-                .setWebsite(user.website)
+                .setPicture(picture)
+                .setBanner(banner)
+                .setBio(bio)
+                .setName(name)
+                .setWebsite(website)
                 .build()
 
             val response = userService.updateUser(request)
-            userDao.insert(response.toUser())
+            val user = response.toUser()
+            userDao.insert(user)
+            Result.success(user)
         } catch (e: Exception) {
             e.printStackTrace()
+            Result.failure(e)
         }
     }
 
@@ -405,9 +424,9 @@ class UserRepository @Inject constructor(
         return userDao.getUserFlow(userIdOrUsername = userIdOrUsername)
     }
 
-    suspend fun fetchCurrentUser() = withContext(Dispatchers.IO) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@withContext
-        fetchUser(uid)
+    suspend fun fetchCurrentUser(): Resource<Unit> = withContext(Dispatchers.IO) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@withContext Resource.Error("failed to retrieve uid")
+        return@withContext fetchUser(uid)
     }
 
     suspend fun fetchUser(
@@ -418,11 +437,10 @@ class UserRepository @Inject constructor(
             .build()
 
         return try {
-            val remoteUser = userService.getUser(request).toUser()
-            userDao.insert(remoteUser)
+            val remoteUser = userService.getUser(request)
+            userDao.insert(remoteUser.toUser())
             Resource.Success(Unit)
         } catch (e: Exception) {
-            println("HUGO ${e.localizedMessage}")
             e.printStackTrace()
             Resource.Error("Oups, something went wrong. Please try again later.")
         }

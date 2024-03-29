@@ -4,6 +4,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.data.user.datastore.StoreUserEmail
+import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 class SignInWithEmailLinkUseCase @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
-    private val dataStoreRepository: DataStoreRepository,
+    private val updateIdTokenUseCase: UpdateIdTokenUseCase,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(
@@ -32,7 +33,7 @@ class SignInWithEmailLinkUseCase @Inject constructor(
         try {
             val result = auth.signInWithEmailLink(email, emailLink).await()
             val idToken = result.user?.getIdToken(false)?.await()
-            dataStoreRepository.updateIdToken(idToken?.token.orEmpty())
+            updateIdTokenUseCase(idToken?.token.orEmpty())
             return@withContext Resource.Success(null)
         } catch (e: java.lang.Exception) {
             return@withContext Resource.Error("Error signing in with email link")

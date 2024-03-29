@@ -24,6 +24,7 @@ import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.core.ui.AddFriendButton
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 
 @Composable
 fun FriendRequestsScreen(
@@ -39,7 +40,7 @@ fun FriendRequestsScreen(
         }
     ) {
         if (uiState.isLoading)
-            com.salazar.cheers.core.share.ui.LoadingScreen()
+            LoadingScreen()
         else
             SwipeToRefresh(
                 state = rememberSwipeToRefreshState(uiState.isRefreshing),

@@ -13,6 +13,18 @@ import kotlinx.serialization.json.Json
 import java.util.Date
 
 class Converters {
+
+    @TypeConverter
+    fun fromStringForIntArray(value: String): List<Int> {
+        if (value.isBlank())
+            return emptyList()
+        return value.split(",").map { it.toInt() }
+    }
+
+    @TypeConverter
+    fun fromIntList(list: List<Int>): String {
+        return list.joinToString(",")
+    }
     @TypeConverter
     fun fromString(value: String): Map<String, String> {
         val mapType = object : TypeToken<Map<String, String>>() {}.type

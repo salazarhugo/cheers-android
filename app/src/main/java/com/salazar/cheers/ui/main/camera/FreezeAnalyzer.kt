@@ -8,7 +8,9 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.MutableLiveData
 import java.io.ByteArrayOutputStream
 
-class FreezeAnalyzer constructor(private var img: MutableLiveData<Bitmap>) :
+class FreezeAnalyzer constructor(
+    private var img: MutableLiveData<Bitmap>,
+) :
     ImageAnalysis.Analyzer {
     private var flag = false
 

@@ -30,11 +30,13 @@ dependencies {
     // Jetpack Compose
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.runtime:runtime-livedata")
+
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 
     // Paging
     implementation(libs.androidx.paging.runtime.ktx)
@@ -51,4 +53,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 }

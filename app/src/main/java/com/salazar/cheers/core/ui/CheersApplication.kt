@@ -30,7 +30,6 @@ class CheersApplication : Application(), Configuration.Provider {
         initFirebase()
         initMapBox()
         createNotificationChannel()
-        initializeAds(this)
     }
 
     private fun initMapBox() {

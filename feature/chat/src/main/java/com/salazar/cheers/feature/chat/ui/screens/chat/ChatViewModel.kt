@@ -8,46 +8,44 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.type.UserOuterClass.UserItem
-import com.salazar.cheers.feature.chat.domain.usecase.seen_room.SeenRoomUseCase
-import com.salazar.cheers.feature.chat.domain.usecase.send_message.SendMessageUseCase
-import com.salazar.cheers.feature.chat.data.repository.ChatRepository
-import com.salazar.cheers.feature.chat.domain.models.ChatChannel
-import com.salazar.cheers.feature.chat.domain.models.ChatMessage
+import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.feature.chat.data.GetChatChannelUseCase
+import com.salazar.cheers.domain.seen_room.SeenRoomUseCase
+import com.salazar.cheers.domain.send_message.SendMessageUseCase
+import com.salazar.cheers.data.chat.repository.ChatRepository
+import com.salazar.cheers.data.chat.websocket.ChatEvent
+import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
+import com.salazar.cheers.domain.get_chat.GetChatFlowUseCase
 import com.salazar.common.util.Resource
+import com.salazar.common.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-
-data class ChatUiState(
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val channel: ChatChannel? = null,
-    val messages: List<ChatMessage> = emptyList(),
-    val textState: TextFieldValue = TextFieldValue(),
-    val replyMessage: ChatMessage? = null,
-    val isRecording: Boolean = false,
-)
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     statsHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
+    private val webSocketManager: ChatWebSocketManager,
     private val chatRepository: ChatRepository,
-//    private val userRepository: UserRepository,
     private val seenRoomUseCase: SeenRoomUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
+    private val getChatChannelUseCase: GetChatChannelUseCase,
+    private val getChatFlowUseCase: GetChatFlowUseCase,
 ) : ViewModel() {
 
     lateinit var userID: String
     var hasChannel = true
     private var typingJob: Job? = null
+    lateinit var chatID: String
 
     private val viewModelState = MutableStateFlow(ChatUiState(isLoading = false))
 
@@ -61,31 +59,30 @@ class ChatViewModel @Inject constructor(
     init {
         val channelID = statsHandle.get<String>(CHANNEL_ID)
 
-        if (channelID != null)
+        if (channelID != null) {
+            chatID = channelID
             loadChannel(channelID)
-        else {
-            val userId = statsHandle.get<String>(USER_ID)!!
-            runBlocking {
+        } else {
+            viewModelScope.launch {
+                val userId = statsHandle.get<String>(USER_ID)!!
                 userID = userId
-                val channel = chatRepository.getChatWithUser(userId)
-                updateChatChannel(channel)
-                if (channel.id != "temp")
-                    loadChannel(channel.id)
-                else
-                    hasChannel = false
+                getChatChannelUseCase(userID).collect(::updateChatChannel)
             }
         }
     }
 
     private fun loadChannel(channelID: String) {
         viewModelScope.launch {
-            chatRepository.getChannel(channelId = channelID).collect { channel ->
+            getChatFlowUseCase(chatID = channelID).collect { channel ->
                 updateChatChannel(channel)
                 seenRoomUseCase(roomId = channelID)
             }
         }
+    }
+
+    private fun listenChatMessages(channelID: String) {
         viewModelScope.launch {
-            chatRepository.getMessages(channelId = channelID).collect { messages ->
+            chatRepository.listMessages(channelId = channelID).collect { messages ->
                 viewModelState.update {
                     it.copy(messages = messages, isLoading = false)
                 }
@@ -97,14 +94,15 @@ class ChatViewModel @Inject constructor(
         val channel = uiState.value.channel
         if (channel != null)
             viewModelScope.launch {
-                chatRepository.sendImage(channel.id, images)
+//                chatRepository.sendImage(channel.id, images)
             }
     }
 
     suspend fun createGroupChat(): Resource<String> {
 //        val user = userRepository.getUserFlow(userID).first()
         val user = UserItem.newBuilder()
-        return chatRepository.createGroupChat(user.username, listOf(userID))
+        return Resource.Error("")
+//        return chatRepository.getOrCreateGroupChat(user.username, listOf(userID))
     }
 
     fun sendTextMessage(text: String) {
@@ -131,7 +129,7 @@ class ChatViewModel @Inject constructor(
 
             val result = sendMessageUseCase(roomId = channelId, text = text)
             when (result) {
-                is Resource.Error -> updateErrorMessage(result.message)
+                is Result.Error -> updateErrorMessage(result.error.name)
                 else -> {}
             }
         }
@@ -147,6 +145,8 @@ class ChatViewModel @Inject constructor(
         viewModelState.update {
             it.copy(channel = chatChannel)
         }
+        chatID = chatChannel.id
+        listenChatMessages(chatChannel.id)
     }
 
     fun unsendMessage(messageId: String) {
@@ -154,21 +154,27 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onTextChanged(textState: TextFieldValue) {
+        val previousText = viewModelState.value.textState.text
         viewModelState.update {
             it.copy(textState = textState)
         }
+        val isTyping = textState.text.length > previousText.length
 
-        val channel = uiState.value.channel
-        if (typingJob?.isCompleted == false) {
-            typingJob = viewModelScope.launch {
-                delay(2000L)
-            }
+        if (isTyping.not())
             return
-        }
 
-        typingJob = viewModelScope.launch {
-            // TODO Start Typing
-            delay(2000L)
+        if (typingJob?.isActive == true) {
+            typingJob?.cancel()
+            typingJob = viewModelScope.launch {
+                delay(1000)
+                webSocketManager.sendChatEvent(chatID, ChatEvent.EndTyping)
+            }
+        } else {
+            typingJob = viewModelScope.launch {
+                webSocketManager.sendChatEvent(chatID, ChatEvent.StartTyping)
+                delay(1000)
+                webSocketManager.sendChatEvent(chatID, ChatEvent.EndTyping)
+            }
         }
     }
 
@@ -178,6 +184,34 @@ class ChatViewModel @Inject constructor(
 
     fun unlikeMessage(messageId: String) {
         //TODO Unlike Message
+    }
+
+    fun sendReadReceipt() {
+        if (!::chatID.isInitialized) {
+            return
+        }
+        viewModelScope.launch {
+            chatRepository.sendReadReceipt(chatID)
+        }
+    }
+
+
+    fun startPresence() {
+        if (!::chatID.isInitialized) {
+            return
+        }
+        GlobalScope.launch {
+            webSocketManager.sendChatEvent(chatID, ChatEvent.StartPresence)
+        }
+    }
+
+    fun endPresence() {
+        if (!::chatID.isInitialized) {
+            return
+        }
+        GlobalScope.launch {
+            webSocketManager.sendChatEvent(chatID, ChatEvent.EndPresence)
+        }
     }
 
     fun onReplyMessage(message: ChatMessage?) {
@@ -235,19 +269,4 @@ class ChatViewModel @Inject constructor(
         updateIsRecording(false)
 //        readRecordings()
     }
-}
-
-sealed class ChatUIAction {
-    object OnBackPressed : ChatUIAction()
-    object OnSwipeRefresh : ChatUIAction()
-    object OnImageSelectorClick : ChatUIAction()
-    data class OnTextInputChange(val text: TextFieldValue) : ChatUIAction()
-    data class OnCopyText(val text: String) : ChatUIAction()
-    data class OnRoomInfoClick(val roomId: String) : ChatUIAction()
-    data class OnUserClick(val userId: String) : ChatUIAction()
-    data class OnLikeClick(val messageId: String) : ChatUIAction()
-    data class OnUnLikeClick(val messageId: String) : ChatUIAction()
-    data class OnReplyMessage(val message: ChatMessage?) : ChatUIAction()
-    data class OnUnSendMessage(val messageId: String) : ChatUIAction()
-    data class OnSendTextMessage(val text: String) : ChatUIAction()
 }

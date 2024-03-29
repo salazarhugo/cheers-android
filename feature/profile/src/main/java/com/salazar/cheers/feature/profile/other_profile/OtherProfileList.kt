@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.profile.other_profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,14 +17,14 @@ import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.components.post.PostComponent
@@ -117,10 +117,9 @@ fun LazyListScope.avatar(
 ) {
     item {
         ProfileBannerAndAvatar(
-            username = username,
-            verified = verified,
+            modifier = Modifier.padding(16.dp),
             banner = banner,
-            picture = avatar,
+            avatar = avatar,
             content = {
                 IconButton(onClick = {}) {
                     Icon(Icons.Default.MoreHoriz, contentDescription = null)
@@ -136,19 +135,22 @@ fun LazyListScope.separator(
 ) {
     stickyHeader {
         val scope = rememberCoroutineScope()
-        TabRow(
+
+        PrimaryTabRow(
             selectedTabIndex = pagerState.currentPage,
-            indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                )
-            },
             contentColor = MaterialTheme.colorScheme.onBackground,
         ) {
             tabs.forEachIndexed { index, icon ->
+                val selected = pagerState.currentPage == index
                 Tab(
-                    icon = { Icon(icon, contentDescription = null) },
-                    selected = pagerState.currentPage == index,
+                    icon = {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (selected) MaterialTheme.colorScheme.onBackground else Color.LightGray
+                        )
+                    },
+                    selected = selected,
                     onClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(index)

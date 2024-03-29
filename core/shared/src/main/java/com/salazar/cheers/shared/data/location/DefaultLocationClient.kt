@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import javax.inject.Singleton
 
+@Singleton
 class DefaultLocationClient(
     private val context: Context,
     private val client: FusedLocationProviderClient,
@@ -38,7 +40,9 @@ class DefaultLocationClient(
         return callbackFlow {
 
             if (checkPermissions()) {
-                throw LocationClient.LocationException("Missing location permissions")
+//                throw LocationClient.LocationException("Missing location permissions")
+                channel.close()
+                return@callbackFlow
             }
 
             val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -46,7 +50,9 @@ class DefaultLocationClient(
             val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
             if (!isGpsEnabled && !isNetworkEnabled) {
-                throw LocationClient.LocationException("GPS is disabled")
+//                throw LocationClient.LocationException("GPS is disabled")
+                channel.close()
+                return@callbackFlow
             }
 
             val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, interval)
@@ -56,9 +62,7 @@ class DefaultLocationClient(
                 override fun onLocationResult(result: LocationResult) {
                     super.onLocationResult(result)
                     result.locations.lastOrNull()?.let { location ->
-                        launch {
-                            send(location)
-                        }
+                        trySend(location)
                     }
                 }
             }
@@ -71,6 +75,7 @@ class DefaultLocationClient(
 
             awaitClose {
                 client.removeLocationUpdates(locationCallback)
+                channel.close()
             }
         }
     }

@@ -3,6 +3,7 @@ syntax = "proto3";
 package cheers.note.v1;
 
 import "google/api/annotations.proto";
+import "cheers/drink/v1/drink_service.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/note/v1;note";
@@ -42,10 +43,20 @@ message Note {
   string username = 4;
   string picture = 5;
   int64 created = 6;
+  NoteType type =  7;
+  cheers.drink.v1.Drink drink = 8;
+}
+
+enum NoteType {
+  NOTHING = 0;
+  DRINKING = 1;
+  SEARCHING = 2;
 }
 
 message CreateNoteRequest {
   string text = 1;
+  NoteType type = 2;
+  string drink_id = 3;
 }
 
 message CreateNoteResponse {

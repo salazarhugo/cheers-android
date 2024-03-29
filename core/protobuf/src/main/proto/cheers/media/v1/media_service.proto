@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package cheers.media.v1;
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/media/v1;media";
+
+service MediaService {
+  rpc UploadMedia (UploadMediaRequest) returns (UploadMediaResponse) {
+    option (google.api.http) = {
+      post: "/v1/media"
+      body: "*"
+    };
+  }
+}
+
+message UploadMediaRequest {
+  bytes chunk = 1;
+  int64 upload_id = 2;
+  string media_type = 3;
+  int64 upload_media_width = 4;
+  int64 upload_media_height = 5;
+}
+
+message UploadMediaResponse {
+  string media_id = 1;
+}

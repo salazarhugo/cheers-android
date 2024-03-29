@@ -28,7 +28,6 @@ dependencies {
     implementation(libs.composed.barcodes)
 
     // Jetpack Compose
-    implementation(libs.androidx.compose.material)
     implementation("androidx.compose.runtime:runtime-livedata")
 
     testImplementation(libs.junit)

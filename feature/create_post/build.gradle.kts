@@ -22,7 +22,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(libs.androidx.compose.material)
 
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)
@@ -31,7 +30,6 @@ dependencies {
     implementation(libs.mapbox)
     implementation(libs.mapbox.sdk.services)
 //    implementation(libs.mapbox.search.android)
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

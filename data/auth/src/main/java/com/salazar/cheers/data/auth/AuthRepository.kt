@@ -1,22 +1,19 @@
 package com.salazar.cheers.data.auth
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
-import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import androidx.credentials.GetPasswordOption
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
-import androidx.credentials.exceptions.CreateCredentialException
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
@@ -24,22 +21,21 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.salazar.cheers.data.auth.mapper.toCreatePasskeyRequest
 import com.salazar.cheers.data.auth.mapper.toGetPasskeyRequest
 import com.salazar.cheers.data.auth.mapper.toPasskey
 import com.salazar.cheers.data.auth.model.CreatePasskeyRequest
 import com.salazar.cheers.data.auth.model.CreatePasskeyResponseData
-import com.salazar.cheers.data.auth.model.GetPasskeyRequest
 import com.salazar.cheers.data.auth.model.GetPasskeyResponseData
-import com.salazar.cheers.shared.data.request.FinishRegistrationRequest
 import com.salazar.cheers.shared.data.BffApiService
 import com.salazar.cheers.shared.data.request.FinishLoginPasskey
 import com.salazar.cheers.shared.data.request.FinishLoginRequest
+import com.salazar.cheers.shared.data.request.FinishRegistrationRequest
 import com.salazar.cheers.shared.data.request.LoginRequest
 import com.salazar.cheers.shared.data.request.Passkey
 import com.salazar.cheers.shared.data.response.BeginLoginResponse
@@ -47,15 +43,11 @@ import com.salazar.cheers.shared.data.response.BeginRegistrationResponse
 import com.salazar.cheers.shared.data.response.FinishLoginResponse
 import com.salazar.cheers.shared.data.response.LoginResponse
 import com.salazar.common.util.Resource
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
+import com.salazar.common.util.result.DataError
+import com.salazar.common.util.result.RootError
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import retrofit2.HttpException
-import java.nio.charset.StandardCharsets
-import java.security.SecureRandom
-import java.util.Base64
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -67,6 +59,21 @@ class AuthRepository @Inject constructor(
     private val credentialManager: CredentialManager,
     private val gson: Gson,
 ) {
+    fun getIdToken(): com.salazar.common.util.result.Result<String, RootError> {
+        val user = auth.currentUser
+            ?: return com.salazar.common.util.result.Result.Error(DataError.Network.UNKNOWN)
+
+        return try {
+            val task: Task<GetTokenResult> = user.getIdToken(false)
+            val tokenResult = Tasks.await(task)
+            val idToken = tokenResult.token!!
+            com.salazar.common.util.result.Result.Success(idToken)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            com.salazar.common.util.result.Result.Error(DataError.Network.UNKNOWN)
+        }
+    }
+
     fun isConnected(): Boolean {
         return FirebaseAuth.getInstance().currentUser?.uid != null
     }
@@ -131,12 +138,13 @@ class AuthRepository @Inject constructor(
         } catch (e: HttpException) {
             e.printStackTrace()
             if (e.code() == 404) {
-                return Result.failure(NotRegisteredException(""))
+                return Result.failure(NotRegisteredException(idToken))
             }
             Result.failure(e)
         }
     }
-    class NotRegisteredException(message: String) : Exception(message)
+
+    class NotRegisteredException(idToken: String) : Exception(idToken)
 
     suspend fun signInWithOneTap(
         idToken: String?,
@@ -198,7 +206,7 @@ class AuthRepository @Inject constructor(
 
     fun updatePassword(
         password: String,
-    )  = flow<Resource<Unit>> {
+    ) = flow<Resource<Unit>> {
         emit(Resource.Loading(true))
         try {
             Firebase.auth.currentUser!!.updatePassword(password).await()
@@ -217,8 +225,11 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun beginLogin(
-        username: String,
-    ): Result<BeginLoginResponse> {
+        username: String?,
+    ): Result<BeginLoginResponse?> {
+        if (username == null)
+            return Result.success(null)
+
         return try {
             val response = bffApiService.beginLogin(
                 username = username
@@ -261,26 +272,24 @@ class AuthRepository @Inject constructor(
                 username = username
             )
             Result.success(response)
-        }
-        catch (e: HttpException) {
+        } catch (e: HttpException) {
             e.printStackTrace()
             if (e.code() == 409)
                 return Result.failure(Exception("Username already taken."))
             Result.failure(e)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             if (e is CancellationException) throw e
             e.printStackTrace()
             Result.failure(e)
         }
     }
 
-     suspend fun finishRegistration(
-         challenge: String,
-         userId: String,
-         username: String,
-         passkey: Passkey,
-     ): Result<Unit> {
+    suspend fun finishRegistration(
+        challenge: String,
+        userId: String,
+        username: String,
+        passkey: Passkey,
+    ): Result<Unit> {
         return try {
             val response = bffApiService.finishRegistration(
                 FinishRegistrationRequest(
@@ -301,33 +310,34 @@ class AuthRepository @Inject constructor(
 
     suspend fun showSigninOptions(
         activityContext: Context,
-        beginLoginResponse: BeginLoginResponse,
+        beginLoginResponse: BeginLoginResponse?,
     ): Result<GetCredentialResponse> {
         val credentialManager = CredentialManager.create(activityContext)
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            // Only show accounts previously used to sign in.
-            .setFilterByAuthorizedAccounts(true)
+            // When 'true' -> Only show accounts previously used to sign in.
+            .setFilterByAuthorizedAccounts(false)
             .setServerClientId(activityContext.getString(R.string.default_web_client_id))
             .build()
 
-        // Get passkey from the user's public key credential provider.
-        val getPublicKeyCredentialOption = GetPublicKeyCredentialOption(
-            requestJson = gson.toJson(beginLoginResponse.toGetPasskeyRequest())
-        )
-
-        val request = GetCredentialRequest.Builder()
+        var request = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
-            .addCredentialOption(getPublicKeyCredentialOption)
-            .build()
+
+        if (beginLoginResponse != null) {
+            // Get passkey from the user's public key credential provider.
+            val getPublicKeyCredentialOption = GetPublicKeyCredentialOption(
+                requestJson = gson.toJson(beginLoginResponse.toGetPasskeyRequest())
+            )
+            request = request.addCredentialOption(getPublicKeyCredentialOption)
+        }
 
         return try {
             val result = credentialManager.getCredential(
                 context = activityContext,
-                request = request,
+                request = request.build(),
             )
             Result.success(result)
-        } catch (e : GetCredentialException) {
+        } catch (e: GetCredentialException) {
             e.printStackTrace()
             Result.failure(e)
         }

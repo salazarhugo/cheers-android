@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -74,8 +75,8 @@ fun PullToRefreshComponent(
     footerPaddingBottom: Dp = Dp.Unspecified,
     content: @Composable BoxScope.(RefreshLayoutState) -> Unit,
 ) {
-    var headerHeight by remember { mutableStateOf(0) }
-    var footerHeight by remember { mutableStateOf(0) }
+    var headerHeight by remember { mutableIntStateOf(0) }
+    var footerHeight by remember { mutableIntStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
     val conn = remember {
         RefreshNestedScrollConnection(

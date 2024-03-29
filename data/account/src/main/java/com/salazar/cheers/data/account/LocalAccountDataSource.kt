@@ -22,7 +22,7 @@ private const val localAccountDatastore = "localAccountDataStore"
 private val accountKey = stringPreferencesKey("accountKey")
 
 @Singleton
-public class LocalAccountDataSource @Inject constructor(
+class LocalAccountDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gson: Gson,
 ) {

@@ -5,12 +5,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.model.ErrorMessage
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersDialog
 import com.salazar.common.util.LocalActivity
 import de.palm.composestateevents.EventEffect
@@ -30,8 +29,8 @@ fun SignInRoute(
     val event = uiState.dialog
 
     LaunchedEffect(uiState.navigateToRegister) {
-        if (uiState.navigateToRegister)
-            navigateToSignUp("email@cheers.social")
+        if (!uiState.navigateToRegister.isNullOrBlank())
+            navigateToSignUp(uiState.navigateToRegister)
     }
 
     var open by remember { mutableStateOf(false) }
@@ -74,13 +73,10 @@ fun SignInRoute(
                     navigateToSignUp(null)
                 },
                 onUsernameChanged = viewModel::onUsernameChanged,
-                onGoogleClick = viewModel::onGoogleButtonClick,
+                onGoogleClick = {
+                    viewModel.onGoogleButtonClick(context = activity)
+                },
             )
-            LaunchedEffect(Unit) {
-                viewModel.showSigningOptions(
-                    activity
-                )
-            }
         }
 
         null -> LoadingScreen()

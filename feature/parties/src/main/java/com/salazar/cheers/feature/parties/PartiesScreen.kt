@@ -9,7 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.EmptyFeed
 import com.salazar.cheers.core.ui.PartiesTopBar
 import com.salazar.cheers.core.ui.item.party.PartyItem

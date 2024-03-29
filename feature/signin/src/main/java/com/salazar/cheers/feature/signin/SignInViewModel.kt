@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.ErrorMessage
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.user.datastore.StoreUserEmail
+import com.salazar.cheers.domain.get_remote_config.CheckFeatureEnabledUseCase
+import com.salazar.cheers.domain.models.RemoteConfigParameter
 import com.salazar.cheers.domain.usecase.SignInWithCredentialManagerFlowUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,12 +23,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SignInUiState(
-    val navigateToRegister: Boolean = false,
+    val navigateToRegister: String? = null,
     val isSignedIn: Boolean? = null,
     val isLoading: Boolean,
     val errorMessage: String? = null,
     val username: String = "",
     val dialog: StateEventWithContent<ErrorMessage> = consumed(),
+    val isPasskeyEnabled: Boolean = false,
 )
 
 @HiltViewModel
@@ -34,6 +37,7 @@ class SignInViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val signInUseCases: SignInUseCases,
     private val signInWithCredentialManagerFlowUseCase: SignInWithCredentialManagerFlowUseCase,
+    private val checkFeatureEnabledUseCase: CheckFeatureEnabledUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SignInUiState(isLoading = false))
@@ -47,6 +51,18 @@ class SignInViewModel @Inject constructor(
 
     init {
         checkIfAlreadySignedIn()
+        checkPasskeyEnabled()
+    }
+
+    private fun checkPasskeyEnabled() {
+        viewModelScope.launch {
+            val isPasskeyEnabled = checkFeatureEnabledUseCase(
+                RemoteConfigParameter.Passkey
+            ).getOrDefault(false)
+            viewModelState.update {
+                it.copy(isPasskeyEnabled = isPasskeyEnabled)
+            }
+        }
     }
 
     private fun checkIfAlreadySignedIn() {
@@ -75,7 +91,13 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onGoogleButtonClick() {
+    fun onGoogleButtonClick(
+        context: Context,
+    ) {
+        showSigningOptions(
+            context = context,
+            username = "cheers.social",
+        )
     }
 
     fun onSignInClick(
@@ -87,16 +109,16 @@ class SignInViewModel @Inject constructor(
         updateIsLoading(true)
         viewModelScope.launch {
             showSigningOptions(
-                context,
+                context = context,
                 username = username
             )
             updateIsLoading(false)
         }
     }
 
-    private fun navigateToRegister() {
+    private fun navigateToRegister(idToken: String) {
         viewModelState.update {
-            it.copy(navigateToRegister = true)
+            it.copy(navigateToRegister = idToken)
         }
     }
 
@@ -106,13 +128,13 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun showSigningOptions(
+    private fun showSigningOptions(
         context: Context,
         username: String? = null,
     ) {
         viewModelScope.launch {
             signInWithCredentialManagerFlowUseCase(
-                context,
+                activityContext = context,
                 username = username,
             ).collect {
                 when(it) {
@@ -121,7 +143,7 @@ class SignInViewModel @Inject constructor(
                     }
                     is Resource.Error -> {
                         if (it.data is AuthRepository.NotRegisteredException) {
-                            navigateToRegister()
+                            navigateToRegister((it.data as AuthRepository.NotRegisteredException).message.orEmpty())
                             return@collect
                         }
                         updateErrorMessage(it.message)

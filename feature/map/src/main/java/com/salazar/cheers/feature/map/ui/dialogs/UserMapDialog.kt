@@ -27,13 +27,11 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.GreenGoogle
-import com.salazar.cheers.core.ui.ui.UserProfilePicture
-import com.salazar.cheers.feature.map.domain.models.UserLocation
 
 
 @Composable
 fun UserMapDialog(
-    userLocation: UserLocation?,
+    userLocation: com.salazar.cheers.data.map.UserLocation?,
     modifier: Modifier = Modifier,
     onClose: () -> Unit = {},
     onChatClick: (String) -> Unit = {},
@@ -52,7 +50,7 @@ fun UserMapDialog(
 @Composable
 fun UserLocationItem(
     modifier: Modifier = Modifier,
-    userLocation: UserLocation,
+    userLocation: com.salazar.cheers.data.map.UserLocation,
     onClose: () -> Unit,
     onChatClick: (String) -> Unit,
 ) {
@@ -79,7 +77,7 @@ fun UserLocationItem(
                     val annotatedString = buildAnnotatedString {
                         append(userLocation.locationName)
                         val timestamp =
-                            com.salazar.cheers.core.util.relativeTimeFormatter(epoch = userLocation.lastUpdated).text
+                            com.salazar.cheers.core.util.relativeTimeFormatter(seconds = userLocation.lastUpdated).text
                         if (timestamp == "just now") {
                             withStyle(style = SpanStyle(color = GreenGoogle)) {
                                 append(timestamp)
@@ -129,7 +127,7 @@ fun UserLocationItem(
 private fun UserMapDialogPreview() {
     CheersPreview {
         UserMapDialog(
-            userLocation = UserLocation(
+            userLocation = com.salazar.cheers.data.map.UserLocation(
                 id = "",
                 picture = "",
                 username = "cheers",

@@ -28,7 +28,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val authRepository: AuthRepository,
     private val signInWithEmailAndPasswordUseCase: SignInWithEmailAndPasswordUseCase,
-    private val signInWithOneTapUseCase: SignInWithOneTapUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
     private val dataStoreRepository: DataStoreRepository,
     private val accountRepository: AccountRepository,
 ) {
@@ -39,22 +39,25 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
         return@withContext flow {
 
             // Get the username from the data store.
-            val username1 = username ?: dataStoreRepository.getUsername().firstOrNull() ?: return@flow
+            val username1 = username ?: dataStoreRepository.getUsername().firstOrNull()
 
             // Get the challenge from the server.
             val beginLoginResponse = authRepository.beginLogin(username = username1).getOrNull()
-                ?: return@flow
 
             val result = authRepository.showSigninOptions(
                 activityContext = activityContext,
-                beginLoginResponse,
+                beginLoginResponse = beginLoginResponse,
             )
 
             result.fold(
                 onSuccess = {
                     emit(Resource.Loading(isLoading = true))
                     emit(
-                        handleSignIn(username1, beginLoginResponse, it)
+                        handleSignIn(
+                            username = username1,
+                            beginLoginResponse = beginLoginResponse,
+                            result = it,
+                        )
                             .fold(
                                 onSuccess = { Resource.Success(Throwable()) },
                                 onFailure = { Resource.Error(it.localizedMessage, it) },
@@ -70,9 +73,9 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
     }
 
     private suspend fun handleSignIn(
-        username: String,
-        beginLoginResponse: BeginLoginResponse,
         result: GetCredentialResponse,
+        username: String?,
+        beginLoginResponse: BeginLoginResponse?,
     ): Result<Unit> {
         val credential = result.credential
 
@@ -81,7 +84,9 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
             is PublicKeyCredential -> {
                 val response = authRepository.parseGetPasskeyResponse(credential)
                     ?: return Result.failure(Exception("failed to parse get passkey response"))
-
+                if (username == null || beginLoginResponse == null) {
+                   return Result.failure(Exception(""))
+                }
                 authRepository.finishLogin(
                     username = username,
                     passkey = response.toPasskey(),
@@ -115,7 +120,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                     try {
                         val googleIdTokenCredential = GoogleIdTokenCredential
                             .createFrom(credential.data)
-                        signInWithOneTapUseCase(
+                        signInWithGoogleUseCase(
                             idToken = googleIdTokenCredential.idToken
                         ).fold(
                             onSuccess = {

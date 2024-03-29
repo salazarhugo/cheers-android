@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.SubcomposeAsyncImage
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
+import com.salazar.cheers.core.ui.components.circular_progress.CircularProgressComponent
 import com.salazar.cheers.core.ui.components.image.InspectionAwareComponent
 
 @Composable
@@ -41,7 +42,7 @@ fun PrettyImage(
             contentDescription = contentDescription,
             loading = {
                 Box {
-                    CircularProgressIndicator(
+                    CircularProgressComponent(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }

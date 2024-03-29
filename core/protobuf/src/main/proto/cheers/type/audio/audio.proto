@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/audio;audio";
+
+message Audio {
+  int64 id = 1;
+  string url = 2;
+  repeated int64 waveform = 3;
+  uint32 duration = 4;
+}

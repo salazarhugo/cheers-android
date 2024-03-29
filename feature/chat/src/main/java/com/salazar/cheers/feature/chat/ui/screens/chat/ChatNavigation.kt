@@ -12,12 +12,18 @@ const val chatNavigationRoute = "chat_route?$CHANNEL_ID={$CHANNEL_ID}&$USER_ID={
 private const val DEEP_LINK_URI_PATTERN =
     "https://maparty.app/chat"
 
-fun NavController.navigateToChat(
-    channelId: String?,
-    userId: String? = null,
+fun NavController.navigateToChatWithChannelId(
+    channelId: String,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("chat_route?$CHANNEL_ID=$channelId&$USER_ID=$userId", navOptions)
+    this.navigate("chat_route?$CHANNEL_ID=$channelId", navOptions)
+}
+
+fun NavController.navigateToChatWithUserId(
+    userId: String,
+    navOptions: NavOptions? = null,
+) {
+    this.navigate("chat_route?$USER_ID=$userId", navOptions)
 }
 
 fun NavGraphBuilder.chatScreen(

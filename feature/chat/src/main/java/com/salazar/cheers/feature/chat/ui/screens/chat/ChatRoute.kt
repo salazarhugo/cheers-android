@@ -1,6 +1,7 @@
 package com.salazar.cheers.feature.chat.ui.screens.chat
 
 import android.Manifest
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,9 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.Permission
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.common.ui.NoScreenshot
 
 
@@ -31,9 +31,18 @@ fun ChatRoute(
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-            if (it != null)
+            if (it != null) {
                 chatViewModel.sendImageMessage(listOf(it))
+            }
         }
+
+    DisposableEffect(Unit) {
+        chatViewModel.startPresence()
+        chatViewModel.sendReadReceipt()
+        onDispose {
+            chatViewModel.endPresence()
+        }
+    }
 
     if (!uiState.errorMessage.isNullOrBlank()) {
         LaunchedEffect(Unit) {
@@ -58,6 +67,7 @@ fun ChatRoute(
             }
         }
     }
+
 
     NoScreenshot()
 

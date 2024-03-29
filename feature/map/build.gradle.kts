@@ -14,6 +14,8 @@ android {
 
 dependencies {
     implementation(project(":data:user"))
+    implementation(project(":data:post"))
+    implementation(project(":data:map"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -22,7 +24,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
 
@@ -40,5 +41,5 @@ dependencies {
     implementation(libs.mapbox)
     implementation(libs.mapbox.compose)
 //    implementation(libs.mapbox.sdk.services)
-//    implementation(libs.mapbox.search.android)
+    implementation(libs.mapbox.search.android)
 }

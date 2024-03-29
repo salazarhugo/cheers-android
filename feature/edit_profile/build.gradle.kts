@@ -27,7 +27,6 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     // Jetpack Compose
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit)

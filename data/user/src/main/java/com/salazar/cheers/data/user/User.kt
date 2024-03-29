@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.user
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -10,6 +11,7 @@ import java.util.UUID
     tableName = "users",
     indices = [Index(value = ["username"], unique = true)]
 )
+@Immutable
 data class User(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),

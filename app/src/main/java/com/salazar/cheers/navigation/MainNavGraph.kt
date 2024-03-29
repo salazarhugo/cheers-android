@@ -21,24 +21,27 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
 import com.salazar.cheers.feature.comment.comment_more.CommentMoreRoute
 import com.salazar.cheers.feature.comment.delete.DeleteCommentDialog
-import com.salazar.cheers.feature.comment.replies.RepliesRoute
-import com.salazar.cheers.core.share.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.util.Constants.URI
 import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.core.util.Utils.shareToSnapchat
-import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
-import com.salazar.cheers.feature.chat.ui.chats.NewChatRoute
 import com.salazar.cheers.feature.chat.ui.screens.chat.chatScreen
-import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChat
+import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithChannelId
+import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithUserId
+import com.salazar.cheers.feature.chat.ui.screens.create_chat.createChatScreen
+import com.salazar.cheers.feature.chat.ui.screens.create_chat.navigateToCreateChat
 import com.salazar.cheers.feature.chat.ui.screens.messages.messagesScreen
 import com.salazar.cheers.feature.chat.ui.screens.messages.navigateToMessages
-import com.salazar.cheers.feature.chat.ui.screens.room.RoomRoute
-import com.salazar.cheers.feature.comment.navigateToPostComments
-import com.salazar.cheers.feature.comment.postCommentsScreen
+import com.salazar.cheers.feature.chat.ui.screens.room.chatInfoScreen
+import com.salazar.cheers.feature.chat.ui.screens.room.navigateToChatInfo
+import com.salazar.cheers.feature.comment.comments.navigateToPostComments
+import com.salazar.cheers.feature.comment.comments.postCommentsScreen
+import com.salazar.cheers.feature.comment.replies.navigateToReplies
+import com.salazar.cheers.feature.comment.replies.repliesScreen
 import com.salazar.cheers.feature.create_note.createNoteScreen
 import com.salazar.cheers.feature.create_note.navigateToCreateNote
 import com.salazar.cheers.feature.create_post.createPostScreen
@@ -49,7 +52,8 @@ import com.salazar.cheers.feature.friend_list.friendListScreen
 import com.salazar.cheers.feature.friend_list.navigateToFriendList
 import com.salazar.cheers.feature.friend_request.friendRequestsScreen
 import com.salazar.cheers.feature.friend_request.navigateToFriendRequests
-import com.salazar.cheers.feature.home.navigation.homeScreen
+import com.salazar.cheers.feature.home.navigation.home.homeNavigationRoute
+import com.salazar.cheers.feature.home.navigation.home.homeScreen
 import com.salazar.cheers.feature.map.navigation.mapScreen
 import com.salazar.cheers.feature.map.navigation.mapSettingsScreen
 import com.salazar.cheers.feature.map.navigation.navigateToMapSettings
@@ -69,7 +73,7 @@ import com.salazar.cheers.feature.search.navigation.searchScreen
 import com.salazar.cheers.feature.settings.navigateToSettings
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
-import com.salazar.cheers.map.ui.MapPostHistoryRoute
+import com.salazar.cheers.feature.map.ui.MapPostHistoryRoute
 import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
@@ -83,7 +87,6 @@ import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
 import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
 import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
 import com.salazar.cheers.feature.parties.detail.partyDetailScreen
-import com.salazar.cheers.feature.parties.partiesNavigationRoute
 import com.salazar.cheers.feature.post_likes.navigateToPostLikes
 import com.salazar.cheers.feature.post_likes.postLikesScreen
 import com.salazar.cheers.feature.profile.other_profile.OtherProfileStatsRoute
@@ -115,7 +118,7 @@ fun NavGraphBuilder.mainNavGraph(
 
     navigation(
         route = CheersDestinations.MAIN_ROUTE,
-        startDestination = partiesNavigationRoute,
+        startDestination = homeNavigationRoute,
     ) {
         friendRequestsScreen(
             navigateBack = navController::popBackStack,
@@ -166,22 +169,13 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
-            route = "${MainDestinations.ROOM_DETAILS}/{roomId}",
-        ) {
-            RoomRoute(
-                navActions = appState.navActions,
-                showSnackBar = appState::showSnackBar,
-            )
-        }
-
-        composable(
             route = "${MainDestinations.STORY_FEED_ROUTE}/{page}",
             arguments = listOf(navArgument("page") { type = NavType.IntType }),
         ) {
-                StoryFeedRoute(
-                    appState = appState,
-                    navActions = appState.navActions,
-                )
+            StoryFeedRoute(
+                appState = appState,
+                navActions = appState.navActions,
+            )
         }
 
         composable(
@@ -260,6 +254,13 @@ fun NavGraphBuilder.mainNavGraph(
             },
             navigateToPostComments = navController::navigateToPostComments,
             navigateToPostLikes = navController::navigateToPostLikes,
+            navigateToSignIn = navController::navigateToSignIn,
+            navigateToCamera = {
+                navController.navigate(MainDestinations.CAMERA_ROUTE) {
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
         )
 
         mapScreen(
@@ -307,7 +308,7 @@ fun NavGraphBuilder.mainNavGraph(
         postCommentsScreen(
             navigateBack = navController::popBackStack,
             navigateToCommentMoreSheet = {},
-            navigateToCommentReplies = {},
+            navigateToCommentReplies = navController::navigateToReplies,
         )
 
         postLikesScreen(
@@ -315,14 +316,11 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToProfile = navController::navigateToOtherProfile,
         )
 
-        composable(
-            route = "${MainDestinations.COMMENT_REPLIES}/{commentId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{commentId}/replies" }),
-        ) {
-            RepliesRoute(
-                navActions = appState.navActions,
-            )
-        }
+        repliesScreen(
+            navigateBack = navController::popBackStack,
+            navigateToCommentMoreSheet = {},
+        )
+//            deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{commentId}/replies" }),
 
         bottomSheet(
             route = "${MainDestinations.COMMENT_MORE_SHEET}/{commentID}",
@@ -376,6 +374,11 @@ fun NavGraphBuilder.mainNavGraph(
             },
             navigateToPostDetail = {},
             navigateToComments = {},
+            navigateToChat = { userID ->
+                navController.navigateToChatWithUserId(
+                    userId = userID,
+                )
+            },
         )
 
         composable(
@@ -459,24 +462,25 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
             navigateToChatCamera = {},
             navigateToOtherProfile = navController::navigateToOtherProfile,
-            navigateToChatWithChannelId = { navController.navigateToChat(channelId = it) },
-            navigateToNewChat = {},
-            navigateToChatsMoreSheet = {},
+            navigateToChatWithChannelId = navController::navigateToChatWithChannelId,
+            navigateToNewChat = navController::navigateToCreateChat,
+        )
+
+        createChatScreen(
+            navigateBack = navController::popBackStack,
+            navigateToChatWithChannelId = navController::navigateToChatWithChannelId,
         )
 
         chatScreen(
             navigateBack = navController::popBackStack,
             navigateToOtherProfile = navController::navigateToOtherProfile,
-            navigateToRoomDetails = {},
+            navigateToRoomDetails = navController::navigateToChatInfo,
         )
 
-        composable(
-            route = MainDestinations.NEW_CHAT_ROUTE,
-        ) {
-            NewChatRoute(
-                navActions = appState.navActions,
-            )
-        }
+        chatInfoScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+        )
 
         editProfileScreen(
             navigateBack = navController::popBackStack,
@@ -615,6 +619,7 @@ fun NavGraphBuilder.mainNavGraph(
                             }
                         appState.navActions.navigateBack()
                     }
+
                     is ProfileSheetUIAction.OnAddSnapchatFriends -> context.shareToSnapchat(username)
                     is ProfileSheetUIAction.OnPostHistoryClick -> appState.navActions.navigateToPostHistory()
                 }
@@ -628,33 +633,5 @@ fun NavGraphBuilder.mainNavGraph(
         val chatsSheetViewModel = hiltViewModel<ChatsSheetViewModel>()
 
         val uiState by chatsSheetViewModel.uiState.collectAsStateWithLifecycle()
-        val room = uiState.room
-
-        val uid by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser?.uid!!) }
-
-        if (room != null)
-            ChatsMoreBottomSheet(
-                modifier = Modifier.navigationBarsPadding(),
-                name = room.name,
-                isAdmin = room.admins.contains(uid),
-                roomType = room.type,
-                onDeleteClick = {
-                    chatsSheetViewModel.deleteChannel {
-                        appState.navActions.navigateBack()
-                    }
-                },
-                onLeaveClick = {
-                    chatsSheetViewModel.leaveChannel {
-                        appState.navActions.navigateBack()
-                    }
-                },
-                onDeleteChats = {
-                    chatsSheetViewModel.deleteChats {
-                        appState.navActions.navigateBack()
-                    }
-                }
-            )
-        else
-            LoadingScreen()
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 
 /**
  * Stateful composable that displays the Navigation route for the Post detail screen.
@@ -45,5 +46,5 @@ fun PostDetailRoute(
             onUserClick = { navActions.navigateToOtherProfile(it) },
         )
     else
-        com.salazar.cheers.core.share.ui.LoadingScreen()
+        LoadingScreen()
 }

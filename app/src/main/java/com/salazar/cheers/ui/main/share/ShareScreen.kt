@@ -50,11 +50,8 @@ fun ShareHeader(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 10.dp),
-        avatar = party?.bannerUrl,
-        photos = emptyList(),
         caption = message,
         onCaptionChanged = onMessageChange,
-        onImageClick = {},
     )
 }
 
