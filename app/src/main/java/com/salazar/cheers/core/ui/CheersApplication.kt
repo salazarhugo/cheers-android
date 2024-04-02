@@ -11,7 +11,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
-import com.salazar.ads.initializeAds
 import com.salazar.cheers.BuildConfig
 import com.salazar.cheers.R
 import dagger.hilt.android.HiltAndroidApp
@@ -43,10 +42,10 @@ class CheersApplication : Application(), Configuration.Provider {
     private fun initFirebase() {
         FirebaseApp.initializeApp(this)
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
-        val provider = if (BuildConfig.DEBUG)
-            DebugAppCheckProviderFactory.getInstance()
-        else
-            PlayIntegrityAppCheckProviderFactory.getInstance()
+        val provider = when {
+            BuildConfig.DEBUG -> DebugAppCheckProviderFactory.getInstance()
+            else -> PlayIntegrityAppCheckProviderFactory.getInstance()
+        }
 
         firebaseAppCheck.installAppCheckProviderFactory(provider)
     }

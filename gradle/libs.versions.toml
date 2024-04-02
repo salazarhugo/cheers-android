@@ -14,7 +14,7 @@ androidxComposeBom = "2024.01.00"
 appUpdateKtx = "2.1.0"
 appUpdate = "2.1.0"
 biometricKtx = "1.1.0"
-firebaseBom = "32.7.1"
+firebaseBom = "32.8.0"
 # don't delete
 androidxComposeCompiler = "1.5.8"
 androidxCore = "1.12.0"
@@ -34,7 +34,6 @@ coreSplashscreen = "1.0.1"
 creativekit = "2.1.0"
 datastorePreferences = "1.0.0"
 espressoCore = "3.5.1"
-firebaseAppcheckDebug = "17.1.1"
 gradle = "8.0.2"
 grpcOkhttp = "1.52.1"
 grpcProtobufLite = "1.52.1"
@@ -108,10 +107,10 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended"}
-androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core"}
-androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest"}
-androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4"}
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 
 # Firebase BOM
@@ -120,6 +119,7 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
 firebase-performance = { group = "com.google.firebase", name = "firebase-perf-ktx" }
 firebase-config = { group = "com.google.firebase", name = "firebase-config-ktx" }
+firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug" }
 
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
@@ -158,7 +158,6 @@ androidx-lifecycle-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:life
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycleRuntimeKtx" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 creativekit = { module = "com.snap.creativekit:creativekit", version.ref = "creativekit" }
-firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug", version.ref = "firebaseAppcheckDebug" }
 
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "grpcOkhttp" }

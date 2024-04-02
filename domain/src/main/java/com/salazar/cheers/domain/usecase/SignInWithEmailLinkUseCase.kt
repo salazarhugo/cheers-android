@@ -38,5 +38,6 @@ class SignInWithEmailLinkUseCase @Inject constructor(
         } catch (e: java.lang.Exception) {
             return@withContext Resource.Error("Error signing in with email link")
         }
+
     }
 }

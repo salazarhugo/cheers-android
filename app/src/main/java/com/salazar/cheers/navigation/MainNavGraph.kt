@@ -2,11 +2,14 @@ package com.salazar.cheers.navigation
 
 import android.content.Intent
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -108,7 +111,6 @@ import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
-import com.salazar.common.util.copyToClipboard
 
 
 fun NavGraphBuilder.mainNavGraph(
@@ -568,6 +570,7 @@ fun NavGraphBuilder.mainNavGraph(
             val eventId = it.arguments?.getString("eventId")!!
             val context = LocalContext.current
             val viewModel = hiltViewModel<EventMoreSheetViewModel>()
+            val clipboardManager = LocalClipboardManager.current
 
             EventMoreBottomSheet(
                 modifier = Modifier.navigationBarsPadding(),
@@ -591,7 +594,7 @@ fun NavGraphBuilder.mainNavGraph(
                 onLinkClick = {
                     FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
                         .addOnSuccessListener { shortLink ->
-                            context.copyToClipboard(shortLink.shortLink.toString())
+                            clipboardManager.setText(AnnotatedString(shortLink.shortLink.toString()))
                         }
                     appState.navActions.navigateBack()
                 },
@@ -606,6 +609,7 @@ fun NavGraphBuilder.mainNavGraph(
     bottomSheet(route = "${MainDestinations.PROFILE_MORE_SHEET}/{username}") {
         val context = LocalContext.current
         val username = it.arguments?.getString("username")!!
+        val clipboardManager = LocalClipboardManager.current
 
         ProfileMoreBottomSheet(
             onProfileSheetUIAction = { action ->
@@ -615,7 +619,7 @@ fun NavGraphBuilder.mainNavGraph(
                     is ProfileSheetUIAction.OnCopyProfileClick -> {
                         FirebaseDynamicLinksUtil.createShortLink("u/$username")
                             .addOnSuccessListener { shortLink ->
-                                context.copyToClipboard(shortLink.shortLink.toString())
+                                clipboardManager.setText(AnnotatedString(shortLink.shortLink.toString()))
                             }
                         appState.navActions.navigateBack()
                     }

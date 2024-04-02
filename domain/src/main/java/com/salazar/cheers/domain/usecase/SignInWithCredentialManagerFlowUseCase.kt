@@ -66,7 +66,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                     emit(Resource.Loading(isLoading = false))
                 },
                 onFailure = {
-                    emit(Resource.Error(it.localizedMessage))
+//                    emit(Resource.Error(it.localizedMessage))
                 }
             )
         }

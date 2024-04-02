@@ -12,10 +12,12 @@ import com.salazar.cheers.data.chat.models.ChatStatus
 import com.salazar.cheers.data.chat.models.Typing
 import com.salazar.cheers.data.chat.models.WebSocketChat
 import com.salazar.cheers.data.chat.models.WebSocketChatMessage
+import com.salazar.cheers.data.chat.models.WebSocketChatStatusUpdate
 import com.salazar.cheers.data.chat.models.WebSocketMessage
 import com.salazar.cheers.data.chat.models.WebSocketMessageType
 import com.salazar.cheers.data.chat.models.toChat
 import com.salazar.cheers.data.chat.models.toChatMessage
+import com.salazar.cheers.data.chat.models.toChatStatus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +58,8 @@ class ChatWebSocketManager @Inject constructor(
     suspend fun connect() {
         getIdToken().onSuccess { idToken ->
             val request = Request.Builder()
-                .url("${Constants.WEBSOCKET_URL}?token=" + idToken)
+                .url(Constants.WEBSOCKET_URL)
+                .addHeader("Authorization", idToken)
                 .build()
 
             val client = OkHttpClient()
@@ -166,7 +169,7 @@ class ChatWebSocketManager @Inject constructor(
 
         GlobalScope.launch {
             websocketState.emit(WebsocketState.Error)
-            if (retryCount == MAX_RETRY) {
+            if (retryCount >= MAX_RETRY) {
                 return@launch
             }
 
@@ -219,6 +222,10 @@ class ChatWebSocketManager @Inject constructor(
                 WebSocketMessageType.CHAT -> {
                     handleChat(message.chat)
                 }
+
+                WebSocketMessageType.CHAT_STATUS -> {
+                    handleChatStatusUpdate(message.chatStatus)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -250,6 +257,18 @@ class ChatWebSocketManager @Inject constructor(
             chatDao.insert(
                 chat.copy(isOtherUserTyping = typing.isTyping)
             )
+        }
+    }
+
+    private fun handleChatStatusUpdate(
+        chatStatusUpdate: WebSocketChatStatusUpdate?,
+    ) {
+        if (chatStatusUpdate == null)
+            return
+
+        GlobalScope.launch {
+            val newChat = chatDao.getChannel(chatStatusUpdate.chatId)
+            chatDao.insert(newChat.copy(status = chatStatusUpdate.status.toChatStatus()))
         }
     }
 

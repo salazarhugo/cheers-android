@@ -5,13 +5,14 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.post.ui.PostMoreBottomSheet
-import com.salazar.common.util.copyToClipboard
 
 /**
  * Stateful composable that displays the Navigation route for the Comments screen.
@@ -25,6 +26,7 @@ fun PostMoreRoute(
 ) {
     val uiState by postMoreViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
 
     val post = uiState.post
     if (post != null) {
@@ -58,7 +60,7 @@ fun PostMoreRoute(
             onLinkClick = {
                 FirebaseDynamicLinksUtil.createShortLink("p/${post.id}")
                     .addOnSuccessListener { shortLink ->
-                        context.copyToClipboard(shortLink.shortLink.toString())
+                        clipboardManager.setText(AnnotatedString(shortLink.shortLink.toString()))
                     }
                 navActions.navigateBack()
             }

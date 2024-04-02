@@ -5,6 +5,7 @@ data class WebSocketMessage(
     val userId: String = "",
     val isViewer: Boolean = false,
     val chatMessage: WebSocketChatMessage? = null,
+    val chatStatus: WebSocketChatStatusUpdate? = null,
     val chat: WebSocketChat? = null,
     val typing: Typing? = null,
     val presence: Presence? = null,
@@ -28,6 +29,12 @@ data class WebSocketChatMessage(
     val createdAt: Long,
 )
 
+data class WebSocketChatStatusUpdate(
+    val chatId: String,
+    val status: WebSocketChatStatus,
+)
+
+
 data class Typing(
     val chatId: String,
     val isTyping: Boolean,
@@ -48,6 +55,7 @@ enum class WebSocketChatStatus {
 
 enum class WebSocketMessageType {
     CHAT,
+    CHAT_STATUS,
     MESSAGE,
     TYPING,
     PRESENCE,

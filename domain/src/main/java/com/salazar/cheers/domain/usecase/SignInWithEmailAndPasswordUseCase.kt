@@ -1,7 +1,5 @@
 package com.salazar.cheers.domain.usecase
 
-import com.salazar.auth.validators.ValidateEmail
-import com.salazar.auth.validators.ValidatePassword
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
@@ -23,14 +21,14 @@ class SignInWithEmailAndPasswordUseCase @Inject constructor(
         email: String,
         password: String,
     ): Result<Unit> = withContext(ioDispatcher) {
-        val emailValidator = ValidateEmail().invoke(email)
-        val passwordValidator = ValidatePassword().invoke(password)
-
-        if (!emailValidator.successful)
-            return@withContext Result.failure(Exception(emailValidator.errorMessage))
-
-        if (!passwordValidator.successful)
-            return@withContext Result.failure(Exception(passwordValidator.errorMessage))
+//        val emailValidator = ValidateEmail().invoke(email)
+//        val passwordValidator = ValidatePassword().invoke(password)
+//
+//        if (!emailValidator.successful)
+//            return@withContext Result.failure(Exception(emailValidator.errorMessage))
+//
+//        if (!passwordValidator.successful)
+//            return@withContext Result.failure(Exception(passwordValidator.errorMessage))
 
         return@withContext try {
             val authResult = authRepository.signInWithEmailAndPassword(email, password)

@@ -1,4 +1,4 @@
-package com.salazar.cheers.feature.chat.ui.screens.messages
+package com.salazar.cheers.feature.chat.ui.components.chat_item
 
 import RoomsUIAction
 import androidx.compose.foundation.background
@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.BlueCheers
@@ -38,14 +37,10 @@ import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.relativeTimeFormatterMilli
 import com.salazar.cheers.data.chat.models.ChatChannel
 import com.salazar.cheers.data.chat.models.ChatStatus
-import com.salazar.cheers.feature.chat.ui.components.DeliveredChat
-import com.salazar.cheers.feature.chat.ui.components.EmptyChat
-import com.salazar.cheers.feature.chat.ui.components.NewChat
-import com.salazar.cheers.feature.chat.ui.components.OpenedChat
-import com.salazar.cheers.feature.chat.ui.components.ReceivedChat
+import com.salazar.cheers.feature.chat.ui.components.ChatTypingComponent
 
 @Composable
-fun DirectConversation(
+fun DirectChatComponent(
     channel: ChatChannel,
     modifier: Modifier = Modifier,
     onRoomsUIAction: (RoomsUIAction) -> Unit = {},
@@ -78,34 +73,28 @@ fun DirectConversation(
             )
             Spacer(modifier = Modifier.width(14.dp))
             Column {
-                val subtitle = buildAnnotatedString {
-                    append("  •  ")
-                    append(relativeTimeFormatterMilli(milliSeconds = channel.lastMessageTime))
-                }
-
-                val fontWeight =
-                    if (channel.status == ChatStatus.NEW) FontWeight.Bold else FontWeight.Normal
-
                 Username(
                     username = channel.name,
                     verified = channel.verified
                 )
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    with(channel.lastMessageType) {
-                        when (channel.status) {
-                            ChatStatus.NEW -> NewChat(this)
-                            ChatStatus.EMPTY -> EmptyChat()
-                            ChatStatus.OPENED -> OpenedChat()
-                            ChatStatus.SENT -> DeliveredChat(this)
-                            ChatStatus.RECEIVED -> ReceivedChat(this)
-//                            RoomStatus.SENDING -> SendingChat()
-                            ChatStatus.UNRECOGNIZED -> {}
-                        }
-                    }
+                    ChatStatus(
+                        status = channel.status,
+                        isOtherUserTyping = channel.isOtherUserTyping,
+                        messageType = channel.lastMessageType,
+                    )
                     if (channel.status != ChatStatus.EMPTY) {
+                        val subtitle = buildAnnotatedString {
+                            append("  •  ")
+                            append(relativeTimeFormatterMilli(milliSeconds = channel.lastMessageTime))
+                        }
+                        val fontWeight = when (channel.status) {
+                            ChatStatus.NEW -> FontWeight.Bold
+                            else -> FontWeight.Normal
+                        }
+
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodyMedium,
@@ -172,7 +161,7 @@ fun DirectConversation(
 @Composable
 private fun DirectChatItemPreview() {
     CheersPreview {
-        DirectConversation(
+        DirectChatComponent(
             channel = ChatChannel(),
             modifier = Modifier,
         )

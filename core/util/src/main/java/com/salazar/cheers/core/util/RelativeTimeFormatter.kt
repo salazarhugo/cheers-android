@@ -26,7 +26,8 @@ fun relativeTimeFormatter(
         val elapsedSeconds = abs(System.currentTimeMillis() / 1000 - seconds)
 
         val res = when {
-            elapsedSeconds < 60 -> "just now"
+            elapsedSeconds < 2 -> "just now"
+            elapsedSeconds < 60 -> "$elapsedSeconds s"
             elapsedSeconds < 60 * 60 -> "${elapsedSeconds / 60}m"
             elapsedSeconds < 60 * 60 * 24 -> "${elapsedSeconds / (60 * 60)}h"
             elapsedSeconds < 60 * 60 * 24 * 7 -> "${elapsedSeconds / (60 * 60 * 24)}d"

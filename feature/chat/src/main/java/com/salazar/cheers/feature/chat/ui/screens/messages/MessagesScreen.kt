@@ -25,6 +25,7 @@ import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.data.chat.models.ChatChannel
 import com.salazar.cheers.feature.chat.ui.chats.EmptyChatsMessage
 import com.salazar.cheers.feature.chat.ui.components.SwipeableChatItem
+import com.salazar.cheers.feature.chat.ui.components.chat_item.DirectChatComponent
 
 
 @Composable
@@ -128,7 +129,7 @@ fun ConversationList(
                     .clip(RoundedCornerShape(8.dp)),
                 state = dismissState,
             ) {
-                DirectConversation(
+                DirectChatComponent(
                     channel = channel,
                     onRoomsUIAction = onRoomsUIAction,
                 )
