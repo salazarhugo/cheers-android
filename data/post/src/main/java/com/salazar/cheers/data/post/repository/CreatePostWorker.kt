@@ -39,7 +39,7 @@ class CreatePostWorker @AssistedInject constructor(
         val audioUri = inputData.getString("AUDIO_URI")
         val audioAmplitudes = inputData.getIntArray("AUDIO_AMPLITUDES")
         val postType = inputData.getString("POST_TYPE") ?: return Result.failure()
-        val drinkID = inputData.getLong("DRINK_ID", -1)
+        val drinkID = inputData.getString("DRINK_ID")
         val drunkenness = inputData.getInt("DRUNKENNESS", 0)
         val photoCaption = inputData.getString("PHOTO_CAPTION") ?: ""
         val locationName = inputData.getString("LOCATION_NAME") ?: ""
@@ -54,8 +54,11 @@ class CreatePostWorker @AssistedInject constructor(
             .setLatitude(latitude)
             .setLongitude(longitude)
             .setDrunkenness(drunkenness.toLong())
-            .setDrinkId(drinkID)
             .setLocationName(locationName)
+
+        if (drinkID != null) {
+            postBuilder.setDrinkId(drinkID)
+        }
 
         if (audioUri != null) {
             val bytes = extractAudio(Uri.parse(audioUri))

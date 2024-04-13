@@ -104,7 +104,7 @@ message ListMapPostResponse {
 message CreatePostRequest {
   string caption = 1;
   string location_name = 2;
-  int64 drink_id = 3;
+  string drink_id = 3;
   int64 drunkenness = 4;
   bool can_comment = 5;
   bool can_share = 6;

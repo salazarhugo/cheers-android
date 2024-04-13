@@ -21,7 +21,7 @@ fun PostResponse.toPost(): Post {
         liked = hasLiked,
         likes = likeCount.toInt(),
         comments = commentCount.toInt(),
-        drinkId = post.drink.id.toInt(),
+        drinkId = post.drink.id,
         drinkName = post.drink.name,
         drinkPicture = post.drink.icon,
         drunkenness = post.drunkenness.toInt(),

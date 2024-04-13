@@ -90,7 +90,7 @@ class CreatePostViewModel @Inject constructor(
     private fun updateDrinks(drinks: List<Drink>) {
         val emptyDrink = listOf(
             Drink(
-                id = 0,
+                id = String(),
                 name = "",
                 icon = "",
                 category = "",
@@ -248,7 +248,7 @@ class CreatePostViewModel @Inject constructor(
 
     fun uploadPost() {
         val uiState = viewModelState.value
-        val drinkID = uiState.currentDrink?.id ?: 0
+        val drinkID = uiState.currentDrink?.id.orEmpty()
         val localAudio = uiState.audio
         updateIsLoading(true)
 
@@ -260,7 +260,7 @@ class CreatePostViewModel @Inject constructor(
                 "POST_TYPE" to uiState.postType,
                 "PHOTO_CAPTION" to uiState.caption,
                 "DRUNKENNESS" to uiState.drunkenness,
-                "DRINK_ID" to drinkID.toLong(),
+                "DRINK_ID" to drinkID,
                 "LOCATION_NAME" to "",
                 "LOCATION_LATITUDE" to uiState.locationPoint?.latitude(),
                 "LOCATION_LONGITUDE" to uiState.locationPoint?.longitude(),

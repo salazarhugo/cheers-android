@@ -10,14 +10,14 @@ import androidx.room.PrimaryKey
 @Immutable
 data class Drink(
     @PrimaryKey
-    val id: Int,
+    val id: String,
     val name: String,
     val icon: String,
     val category: String,
 )
 
 val emptyDrink = Drink(
-    id = 0,
+    id = String(),
     name = "Heineiken",
     icon = String(),
     category = String(),

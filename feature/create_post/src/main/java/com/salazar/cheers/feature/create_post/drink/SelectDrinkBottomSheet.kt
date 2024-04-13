@@ -53,13 +53,13 @@ private fun SelectDrinkBottomSheetPreview() {
         SelectDrinkBottomSheet(
             drinks = listOf(
                 Drink(
-                    id = 0,
+                    id = String(),
                     name = "Heineiken",
                     icon = String(),
                     category = String(),
                 ),
                 Drink(
-                    id = 1,
+                    id = String(),
                     name = "1664",
                     icon = String(),
                     category = String(),

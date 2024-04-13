@@ -25,6 +25,7 @@ import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.emptyDrink
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.modifier.carousel
 import com.salazar.common.ui.extensions.noRippleClickable
@@ -113,8 +114,8 @@ fun CarouselDrinkPreview() {
                 2
             },
             drinks = listOf(
-                Drink(0, "Beer", "", ""),
-                Drink(1, "Wine", "", ""),
+                emptyDrink.copy(name= "Beer"),
+                emptyDrink.copy(name= "Wine"),
             ),
             onBeverageClick = {},
         )

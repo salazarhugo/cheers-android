@@ -38,7 +38,7 @@ data class Post(
     val audioWaveform: List<Int> = emptyList(),
     val likes: Int = 0,
     val liked: Boolean = false,
-    val drinkId: Int = 0,
+    val drinkId: String = String(),
     val drinkName: String = String(),
     val drinkPicture: String = String(),
     val comments: Int = 0,
