@@ -6,8 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.data.chat.models.ChatStatus
-import com.salazar.cheers.data.chat.models.MessageType
+import com.salazar.cheers.core.model.ChatStatus
+import com.salazar.cheers.core.model.MessageType
 import com.salazar.cheers.feature.chat.ui.components.ChatTypingComponent
 import com.salazar.cheers.feature.chat.ui.components.DeliveredChat
 import com.salazar.cheers.feature.chat.ui.components.EmptyChat

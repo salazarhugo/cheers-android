@@ -1,7 +1,7 @@
 package com.salazar.cheers.domain.list_map_post
 
 import com.salazar.cheers.core.model.Privacy
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher

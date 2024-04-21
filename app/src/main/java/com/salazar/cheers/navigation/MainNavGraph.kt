@@ -57,8 +57,10 @@ import com.salazar.cheers.feature.friend_request.friendRequestsScreen
 import com.salazar.cheers.feature.friend_request.navigateToFriendRequests
 import com.salazar.cheers.feature.home.navigation.home.homeNavigationRoute
 import com.salazar.cheers.feature.home.navigation.home.homeScreen
+import com.salazar.cheers.feature.map.navigation.mapPostHistoryScreen
 import com.salazar.cheers.feature.map.navigation.mapScreen
 import com.salazar.cheers.feature.map.navigation.mapSettingsScreen
+import com.salazar.cheers.feature.map.navigation.navigateToMapPostHistory
 import com.salazar.cheers.feature.map.navigation.navigateToMapSettings
 import com.salazar.cheers.feature.notifications.navigation.navigateToNotifications
 import com.salazar.cheers.feature.notifications.navigation.notificationsScreen
@@ -92,6 +94,8 @@ import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
 import com.salazar.cheers.feature.parties.detail.partyDetailScreen
 import com.salazar.cheers.feature.post_likes.navigateToPostLikes
 import com.salazar.cheers.feature.post_likes.postLikesScreen
+import com.salazar.cheers.feature.profile.navigation.cheersCodeScreen
+import com.salazar.cheers.feature.profile.navigation.navigateToCheerscode
 import com.salazar.cheers.feature.profile.other_profile.OtherProfileStatsRoute
 import com.salazar.cheers.feature.signin.navigateToSignIn
 import com.salazar.cheers.feature.signup.navigateToSignUp
@@ -266,24 +270,21 @@ fun NavGraphBuilder.mainNavGraph(
         )
 
         mapScreen(
-            navigateBack = {
-                navController.popBackStack()
-            },
+            navigateBack = navController::popBackStack,
             navigateToMapSettings = navController::navigateToMapSettings,
-            navigateToCreatePost = {
-            }
+            navigateToCreatePost = {},
+        )
+
+        mapPostHistoryScreen(
+            navigateBack = navController::popBackStack,
+            navigateToMapSettings = navController::navigateToMapSettings,
+            navigateToCreatePost = {},
         )
 
         mapSettingsScreen(
             navigateBack = navController::popBackStack,
         )
 
-
-        composable(MainDestinations.MAP_POST_HISTORY_ROUTE) {
-            MapPostHistoryRoute(
-                navActions = appState.navActions
-            )
-        }
 
         bottomSheet("${MainDestinations.CHAT_CAMERA_ROUTE}/{roomId}") {
             ChatCameraRoute(
@@ -499,6 +500,10 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
         )
 
+        cheersCodeScreen(
+            navigateBack = navController::popBackStack,
+        )
+
         friendListScreen(
             navigateBack = navController::popBackStack,
             navigateToOtherProfile = navController::navigateToOtherProfile,
@@ -606,7 +611,9 @@ fun NavGraphBuilder.mainNavGraph(
         }
     }
 
-    bottomSheet(route = "${MainDestinations.PROFILE_MORE_SHEET}/{username}") {
+    bottomSheet(
+        route = "${MainDestinations.PROFILE_MORE_SHEET}/{username}",
+    ) {
         val context = LocalContext.current
         val username = it.arguments?.getString("username")!!
         val clipboardManager = LocalClipboardManager.current
@@ -625,7 +632,8 @@ fun NavGraphBuilder.mainNavGraph(
                     }
 
                     is ProfileSheetUIAction.OnAddSnapchatFriends -> context.shareToSnapchat(username)
-                    is ProfileSheetUIAction.OnPostHistoryClick -> appState.navActions.navigateToPostHistory()
+                    is ProfileSheetUIAction.OnPostHistoryClick -> navController.navigateToMapPostHistory()
+                    ProfileSheetUIAction.OnQrCodeClick -> navController.navigateToCheerscode()
                 }
             },
         )

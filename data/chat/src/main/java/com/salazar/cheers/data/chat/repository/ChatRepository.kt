@@ -4,9 +4,9 @@ import cheers.chat.v1.GetRoomIdReq
 import cheers.chat.v1.RoomId
 import cheers.chat.v1.SendMessageResponse
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatMessage
-import com.salazar.cheers.data.chat.models.ChatStatus
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.common.util.result.Result
 import com.salazar.common.util.result.DataError
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +39,7 @@ interface ChatRepository {
     suspend fun deleteChats(channelId: String)
 
     suspend fun deleteRoom(channelId: String)
+    suspend fun clear()
 
     suspend fun getRoomId(request: GetRoomIdReq): RoomId
 

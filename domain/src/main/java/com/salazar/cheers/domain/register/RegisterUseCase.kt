@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.register
 
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.Resource
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class RegisterUseCase @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(
@@ -27,13 +27,14 @@ class RegisterUseCase @Inject constructor(
         val email = storeUserEmail.getEmail.firstOrNull()
             ?: return@withContext Resource.Error("No stored email")
 
-        val result = userRepository.createUser(
+        val result = userRepositoryImpl.createUser(
             username = username,
             email = email,
         )
 
-        if (result.isFailure)
+        if (result.isFailure) {
             return@withContext Resource.Error("Couldn't create user")
+        }
 
         return@withContext Resource.Success(Unit)
     }

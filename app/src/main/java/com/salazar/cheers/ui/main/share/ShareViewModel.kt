@@ -3,7 +3,7 @@ package com.salazar.cheers.ui.main.share
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.domain.list_friend.ListFriendUseCase
 import com.salazar.cheers.parties.domain.usecase.get_party.GetPartyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

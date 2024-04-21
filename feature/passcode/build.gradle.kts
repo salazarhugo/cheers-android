@@ -1,6 +1,6 @@
 plugins {
-    id("cheers.android.feature")
-    id("cheers.android.library.compose")
+    alias(libs.plugins.cheers.android.feature)
+    alias(libs.plugins.cheers.android.library.compose)
 }
 
 android {
@@ -12,13 +12,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(projects.common)
 
     // Biometric
     api(libs.androidx.biometric)
-    implementation(project(":data:user"))
-//    implementation(project(":core:protobuf"))
-//    implementation(project(":data:auth"))
+    implementation(projects.data.user)
+//    implementation(projects.core.protobuf)
+//    implementation(projects.data.auth)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

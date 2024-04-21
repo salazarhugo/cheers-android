@@ -25,7 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.ui.LoadingScreen
@@ -118,7 +119,7 @@ fun Comments(
     ) {
         item {
             GuidelinesBanner()
-            Divider()
+            HorizontalDivider()
         }
         if (comments.isEmpty()) {
             emptyComments()
@@ -153,7 +154,7 @@ private fun LazyListScope.emptyComments() {
 
 @Composable
 fun Caption(
-    post: com.salazar.cheers.data.post.repository.Post,
+    post: Post,
 ) {
     Row(
         modifier = Modifier
@@ -280,7 +281,7 @@ fun CommentBottomBar(
                 onRemove = onDeleteReplyCommentClick,
             )
         }
-        Divider()
+        HorizontalDivider()
         Row(
             modifier = Modifier
                 .fillMaxWidth()

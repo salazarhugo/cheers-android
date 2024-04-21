@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.data.chat.models.ChatMessage
-import com.salazar.cheers.data.chat.models.MessageType
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.MessageType
 import com.salazar.cheers.data.chat.models.mockMessage1
 import java.text.SimpleDateFormat
 import java.util.Date

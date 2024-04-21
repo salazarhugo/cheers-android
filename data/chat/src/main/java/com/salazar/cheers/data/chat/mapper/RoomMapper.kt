@@ -1,10 +1,10 @@
 package com.salazar.cheers.data.chat.mapper
 
 import cheers.chat.v1.Room
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.MessageType
-import com.salazar.cheers.data.chat.models.ChatStatus
-import com.salazar.cheers.data.chat.models.ChatType
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.MessageType
+import com.salazar.cheers.core.model.ChatStatus
+import com.salazar.cheers.core.model.ChatType
 
 fun Room.toChatChannel(): ChatChannel {
     return ChatChannel(

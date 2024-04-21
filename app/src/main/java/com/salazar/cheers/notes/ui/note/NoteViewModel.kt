@@ -3,7 +3,7 @@ package com.salazar.cheers.notes.ui.note
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.core.model.Note
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.domain.delete_note.DeleteNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -1,7 +1,7 @@
 package com.salazar.cheers.feature.profile
 
 import androidx.compose.runtime.Composable
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.User
 
 @Composable
 fun ProfileItem(

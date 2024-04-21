@@ -11,29 +11,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Ticket
+import com.salazar.cheers.core.model.duplexTicket
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ScreenPreviews
+import com.salazar.cheers.core.ui.components.qrcode.QrCodeComponent
 import com.salazar.cheers.core.ui.ui.Toolbar
-import com.simonsickle.compose.barcodes.Barcode
-import com.simonsickle.compose.barcodes.BarcodeType
 
 @Composable
 fun TicketDetailsScreen(
     uiState: TicketDetailsUiState,
-    navigateBack: () -> Unit,
+    onBackPressed: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
             Toolbar(
-                onBackPressed = navigateBack,
+                onBackPressed = onBackPressed,
                 title = "Ticket",
             )
         },
     ) {
-        Column(modifier = Modifier.padding(it)) {
-            if (uiState.ticket != null)
+        Column(
+            modifier = Modifier.padding(it),
+        ) {
+            if (uiState.ticket != null) {
                 Ticket(
                     ticket = uiState.ticket,
                 )
+            }
         }
+    }
+}
+
+@ScreenPreviews
+@Composable
+private fun TicketDetailScreenPreview() {
+    CheersPreview() {
+        TicketDetailsScreen(
+            uiState = TicketDetailsUiState(
+                isLoading = false,
+                errorMessage = "",
+                ticket = duplexTicket,
+            ),
+        )
     }
 }
 
@@ -73,12 +92,11 @@ fun Ticket(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Barcode(
+                QrCodeComponent(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.large)
                         .size(160.dp),
-                    type = BarcodeType.QR_CODE,
-                    value = ticket.id
+                    value = ticket.id,
                 )
                 Text(
                     text = ticket.id,

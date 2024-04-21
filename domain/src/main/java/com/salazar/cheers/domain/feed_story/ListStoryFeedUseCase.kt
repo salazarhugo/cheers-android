@@ -1,10 +1,10 @@
 package com.salazar.cheers.domain.feed_story
 
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import javax.inject.Inject
 
 class ListStoryFeedUseCase @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 //    private val repository: StoryRepository,
 ) {
 //    suspend operator fun invoke(): Flow<List<UserWithStories>> {

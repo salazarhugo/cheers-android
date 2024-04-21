@@ -1,5 +1,5 @@
 plugins {
-    id("cheers.android.library")
+    alias(libs.plugins.cheers.android.library)
     alias(libs.plugins.protobuf)
 }
 

@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +23,7 @@ data class ProfileStatsUiState(
 
 @HiltViewModel
 class ProfileStatsViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileStatsUiState())
@@ -52,7 +52,7 @@ class ProfileStatsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val following =
-                userRepository.getFollowing("")
+                userRepositoryImpl.getFollowing("")
             viewModelState.update {
                 it.copy(following = following, isLoadingFollowing = false)
             }
@@ -66,7 +66,7 @@ class ProfileStatsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val followers =
-                userRepository.getFollowers("")
+                userRepositoryImpl.getFollowers("")
             viewModelState.update {
                 it.copy(followers = followers, isLoadingFollowers = false)
             }
@@ -74,8 +74,5 @@ class ProfileStatsViewModel @Inject constructor(
     }
 
     fun toggleFollow(userID: String) {
-        viewModelScope.launch {
-            userRepository.toggleFollow(userID = userID)
-        }
     }
 }

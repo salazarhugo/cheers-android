@@ -1,19 +1,16 @@
 package com.salazar.cheers.feature.chat.ui.screens.messages
 
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.feature.chat.ui.chats.ChatsMoreBottomSheet
-import kotlinx.coroutines.launch
 
 @Composable
 fun MessagesRoute(

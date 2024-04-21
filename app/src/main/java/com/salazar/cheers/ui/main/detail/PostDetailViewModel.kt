@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.core.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +25,7 @@ sealed interface PostDetailUiState {
     ) : PostDetailUiState
 
     data class HasPost(
-        val postFeed: com.salazar.cheers.data.post.repository.Post,
+        val postFeed: Post,
         val members: List<com.salazar.cheers.core.model.UserItem>?,
         override val isLoading: Boolean,
         override val errorMessages: List<String>,
@@ -32,7 +33,7 @@ sealed interface PostDetailUiState {
 }
 
 private data class PostDetailViewModelState(
-    val postFeed: com.salazar.cheers.data.post.repository.Post? = null,
+    val postFeed: Post? = null,
     val members: List<com.salazar.cheers.core.model.UserItem>? = null,
     val isLoading: Boolean = false,
     val errorMessages: List<String> = emptyList(),
@@ -100,13 +101,13 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updatePost(post: com.salazar.cheers.data.post.repository.Post?) {
+    private fun updatePost(post: Post?) {
         viewModelState.update {
             it.copy(postFeed = post)
         }
     }
 
-    fun toggleLike(post: com.salazar.cheers.data.post.repository.Post) {
+    fun toggleLike(post: Post) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
         }

@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.activity
 
+import com.salazar.cheers.core.model.Activity
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.flow.Flow
 

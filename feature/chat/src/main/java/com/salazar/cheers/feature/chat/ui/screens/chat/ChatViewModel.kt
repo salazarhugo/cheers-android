@@ -8,8 +8,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cheers.type.UserOuterClass.UserItem
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.feature.chat.data.GetChatChannelUseCase
 import com.salazar.cheers.domain.seen_room.SeenRoomUseCase
 import com.salazar.cheers.domain.send_message.SendMessageUseCase

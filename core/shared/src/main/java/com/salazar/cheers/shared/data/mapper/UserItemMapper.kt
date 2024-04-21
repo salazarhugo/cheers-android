@@ -9,7 +9,7 @@ fun UserItem.toUserItem(): com.salazar.cheers.core.model.UserItem {
         id = id,
         name = name,
         picture = picture,
-        has_followed = hasFollowed,
+        hasFollowed = hasFollowed,
         username = username,
         verified = verified,
         story_state = com.salazar.cheers.core.model.StoryState.EMPTY,
@@ -27,7 +27,7 @@ fun UserOuterClass.User.toUserItem(): com.salazar.cheers.core.model.UserItem {
         verified = verified,
         story_state = com.salazar.cheers.core.model.StoryState.EMPTY,
         requested = false,
-        has_followed = false,
+        hasFollowed = false,
         friend = true,
     )
 }

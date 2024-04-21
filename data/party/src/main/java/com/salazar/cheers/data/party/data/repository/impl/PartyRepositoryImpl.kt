@@ -7,9 +7,11 @@ import cheers.party.v1.ListPartyRequest
 import cheers.party.v1.PartyServiceGrpcKt
 import cheers.type.PartyOuterClass
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.party.Party
-import com.salazar.cheers.data.party.PartyDao
-import com.salazar.cheers.data.party.WatchStatus
+import com.salazar.cheers.core.db.dao.PartyDao
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.model.WatchStatus
 import com.salazar.cheers.data.party.data.mapper.toPartyAnswer
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import com.salazar.cheers.data.party.toParty
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -60,14 +63,14 @@ class PartyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getParty(partyId: String): Flow<Party> {
-        return partyDao.getEvent(partyId)
+        return partyDao.getEvent(partyId).map { it.asExternalModel() }
     }
 
     override suspend fun feedParty(
         page: Int,
         pageSize: Int
     ): Flow<List<Party>> {
-        return partyDao.feedParty()
+        return partyDao.feedParty().map { it.asExternalModel() }
     }
 
     override suspend fun fetchFeedParty(
@@ -85,7 +88,7 @@ class PartyRepositoryImpl @Inject constructor(
                 it.toParty()
             }
             partyDao.clearAll()
-            partyDao.insertAll(parties)
+            partyDao.insertAll(parties.asEntity())
 
             Result.success(parties)
         } catch (e: Exception) {
@@ -106,19 +109,19 @@ class PartyRepositoryImpl @Inject constructor(
             .build()
 
         val localParties = partyDao.getEvents(accountId = userId).first()
-        emit(localParties)
+        emit(localParties.asExternalModel())
 
         try {
             val response = service.listParty(request)
             val parties = response.itemsList.map {
                 it.toParty()
             }
-            partyDao.insertAll(parties)
+            partyDao.insertAll(parties.asEntity())
         } catch (e: Exception) {
             e.printStackTrace()
         }
         val parties = partyDao.getEvents(accountId = userId)
-        emitAll(parties)
+        emitAll(parties.map { it.asExternalModel() })
     }
 
     override suspend fun deleteParty(partyId: String): Result<Unit> {
@@ -139,7 +142,7 @@ class PartyRepositoryImpl @Inject constructor(
     ): Result<Unit> {
         return try {
             val party = getParty(partyId = partyId).first()
-            partyDao.update(party.copy(watchStatus = watchStatus))
+            partyDao.update(party.copy(watchStatus = watchStatus).asEntity())
 
             val request = AnswerPartyRequest.newBuilder()
                 .setPartyId(partyId)

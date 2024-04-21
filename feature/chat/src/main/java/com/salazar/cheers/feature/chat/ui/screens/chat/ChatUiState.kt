@@ -1,8 +1,8 @@
 package com.salazar.cheers.feature.chat.ui.screens.chat
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatMessage
 
 data class ChatUiState(
     val isLoading: Boolean = false,

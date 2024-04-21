@@ -7,8 +7,8 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.playback.AudioState
 import com.salazar.cheers.data.account.Account
-import com.salazar.cheers.data.note.Note
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.model.Note
+import com.salazar.cheers.core.Post
 
 data class HomeUiState(
     val posts: List<Post> = emptyList(),

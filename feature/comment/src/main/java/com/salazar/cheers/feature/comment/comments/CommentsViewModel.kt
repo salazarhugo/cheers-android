@@ -3,9 +3,8 @@ package com.salazar.cheers.feature.comment.comments
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cheers.type.UserOuterClass
 import com.salazar.cheers.core.model.Comment
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.domain.create_comment.CreateCommentUseCase
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.cheers.domain.like_comment.LikeCommentUseCase

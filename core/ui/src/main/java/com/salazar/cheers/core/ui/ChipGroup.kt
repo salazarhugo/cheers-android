@@ -21,6 +21,7 @@ import com.salazar.cheers.core.ui.animations.Animate
 @Preview(showBackground = true)
 @Composable
 fun ChipGroup(
+    modifier: Modifier = Modifier,
     users: List<String> = emptyList(),
     isPrimary: Boolean = false,
     onSelectedChanged: (String) -> Unit = {},
@@ -28,7 +29,7 @@ fun ChipGroup(
     if (users.isEmpty())
         return
 
-    Column(modifier = Modifier.padding(8.dp)) {
+    Column(modifier = modifier.padding(8.dp)) {
         LazyRow(
         ) {
             items(users) {

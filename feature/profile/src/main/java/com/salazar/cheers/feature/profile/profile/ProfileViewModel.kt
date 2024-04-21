@@ -3,10 +3,11 @@ package com.salazar.cheers.feature.profile.profile
 import androidx.compose.material3.SheetState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.post.repository.PostRepository
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +36,7 @@ sealed interface ProfileUiState {
 
     data class HasUser(
         val user: User,
-        val posts: List<com.salazar.cheers.data.post.repository.Post>?,
+        val posts: List<Post>?,
         val parties: List<Party>?,
         override val sheetState: SheetState,
         override val isLoading: Boolean,
@@ -46,7 +47,7 @@ sealed interface ProfileUiState {
 
 private data class ProfileViewModelState(
     val user: User? = null,
-    val posts: List<com.salazar.cheers.data.post.repository.Post>? = null,
+    val posts: List<Post>? = null,
     val parties: List<Party>? = null,
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -75,7 +76,7 @@ private data class ProfileViewModelState(
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val postRepository: PostRepository,
     private val listPostUseCase: ListPostUseCase,
 ) : ViewModel() {
@@ -92,7 +93,7 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getCurrentUserFlow().collect { user ->
+            userRepositoryImpl.getCurrentUserFlow().collect { user ->
                 updateUser(user)
             }
         }
@@ -122,7 +123,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun toggleLike(
-        post: com.salazar.cheers.data.post.repository.Post,
+        post: Post,
     ) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
@@ -133,7 +134,7 @@ class ProfileViewModel @Inject constructor(
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val result = userRepository.fetchCurrentUser()
+            val result = userRepositoryImpl.fetchCurrentUser()
             when(result) {
                 is Resource.Error -> updateError(result.message)
                 is Resource.Loading -> {}
@@ -143,7 +144,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun updatePosts(posts: List<com.salazar.cheers.data.post.repository.Post>) {
+    private fun updatePosts(posts: List<Post>) {
         viewModelState.update {
             it.copy(posts = posts)
         }

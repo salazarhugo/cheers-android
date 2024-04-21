@@ -21,6 +21,11 @@ class LoggerInterceptor @Inject constructor(
         val delegateCall = next.newCall(method, callOptions)
 
         return object : ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(delegateCall) {
+            override fun sendMessage(message: ReqT) {
+                println("Request Message: $message")
+                super.sendMessage(message)
+            }
+
             override fun start(responseListener: Listener<RespT>?, headers: Metadata) {
                 super.start(
                     object : ForwardingClientCallListener.SimpleForwardingClientCallListener<RespT>(

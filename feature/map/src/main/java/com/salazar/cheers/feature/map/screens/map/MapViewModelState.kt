@@ -2,8 +2,7 @@ package com.salazar.cheers.feature.map.screens.map
 
 import androidx.compose.material3.SheetState
 import com.mapbox.geojson.FeatureCollection
-import com.salazar.cheers.data.post.repository.Post
-import com.salazar.cheers.data.map.UserLocation
+import com.salazar.cheers.core.Post
 
 data class MapViewModelState(
     val geojson: FeatureCollection? = null,

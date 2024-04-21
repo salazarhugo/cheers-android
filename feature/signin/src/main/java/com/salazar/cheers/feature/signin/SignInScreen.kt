@@ -28,7 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -215,7 +215,7 @@ fun Footer(
     Column(
         modifier = modifier.clickable { navigateToSignUp() }
     ) {
-        Divider()
+        HorizontalDivider()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -257,10 +257,10 @@ fun TextDivider(
 
 @Composable
 private fun RowScope.Line() {
-    Divider(
+    HorizontalDivider(
         modifier = Modifier
             .weight(1f)
             .align(Alignment.CenterVertically),
-        thickness = 2.dp,
+        thickness = 2.dp
     )
 }

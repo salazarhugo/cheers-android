@@ -59,9 +59,9 @@ class AuthRepository @Inject constructor(
     private val credentialManager: CredentialManager,
     private val gson: Gson,
 ) {
-    fun getIdToken(): com.salazar.common.util.result.Result<String, RootError> {
+    fun getIdToken(): com.salazar.common.util.result.Result<String, DataError> {
         val user = auth.currentUser
-            ?: return com.salazar.common.util.result.Result.Error(DataError.Network.UNKNOWN)
+            ?: return com.salazar.common.util.result.Result.Error(DataError.Auth.NOT_SIGNED_IN)
 
         return try {
             val task: Task<GetTokenResult> = user.getIdToken(false)
@@ -176,8 +176,9 @@ class AuthRepository @Inject constructor(
         return auth.signInWithCredential(credential).await()
     }
 
-    suspend fun signOut() {
+    fun signOut(): com.salazar.common.util.result.Result<Unit, RootError> {
         FirebaseAuth.getInstance().signOut()
+        return com.salazar.common.util.result.Result.Success(Unit)
     }
 
     suspend fun deleteAccount(): Result<Unit> {

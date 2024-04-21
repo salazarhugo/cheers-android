@@ -67,6 +67,7 @@ import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.data.account.Account
+import com.salazar.cheers.feature.create_post.components.SelectLocationComponent
 import com.salazar.cheers.feature.create_post.drink.SelectDrinkBottomSheet
 import com.salazar.common.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
@@ -76,38 +77,8 @@ import java.util.Date
 fun CreatePostScreenStateful(
     uiState: CreatePostUiState,
     onUploadPost: () -> Unit,
-    navigateToTagUser: () -> Unit,
-//    onSelectLocation: (SearchResult) -> Unit,
-//    updateLocationResults: (List<SearchResult>) -> Unit,
     onCreatePostUIAction: (CreatePostUIAction) -> Unit,
 ) {
-//    val searchCallback = object : SearchCallback {
-//        override fun onResults(
-//            results: List<SearchResult>,
-//            responseInfo: ResponseInfo
-//        ) {
-//            if (results.isNotEmpty()) {
-//                updateLocationResults(results)
-//                updateLocationName("On Pin")
-//            }
-//        }
-//
-//        override fun onError(e: Exception) {}
-//    }
-
-    if (uiState.locationPoint != null) {
-//        val options = ReverseGeoOptions(
-//            center = uiState.locationPoint,
-//        )
-        val context = LocalContext.current
-//        val reverseGeocoding = remember {
-//            SearchEngine.createSearchEngine(
-//                SearchEngineSettings(context.getString(R.string.mapbox_access_token))
-//            )
-//        }
-//        reverseGeocoding.search(options, searchCallback)
-    }
-
     CreatePostScreen(
         account = uiState.account,
         audio = uiState.audio,
@@ -123,8 +94,8 @@ fun CreatePostScreenStateful(
         medias = uiState.medias,
         notificationEnabled = uiState.notify,
         isLoading = uiState.isLoading,
+        location = uiState.location,
         locationResults = uiState.locationResults,
-//        location = uiState.location,
     )
 }
 
@@ -135,6 +106,7 @@ fun CreatePostScreen(
     modifier: Modifier = Modifier,
     errorMessage: String? = null,
     selectedDrink: Drink? = null,
+    location: String? = null,
     locationResults: List<String>? = null,
     audio: LocalAudio? = null,
     isAudioPlaying: Boolean = false,
@@ -147,7 +119,8 @@ fun CreatePostScreen(
     onUploadPost: () -> Unit = {},
     onCreatePostUIAction: (CreatePostUIAction) -> Unit = {},
 ) {
-    val enabled = caption.isNotEmpty() || medias.isNotEmpty() // || uiState.drinkState.currentPage > 0
+    val enabled =
+        caption.isNotEmpty() || medias.isNotEmpty() // || uiState.drinkState.currentPage > 0
     val drinkState = rememberPagerState {
         drinks.size
     }
@@ -207,6 +180,7 @@ fun CreatePostScreen(
                     username = account.username,
                     verified = account.verified,
                     avatar = account.picture,
+                    locationName = location,
                 )
             }
             CaptionSection(
@@ -268,19 +242,22 @@ fun CreatePostScreen(
                 onEndDateChange = {},
             )
             HorizontalDivider()
-            LocationSection(
-                location = "",
-                navigateToChooseOnMap = {
+
+            SelectLocationComponent(
+                location = location,
+                locationResults = locationResults.orEmpty(),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                onMapClick = {
                     onCreatePostUIAction(CreatePostUIAction.OnLocationClick)
                 },
+                onLocationClick = {
+                    onCreatePostUIAction(CreatePostUIAction.OnSelectLocation(it))
+                },
+                onDeleteLocation = {
+                    onCreatePostUIAction(CreatePostUIAction.OnSelectLocation(null))
+                },
             )
-            if (locationResults != null) {
-                LocationResultsSection(
-                    results = locationResults,
-                    onSelectLocation = {
-                    },
-                )
-            }
+
             HorizontalDivider()
             SwitchPreference(
                 text = "Send notification to friends",
@@ -335,7 +312,7 @@ private fun CreatePostScreenPreview() {
             modifier = Modifier,
             medias = List(4) {
                 Media.Image(uri = Uri.parse(""))
-             },
+            },
             account = Account(
                 username = "cheers",
                 verified = true,
@@ -538,65 +515,6 @@ fun SwitchPreference(
             }
         )
     }
-}
-
-@Composable
-fun LocationSection(
-    location: String?,
-    navigateToChooseOnMap: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .clickable { navigateToChooseOnMap() }
-            .padding(15.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = "Add location",
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(Icons.Outlined.MyLocation, null)
-            if (location?.isNotBlank() == true)
-                Text(
-                    text = location,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-                )
-        }
-    }
-}
-
-@Composable
-fun LocationResultsSection(
-    results: List<String>,
-    onSelectLocation: (String) -> Unit,
-) {
-    if (results.isNotEmpty()) {
-        LocationResult(
-            results = results,
-            onSelectLocation = onSelectLocation,
-        )
-    }
-}
-
-@Composable
-fun LocationResult(
-    results: List<String>,
-    onSelectLocation: (String) -> Unit,
-) {
-    ChipGroup(
-        users = results,
-        onSelectedChanged = { name ->
-            val location = results.find { it == name }
-            if (location != null)
-                onSelectLocation(location)
-        },
-    )
 }
 
 @Composable

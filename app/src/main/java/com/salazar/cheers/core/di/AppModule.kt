@@ -20,37 +20,29 @@ import cheers.user.v1.UserServiceGrpcKt
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.salazar.cheers.BuildConfig
-import com.salazar.cheers.comment.data.db.CommentDao
-import com.salazar.cheers.core.data.db.CheersDatabase
-import com.salazar.cheers.core.data.remote.TokenInterceptor
 import com.salazar.cheers.core.data.remote.FirebaseUserIdTokenInterceptor
 import com.salazar.cheers.core.data.remote.LoggerInterceptor
+import com.salazar.cheers.core.data.remote.TokenInterceptor
+import com.salazar.cheers.core.db.CheersDatabase
+import com.salazar.cheers.core.db.dao.CheersDao
+import com.salazar.cheers.core.db.dao.StoryDao
+import com.salazar.cheers.core.db.dao.UserPreferenceDao
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.data.activity.impl.ActivityRepositoryImpl
 import com.salazar.cheers.data.billing.api.ApiService
+import com.salazar.cheers.data.chat.repository.ChatRepository
+import com.salazar.cheers.data.chat.repository.ChatRepositoryImpl
 import com.salazar.cheers.data.comment.CommentRepository
 import com.salazar.cheers.data.comment.CommentRepositoryImpl
-import com.salazar.cheers.data.db.*
-import com.salazar.cheers.data.drink.db.DrinkDao
-import com.salazar.cheers.data.note.db.NoteDao
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.data.note.repository.NoteRepositoryImpl
-import com.salazar.cheers.data.party.PartyDao
-import com.salazar.cheers.data.post.repository.PostDao
-import com.salazar.cheers.data.user.account.AccountRepository
-import com.salazar.cheers.data.user.account.AccountRepositoryImpl
 import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.ticket.TicketRepository
 import com.salazar.cheers.data.ticket.impl.TicketRepositoryImpl
-import com.salazar.cheers.data.user.UserDao
-import com.salazar.cheers.data.user.UserItemDao
-import com.salazar.cheers.data.user.UserStatsDao
-import com.salazar.cheers.data.chat.db.ChatDao
-import com.salazar.cheers.data.chat.repository.ChatRepository
-import com.salazar.cheers.data.chat.repository.ChatRepositoryImpl
-import com.salazar.cheers.data.chat.websocket.ChatWebSocketListener
+import com.salazar.cheers.data.user.account.AccountRepository
+import com.salazar.cheers.data.user.account.AccountRepositoryImpl
 import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -357,10 +349,12 @@ object AppModule {
     fun provideNotificationServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): NotificationServiceGrpcKt.NotificationServiceCoroutineStub {
         return NotificationServiceGrpcKt
             .NotificationServiceCoroutineStub(managedChannel)
             .withInterceptors(tokenInterceptor)
+            .withInterceptors(loggerInterceptor)
             .withInterceptors()
     }
 
@@ -369,9 +363,11 @@ object AppModule {
     fun provideUserServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): UserServiceGrpcKt.UserServiceCoroutineStub {
         return UserServiceGrpcKt
             .UserServiceCoroutineStub(managedChannel)
+            .withInterceptors(loggerInterceptor)
             .withInterceptors(tokenInterceptor)
             .withInterceptors()
     }
@@ -420,7 +416,7 @@ object AppModule {
     @Provides
     fun provideDb(@ApplicationContext context: Context): CheersDatabase {
         return androidx.room.Room
-            .databaseBuilder(context.applicationContext, CheersDatabase::class.java, "cheers.db")
+            .databaseBuilder(context.applicationContext, com.salazar.cheers.core.db.CheersDatabase::class.java, "cheers.db")
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -428,71 +424,71 @@ object AppModule {
     @Singleton
     @Provides
     fun provideNoteDao(
-        cheersDatabase: CheersDatabase,
-    ): NoteDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.NoteDao {
         return cheersDatabase.noteDao()
     }
 
     @Singleton
     @Provides
     fun provideDrinkDao(
-        cheersDatabase: CheersDatabase,
-    ): DrinkDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.DrinkDao {
         return cheersDatabase.drinkDao()
     }
 
     @Singleton
     @Provides
     fun provideFriendRequestDao(
-        cheersDatabase: CheersDatabase,
-    ): com.salazar.cheers.data.friendship.FriendRequestDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.FriendRequestDao {
         return cheersDatabase.friendRequestDao()
     }
 
     @Singleton
     @Provides
     fun provideCommentDao(
-        cheersDatabase: CheersDatabase,
-    ): CommentDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.CommentDao {
         return cheersDatabase.commentDao()
     }
 
     @Singleton
     @Provides
     fun provideTicketDao(
-        cheersDatabase: CheersDatabase,
-    ): com.salazar.cheers.data.ticket.TicketDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.TicketDao {
         return cheersDatabase.ticketDao()
     }
 
     @Singleton
     @Provides
     fun providePartyDao(
-        cheersDatabase: CheersDatabase,
-    ): PartyDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.PartyDao {
         return cheersDatabase.partyDao()
     }
 
     @Singleton
     @Provides
     fun provideActivityDao(
-        cheersDatabase: CheersDatabase,
-    ): com.salazar.cheers.data.activity.ActivityDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.ActivityDao {
         return cheersDatabase.activityDao()
     }
 
     @Singleton
     @Provides
     fun provideUserStatsDao(
-        cheersDatabase: CheersDatabase,
-    ): UserStatsDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.UserStatsDao {
         return cheersDatabase.userStatsDao()
     }
 
     @Singleton
     @Provides
     fun provideStoryDao(
-        cheersDatabase: CheersDatabase,
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
     ): StoryDao {
         return cheersDatabase.storyDao()
     }
@@ -500,31 +496,31 @@ object AppModule {
     @Singleton
     @Provides
     fun provideUserDao(
-        cheersDatabase: CheersDatabase,
-    ): UserDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.UserDao {
         return cheersDatabase.userDao()
     }
 
     @Singleton
     @Provides
     fun provideUserItemDao(
-        cheersDatabase: CheersDatabase,
-    ): UserItemDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.UserItemDao {
         return cheersDatabase.userItemDao()
     }
 
     @Singleton
     @Provides
     fun provideChatDao(
-        cheersDatabase: CheersDatabase,
-    ): com.salazar.cheers.data.chat.db.ChatDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.ChatDao {
         return cheersDatabase.chatDao()
     }
 
     @Singleton
     @Provides
     fun provideUserPreferenceDao(
-        cheersDatabase: CheersDatabase,
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
     ): UserPreferenceDao {
         return cheersDatabase.userPreferenceDao()
     }
@@ -532,15 +528,15 @@ object AppModule {
     @Singleton
     @Provides
     fun providePostDao(
-        cheersDatabase: CheersDatabase,
-    ): PostDao {
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+    ): com.salazar.cheers.core.db.dao.PostDao {
         return cheersDatabase.postDao()
     }
 
     @Singleton
     @Provides
     fun provideCheersDao(
-        cheersDatabase: CheersDatabase,
+        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
     ): CheersDao {
         return cheersDatabase.cheersDao()
     }

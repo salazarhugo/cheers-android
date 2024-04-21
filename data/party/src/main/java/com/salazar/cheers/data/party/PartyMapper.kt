@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.party
 
 import cheers.party.v1.PartyItem
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.data.party.data.mapper.toWatchStatus
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.salazar.cheers.core.model.Activity
 import com.salazar.cheers.core.ui.CheersBadgeBox
 import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
@@ -36,7 +37,7 @@ import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.core.ui.AddFriendButton
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.util.relativeTimeFormatter
-import com.salazar.cheers.data.activity.ActivityType
+import com.salazar.cheers.core.model.ActivityType
 
 
 @Composable
@@ -74,7 +75,7 @@ fun ActivityScreen(
 @Composable
 fun ActivityList(
     uiState: ActivityUiState,
-    activities: List<com.salazar.cheers.data.activity.Activity>?,
+    activities: List<Activity>?,
     onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     val suggestions = uiState.suggestions
@@ -180,8 +181,8 @@ fun FriendRequests(
 
 @Composable
 fun ActivityItem(
-    activity: com.salazar.cheers.data.activity.Activity,
-    onActivityClick: (com.salazar.cheers.data.activity.Activity) -> Unit,
+    activity: Activity,
+    onActivityClick: (Activity) -> Unit,
     onActivityUIAction: (ActivityUIAction) -> Unit,
 ) {
     Row(

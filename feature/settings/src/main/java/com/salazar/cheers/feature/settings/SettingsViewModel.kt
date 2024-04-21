@@ -29,7 +29,6 @@ data class SettingsUiState(
 class SettingsViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val dataStoreRepository: DataStoreRepository,
-    private val deleteAccountUseCase: DeleteAccountUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SettingsUiState(isLoading = true))

@@ -10,12 +10,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.Celebration
-import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
@@ -25,14 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.coronaExtraDrink
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.item.party.PartyItem
-import com.salazar.cheers.data.party.Party
-import com.salazar.cheers.data.post.repository.Post
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.profile.ProfileHeader
+import com.salazar.cheers.feature.profile.components.favorite_drink.FavoriteDrinkComponent
 import kotlinx.coroutines.launch
 
 
@@ -47,7 +48,7 @@ fun OtherProfileList(
 ) {
     val userID = user.id
     val tabs = listOf(
-        Icons.Outlined.ViewList,
+        Icons.AutoMirrored.Outlined.ViewList,
         Icons.Default.GridView,
         Icons.Outlined.Celebration
     )
@@ -60,6 +61,7 @@ fun OtherProfileList(
         state = state,
     ) {
         avatar(
+            drink =  coronaExtraDrink,
             avatar = user.picture,
             banner = user.banner,
             verified = user.verified,
@@ -110,6 +112,7 @@ fun OtherProfileList(
 }
 
 fun LazyListScope.avatar(
+    drink: Drink?,
     avatar: String?,
     banner: String?,
     username: String,
@@ -121,8 +124,8 @@ fun LazyListScope.avatar(
             banner = banner,
             avatar = avatar,
             content = {
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.MoreHoriz, contentDescription = null)
+                if (drink != null) {
+                    FavoriteDrinkComponent(drink = drink)
                 }
             }
         )

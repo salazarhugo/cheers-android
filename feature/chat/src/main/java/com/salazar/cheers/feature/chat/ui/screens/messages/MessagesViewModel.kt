@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.chat.ui.screens.messages
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.domain.pin_room.PinRoomUseCase
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager

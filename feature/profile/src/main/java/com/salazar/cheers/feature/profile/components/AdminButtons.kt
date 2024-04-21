@@ -38,7 +38,7 @@ fun AdminButtons(
 private fun AdminButtonsPreview() {
     CheersPreview {
         AdminButtons(
-            modifier = Modifier,
+            modifier = Modifier.padding(16.dp),
         )
     }
 }

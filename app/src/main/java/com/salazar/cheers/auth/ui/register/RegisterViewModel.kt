@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.util.Utils.validateUsername
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.register.RegisterUseCase
 import com.salazar.cheers.domain.usecase.SignInWithEmailLinkUseCase
 import com.salazar.common.util.Resource
@@ -28,7 +28,7 @@ data class RegisterUiState(
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val registerUseCase: RegisterUseCase,
     private val signInWithEmailLinkUseCase: SignInWithEmailLinkUseCase,
 ) : ViewModel() {
@@ -107,7 +107,7 @@ class RegisterViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val result = userRepository.checkUsername(username = username)
+            val result = userRepositoryImpl.checkUsername(username = username)
             result.onSuccess { valid ->
                 updateUsernameAvailable(valid)
                 onComplete(valid)

@@ -13,9 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.salazar.cheers.core.ui.ShareButton
-import com.salazar.cheers.feature.create_post.LocationSection
 import com.salazar.cheers.feature.parties.ui.PartyDetails
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.ui.main.party.create.CategorySection
 import com.salazar.cheers.ui.main.party.create.Description
@@ -57,18 +56,17 @@ fun EditEventScreen(
                     startTimeSeconds = event.startDate,
                     onPartyDetailsClick = {}
                 )
-                Divider()
+                HorizontalDivider()
                 Description(
                     description = event.description,
                     onDescriptionClick = {}
                 )
-                Divider()
+                HorizontalDivider()
                 CategorySection(
                     category = "",
                     onClick = {},
                 )
-                Divider()
-                LocationSection("", navigateToChooseOnMap = {})
+                HorizontalDivider()
                 ShareButton(
                     onClick = onSave,
                     text = "Share",

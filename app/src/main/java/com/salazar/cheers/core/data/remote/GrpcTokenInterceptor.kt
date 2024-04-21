@@ -1,6 +1,8 @@
 package com.salazar.cheers.core.data.remote
 
+import android.util.Log
 import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
+import com.salazar.common.util.result.getOrNull
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall

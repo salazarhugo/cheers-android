@@ -3,7 +3,6 @@
 package com.salazar.cheers.feature.map.screens.map
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,33 +17,26 @@ import androidx.compose.material.icons.filled.PublicOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.dsl.cameraOptions
-import com.mapbox.maps.extension.compose.MapEffect
-import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.maps.extension.compose.annotation.ViewAnnotation
-import com.mapbox.maps.plugin.gestures.generated.GesturesSettings
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
-import com.salazar.cheers.data.post.repository.Post
-import com.salazar.cheers.data.map.UserLocation
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.feature.map.ui.annotations.CurrentUserAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.FriendAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.PostAnnotation
+import com.salazar.cheers.feature.map.ui.components.MapComponent
 import com.salazar.common.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
 
@@ -60,85 +52,36 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         mapViewportState.flyTo(
             cameraOptions = cameraOptions {
-                center(Point.fromLngLat(uiState.userLocation.longitude, uiState.userLocation.latitude))
+                center(
+                    Point.fromLngLat(
+                        uiState.userLocation.longitude,
+                        uiState.userLocation.latitude
+                    )
+                )
                 zoom(13.0)
             }
         )
     }
 
-    Scaffold(
-    ) {
-        it
-        if (selectedAnnotation != null) {
-            MapBottomSheet(
-                state = uiState.sheetState,
-                type = selectedAnnotation,
-//                modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
-                onMapUIAction = onMapUIAction,
-                onDismissRequest = {
-                    scope.launch {
-                        uiState.sheetState.hide()
-                    }.invokeOnCompletion {
-                        onMapUIAction(MapUIAction.OnDismissBottomSheet)
-                    }
-                }
-            )
-        }
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-            MapboxMap(
-                modifier = Modifier.fillMaxSize(),
-                mapViewportState = mapViewportState,
-                gesturesSettings = GesturesSettings {
-                    rotateEnabled = false
-                },
-                attribution = {},
-                scaleBar = {},
-                mapInitOptionsFactory = { context ->
-                    MapInitOptions(
-                        context = context,
-                        styleUri = "mapbox://styles/salazarbrock/ckxuwlu02gjiq15p3iknr2lk0",
-                        cameraOptions = CameraOptions.Builder()
-                            .zoom(1.0)
-                            .build()
-                    )
-                }
-            ) {
-                val userLocation = uiState.userLocation
-                val isSelected = selectedAnnotation is MapAnnotation.UserAnnotation &&
-                            selectedAnnotation.user.id == userLocation.id
-                CurrentUserViewAnnotation(
-                    isSelected = isSelected,
-                    userLocation = userLocation,
-                    ghostMode = uiState.ghostMode,
-                    onClick = {
-                        onMapUIAction(MapUIAction.OnUserViewAnnotationClick(userLocation))
-                    },
-                )
-
-                uiState.posts?.forEach { post ->
-                    AddPostViewAnnotation(
-                        post = post,
-                        isSelected = false,
-                        onClick = {
-                            onMapUIAction(MapUIAction.OnPostViewAnnotationClick(post))
-                        },
-                    )
-                }
-
-                uiState.users.forEach { user ->
-                    val isSelected = selectedAnnotation is MapAnnotation.UserAnnotation &&
-                            selectedAnnotation.user.id == user.id
-                    AddFriendViewAnnotation(
-                        isSelected = isSelected,
-                        userLocation = user,
-                        onClick = {
-                            onMapUIAction(MapUIAction.OnUserViewAnnotationClick(user))
-                        },
-                    )
+    if (selectedAnnotation != null) {
+        MapBottomSheet(
+            state = uiState.sheetState,
+            type = selectedAnnotation,
+            onMapUIAction = onMapUIAction,
+            onDismissRequest = {
+                scope.launch {
+                    uiState.sheetState.hide()
+                }.invokeOnCompletion {
+                    onMapUIAction(MapUIAction.OnDismissBottomSheet)
                 }
             }
+        )
+    }
+
+    MapComponent(
+        modifier = Modifier.fillMaxSize(),
+        mapViewportState = mapViewportState,
+        overlay = {
             UiLayer(
                 isPublic = uiState.isPublic,
                 modifier = Modifier
@@ -146,6 +89,40 @@ fun MapScreen(
                     .fillMaxSize()
                     .align(Alignment.TopCenter),
                 onMapUIAction = onMapUIAction,
+            )
+        }
+    ) {
+        val userLocation = uiState.userLocation
+        val isSelected = selectedAnnotation is MapAnnotation.UserAnnotation &&
+                selectedAnnotation.user.id == userLocation.id
+        CurrentUserViewAnnotation(
+            isSelected = isSelected,
+            userLocation = userLocation,
+            ghostMode = uiState.ghostMode,
+            onClick = {
+                onMapUIAction(MapUIAction.OnUserViewAnnotationClick(userLocation))
+            },
+        )
+
+        uiState.posts?.forEach { post ->
+            AddPostViewAnnotation(
+                post = post,
+                isSelected = false,
+                onClick = {
+                    onMapUIAction(MapUIAction.OnPostViewAnnotationClick(post))
+                },
+            )
+        }
+
+        uiState.users.forEach { user ->
+            val isSelected = selectedAnnotation is MapAnnotation.UserAnnotation &&
+                    selectedAnnotation.user.id == user.id
+            AddFriendViewAnnotation(
+                isSelected = isSelected,
+                userLocation = user,
+                onClick = {
+                    onMapUIAction(MapUIAction.OnUserViewAnnotationClick(user))
+                },
             )
         }
     }
@@ -279,7 +256,7 @@ fun MapTopBar(
     isPublic: Boolean,
     onMapUIAction: (MapUIAction) -> Unit,
 ) {
-    val icon = when (isPublic)  {
+    val icon = when (isPublic) {
         true -> Icons.Default.Public
         false -> Icons.Default.PublicOff
     }

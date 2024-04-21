@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.theme.GreySheet
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatType
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatType
 
 @Composable
 internal fun ChatsMoreBottomSheet(

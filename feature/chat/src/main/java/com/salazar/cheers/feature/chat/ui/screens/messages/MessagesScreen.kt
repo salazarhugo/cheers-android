@@ -22,7 +22,7 @@ import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.feature.chat.ui.chats.EmptyChatsMessage
 import com.salazar.cheers.feature.chat.ui.components.SwipeableChatItem
 import com.salazar.cheers.feature.chat.ui.components.chat_item.DirectChatComponent

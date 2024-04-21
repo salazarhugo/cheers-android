@@ -1,4 +1,4 @@
-import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.core.model.ChatChannel
 
 sealed class RoomsUIAction {
     data object OnBackPressed : RoomsUIAction()

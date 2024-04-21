@@ -1,7 +1,6 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.library.compose")
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.library.compose)
 }
 
 android {
@@ -9,26 +8,4 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-
-    // Room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
-
-    // Moshi
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi)
-    ksp(libs.moshi.kotlin.codegen)
-
-    // Map Box SDK
-    implementation(libs.mapbox)
-    implementation(libs.mapbox.sdk.services)
-//    implementation(libs.mapbox.search.android)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

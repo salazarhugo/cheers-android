@@ -5,18 +5,21 @@ import cheers.note.v1.DeleteNoteRequest
 import cheers.note.v1.ListFriendNoteRequest
 import cheers.note.v1.NoteServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.data.note.Note
-import com.salazar.cheers.data.note.NoteType
-import com.salazar.cheers.data.note.db.NoteDao
+import com.salazar.cheers.core.model.Note
+import com.salazar.cheers.core.model.NoteType
+import com.salazar.cheers.core.db.dao.NoteDao
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.data.note.mapper.toNote
 import com.salazar.cheers.data.note.mapper.toNoteTypePb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
-    private val dao: NoteDao,
+    private val dao: com.salazar.cheers.core.db.dao.NoteDao,
     private val service: NoteServiceGrpcKt.NoteServiceCoroutineStub,
 ): NoteRepository {
     override suspend fun createNote(
@@ -37,7 +40,7 @@ class NoteRepositoryImpl @Inject constructor(
 
             val response = service.createNote(request = request.build())
             val note = response.note.toNote()
-            dao.insert(note)
+            dao.insert(note.asEntity())
             Result.success(note)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -46,7 +49,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getNote(userID: String): Flow<Note> {
-        return dao.getNote(userID = userID)
+        return dao.getNote(userID = userID).map { it.asExternalModel() }
     }
 
     override suspend fun getYourNote(): Flow<Note> {
@@ -55,7 +58,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override fun listFriendNotes(): Flow<List<Note>>  {
-        return dao.listNotes()
+        return dao.listNotes().map { it.asExternalModel() }
     }
 
     override suspend fun refreshFriendNotes(): Result<Unit> = withContext(Dispatchers.IO) {
@@ -66,7 +69,7 @@ class NoteRepositoryImpl @Inject constructor(
                 it.toNote()
             }
             dao.clear()
-            dao.insert(notes)
+            dao.insert(notes.asEntity())
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()

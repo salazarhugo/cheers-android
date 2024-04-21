@@ -2,6 +2,7 @@ package com.salazar.cheers.data.map
 
 import android.content.Context
 import android.util.Log
+import cheers.location.v1.GeocodeRequest
 import cheers.location.v1.ListFriendLocationRequest
 import cheers.location.v1.LocationServiceGrpcKt
 import cheers.location.v1.UpdateGhostModeRequest
@@ -21,6 +22,7 @@ import com.mapbox.search.SearchCallback
 import com.mapbox.search.SearchEngine
 import com.mapbox.search.common.AsyncOperationTask
 import com.mapbox.search.result.SearchResult
+import com.salazar.common.util.result.DataError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -84,11 +86,11 @@ class MapRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getLocationName(
+    override suspend fun getLocationName(
         longitude: Double,
         latitude: Double,
         zoom: Double?,
-    ) = callbackFlow {
+    ): com.salazar.common.util.result.Result<List<String>, DataError> {
 
         val queryType = if (zoom == null) {
             QueryType.PLACE
@@ -100,29 +102,21 @@ class MapRepositoryImpl @Inject constructor(
             }
         }
 
-        val options = ReverseGeoOptions(
-            center = Point.fromLngLat(longitude, latitude),
-            types = listOf(queryType)
-        )
-        searchRequestTask = searchEngine.search(options, object : SearchCallback {
-            override fun onError(e: Exception) {
-                Log.i("SearchApiExample", "Reverse geocoding error", e)
-            }
+        val request = GeocodeRequest.newBuilder()
+            .setLatitude(latitude)
+            .setLongitude(longitude)
+            .build()
 
-            override fun onResults(
-                results: List<SearchResult>,
-                responseInfo: com.mapbox.search.ResponseInfo
-            ) {
-                trySend(results.map { it.name })
+        return try {
+            val locations = locationService.geocode(request)
+            val userLocation = locations.locationsList.map {
+                it.name
             }
-        })
-
-        awaitClose {
-            searchRequestTask.cancel()
-            channel.close()
+            com.salazar.common.util.result.Result.Success(userLocation)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            com.salazar.common.util.result.Result.Error(DataError.Network.UNKNOWN)
         }
     }
-
-    private lateinit var searchRequestTask: AsyncOperationTask
 
 }

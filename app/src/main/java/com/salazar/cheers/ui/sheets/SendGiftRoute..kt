@@ -23,7 +23,6 @@ import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.theme.Green
 import com.salazar.cheers.core.ui.theme.GreenSurface
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
-import androidx.compose.material3.Divider
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import kotlinx.coroutines.delay
 
@@ -65,6 +64,7 @@ fun SendGiftRoute(
                     }
                 )
             }
+
             false -> {
 //                val y = bottomSheetNavigator.navigatorSheetState.offset.value
                 val y = 0f
@@ -79,6 +79,7 @@ fun SendGiftRoute(
                     onRechargeClick = { navActions.navigateToRecharge() },
                 )
             }
+
             else -> {
                 if (uiState.isLoading) {
 //                    val y = bottomSheetNavigator.navigatorSheetState.offset.value
@@ -120,7 +121,7 @@ fun ConfirmTransactionScreen(
         modifier = Modifier.padding(16.dp),
         color = MaterialTheme.colorScheme.onBackground,
     )
-    Divider()
+    HorizontalDivider()
     Button(
         onClick = onConfirm,
         modifier = Modifier

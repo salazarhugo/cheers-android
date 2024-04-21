@@ -14,12 +14,14 @@ import cheers.chat.v1.SendMessageResponse
 import cheers.chat.v1.SendReadReceiptRequest
 import cheers.chat.v1.TypingReq
 import cheers.type.UserOuterClass.UserItem
-import com.salazar.cheers.data.chat.db.ChatDao
+import com.salazar.cheers.core.db.dao.ChatDao
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.data.chat.mapper.toChatChannel
 import com.salazar.cheers.data.chat.mapper.toTextMessage
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatMessage
-import com.salazar.cheers.data.chat.models.ChatStatus
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.cheers.shared.data.toDataError
 import com.salazar.common.util.result.DataError
@@ -29,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,8 +41,6 @@ class ChatRepositoryImpl @Inject constructor(
     private val chatDao: ChatDao,
     private val chatService: ChatServiceGrpcKt.ChatServiceCoroutineStub,
 ) : ChatRepository {
-
-//    private val workManager = WorkManager.getInstance(application)
 
     override fun getUnreadChatCount(): Flow<Int> {
         return try {
@@ -70,6 +71,7 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun listMessages(channelId: String): Flow<List<ChatMessage>> =
         withContext(Dispatchers.IO) {
             return@withContext chatDao.getMessages(channelId = channelId)
+                .map { it.asExternalModel() }
         }
 
     override suspend fun getRoomMembers(roomId: String): Result<List<com.salazar.cheers.core.model.UserItem>, DataError.Network> {
@@ -93,11 +95,12 @@ class ChatRepositoryImpl @Inject constructor(
 
     override fun getChannel(channelId: String): Flow<ChatChannel> {
         return chatDao.getChannelFlow(channelId = channelId).filterNotNull()
+            .map { it.asExternalModel() }
     }
 
     override suspend fun getChatWithUser(userId: String): ChatChannel? =
         withContext(Dispatchers.IO) {
-            return@withContext chatDao.getChatWithUser(userId = userId)
+            return@withContext chatDao.getChatWithUser(userId = userId)?.asExternalModel()
         }
 
     override suspend fun getOrCreateDirectChat(
@@ -117,7 +120,7 @@ class ChatRepositoryImpl @Inject constructor(
 
         return@withContext try {
             val chatChannel = chatService.createRoom(request).room.toChatChannel()
-            chatDao.insert(chatChannel)
+            chatDao.insert(chatChannel.asEntity())
             Result.Success(chatChannel)
         } catch (e: StatusException) {
             e.printStackTrace()
@@ -155,6 +158,10 @@ class ChatRepositoryImpl @Inject constructor(
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+    }
+
+    override suspend fun clear() {
+        chatDao.clearRooms()
     }
 
     override suspend fun getRoomId(request: GetRoomIdReq): RoomId {
@@ -212,7 +219,7 @@ class ChatRepositoryImpl @Inject constructor(
         roomId: String,
         message: ChatMessage
     ): Result<ChatMessage, DataError.Network> {
-        chatDao.insertMessage(message)
+        chatDao.insertMessage(message.asEntity())
         chatDao.updateLastMessage(
             roomId,
             message.text,
@@ -233,7 +240,7 @@ class ChatRepositoryImpl @Inject constructor(
                 id = message.id,
                 isSender = true,
             )
-            chatDao.insertMessage(textMessage)
+            chatDao.insertMessage(textMessage.asEntity())
 
             Result.Success(textMessage)
         } catch (e: StatusException) {
@@ -262,14 +269,14 @@ class ChatRepositoryImpl @Inject constructor(
             val response = chatService.getInbox(request = request)
 
             val rooms = response.inboxList.map { it.room.toChatChannel() }
-            chatDao.insertInbox(rooms)
+            chatDao.insertInbox(rooms.asEntity())
 
             response.inboxList.forEach { roomWithMessages ->
                 val messages = roomWithMessages.messagesList.map {
                     it.toTextMessage()
                 }
                 chatDao.deleteChannelMessages(roomWithMessages.room.id)
-                chatDao.insertMessages(messages)
+                chatDao.insertMessages(messages.asEntity())
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -278,6 +285,6 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override fun getChannels(): Flow<List<ChatChannel>> {
-        return chatDao.getChannels()
+        return chatDao.getChannels().map { it.asExternalModel() }
     }
 }

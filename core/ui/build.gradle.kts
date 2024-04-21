@@ -1,7 +1,7 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.library.compose")
-    id("cheers.android.hilt")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.library.compose)
+    alias(libs.plugins.cheers.android.hilt)
 }
 
 android {
@@ -17,15 +17,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":core:util"))
-    implementation(project(":core:model"))
-    implementation(project(":core:shared"))
+    implementation(projects.common)
+    implementation(projects.core.util)
+    implementation(projects.core.model)
+    implementation(projects.core.shared)
 
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
 
-    implementation(project(":data:party"))
-    implementation(project(":data:post"))
+    implementation(projects.data.party)
+    implementation(projects.data.post)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -42,6 +42,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
+
+    // QR Code
+    implementation(libs.composed.barcodes)
 
     // Amplituda
     implementation("com.github.lincollincol:compose-audiowaveform:1.1.1")

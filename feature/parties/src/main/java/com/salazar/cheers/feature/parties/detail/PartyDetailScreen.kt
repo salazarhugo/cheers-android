@@ -2,20 +2,18 @@ package com.salazar.cheers.feature.parties.detail
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,16 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.util.numberFormatter
-import com.salazar.cheers.data.party.Party
-import com.salazar.cheers.data.party.WatchStatus
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.model.WatchStatus
 import com.salazar.cheers.feature.parties.ui.PartyDescription
 import com.salazar.cheers.feature.parties.ui.PartyDetails
 import com.salazar.cheers.feature.parties.ui.PartyHeaderButtons
 import com.salazar.cheers.feature.parties.ui.PartyInfo
 import com.salazar.cheers.feature.parties.ui.PartyVenue
-import com.salazar.cheers.feature.parties.ui.PartyManageSheet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -135,7 +131,7 @@ fun PartyDetail(
                 modifier = Modifier.padding(16.dp),
                 onUserClicked = onUserClicked,
             )
-            Divider()
+            HorizontalDivider()
         }
 
         item {
@@ -161,7 +157,7 @@ fun LazyListScope.guestList(party: Party) {
             onGoingCountClick = {},
             onInterestedCountClick = {},
         )
-        Divider()
+        HorizontalDivider()
     }
 }
 
@@ -296,6 +292,6 @@ fun PartyHeader(
                 Text("Discussion")
             }
         }
-        Divider()
+        HorizontalDivider()
     }
 }

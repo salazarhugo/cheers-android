@@ -32,11 +32,12 @@ import com.salazar.cheers.core.ui.SheetItem
 
 
 sealed class ProfileSheetUIAction {
-    object OnNfcClick : ProfileSheetUIAction()
-    object OnCopyProfileClick : ProfileSheetUIAction()
-    object OnSettingsClick : ProfileSheetUIAction()
-    object OnAddSnapchatFriends : ProfileSheetUIAction()
-    object OnPostHistoryClick : ProfileSheetUIAction()
+    data object OnNfcClick : ProfileSheetUIAction()
+    data object OnCopyProfileClick : ProfileSheetUIAction()
+    data object OnSettingsClick : ProfileSheetUIAction()
+    data object OnAddSnapchatFriends : ProfileSheetUIAction()
+    data object OnPostHistoryClick : ProfileSheetUIAction()
+    data object OnQrCodeClick : ProfileSheetUIAction()
 }
 
 @Composable
@@ -58,26 +59,27 @@ fun ProfileMoreBottomSheet(
         SheetItem(
             text = "Settings",
             icon = Icons.Outlined.Settings,
-            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnSettingsClick) }
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnSettingsClick) },
         )
         SheetItem(
             text = "Add Snapchat Friends",
             icon = Icons.Outlined.Archive,
-            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnAddSnapchatFriends) }
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnAddSnapchatFriends) },
         )
         SheetItem(
             text = "Post History",
             icon = Icons.Outlined.Archive,
-            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnPostHistoryClick) }
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnPostHistoryClick) },
         )
         SheetItem(
             text = "Nfc",
             icon = Icons.Outlined.Contactless,
-            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnNfcClick) }
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnNfcClick) },
         )
         SheetItem(
             text = "QR code",
             icon = Icons.Outlined.QrCode,
+            onClick = { onProfileSheetUIAction(ProfileSheetUIAction.OnQrCodeClick) },
         )
         SheetItem(
             text = "Saved",

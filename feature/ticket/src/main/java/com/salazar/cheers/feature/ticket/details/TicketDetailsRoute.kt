@@ -17,6 +17,6 @@ fun TicketDetailsRoute(
 
     TicketDetailsScreen(
         uiState = uiState,
-        navigateBack = navigateBack,
+        onBackPressed = navigateBack,
     )
 }

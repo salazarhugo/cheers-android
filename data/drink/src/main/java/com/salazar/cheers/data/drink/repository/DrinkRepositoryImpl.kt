@@ -4,11 +4,9 @@ import cheers.drink.v1.DrinkServiceGrpcKt
 import cheers.drink.v1.ListDrinkRequest
 import com.salazar.cheers.data.drink.mapper.toDrink
 import com.salazar.cheers.core.model.Drink
-import com.salazar.cheers.data.drink.db.DrinkDao
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -17,7 +15,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DrinkRepositoryImpl @Inject constructor(
-    private val drinkDao: DrinkDao,
+    private val drinkDao: com.salazar.cheers.core.db.dao.DrinkDao,
     private val service: DrinkServiceGrpcKt.DrinkServiceCoroutineStub,
 ): DrinkRepository {
     override suspend fun listDrink(): Flow<Result<List<Drink>>> = flow {
@@ -25,7 +23,7 @@ class DrinkRepositoryImpl @Inject constructor(
 
         // Emit local drinks first
         if (localDrinks.isNotEmpty()) {
-            emit(Result.success(localDrinks))
+            emit(Result.success(localDrinks.asExternalModel()))
         }
 
         try {
@@ -34,8 +32,8 @@ class DrinkRepositoryImpl @Inject constructor(
             val drinks = response.itemsList.map {
                 it.toDrink()
             }
-            drinkDao.clearAndInsert(drinks = drinks)
-            emit(Result.success(drinkDao.listDrinks().first()))
+            drinkDao.clearAndInsert(drinks = drinks.asEntity())
+            emit(Result.success(drinkDao.listDrinks().first().asExternalModel()))
         } catch (e: Exception) {
             e.printStackTrace()
             emit(Result.failure(e))

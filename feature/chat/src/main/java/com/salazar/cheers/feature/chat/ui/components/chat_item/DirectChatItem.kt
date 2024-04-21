@@ -35,9 +35,8 @@ import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.relativeTimeFormatterMilli
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatStatus
-import com.salazar.cheers.feature.chat.ui.components.ChatTypingComponent
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatStatus
 
 @Composable
 fun DirectChatComponent(

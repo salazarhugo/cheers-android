@@ -42,10 +42,10 @@ import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
-import com.salazar.cheers.data.db.entities.Story
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.db.model.Story
+import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.search.UserCard
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import kotlin.math.absoluteValue
 
@@ -171,7 +171,7 @@ fun Views(
             onDeleteStory = onDeleteStory,
         )
 
-        Divider()
+        HorizontalDivider()
 
         LazyColumn(
             modifier = Modifier.animateContentSize()

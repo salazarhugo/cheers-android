@@ -40,9 +40,9 @@ import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.data.user.RecentUser
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserSuggestion
+import com.salazar.cheers.core.model.RecentUser
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.UserSuggestion
 
 @Composable
 fun SearchScreen(

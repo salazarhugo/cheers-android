@@ -3,8 +3,8 @@ package com.salazar.cheers.ui.sheets
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +24,7 @@ data class SendGiftUiState(
 
 @HiltViewModel
 class SendGiftViewModel @Inject constructor(
-    userRepository: UserRepository,
+    userRepositoryImpl: UserRepositoryImpl,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -44,7 +44,7 @@ class SendGiftViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            userRepository.getUserFlow(userIdOrUsername = receiverId).collect { receiver ->
+            userRepositoryImpl.getUserFlow(userIdOrUsername = receiverId).collect { receiver ->
                 viewModelState.update {
                     it.copy(receiver = receiver)
                 }

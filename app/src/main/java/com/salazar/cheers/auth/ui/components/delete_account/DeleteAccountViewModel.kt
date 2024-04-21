@@ -23,7 +23,6 @@ class DeleteAccountViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(DeleteAccountUiState())
-    lateinit var commentID: String
 
     val uiState = viewModelState
         .stateIn(

@@ -1,6 +1,6 @@
 plugins {
-    id("cheers.android.feature")
-    id("cheers.android.library.compose")
+    alias(libs.plugins.cheers.android.feature)
+    alias(libs.plugins.cheers.android.library.compose)
     alias(libs.plugins.ksp)
 }
 
@@ -14,10 +14,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":core:util"))
-    implementation(project(":domain"))
-    implementation(project(":data:friendship"))
+    implementation(projects.common)
+    implementation(projects.core.util)
+    implementation(projects.domain)
+    implementation(projects.data.friendship)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

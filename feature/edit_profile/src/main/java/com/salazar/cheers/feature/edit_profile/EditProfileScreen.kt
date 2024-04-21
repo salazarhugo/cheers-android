@@ -31,7 +31,7 @@ import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.MyTopAppBar
 import com.salazar.cheers.core.ui.ProfileBanner
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.User
 
 @Composable
 fun EditProfileScreen(

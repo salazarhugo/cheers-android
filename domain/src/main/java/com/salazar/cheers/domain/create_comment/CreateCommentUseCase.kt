@@ -3,7 +3,7 @@ package com.salazar.cheers.domain.create_comment
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.data.comment.CommentRepository
 import com.salazar.cheers.data.post.repository.PostRepository
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class CreateCommentUseCase @Inject constructor(
     private val repository: CommentRepository,
     private val postRepository: PostRepository,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(
@@ -23,7 +23,7 @@ class CreateCommentUseCase @Inject constructor(
         replyToCommentId: String?,
     ) = withContext(dispatcher) {
         val isReply = replyToCommentId != null
-        val user = userRepository.getCurrentUser()
+        val user = userRepositoryImpl.getCurrentUser()
 
         val localComment = Comment(
             id = UUID.randomUUID().toString(),

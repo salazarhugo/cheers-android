@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.theme.BlueCheers
-import com.salazar.cheers.data.chat.models.MessageType
+import com.salazar.cheers.core.model.MessageType
 
 @Composable
 fun OpenedChat() {

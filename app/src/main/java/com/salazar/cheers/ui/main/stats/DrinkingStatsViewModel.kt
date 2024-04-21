@@ -3,8 +3,8 @@ package com.salazar.cheers.ui.main.stats
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.data.user.UserStats
+import com.salazar.cheers.data.user.UserRepositoryImpl
+import com.salazar.cheers.core.model.UserStats
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +22,7 @@ data class DrinkingStatsUiState(
 @HiltViewModel
 class DrinkingStatsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(DrinkingStatsUiState(isLoading = true))
@@ -41,7 +41,7 @@ class DrinkingStatsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val userStats = userRepository.getUserStats(username = username)
+            val userStats = userRepositoryImpl.getUserStats(username = username)
             try {
                 viewModelState.update { it.copy(userStats = userStats) }
             } catch (e: Exception) {

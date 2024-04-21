@@ -2,8 +2,7 @@ package com.salazar.cheers.feature.map.screens.map
 
 import android.content.Context
 import com.mapbox.maps.MapView
-import com.salazar.cheers.data.post.repository.Post
-import com.salazar.cheers.data.map.UserLocation
+import com.salazar.cheers.core.Post
 
 sealed class MapUIAction {
     data object OnSwipeRefresh : MapUIAction()

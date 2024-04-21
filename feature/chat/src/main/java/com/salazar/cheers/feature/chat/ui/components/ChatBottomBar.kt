@@ -86,7 +86,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
-import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.feature.chat.R
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatUIAction
 

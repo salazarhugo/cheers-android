@@ -5,7 +5,7 @@ import android.view.View
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -92,7 +92,7 @@ private fun NativeAdPost(
     Column(
         modifier = modifier,
     ) {
-        Divider()
+        HorizontalDivider()
         NativeAdHeader(
             icon = ad.icon?.uri,
             headline = ad.headline.orEmpty(),
@@ -100,7 +100,7 @@ private fun NativeAdPost(
                 .fillMaxWidth()
                 .padding(14.dp, 11.dp),
         )
-        Divider()
+        HorizontalDivider()
         MediaCarouselComponent(
             medias = ad.images.map { Media.Image(uri = it.uri ?: Uri.EMPTY) }
         )

@@ -10,14 +10,15 @@ import cheers.story.v1.StoryServiceGrpcKt
 import cheers.story.v1.UnlikeStoryRequest
 import cheers.story.v1.ViewStoryRequest
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.data.db.CheersDatabase
+import com.salazar.cheers.core.db.CheersDatabase
+import com.salazar.cheers.core.db.dao.StoryDao
 import com.salazar.cheers.core.domain.model.UserWithStories
-import com.salazar.cheers.data.db.StoryDao
-import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.core.db.model.Story
 import com.salazar.cheers.data.mapper.toStory
 import com.salazar.cheers.data.repository.story.StoryRepository
-import com.salazar.cheers.data.user.UserDao
-import com.salazar.cheers.data.user.UserItemDao
+import com.salazar.cheers.core.db.dao.UserDao
+import com.salazar.cheers.core.db.dao.UserItemDao
+import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -96,7 +97,7 @@ class StoryRepositoryImpl @Inject constructor(
                     )
                 }
 
-                userItemDao.insert(user)
+                userItemDao.insert(user.asEntity())
                 storyDao.insertAll(stories)
             }
 

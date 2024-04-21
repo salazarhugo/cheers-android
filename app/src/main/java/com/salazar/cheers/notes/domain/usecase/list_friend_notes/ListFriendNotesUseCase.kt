@@ -1,6 +1,6 @@
 package com.salazar.cheers.notes.domain.usecase.list_friend_notes
 
-import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.core.model.Note
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher

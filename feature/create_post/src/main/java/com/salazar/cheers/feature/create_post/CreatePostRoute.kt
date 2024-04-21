@@ -40,7 +40,6 @@ fun CreatePostRoute(
             CreatePostScreenStateful(
                 uiState = uiState,
                 onUploadPost = viewModel::uploadPost,
-                navigateToTagUser = { viewModel.updatePage(CreatePostPage.AddPeople) },
                 onCreatePostUIAction = {
                     when (it) {
                         CreatePostUIAction.OnBackPressed -> navigateBack()
@@ -62,7 +61,7 @@ fun CreatePostRoute(
                             viewModel.updatePage(CreatePostPage.ChooseOnMap)
                         }
 
-                        else -> {}
+                        is CreatePostUIAction.OnSelectLocation -> viewModel.updateLocation(it.location)
                     }
                 }
             )

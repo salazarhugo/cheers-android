@@ -3,9 +3,9 @@ package com.salazar.cheers.ui.main.story.stats
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.core.db.model.Story
 import com.salazar.cheers.data.repository.story.StoryRepository
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +23,7 @@ data class StoryStatsViewModelUiState(
 @HiltViewModel
 class StoryStatsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val storyRepository: StoryRepository,
 ) : ViewModel() {
 

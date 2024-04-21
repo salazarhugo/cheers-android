@@ -13,7 +13,7 @@ import cheers.type.PartyOuterClass
 import cheers.type.PrivacyOuterClass
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -24,7 +24,7 @@ class CreatePartyWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 ) : CoroutineWorker(appContext, params) {
 
 
@@ -67,7 +67,7 @@ class CreatePartyWorker @AssistedInject constructor(
             inputData.getLong("END_DATETIME", 0L)
 
         try {
-            val user = userRepository.getCurrentUser()
+            val user = userRepositoryImpl.getCurrentUser()
             val uid = FirebaseAuth.getInstance().currentUser?.uid!!
 
             val party = PartyOuterClass.Party.newBuilder()

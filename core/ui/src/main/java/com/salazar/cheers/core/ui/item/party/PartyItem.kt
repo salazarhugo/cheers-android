@@ -23,7 +23,7 @@ import coil.compose.AsyncImage
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.EventItemDetails
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 
 @Composable
 fun PartyItem(

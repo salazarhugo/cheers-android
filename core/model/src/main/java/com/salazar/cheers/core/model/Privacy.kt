@@ -6,8 +6,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.ToJson
 
 
 enum class Privacy(
@@ -37,10 +35,10 @@ enum class Privacy(
     ),
 }
 
-class PrivacyAdapter {
-    @ToJson
-    fun toJson(value: Privacy): String = value.name
-
-    @FromJson
-    fun fromJson(value: String): Privacy = Privacy.valueOf(value)
-}
+//class PrivacyAdapter {
+//    @ToJson
+//    fun toJson(value: Privacy): String = value.name
+//
+//    @FromJson
+//    fun fromJson(value: String): Privacy = Privacy.valueOf(value)
+//}

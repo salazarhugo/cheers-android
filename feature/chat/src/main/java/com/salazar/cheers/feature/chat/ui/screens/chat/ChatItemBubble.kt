@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.AnimateHeart
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.data.chat.models.mockMessage1
 
 private val ChatBubbleStartShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)

@@ -1,6 +1,6 @@
 package com.salazar.cheers.parties.domain.usecase.get_party
 
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

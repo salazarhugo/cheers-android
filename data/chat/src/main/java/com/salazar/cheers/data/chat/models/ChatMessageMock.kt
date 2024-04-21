@@ -1,5 +1,8 @@
 package com.salazar.cheers.data.chat.models
 
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatMessageStatus
+import com.salazar.cheers.core.model.MessageType
 import java.util.Date
 import java.util.UUID
 

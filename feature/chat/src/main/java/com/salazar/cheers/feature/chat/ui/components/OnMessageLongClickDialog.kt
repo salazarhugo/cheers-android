@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.core.model.ChatMessage
 
 @Composable
 fun OnMessageLongClickDialog(

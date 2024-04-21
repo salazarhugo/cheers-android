@@ -8,9 +8,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.Settings
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.data.account.AccountRepository
-import com.salazar.cheers.data.user.Theme
-import com.salazar.cheers.data.user.UserPreference
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.Theme
+import com.salazar.cheers.core.model.UserPreference
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
 import com.salazar.cheers.data.chat.repository.ChatRepository
@@ -62,7 +62,7 @@ private data class CheersViewModelState(
 @HiltViewModel
 class CheersViewModel @Inject constructor(
     private val webSocketManager: ChatWebSocketManager,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val accountRepository: AccountRepository,
     private val chatRepository: ChatRepository,
     private val dataStoreRepository: DataStoreRepository,
@@ -169,7 +169,7 @@ class CheersViewModel @Inject constructor(
             val token = task.result
             viewModelScope.launch(Dispatchers.IO) {
                 chatRepository.addToken(token = token)
-                userRepository.addTokenToNeo4j(token)
+                userRepositoryImpl.addTokenToNeo4j(token)
             }
         }
     }

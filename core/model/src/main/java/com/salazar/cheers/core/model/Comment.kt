@@ -1,11 +1,6 @@
 package com.salazar.cheers.core.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "comments")
 data class Comment(
-    @PrimaryKey
     val id: String = "",
     val username: String = "",
     val verified: Boolean = false,

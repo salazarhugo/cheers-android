@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.parties
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

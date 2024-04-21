@@ -11,8 +11,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.workers.UploadStoryWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +34,7 @@ data class CameraUiState(
 @HiltViewModel
 class CameraViewModel @Inject constructor(
     application: Application,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 ) : ViewModel() {
 
     private val workManager = WorkManager.getInstance(application)
@@ -49,7 +49,7 @@ class CameraViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getCurrentUserFlow().collect(::updateUser)
+            userRepositoryImpl.getCurrentUserFlow().collect(::updateUser)
         }
     }
 

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.CheersOutlinedButton
 import com.salazar.cheers.core.ui.UserItem
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.feature.create_post.CaptionSection
 
 @Composable

@@ -59,6 +59,7 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.domain.model.UserWithStories
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.components.post.PostHeader
@@ -66,7 +67,7 @@ import com.salazar.cheers.core.ui.modifier.carousel
 import com.salazar.cheers.core.ui.theme.StrongRed
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.PrettyImage
-import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.core.db.model.Story
 import com.salazar.cheers.ui.compose.story.StoryProgressBar
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -299,7 +300,7 @@ fun StoryFeedHeader(
             onStepFinish = onStepFinish,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
-        val post = com.salazar.cheers.data.post.repository.Post()
+        val post = Post()
             .copy(
                 username = user.username,
                 verified = user.verified,

@@ -1,6 +1,6 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.hilt")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.hilt)
     alias(libs.plugins.ksp)
 }
 
@@ -17,11 +17,12 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(project(":common"))
-    implementation(project(":core:protobuf"))
-    implementation(project(":core:model"))
-    implementation(project(":core:util"))
-    implementation(project(":core:shared"))
+    implementation(projects.common)
+    implementation(projects.core.protobuf)
+    implementation(projects.core.model)
+    implementation(projects.core.util)
+    implementation(projects.core.shared)
+    implementation(projects.core.db)
 
     // Room
     implementation(libs.androidx.room.runtime)

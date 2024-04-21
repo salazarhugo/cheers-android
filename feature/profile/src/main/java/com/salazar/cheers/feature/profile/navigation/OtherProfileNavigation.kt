@@ -7,7 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.profile.other_profile.OtherProfileRoute
 
 const val USERNAME = "username"

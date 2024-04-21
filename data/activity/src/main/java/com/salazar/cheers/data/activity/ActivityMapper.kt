@@ -1,5 +1,8 @@
 package com.salazar.cheers.data.activity
 
+import com.salazar.cheers.core.model.Activity
+import com.salazar.cheers.core.model.ActivityType
+
 
 fun cheers.activity.v1.Activity.toActivity(): Activity {
     return Activity().copy(

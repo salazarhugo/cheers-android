@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.notifications.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.activity.Activity
+import com.salazar.cheers.core.model.Activity
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.domain.list_friend_request.ListFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase

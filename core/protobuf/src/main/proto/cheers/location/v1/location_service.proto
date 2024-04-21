@@ -25,16 +25,38 @@ service LocationService {
       get: "/v1/locations/friends"
     };
   }
+
+  rpc Geocode (GeocodeRequest) returns (GeocodeResponse) {
+    option (google.api.http) = {
+      get: "/v1/locations/geocode"
+    };
+  }
+}
+
+message GeocodeRequest {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message GeocodeResponse {
+  repeated Location locations = 1;
+}
+
+message Location {
+  string name = 1;
+  string type = 2;
+  double latitude = 3;
+  double longitude = 4;
 }
 
 message ListFriendLocationRequest {
 }
 
 message ListFriendLocationResponse {
-  repeated Location items = 1;
+  repeated UserLocation items = 1;
 }
 
-message Location {
+message UserLocation {
   double latitude = 1;
   double longitude = 2;
   string user_id = 3;

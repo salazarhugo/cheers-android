@@ -3,13 +3,11 @@ package com.salazar.cheers.feature.map.screens.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Settings
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.cheers.domain.get_location_updates.GetLocationUpdatesUseCase
 import com.salazar.cheers.domain.list_map_post.ListMapPostUseCase
-import com.salazar.cheers.data.map.MapRepositoryImpl
-import com.salazar.cheers.data.map.UserLocation
 import com.salazar.cheers.feature.map.domain.usecase.update_location.UpdateLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

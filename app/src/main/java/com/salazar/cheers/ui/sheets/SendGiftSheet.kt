@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.navigation.material.BottomSheetNavigator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 
 data class Sticker(
     val name: String,
@@ -36,7 +36,7 @@ fun SendGiftSheet(
         modifier = Modifier.padding(16.dp),
         color = MaterialTheme.colorScheme.onBackground,
     )
-    Divider()
+    HorizontalDivider()
     val items = listOf(
         Sticker(
             name = "Cheers",

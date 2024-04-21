@@ -18,7 +18,6 @@ object CheersDestinations {
  */
 object MainDestinations {
     const val ROOM_DETAILS = "roomDetails"
-    const val MAP_POST_HISTORY_ROUTE = "posts/history"
     const val DIALOG_DELETE_POST = "dialogDeletePost"
     const val DIALOG_DELETE_STORY = "dialogDeleteStory"
     const val EDIT_EVENT_ROUTE = "event/edit"
@@ -283,13 +282,6 @@ class CheersNavigationActions(
     val navigateToProfileMoreSheet: (username: String) -> Unit = { username ->
         navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$username") {
             launchSingleTop = true
-            restoreState = true
-        }
-    }
-
-    val navigateToPostHistory: () -> Unit = {
-        navController.navigate(MainDestinations.MAP_POST_HISTORY_ROUTE) {
-            launchSingleTop = false
             restoreState = true
         }
     }

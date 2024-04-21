@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.note.mapper
 
-import com.salazar.cheers.data.note.Note
-import com.salazar.cheers.data.note.NoteType
+import com.salazar.cheers.core.model.Note
+import com.salazar.cheers.core.model.NoteType
 
 
 fun cheers.note.v1.Note.toNote(): Note {

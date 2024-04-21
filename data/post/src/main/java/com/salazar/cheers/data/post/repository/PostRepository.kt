@@ -12,11 +12,15 @@ import cheers.post.v1.DeletePostRequest
 import cheers.post.v1.FeedPostRequest
 import cheers.post.v1.LikePostRequest
 import cheers.post.v1.ListMapPostRequest
-import cheers.post.v1.ListMapPostResponse
 import cheers.post.v1.ListPostLikesRequest
 import cheers.post.v1.ListPostRequest
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.post.v1.UnlikePostRequest
+import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.db.dao.PostDao
+import com.salazar.cheers.core.db.model.PostEntity
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.shared.data.mapper.toUserItem
@@ -26,6 +30,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,25 +52,27 @@ class PostRepository @Inject constructor(
 
         return try {
             val remotePosts = postService.feedPost(request)
-            val posts = remotePosts.postsList.map { it.toPost() }
+            val posts = remotePosts.postsList.map { it.asEntity() }
             postDao.insertAll(posts)
-            Result.success(posts)
+            Result.success(remotePosts.postsList.map { it.toPost() })
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
     fun getPostFeedFlow(): Flow<List<Post>> {
-        return postDao.getPostFeed()
+        return postDao.getPostFeed().map {posts ->
+            posts.map { it.asExternalModel() }
+        }
     }
 
     suspend fun updatePost(post: Post) {
-        postDao.update(post = post)
+        postDao.update(post = post.asEntity())
     }
 
     suspend fun listPost(userIdOrUsername: String): Flow<List<Post>> {
         return flow {
-            emit(postDao.getUserPosts(userIdOrUsername).first())
+            emit(postDao.getUserPosts(userIdOrUsername).first().asExternalModel())
 
             val remoteUserPosts = try {
                 val request = ListPostRequest.newBuilder()
@@ -85,8 +92,8 @@ class PostRepository @Inject constructor(
             }
 
             remoteUserPosts?.let {
-                postDao.insertUserPosts(it)
-                emitAll(postDao.getUserPosts(userIdOrUsername))
+                postDao.insertUserPosts(it.map { it.asEntity() })
+                emitAll(postDao.getUserPosts(userIdOrUsername).map { it.asExternalModel() })
             }
         }
     }
@@ -170,14 +177,10 @@ class PostRepository @Inject constructor(
             return Resource.Error(e.localizedMessage)
         }
 
-        val post = response.toPost()
+        val post = response.toPost().asEntity()
         postDao.insert(post)
 
         return Resource.Success(Unit)
-    }
-
-    suspend fun getPostsWithAuthorId(authorId: String): List<Post> {
-        return postDao.getPostsWithAuthorId(authorId = authorId)
     }
 
     suspend fun clearPosts() {
@@ -213,10 +216,12 @@ class PostRepository @Inject constructor(
                 .build()
 
             val response = postService.listMapPost(request)
-            val posts = response.postsList.map { it.toPost() }
+            val posts = response.postsList.map { it.asEntity() }
             postDao.insertAll(posts)
 
-            Result.success(posts)
+            val res = postDao.listMapPost().first().map { it.asExternalModel() }
+
+            Result.success(res)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
@@ -225,19 +230,23 @@ class PostRepository @Inject constructor(
 
     suspend fun getMapPostFlow(privacy: Privacy): Flow<List<Post>> {
         listMapPost()
-        return postDao.listMapPost()
+        return postDao.listMapPost().map { posts ->
+            posts.asExternalModel()
+        }
     }
 
-    fun postFlow(postId: String) = postDao.postFlow(postId = postId)
+    fun postFlow(postId: String): Flow<Post> {
+        return postDao.postFlow(postId = postId).map { it.asExternalModel() }
+    }
 
     suspend fun getPost(postId: String): Post? {
-        return postDao.getPost(postId = postId)
+        return postDao.getPost(postId = postId)?.asExternalModel()
     }
 
     suspend fun toggleLike(post: Post) = withContext(Dispatchers.IO) {
         val likes = if (post.liked) post.likes - 1 else post.likes + 1
 
-        postDao.update(post.copy(liked = !post.liked, likes = likes))
+        postDao.update(post.copy(liked = !post.liked, likes = likes).asEntity())
 
         if (post.liked)
             unlikePost(postId = post.id)

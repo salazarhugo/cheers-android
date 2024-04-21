@@ -1,6 +1,6 @@
 package com.salazar.cheers.domain.seen_room
 
-import com.salazar.cheers.data.chat.models.ChatStatus
+import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher

@@ -5,10 +5,11 @@ import com.google.gson.Gson
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.data.account.AccountRepository
 import com.salazar.cheers.data.account.isNotConnected
-import com.salazar.cheers.data.chat.db.ChatDao
-import com.salazar.cheers.data.chat.models.MessageType
+import com.salazar.cheers.core.db.dao.ChatDao
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.model.MessageType
 import com.salazar.cheers.data.chat.models.Presence
-import com.salazar.cheers.data.chat.models.ChatStatus
+import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.data.chat.models.Typing
 import com.salazar.cheers.data.chat.models.WebSocketChat
 import com.salazar.cheers.data.chat.models.WebSocketChatMessage
@@ -34,7 +35,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ChatWebSocketManager @Inject constructor(
-    private val chatDao: ChatDao,
+    private val chatDao: com.salazar.cheers.core.db.dao.ChatDao,
     private val accountRepository: AccountRepository,
 ) : WebSocketListener() {
 
@@ -279,7 +280,7 @@ class ChatWebSocketManager @Inject constructor(
             return
 
         GlobalScope.launch {
-            chatDao.insert(chat.toChat())
+            chatDao.insert(chat.toChat().asEntity())
         }
     }
 
@@ -292,7 +293,7 @@ class ChatWebSocketManager @Inject constructor(
 
         GlobalScope.launch {
             chatDao.insertMessage(
-                chatMessage.toChatMessage(isSender)
+                chatMessage.toChatMessage(isSender).asEntity()
             )
             chatDao.updateLastMessage(
                 channelId = chatMessage.chatId,

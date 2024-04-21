@@ -19,7 +19,7 @@ import com.salazar.cheers.core.data.notifications.newFollowerNotification
 import com.salazar.cheers.core.data.notifications.newPostNotification
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.core.util.Utils.getCircledBitmap
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class MyFirebaseMessagingService: FirebaseMessagingService() {
 
     @Inject
-    lateinit var userRepository: UserRepository
+    lateinit var userRepositoryImpl: UserRepositoryImpl
 
     override fun onNewToken(newRegistrationToken: String) {
         super.onNewToken(newRegistrationToken)
@@ -40,7 +40,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             return
 
         runBlocking {
-            userRepository.addTokenToNeo4j(newRegistrationToken)
+            userRepositoryImpl.addTokenToNeo4j(newRegistrationToken)
         }
     }
 

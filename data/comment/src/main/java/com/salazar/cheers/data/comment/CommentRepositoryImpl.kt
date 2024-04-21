@@ -2,8 +2,10 @@ package com.salazar.cheers.data.comment
 
 import android.content.res.Resources.NotFoundException
 import cheers.comment.v1.*
-import com.salazar.cheers.comment.data.db.CommentDao
 import com.salazar.cheers.comment.data.mapper.toComment
+import com.salazar.cheers.core.db.dao.CommentDao
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Comment
 import com.salazar.common.util.Resource
 import kotlinx.coroutines.flow.*
@@ -14,13 +16,13 @@ class CommentRepositoryImpl @Inject constructor(
     private val service: CommentServiceGrpcKt.CommentServiceCoroutineStub,
 ) : CommentRepository {
     override suspend fun updateComment(comment: Comment) {
-        return commentDao.update(comment = comment)
+        return commentDao.update(comment = comment.asEntity())
     }
 
     override suspend fun getComment(commentId: String): Result<Comment> {
         val localComment = commentDao.getComment(id = commentId).firstOrNull()
         if (localComment != null)
-            return Result.success(localComment)
+            return Result.success(localComment.asExternalModel())
 
         return Result.failure(NotFoundException())
     }
@@ -31,7 +33,7 @@ class CommentRepositoryImpl @Inject constructor(
         replyToCommentId: String?,
     ): Result<Unit> {
 
-        commentDao.insert(comment)
+        commentDao.insert(comment.asEntity())
 
         val request = CreateCommentRequest.newBuilder()
             .setPostId(postId)
@@ -45,7 +47,7 @@ class CommentRepositoryImpl @Inject constructor(
         return try {
             val response = service.createComment(request = request)
             commentDao.delete(commentID = comment.id)
-            commentDao.insert(response.item.toComment())
+            commentDao.insert(response.item.toComment().asEntity())
             Result.success(Unit)
         } catch (e: Exception) {
             commentDao.delete(commentID = comment.id)
@@ -59,7 +61,7 @@ class CommentRepositoryImpl @Inject constructor(
 
         val localComments = commentDao.listPostComments(postId = postId).first()
 
-        emit(Resource.Success(localComments))
+        emit(Resource.Success(localComments.asExternalModel()))
 
         val request = ListCommentRequest.newBuilder()
             .setPostId(postId)
@@ -77,12 +79,12 @@ class CommentRepositoryImpl @Inject constructor(
         }
 
         remoteComments?.let {
-            commentDao.insertPostComments(postId, it)
+            commentDao.insertPostComments(postId, it.asEntity())
         }
 
         val localComment = commentDao.listPostComments(postId = postId)
         val all = localComment.map {
-            Resource.Success(it)
+            Resource.Success(it.asExternalModel())
         }
 
         emitAll(all)
@@ -94,7 +96,7 @@ class CommentRepositoryImpl @Inject constructor(
 
         val localComments = commentDao.listCommentReplies(commentId = commentId).first()
 
-        emit(Resource.Success(localComments))
+        emit(Resource.Success(localComments.asExternalModel()))
 
         val request = ListRepliesRequest.newBuilder()
             .setCommentId(commentId)
@@ -112,12 +114,12 @@ class CommentRepositoryImpl @Inject constructor(
         }
 
         remoteComments?.let {
-            commentDao.insert(it)
+            commentDao.insert(it.asEntity())
         }
 
         val localComment = commentDao.listCommentReplies(commentId = commentId)
         val all = localComment.map {
-            Resource.Success(it)
+            Resource.Success(it.asExternalModel())
         }
 
         emitAll(all)

@@ -14,7 +14,7 @@ import com.google.android.gms.tasks.Tasks
 import com.salazar.cheers.core.util.StorageUtil
 import com.salazar.cheers.core.util.Utils.extractImage
 import com.salazar.cheers.data.user.R
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -22,7 +22,7 @@ import dagger.assisted.AssistedInject
 class UploadProfilePicture @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
@@ -36,8 +36,8 @@ class UploadProfilePicture @AssistedInject constructor(
             val task: Task<Uri> = StorageUtil.uploadProfilePhoto(photoBytes)
             val downloadUrl = Tasks.await(task)
 
-            val user = userRepository.getCurrentUser()
-            userRepository.updateUserProfile(user.copy(picture = downloadUrl.toString()))
+            val user = userRepositoryImpl.getCurrentUser()
+            userRepositoryImpl.updateUserProfile(user.copy(picture = downloadUrl.toString()))
 
             return Result.success()
         } catch (throwable: Throwable) {

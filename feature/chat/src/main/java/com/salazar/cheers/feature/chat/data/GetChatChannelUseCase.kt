@@ -1,8 +1,8 @@
 package com.salazar.cheers.feature.chat.data
 
-import com.salazar.cheers.data.chat.models.ChatChannel
-import com.salazar.cheers.data.chat.models.ChatType
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatType
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.result.Result
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class GetChatChannelUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     @IODispatcher
     private val dispatcher: CoroutineDispatcher
 ) {
@@ -24,7 +24,7 @@ class GetChatChannelUseCase @Inject constructor(
         userID: String,
     ): Flow<ChatChannel> = withContext(dispatcher) {
         return@withContext flow {
-            val user = userRepository.getUserItem(userID).first()
+            val user = userRepositoryImpl.getUserItem(userID).first()
             val localChat = chatRepository.getChatWithUser(userID)
             val tempChatChannel = ChatChannel(
                 id = "temp",

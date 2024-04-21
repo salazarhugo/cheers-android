@@ -4,8 +4,8 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.update_profile.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +60,7 @@ private data class EditProfileViewModelState(
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    val userRepository: UserRepository,
+    val userRepositoryImpl: UserRepositoryImpl,
     val updateProfileUseCase: UpdateProfileUseCase,
 ) : ViewModel() {
 
@@ -76,7 +76,7 @@ class EditProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getCurrentUserFlow().collect { user ->
+            userRepositoryImpl.getCurrentUserFlow().collect { user ->
                 viewModelState.update {
                     it.copy(user = user, isLoading = false)
                 }
@@ -156,7 +156,7 @@ class EditProfileViewModel @Inject constructor(
         val banner = viewModelState.value.bannerUri ?: return
 
         viewModelScope.launch {
-            userRepository.uploadProfileBanner(banner)
+            userRepositoryImpl.uploadProfileBanner(banner)
         }
     }
 
@@ -164,7 +164,7 @@ class EditProfileViewModel @Inject constructor(
         val profilePicture = viewModelState.value.profilePictureUri ?: return
 
         viewModelScope.launch {
-            userRepository.uploadProfilePicture(profilePicture)
+            userRepositoryImpl.uploadProfilePicture(profilePicture)
         }
     }
 }

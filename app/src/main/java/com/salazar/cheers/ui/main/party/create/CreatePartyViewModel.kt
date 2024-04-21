@@ -2,7 +2,6 @@ package com.salazar.cheers.ui.main.party.create
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.salazar.cheers.R
+import com.salazar.cheers.core.PostType
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.SearchSuggestion
 import com.salazar.cheers.workers.CreatePartyWorker
@@ -122,7 +121,7 @@ class CreatePartyViewModel @Inject constructor(
 //        }
 //    }
     val caption = mutableStateOf("")
-    val postType = mutableStateOf(com.salazar.cheers.data.post.repository.PostType.TEXT)
+    val postType = mutableStateOf(PostType.TEXT)
 
 
     fun setPhoto(photo: Uri?) {

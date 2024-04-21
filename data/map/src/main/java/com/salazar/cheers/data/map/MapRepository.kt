@@ -1,17 +1,17 @@
 package com.salazar.cheers.data.map
 
-import kotlinx.coroutines.flow.Flow
+import com.salazar.common.util.result.DataError
 
 interface MapRepository {
     suspend fun updateGhostMode(
         ghostMode: Boolean,
     ): Result<Unit>
 
-    fun getLocationName(
+    suspend fun getLocationName(
         longitude: Double,
         latitude: Double,
         zoom: Double? = null,
-    ): Flow<List<String>>
+    ): com.salazar.common.util.result.Result<List<String>, DataError>
 
     suspend fun updateLocation(
         longitude: Double,

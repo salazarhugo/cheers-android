@@ -1,6 +1,6 @@
 package com.salazar.cheers.domain.get_chat
 
-import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.common.di.IODispatcher

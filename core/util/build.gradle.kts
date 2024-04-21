@@ -1,7 +1,7 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.library.compose")
-    id("cheers.android.hilt")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.library.compose)
+    alias(libs.plugins.cheers.android.hilt)
 }
 
 android {
@@ -13,7 +13,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(projects.common)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

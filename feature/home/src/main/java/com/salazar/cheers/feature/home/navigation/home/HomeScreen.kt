@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -53,7 +52,7 @@ import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.ui.AddFriendButton
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
@@ -390,7 +389,7 @@ fun UploadingSection() {
                 }
             }
 
-            Divider()
+            HorizontalDivider()
         }
 }
 

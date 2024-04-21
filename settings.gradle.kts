@@ -32,6 +32,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Cheers"
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":ads")
 include(":common")
@@ -92,3 +93,4 @@ include(":data:remote_config")
 include(":data:search")
 include(":data:map")
 include(":data:chat")
+include(":core:db")

@@ -1,8 +1,8 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.library.compose")
-    id("cheers.android.hilt")
-    id("cheers.android.room")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.library.compose)
+    alias(libs.plugins.cheers.android.hilt)
+    alias(libs.plugins.cheers.android.room)
 }
 
 android {
@@ -15,12 +15,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":auth"))
+    implementation(projects.common)
+    implementation(projects.auth)
 
-    implementation(project(":core:shared"))
-    implementation(project(":core:model"))
-    implementation(project(":core:protobuf"))
+    implementation(projects.core.shared)
+    implementation(projects.core.model)
+    implementation(projects.core.protobuf)
+    implementation(projects.core.db)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -33,7 +34,7 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.2.0")
 
     // Gson
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
 
     // Googleid
     implementation(libs.googleid)

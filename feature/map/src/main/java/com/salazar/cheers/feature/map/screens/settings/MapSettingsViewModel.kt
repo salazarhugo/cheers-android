@@ -3,10 +3,9 @@ package com.salazar.cheers.feature.map.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Settings
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
-import com.salazar.cheers.data.map.MapRepository
 import com.salazar.cheers.feature.map.domain.usecase.update_ghost_mode.UpdateGhostModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +26,7 @@ data class MapSettingsUiState(
 @HiltViewModel
 class MapSettingsViewModel @Inject constructor(
     private val mapRepository: com.salazar.cheers.data.map.MapRepository,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val dataStoreRepository: DataStoreRepository,
     private val updateGhostModeUseCase: UpdateGhostModeUseCase,
 ) : ViewModel() {
@@ -43,7 +42,7 @@ class MapSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getCurrentUserFlow().collect(::updateUser)
+            userRepositoryImpl.getCurrentUserFlow().collect(::updateUser)
         }
         viewModelScope.launch {
             dataStoreRepository.userPreferencesFlow.collect(::updateSettings)

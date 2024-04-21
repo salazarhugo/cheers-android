@@ -2,9 +2,9 @@ package com.salazar.cheers.feature.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.user.RecentUser
-import com.salazar.cheers.data.user.UserRepository
-import com.salazar.cheers.data.user.UserSuggestion
+import com.salazar.cheers.core.model.RecentUser
+import com.salazar.cheers.data.user.UserRepositoryImpl
+import com.salazar.cheers.core.model.UserSuggestion
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -29,7 +29,7 @@ data class SearchUiState(
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SearchUiState(isLoading = true))
@@ -79,7 +79,7 @@ class SearchViewModel @Inject constructor(
         fetchFromRemote: Boolean = true,
     ) {
         viewModelScope.launch {
-            userRepository
+            userRepositoryImpl
                 .queryUsers(fetchFromRemote = fetchFromRemote, query = query)
                 .collect { result ->
                     when (result) {
@@ -110,20 +110,17 @@ class SearchViewModel @Inject constructor(
     }
 
     fun toggleFollow(username: String) {
-        viewModelScope.launch {
-            userRepository.toggleFollow(username)
-        }
     }
 
     fun insertRecentUser(username: String) {
         viewModelScope.launch {
-            userRepository.insertRecent(username)
+            userRepositoryImpl.insertRecent(username)
         }
     }
 
     private fun refreshSuggestions() {
         viewModelScope.launch {
-            userRepository.getSuggestions().collect { suggestions ->
+            userRepositoryImpl.getSuggestions().collect { suggestions ->
                 viewModelState.update {
                     it.copy(suggestions = suggestions)
                 }

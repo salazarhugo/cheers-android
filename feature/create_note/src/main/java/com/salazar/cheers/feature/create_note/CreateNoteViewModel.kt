@@ -2,8 +2,7 @@ package com.salazar.cheers.feature.create_note
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.note.NoteType
-import com.salazar.cheers.data.note.repository.NoteRepository
+import com.salazar.cheers.core.model.NoteType
 import com.salazar.cheers.domain.create_note.CreateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

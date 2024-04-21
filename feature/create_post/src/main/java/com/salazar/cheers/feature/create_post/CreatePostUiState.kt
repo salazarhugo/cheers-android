@@ -9,7 +9,7 @@ import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.data.account.Account
-import com.salazar.cheers.data.post.repository.PostType
+import com.salazar.cheers.core.PostType
 
 
 data class CreatePostUiState(
@@ -22,7 +22,7 @@ data class CreatePostUiState(
     val postType: String = PostType.TEXT,
     val medias: List<Media> = emptyList(),
     val locationPoint: Point? = null,
-    val location: String = "",
+    val location: String? = null,
     val locationResults: List<String> = emptyList(),
 //    val selectedLocation: SearchResult? = null,
     val selectedTagUsers: List<UserItem> = emptyList(),

@@ -15,7 +15,7 @@ import com.salazar.cheers.core.ui.PartiesTopBar
 import com.salazar.cheers.core.ui.item.party.PartyItem
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 
 
 @Composable

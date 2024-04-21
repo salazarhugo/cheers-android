@@ -14,7 +14,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.User
 
 @Composable
 fun ProfileText(

@@ -1,7 +1,7 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.hilt")
-    id("cheers.android.room")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.hilt)
+    alias(libs.plugins.cheers.android.room)
 }
 
 android {

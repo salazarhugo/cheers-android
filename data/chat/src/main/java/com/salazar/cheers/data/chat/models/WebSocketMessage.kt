@@ -1,5 +1,12 @@
 package com.salazar.cheers.data.chat.models
 
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatMessageStatus
+import com.salazar.cheers.core.model.ChatStatus
+import com.salazar.cheers.core.model.ChatType
+import com.salazar.cheers.core.model.MessageType
+
 data class WebSocketMessage(
     val type: WebSocketMessageType,
     val userId: String = "",

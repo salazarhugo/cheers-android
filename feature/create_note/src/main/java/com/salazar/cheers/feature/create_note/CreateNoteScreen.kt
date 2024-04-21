@@ -9,8 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.ShareButton
 import com.salazar.cheers.core.ui.theme.Roboto
+import kotlin.math.max
 
 @Composable
 fun CreateNoteScreen(
@@ -43,27 +45,22 @@ fun CreateNoteScreen(
                 .padding(it)
                 .padding(16.dp),
         ) {
-            Text(
-                text = "People won't be notified when you leave a note. They can see your note for 24 hours.",
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-            )
             Spacer(modifier = Modifier.height(16.dp))
 
-            com.salazar.cheers.core.ui.CheersSearchBar(
+            CheersSearchBar(
                 searchInput = text,
                 onSearchInputChanged = { text ->
                     onCreateNoteUIAction(CreateNoteUIAction.OnTextChange(text))
                 },
                 placeholder = {
                     Text(
-                        text = "Share what's on your mind..."
+                        text = "What're you up to?"
                     )
                 },
                 autoFocus = true,
             )
             Text(
-                text = "${text.length}/60",
+                text = "${max(0, 60 - text.length)}",
                 style = MaterialTheme.typography.labelMedium,
             )
         }

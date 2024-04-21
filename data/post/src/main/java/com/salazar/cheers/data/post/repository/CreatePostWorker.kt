@@ -14,6 +14,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import cheers.post.v1.CreatePostRequest
 import cheers.type.AudioOuterClass.Audio
+import com.salazar.cheers.core.PostType
 import com.salazar.cheers.core.util.StorageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -56,6 +57,7 @@ class CreatePostWorker @AssistedInject constructor(
             .setDrunkenness(drunkenness.toLong())
             .setLocationName(locationName)
 
+        Log.d("CreatePostWorker", drinkID.toString())
         if (drinkID != null) {
             postBuilder.setDrinkId(drinkID)
         }
@@ -104,6 +106,7 @@ class CreatePostWorker @AssistedInject constructor(
                     val request = postBuilder
                         .build()
 
+                    Log.d("CreatePostWorker", request.toString())
                     postRepository.createPost(
                         request = request,
                     )

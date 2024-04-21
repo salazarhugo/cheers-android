@@ -1,6 +1,8 @@
 package com.salazar.cheers.data.user
 
 import cheers.user.v1.GetUserResponse
+import com.salazar.cheers.core.model.RecentUser
+import com.salazar.cheers.core.model.User
 
 fun RecentUser.toUser(): User {
     return User().copy(

@@ -16,7 +16,7 @@ import com.salazar.cheers.core.ui.PostCaption
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
 import com.salazar.cheers.core.util.playback.AudioState
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import java.util.Date
 
 @Composable

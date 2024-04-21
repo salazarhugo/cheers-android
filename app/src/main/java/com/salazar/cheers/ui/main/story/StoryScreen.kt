@@ -1,7 +1,7 @@
 package com.salazar.cheers.ui.main.story
 
 import androidx.compose.runtime.Composable
-import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.core.db.model.Story
 
 
 @Composable

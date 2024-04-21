@@ -15,6 +15,7 @@ sealed class CreatePostUIAction {
     data class OnAddAudio(val localAudio: LocalAudio?) : CreatePostUIAction()
     data class OnSelectPrivacy(val privacy: Privacy) : CreatePostUIAction()
     data class OnSelectDrink(val drink: Drink) : CreatePostUIAction()
+    data class OnSelectLocation(val location: String?) : CreatePostUIAction()
     data class OnCaptionChange(val text: String) : CreatePostUIAction()
     data class OnNotificationChange(val enabled: Boolean) : CreatePostUIAction()
 }

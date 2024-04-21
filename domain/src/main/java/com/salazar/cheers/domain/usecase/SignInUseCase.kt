@@ -26,19 +26,26 @@ class SignInUseCase @Inject constructor(
             val currentUser = FirebaseAuth.getInstance().currentUser
                 ?: return@withContext Result.failure(Exception("not signed in with firebase"))
 
-            val idToken = getIdTokenUseCase().getOrNull()
+            val idToken = getIdTokenUseCase()
 
-            return@withContext authRepository.signIn(idToken = idToken!!)
-                .fold(
-                    onSuccess = {
-                        accountRepository.putAccount(it.toAccount(idToken))
-                        storeUserEmail.saveEmail(currentUser.email.orEmpty())
-                        return@fold Result.success(false)
-                    },
-                    onFailure = {
-                        return@fold Result.failure(it)
-                    }
-                )
+            return@withContext when (idToken) {
+                is com.salazar.common.util.result.Result.Success -> {
+                    authRepository.signIn(idToken = idToken.data)
+                        .fold(
+                            onSuccess = {
+                                accountRepository.putAccount(it.toAccount(idToken.data))
+                                storeUserEmail.saveEmail(currentUser.email.orEmpty())
+                                return@fold Result.success(false)
+                            },
+                            onFailure = {
+                                return@fold Result.failure(it)
+                            }
+                        )
+                }
+                is com.salazar.common.util.result.Result.Error -> {
+                    Result.failure(Throwable(""))
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)

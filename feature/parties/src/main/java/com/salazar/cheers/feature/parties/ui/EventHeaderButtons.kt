@@ -12,7 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.data.party.WatchStatus
+import com.salazar.cheers.core.model.WatchStatus
 
 @Composable
 fun PartyHeaderButtons(

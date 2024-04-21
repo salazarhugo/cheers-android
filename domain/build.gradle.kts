@@ -1,7 +1,7 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.hilt")
-    id("cheers.android.room")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.hilt)
+    alias(libs.plugins.cheers.android.room)
 }
 
 android {
@@ -17,25 +17,26 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(project(":auth"))
-    implementation(project(":common"))
-    implementation(project(":core:model"))
-    implementation(project(":core:shared"))
+    implementation(projects.auth)
+    implementation(projects.common)
+    implementation(projects.core.model)
+    implementation(projects.core.shared)
+    implementation(projects.core.db)
 
-    implementation(project(":data:user"))
-    api(project(":data:account"))
-    implementation(project(":data:auth"))
-    implementation(project(":data:post"))
-    implementation(project(":data:party"))
-    implementation(project(":data:note"))
-    implementation(project(":data:activity"))
-    implementation(project(":data:story"))
-    implementation(project(":data:friendship"))
-    implementation(project(":data:drink"))
-    implementation(project(":data:ticket"))
-    implementation(project(":data:comment"))
-    implementation(project(":data:map"))
-    implementation(project(":data:chat"))
+    implementation(projects.data.user)
+    api(projects.data.account)
+    implementation(projects.data.auth)
+    implementation(projects.data.post)
+    implementation(projects.data.party)
+    implementation(projects.data.note)
+    implementation(projects.data.activity)
+    implementation(projects.data.story)
+    implementation(projects.data.friendship)
+    implementation(projects.data.drink)
+    implementation(projects.data.ticket)
+    implementation(projects.data.comment)
+    implementation(projects.data.map)
+    implementation(projects.data.chat)
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {

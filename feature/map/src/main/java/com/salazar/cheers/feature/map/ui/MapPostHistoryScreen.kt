@@ -1,76 +1,44 @@
+@file:OptIn(MapboxExperimental::class)
+
 package com.salazar.cheers.feature.map.ui
 
-import android.Manifest
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import com.mapbox.maps.MapView
-import com.salazar.cheers.core.ui.ui.Permission
-import com.salazar.cheers.feature.map.ui.MapPostHistoryUiState
-import kotlinx.coroutines.launch
+import com.mapbox.maps.MapboxExperimental
+import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
+import com.salazar.cheers.feature.map.screens.map.AddPostViewAnnotation
+import com.salazar.cheers.feature.map.screens.map.UiLayer
+import com.salazar.cheers.feature.map.ui.components.MapComponent
 
 @Composable
 fun MapPostHistoryScreen(
     uiState: MapPostHistoryUiState,
-    mapView: MapView,
-    onMapReady: () -> Unit,
+    mapViewportState: MapViewportState,
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
-                Icon(Icons.Default.MyLocation, null)
-            }
+    MapComponent(
+        modifier = Modifier.fillMaxSize(),
+        mapViewportState = mapViewportState,
+        overlay = {
+            UiLayer(
+                isPublic = false,
+                modifier = Modifier
+                    .systemBarsPadding()
+                    .fillMaxSize()
+                    .align(Alignment.TopCenter),
+                onMapUIAction = {},
+            )
         }
     ) {
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier.padding(it),
-        ) {
-            Permission(Manifest.permission.ACCESS_FINE_LOCATION) {
-                AndroidView(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = {
-                        onMapReady()
-                        mapView
-                    },
-                ) { mapView ->
-                    scope.launch {
-//                        uiState.posts?.forEach { post ->
-//                            launch {
-//                                addPostsAnnotation(
-//                                    context = context,
-//                                    post = post,
-//                                    mapView = mapView,
-//                                    onMapUIAction = {},
-//                                )
-//                            }
-//                        }
-                    }
-                }
-//                UiLayer(
-//                    scope = this,
-//                    uiState = uiState,
-//                    mapView = mapView,
-//                    onSelectPost = onSelectPost,
-//                    onTogglePublic = onTogglePublic,
-//                    isPublic = uiState.isPublic,
-//                    onCreatePostClicked = onCreatePostClicked,
-//                )
-            }
+        uiState.posts?.forEach { post ->
+            AddPostViewAnnotation(
+                post = post,
+                isSelected = false,
+                onClick = {},
+            )
         }
+
     }
 }

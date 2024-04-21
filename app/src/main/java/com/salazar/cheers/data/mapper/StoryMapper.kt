@@ -1,7 +1,7 @@
 package com.salazar.cheers.data.mapper
 
 import cheers.story.v1.StoryResponse
-import com.salazar.cheers.data.db.entities.Story
+import com.salazar.cheers.core.db.model.Story
 
 
 fun StoryResponse.toStory(authorId: String, accountId: String): Story {

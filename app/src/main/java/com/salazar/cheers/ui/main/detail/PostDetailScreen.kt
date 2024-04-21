@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.R
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.FriendButton
@@ -59,7 +60,7 @@ fun PostDetailScreen(
     onLeave: () -> Unit,
     onMessageClicked: () -> Unit,
     onMapClick: () -> Unit,
-    onToggleLike: (com.salazar.cheers.data.post.repository.Post) -> Unit,
+    onToggleLike: (Post) -> Unit,
     onUserClick: (String) -> Unit,
 ) {
     val post = uiState.postFeed
@@ -157,7 +158,7 @@ fun PostDetails(
 
 @Composable
 fun Post(
-    post: com.salazar.cheers.data.post.repository.Post,
+    post: Post,
     members: List<com.salazar.cheers.core.model.UserItem>?,
     onHeaderClicked: (username: String) -> Unit,
     onLeave: () -> Unit,
@@ -165,7 +166,7 @@ fun Post(
     onUserClick: (String) -> Unit,
     onMapClick: () -> Unit,
     onMessageClicked: () -> Unit,
-    onToggleLike: (com.salazar.cheers.data.post.repository.Post) -> Unit,
+    onToggleLike: (Post) -> Unit,
     isAuthor: Boolean,
 ) {
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -309,10 +310,10 @@ fun Buttons(
 
 @Composable
 fun PostFooter(
-    post: com.salazar.cheers.data.post.repository.Post,
+    post: Post,
     isAuthor: Boolean,
     onDelete: () -> Unit,
-    onToggleLike: (com.salazar.cheers.data.post.repository.Post) -> Unit,
+    onToggleLike: (Post) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,

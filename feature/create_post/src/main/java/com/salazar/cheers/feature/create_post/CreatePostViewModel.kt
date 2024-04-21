@@ -2,7 +2,7 @@ package com.salazar.cheers.feature.create_post
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.material3.SheetState
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,8 +14,8 @@ import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.toMedia
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.core.util.playback.AndroidAudioPlayer
-import com.salazar.cheers.data.account.Account
-import com.salazar.cheers.data.post.repository.PostType
+import com.salazar.cheers.core.PostType
+import com.salazar.common.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -127,13 +127,17 @@ class CreatePostViewModel @Inject constructor(
         zoom: Double,
     ) {
         viewModelScope.launch {
-            createPostUseCases.getLocationNameUseCase(
+            val result = createPostUseCases.getLocationNameUseCase(
                 longitude = longitude,
                 latitude = latitude,
                 zoom = zoom,
-            ).collect { names ->
-                viewModelState.update {
-                    it.copy(locationResults = names)
+            )
+            when(result) {
+                is Result.Error -> {}
+                is Result.Success -> {
+                    viewModelState.update {
+                        it.copy(locationResults = result.data)
+                    }
                 }
             }
         }
@@ -193,7 +197,7 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun updateLocation(location: String) {
+    fun updateLocation(location: String?) {
         viewModelState.update {
             it.copy(location = location)
         }
@@ -250,8 +254,11 @@ class CreatePostViewModel @Inject constructor(
         val uiState = viewModelState.value
         val drinkID = uiState.currentDrink?.id.orEmpty()
         val localAudio = uiState.audio
+        val location = uiState.location.orEmpty()
+
         updateIsLoading(true)
 
+        Log.d("CreatePostViewModel", drinkID.toString())
         viewModelScope.launch {
             createPostUseCases.createPostUseCase(
                 "PHOTOS" to uiState.medias.filterIsInstance(Media.Image::class.java).map { it.uri.toString() }.toTypedArray(),
@@ -261,7 +268,7 @@ class CreatePostViewModel @Inject constructor(
                 "PHOTO_CAPTION" to uiState.caption,
                 "DRUNKENNESS" to uiState.drunkenness,
                 "DRINK_ID" to drinkID,
-                "LOCATION_NAME" to "",
+                "LOCATION_NAME" to location,
                 "LOCATION_LATITUDE" to uiState.locationPoint?.latitude(),
                 "LOCATION_LONGITUDE" to uiState.locationPoint?.longitude(),
                 "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),

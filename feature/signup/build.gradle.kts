@@ -1,6 +1,6 @@
 plugins {
-    id("cheers.android.feature")
-    id("cheers.android.library.compose")
+    alias(libs.plugins.cheers.android.feature)
+    alias(libs.plugins.cheers.android.library.compose)
     alias(libs.plugins.ksp)
 }
 
@@ -17,11 +17,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(project(":data:user"))
-    api(project(":data:auth"))
-    implementation(project(":common"))
-    implementation(project(":auth"))
-    implementation(project(":domain"))
+    implementation(projects.data.user)
+    api(projects.data.auth)
+    implementation(projects.common)
+    implementation(projects.auth)
+    implementation(projects.domain)
     implementation(libs.material)
 
     implementation("com.google.android.gms:play-services-tasks:18.0.2")

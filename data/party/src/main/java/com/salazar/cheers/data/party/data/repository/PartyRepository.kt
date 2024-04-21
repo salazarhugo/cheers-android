@@ -1,8 +1,8 @@
 package com.salazar.cheers.data.party.data.repository
 
 import cheers.type.PartyOuterClass
-import com.salazar.cheers.data.party.Party
-import com.salazar.cheers.data.party.WatchStatus
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.model.WatchStatus
 import kotlinx.coroutines.flow.Flow
 
 /**

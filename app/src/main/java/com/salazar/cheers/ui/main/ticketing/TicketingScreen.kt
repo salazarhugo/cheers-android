@@ -38,8 +38,8 @@ import com.salazar.cheers.core.ui.PriceTag
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.data.party.Party
-import androidx.compose.material3.Divider
+import com.salazar.cheers.core.model.Party
+import androidx.compose.material3.HorizontalDivider
 
 @Composable
 fun TicketingScreen(
@@ -97,7 +97,7 @@ fun Tickets(
                         .padding(16.dp),
                     ticket = ticket
                 )
-                Divider()
+                HorizontalDivider()
             }
         }
     }

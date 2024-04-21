@@ -1,6 +1,6 @@
 package com.salazar.cheers.domain.list_post
 
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.common.di.IODispatcher

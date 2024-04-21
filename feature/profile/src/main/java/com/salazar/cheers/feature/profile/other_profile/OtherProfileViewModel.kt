@@ -3,12 +3,12 @@ package com.salazar.cheers.feature.profile.other_profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.data.party.Party
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.data.post.repository.PostRepository
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
@@ -62,7 +62,7 @@ private data class OtherProfileViewModelState(
 @HiltViewModel
 class OtherProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val postRepository: PostRepository,
     private val partyRepository: PartyRepository,
     private val sendFriendRequestUseCase: SendFriendRequestUseCase,
@@ -88,9 +88,9 @@ class OtherProfileViewModel @Inject constructor(
             updateUsername(username)
         }
         viewModelScope.launch {
-            userRepository.getUserFlow(userIdOrUsername = username).collect { user ->
+            userRepositoryImpl.getUserFlow(userIdOrUsername = username).collect { user ->
                 updateUser(user)
-                refreshUserParties()
+//                refreshUserParties()
             }
         }
         onSwipeRefresh()
@@ -98,13 +98,14 @@ class OtherProfileViewModel @Inject constructor(
 
     private fun refreshUser() {
         viewModelScope.launch {
-            val result = userRepository.fetchUser(username)
+            updateIsRefreshing(true)
+            val result = userRepositoryImpl.fetchUser(username)
             when(result) {
                 is Resource.Error -> {}
-                is Resource.Loading -> updateIsLoading(result.isLoading)
+                is Resource.Loading -> updateIsRefreshing(result.isLoading)
                 is Resource.Success -> {}
             }
-            updateIsLoading(false)
+            updateIsRefreshing(false)
         }
     }
 
@@ -121,13 +122,7 @@ class OtherProfileViewModel @Inject constructor(
     }
 
     fun onSwipeRefresh() {
-        viewModelScope.launch {
-            updateIsRefreshing(true)
-            refreshUser()
-            refreshUserPosts()
-            refreshUserParties()
-            updateIsRefreshing(false)
-        }
+        refreshUser()
     }
 
     private fun updateUsername(username: String) {
@@ -172,7 +167,7 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike(post: com.salazar.cheers.data.post.repository.Post) {
+    fun toggleLike(post: Post) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
         }

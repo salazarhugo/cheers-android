@@ -1,7 +1,7 @@
 plugins {
-    id("cheers.android.library")
-    id("cheers.android.hilt")
-    id("cheers.android.room")
+    alias(libs.plugins.cheers.android.library)
+    alias(libs.plugins.cheers.android.hilt)
+    alias(libs.plugins.cheers.android.room)
 }
 
 android {
@@ -18,8 +18,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(project(":core:protobuf"))
+    implementation(projects.core.model)
+    implementation(projects.core.protobuf)
+    implementation(projects.core.db)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

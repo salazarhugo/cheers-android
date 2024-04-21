@@ -2,18 +2,16 @@ package com.salazar.cheers.domain.update_profile
 
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.data.account.AccountRepository
-import com.salazar.cheers.data.account.toAccount
-import com.salazar.cheers.data.user.User
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.common.di.IODispatcher
-import com.salazar.common.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class UpdateProfileUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(
@@ -23,7 +21,7 @@ class UpdateProfileUseCase @Inject constructor(
         name: String,
         website: String,
     ): Result<User> = withContext(ioDispatcher) {
-        return@withContext userRepository.updateUserProfile(
+        return@withContext userRepositoryImpl.updateUserProfile(
             picture = picture.orEmpty(),
             name = name,
             bio = bio,

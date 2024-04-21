@@ -18,11 +18,11 @@ import com.salazar.cheers.core.util.paging.DefaultPaginator
 import com.salazar.cheers.core.util.playback.AndroidAudioPlayer
 import com.salazar.cheers.core.util.playback.AudioState
 import com.salazar.cheers.data.account.Account
-import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.core.model.Note
 import com.salazar.cheers.data.note.repository.NoteRepository
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.data.post.repository.PostRepository
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val postRepository: PostRepository,
     private val noteRepository: NoteRepository,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val homeUseCases: HomeUseCases,
     private val audioPlayer: AndroidAudioPlayer,
 ) : ViewModel() {
@@ -220,7 +220,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike(post: com.salazar.cheers.data.post.repository.Post) {
+    fun toggleLike(post: Post) {
         viewModelScope.launch {
             postRepository.toggleLike(post = post)
         }
@@ -228,7 +228,7 @@ class HomeViewModel @Inject constructor(
 
     fun blockUser(userId: String) {
         viewModelScope.launch {
-            userRepository.blockUser(userId = userId)
+            userRepositoryImpl.blockUser(userId = userId)
         }
     }
 

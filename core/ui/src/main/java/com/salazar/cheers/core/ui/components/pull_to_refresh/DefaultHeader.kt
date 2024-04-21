@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,7 +67,16 @@ fun DefaultRefreshHeader(
             ,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (state.componentStatus == ActionComponentStatus.ActionInProgress) {
+            if (state.componentStatus == ActionComponentStatus.ActionSuccess) {
+                Icon(
+                    imageVector = Icons.Rounded.Check,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(2.dp),
+                    tint = color,
+                    contentDescription = null,
+                )
+            } else if (state.componentStatus == ActionComponentStatus.ActionInProgress) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .padding(end = 12.dp)
@@ -101,7 +113,7 @@ fun DefaultRefreshHeader(
                 headerText = text
             }
             if (state.componentStatus != ActionComponentStatus.ActionInProgress) {
-                Text(text = headerText, color = color)
+//                Text(text = headerText, color = color)
             }
         }
     }

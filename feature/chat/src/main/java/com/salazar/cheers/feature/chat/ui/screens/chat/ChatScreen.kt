@@ -48,10 +48,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.salazar.cheers.core.ui.SymbolAnnotationType
 import com.salazar.cheers.core.ui.messageFormatter
-import com.salazar.cheers.data.chat.models.ChatMessage
-import com.salazar.cheers.data.chat.models.ChatMessageStatus
-import com.salazar.cheers.data.chat.models.ChatStatus
-import com.salazar.cheers.data.chat.models.ChatType
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatMessageStatus
+import com.salazar.cheers.core.model.ChatStatus
+import com.salazar.cheers.core.model.ChatType
 import com.salazar.cheers.feature.chat.ui.components.ChatBottomBar
 import com.salazar.cheers.feature.chat.ui.components.ChatPresenceIndicator
 import com.salazar.cheers.feature.chat.ui.components.DirectChatBar

@@ -1,6 +1,6 @@
 package com.salazar.cheers.domain.create_note
 
-import com.salazar.cheers.data.note.NoteType
+import com.salazar.cheers.core.model.NoteType
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.common.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher

@@ -1,7 +1,7 @@
 package com.salazar.cheers.feature.chat.ui.screens.chat
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.salazar.cheers.data.chat.models.ChatMessage
+import com.salazar.cheers.core.model.ChatMessage
 
 sealed class ChatUIAction {
     data object OnBackPressed : ChatUIAction()

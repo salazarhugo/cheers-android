@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.profile
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,8 +23,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.components.multi_avatar.MultiAvatarComponent
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.User
 
 @Composable
 fun ProfileHeader(

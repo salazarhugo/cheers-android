@@ -4,13 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.user.UserRepository
+import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.list_friend.ListFriendUseCase
 import com.salazar.common.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,7 +30,7 @@ data class OtherProfileStatsUiState(
 @HiltViewModel
 class OtherProfileStatsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val userRepository: UserRepository,
+    private val userRepositoryImpl: UserRepositoryImpl,
     private val listFriendUseCase: ListFriendUseCase,
 ) : ViewModel() {
 
@@ -97,8 +96,5 @@ class OtherProfileStatsViewModel @Inject constructor(
     }
 
     fun toggleFollow(userID: String) {
-        viewModelScope.launch {
-            userRepository.toggleFollow(userID)
-        }
     }
 }

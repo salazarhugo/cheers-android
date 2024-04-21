@@ -17,9 +17,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.Celebration
-import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,9 +50,10 @@ import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshCompon
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.core.ui.item.party.PartyItem
 import com.salazar.cheers.core.ui.ui.PrettyImage
-import com.salazar.cheers.data.party.Party
-import com.salazar.cheers.data.post.repository.Post
-import com.salazar.cheers.data.user.User
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.PostType
+import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.profile.ProfileItem
 import com.salazar.cheers.feature.profile.ProfileTopBar
 import com.salazar.cheers.feature.profile.R
@@ -133,7 +134,7 @@ fun ProfileList(
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val tabs = listOf(
-        Icons.Outlined.ViewList,
+        Icons.AutoMirrored.Outlined.ViewList,
         Icons.Default.GridView,
         Icons.Outlined.Celebration
     )
@@ -296,7 +297,7 @@ fun PostGridItem(
         contentAlignment = Alignment.TopEnd
     ) {
         val url =
-            if (post.type == com.salazar.cheers.data.post.repository.PostType.VIDEO) post.videoThumbnailUrl else post.photos[0]
+            if (post.type == PostType.VIDEO) post.videoThumbnailUrl else post.photos[0]
         PrettyImage(
             data = url,
             contentDescription = "avatar",
@@ -310,7 +311,7 @@ fun PostGridItem(
                 }
         )
 
-        if (post.type == com.salazar.cheers.data.post.repository.PostType.VIDEO)
+        if (post.type == PostType.VIDEO)
             PlayIcon()
     }
 }

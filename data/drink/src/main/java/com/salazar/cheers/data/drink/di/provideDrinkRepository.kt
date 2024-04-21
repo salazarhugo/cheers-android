@@ -1,6 +1,5 @@
 package com.salazar.cheers.data.drink.di
 
-import com.salazar.cheers.data.drink.db.DrinkDao
 import com.salazar.cheers.data.drink.repository.DrinkRepository
 import com.salazar.cheers.data.drink.repository.DrinkRepositoryImpl
 import dagger.Module

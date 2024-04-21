@@ -1,6 +1,6 @@
 package com.salazar.cheers.domain.feed_note
 
-import com.salazar.cheers.data.note.Note
+import com.salazar.cheers.core.model.Note
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import kotlinx.coroutines.flow.Flow

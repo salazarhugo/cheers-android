@@ -6,9 +6,9 @@ import cheers.friendship.v1.DeleteFriendRequest2
 import cheers.friendship.v1.DeleteFriendRequestRequest
 import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.friendship.v1.ListFriendRequestsRequest
+import com.salazar.cheers.core.db.model.FriendRequestEntity
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.shared.data.mapper.toUserItem
-import com.salazar.common.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 
 class FriendshipRepositoryImpl @Inject constructor(
-    private val friendRequestDao: FriendRequestDao,
+    private val friendRequestDao: com.salazar.cheers.core.db.dao.FriendRequestDao,
 //    private val dataStoreRepo
     private val service: FriendshipServiceGrpcKt.FriendshipServiceCoroutineStub,
 ) : FriendshipRepository {
@@ -40,7 +40,7 @@ class FriendshipRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun listFriendRequest(): Flow<List<FriendRequest>> {
+    override suspend fun listFriendRequest(): Flow<List<FriendRequestEntity>> {
         return friendRequestDao.listFriendRequests()
     }
 
@@ -57,7 +57,7 @@ class FriendshipRepositoryImpl @Inject constructor(
 //                userItemDao.insertAll(users)
             friendRequestDao.insertFriendRequests(
                 friendRequests = response.itemsList.map {
-                    FriendRequest(id = it.id)
+                    FriendRequestEntity(id = it.id)
                 }
             )
             users

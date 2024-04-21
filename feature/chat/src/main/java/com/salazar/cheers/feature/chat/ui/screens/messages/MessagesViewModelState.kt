@@ -1,7 +1,7 @@
 package com.salazar.cheers.feature.chat.ui.screens.messages
 
 import cheers.chat.v1.Room
-import com.salazar.cheers.data.chat.models.ChatChannel
+import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.data.chat.websocket.WebsocketState
 
 data class MessagesViewModelState(

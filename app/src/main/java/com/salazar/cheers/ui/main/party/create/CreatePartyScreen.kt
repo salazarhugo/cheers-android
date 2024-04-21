@@ -71,12 +71,11 @@ import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.SearchSuggestion
 import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.core.ui.theme.Roboto
-import com.salazar.cheers.feature.create_post.LocationSection
 import com.salazar.cheers.feature.create_post.PrivacyBottomSheet
 import com.salazar.cheers.feature.create_post.SwitchPreference
 import com.salazar.cheers.feature.parties.ui.PartyDetails
 import com.salazar.cheers.feature.search.SearchLocation
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -252,18 +251,17 @@ fun FirstScreen(
             startTimeSeconds = uiState.startTimeSeconds,
             onPartyDetailsClick = { onCreatePartyUIAction(CreatePartyUIAction.OnPartyDetailsClick) }
         )
-        Divider()
+        HorizontalDivider()
         Description(
             description = uiState.description,
             onDescriptionClick = { onCreatePartyUIAction(CreatePartyUIAction.OnDescriptionClick) }
         )
-        Divider()
+        HorizontalDivider()
         CategorySection(
             category = "",
             onClick = {},
         )
-        Divider()
-        LocationSection("", navigateToChooseOnMap = {})
+        HorizontalDivider()
 //        NameTextField(uiState = uiState)
     }
 }
@@ -502,7 +500,7 @@ private fun ShareButton(
         modifier = modifier,
         verticalArrangement = Arrangement.Bottom,
     ) {
-        Divider()
+        HorizontalDivider()
         Button(
             onClick = onClick,
             modifier = Modifier
@@ -710,12 +708,12 @@ fun EventDetailsPage(
         onEndDateChanged = onEndTimeSecondsChange,
         onHasEndDateToggle = onHasEndDateToggle,
     )
-    Divider()
+    HorizontalDivider()
 //    Privacy(
 //        privacyState = uiState.privacyState,
 //        privacy = uiState.privacy,
 //    )
-    Divider()
+    HorizontalDivider()
     SwitchPreference(
         checked = uiState.showGuestList,
         text = "Show Guest List",

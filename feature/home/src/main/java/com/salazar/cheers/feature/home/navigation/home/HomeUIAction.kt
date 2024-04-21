@@ -1,6 +1,6 @@
 package com.salazar.cheers.feature.home.navigation.home
 
-import com.salazar.cheers.data.post.repository.Post
+import com.salazar.cheers.core.Post
 
 sealed class HomeUIAction {
     data object OnChatClick : HomeUIAction()

@@ -2,8 +2,9 @@ package com.salazar.cheers.data.activity.impl
 
 import cheers.activity.v1.ActivityServiceGrpcKt
 import cheers.activity.v1.ListActivityRequest
-import com.salazar.cheers.data.activity.Activity
-import com.salazar.cheers.data.activity.ActivityDao
+import com.salazar.cheers.core.model.Activity
+import com.salazar.cheers.core.db.model.asEntity
+import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.data.activity.toActivity
 import com.salazar.common.util.Resource
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ActivityRepositoryImpl @Inject constructor(
-    private val activityDao: ActivityDao,
+    private val activityDao: com.salazar.cheers.core.db.dao.ActivityDao,
     private val service: ActivityServiceGrpcKt.ActivityServiceCoroutineStub,
 ) : ActivityRepository {
 
@@ -22,7 +23,7 @@ class ActivityRepositoryImpl @Inject constructor(
         emit(Resource.Loading(true))
 
         val localActivities = activityDao.listActivity("")
-        emit(Resource.Success(localActivities))
+        emit(Resource.Success(localActivities.asExternalModel()))
 
 
         val remoteActivities = try {
@@ -39,8 +40,8 @@ class ActivityRepositoryImpl @Inject constructor(
         }
 
         remoteActivities?.let { activities ->
-            activityDao.insertActivities(activities)
-            emit(Resource.Success(activityDao.listActivity("")))
+            activityDao.insertActivities(activities.asEntity())
+            emit(Resource.Success(activityDao.listActivity("").asExternalModel()))
         }
 
         emit(Resource.Loading(false))

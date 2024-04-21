@@ -75,7 +75,7 @@ fun ShareButton(
             .navigationBarsPadding(),
         verticalArrangement = Arrangement.Bottom,
     ) {
-        Divider()
+        HorizontalDivider()
         ButtonWithLoading(
             onClick = onClick,
             modifier = Modifier

@@ -1,9 +1,9 @@
 package com.salazar.cheers.domain.send_message
 
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.chat.models.ChatMessage
-import com.salazar.cheers.data.chat.models.ChatMessageStatus
-import com.salazar.cheers.data.chat.models.MessageType
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatMessageStatus
+import com.salazar.cheers.core.model.MessageType
 import com.salazar.common.di.IODispatcher
 import com.salazar.common.util.result.DataError
 import com.salazar.common.util.result.Result

@@ -1,6 +1,6 @@
 plugins {
-    id("cheers.android.feature")
-    id("cheers.android.library.compose")
+    alias(libs.plugins.cheers.android.feature)
+    alias(libs.plugins.cheers.android.library.compose)
     alias(libs.plugins.ksp)
 }
 
@@ -14,18 +14,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":domain"))
-    implementation(project(":core:util"))
-    implementation(project(":core:shared"))
-    implementation(project(":data:ticket"))
+    implementation(projects.common)
+    implementation(projects.domain)
+    implementation(projects.core.util)
+    implementation(projects.core.shared)
+    implementation(projects.data.ticket)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
-    // QR Code
-    implementation(libs.composed.barcodes)
 
     // Jetpack Compose
     implementation("androidx.compose.runtime:runtime-livedata")

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.theme.BlueCheers
-import com.salazar.cheers.data.chat.models.ChatMessageStatus
+import com.salazar.cheers.core.model.ChatMessageStatus
 
 @Composable
 fun ChatMessageStatus(

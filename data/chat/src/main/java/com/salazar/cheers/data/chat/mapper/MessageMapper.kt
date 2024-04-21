@@ -2,10 +2,10 @@ package com.salazar.cheers.data.chat.mapper
 
 import cheers.chat.v1.Message
 import cheers.chat.v1.MessageItem
-import com.salazar.cheers.data.chat.models.ChatMessage
-import com.salazar.cheers.data.chat.models.ChatMessageStatus
+import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatMessageStatus
 import com.salazar.cheers.data.chat.models.ImageMessage
-import com.salazar.cheers.data.chat.models.MessageType
+import com.salazar.cheers.core.model.MessageType
 
 fun MessageItem.toTextMessage(): ChatMessage {
     return message.toTextMessage().copy(
