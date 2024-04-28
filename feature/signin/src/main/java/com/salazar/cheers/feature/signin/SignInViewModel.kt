@@ -1,6 +1,7 @@
 package com.salazar.cheers.feature.signin
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -139,6 +140,7 @@ class SignInViewModel @Inject constructor(
             ).collect {
                 when(it) {
                     is Resource.Success -> {
+                        Log.d("SignInViewModel", "showSigningOptions: SUCCESS")
                         updateIsSignedIn(true)
                     }
                     is Resource.Error -> {

@@ -20,6 +20,7 @@ private const val localAccountDatastore = "localAccountDataStore"
 
 /* Data store keys */
 private val accountKey = stringPreferencesKey("accountKey")
+private val idTokenKey = stringPreferencesKey("idTokenKey")
 
 @Singleton
 class LocalAccountDataSource @Inject constructor(
@@ -33,6 +34,12 @@ class LocalAccountDataSource @Inject constructor(
 
     private val dataStore: DataStore<Preferences>
         get() = context.dataStore
+
+    suspend fun getIdToken(): String? {
+        return dataStore.data.map { prefs ->
+            prefs[idTokenKey]
+        }.firstOrNull()
+    }
 
     suspend fun getAccount(): Account? {
         return getAccountFlow().firstOrNull()
@@ -57,6 +64,13 @@ class LocalAccountDataSource @Inject constructor(
     suspend fun putAccount(account: Account): Boolean {
         dataStore.edit { settings ->
             settings[accountKey] = gson.toJson(account)
+        }
+        return true
+    }
+
+    suspend fun putIdToken(idToken: String): Boolean {
+        dataStore.edit { settings ->
+            settings[idTokenKey] = idToken
         }
         return true
     }

@@ -17,13 +17,12 @@ class GetIdTokenUseCase @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(): Result<String, DataError> = withContext(dispatcher) {
-        if (accountRepository.isNotConnected()) {
-            return@withContext Result.Error(DataError.Auth.NOT_SIGNED_IN)
-        }
+//        if (accountRepository.isNotConnected()) {
+//            return@withContext Result.Error(DataError.Auth.NOT_SIGNED_IN)
+//        }
 
-        val idToken = accountRepository.getAccountFlow().map {
-            it?.idToken
-        }.firstOrNull() ?: return@withContext Result.Error(DataError.Network.UNKNOWN)
+        val idToken = accountRepository.getIdToken()
+            ?: return@withContext Result.Error(DataError.Network.UNKNOWN)
 
         return@withContext Result.Success(idToken)
     }

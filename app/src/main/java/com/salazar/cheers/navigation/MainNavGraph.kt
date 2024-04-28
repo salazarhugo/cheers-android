@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -115,6 +116,8 @@ import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
+import com.salazar.common.util.result.getOrNull
+import kotlinx.coroutines.launch
 
 
 fun NavGraphBuilder.mainNavGraph(
@@ -576,6 +579,7 @@ fun NavGraphBuilder.mainNavGraph(
             val context = LocalContext.current
             val viewModel = hiltViewModel<EventMoreSheetViewModel>()
             val clipboardManager = LocalClipboardManager.current
+            val scope = rememberCoroutineScope()
 
             EventMoreBottomSheet(
                 modifier = Modifier.navigationBarsPadding(),
@@ -584,24 +588,27 @@ fun NavGraphBuilder.mainNavGraph(
                 onDelete = { },
                 onReport = { /*TODO*/ },
                 onShare = {
-                    FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
-                        .addOnSuccessListener { shortLink ->
-                            val sendIntent: Intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, shortLink.shortLink.toString())
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            context.startActivity(shareIntent)
+                    scope.launch {
+                        val link =
+                            FirebaseDynamicLinksUtil.createShortLink("event/$eventId").getOrNull()
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, link)
+                            type = "text/plain"
                         }
-                    appState.navActions.navigateBack()
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                        appState.navActions.navigateBack()
+                    }
                 },
                 onLinkClick = {
-                    FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
-                        .addOnSuccessListener { shortLink ->
-                            clipboardManager.setText(AnnotatedString(shortLink.shortLink.toString()))
-                        }
-                    appState.navActions.navigateBack()
+                    scope.launch {
+                        val link =
+                            FirebaseDynamicLinksUtil.createShortLink("event/$eventId").getOrNull()
+                                ?: return@launch
+                        clipboardManager.setText(AnnotatedString(link))
+                        appState.navActions.navigateBack()
+                    }
                 },
                 onHide = {
                     viewModel.onHide()
@@ -617,6 +624,7 @@ fun NavGraphBuilder.mainNavGraph(
         val context = LocalContext.current
         val username = it.arguments?.getString("username")!!
         val clipboardManager = LocalClipboardManager.current
+        val scope = rememberCoroutineScope()
 
         ProfileMoreBottomSheet(
             onProfileSheetUIAction = { action ->
@@ -624,14 +632,21 @@ fun NavGraphBuilder.mainNavGraph(
                     is ProfileSheetUIAction.OnNfcClick -> appState.navActions.navigateToNfc()
                     is ProfileSheetUIAction.OnSettingsClick -> navController.navigateToSettings()
                     is ProfileSheetUIAction.OnCopyProfileClick -> {
-                        FirebaseDynamicLinksUtil.createShortLink("u/$username")
-                            .addOnSuccessListener { shortLink ->
-                                clipboardManager.setText(AnnotatedString(shortLink.shortLink.toString()))
-                            }
+                        scope.launch {
+                            val link =
+                                FirebaseDynamicLinksUtil.createShortLink("u/$username").getOrNull()
+                                    ?: return@launch
+                            clipboardManager.setText(AnnotatedString(link))
+                        }
                         appState.navActions.navigateBack()
                     }
 
-                    is ProfileSheetUIAction.OnAddSnapchatFriends -> context.shareToSnapchat(username)
+                    is ProfileSheetUIAction.OnAddSnapchatFriends -> {
+                        scope.launch {
+                            context.shareToSnapchat(username)
+                        }
+                    }
+
                     is ProfileSheetUIAction.OnPostHistoryClick -> navController.navigateToMapPostHistory()
                     ProfileSheetUIAction.OnQrCodeClick -> navController.navigateToCheerscode()
                 }

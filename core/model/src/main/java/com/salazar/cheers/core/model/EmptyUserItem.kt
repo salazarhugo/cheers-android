@@ -26,6 +26,16 @@ val cheersUserItem = UserItem(
     requested = false,
 )
 
+val cheersUser = User(
+    id = UUID.randomUUID().toString(),
+    username = "cheers",
+    name = "Cheers Social",
+    verified = true,
+    picture = null,
+    friend = true,
+    requested = false,
+)
+
 val cheersUserItemList = List(20) {
     cheersUserItem.copy(id = UUID.randomUUID().toString())
 }

@@ -127,6 +127,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                                 return Result.success(Unit)
                             },
                             onFailure = {
+                                it.printStackTrace()
                                 return Result.failure(it)
                             }
                         )

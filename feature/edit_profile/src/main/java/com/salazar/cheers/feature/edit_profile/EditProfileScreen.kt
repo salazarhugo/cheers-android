@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,24 +27,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.MyTopAppBar
 import com.salazar.cheers.core.ui.ProfileBanner
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.cheersUser
+import com.salazar.cheers.core.model.cheersUserItem
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
+import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 
 @Composable
 fun EditProfileScreen(
     uiState: EditProfileUiState,
-    onBioChanged: (String) -> Unit,
-    onNameChanged: (String) -> Unit,
-    onUsernameChanged: (String) -> Unit,
-    onWebsiteChanged: (String) -> Unit,
-    onSelectImage: (Uri?) -> Unit,
-    onSelectBanner: (Uri?) -> Unit,
-    onDismiss: () -> Unit,
-    onSave: () -> Unit,
+    onBioChanged: (String) -> Unit = {},
+    onNameChanged: (String) -> Unit = {},
+    onUsernameChanged: (String) -> Unit = {},
+    onWebsiteChanged: (String) -> Unit = {},
+    onSelectImage: (Uri?) -> Unit = {},
+    onSelectBanner: (Uri?) -> Unit = {},
+    onDismiss: () -> Unit = {},
+    onSave: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -59,8 +66,9 @@ fun EditProfileScreen(
                 .padding(it)
                 .verticalScroll(rememberScrollState())
         ) {
-            if (uiState.isLoading)
+            if (uiState.isLoading) {
                 LoadingScreen()
+            }
             else {
                 EditProfileHeader(
                     user = uiState.user,
@@ -113,9 +121,11 @@ fun EditProfileHeader(
         val photo = photoUri?.toString() ?: user.picture
         val banner = bannerUri?.toString() ?: user.banner
 
-        EditProfileBannerAndAvatar(
+        ProfileBannerAndAvatar(
+            isEditable = true,
+            modifier = Modifier.padding(16.dp),
             banner = banner,
-            picture = photo,
+            avatar = photo,
             onAvatarClick = {
                 launcher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -129,35 +139,6 @@ fun EditProfileHeader(
         )
     }
 
-}
-
-@Composable
-fun EditProfileBannerAndAvatar(
-    banner: String?,
-    picture: String?,
-    onAvatarClick: () -> Unit,
-    onBannerClick: () -> Unit,
-) {
-    Box(
-        contentAlignment = Alignment.BottomStart,
-    ) {
-        Column {
-            ProfileBanner(
-                banner = banner,
-                clickable = true,
-                onClick = onBannerClick,
-            )
-            Spacer(Modifier.height(48.dp))
-        }
-        AvatarComponent(
-            modifier = Modifier
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background, CircleShape),
-            avatar = picture,
-            size = 110.dp,
-            onClick = onAvatarClick,
-        )
-    }
 }
 
 @Composable
@@ -189,9 +170,12 @@ fun EditProfileBody(
     onWebsiteChanged: (String) -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
@@ -204,15 +188,14 @@ fun EditProfileBody(
             value = user.name,
             onValueChange = {
 //                if (it.length <= NAME_MAX_CHAR)
-                    onNameChanged(it)
+                onNameChanged(it)
             },
         )
-        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
-                    "Username",
+                    text = "Username",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -221,12 +204,11 @@ fun EditProfileBody(
             onValueChange = { onUsernameChange(it) },
             enabled = true,
         )
-        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
-                    "Email",
+                    text = "Email",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -235,12 +217,11 @@ fun EditProfileBody(
             onValueChange = {},
             enabled = false,
         )
-        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
-                    "Website",
+                    text = "Website",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -251,20 +232,35 @@ fun EditProfileBody(
                     onWebsiteChanged(it)
             },
         )
-        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Bio", style = MaterialTheme.typography.labelMedium) },
-//            colors = OutlinedTextFieldDefaults.textFieldColors(
-//                backgroundColor = Color.Transparent,
-//                textColor = MaterialTheme.colorScheme.onBackground,
-//            ),
+            modifier = Modifier.fillMaxWidth()
+                .height(100.dp)
+            ,
+            label = {
+                Text("Bio", style = MaterialTheme.typography.labelMedium)
+            },
             value = user.bio,
             onValueChange = {
-//                if (it.length <= BIO_MAX_CHAR)
-                    onBioChanged(it)
+                onBioChanged(it)
             },
         )
-        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@ScreenPreviews
+@Composable
+private fun EditProfileScreenPreview() {
+    CheersPreview {
+        EditProfileScreen(
+            uiState = EditProfileUiState.HasPosts(
+                user = cheersUser,
+                bannerUri = null,
+                done = false,
+                errorMessages = emptyList(),
+                isFollowing = false,
+                isLoading = false,
+                profilePictureUri = null,
+            ),
+        )
     }
 }

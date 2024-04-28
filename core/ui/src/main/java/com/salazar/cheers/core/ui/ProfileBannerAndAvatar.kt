@@ -31,6 +31,9 @@ fun ProfileBannerAndAvatar(
     banner: String?,
     avatar: String?,
     modifier: Modifier = Modifier,
+    isEditable: Boolean = false,
+    onBannerClick: () -> Unit = {},
+    onAvatarClick: () -> Unit = {},
     content: @Composable RowScope.() -> Unit = {},
 ) {
     var openAlertDialog by remember { mutableStateOf(false) }
@@ -53,6 +56,8 @@ fun ProfileBannerAndAvatar(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp)),
                 banner = banner,
+                onClick = onBannerClick,
+                clickable = isEditable,
             )
             Row(
                 modifier = Modifier
@@ -69,7 +74,10 @@ fun ProfileBannerAndAvatar(
                 .border(5.dp, MaterialTheme.colorScheme.background, CircleShape),
             size = 110.dp,
             onClick = {
-                openAlertDialog = true
+                if (isEditable.not()) {
+                    openAlertDialog = true
+                }
+                onAvatarClick()
             },
         )
     }

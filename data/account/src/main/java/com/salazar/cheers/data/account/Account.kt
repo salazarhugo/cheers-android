@@ -10,7 +10,6 @@ data class Account(
     val username: String = String(),
     val verified: Boolean = false,
     val email: String = String(),
-    val idToken: String = String(),
 )
 
 fun UserResponse.toAccount(): Account {

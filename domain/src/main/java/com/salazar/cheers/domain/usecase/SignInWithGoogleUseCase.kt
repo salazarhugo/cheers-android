@@ -1,5 +1,6 @@
 package com.salazar.cheers.domain.usecase
 
+import android.util.Log
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
 import com.salazar.common.di.IODispatcher
@@ -23,7 +24,10 @@ class SignInWithGoogleUseCase @Inject constructor(
                 ?: return@withContext Result.failure(Exception("Error signing in with one tap"))
 
             val token = authResult.user?.getIdToken(true)?.await()
-            updateIdTokenUseCase(token?.token.orEmpty())
+                ?: return@withContext Result.failure(Exception("failed to refresh id token"))
+            Log.d("SIgnInWithGoogleUseCase", "invoke: ${token.token}")
+
+            updateIdTokenUseCase(token.token.orEmpty())
 
             return@withContext signInUseCase()
         } catch (e: Exception) {

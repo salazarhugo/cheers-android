@@ -33,7 +33,7 @@ class SignInUseCase @Inject constructor(
                     authRepository.signIn(idToken = idToken.data)
                         .fold(
                             onSuccess = {
-                                accountRepository.putAccount(it.toAccount(idToken.data))
+                                accountRepository.putAccount(it.toAccount())
                                 storeUserEmail.saveEmail(currentUser.email.orEmpty())
                                 return@fold Result.success(false)
                             },

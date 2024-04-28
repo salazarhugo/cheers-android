@@ -35,7 +35,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ChatWebSocketManager @Inject constructor(
-    private val chatDao: com.salazar.cheers.core.db.dao.ChatDao,
+    private val chatDao: ChatDao,
     private val accountRepository: AccountRepository,
 ) : WebSocketListener() {
 
@@ -44,14 +44,13 @@ class ChatWebSocketManager @Inject constructor(
     val websocketState = MutableStateFlow<WebsocketState>(WebsocketState.Loading)
     var retryCount = 0
 
-    private suspend fun getIdToken(): Result<String>  {
+    private suspend fun getIdToken(): Result<String> {
         if (accountRepository.isNotConnected()) {
             return Result.failure(Exception("Not connected"))
         }
 
-        val idToken = accountRepository.getAccountFlow().map {
-            it?.idToken
-        }.firstOrNull() ?: return Result.failure(Exception("failed to get idtoken"))
+        val idToken = accountRepository.getIdToken()
+            ?: return Result.failure(Exception("failed to get idtoken"))
 
         return Result.success(idToken)
     }

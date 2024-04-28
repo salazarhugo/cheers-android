@@ -149,8 +149,8 @@ class AuthRepository @Inject constructor(
     suspend fun signInWithOneTap(
         idToken: String?,
     ): AuthResult? {
-        val credential = getFirebaseCredentialFromIdToken(idToken)
-        return signInWithCredential(credential)
+        val credential = getFirebaseCredentialFromIdToken(idToken = idToken)
+        return signInWithCredential(credential = credential)
     }
 
     suspend fun signInWithGoogle(

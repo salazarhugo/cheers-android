@@ -3,6 +3,7 @@ package com.salazar.cheers.feature.profile.cheerscode
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +20,7 @@ import com.salazar.cheers.core.ui.components.qrcode.QrCodeComponent
 
 @Composable
 fun CheerscodeScreen(
+    link: String,
     onBackPressed: () -> Unit = {},
 ) {
     Scaffold(
@@ -29,6 +31,7 @@ fun CheerscodeScreen(
         }
     ) {
         Box(
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
             Column(
@@ -41,8 +44,8 @@ fun CheerscodeScreen(
                 QrCodeComponent(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.large)
-                        .size(160.dp),
-                    value = "",
+                        .fillMaxWidth(0.5f),
+                    value = link,
                 )
             }
         }
@@ -53,6 +56,8 @@ fun CheerscodeScreen(
 @Composable
 private fun CheerscodeScreenPreview() {
     CheersPreview {
-        CheerscodeScreen()
+        CheerscodeScreen(
+            link = ""
+        )
     }
 }

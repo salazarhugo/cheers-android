@@ -12,6 +12,7 @@ fun CheerscodeRoute(
     val uiState = viewModel.uiState.collectAsState().value
 
     CheerscodeScreen(
+        link = uiState.link,
         onBackPressed = onBackPressed,
     )
 }

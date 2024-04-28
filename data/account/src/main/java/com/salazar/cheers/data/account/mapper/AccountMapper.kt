@@ -3,7 +3,7 @@ package com.salazar.cheers.data.account.mapper
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.shared.data.response.LoginResponse
 
-fun LoginResponse.toAccount(idToken: String = String()): Account {
+fun LoginResponse.toAccount(): Account {
     user.apply {
         return Account(
             id = id.orEmpty(),
@@ -13,7 +13,6 @@ fun LoginResponse.toAccount(idToken: String = String()): Account {
             email = email.orEmpty(),
             picture = picture.orEmpty(),
             banner = banner.orEmpty(),
-            idToken = idToken,
         )
     }
 }

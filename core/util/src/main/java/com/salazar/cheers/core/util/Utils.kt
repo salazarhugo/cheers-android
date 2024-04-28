@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.compose.ui.Modifier
+import com.salazar.common.util.result.getOrThrow
 import com.snap.creativekit.SnapCreative
 import com.snap.creativekit.exceptions.SnapMediaSizeException
 import com.snap.creativekit.models.SnapPhotoContent
@@ -44,7 +45,7 @@ object Utils {
         }
     }
 
-    fun Context.shareToSnapchat(username: String) {
+    suspend fun Context.shareToSnapchat(username: String) {
         val snapCreativeKitApi = SnapCreative.getApi(this)
         val snapMediaFactory = SnapCreative.getMediaFactory(this)
 
@@ -52,11 +53,10 @@ object Utils {
             val file = File("${filesDir}/snapchat-add-friend.jpg")
             val photoFile = snapMediaFactory.getSnapPhotoFromFile(file)
             val snapPhotoContent = SnapPhotoContent(photoFile)
-            FirebaseDynamicLinksUtil.createShortLink("u/$username").addOnSuccessListener {
-                snapPhotoContent.attachmentUrl = it.shortLink.toString()
-                snapCreativeKitApi.send(snapPhotoContent)
-                Log.d("SNAP", it.shortLink.toString())
-            }
+            val result = FirebaseDynamicLinksUtil.createShortLink("u/$username").getOrThrow()
+            snapPhotoContent.attachmentUrl = result
+            snapCreativeKitApi.send(snapPhotoContent)
+            Log.d("SNAP", result)
         } catch (e: SnapMediaSizeException) {
             Log.e("SNAP", e.toString())
             return
