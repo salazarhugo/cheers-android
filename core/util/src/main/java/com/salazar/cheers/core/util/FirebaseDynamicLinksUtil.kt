@@ -9,8 +9,8 @@ import com.google.firebase.dynamiclinks.ktx.shortLinkAsync
 import com.google.firebase.dynamiclinks.ktx.socialMetaTagParameters
 import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.core.util.Constants.URI
-import com.salazar.common.util.result.DataError
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.util.result.DataError
+import com.salazar.cheers.shared.util.result.Result
 import kotlinx.coroutines.tasks.await
 
 

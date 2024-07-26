@@ -28,7 +28,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 @Composable
 fun PostFooter(

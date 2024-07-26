@@ -80,6 +80,9 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
+            if (!uiState.showFloatingActionButton)
+                return@Scaffold
+
             FloatingActionButton(
                 onClick = { onHomeUIAction(HomeUIAction.OnCreatePostClick) },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -92,8 +95,9 @@ fun HomeScreen(
             }
         },
     ) {
+        it
         val state = rememberRefreshLayoutState()
-        val scope  = rememberCoroutineScope()
+        val scope = rememberCoroutineScope()
         LaunchedEffect(uiState.isLoading) {
             if (!uiState.isLoading) {
                 scope.launch {
@@ -134,15 +138,13 @@ fun PostList(
 
         item {
             WhatsUpSection(
-                avatar = uiState.account?.picture ?: "",
+                avatar = uiState.account?.picture.orEmpty(),
                 onClick = { onHomeUIAction(HomeUIAction.OnCreatePostClick) },
             )
             HorizontalDivider()
         }
 
-        item {
-            UploadingSection()
-        }
+        uploadingSection()
 
         posts(
             posts = uiState.posts,
@@ -223,7 +225,7 @@ private fun LazyListScope.suggestions(
                         onHomeUIAction(HomeUIAction.OnAddFriendClick(user.id))
                     },
                     onCancelFriendRequestClick = {},
-                    onDelete =  {},
+                    onDelete = {},
                 )
             }
         )
@@ -288,15 +290,12 @@ private fun LazyListScope.posts(
                 isAudioPlaying = isAudioFocused && audioState.isAudioPlaying,
                 audioProgress = if (isAudioFocused) audioState.audioProgress else 0f,
             ),
-            modifier = Modifier.animateItemPlacement(),
+//            modifier = Modifier.animateItemPlacement(),
             onAudioClick = {
                 onHomeUIAction(HomeUIAction.OnAudioClick(post.id, post.audioUrl))
             },
             onUserClick = { userID ->
                 onHomeUIAction(HomeUIAction.OnUserClick(userID))
-            },
-            onMoreClick = {
-                onHomeUIAction(HomeUIAction.OnPostMoreClick(post.id))
             },
             onLikeClick = {
                 onHomeUIAction(HomeUIAction.OnLikeClick(post))
@@ -307,6 +306,9 @@ private fun LazyListScope.posts(
             onCommentClick = {
                 onHomeUIAction(HomeUIAction.OnPostCommentClick(post.id))
             },
+            navigateToDeleteDialog = {
+                onHomeUIAction(HomeUIAction.OnDeletePostClick(post.id))
+            }
         )
     }
 }
@@ -348,17 +350,23 @@ fun HomeLazyPagingListState(
     }
 }
 
-@Composable
-fun UploadingSection() {
-    val context = LocalContext.current
-    val workManager = WorkManager.getInstance(context)
-    val workInfos = workManager.getWorkInfosForUniqueWorkLiveData("post_upload")
-        .observeAsState()
-        .value
-    val uploadInfo = workInfos?.firstOrNull()
+private fun LazyListScope.uploadingSection() {
+    item(key = "uploading") {
+        val context = LocalContext.current
+        val workManager = WorkManager.getInstance(context)
+        val workInfos = workManager.getWorkInfosForUniqueWorkLiveData("post_upload")
+            .observeAsState()
+            .value
+        val uploadInfo = workInfos?.firstOrNull()
+        val isUploading = uploadInfo?.state?.isFinished == false
 
-    if (uploadInfo?.state?.isFinished == false)
-        Column {
+        if (!isUploading) {
+            return@item
+        }
+
+        Column(
+            modifier = Modifier.animateItemPlacement(),
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -366,7 +374,7 @@ fun UploadingSection() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                when (uploadInfo.state) {
+                when (uploadInfo?.state) {
                     WorkInfo.State.ENQUEUED ->
                         Text(
                             text = "Will automatically post when possible",
@@ -381,16 +389,22 @@ fun UploadingSection() {
                                 .clip(RoundedCornerShape(22.dp)),
                         )
 
-                    else -> {}
+                    else -> Unit
                 }
                 Spacer(Modifier.width(8.dp))
-                IconButton(onClick = { workManager.cancelUniqueWork("post_upload") }) {
-                    Icon(Icons.Outlined.Close, contentDescription = null)
+                IconButton(
+                    onClick = { workManager.cancelUniqueWork("post_upload") },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = null,
+                    )
                 }
             }
 
             HorizontalDivider()
         }
+    }
 }
 
 @Composable

@@ -3,12 +3,18 @@ plugins {
     alias(libs.plugins.cheers.android.application.compose)
     alias(libs.plugins.cheers.android.application.firebase)
     alias(libs.plugins.cheers.android.room)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storeFile = File("/home/hugo/.android/cheers_debug.keystore")
+        }
+    }
     namespace = "com.salazar.cheers"
     compileSdk = 34
 
@@ -19,6 +25,7 @@ android {
         versionCode = 72
         versionName = "1.0.0-072"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig = signingConfigs.getByName("debug")
     }
 
     buildTypes {
@@ -35,7 +42,7 @@ android {
             isDebuggable = true
             isMinifyEnabled = false
             versionNameSuffix = "_dev_debug"
-            applicationIdSuffix = ".dev"
+//            applicationIdSuffix = ".dev"
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -44,18 +51,20 @@ android {
         excludes.add("/META-INF/AL2.0")
         excludes.add("/META-INF/LGPL2.1")
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
-    implementation(projects.ads)
-    implementation(projects.common)
-
     implementation(projects.core.protobuf)
     implementation(projects.core.ui)
     implementation(projects.core.util)
     implementation(projects.core.model)
     implementation(projects.core.shared)
     implementation(projects.core.db)
+    implementation(projects.core.analytics)
 
     implementation(projects.feature.home)
     implementation(projects.feature.chat)
@@ -76,6 +85,7 @@ dependencies {
     implementation(projects.feature.friendList)
     implementation(projects.feature.comment)
     implementation(projects.feature.postLikes)
+    implementation(projects.feature.premium)
 
     implementation(projects.domain)
 
@@ -97,21 +107,8 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
 
     implementation(libs.kotlinx.coroutines.play.services)
-
-//    implementation(libs.grpc.okhttp)
-//    implementation(libs.grpc.protobuf.lite) {
-//        exclude(group = "com.google.firebase", module = "protolite-well-known-types")
-//    }
-//    implementation(libs.grpc.stub)
-//    implementation(libs.grpc.kotlin.stub)
-//    compileOnly(libs.annotations.api) // necessary for Java 9+
-
-//    implementation("com.google.protobuf:protobuf-javalite:3.21.12")
-
-//    implementation("com.google.protobuf:protobuf-javalite:3.21.7"
 
     // KSP
     implementation(libs.symbol.processing.api)
@@ -131,9 +128,6 @@ dependencies {
 
     // Jetpack Compose BOM
     implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.runtime:runtime-livedata")
 

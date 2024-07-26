@@ -2,10 +2,7 @@ package com.salazar.cheers.navigation
 
 import android.content.Intent
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -14,6 +11,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
@@ -21,11 +19,9 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
 import com.salazar.cheers.feature.comment.comment_more.CommentMoreRoute
 import com.salazar.cheers.feature.comment.delete.DeleteCommentDialog
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
@@ -79,7 +75,6 @@ import com.salazar.cheers.feature.search.navigation.searchScreen
 import com.salazar.cheers.feature.settings.navigateToSettings
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
-import com.salazar.cheers.feature.map.ui.MapPostHistoryRoute
 import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
@@ -116,7 +111,9 @@ import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
 import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
-import com.salazar.common.util.result.getOrNull
+import com.salazar.cheers.shared.util.result.getOrNull
+import com.salazar.cheers.ui.sheets.deletePostDialog
+import com.salazar.cheers.ui.sheets.navigateToDeletePostDialog
 import kotlinx.coroutines.launch
 
 
@@ -237,13 +234,9 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        dialog(
-            route = "${MainDestinations.DIALOG_DELETE_POST}/{postID}",
-        ) {
-            DeletePostDialog(
-                navActions = appState.navActions
-            )
-        }
+        deletePostDialog(
+            onBackPressed =  navController::popBackStack,
+        )
 
         homeScreen(
             onActivityClick = navController::navigateToNotifications,
@@ -269,7 +262,11 @@ fun NavGraphBuilder.mainNavGraph(
                     launchSingleTop = true
                     restoreState = true
                 }
-            }
+            },
+            navigateToDeletePostDialog = navController::navigateToDeletePostDialog,
+//            {
+//                navController.navigate(DeletePostDialog(postID = it))
+//            },
         )
 
         mapScreen(
@@ -493,14 +490,21 @@ fun NavGraphBuilder.mainNavGraph(
         )
 
         profileScreen(
+            navigateBack = navController::popBackStack,
             navigateToSignIn = navController::navigateToSignIn,
             navigateToSignUp = navController::navigateToSignUp,
             navigateToEditProfile = navController::navigateToEditProfile,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+            navigateToFriendList = navController::navigateToFriendList,
+            navigateToPostDetails = { postID ->
+                navController.navigate(route = "${MainDestinations.POST_DETAIL_ROUTE}/$postID")
+            },
             navigateToProfileMore = {
                 navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$it")
             },
-            navigateToFriendList = navController::navigateToFriendList,
-            navigateBack = navController::popBackStack,
+            navigateToPostMore = {
+                navController.navigate("${MainDestinations.POST_MORE_SHEET}/$it")
+            },
         )
 
         cheersCodeScreen(

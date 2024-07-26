@@ -1,6 +1,6 @@
 package com.salazar.cheers.shared.data
 
-import com.salazar.common.util.result.DataError
+import com.salazar.cheers.shared.util.result.DataError
 import io.grpc.Status
 import io.grpc.StatusException
 

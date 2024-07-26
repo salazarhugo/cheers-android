@@ -2,8 +2,8 @@ package com.salazar.cheers.domain.list_replies
 
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.data.comment.CommentRepository
-import com.salazar.common.util.Resource
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.util.Resource
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

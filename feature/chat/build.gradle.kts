@@ -10,6 +10,9 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 
@@ -18,7 +21,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(projects.common)
     implementation(projects.domain)
     implementation(projects.data.user)
     implementation(projects.data.chat)
@@ -26,12 +28,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
 
     // Jetpack Compose
-    implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
-    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation(libs.androidx.runtime.livedata)
 
     // Lifecycle
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)

@@ -1,8 +1,8 @@
 package com.salazar.cheers.domain.get_location_updates
 
 import com.salazar.cheers.shared.data.location.DefaultLocationClient
-import com.salazar.common.di.IODispatcher
-import com.salazar.common.di.MainDispatcher
+import com.salazar.cheers.shared.di.IODispatcher
+import com.salazar.cheers.shared.di.MainDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

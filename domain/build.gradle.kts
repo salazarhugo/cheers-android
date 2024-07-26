@@ -17,8 +17,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(projects.auth)
-    implementation(projects.common)
     implementation(projects.core.model)
     implementation(projects.core.shared)
     implementation(projects.core.db)
@@ -37,6 +35,7 @@ dependencies {
     implementation(projects.data.comment)
     implementation(projects.data.map)
     implementation(projects.data.chat)
+    implementation(projects.data.billing)
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {

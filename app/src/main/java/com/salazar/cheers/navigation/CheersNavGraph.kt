@@ -26,7 +26,7 @@ import com.salazar.cheers.feature.create_post.createPostNavigationRoute
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
 import com.salazar.cheers.feature.signin.signInNavigationRoute
 import com.salazar.cheers.ui.CheersAppState
-import com.salazar.cheers.ui.compose.CheersBottomBar
+import com.salazar.cheers.ui.compose.bottombar.CheersBottomBar
 
 
 @Composable
@@ -34,15 +34,18 @@ fun CheersNavGraph(
     uiState: CheersUiState.Initialized,
     appState: CheersAppState,
 ) {
+    val passcodeEnabled = uiState.settings.passcodeEnabled
+
     val startDestination =
         remember {
-            if (uiState.settings.passcode.isNotBlank())
-                CheersDestinations.PASSCODE_ROUTE
-            else
-                CheersDestinations.MAIN_ROUTE
+            when (passcodeEnabled) {
+                true -> CheersDestinations.PASSCODE_ROUTE
+                false -> CheersDestinations.MAIN_ROUTE
+            }
         }
 
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
     val currentRoute =
         navBackStackEntry?.destination?.route ?: partiesNavigationRoute
     val navActions = appState.navActions
@@ -78,21 +81,20 @@ fun CheersNavGraph(
         Scaffold(
             snackbarHost = { SnackbarHost(appState.snackBarHostState) },
             bottomBar = {
-                val visible = !hide
-                if (visible) {
-                    CheersBottomBar(
-                        currentRoute = currentRoute,
-                        onNavigate = { route ->
-                            appState.navController.navigate(route)
-                        },
-                    )
-                }
+                if (hide) return@Scaffold
+
+                CheersBottomBar(
+                    currentDestination = currentDestination,
+                    onNavigate = { route ->
+                        appState.navController.navigate(route)
+                    },
+                )
             },
         ) { innerPadding ->
-            val padding = if (hide)
-                0.dp
-            else
-                innerPadding.calculateBottomPadding()
+            val padding = when (hide) {
+                true -> 0.dp
+                false -> innerPadding.calculateBottomPadding()
+            }
             NavHost(
                 modifier = Modifier.padding(bottom = padding),
                 route = CheersDestinations.ROOT_ROUTE,

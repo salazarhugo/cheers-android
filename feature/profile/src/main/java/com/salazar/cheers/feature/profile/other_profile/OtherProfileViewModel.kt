@@ -14,7 +14,7 @@ import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCas
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.feature.profile.navigation.USERNAME
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

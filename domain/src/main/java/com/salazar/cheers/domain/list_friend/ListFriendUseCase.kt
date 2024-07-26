@@ -3,7 +3,7 @@ package com.salazar.cheers.domain.list_friend
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.friendship.FriendshipRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

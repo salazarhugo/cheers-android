@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.RecentUser
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.core.model.UserSuggestion
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

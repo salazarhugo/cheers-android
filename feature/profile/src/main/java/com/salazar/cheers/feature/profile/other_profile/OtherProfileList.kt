@@ -33,7 +33,7 @@ import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.profile.ProfileHeader
-import com.salazar.cheers.feature.profile.components.favorite_drink.FavoriteDrinkComponent
+import com.salazar.cheers.core.ui.components.favorite_drink.FavoriteDrinkComponent
 import kotlinx.coroutines.launch
 
 
@@ -61,7 +61,7 @@ fun OtherProfileList(
         state = state,
     ) {
         avatar(
-            drink =  coronaExtraDrink,
+            drink =  user.favouriteDrink,
             avatar = user.picture,
             banner = user.banner,
             verified = user.verified,

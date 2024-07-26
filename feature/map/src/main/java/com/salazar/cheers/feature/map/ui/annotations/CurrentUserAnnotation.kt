@@ -24,15 +24,21 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.google.common.io.Files.append
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.modifier.animatedBorder
 import com.salazar.cheers.core.ui.theme.BlueCheers
+import com.salazar.cheers.core.ui.theme.GreenGoogle
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.feature.map.R
+import java.util.Date
 
 @Composable
 internal fun CurrentUserAnnotation(
@@ -41,6 +47,7 @@ internal fun CurrentUserAnnotation(
     picture: String? = null,
     ghostMode: Boolean = false,
     isSelected: Boolean = false,
+    lastUpdated: Long = Date().time / 1000,
     onClick: () -> Unit = {},
 ) {
     val color = when(isSelected) {
@@ -92,19 +99,9 @@ internal fun CurrentUserAnnotation(
                 onClick = onClick,
             )
         }
-        Text(
-            text = name,
-            modifier = Modifier
-                .offset(y = (-8).dp)
-                .shadow(elevation = 9.dp, shape = CircleShape)
-                .clip(RoundedCornerShape(4.dp))
-                .border(1.dp, Color(0xFFE5E5E5), RoundedCornerShape(4.dp))
-                .background(Color.White)
-                .padding(4.dp),
-            color = Color.Black,
-            style = MaterialTheme.typography.bodyMedium,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
+        UserAnnotationText(
+            name = name,
+            lastUpdated = lastUpdated,
         )
     }
 }
@@ -119,6 +116,7 @@ private fun CurrentUserAnnotationPreview() {
         )
         CurrentUserAnnotation(
             name = "Me",
+            lastUpdated = Date().time / 1000 - 60 * 6
         )
         CurrentUserAnnotation(
             name = "Me",

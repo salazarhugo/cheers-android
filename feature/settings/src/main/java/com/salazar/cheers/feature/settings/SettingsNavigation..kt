@@ -26,6 +26,7 @@ fun NavGraphBuilder.settingsScreen(
     navigateToPaymentHistory: () -> Unit,
     navigateToSignIn: () -> Unit,
     navigateToDeleteAccount: () -> Unit,
+    navigateToPremium: () -> Unit,
 ) {
     composable(
         route = settingsNavigationRoute,
@@ -44,6 +45,7 @@ fun NavGraphBuilder.settingsScreen(
             navigateToPaymentHistory = navigateToPaymentHistory,
             navigateToSignIn = navigateToSignIn,
             navigateToDeleteAccount = navigateToDeleteAccount,
+            navigateToPremium = navigateToPremium,
         )
     }
 }

@@ -24,8 +24,8 @@ import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.cheers.shared.data.toDataError
-import com.salazar.common.util.result.DataError
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.util.result.DataError
+import com.salazar.cheers.shared.util.result.Result
 import io.grpc.StatusException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

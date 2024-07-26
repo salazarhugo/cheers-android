@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.create_note
 
 import com.salazar.cheers.core.model.NoteType
 import com.salazar.cheers.data.note.repository.NoteRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

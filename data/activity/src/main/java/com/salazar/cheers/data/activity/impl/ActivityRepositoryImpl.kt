@@ -7,7 +7,7 @@ import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.data.activity.ActivityRepository
 import com.salazar.cheers.data.activity.toActivity
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

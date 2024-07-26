@@ -1,8 +1,7 @@
 package com.salazar.cheers.core.data.remote
 
 import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
-import com.salazar.common.util.result.Result
-import com.salazar.common.util.result.getOrThrow
+import com.salazar.cheers.shared.util.result.getOrThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

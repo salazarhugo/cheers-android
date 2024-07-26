@@ -2,7 +2,7 @@ package com.salazar.cheers.core.util.audio
 
 import android.content.Context
 import androidx.core.content.FileProvider
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

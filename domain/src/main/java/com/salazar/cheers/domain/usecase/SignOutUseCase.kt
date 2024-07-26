@@ -7,7 +7,7 @@ import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

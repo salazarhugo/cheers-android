@@ -25,8 +25,9 @@ import com.salazar.cheers.core.model.UserStats
 import com.salazar.cheers.core.model.UserSuggestion
 import com.salazar.cheers.data.user.workers.UploadProfileBanner
 import com.salazar.cheers.data.user.workers.UploadProfilePicture
+import com.salazar.cheers.shared.data.mapper.toUser
 import com.salazar.cheers.shared.data.mapper.toUserItem
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -255,6 +256,7 @@ class UserRepositoryImpl @Inject constructor(
         bio: String?,
         name: String?,
         website: String?,
+        favouriteDrinkId: String?,
     ): Result<User> {
         return try {
             val request = UpdateUserRequest.newBuilder()
@@ -263,6 +265,7 @@ class UserRepositoryImpl @Inject constructor(
                 .setBio(bio)
                 .setName(name)
                 .setWebsite(website)
+                .setFavouriteDrinkId(favouriteDrinkId)
                 .build()
 
             val response = userService.updateUser(request)

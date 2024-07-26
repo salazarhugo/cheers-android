@@ -14,8 +14,8 @@ import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.auth.mapper.toPasskey
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.shared.data.response.BeginLoginResponse
-import com.salazar.common.di.IODispatcher
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.di.IODispatcher
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -66,7 +66,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                     emit(Resource.Loading(isLoading = false))
                 },
                 onFailure = {
-//                    emit(Resource.Error(it.localizedMessage))
+                    emit(Resource.Error(it.localizedMessage))
                 }
             )
         }

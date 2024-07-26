@@ -23,7 +23,9 @@ import com.salazar.cheers.core.model.User
 fun ProfileStats(
     user: User,
     modifier: Modifier = Modifier,
-    onStatClicked: () -> Unit = {},
+    onFriendsClick: () -> Unit = {},
+    onDrinksClick: () -> Unit = {},
+    onPartiesClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier,
@@ -31,18 +33,23 @@ fun ProfileStats(
     ) {
         val items = listOf(
             Counter(com.salazar.cheers.core.ui.R.plurals.friends, user.friendsCount),
-            Counter(com.salazar.cheers.core.ui.R.plurals.posts, user.postCount),
+            Counter(com.salazar.cheers.core.ui.R.plurals.drinks, user.postCount),
             Counter(com.salazar.cheers.core.ui.R.plurals.parties, user.followers),
         )
 
-        items.forEach { item ->
+        items.forEachIndexed { i, item ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }) {
-                    onStatClicked()
+                    when (i) {
+                        0 -> onFriendsClick()
+                        1 -> onDrinksClick()
+                        2 -> onPartiesClick()
+                        else -> onFriendsClick()
+                    }
                 }
             ) {
                 AnimatedTextCounter(
@@ -51,7 +58,10 @@ fun ProfileStats(
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = pluralStringResource(id = item.name, count = item.value).replaceFirstChar(Char::titlecase),
+                    text = pluralStringResource(
+                        id = item.name,
+                        count = item.value
+                    ).replaceFirstChar(Char::titlecase),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

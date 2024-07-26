@@ -35,7 +35,7 @@ import com.salazar.cheers.core.ui.components.playback.LargePlaybackComponent
 import com.salazar.cheers.core.ui.components.record_button.RecordButtonComponent
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.core.util.recorder.AndroidAudioRecorder
-import com.salazar.common.util.LocalActivity
+import com.salazar.cheers.shared.util.LocalActivity
 import java.io.File
 
 

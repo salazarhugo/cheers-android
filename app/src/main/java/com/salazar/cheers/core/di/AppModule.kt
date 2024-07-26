@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.WorkManager
 import cheers.account.v1.AccountServiceGrpcKt
 import cheers.activity.v1.ActivityServiceGrpcKt
+import cheers.auth.v1.AuthServiceGrpcKt
 import cheers.chat.v1.ChatServiceGrpcKt
 import cheers.comment.v1.CommentServiceGrpcKt
 import cheers.drink.v1.DrinkServiceGrpcKt
@@ -196,6 +197,17 @@ object AppModule {
         storyRepositoryImpl: StoryRepositoryImpl,
     ): StoryRepository {
         return storyRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        tokenInterceptor: TokenInterceptor,
+    ): AuthServiceGrpcKt.AuthServiceCoroutineStub {
+        return AuthServiceGrpcKt
+            .AuthServiceCoroutineStub(managedChannel)
+            .withInterceptors(tokenInterceptor)
     }
 
     @Provides

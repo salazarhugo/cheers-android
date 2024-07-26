@@ -5,7 +5,7 @@ import androidx.credentials.exceptions.CreateCredentialException
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.auth.mapper.toCreatePasskeyRequest
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

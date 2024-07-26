@@ -2,11 +2,10 @@ package com.salazar.cheers.domain.usecase
 
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
-import com.salazar.common.di.IODispatcher
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.di.IODispatcher
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.tasks.await

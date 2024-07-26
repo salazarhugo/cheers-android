@@ -1,11 +1,11 @@
 package com.salazar.cheers.feature.edit_profile
 
 import android.net.Uri
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.data.user.UserRepositoryImpl
+import com.salazar.cheers.domain.list_drink.ListDrinkUseCase
 import com.salazar.cheers.domain.update_profile.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,52 +16,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface EditProfileUiState {
-
-    val isLoading: Boolean
-    val errorMessages: List<String>
-    val isFollowing: Boolean
-    val done: Boolean
-    val user: User
-    val profilePictureUri: Uri?
-    val bannerUri: Uri?
-
-    data class HasPosts(
-        override val isLoading: Boolean,
-        override val errorMessages: List<String>,
-        override val isFollowing: Boolean,
-        override val user: User,
-        override val done: Boolean,
-        override val profilePictureUri: Uri?,
-        override val bannerUri: Uri?,
-    ) : EditProfileUiState
-}
-
-private data class EditProfileViewModelState(
-    val user: User? = null,
-    val isLoading: Boolean = false,
-    val errorMessages: List<String> = emptyList(),
-    val isFollowing: Boolean = false,
-    val done: Boolean = false,
-    val profilePictureUri: Uri? = null,
-    val bannerUri: Uri? = null,
-) {
-    fun toUiState(): EditProfileUiState =
-        EditProfileUiState.HasPosts(
-            user = user ?: User(),
-            isLoading = isLoading,
-            errorMessages = errorMessages,
-            isFollowing = isFollowing,
-            done = done,
-            profilePictureUri = profilePictureUri,
-            bannerUri = bannerUri,
-        )
-}
-
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    val userRepositoryImpl: UserRepositoryImpl,
-    val updateProfileUseCase: UpdateProfileUseCase,
+    private val userRepositoryImpl: UserRepositoryImpl,
+    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val listDrinkUseCase: ListDrinkUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EditProfileViewModelState(isLoading = true))
@@ -82,9 +41,15 @@ class EditProfileViewModel @Inject constructor(
                 }
             }
         }
-    }
 
-    val currentUser = mutableStateOf(User())
+        viewModelScope.launch {
+            listDrinkUseCase().collect { result ->
+                result.onSuccess(::updateDrinks)
+                    .onFailure {
+                    }
+            }
+        }
+    }
 
 
     fun onSelectPicture(pictureUri: Uri?) {
@@ -94,6 +59,28 @@ class EditProfileViewModel @Inject constructor(
             it.copy(profilePictureUri = pictureUri)
         }
     }
+
+    private fun updateDrinks(drinks: List<Drink>) {
+        val emptyDrink = listOf(
+            Drink(
+                id = String(),
+                name = "",
+                icon = "",
+                category = "",
+            )
+        )
+        viewModelState.update {
+            it.copy(drinks = emptyDrink + drinks)
+        }
+    }
+
+    fun selectDrink(drink: Drink) {
+        viewModelState.update {
+            val newUser = it.user?.copy(favouriteDrink = drink)
+            it.copy(user = newUser)
+        }
+    }
+
 
     fun onSelectBanner(bannerUri: Uri?) {
         if (bannerUri == null)
@@ -143,6 +130,7 @@ class EditProfileViewModel @Inject constructor(
                 banner = user.banner,
                 website = user.website,
                 bio = user.bio,
+                favouriteDrinkId = user.favouriteDrink?.id,
             )
             viewModelState.update {
                 it.copy(done = true, isLoading = false)

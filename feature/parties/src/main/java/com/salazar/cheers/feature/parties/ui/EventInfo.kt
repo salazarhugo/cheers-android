@@ -22,7 +22,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.util.numberFormatter
 import com.salazar.cheers.core.model.Party
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 @Composable
 fun PartyInfo(

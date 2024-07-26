@@ -2,12 +2,16 @@ package com.salazar.cheers.data.billing
 
 import android.app.Activity
 import android.app.Application
+import android.content.res.Resources.NotFoundException
 import android.util.Log
 import com.android.billingclient.api.*
+import com.android.billingclient.api.BillingClient.BillingResponseCode
+import com.google.common.collect.ImmutableList
 import com.salazar.cheers.data.billing.api.ApiService
 import com.salazar.cheers.data.billing.response.RechargeCoinRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -23,6 +27,7 @@ class BillingRepository @Inject constructor(
         billingResult: BillingResult,
         purchases: MutableList<Purchase>?
     ) {
+        Log.d("Billing", "On purchase updated $purchases")
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             for (purchase in purchases) {
                 handlePurchase(purchase)
@@ -47,7 +52,13 @@ class BillingRepository @Inject constructor(
 
     var billingClient = BillingClient.newBuilder(application)
         .setListener(this)
-        .enablePendingPurchases()
+        .enableUserChoiceBilling(UserChoiceBillingListener {  })
+        .enablePendingPurchases(
+            PendingPurchasesParams.newBuilder()
+                .enablePrepaidPlans()
+                .enableOneTimeProducts()
+                .build(),
+        )
         .build()
 
     private suspend fun verifyPurchase(purchase: Purchase): Boolean {
@@ -60,7 +71,7 @@ class BillingRepository @Inject constructor(
         return try {
             val response = apiService.rechargeCoins(request = request)
             true
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             false
         }
@@ -93,31 +104,38 @@ class BillingRepository @Inject constructor(
     fun startConnection() {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
-                Log.d("Billing", billingResult.toString())
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                if (billingResult.responseCode == BillingResponseCode.OK) {
+                    Log.d("Billing", "BillingClient is ready. Connection started")
                     // The BillingClient is ready. You can query purchases here.
+                } else {
+                    Log.e("Billing", billingResult.toString())
                 }
             }
 
             override fun onBillingServiceDisconnected() {
+                Log.e("Billing", "Billing service disconnected")
             }
         })
     }
 
-    fun launchBillingFlow(
+    suspend fun launchBillingFlow(
+        userID: String,
         activity: Activity,
-        productDetails: ProductDetails
+        productDetails: com.salazar.cheers.core.model.ProductDetails,
     ) {
+        val productDetails = getProduct(productId = productDetails.id).getOrNull() ?: return
+        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return
+
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
                 .setProductDetails(productDetails)
+                .setOfferToken(offerToken)
                 .build()
         )
-        val uid = ""
 
         val flowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(productDetailsParamsList)
-            .setObfuscatedAccountId(uid)
+            .setObfuscatedAccountId(userID)
             .build()
 
         val responseCode = billingClient.launchBillingFlow(
@@ -126,7 +144,7 @@ class BillingRepository @Inject constructor(
         ).responseCode
     }
 
-    suspend fun queryProductDetails(): ProductDetailsResult {
+    suspend fun queryProductDetails(): Result<List<com.salazar.cheers.core.model.ProductDetails>> {
         val productList = ArrayList<String>()
         productList.add("coins_36")
         productList.add("coins_70")
@@ -148,12 +166,67 @@ class BillingRepository @Inject constructor(
             .setProductList(products)
             .build()
 
-        // leverage queryProductDetails Kotlin extension function
+        val productDetailsResult = withContext(Dispatchers.IO) {
+            billingClient.queryProductDetails(params)
+        }
+        Log.d("HUGO", productDetailsResult.productDetailsList.toString())
+        Log.d("HUGO", productDetailsResult.billingResult.debugMessage.toString())
+        productDetailsResult.billingResult.responseCode
+        val productDetails = productDetailsResult.productDetailsList?.map { it.toProductDetails() }
+            ?: return Result.failure(NotFoundException())
+
+        return Result.success(productDetails)
+    }
+
+    suspend fun getSubProduct(
+        productId: String,
+    ): Result<com.salazar.cheers.core.model.ProductDetails> {
+        val product = QueryProductDetailsParams.Product.newBuilder()
+            .setProductId(productId)
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(listOf(product))
+            .build()
+
         val productDetailsResult = withContext(Dispatchers.IO) {
             billingClient.queryProductDetails(params)
         }
 
-        return productDetailsResult
+        val a =
+            productDetailsResult.productDetailsList?.map { it.toProductDetails() }?.firstOrNull()
+        if (a != null) {
+            return Result.success(a)
+        }
+
+        return Result.failure(NotFoundException())
     }
 
+    private suspend fun getProduct(
+        productId: String,
+    ): Result<ProductDetails> {
+        val product = QueryProductDetailsParams.Product.newBuilder()
+            .setProductId(productId)
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(listOf(product))
+            .build()
+
+        val productDetailsResult = withContext(Dispatchers.IO) {
+            billingClient.queryProductDetails(params)
+        }
+
+        Log.e("BillingRepository", productDetailsResult.billingResult.toString())
+        Log.e("BillingRepository", productDetailsResult.productDetailsList.toString())
+        val a = productDetailsResult.productDetailsList?.firstOrNull()
+        if (a != null) {
+            return Result.success(a)
+        }
+
+        Log.e("BillingRepository", "product not found with id $productId")
+        return Result.failure(NotFoundException())
+    }
 }

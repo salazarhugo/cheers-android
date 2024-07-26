@@ -31,7 +31,7 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.feature.chat.R
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 @Composable
 fun DirectChatBar(

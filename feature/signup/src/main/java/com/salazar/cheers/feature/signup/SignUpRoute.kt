@@ -4,7 +4,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.common.util.LocalActivity
+import com.salazar.cheers.shared.util.LocalActivity
 
 @Composable
 fun SignUpRoute(

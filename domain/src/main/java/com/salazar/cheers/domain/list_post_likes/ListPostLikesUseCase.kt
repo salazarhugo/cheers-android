@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.list_post_likes
 
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.post.repository.PostRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

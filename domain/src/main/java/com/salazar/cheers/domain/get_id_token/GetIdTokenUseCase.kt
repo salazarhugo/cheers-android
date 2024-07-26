@@ -1,14 +1,10 @@
 package com.salazar.cheers.domain.get_id_token
 
 import com.salazar.cheers.data.account.AccountRepository
-import com.salazar.cheers.data.account.isNotConnected
-import com.salazar.cheers.data.auth.AuthRepository
-import com.salazar.common.di.IODispatcher
-import com.salazar.common.util.result.DataError
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.di.IODispatcher
+import com.salazar.cheers.shared.util.result.DataError
+import com.salazar.cheers.shared.util.result.Result
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

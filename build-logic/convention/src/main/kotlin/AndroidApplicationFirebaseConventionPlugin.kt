@@ -1,3 +1,4 @@
+import com.salazar.cheers.build_logic.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -15,7 +16,7 @@ class AndroidApplicationFirebaseConventionPlugin : Plugin<Project> {
                 apply("com.google.firebase.crashlytics")
             }
 
-            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+            
             dependencies {
                 val bom = libs.findLibrary("firebase-bom").get()
                 add("implementation", platform(bom))

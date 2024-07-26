@@ -1,7 +1,7 @@
 package com.salazar.cheers.domain.get_location_name
 
 import com.salazar.cheers.data.map.MapRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

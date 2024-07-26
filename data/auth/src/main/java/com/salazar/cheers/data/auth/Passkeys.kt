@@ -1,13 +1,9 @@
 package com.salazar.cheers.data.auth
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.credentials.CreateCredentialRequest
-import androidx.credentials.CreatePasswordRequest
-import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -26,7 +22,7 @@ import androidx.credentials.exceptions.publickeycredential.CreatePublicKeyCreden
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import com.salazar.common.util.LocalActivity
+import com.salazar.cheers.shared.util.LocalActivity
 
 @Composable
 fun SignInWithPasskeys(

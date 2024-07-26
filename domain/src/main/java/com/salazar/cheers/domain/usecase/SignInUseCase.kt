@@ -4,12 +4,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.account.AccountRepository
 import com.salazar.cheers.data.account.mapper.toAccount
 import com.salazar.cheers.data.auth.AuthRepository
-import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -29,7 +27,7 @@ class SignInUseCase @Inject constructor(
             val idToken = getIdTokenUseCase()
 
             return@withContext when (idToken) {
-                is com.salazar.common.util.result.Result.Success -> {
+                is com.salazar.cheers.shared.util.result.Result.Success -> {
                     authRepository.signIn(idToken = idToken.data)
                         .fold(
                             onSuccess = {
@@ -42,7 +40,7 @@ class SignInUseCase @Inject constructor(
                             }
                         )
                 }
-                is com.salazar.common.util.result.Result.Error -> {
+                is com.salazar.cheers.shared.util.result.Result.Error -> {
                     Result.failure(Throwable(""))
                 }
             }

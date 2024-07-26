@@ -15,7 +15,8 @@ android {
 
 dependencies {
     implementation(projects.data.user)
-    implementation(projects.common)
+    implementation(projects.cheers.core.shared)
+
     implementation(projects.domain)
 
     implementation(libs.androidx.core.ktx)

@@ -16,7 +16,7 @@ dependencies {
     implementation(projects.data.user)
     implementation(projects.data.post)
     implementation(projects.data.party)
-    implementation(projects.common)
+    
     implementation(projects.domain)
     implementation(projects.core.ui)
 

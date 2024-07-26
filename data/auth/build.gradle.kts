@@ -8,16 +8,19 @@ plugins {
 android {
     namespace = "com.salazar.cheers.data.auth"
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = File("/home/hugo/.android/cheers_debug.keystore")
+        }
+    }
     defaultConfig {
         minSdk = 28
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig = signingConfigs.getByName("debug")
     }
 }
 
 dependencies {
-    implementation(projects.common)
-    implementation(projects.auth)
-
     implementation(projects.core.shared)
     implementation(projects.core.model)
     implementation(projects.core.protobuf)
@@ -28,10 +31,10 @@ dependencies {
     implementation(libs.material)
 
     // Credential Manager
-    implementation("androidx.credentials:credentials:1.2.0")
+    implementation(libs.androidx.credentials)
     // needed for credentials support from play services, for devices running
     // Android 13 and below.
-    implementation("androidx.credentials:credentials-play-services-auth:1.2.0")
+    implementation(libs.androidx.credentials.play.services.auth)
 
     // Gson
     implementation(libs.gson)

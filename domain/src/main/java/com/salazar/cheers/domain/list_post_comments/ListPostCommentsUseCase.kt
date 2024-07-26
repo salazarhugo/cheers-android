@@ -1,7 +1,7 @@
 package com.salazar.cheers.domain.list_post_comments
 
 import com.salazar.cheers.data.comment.CommentRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

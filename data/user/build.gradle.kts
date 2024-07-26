@@ -16,7 +16,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
-    implementation(projects.common)
+    
     implementation(projects.core.model)
     implementation(projects.core.protobuf)
     implementation(projects.core.util)

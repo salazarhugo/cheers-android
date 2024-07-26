@@ -87,50 +87,13 @@ fun Animate(content: @Composable () -> Unit) {
 
 @Composable
 fun AnimatedLogo() {
-    val value by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 300),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-    val visible by remember { mutableStateOf(true) }
-    val density = LocalDensity.current
+    val CARDIAC_CYLCLE_MILLIS = 800
 
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically {
-            // Slide in from 40 dp from the top.
-            with(density) { -40.dp.roundToPx() }
-        } + expandVertically(
-            // Expand from the top.
-            expandFrom = Alignment.Top
-        ) + fadeIn(
-            // Fade in with the initial alpha of 0.3f.
-            initialAlpha = 0.3f
-        ),
-        exit = slideOutVertically() + shrinkVertically() + fadeOut()
-    ) {
-        val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.WHITE
-            strokeWidth = 5f
-            style = Paint.Style.STROKE
-        }
-//        Canvas(modifier = Modifier, onDraw = {
-//            glowPaint.setShadowLayer(
-//                1f,
-//                0f,
-//                0f,
-//                Color.WHITE
-//            )
-//            drawArc(glowPaint.color, 0f, 360f, true)
-//        })
+    Pulsating(durationMillis = CARDIAC_CYLCLE_MILLIS) {
         Image(
+            modifier = Modifier.size(80.dp),
             painter = rememberAsyncImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
             contentDescription = null,
-            modifier = Modifier
-                .size(80.dp)
-                .alpha(alpha = value)
         )
     }
 }

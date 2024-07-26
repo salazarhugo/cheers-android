@@ -34,9 +34,6 @@ rootProject.name = "Cheers"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
-include(":ads")
-include(":common")
-include(":auth")
 
 // Core
 include(":core:protobuf")
@@ -44,6 +41,7 @@ include(":core:ui")
 include(":core:util")
 include(":core:model")
 include(":core:shared")
+include(":core:analytics")
 
 // Data
 include(":data:user")
@@ -74,11 +72,6 @@ include(":feature:settings")
 include(":feature:create_post")
 include(":feature:create_note")
 include(":feature:passcode")
-
-project(":common").projectDir = File(settingsDir, "../common")
-project(":ads").projectDir = File(settingsDir, "../ads")
-project(":auth").projectDir = File(settingsDir, "../auth")
-
 include(":feature:friend_request")
 include(":feature:parties")
 include(":feature:ticket")
@@ -94,3 +87,4 @@ include(":data:search")
 include(":data:map")
 include(":data:chat")
 include(":core:db")
+include(":feature:premium")

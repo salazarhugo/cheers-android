@@ -13,6 +13,7 @@ sealed class HomeUIAction {
     data object OnLoadNextItems : HomeUIAction()
     data object OnCreateNoteClick : HomeUIAction()
     data class OnPostCommentClick(val postID: String) : HomeUIAction()
+    data class OnDeletePostClick(val postID: String) : HomeUIAction()
     data class OnPostLikesClick(val postID: String) : HomeUIAction()
     data class OnShareClick(val postID: String) : HomeUIAction()
     data class OnLikeClick(val post: Post) : HomeUIAction()
@@ -25,6 +26,5 @@ sealed class HomeUIAction {
     ) : HomeUIAction()
     data class OnPostClick(val postID: String) : HomeUIAction()
     data class OnNoteClick(val userID: String) : HomeUIAction()
-    data class OnPostMoreClick(val postID: String) : HomeUIAction()
     data class OnAddFriendClick(val userID: String) : HomeUIAction()
 }

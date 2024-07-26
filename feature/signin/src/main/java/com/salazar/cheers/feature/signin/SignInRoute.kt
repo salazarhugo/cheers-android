@@ -11,7 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.model.ErrorMessage
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersDialog
-import com.salazar.common.util.LocalActivity
+import com.salazar.cheers.shared.util.LocalActivity
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContentTriggered
 

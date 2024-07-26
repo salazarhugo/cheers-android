@@ -19,9 +19,12 @@ fun NavGraphBuilder.profileScreen(
     navigateBack: () -> Unit,
     navigateToEditProfile: () -> Unit,
     navigateToProfileMore: (String) -> Unit,
+    navigateToPostMore: (String) -> Unit,
     navigateToSignIn: () -> Unit,
     navigateToSignUp: () -> Unit,
     navigateToFriendList: () -> Unit,
+    navigateToPostDetails: (String) -> Unit,
+    navigateToOtherProfile: (String) -> Unit,
 ) {
     composable(
         route = profileNavigationRoute,
@@ -30,12 +33,15 @@ fun NavGraphBuilder.profileScreen(
         ),
     ) {
         ProfileRoute(
+            navigateBack = navigateBack,
             navigateToEditProfile = navigateToEditProfile,
             navigateToProfileMore = navigateToProfileMore,
             navigateToSignIn = navigateToSignIn,
             navigateToSignUp = navigateToSignUp,
             navigateToFriendList = navigateToFriendList,
-            navigateBack = navigateBack,
+            navigateToPostDetails = navigateToPostDetails,
+            navigateToOtherProfile = navigateToOtherProfile,
+            navigateToPostMore = navigateToPostMore,
         )
     }
 }

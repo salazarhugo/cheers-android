@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -53,6 +54,7 @@ import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
+import com.salazar.cheers.feature.profile.profile.ProfileUIAction
 import kotlinx.coroutines.launch
 
 @Composable
@@ -71,7 +73,7 @@ fun ProfileStatsScreen(
             ProfileTopBar(
                 username = username,
                 verified = verified,
-                onBackPressed = onBackPressed
+                onBackPressed = onBackPressed,
             )
         }
     ) {
@@ -152,6 +154,7 @@ fun Tabs(
                     onUserClicked = onUserClicked,
                     onStoryClick = onStoryClick,
                 )
+
                 1 -> Following(
                     following = uiState.following,
                     onUserClicked = onUserClicked,
@@ -279,6 +282,7 @@ fun ProfileTopBar(
     verified: Boolean,
     onBackPressed: () -> Unit,
     onMenuClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
 ) {
     TopAppBar(
         title = {
@@ -297,6 +301,12 @@ fun ProfileTopBar(
             }
         },
         actions = {
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = null,
+                )
+            }
             IconButton(onClick = onMenuClick) {
                 Icon(Icons.Outlined.Menu, null)
             }

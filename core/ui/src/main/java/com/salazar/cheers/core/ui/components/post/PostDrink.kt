@@ -50,13 +50,13 @@ fun PostDrink(
         modifier = modifier
             .clickable { onClick() }
             .clip(RoundedCornerShape(8.dp))
-            .border(width = 2.dp, color = color, RoundedCornerShape(8.dp))
+            .border(width = 1.dp, color = color, RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         InspectionAwareComponent(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(20.dp),
             inspectionModePainter = R.drawable.beer,
         ) {
             AsyncImage(
@@ -64,14 +64,14 @@ fun PostDrink(
                     .data(picture)
                     .decoderFactory(SvgDecoder.Factory())
                     .build(),
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(18.dp),
                 contentDescription = "Label",
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = drink,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
         )
     }
 }

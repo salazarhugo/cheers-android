@@ -6,8 +6,8 @@ import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.addOrRemove
 import com.salazar.cheers.domain.list_friend.ListFriendUseCase
 import com.salazar.cheers.data.chat.repository.ChatRepository
-import com.salazar.common.util.Resource
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.util.Resource
+import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

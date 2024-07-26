@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(projects.common)
+    
     implementation(projects.core.model)
     implementation(projects.core.shared)
     implementation(projects.core.db)

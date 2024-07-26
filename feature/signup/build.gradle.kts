@@ -19,8 +19,7 @@ dependencies {
 
     implementation(projects.data.user)
     api(projects.data.auth)
-    implementation(projects.common)
-    implementation(projects.auth)
+    
     implementation(projects.domain)
     implementation(libs.material)
 

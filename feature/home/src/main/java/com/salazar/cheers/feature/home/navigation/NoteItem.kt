@@ -30,7 +30,7 @@ import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.modifier.animatedBorder
 import com.salazar.cheers.core.model.Note
 import com.salazar.cheers.core.model.NoteType
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 @Composable
 fun NoteItem(

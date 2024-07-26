@@ -143,20 +143,18 @@ fun SignInScreen(
                     errorMessage = uiState.errorMessage,
                     paddingValues = PaddingValues(vertical = 8.dp)
                 )
-//                TextDivider(
-//                    modifier = Modifier.padding(vertical = 16.dp),
-//                    dayString = "OR",
-//                )
-//                OutlinedButton(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    onClick = navigateToSignUp,
-//                ) {
-//                    Text(text = "Register")
-//                }
+                TextDivider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    dayString = "OR",
+                )
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = navigateToSignUp,
+                ) {
+                    Text(text = "Register")
+                }
             }
-            Footer(
-                navigateToSignUp = navigateToSignUp,
-            )
+            Footer()
         }
     }
 }
@@ -210,10 +208,9 @@ fun LoginButton(
 @Composable
 fun Footer(
     modifier: Modifier = Modifier,
-    navigateToSignUp: () -> Unit,
 ) {
     Column(
-        modifier = modifier.clickable { navigateToSignUp() }
+        modifier = modifier
     ) {
         HorizontalDivider()
         Row(

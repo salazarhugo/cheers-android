@@ -17,7 +17,7 @@ fun NavGraphBuilder.passcodeNavGraph(
         startDestination = passcodeNavigationRoute,
     ) {
         passcodeScreen(
-            banner = R.drawable.ic_artboard_1cheers_logo_svg,
+            banner = R.drawable.ic_splash,
             navigateToHome = navController::navigateToHome,
         )
     }

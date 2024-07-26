@@ -13,7 +13,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    implementation(projects.cheers.core.shared)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

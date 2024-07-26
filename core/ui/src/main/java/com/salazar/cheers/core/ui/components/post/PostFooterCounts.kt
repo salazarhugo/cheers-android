@@ -2,9 +2,7 @@ package com.salazar.cheers.core.ui.components.post
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +14,7 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 @Composable
 fun PostFooterCounters(

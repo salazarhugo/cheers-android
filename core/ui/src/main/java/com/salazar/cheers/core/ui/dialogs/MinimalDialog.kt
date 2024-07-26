@@ -11,7 +11,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 @Composable
 fun AvatarDialog(

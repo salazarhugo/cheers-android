@@ -43,7 +43,7 @@ fun WelcomeScreen(
 @Composable
 fun WelcomeScreenBody() {
     Image(
-        painter = rememberAsyncImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
+        painter = rememberAsyncImagePainter(R.drawable.ic_splash),
         contentDescription = null,
         modifier = Modifier
             .padding(vertical = 32.dp)

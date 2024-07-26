@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.domain.RegisterPasskeyUseCase
 import com.salazar.cheers.domain.register.RegisterUseCase
 import com.salazar.cheers.domain.usecase.SignInUseCase
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

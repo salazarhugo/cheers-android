@@ -9,14 +9,21 @@ android {
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
+    }
+
+    kapt {
+        correctErrorTypes = true
     }
 }
 
 dependencies {
+    implementation(projects.data.account)
     implementation(projects.data.user)
     implementation(projects.data.post)
     implementation(projects.data.party)
-    implementation(projects.common)
+    implementation(projects.data.drink)
+    implementation(projects.core.model)
     implementation(projects.domain)
 
     implementation(libs.androidx.core.ktx)

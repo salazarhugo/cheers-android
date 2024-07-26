@@ -23,4 +23,5 @@ message Settings {
   bool hide_content = 6;
   string idToken = 7;
   string username = 8;
+  bool passcode_enabled = 9;
 }

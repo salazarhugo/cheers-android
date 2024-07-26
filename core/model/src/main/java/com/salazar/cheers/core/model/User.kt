@@ -31,5 +31,6 @@ data class User(
     val seenStory: Boolean = false,
     val createTime: Long = 0L,
     val isBusinessAccount: Boolean = false,
-    val birthDate: ,
+    val birthDate: Long = 0L,
+    val favouriteDrink: Drink? = null,
 )

@@ -1,32 +1,13 @@
 package com.salazar.cheers.data.map
 
-import android.content.Context
-import android.util.Log
 import cheers.location.v1.GeocodeRequest
 import cheers.location.v1.ListFriendLocationRequest
 import cheers.location.v1.LocationServiceGrpcKt
 import cheers.location.v1.UpdateGhostModeRequest
 import cheers.location.v1.UpdateLocationRequest
-import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapView
-import com.mapbox.maps.plugin.animation.flyTo
-import com.mapbox.maps.plugin.gestures.OnMoveListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.search.QueryType
-import com.mapbox.search.ReverseGeoOptions
-import com.mapbox.search.SearchCallback
 import com.mapbox.search.SearchEngine
-import com.mapbox.search.common.AsyncOperationTask
-import com.mapbox.search.result.SearchResult
-import com.salazar.common.util.result.DataError
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.withContext
+import com.salazar.cheers.shared.util.result.DataError
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -90,7 +71,7 @@ class MapRepositoryImpl @Inject constructor(
         longitude: Double,
         latitude: Double,
         zoom: Double?,
-    ): com.salazar.common.util.result.Result<List<String>, DataError> {
+    ): com.salazar.cheers.shared.util.result.Result<List<String>, DataError> {
 
         val queryType = if (zoom == null) {
             QueryType.PLACE
@@ -112,10 +93,10 @@ class MapRepositoryImpl @Inject constructor(
             val userLocation = locations.locationsList.map {
                 it.name
             }
-            com.salazar.common.util.result.Result.Success(userLocation)
+            com.salazar.cheers.shared.util.result.Result.Success(userLocation)
         } catch (e: Exception) {
             e.printStackTrace()
-            com.salazar.common.util.result.Result.Error(DataError.Network.UNKNOWN)
+            com.salazar.cheers.shared.util.result.Result.Error(DataError.Network.UNKNOWN)
         }
     }
 

@@ -3,7 +3,7 @@ package com.salazar.cheers.domain.usecase
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext

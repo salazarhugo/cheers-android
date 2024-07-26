@@ -24,6 +24,7 @@ fun HomeRoute(
     navigateToPostLikes: (String) -> Unit = {},
     navigateToSignIn: () -> Unit = {},
     navigateToCamera: () -> Unit = {},
+    navigateToDeletePostDialog: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
@@ -34,12 +35,6 @@ fun HomeRoute(
     LaunchedEffect(Unit) {
         viewModel.initNativeAdd(context = context)
     }
-
-//    if (errorMessage != null) {
-//        LaunchedEffect(appState.snackBarHostState) {
-//            appState.showSnackBar(errorMessage)
-//        }
-//    }
 
     HomeScreen(
         uiState = uiState,
@@ -62,7 +57,6 @@ fun HomeRoute(
                         navigateToCreatePost()
                 }
                 is HomeUIAction.OnAddStoryClick -> {}//navActions.navigateToCamera()
-                is HomeUIAction.OnPostMoreClick -> navigateToPostMoreSheet(action.postID)
                 is HomeUIAction.OnLoadNextItems -> viewModel.loadNextPosts()
                 is HomeUIAction.OnChatClick -> navigateToMessages()
                 is HomeUIAction.OnShareClick -> {}// navActions.navigateToShare(action.postID)
@@ -71,6 +65,7 @@ fun HomeRoute(
                 is HomeUIAction.OnAddFriendClick -> viewModel.onAddFriendClick(action.userID)
                 HomeUIAction.OnPartiesClick -> navigateToParties()
                 is HomeUIAction.OnAudioClick -> viewModel.onAudioClick(action.postID, action.audioUrl)
+                is HomeUIAction.OnDeletePostClick -> navigateToDeletePostDialog(action.postID)
             }
         }
     )

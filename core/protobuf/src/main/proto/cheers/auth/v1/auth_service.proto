@@ -2,15 +2,62 @@ syntax = "proto3";
 
 package cheers.auth.v1;
 
+import "cheers/type/user/user.proto";
 import "google/api/annotations.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/auth/v1;auth";
 
 service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  rpc BeginLogin(BeginLoginRequest) returns (BeginLoginResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/login/begin/{username}"
+    };
+  }
+
+  rpc FinishLogin(FinishLoginRequest) returns (FinishLoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login/finish"
+      body: "*"
+    };
+  }
+
+  rpc BeginRegistration(BeginRegistrationRequest) returns (BeginRegistrationResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/register/begin/{username}"
+    };
+  }
+
+  rpc FinishRegistration(FinishRegistrationRequest) returns (FinishRegistrationResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/register/finish"
+      body: "*"
+    };
+  }
+
+  rpc ListCredentials(ListCredentialsRequest) returns (ListCredentialsResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/credentials"
+    };
+  }
+
   rpc CreateModerator(CreateModeratorRequest) returns (CreateModeratorResponse) {
     option (google.api.http) = {
       post: "/v1/auths/moderator"
+      body: "*"
+    };
+  }
+
+  rpc DeleteModerator(DeleteModeratorRequest) returns (DeleteModeratorResponse) {
+    option (google.api.http) = {
+      delete: "/v1/auths/moderator"
       body: "*"
     };
   }
@@ -28,6 +75,113 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc DeleteVerifyUser(VerifyUserRequest) returns (VerifyUserResponse) {
+    option (google.api.http) = {
+      delete: "/v1/auths/verify"
+    };
+  }
+}
+
+message BeginLoginRequest {
+  string username = 1;
+}
+
+message BeginLoginResponse {
+  uint64 user_id = 1;
+  string challenge = 2;
+  string relying_party_id = 3;
+  string user_verification = 4;
+  repeated Credential allow_credentials = 5;
+  int64 timeout = 6;
+}
+
+message Credential {
+  bytes id = 1;
+  bytes public_key = 2;
+  string attestation_type = 3;
+  repeated string transport = 4;
+  Device device = 5;
+  int64 last_used = 6;
+}
+
+message FinishLoginRequest {
+  string username = 1;
+  GetPasskeyResponseData passkey = 2;
+  string challenge = 3;
+}
+
+message FinishLoginResponse {
+  cheers.type.User user = 1;
+  string token = 2;
+}
+
+message BeginRegistrationRequest {
+  string username = 1;
+}
+
+message BeginRegistrationResponse {
+  uint64 user_id = 1;
+  string challenge = 2;
+}
+
+message ListCredentialsRequest {
+}
+
+message ListCredentialsResponse {
+  repeated Credential credentials = 1;
+}
+
+message FinishRegistrationRequest {
+  string email = 1;
+  string username = 2;
+  CreatePasskeyResponseData passkey = 3;
+  uint64 user_id = 4;
+  string challenge = 5;
+  Device device = 6;
+}
+
+message Device {
+  string name = 1;
+  string model = 2;
+}
+
+message FinishRegistrationResponse {
+  cheers.type.User user = 1;
+}
+
+message GetPasskeyResponseData {
+  string id = 1;
+  string raw_id = 2;
+  string type = 3;
+  GetPasskeyResponse response = 4;
+}
+
+message GetPasskeyResponse {
+  string authenticator_data = 1;
+  string client_data_JSON = 2;
+  string signature = 3;
+  string user_handle = 4;
+}
+
+message CreatePasskeyResponseData {
+  string id = 1;
+  string raw_id = 2;
+  string type = 3;
+  Response response = 4;
+}
+
+message Response {
+  string attestation_object = 1;
+  string client_data_JSON = 2;
+}
+
+message LoginRequest {
+  string id_token = 1;
+}
+
+message LoginResponse {
+  cheers.type.User user = 1;
 }
 
 message VerifyUserRequest {
@@ -35,6 +189,13 @@ message VerifyUserRequest {
 }
 
 message VerifyUserResponse {
+}
+
+message DeleteModeratorRequest {
+  string user_id = 1;
+}
+
+message DeleteModeratorResponse {
 }
 
 message CreateModeratorRequest {

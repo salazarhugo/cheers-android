@@ -15,7 +15,7 @@ import com.salazar.cheers.core.model.toMedia
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.core.util.playback.AndroidAudioPlayer
 import com.salazar.cheers.core.PostType
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

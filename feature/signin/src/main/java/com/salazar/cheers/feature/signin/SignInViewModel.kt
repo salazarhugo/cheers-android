@@ -11,7 +11,7 @@ import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.cheers.domain.get_remote_config.CheckFeatureEnabledUseCase
 import com.salazar.cheers.domain.models.RemoteConfigParameter
 import com.salazar.cheers.domain.usecase.SignInWithCredentialManagerFlowUseCase
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed

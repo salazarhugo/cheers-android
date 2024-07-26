@@ -8,7 +8,7 @@ import com.salazar.cheers.domain.list_friend_request.ListFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.domain.list_suggestions.ListSuggestionsUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

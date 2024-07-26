@@ -4,8 +4,8 @@ import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.model.ChatType
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.chat.repository.ChatRepository
-import com.salazar.common.di.IODispatcher
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.di.IODispatcher
+import com.salazar.cheers.shared.util.result.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll

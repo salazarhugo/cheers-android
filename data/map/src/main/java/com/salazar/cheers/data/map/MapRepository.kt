@@ -1,6 +1,6 @@
 package com.salazar.cheers.data.map
 
-import com.salazar.common.util.result.DataError
+import com.salazar.cheers.shared.util.result.DataError
 
 interface MapRepository {
     suspend fun updateGhostMode(
@@ -11,7 +11,7 @@ interface MapRepository {
         longitude: Double,
         latitude: Double,
         zoom: Double? = null,
-    ): com.salazar.common.util.result.Result<List<String>, DataError>
+    ): com.salazar.cheers.shared.util.result.Result<List<String>, DataError>
 
     suspend fun updateLocation(
         longitude: Double,

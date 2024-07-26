@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.common.util.LocalActivity
+import com.salazar.cheers.shared.util.LocalActivity
 
 @Composable
 fun CreatePostRoute(
@@ -17,7 +17,6 @@ fun CreatePostRoute(
     navigateToCamera: () -> Unit,
     viewModel: CreatePostViewModel = hiltViewModel(),
 ) {
-    val activity = LocalActivity.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 

@@ -18,6 +18,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.shared)
     implementation(projects.core.model)
     implementation(projects.core.protobuf)
     implementation(projects.core.db)

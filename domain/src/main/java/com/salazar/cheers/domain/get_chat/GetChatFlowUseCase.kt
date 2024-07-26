@@ -3,7 +3,7 @@ package com.salazar.cheers.domain.get_chat
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

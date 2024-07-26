@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    
     implementation(projects.domain)
     implementation(projects.core.util)
     implementation(projects.core.shared)

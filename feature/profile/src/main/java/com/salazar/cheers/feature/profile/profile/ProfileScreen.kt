@@ -57,6 +57,7 @@ import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.profile.ProfileItem
 import com.salazar.cheers.feature.profile.ProfileTopBar
 import com.salazar.cheers.feature.profile.R
+import com.salazar.cheers.core.ui.components.favorite_drink.FavoriteDrinkComponent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -74,6 +75,7 @@ fun ProfileScreen(
                 onRegisterClick = navigateToSignUp,
             )
         }
+
         is ProfileUiState.HasUser -> Profile(
             uiState = uiState,
             navigateToProfileMoreSheet = navigateToProfileMoreSheet,
@@ -90,7 +92,7 @@ fun Profile(
 ) {
     val user = uiState.user
     val state = rememberRefreshLayoutState()
-    val scope  = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     LaunchedEffect(uiState.isLoading) {
         if (!uiState.isLoading) {
             scope.launch {
@@ -106,6 +108,7 @@ fun Profile(
                 verified = user.verified,
                 onBackPressed = { onProfileUIAction(ProfileUIAction.OnBackPressed) },
                 onMenuClick = { navigateToProfileMoreSheet(user.username) },
+                onEditClick = { onProfileUIAction(ProfileUIAction.OnEditProfileClick) },
             )
         }
     ) { insets ->
@@ -141,6 +144,7 @@ fun ProfileList(
     val pagerState = rememberPagerState(
         pageCount = { tabs.size },
     )
+    val drink = user.favouriteDrink
 
     LazyColumn(
         state = listState,
@@ -152,12 +156,8 @@ fun ProfileList(
                 banner = user.banner,
                 avatar = user.picture,
                 content = {
-                    OutlinedButton(
-                        onClick = { onProfileUIAction(ProfileUIAction.OnEditProfileClick) },
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.edit_profile),
-                        )
+                    if (drink != null) {
+                        FavoriteDrinkComponent(drink = drink)
                     }
                 }
             )
@@ -214,7 +214,9 @@ fun ProfileList(
                     when (page) {
                         0 -> PostTab(
                             posts = posts,
+                            onProfileUIAction = onProfileUIAction,
                         )
+
                         1 -> parties?.forEach {
                             PartyItem(
                                 party = it,
@@ -222,6 +224,7 @@ fun ProfileList(
                                 onMoreClick = {},
                             )
                         }
+
                         2 -> FunctionalityNotAvailablePanel()
                     }
                 }
@@ -233,19 +236,29 @@ fun ProfileList(
 @Composable
 fun PostTab(
     posts: List<Post>?,
+    onProfileUIAction: (ProfileUIAction) -> Unit,
 ) {
-    if (posts == null)
-        return
+    if (posts == null) return
 
-    if (posts.isEmpty())
+    if (posts.isEmpty()) {
         PrettyPanel(
             title = stringResource(id = R.string.profile),
             body = stringResource(id = R.string.profile_empty_post),
         )
+    }
 
     posts.forEach { postFeed ->
         PostComponent(
             post = postFeed,
+            onMoreClick = {
+                onProfileUIAction(ProfileUIAction.OnPostMoreClick(postFeed.id))
+            },
+            onDetailsClick = {
+                onProfileUIAction(ProfileUIAction.OnPostDetailsClick(postFeed.id))
+            },
+            onUserClick = {
+                onProfileUIAction(ProfileUIAction.OnUserClick(it))
+            },
         )
     }
 }

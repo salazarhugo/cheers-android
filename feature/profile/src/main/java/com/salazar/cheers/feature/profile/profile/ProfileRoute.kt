@@ -14,6 +14,9 @@ fun ProfileRoute(
     navigateToSignUp: () -> Unit,
     navigateToProfileMore: (String) -> Unit,
     navigateToFriendList: () -> Unit,
+    navigateToPostDetails: (String) -> Unit,
+    navigateToPostMore: (String) -> Unit,
+    navigateToOtherProfile: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -28,8 +31,10 @@ fun ProfileRoute(
                 ProfileUIAction.OnEditProfileClick -> navigateToEditProfile()
                 ProfileUIAction.OnSwipeRefresh -> viewModel.onSwipeRefresh()
                 ProfileUIAction.OnFriendListClick -> navigateToFriendList()
+                is ProfileUIAction.OnPostDetailsClick -> navigateToPostDetails(action.postID)
+                is ProfileUIAction.OnUserClick -> navigateToOtherProfile(action.userID)
+                is ProfileUIAction.OnPostMoreClick -> navigateToPostMore(action.postID)
             }
-
         }
     )
 }

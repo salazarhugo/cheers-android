@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.send_friend_request
 
 import com.salazar.cheers.data.friendship.FriendshipRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext

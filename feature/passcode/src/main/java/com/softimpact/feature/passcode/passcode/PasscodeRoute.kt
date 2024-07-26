@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.common.util.getActivity
+import com.salazar.cheers.shared.util.getActivity
 import com.softimpact.feature.passcode.BiometricPromptUtils
 import com.softimpact.feature.passcode.util.gradientBackground
 

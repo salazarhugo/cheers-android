@@ -37,6 +37,11 @@
         <item quantity="one">friend</item>
         <item quantity="other">friends</item>
     </plurals>
+    <plurals name="drinks">
+        <item quantity="zero">drink</item>
+        <item quantity="one">drink</item>
+        <item quantity="other">drinks</item>
+    </plurals>
     <plurals name="posts">
         <item quantity="zero">post</item>
         <item quantity="one">post</item>

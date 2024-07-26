@@ -60,7 +60,7 @@ fun ProfileHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            onStatClicked = onFriendsClick,
+            onFriendsClick = onFriendsClick,
         )
         Spacer(Modifier.height(8.dp))
     }

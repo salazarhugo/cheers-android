@@ -12,7 +12,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    
 
     // Biometric
     api(libs.androidx.biometric)

@@ -1,6 +1,8 @@
 package com.salazar.cheers.data.auth
 
 import android.content.Context
+import android.os.Build
+import android.provider.ContactsContract.Data
 import android.util.Log
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
@@ -11,6 +13,9 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
 import androidx.credentials.exceptions.GetCredentialException
+import cheers.auth.v1.AuthServiceGrpcKt
+import cheers.auth.v1.ListCredentialsRequest
+import cheers.notification.v1.NotificationServiceGrpcKt
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -33,6 +38,7 @@ import com.salazar.cheers.data.auth.model.CreatePasskeyRequest
 import com.salazar.cheers.data.auth.model.CreatePasskeyResponseData
 import com.salazar.cheers.data.auth.model.GetPasskeyResponseData
 import com.salazar.cheers.shared.data.BffApiService
+import com.salazar.cheers.shared.data.mapper.toCredential
 import com.salazar.cheers.shared.data.request.FinishLoginPasskey
 import com.salazar.cheers.shared.data.request.FinishLoginRequest
 import com.salazar.cheers.shared.data.request.FinishRegistrationRequest
@@ -42,9 +48,10 @@ import com.salazar.cheers.shared.data.response.BeginLoginResponse
 import com.salazar.cheers.shared.data.response.BeginRegistrationResponse
 import com.salazar.cheers.shared.data.response.FinishLoginResponse
 import com.salazar.cheers.shared.data.response.LoginResponse
-import com.salazar.common.util.Resource
-import com.salazar.common.util.result.DataError
-import com.salazar.common.util.result.RootError
+import com.salazar.cheers.shared.util.Resource
+import com.salazar.cheers.shared.util.result.DataError
+import com.salazar.cheers.shared.util.result.Error
+import com.salazar.cheers.shared.util.result.RootError
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import retrofit2.HttpException
@@ -58,19 +65,20 @@ class AuthRepository @Inject constructor(
     private val bffApiService: BffApiService,
     private val credentialManager: CredentialManager,
     private val gson: Gson,
+    private val authService: AuthServiceGrpcKt.AuthServiceCoroutineStub,
 ) {
-    fun getIdToken(): com.salazar.common.util.result.Result<String, DataError> {
+    fun getIdToken(): com.salazar.cheers.shared.util.result.Result<String, DataError> {
         val user = auth.currentUser
-            ?: return com.salazar.common.util.result.Result.Error(DataError.Auth.NOT_SIGNED_IN)
+            ?: return com.salazar.cheers.shared.util.result.Result.Error(DataError.Auth.NOT_SIGNED_IN)
 
         return try {
             val task: Task<GetTokenResult> = user.getIdToken(false)
             val tokenResult = Tasks.await(task)
             val idToken = tokenResult.token!!
-            com.salazar.common.util.result.Result.Success(idToken)
+            com.salazar.cheers.shared.util.result.Result.Success(idToken)
         } catch (e: Exception) {
             e.printStackTrace()
-            com.salazar.common.util.result.Result.Error(DataError.Network.UNKNOWN)
+            com.salazar.cheers.shared.util.result.Result.Error(DataError.Network.UNKNOWN)
         }
     }
 
@@ -94,7 +102,9 @@ class AuthRepository @Inject constructor(
         request: CreatePasskeyRequest,
     ): Result<Passkey> {
         return try {
-            val createCredentialRequest = CreatePublicKeyCredentialRequest(gson.toJson(request))
+            val createCredentialRequest = CreatePublicKeyCredentialRequest(
+                requestJson = gson.toJson(request),
+            )
             // Launch the FIDO2 flow
             val response = credentialManager.createCredential(
                 context = activityContext,
@@ -107,6 +117,7 @@ class AuthRepository @Inject constructor(
             Result.success(responseData.toPasskey())
         } catch (e: Exception) {
             if (e is CancellationException) throw e
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -176,9 +187,9 @@ class AuthRepository @Inject constructor(
         return auth.signInWithCredential(credential).await()
     }
 
-    fun signOut(): com.salazar.common.util.result.Result<Unit, RootError> {
+    fun signOut(): com.salazar.cheers.shared.util.result.Result<Unit, RootError> {
         FirebaseAuth.getInstance().signOut()
-        return com.salazar.common.util.result.Result.Success(Unit)
+        return com.salazar.cheers.shared.util.result.Result.Success(Unit)
     }
 
     suspend fun deleteAccount(): Result<Unit> {
@@ -223,6 +234,22 @@ class AuthRepository @Inject constructor(
             emit(Resource.Error(e.message.toString()))
         }
         emit(Resource.Loading(false))
+    }
+
+    suspend fun listPasskeys(): com.salazar.cheers.shared.util.result.Result<List<com.salazar.cheers.core.model.Credential>, DataError> {
+        return try {
+            val response = authService.listCredentials(
+                request = ListCredentialsRequest.newBuilder().build()
+            )
+            val credentials = response.credentialsList.map {
+                it.toCredential()
+            }
+            com.salazar.cheers.shared.util.result.Result.Success(credentials)
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            e.printStackTrace()
+            com.salazar.cheers.shared.util.result.Result.Error(DataError.Network.UNKNOWN)
+        }
     }
 
     suspend fun beginLogin(
@@ -291,16 +318,17 @@ class AuthRepository @Inject constructor(
         username: String,
         passkey: Passkey,
     ): Result<Unit> {
+        val deviceName = Build.MODEL
         return try {
-            val response = bffApiService.finishRegistration(
-                FinishRegistrationRequest(
-                    email = "",
-                    username = username,
-                    passkey = passkey,
-                    challenge = challenge,
-                    userId = userId,
-                )
+            val request = FinishRegistrationRequest(
+                email = "",
+                username = username,
+                passkey = passkey,
+                challenge = challenge,
+                userId = userId,
+                deviceName = deviceName,
             )
+            val response = bffApiService.finishRegistration(request = request)
             Result.success(Unit)
         } catch (e: Exception) {
             if (e is CancellationException) throw e

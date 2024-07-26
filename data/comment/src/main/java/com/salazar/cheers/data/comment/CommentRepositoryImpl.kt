@@ -7,7 +7,7 @@ import com.salazar.cheers.core.db.dao.CommentDao
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Comment
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 

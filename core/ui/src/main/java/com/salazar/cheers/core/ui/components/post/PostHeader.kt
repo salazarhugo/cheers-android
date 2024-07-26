@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
@@ -85,13 +86,13 @@ fun PostHeader(
             )
             if (isPublic)
                 Icon(
-                    Icons.Default.Public,
+                    imageVector = Icons.Default.Public,
                     contentDescription = null,
                     modifier = Modifier.padding(end = 8.dp),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             Icon(
-                Icons.Default.MoreVert,
+                imageVector = Icons.Default.MoreHoriz,
                 contentDescription = null,
                 modifier = Modifier
                     .clip(CircleShape)

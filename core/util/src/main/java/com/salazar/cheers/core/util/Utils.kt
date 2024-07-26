@@ -20,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.compose.ui.Modifier
-import com.salazar.common.util.result.getOrThrow
+import com.salazar.cheers.shared.util.result.getOrThrow
 import com.snap.creativekit.SnapCreative
 import com.snap.creativekit.exceptions.SnapMediaSizeException
 import com.snap.creativekit.models.SnapPhotoContent

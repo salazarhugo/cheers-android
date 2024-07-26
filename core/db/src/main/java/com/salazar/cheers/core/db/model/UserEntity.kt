@@ -1,5 +1,6 @@
 package com.salazar.cheers.core.db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -39,6 +40,9 @@ data class UserEntity(
     val seenStory: Boolean = false,
     val createTime: Long = 0L,
     val isBusinessAccount: Boolean = false,
+    @Embedded(
+        prefix = "drink_",
+    ) val favouriteDrink: DrinkEntity? = null,
 )
 
 fun UserEntity.asExternalModel() = User(
@@ -68,6 +72,7 @@ fun UserEntity.asExternalModel() = User(
     seenStory =seenStory,
     createTime = createTime,
     isBusinessAccount = isBusinessAccount,
+    favouriteDrink = favouriteDrink?.asExternalModel(),
 )
 
 fun User.asEntity(): UserEntity {
@@ -98,6 +103,7 @@ fun User.asEntity(): UserEntity {
         seenStory =seenStory,
         createTime = createTime,
         isBusinessAccount = isBusinessAccount,
+        favouriteDrink = favouriteDrink?.asEntity(),
     )
 }
 

@@ -32,4 +32,5 @@ data class HomeUiState(
     val notes: List<Note> = emptyList(),
     val audioPostID: String = String(),
     val audioState: AudioState = AudioState(),
+    val showFloatingActionButton: Boolean = false,
 )

@@ -18,7 +18,7 @@ dependencies {
     implementation(projects.core.util)
     implementation(projects.core.shared)
     implementation(projects.data.party)
-    implementation(projects.common)
+    
     implementation(projects.domain)
 
     implementation(libs.androidx.core.ktx)

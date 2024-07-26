@@ -1,3 +1,4 @@
+import com.salazar.cheers.build_logic.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -14,7 +15,7 @@ class AndroidHiltConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.kapt")
             }
 
-            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+            
             dependencies {
                 "implementation"(libs.findLibrary("hilt.android").get())
                 "implementation"(libs.findLibrary("androidx.hilt.navigation.compose").get())

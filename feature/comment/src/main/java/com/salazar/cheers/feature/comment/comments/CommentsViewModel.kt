@@ -9,7 +9,7 @@ import com.salazar.cheers.domain.create_comment.CreateCommentUseCase
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.cheers.domain.like_comment.LikeCommentUseCase
 import com.salazar.cheers.domain.list_post_comments.ListPostCommentsUseCase
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    
     implementation(projects.core.model)
     implementation(projects.core.protobuf)
     implementation(projects.core.util)

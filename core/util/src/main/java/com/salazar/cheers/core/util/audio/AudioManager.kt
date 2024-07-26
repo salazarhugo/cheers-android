@@ -1,6 +1,6 @@
 package com.salazar.cheers.core.util.audio
 
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda

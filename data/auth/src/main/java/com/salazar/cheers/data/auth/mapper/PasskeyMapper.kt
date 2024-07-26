@@ -56,14 +56,7 @@ fun BeginLoginResponse.toGetPasskeyRequest(): GetPasskeyRequest {
         timeout = 1_800_000,
         rpId = relyingPartyId,
         userVerification = userVerification,
-        allowCredentials = emptyList(),
-//        allowCredentials.map {
-//            GetPasskeyRequest.AllowCredentials(
-//                id = it.id,
-//                type = "public-key",
-//                transports = it.transport.orEmpty() + "internal",
-//            )
-//        },
+        allowCredentials = emptyList()
     )
 }
 
@@ -85,7 +78,7 @@ fun BeginRegistrationResponse.toCreatePasskeyRequest(username: String): CreatePa
                 alg = -7
             )
         ),
-        timeout = 1800000,
+        timeout = 1_800_000,
         attestation = "Android Key Attestation",
         excludeCredentials = emptyList(),
         authenticatorSelection = CreatePasskeyRequest.AuthenticatorSelection(

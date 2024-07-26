@@ -4,7 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import com.salazar.cheers.core.util.audio.LocalAudio
-import com.salazar.common.di.MainDispatcher
+import com.salazar.cheers.shared.di.MainDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

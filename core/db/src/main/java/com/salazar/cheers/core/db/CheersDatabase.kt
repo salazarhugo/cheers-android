@@ -67,7 +67,7 @@ import com.salazar.cheers.core.model.Ticket
         NoteEntity::class,
         DrinkEntity::class,
     ],
-    version = 37,
+    version = 38,
     exportSchema = false,
     autoMigrations = []
 )

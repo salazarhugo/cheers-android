@@ -11,6 +11,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {

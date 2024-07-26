@@ -28,7 +28,7 @@ import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.emptyDrink
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.modifier.carousel
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
 
 

@@ -3,7 +3,7 @@ package com.salazar.cheers.domain.list_ticket
 import com.salazar.cheers.core.model.Ticket
 import com.salazar.cheers.data.ticket.TicketRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

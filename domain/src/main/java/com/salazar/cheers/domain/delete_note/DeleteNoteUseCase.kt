@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.delete_note
 
 import com.salazar.cheers.data.note.repository.NoteRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext

@@ -1,29 +1,29 @@
 [versions]
-accompanistPagerIndicators = "0.30.1"
 accompanistPager = "0.30.1"
 accompanistSwiperefresh = "0.24.8-beta"
-androidGradlePlugin = "8.3.2"
+androidGradlePlugin = "8.5.0"
 accompanistPermissions = "0.30.1"
 accompanistPlaceholderMaterial = "0.24.8-beta"
 accompanistSystemuicontroller = "0.30.1"
 accompanistNavigationAnimation = "0.30.0"
 accompanistNavigationMaterial = "0.33.0-alpha"
-activityCompose = "1.8.2"
+activityCompose = "1.9.0"
 androidx-lifecycleRuntimeKtx = "2.7.0"
-androidxComposeBom = "2024.04.00"
+androidxComposeBom = "2024.06.00"
+composeNavigation = "2.8.0-beta06"
 appUpdateKtx = "2.1.0"
 appUpdate = "2.1.0"
 biometricKtx = "1.1.0"
-firebaseBom = "32.8.0"
+firebaseBom = "33.1.2"
 # don't delete
-androidxComposeCompiler = "1.5.8"
-androidxCore = "1.12.0"
+androidxComposeCompiler = "1.5.13"
+androidxCore = "1.13.1"
 annotationsApi = "6.0.53"
-appcompat = "1.6.1"
-billingKtx = "6.2.0"
-cameraLifecycle = "1.3.2"
-cameraView = "1.3.2"
-cameraCamera2 = "1.3.2"
+appcompat = "1.7.0"
+billingKtx = "7.0.0"
+cameraLifecycle = "1.3.4"
+cameraView = "1.3.4"
+cameraCamera2 = "1.3.4"
 coilSvg = "2.2.2"
 composeStateEvents = "1.2.3"
 composedBarcodes = "1.1.1"
@@ -32,9 +32,9 @@ converterMoshi = "2.9.0"
 coilCompose = "2.3.0"
 coreSplashscreen = "1.0.1"
 creativekit = "2.1.0"
-datastorePreferences = "1.0.0"
-espressoCore = "3.5.1"
-gradle = "8.0.2"
+datastorePreferences = "1.1.1"
+espressoCore = "3.6.1"
+gradle = "8.5.0"
 grpcOkhttp = "1.52.1"
 grpcProtobufLite = "1.57.0"
 grpcStub = "1.57.0"
@@ -45,48 +45,52 @@ hiltNavigationCompose = "1.2.0"
 hiltAndroid = "2.50"
 hiltWork = "1.2.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
+junitVersion = "1.2.1"
 klaxon = "5.5"
 kotlinxCoroutinesPlayServices = "1.7.3"
-kotlinxSerializationJson = "1.5.1"
+kotlinxSerializationJson = "1.6.3"
 lifecycleLivedataKtx = "2.7.0"
 loginkit = "2.1.0"
 mapbox = "11.3.0-beta.1"
 mapboxSearchAndroid = "2.0.0-beta.3"
 mapboxSdkServices = "6.15.0"
-material = "1.11.0"
+material = "1.12.0"
 moshiKotlinCodegen = "1.14.0"
 moshi = "1.14.0"
 okhttpBom = "5.0.0-alpha.11"
-pagingCompose = "3.2.1"
-pagingRuntimeKtx = "3.2.1"
-playServicesAds = "23.0.0"
-playServicesAuth = "21.0.0"
-playServicesLocation = "21.2.0"
-playServicesMaps = "18.2.0"
+pagingCompose = "3.3.0"
+pagingRuntimeKtx = "3.3.0"
+playServicesAds = "23.2.0"
+playServicesAuth = "21.2.0"
+playServicesLocation = "21.3.0"
+playServicesMaps = "19.0.0"
 roomPaging = "2.6.1"
 roomKtx = "2.6.1"
 roomCompiler = "2.6.1"
 roomRuntime = "2.6.1"
 retrofit = "2.9.0"
-kotlin = "1.9.22"
-symbolProcessingApi = "1.9.22-1.0.17"
-ksp = "1.9.22-1.0.17"
+kotlin = "1.9.23"
+symbolProcessingApi = "1.9.23-1.0.20"
+ksp = "1.9.23-1.0.20"
 protobuf = "3.23.0"
 protobufPlugin = "0.9.3"
-gmsPlugin = "4.4.1"
-firebaseCrashlyticsPlugin = "2.9.9"
+gmsPlugin = "4.4.2"
+firebaseCrashlyticsPlugin = "3.0.2"
 firebasePerfPlugin = "1.4.2"
-userMessagingPlatform = "2.2.0"
+userMessagingPlatform = "3.0.0"
 workMultiprocess = "2.9.0"
 workRuntimeKtx = "2.9.0"
 org-jetbrains-kotlin-jvm = "1.8.20"
-googleid = "1.1.0"
-credentials = "1.2.2"
+googleid = "1.1.1"
+credentials = "1.3.0-rc01"
 gsonVersion = "2.10.1"
 
 [libraries]
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometricKtx" }
+#noinspection CredentialDependency
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
@@ -99,7 +103,7 @@ mapbox-sdk-services = { module = "com.mapbox.mapboxsdk:mapbox-sdk-services", ver
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraLifecycle" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraView" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
-accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPagerIndicators" }
+accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPager" }
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 
 # OkHttp3 BOM
@@ -119,6 +123,7 @@ androidx-material-icons-core = { module = "androidx.compose.material:material-ic
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 
 # Firebase BOM
 firebase-bom = { module = "com.google.firebase:firebase-bom", name = "firebase-bom", version.ref = "firebaseBom" }
@@ -146,7 +151,6 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 androidx-lifecycle-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycleRuntimeKtx" }
-androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomPaging" }
@@ -172,7 +176,6 @@ grpc-protobuf-lite = { module = "io.grpc:grpc-protobuf-lite", version.ref = "grp
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpcStub" }
 grpc-kotlin-stub = { module = "io.grpc:grpc-kotlin-stub", version.ref = "grpcKotlinStub" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
-androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycleRuntimeKtx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 junit = { module = "junit:junit", version.ref = "junit" }
 klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
@@ -197,7 +200,6 @@ firebase-performance-gradlePlugin = { group = "com.google.firebase", name = "per
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
-androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -211,6 +213,7 @@ protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin-jvm" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # Plugins defined by this project
 cheers-android-application = { id = "cheers.android.application", version = "unspecified" }

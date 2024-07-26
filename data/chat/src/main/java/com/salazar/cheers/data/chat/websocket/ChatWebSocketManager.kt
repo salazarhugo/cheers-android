@@ -20,6 +20,7 @@ import com.salazar.cheers.data.chat.models.toChat
 import com.salazar.cheers.data.chat.models.toChatMessage
 import com.salazar.cheers.data.chat.models.toChatStatus
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -68,7 +69,7 @@ class ChatWebSocketManager @Inject constructor(
         }
     }
 
-    suspend fun sendChatEvent(
+    fun sendChatEvent(
         chatID: String,
         event: ChatEvent,
     ) {
@@ -246,17 +247,30 @@ class ChatWebSocketManager @Inject constructor(
         }
     }
 
+    private var typingJob: Job? = null
+
     private fun handleTyping(
         typing: Typing?,
     ) {
-        if (typing == null)
-            return
+        if (typing == null) return
 
         GlobalScope.launch {
             val chat = chatDao.getChannel(typing.chatId)
             chatDao.insert(
                 chat.copy(isOtherUserTyping = typing.isTyping)
             )
+
+            if(typing.isTyping) {
+                typingJob?.cancel()
+            }
+
+            delay(2000L)
+            typingJob = GlobalScope.launch {
+                val chat = chatDao.getChannel(typing.chatId)
+                chatDao.insert(
+                    chat.copy(isOtherUserTyping = false)
+                )
+            }
         }
     }
 

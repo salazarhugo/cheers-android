@@ -4,7 +4,9 @@ package cheers.user.v1;
 
 import "cheers/type/user/user.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "google/api/annotations.proto";
+import "cheers/drink/v1/drink_service.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/user/v1;user";
@@ -36,7 +38,12 @@ service UserService {
 
   rpc GetUsersIn (GetUsersInRequest) returns (GetUsersInResponse);
   rpc GetUserItemsIn (GetUserItemsInRequest) returns (GetUserItemsInResponse);
-  rpc SearchUser (SearchUserRequest) returns (SearchUserResponse);
+
+  rpc SearchUser (SearchUserRequest) returns (SearchUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/search/{query}"
+    };
+  }
 
   rpc FollowUser (FollowUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -167,6 +174,7 @@ message GetUserResponse {
   bool requested = 8;
   bool has_requested_viewer = 9;
   int32 friends_count = 10;
+  optional cheers.drink.v1.Drink drink = 11;
 }
 
 message BlockUserRequest {
@@ -205,6 +213,8 @@ message UpdateUserRequest {
   string birthday = 5;
   string phone_number = 6;
   string banner = 7;
+  string favourite_drink_id = 8;
+  optional google.protobuf.FieldMask update_mask = 9;
 }
 
 message DeleteUserRequest {

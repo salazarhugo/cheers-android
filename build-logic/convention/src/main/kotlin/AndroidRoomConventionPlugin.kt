@@ -15,6 +15,7 @@
  */
 
 import com.google.devtools.ksp.gradle.KspExtension
+import com.salazar.cheers.build_logic.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -37,7 +38,7 @@ class AndroidRoomConventionPlugin : Plugin<Project> {
 //                arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
             }
 
-            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+            
             dependencies {
                 add("implementation", libs.findLibrary("androidx.room.runtime").get())
                 add("implementation", libs.findLibrary("androidx.room.ktx").get())

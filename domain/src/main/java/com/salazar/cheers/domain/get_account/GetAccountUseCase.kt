@@ -2,7 +2,7 @@ package com.salazar.cheers.domain.get_account
 
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.data.account.AccountRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

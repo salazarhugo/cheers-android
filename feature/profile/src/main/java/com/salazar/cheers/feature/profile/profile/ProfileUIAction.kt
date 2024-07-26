@@ -1,8 +1,11 @@
 package com.salazar.cheers.feature.profile.profile
 
 sealed class ProfileUIAction {
-    object OnSwipeRefresh : ProfileUIAction()
-    object OnBackPressed : ProfileUIAction()
-    object OnEditProfileClick : ProfileUIAction()
-    object OnFriendListClick : ProfileUIAction()
+    data object OnSwipeRefresh : ProfileUIAction()
+    data object OnBackPressed : ProfileUIAction()
+    data object OnEditProfileClick : ProfileUIAction()
+    data object OnFriendListClick : ProfileUIAction()
+    data class OnPostMoreClick(val postID: String) : ProfileUIAction()
+    data class OnPostDetailsClick(val postID: String) : ProfileUIAction()
+    data class OnUserClick(val userID: String) : ProfileUIAction()
 }

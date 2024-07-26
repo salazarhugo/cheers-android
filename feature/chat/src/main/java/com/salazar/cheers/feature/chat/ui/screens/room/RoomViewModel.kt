@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.domain.list_chat_members.ListChatMembersUseCase
-import com.salazar.common.util.result.Result.Error
-import com.salazar.common.util.result.Result.Success
+import com.salazar.cheers.shared.util.result.Result.Error
+import com.salazar.cheers.shared.util.result.Result.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

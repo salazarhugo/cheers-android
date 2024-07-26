@@ -55,6 +55,7 @@ class DataStoreRepository @Inject constructor(
     suspend fun updatePasscode(passcode: String) {
         settingsStore.updateData { currentPreferences ->
             currentPreferences.toBuilder().setPasscode(passcode).build()
+            currentPreferences.toBuilder().setPasscodeEnabled(passcode.isNotBlank()).build()
         }
     }
 

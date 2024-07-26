@@ -7,7 +7,7 @@ import com.salazar.cheers.core.util.Utils.validateUsername
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.register.RegisterUseCase
 import com.salazar.cheers.domain.usecase.SignInWithEmailLinkUseCase
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

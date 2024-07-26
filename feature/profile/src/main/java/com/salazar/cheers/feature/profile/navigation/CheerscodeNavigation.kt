@@ -6,7 +6,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.salazar.cheers.feature.profile.cheerscode.CheerscodeRoute
-import com.salazar.cheers.feature.profile.profile.ProfileRoute
 
 const val cheersCodeNavigationRoute = "cheerscode_route"
 private const val DEEP_LINK_URI_PATTERN =

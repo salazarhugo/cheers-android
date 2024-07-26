@@ -33,7 +33,7 @@ import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.Utils.conditional
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import java.util.Date
 
 @Composable

@@ -1,7 +1,7 @@
 package com.salazar.cheers.domain.list_suggestions
 
 import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

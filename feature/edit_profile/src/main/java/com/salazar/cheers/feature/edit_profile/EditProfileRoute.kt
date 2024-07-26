@@ -7,23 +7,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun EditProfileRoute(
-    editProfileViewModel: EditProfileViewModel = hiltViewModel(),
-    navigateBack: () -> Unit,
+    viewModel: EditProfileViewModel = hiltViewModel(),
+    navigateBack: () -> Unit = {},
 ) {
-    val uiState by editProfileViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EditProfileScreen(
         uiState = uiState,
-        onWebsiteChanged = editProfileViewModel::onWebsiteChanged,
-        onNameChanged = editProfileViewModel::onNameChanged,
-        onBioChanged = editProfileViewModel::onBioChanged,
-        onUsernameChanged = editProfileViewModel::onUsernameChange,
-        onSelectImage = editProfileViewModel::onSelectPicture,
-        onSelectBanner = editProfileViewModel::onSelectBanner,
+        onWebsiteChanged = viewModel::onWebsiteChanged,
+        onNameChanged = viewModel::onNameChanged,
+        onBioChanged = viewModel::onBioChanged,
+        onUsernameChanged = viewModel::onUsernameChange,
+        onSelectImage = viewModel::onSelectPicture,
+        onSelectBanner = viewModel::onSelectBanner,
         onDismiss = { navigateBack() },
         onSave = {
-            editProfileViewModel.onSave()
+            viewModel.onSave()
             navigateBack()
         },
+        onDrinkClick = viewModel::selectDrink,
     )
 }

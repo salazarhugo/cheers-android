@@ -7,8 +7,8 @@ import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.model.ChatStatus
-import com.salazar.common.util.result.Result
-import com.salazar.common.util.result.DataError
+import com.salazar.cheers.shared.util.result.Result
+import com.salazar.cheers.shared.util.result.DataError
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {

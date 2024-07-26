@@ -28,7 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.item.SettingItem
 import com.salazar.cheers.core.ui.item.SettingTitle
 import com.salazar.cheers.core.ui.ui.ErrorMessage
@@ -111,8 +114,9 @@ fun HelpSection(
             title = stringResource(id = R.string.help),
         )
         SettingItem(
-            title = stringResource(id = R.string.ask_a_question),
+            title = stringResource(id = R.string.request_feature),
             icon = Icons.Outlined.QuestionAnswer,
+            onClick = { onSettingsUIAction(SettingsUIAction.OnRequestNewFeatureClick) },
         )
         SettingItem(
             title = stringResource(id = R.string.privacy_policy),
@@ -136,7 +140,7 @@ fun AccountSection(
             title = stringResource(id = R.string.account),
         )
         SettingItem(
-            title = "Become VIP",
+            title = "Cheers Premium",
             icon = Icons.Outlined.WorkspacePremium,
             onClick = navigateToBecomeVip,
         )
@@ -247,5 +251,20 @@ fun SignOutButton(onSignOut: () -> Unit) {
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Start,
         )
+    }
+}
+
+@ScreenPreviews
+@Composable
+private fun SettingsScreenPreview() {
+    CheersPreview {
+        SettingsScreen(
+            uiState = SettingsUiState(isLoading = false),
+            onSettingsUIAction = {},
+            onSignOut = { /*TODO*/ },
+            navigateToBecomeVip = { /*TODO*/ },
+            onBackPressed = { /*TODO*/ }) {
+
+        }
     }
 }

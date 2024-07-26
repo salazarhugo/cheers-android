@@ -13,7 +13,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    
     implementation(projects.domain)
 
     implementation(projects.data.user)

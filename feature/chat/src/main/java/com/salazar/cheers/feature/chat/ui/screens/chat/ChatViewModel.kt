@@ -17,8 +17,8 @@ import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatEvent
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.domain.get_chat.GetChatFlowUseCase
-import com.salazar.common.util.Resource
-import com.salazar.common.util.result.Result
+import com.salazar.cheers.shared.util.Resource
+import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.GlobalScope

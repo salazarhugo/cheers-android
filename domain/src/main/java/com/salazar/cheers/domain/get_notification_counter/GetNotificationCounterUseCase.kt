@@ -1,7 +1,7 @@
 package com.salazar.cheers.domain.get_notification_counter
 
 import com.salazar.cheers.data.activity.ActivityRepository
-import com.salazar.common.di.IODispatcher
+import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

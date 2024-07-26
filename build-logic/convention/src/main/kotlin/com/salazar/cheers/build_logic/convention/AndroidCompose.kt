@@ -15,8 +15,6 @@ import java.io.File
 internal fun Project.configureAndroidCompose(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
-    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-
     commonExtension.apply {
         buildFeatures {
             compose = true

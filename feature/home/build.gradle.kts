@@ -17,7 +17,7 @@ dependencies {
     implementation(projects.data.note)
     implementation(projects.data.post)
     implementation(projects.data.user)
-    implementation(projects.common)
+
     implementation(projects.domain)
 
     implementation(libs.androidx.core.ktx)
@@ -29,8 +29,6 @@ dependencies {
 
     // Jetpack Compose
     implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.runtime:runtime-livedata")
 
@@ -44,7 +42,6 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(libs.androidx.hilt.work)
     // Work Manager

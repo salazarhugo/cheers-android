@@ -1,6 +1,8 @@
+import com.salazar.cheers.build_logic.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
@@ -10,18 +12,19 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             pluginManager.apply {
                 apply("cheers.android.library")
                 apply("cheers.android.hilt")
+//                apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
-            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-
             dependencies {
-                add("implementation", project(":common"))
                 add("implementation", project(":core:model"))
                 add("implementation", project(":core:ui"))
                 add("implementation", project(":core:util"))
+                add("implementation", project(":core:shared"))
                 add("implementation", project(":core:protobuf"))
                 add("implementation", project(":domain"))
 
+                // Serialization
+                add("implementation", libs.findLibrary("kotlinx.serialization.json").get())
                 add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
                 add(
                     "implementation",

@@ -22,7 +22,7 @@ fun CheersSplashScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = rememberAsyncImagePainter(R.drawable.ic_artboard_1cheers_logo_svg),
+            painter = rememberAsyncImagePainter(R.drawable.ic_splash),
             modifier = Modifier.size(56.dp),
             contentDescription = null,
         )

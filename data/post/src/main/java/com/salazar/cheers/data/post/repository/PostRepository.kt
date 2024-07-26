@@ -18,13 +18,12 @@ import cheers.post.v1.PostServiceGrpcKt
 import cheers.post.v1.UnlikePostRequest
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.db.dao.PostDao
-import com.salazar.cheers.core.db.model.PostEntity
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.shared.data.mapper.toUserItem
-import com.salazar.common.util.Resource
+import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll

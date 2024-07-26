@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
+import com.salazar.cheers.core.util.Constants
 
 @Composable
 fun SettingsRoute(
@@ -19,6 +20,7 @@ fun SettingsRoute(
     navigateToSecurity: () -> Unit,
     navigateToPaymentHistory: () -> Unit,
     navigateToSignIn: () -> Unit,
+    navigateToPremium: () -> Unit,
     navigateToDeleteAccount: () -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -46,24 +48,26 @@ fun SettingsRoute(
                 is SettingsUIAction.OnAddPaymentClick -> navigateToAddPaymentMethod()
                 is SettingsUIAction.OnPaymentHistoryClick -> navigateToPaymentHistory()
                 is SettingsUIAction.OnNotificationsClick -> navigateToNotifications()
-                is SettingsUIAction.OnPrivacyPolicyClick -> uriHandler.openUri("https://cheers-a275e.web.app/privacy-policy")
-                is SettingsUIAction.OnTermsOfUseClick -> uriHandler.openUri("https://cheers-a275e.web.app/terms-of-use")
+                is SettingsUIAction.OnPrivacyPolicyClick -> uriHandler.openUri(Constants.PRIVACY_POLICY_LINK)
+                is SettingsUIAction.OnTermsOfUseClick -> uriHandler.openUri(Constants.TERMS_AND_CONDITIONS_LINK)
                 is SettingsUIAction.OnSecurityClick -> navigateToSecurity()
+                SettingsUIAction.OnRequestNewFeatureClick -> uriHandler.openUri(Constants.FEEDBACK_LINK)
             }
         },
-        navigateToBecomeVip = {},
+        navigateToBecomeVip = navigateToPremium,
         onDeleteAccount = navigateToDeleteAccount,
     )
 }
 
 sealed class SettingsUIAction {
-    object OnThemeClick : SettingsUIAction()
-    object OnNotificationsClick : SettingsUIAction()
-    object OnLanguageClick : SettingsUIAction()
-    object OnAddPaymentClick : SettingsUIAction()
-    object OnPaymentHistoryClick : SettingsUIAction()
-    object OnRechargeClick : SettingsUIAction()
-    object OnPrivacyPolicyClick : SettingsUIAction()
-    object OnTermsOfUseClick : SettingsUIAction()
-    object OnSecurityClick : SettingsUIAction()
+    data object OnThemeClick : SettingsUIAction()
+    data object OnNotificationsClick : SettingsUIAction()
+    data object OnLanguageClick : SettingsUIAction()
+    data object OnAddPaymentClick : SettingsUIAction()
+    data object OnPaymentHistoryClick : SettingsUIAction()
+    data object OnRechargeClick : SettingsUIAction()
+    data object OnPrivacyPolicyClick : SettingsUIAction()
+    data object OnRequestNewFeatureClick : SettingsUIAction()
+    data object OnTermsOfUseClick : SettingsUIAction()
+    data object OnSecurityClick : SettingsUIAction()
 }

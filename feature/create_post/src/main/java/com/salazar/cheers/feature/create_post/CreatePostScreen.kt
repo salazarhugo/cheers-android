@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.outlined.Bloodtype
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.HorizontalDivider
@@ -46,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -57,7 +55,6 @@ import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.core.ui.ChipGroup
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
 import com.salazar.cheers.core.ui.components.post.PostMedia
@@ -68,8 +65,8 @@ import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.feature.create_post.components.SelectLocationComponent
-import com.salazar.cheers.feature.create_post.drink.SelectDrinkBottomSheet
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
 import java.util.Date
 

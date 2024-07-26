@@ -2,6 +2,11 @@ package com.salazar.cheers.feature.chat.ui.components.chat_item
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -14,6 +19,7 @@ import com.salazar.cheers.feature.chat.ui.components.EmptyChat
 import com.salazar.cheers.feature.chat.ui.components.NewChat
 import com.salazar.cheers.feature.chat.ui.components.OpenedChat
 import com.salazar.cheers.feature.chat.ui.components.ReceivedChat
+import kotlinx.coroutines.delay
 
 @Composable
 fun ChatStatus(
@@ -31,7 +37,6 @@ fun ChatStatus(
             ChatStatus.OPENED -> OpenedChat()
             ChatStatus.SENT -> DeliveredChat(messageType)
             ChatStatus.RECEIVED -> ReceivedChat(messageType)
-//                            RoomStatus.SENDING -> SendingChat()
             ChatStatus.UNRECOGNIZED -> {}
         }
     }

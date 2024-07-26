@@ -2,7 +2,8 @@ package com.salazar.cheers.data.drink.repository
 
 import cheers.drink.v1.DrinkServiceGrpcKt
 import cheers.drink.v1.ListDrinkRequest
-import com.salazar.cheers.data.drink.mapper.toDrink
+import com.salazar.cheers.core.db.dao.DrinkDao
+import com.salazar.cheers.shared.data.mapper.toDrink
 import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
@@ -15,7 +16,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DrinkRepositoryImpl @Inject constructor(
-    private val drinkDao: com.salazar.cheers.core.db.dao.DrinkDao,
+    private val drinkDao: DrinkDao,
     private val service: DrinkServiceGrpcKt.DrinkServiceCoroutineStub,
 ): DrinkRepository {
     override suspend fun listDrink(): Flow<Result<List<Drink>>> = flow {

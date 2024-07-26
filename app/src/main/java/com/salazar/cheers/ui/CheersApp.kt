@@ -1,8 +1,10 @@
 package com.salazar.cheers.ui
 
 import android.view.WindowManager
+import androidx.activity.SystemBarStyle
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -17,26 +19,23 @@ import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.core.util.Utils.setLocale
-import com.salazar.common.util.LocalActivity
+import com.salazar.cheers.shared.util.LocalActivity
 
 
 @Composable
 fun CheersApp(
+    darkTheme: Boolean,
     appState: CheersAppState = rememberCheersAppState()
 ) {
     val cheersViewModel = hiltViewModel<CheersViewModel>()
     val uiState: CheersUiState by cheersViewModel.uiState.collectAsStateWithLifecycle()
 
-    when(uiState) {
+    when (uiState) {
         is CheersUiState.Loading -> LoadingScreen()
         is CheersUiState.Initialized -> {
             val uiState = (uiState as CheersUiState.Initialized)
             val settings = uiState.settings
-            val darkTheme = isDarkTheme(uiState.settings.theme, isSystemInDarkTheme())
 
-            SetStatusBars(
-                darkTheme = darkTheme,
-            )
             SetLanguage(
                 language = settings.language,
             )
@@ -74,16 +73,16 @@ fun SetStatusBars(
     val systemUiController = rememberSystemUiController()
     val darkIcons = !darkTheme
 
-//    val color = MaterialTheme.colorScheme.background
     val color = if (darkIcons) Color.White else Color(0xFF101010)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(darkTheme) {
         systemUiController.setSystemBarsColor(
             color = color,
             darkIcons = darkIcons,
         )
     }
 }
+
 @Composable
 fun SetLanguage(language: Language) {
     val activity = LocalActivity.current
@@ -101,13 +100,14 @@ fun SetFlags(hideContent: Boolean) {
     val activity = LocalActivity.current
 
     LaunchedEffect(hideContent) {
-        if (hideContent)
+        if (hideContent) {
             activity.window.setFlags(
                 WindowManager.LayoutParams.FLAG_SECURE,
                 WindowManager.LayoutParams.FLAG_SECURE
             )
-        else
+        } else {
             activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
     }
 }
 

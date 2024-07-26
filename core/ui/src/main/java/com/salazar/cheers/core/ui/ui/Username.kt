@@ -14,12 +14,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
 
 @Composable

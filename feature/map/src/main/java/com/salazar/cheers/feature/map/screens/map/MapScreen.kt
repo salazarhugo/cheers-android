@@ -37,7 +37,7 @@ import com.salazar.cheers.feature.map.ui.annotations.CurrentUserAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.FriendAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.PostAnnotation
 import com.salazar.cheers.feature.map.ui.components.MapComponent
-import com.salazar.common.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
 
 @Composable
@@ -151,6 +151,7 @@ fun CurrentUserViewAnnotation(
             ghostMode = ghostMode,
             isSelected = isSelected,
             onClick = onClick,
+            lastUpdated = userLocation.lastUpdated,
         )
     }
 }
@@ -173,6 +174,7 @@ fun AddFriendViewAnnotation(
             isSelected = isSelected,
             name = userLocation.name,
             picture = userLocation.picture,
+            lastUpdated = userLocation.lastUpdated,
             onClick = onClick,
         )
     }

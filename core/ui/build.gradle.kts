@@ -17,7 +17,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    
     implementation(projects.core.util)
     implementation(projects.core.model)
     implementation(projects.core.shared)
@@ -53,6 +53,7 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.navigation.material)
     implementation(libs.accompanist.navigation.animation)
+    implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
 
     // Map Box SDK

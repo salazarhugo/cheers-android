@@ -32,6 +32,7 @@ fun NavGraphBuilder.homeScreen(
     navigateToSignIn: () -> Unit = {},
     onPostClick: (String) -> Unit = {},
     navigateToCamera: () -> Unit = {},
+    navigateToDeletePostDialog: (String) -> Unit,
 ) {
     composable(
         route = homeNavigationRoute,
@@ -56,6 +57,7 @@ fun NavGraphBuilder.homeScreen(
             navigateToUser = navigateToUser,
             navigateToSignIn = navigateToSignIn,
             navigateToCamera = navigateToCamera,
+            navigateToDeletePostDialog = navigateToDeletePostDialog,
         )
     }
 }
