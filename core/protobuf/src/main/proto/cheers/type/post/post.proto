@@ -19,8 +19,9 @@ message Post {
   Drink drink = 9;
   int64 drunkenness = 10;
   int64 create_time = 12;
-  bool can_comment = 13;
-  bool can_share = 14;
+  bool likes_enabled = 22;
+  bool comments_enabled = 13;
+  bool shares_enabled = 14;
   PostRatio ratio = 15;
   // The latitude in degrees. It must be in the range [-90.0, +90.0].
   double latitude = 16;
@@ -30,6 +31,7 @@ message Post {
   string last_comment_username = 19;
   int64 last_comment_create_time = 20;
   Audio audio = 21;
+  bool notifications_enabled = 23;
 }
 
 message PostMedia {

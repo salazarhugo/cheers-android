@@ -1,4 +1,4 @@
-package com.salazar.cheers.map.ui.dialogs
+package com.salazar.cheers.feature.map.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

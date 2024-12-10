@@ -1,5 +1,6 @@
 package com.salazar.cheers.core.data.remote
 
+import com.salazar.cheers.BuildConfig
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
@@ -22,7 +23,9 @@ class LoggerInterceptor @Inject constructor(
 
         return object : ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(delegateCall) {
             override fun sendMessage(message: ReqT) {
-                println("Request Message: $message")
+                if (BuildConfig.DEBUG) {
+                    println("Request Message: $callOptions.")
+                }
                 super.sendMessage(message)
             }
 
@@ -33,7 +36,9 @@ class LoggerInterceptor @Inject constructor(
                     ) {
                         override fun onMessage(message: RespT) {
                             // This is where you can access and print the response body
-                            println("Response Body: $message")
+                            if (BuildConfig.DEBUG) {
+                                println("Response Body: $message")
+                            }
                             super.onMessage(message)
                         }
                     },

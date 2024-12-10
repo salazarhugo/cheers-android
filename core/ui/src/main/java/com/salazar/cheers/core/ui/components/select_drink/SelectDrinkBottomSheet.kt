@@ -32,7 +32,14 @@ fun SelectDrinkBottomSheet(
         containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
         shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         onDismissRequest = onDismiss,
-        windowInsets = WindowInsets(0, WindowInsets.statusBars.getTop(LocalDensity.current),0,0),
+        contentWindowInsets = {
+            WindowInsets(
+                0,
+                WindowInsets.statusBars.getTop(LocalDensity.current),
+                0,
+                0
+            )
+        },
     ) {
         SelectDrinkScreen(
             drinks = drinks,

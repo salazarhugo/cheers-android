@@ -12,28 +12,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Bloodtype
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.HeartBroken
+import androidx.compose.material.icons.outlined.MotionPhotosOff
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -57,16 +55,15 @@ import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
-import com.salazar.cheers.core.ui.components.post.PostMedia
 import com.salazar.cheers.core.ui.components.post.PostDrink
 import com.salazar.cheers.core.ui.components.post.PostHeader
-import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.components.post.PostMedia
+import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.feature.create_post.components.SelectLocationComponent
-import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
-import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -93,6 +90,9 @@ fun CreatePostScreenStateful(
         isLoading = uiState.isLoading,
         location = uiState.location,
         locationResults = uiState.locationResults,
+        likesEnabled = uiState.likesEnabled,
+        commentsEnabled = uiState.commentsEnabled,
+        shareEnabled = uiState.shareEnabled,
     )
 }
 
@@ -111,7 +111,10 @@ fun CreatePostScreen(
     account: Account? = null,
     medias: List<Media> = emptyList(),
     drinks: List<Drink> = emptyList(),
-    notificationEnabled: Boolean = true,
+    notificationEnabled: Boolean,
+    likesEnabled: Boolean,
+    commentsEnabled: Boolean,
+    shareEnabled: Boolean,
     isLoading: Boolean = false,
     onUploadPost: () -> Unit = {},
     onCreatePostUIAction: (CreatePostUIAction) -> Unit = {},
@@ -257,10 +260,56 @@ fun CreatePostScreen(
 
             HorizontalDivider()
             SwitchPreference(
-                text = "Send notification to friends",
-                checked = notificationEnabled,
+                text = "Turn off notifications",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Outlined.NotificationsOff,
+                        contentDescription = "Notifications off"
+                    )
+                },
+                checked = !notificationEnabled,
                 onCheckedChange = {
-                    onCreatePostUIAction(CreatePostUIAction.OnNotificationChange(it))
+                    onCreatePostUIAction(CreatePostUIAction.OnNotificationChange(!it))
+                },
+            )
+            HorizontalDivider()
+            SwitchPreference(
+                text = "Turn off liking",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Outlined.HeartBroken,
+                        contentDescription = "Likes off"
+                    )
+                },
+                checked = !likesEnabled,
+                onCheckedChange = {
+                    onCreatePostUIAction(CreatePostUIAction.OnEnableLikesChange(it.not()))
+                },
+            )
+            SwitchPreference(
+                text = "Turn off commenting",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Outlined.MotionPhotosOff,
+                        contentDescription = "Comments off",
+                    )
+                },
+                checked = !commentsEnabled,
+                onCheckedChange = {
+                    onCreatePostUIAction(CreatePostUIAction.OnEnableCommentsChange(it.not()))
+                },
+            )
+            SwitchPreference(
+                text = "Turn off sharing",
+                checked = !shareEnabled,
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Send,
+                        contentDescription = "Sharing off",
+                    )
+                },
+                onCheckedChange = {
+                    onCreatePostUIAction(CreatePostUIAction.OnEnableShareChange(it.not()))
                 },
             )
         }
@@ -316,6 +365,10 @@ private fun CreatePostScreenPreview() {
                 name = "Cheers Social",
             ),
             privacy = Privacy.FRIENDS,
+            commentsEnabled = true,
+            shareEnabled = true,
+            likesEnabled = true,
+            notificationEnabled = true,
         )
     }
 }
@@ -458,57 +511,55 @@ fun DrunkennessLevelSection(
 }
 
 @Composable
-fun CreatePostTopBar(
-    onDismiss: () -> Unit,
-    onShare: () -> Unit,
-    isLoading: Boolean,
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = "New post",
-                fontWeight = FontWeight.Bold,
-                fontFamily = Roboto,
-            )
-        },
-        navigationIcon = {
-            IconButton(
-                onClick = onDismiss,
-            ) {
-                Icon(Icons.Default.Close, null)
-            }
-        },
-        actions = {}
-    )
-}
-
-@Composable
 fun SwitchPreference(
     checked: Boolean,
     text: String,
+    subtext: String = String(),
+    icon: (@Composable () -> Unit)? = null,
     onCheckedChange: (Boolean) -> Unit = {},
 ) {
     Row(
         modifier = Modifier
+            .clickable { onCheckedChange(checked.not()) }
             .padding(horizontal = 15.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp))
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            if (icon != null) {
+                icon()
+            }
+            Column {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
+                )
+                if (subtext.isNotBlank()) {
+                    Text(
+                        text = subtext,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
+        }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             thumbContent = {
-                when (checked) {
-                    true -> Icon(
-                        imageVector = Icons.Default.NotificationsActive,
-                        contentDescription = null,
-                        modifier = Modifier.size(androidx.compose.material3.SwitchDefaults.IconSize),
-                    )
-
-                    false -> Unit
-                }
+//                when (checked) {
+//                    true -> Icon(
+//                        imageVector = Icons.Default.NotificationsActive,
+//                        contentDescription = null,
+//                        modifier = Modifier.size(androidx.compose.material3.SwitchDefaults.IconSize),
+//                    )
+//
+//                    false -> Unit
+//                }
             }
         )
     }

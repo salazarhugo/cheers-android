@@ -17,8 +17,8 @@ dependencies {
     implementation(projects.data.note)
     implementation(projects.data.post)
     implementation(projects.data.user)
-
     implementation(projects.domain)
+    implementation(projects.feature.parties)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -30,7 +30,7 @@ dependencies {
     // Jetpack Compose
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.activity.compose)
-    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation(libs.runtime.livedata)
 
     // Coil
     implementation(libs.coil.compose)
@@ -46,6 +46,9 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)
+
+    // Confetti
+    implementation(libs.konfetti.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

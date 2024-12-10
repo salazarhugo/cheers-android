@@ -19,6 +19,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.Modifier
 import com.salazar.cheers.shared.util.result.getOrThrow
 import com.snap.creativekit.SnapCreative
@@ -81,6 +82,18 @@ object Utils {
         } else {
             this
         }
+    }
+
+    fun Modifier.clickableIf(
+        condition: Boolean,
+        onClick: () -> Unit,
+    ): Modifier {
+        return conditional(
+            condition = condition,
+            modifier = {
+                clickable { onClick() }
+            }
+        )
     }
 
     fun String.validateUsername(): Boolean {
@@ -192,7 +205,7 @@ object Utils {
         return output
     }
 
-    public fun extractImage(
+    fun extractImage(
         path: Uri,
         applicationContext: Context,
     ): ByteArray {

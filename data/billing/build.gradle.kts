@@ -19,7 +19,7 @@ dependencies {
     implementation(projects.core.util)
 
     // Google Billing
-    implementation(libs.billing.ktx)
+    api(libs.billing.ktx)
 
     // Moshi
     implementation(libs.converter.moshi)

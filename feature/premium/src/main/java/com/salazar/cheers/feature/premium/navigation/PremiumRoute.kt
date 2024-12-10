@@ -21,6 +21,7 @@ fun PremiumRoute(
     val state = rememberRefreshLayoutState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val activity = LocalActivity.current
 
     LaunchedEffect(uiState.isRefreshing) {
         if (!uiState.isRefreshing) {
@@ -34,10 +35,7 @@ fun PremiumRoute(
         uiState = uiState,
         onBackPressed = onBackPressed,
         onSubscribeClick = {
-            val activity = context.getActivity()
-            if (activity != null) {
-                viewModel.onSubscribeClick(activity)
-            }
+            viewModel.onSubscribeClick(activity)
         },
     )
 }

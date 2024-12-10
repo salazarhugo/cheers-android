@@ -33,6 +33,9 @@ fun PostResponse.toPost(): Post {
         lastCommentText = post.lastCommentText,
         lastCommentUsername = post.lastCommentUsername,
         lastCommentCreateTime = post.lastCommentCreateTime,
+        canComment = post.commentsEnabled,
+        canLike = post.likesEnabled,
+        canShare = post.sharesEnabled,
     )
 }
 
@@ -64,5 +67,8 @@ fun PostResponse.asEntity(): PostEntity {
         lastCommentText = post.lastCommentText,
         lastCommentUsername = post.lastCommentUsername,
         lastCommentCreateTime = post.lastCommentCreateTime,
+        canComment = post.commentsEnabled,
+        canLike = post.likesEnabled,
+        canShare = post.sharesEnabled,
     )
 }

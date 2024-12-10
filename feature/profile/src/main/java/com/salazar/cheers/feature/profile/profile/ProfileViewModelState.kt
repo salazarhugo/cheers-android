@@ -12,7 +12,6 @@ internal data class ProfileViewModelState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val errorMessages: String = "",
-    val sheetState: SheetState = SheetState(true),
 ) {
     fun toUiState(): ProfileUiState {
         return when (user != null) {
@@ -22,7 +21,6 @@ internal data class ProfileViewModelState(
                 parties = parties,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
-                sheetState = sheetState,
                 isRefreshing = isRefreshing,
             )
 
@@ -30,7 +28,6 @@ internal data class ProfileViewModelState(
                 ProfileUiState.NoAccount(
                     isLoading = isLoading,
                     errorMessages = errorMessages,
-                    sheetState = sheetState,
                     isRefreshing = isRefreshing,
                 )
             }

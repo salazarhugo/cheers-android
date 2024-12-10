@@ -5,23 +5,23 @@ import cheers.note.v1.DeleteNoteRequest
 import cheers.note.v1.ListFriendNoteRequest
 import cheers.note.v1.NoteServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.core.model.Note
-import com.salazar.cheers.core.model.NoteType
-import com.salazar.cheers.core.db.dao.NoteDao
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
+import com.salazar.cheers.core.model.Note
+import com.salazar.cheers.core.model.NoteType
 import com.salazar.cheers.data.note.mapper.toNote
 import com.salazar.cheers.data.note.mapper.toNoteTypePb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
     private val dao: com.salazar.cheers.core.db.dao.NoteDao,
     private val service: NoteServiceGrpcKt.NoteServiceCoroutineStub,
-): NoteRepository {
+) : NoteRepository {
     override suspend fun createNote(
         text: String?,
         type: NoteType,
@@ -49,7 +49,9 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getNote(userID: String): Flow<Note> {
-        return dao.getNote(userID = userID).map { it.asExternalModel() }
+        return dao.getNote(userID = userID).mapNotNull {
+            it?.asExternalModel()
+        }
     }
 
     override suspend fun getYourNote(): Flow<Note> {
@@ -57,7 +59,7 @@ class NoteRepositoryImpl @Inject constructor(
         return getNote(userID = uid)
     }
 
-    override fun listFriendNotes(): Flow<List<Note>>  {
+    override fun listFriendNotes(): Flow<List<Note>> {
         return dao.listNotes().map { it.asExternalModel() }
     }
 

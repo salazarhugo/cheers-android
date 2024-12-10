@@ -12,7 +12,16 @@ import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.friendship.v1.ListFriendRequest
 import cheers.notification.v1.CreateRegistrationTokenRequest
 import cheers.notification.v1.NotificationServiceGrpcKt
-import cheers.user.v1.*
+import cheers.user.v1.BlockUserRequest
+import cheers.user.v1.CheckUsernameRequest
+import cheers.user.v1.CreateUserRequest
+import cheers.user.v1.GetUserRequest
+import cheers.user.v1.ListFollowersRequest
+import cheers.user.v1.ListFollowingRequest
+import cheers.user.v1.ListSuggestionsRequest
+import cheers.user.v1.SearchUserRequest
+import cheers.user.v1.UpdateUserRequest
+import cheers.user.v1.UserServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.db.dao.UserDao
 import com.salazar.cheers.core.db.dao.UserItemDao
@@ -101,16 +110,6 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             return Result.failure(e)
-        }
-    }
-
-    override suspend fun insertRecent(username: String) = withContext(Dispatchers.IO) {
-        try {
-            val user = userDao.getUser(userIdOrUsername = username)
-//            cheersDao.insertRecentUser(recentUser)
-        } catch (e: Exception) {
-            val user = userDao.getUserSuggestion(username = username) ?: return@withContext
-//            cheersDao.insertRecentUser(recentUser)
         }
     }
 
@@ -265,7 +264,7 @@ class UserRepositoryImpl @Inject constructor(
                 .setBio(bio)
                 .setName(name)
                 .setWebsite(website)
-                .setFavouriteDrinkId(favouriteDrinkId)
+                .setFavouriteDrinkId(favouriteDrinkId.orEmpty())
                 .build()
 
             val response = userService.updateUser(request)

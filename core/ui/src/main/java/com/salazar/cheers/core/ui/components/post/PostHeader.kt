@@ -4,13 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import com.salazar.cheers.core.ui.ui.Username
+import com.salazar.cheers.core.util.relativeTimeFormatter
 import java.util.Date
 
 @Composable
@@ -56,41 +55,42 @@ fun PostHeader(
                 size = 33.dp,
                 onClick = onUserClick,
             )
-            Spacer(Modifier.width(8.dp))
             Column(
+                modifier = Modifier.padding(horizontal = 8.dp),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Username(
-                        username = username,
-                        verified = verified,
-                        textStyle = MaterialTheme.typography.bodyMedium,
-                        color = color,
-                        onClick = onUserClick,
-                    )
-                }
+                Username(
+                    username = username,
+                    verified = verified,
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    color = color,
+                    onClick = onUserClick,
+                )
                 if (!locationName.isNullOrBlank()) {
-                    Text(text = locationName, style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        text = locationName,
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = com.salazar.cheers.core.util.relativeTimeFormatter(seconds = createTime),
+                text = relativeTimeFormatter(seconds = createTime),
                 style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.padding(end = 8.dp),
                 color = color,
             )
-            if (isPublic)
+            if (isPublic) {
                 Icon(
                     imageVector = Icons.Default.Public,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp),
                     tint = MaterialTheme.colorScheme.primary,
                 )
+            }
             Icon(
                 imageVector = Icons.Default.MoreHoriz,
                 contentDescription = null,

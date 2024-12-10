@@ -1,7 +1,6 @@
 package com.salazar.cheers.data.user.datastore
 
 import android.content.Context
-import android.hardware.biometrics.BiometricPrompt
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -27,12 +26,24 @@ class DataStoreRepository @Inject constructor(
     val userPreferencesFlow: Flow<Settings> = settingsStore.data
         .catch { exception ->
             if (exception is IOException) {
-                Log.e(TAG, "Error reading sort order preferences.", exception)
+                Log.e(TAG, "Error reading user preferences.", exception)
                 emit(Settings.getDefaultInstance())
             } else {
                 throw exception
             }
         }
+
+    fun getSelectedHomeTab(): Flow<Int> {
+        return userPreferencesFlow.map { it.selectedHomeTab }
+    }
+
+    fun getCity(): Flow<String> {
+        return userPreferencesFlow.map { it.city }
+    }
+
+    fun getLocationEnabled(): Flow<Boolean> {
+        return userPreferencesFlow.map { it.autoLocationEnabled }
+    }
 
     fun getBiometricEnabled(): Flow<Boolean> {
         return userPreferencesFlow.map { it.hasBiometric }
@@ -44,6 +55,24 @@ class DataStoreRepository @Inject constructor(
 
     fun getUsername(): Flow<String> {
         return userPreferencesFlow.map { it.username }
+    }
+
+    suspend fun updateSelectedHomeTab(selectedHomeTab: Int) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setSelectedHomeTab(selectedHomeTab).build()
+        }
+    }
+
+    suspend fun updateCity(city: String) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setCity(city).build()
+        }
+    }
+
+    suspend fun updateLocationEnabled(autoLocationEnabled: Boolean) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setAutoLocationEnabled(autoLocationEnabled).build()
+        }
     }
 
     suspend fun updateUsername(username: String) {

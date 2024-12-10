@@ -12,16 +12,17 @@ fun PartiesRoute(
     navigateToPartyMoreSheet: (String) -> Unit,
     navigateToTickets: () -> Unit,
     navigateToCreateParty: () -> Unit,
+    onChangeCityClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     PartiesScreen(
         uiState = uiState,
         onPartyClicked = navigateToPartyDetail,
-        onQueryChange = viewModel::onQueryChange,
         onMoreClick = navigateToPartyMoreSheet,
         onSwipeToRefresh = viewModel::onSwipeToRefresh,
         navigateToTickets = navigateToTickets,
         onCreatePartyClick = navigateToCreateParty,
+        onChangeCityClick = onChangeCityClick,
     )
 }

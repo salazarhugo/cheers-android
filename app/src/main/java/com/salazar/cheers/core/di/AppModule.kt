@@ -1,6 +1,7 @@
 package com.salazar.cheers.core.di
 
 import android.content.Context
+import android.location.Geocoder
 import androidx.work.WorkManager
 import cheers.account.v1.AccountServiceGrpcKt
 import cheers.activity.v1.ActivityServiceGrpcKt
@@ -15,6 +16,7 @@ import cheers.note.v1.NoteServiceGrpcKt
 import cheers.notification.v1.NotificationServiceGrpcKt
 import cheers.party.v1.PartyServiceGrpcKt
 import cheers.post.v1.PostServiceGrpcKt
+import cheers.search.v1.SearchServiceGrpcKt
 import cheers.story.v1.StoryServiceGrpcKt
 import cheers.ticket.v1.TicketServiceGrpcKt
 import cheers.user.v1.UserServiceGrpcKt
@@ -64,6 +66,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    fun provideGeocoder(
+        @ApplicationContext context: Context,
+    ): Geocoder {
+        return Geocoder(context)
+    }
+
     @Singleton
     @Provides
     fun provideWorkManager(
@@ -77,7 +87,7 @@ object AppModule {
     fun provideFirebaseUserIdTokenInterceptor(
         getIdTokenUseCase: GetIdTokenUseCase,
     ): FirebaseUserIdTokenInterceptor {
-       return FirebaseUserIdTokenInterceptor(getIdTokenUseCase)
+        return FirebaseUserIdTokenInterceptor(getIdTokenUseCase)
     }
 
     @Singleton
@@ -201,6 +211,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSearchServiceCoroutineStub(
+        managedChannel: ManagedChannel,
+        tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
+    ): SearchServiceGrpcKt.SearchServiceCoroutineStub {
+        return SearchServiceGrpcKt
+            .SearchServiceCoroutineStub(managedChannel)
+            .withInterceptors(tokenInterceptor, loggerInterceptor)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
@@ -248,9 +270,11 @@ object AppModule {
     fun provideLocationServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): LocationServiceGrpcKt.LocationServiceCoroutineStub {
         return LocationServiceGrpcKt
             .LocationServiceCoroutineStub(managedChannel)
+            .withInterceptors(loggerInterceptor)
             .withInterceptors(tokenInterceptor)
     }
 
@@ -379,9 +403,7 @@ object AppModule {
     ): UserServiceGrpcKt.UserServiceCoroutineStub {
         return UserServiceGrpcKt
             .UserServiceCoroutineStub(managedChannel)
-            .withInterceptors(loggerInterceptor)
-            .withInterceptors(tokenInterceptor)
-            .withInterceptors()
+            .withInterceptors(tokenInterceptor, loggerInterceptor)
     }
 
     @Provides
@@ -398,7 +420,6 @@ object AppModule {
                 if (BuildConfig.DEBUG)
                     return withInterceptors(loggerInterceptor)
             }
-            .withInterceptors()
     }
 
     @Provides
@@ -428,7 +449,11 @@ object AppModule {
     @Provides
     fun provideDb(@ApplicationContext context: Context): CheersDatabase {
         return androidx.room.Room
-            .databaseBuilder(context.applicationContext, com.salazar.cheers.core.db.CheersDatabase::class.java, "cheers.db")
+            .databaseBuilder(
+                context.applicationContext,
+                CheersDatabase::class.java,
+                "cheers.db"
+            )
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -436,7 +461,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideNoteDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.NoteDao {
         return cheersDatabase.noteDao()
     }
@@ -444,7 +469,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideDrinkDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.DrinkDao {
         return cheersDatabase.drinkDao()
     }
@@ -452,7 +477,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideFriendRequestDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.FriendRequestDao {
         return cheersDatabase.friendRequestDao()
     }
@@ -460,7 +485,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideCommentDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.CommentDao {
         return cheersDatabase.commentDao()
     }
@@ -468,7 +493,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTicketDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.TicketDao {
         return cheersDatabase.ticketDao()
     }
@@ -476,7 +501,7 @@ object AppModule {
     @Singleton
     @Provides
     fun providePartyDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.PartyDao {
         return cheersDatabase.partyDao()
     }
@@ -484,7 +509,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideActivityDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.ActivityDao {
         return cheersDatabase.activityDao()
     }
@@ -492,7 +517,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideUserStatsDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.UserStatsDao {
         return cheersDatabase.userStatsDao()
     }
@@ -500,7 +525,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideStoryDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): StoryDao {
         return cheersDatabase.storyDao()
     }
@@ -508,7 +533,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideUserDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.UserDao {
         return cheersDatabase.userDao()
     }
@@ -516,7 +541,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideUserItemDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.UserItemDao {
         return cheersDatabase.userItemDao()
     }
@@ -524,7 +549,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideChatDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.ChatDao {
         return cheersDatabase.chatDao()
     }
@@ -532,7 +557,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideUserPreferenceDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): UserPreferenceDao {
         return cheersDatabase.userPreferenceDao()
     }
@@ -540,7 +565,7 @@ object AppModule {
     @Singleton
     @Provides
     fun providePostDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): com.salazar.cheers.core.db.dao.PostDao {
         return cheersDatabase.postDao()
     }
@@ -548,7 +573,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideCheersDao(
-        cheersDatabase: com.salazar.cheers.core.db.CheersDatabase,
+        cheersDatabase: CheersDatabase,
     ): CheersDao {
         return cheersDatabase.cheersDao()
     }

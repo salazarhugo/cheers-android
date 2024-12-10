@@ -39,6 +39,7 @@ class TokenInterceptor @Inject constructor(
                         Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER),
                         format("Bearer %s", idToken)
                     )
+                    println("xxx $headers")
                 }
                 delegate().start(responseListener, headers)
             }

@@ -20,8 +20,9 @@ fun ActivityRoute(
 
     ActivityScreen(
         uiState = uiState,
+        onFilterClick = viewModel::onFilterClick,
         onActivityUIAction = { action ->
-            when(action) {
+            when (action) {
                 is ActivityUIAction.OnActivityClick -> {
                     when (action.activity.type) {
                         ActivityType.NONE -> {}
@@ -43,6 +44,7 @@ fun ActivityRoute(
                         ActivityType.CREATE_EVENT -> {}
                         ActivityType.CREATE_STORY -> {}
                         ActivityType.COMMENT_LIKED -> {}
+                        ActivityType.INFORMATION -> Unit
                     }
                 }
 

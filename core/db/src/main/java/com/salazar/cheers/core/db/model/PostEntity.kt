@@ -50,6 +50,9 @@ data class PostEntity(
     val lastCommentText: String = String(),
     val lastCommentUsername: String = String(),
     val lastCommentCreateTime: Long = 0,
+    val canLike: Boolean = true,
+    val canComment: Boolean = true,
+    val canShare: Boolean = true,
 )
 
 fun PostEntity.asExternalModel() = Post(
@@ -87,6 +90,9 @@ fun PostEntity.asExternalModel() = Post(
     lastCommentText = lastCommentText,
     lastCommentUsername = lastCommentUsername,
     lastCommentCreateTime = lastCommentCreateTime,
+    canComment = canComment,
+    canLike = canLike,
+    canShare = canShare,
 )
 
 fun Post.asEntity(): PostEntity {
@@ -125,6 +131,9 @@ fun Post.asEntity(): PostEntity {
         lastCommentText = lastCommentText,
         lastCommentUsername = lastCommentUsername,
         lastCommentCreateTime = lastCommentCreateTime,
+        canComment = canComment,
+        canLike = canLike,
+        canShare = canShare,
     )
 }
 

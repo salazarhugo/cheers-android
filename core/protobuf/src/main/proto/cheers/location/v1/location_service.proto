@@ -31,6 +31,20 @@ service LocationService {
       get: "/v1/locations/geocode"
     };
   }
+
+  rpc TextSearch (TextSearchRequest) returns (TextSearchResponse) {
+    option (google.api.http) = {
+      get: "/v1/locations/search"
+    };
+  }
+}
+
+message TextSearchRequest {
+  string query = 1;
+}
+
+message TextSearchResponse {
+  repeated Location locations = 1;
 }
 
 message GeocodeRequest {
@@ -47,6 +61,7 @@ message Location {
   string type = 2;
   double latitude = 3;
   double longitude = 4;
+  string city = 5;
 }
 
 message ListFriendLocationRequest {

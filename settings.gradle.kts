@@ -1,14 +1,14 @@
 pluginManagement {
     includeBuild("build-logic")
     repositories {
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
         google()
         mavenCentral()
@@ -88,3 +88,11 @@ include(":data:map")
 include(":data:chat")
 include(":core:db")
 include(":feature:premium")
+
+check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
+    """
+    Cheers requires JDK 17+ but it is currently using JDK ${JavaVersion.current()}.
+    Java Home: [${System.getProperty("java.home")}]
+    https://developer.android.com/build/jdks#jdk-config-in-studio
+    """.trimIndent()
+}

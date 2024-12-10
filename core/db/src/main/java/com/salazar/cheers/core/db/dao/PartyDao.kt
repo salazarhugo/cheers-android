@@ -1,9 +1,16 @@
 package com.salazar.cheers.core.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.salazar.cheers.core.db.model.PartyEntity
 import com.salazar.cheers.core.model.WatchStatus
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface PartyDao{
@@ -11,18 +18,18 @@ interface PartyDao{
     fun getEventT(eventId: String): PartyEntity
 
     @Query("SELECT * FROM events WHERE eventId = :eventId")
-    fun getEvent(eventId: String): Flow<PartyEntity>
+    fun getEvent(eventId: String): Flow<PartyEntity?>
 
     @Query("SELECT * FROM events WHERE hostId = :accountId")
     fun getEvents(accountId: String = ""): Flow<List<PartyEntity>>
 
     @Query("""
         SELECT * FROM events 
+        WHERE endDate > :now
+        ORDER BY events.startDate ASC
         """)
-//        AND startDate > :now
-//        ORDER BY events.startDate ASC
     fun feedParty(
-//        now: Long = Date().time / 1000,
+        now: Long = Date().time / 1000,
     ): Flow<List<PartyEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

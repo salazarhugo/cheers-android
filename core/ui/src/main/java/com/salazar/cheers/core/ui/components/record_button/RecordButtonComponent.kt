@@ -1,6 +1,7 @@
 package com.salazar.cheers.core.ui.components.record_button
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -12,9 +13,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.core.ui.animations.Bounce
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
@@ -38,28 +39,35 @@ fun RecordButtonComponent(
         false -> 7.dp
     }
 
-    Bounce(
-        modifier = modifier,
-        onBounce =  onClick,
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = Color.Transparent,
-            shadowElevation = 0.dp,
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(80.dp)
-                .border(4.dp, borderColor, CircleShape)
-                .padding(padding)
-                .drawBehind {
-                    if (isRecording) {
-                        drawRoundRect(color = color, cornerRadius = CornerRadius(16f))
-                    } else {
-                        drawCircle(color = color)
-                    }
+    Surface(
+        shape = CircleShape,
+        color = Color.Transparent,
+        shadowElevation = 0.dp,
+        modifier = Modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        onClick()
+                        val released = tryAwaitRelease()
+
+                        if (released) {
+                            onClick()
+                        }
+                    },
+                )
+            }
+            .clip(CircleShape)
+            .size(80.dp)
+            .border(4.dp, borderColor, CircleShape)
+            .padding(padding)
+            .drawBehind {
+                if (isRecording) {
+                    drawRoundRect(color = color, cornerRadius = CornerRadius(16f))
+                } else {
+                    drawCircle(color = color)
                 }
-        ) {}
-    }
+            }
+    ) {}
 }
 
 @ComponentPreviews

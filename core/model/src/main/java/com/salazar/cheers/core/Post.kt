@@ -41,5 +41,8 @@ data class Post(
     val lastCommentText: String = String(),
     val lastCommentUsername: String = String(),
     val lastCommentCreateTime: Long = 0,
+    val canLike: Boolean = true,
+    val canComment: Boolean = true,
+    val canShare: Boolean = true,
 )
 

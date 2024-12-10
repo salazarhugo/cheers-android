@@ -4,8 +4,10 @@ package com.salazar.cheers.feature.map.screens.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import androidx.compose.material3.SheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
@@ -26,8 +28,8 @@ fun MapRoute(
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val sheetState  = SheetState(skipPartiallyExpanded = true, LocalDensity.current)
     val scope = rememberCoroutineScope()
 
     val paris = Point.fromLngLat(2.3522, 48.8566)
@@ -55,6 +57,7 @@ fun MapRoute(
         is MapUiState.Initialized -> {
             MapScreen(
                 uiState = uiState,
+                sheetState = sheetState,
                 mapViewportState = mapViewportState,
                 onMapUIAction = { action ->
                     when (action) {
@@ -89,7 +92,7 @@ fun MapRoute(
                             val post = action.post
 
                             scope.launch {
-                                uiState.sheetState.expand()
+                                sheetState.expand()
                             }
 
                             val point = Point.fromLngLat(
@@ -115,7 +118,7 @@ fun MapRoute(
                             val userLocation = action.userLocation
 
                             scope.launch {
-                                uiState.sheetState.expand()
+                                sheetState.expand()
                             }
 
                             val point = Point.fromLngLat(

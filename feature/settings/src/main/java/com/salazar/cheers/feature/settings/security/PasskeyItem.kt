@@ -29,7 +29,7 @@ fun PasskeyItem(
     onClick: () -> Unit = {},
 ) {
     val deviceText = "Stored on your ${credential.deviceName}"
-    val lastUsedText = "Last used ${dateTimeFormatter(timestamp = credential.lastUsed)}"
+    val lastUsedText = "Last used ${dateTimeFormatter(startTimestamp = credential.lastUsed)}"
 
     Card(
         modifier = modifier,

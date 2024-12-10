@@ -15,13 +15,22 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun RequestPermission(
     permission: String,
+    onGranted: () -> Unit = {},
+    onDenied: () -> Unit = {},
 ) {
     val permissionState = rememberPermissionState(
-        permission
+        permission = permission,
+        onPermissionResult = {
+            if (it) {
+                onGranted()
+            } else {
+                onDenied()
+            }
+        }
     )
 
     when (permissionState.status) {
-        PermissionStatus.Granted -> {}
+        PermissionStatus.Granted -> Unit
         is PermissionStatus.Denied -> {
             Column {
                 if ((permissionState.status as PermissionStatus.Denied).shouldShowRationale) {

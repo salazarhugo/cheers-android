@@ -90,7 +90,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                 authRepository.finishLogin(
                     username = username,
                     passkey = response.toPasskey(),
-                    challenge = beginLoginResponse.challenge,
+                    challenge = beginLoginResponse.publicKey.challenge,
                 ).fold(
                     onSuccess = { response ->
                         accountRepository.putAccount(

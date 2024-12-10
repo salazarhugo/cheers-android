@@ -1,10 +1,7 @@
 import com.salazar.cheers.build_logic.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
 
 class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -12,7 +9,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             pluginManager.apply {
                 apply("cheers.android.library")
                 apply("cheers.android.hilt")
-//                apply("org.jetbrains.kotlin.plugin.serialization")
+                apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
             dependencies {
@@ -35,6 +32,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                     libs.findLibrary("androidx.lifecycle.lifecycle.viewmodel.ktx").get()
                 )
                 add("implementation", libs.findLibrary("androidx.lifecycle.runtime.compose").get())
+                add("implementation", libs.findLibrary("androidx.navigation.compose").get())
 
                 add("testImplementation", libs.findLibrary("junit").get())
                 add("androidTestImplementation", libs.findLibrary("androidx.junit").get())

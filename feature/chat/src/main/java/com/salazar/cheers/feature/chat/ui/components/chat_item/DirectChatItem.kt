@@ -87,7 +87,7 @@ fun DirectChatComponent(
                     if (channel.status != ChatStatus.EMPTY) {
                         val subtitle = buildAnnotatedString {
                             append("  •  ")
-                            append(relativeTimeFormatterMilli(milliSeconds = channel.lastMessageTime))
+                            append(relativeTimeFormatterMilli(value = channel.lastMessageTime))
                         }
                         val fontWeight = when (channel.status) {
                             ChatStatus.NEW -> FontWeight.Bold

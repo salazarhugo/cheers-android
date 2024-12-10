@@ -1,8 +1,8 @@
 package com.salazar.cheers.core.ui.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,8 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.SubcomposeAsyncImage
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
-import com.salazar.cheers.core.ui.components.circular_progress.CircularProgressComponent
 import com.salazar.cheers.core.ui.components.image.InspectionAwareComponent
+import com.salazar.cheers.core.ui.modifier.cheersShimmer
 
 @Composable
 fun PrettyImage(
@@ -42,8 +42,8 @@ fun PrettyImage(
             contentDescription = contentDescription,
             loading = {
                 Box {
-                    CircularProgressComponent(
-                        modifier = Modifier.align(Alignment.Center),
+                    Spacer(
+                        modifier = modifier.cheersShimmer(true),
                     )
                 }
             },

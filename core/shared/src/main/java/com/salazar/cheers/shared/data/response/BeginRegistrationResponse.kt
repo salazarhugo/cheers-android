@@ -5,7 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class BeginRegistrationResponse(
-    val userId: String,
-    val challenge: String,
+    val publicKey: PublicKeyCredential,
 )
 

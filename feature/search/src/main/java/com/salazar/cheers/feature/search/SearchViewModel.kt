@@ -2,10 +2,10 @@ package com.salazar.cheers.feature.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.model.RecentUser
-import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.cheers.core.model.UserSuggestion
-import com.salazar.cheers.shared.util.Resource
+import com.salazar.cheers.core.model.RecentSearch
+import com.salazar.cheers.core.model.SearchResult
+import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,20 +16,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-data class SearchUiState(
-    val name: String = "",
-    val users: List<com.salazar.cheers.core.model.UserItem>? = null,
-    val suggestions: List<UserSuggestion> = emptyList(),
-    val recentUsers: List<RecentUser> = emptyList(),
-    val isLoading: Boolean = false,
-    val errorMessage: String = "",
-    val searchInput: String = "",
-)
+sealed interface SearchResultState {
+    data object Loading : SearchResultState
+    data class SearchResults(val searchResult: SearchResult) :
+        SearchResultState
+}
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val userRepositoryImpl: UserRepositoryImpl,
+    private val searchUseCases: SearchUseCases,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(SearchUiState(isLoading = true))
@@ -50,11 +45,14 @@ class SearchViewModel @Inject constructor(
 
     private fun updateRecentUser() {
         viewModelScope.launch {
-//            cheersDao.getRecentUsers().collect { recentUsers ->
-//                viewModelState.update {
-//                    it.copy(recentUsers = recentUsers)
-//                }
-//            }
+            searchUseCases.getRecentSearchUseCase()
+                .collect(::updateRecentSearches)
+        }
+    }
+
+    fun updateRecentSearches(recentSearches: List<RecentSearch>) {
+        viewModelState.update {
+            it.copy(recentSearch = recentSearches)
         }
     }
 
@@ -78,53 +76,62 @@ class SearchViewModel @Inject constructor(
         query: String = uiState.value.searchInput.lowercase(),
         fetchFromRemote: Boolean = true,
     ) {
+        updateSearchResultState(SearchResultState.Loading)
         viewModelScope.launch {
-            userRepositoryImpl
-                .queryUsers(fetchFromRemote = fetchFromRemote, query = query)
+            searchUseCases.searchUseCase(query)
                 .collect { result ->
                     when (result) {
-                        is Resource.Success -> updateUsers(users = result.data)
-                        is Resource.Loading -> updateIsLoading(result.isLoading)
-                        is Resource.Error -> Unit
+                        is Result.Error -> Unit
+                        is Result.Success -> updateSearchResultState(
+                            SearchResultState.SearchResults(searchResult = result.data)
+                        )
                     }
                 }
         }
     }
 
-    fun updateIsLoading(isLoading: Boolean) {
+    private fun updateIsLoading(isLoading: Boolean) {
         viewModelState.update {
             it.copy(isLoading = isLoading)
         }
     }
 
-    private fun updateUsers(users: List<com.salazar.cheers.core.model.UserItem>?) {
+    private fun updateSearchResultState(searchResultState: SearchResultState) {
         viewModelState.update {
-            it.copy(users = users)
+            it.copy(searchResultState = searchResultState)
         }
     }
 
-    fun deleteRecentUser(user: RecentUser) {
-//        viewModelScope.launch {
-//            cheersDao.deleteRecentUser(user)
-//        }
+    fun deleteRecentSearch(search: RecentSearch) {
+        viewModelScope.launch {
+            searchUseCases.deleteRecentSearchUseCase(search)
+        }
     }
 
     fun toggleFollow(username: String) {
     }
 
-    fun insertRecentUser(username: String) {
+    fun insertRecentUser(user: UserItem) {
         viewModelScope.launch {
-            userRepositoryImpl.insertRecent(username)
+            val recentSearch = RecentSearch.User(user = user)
+            searchUseCases.createRecentUserUseCase(recentSearch)
         }
     }
 
     private fun refreshSuggestions() {
         viewModelScope.launch {
-            userRepositoryImpl.getSuggestions().collect { suggestions ->
-                viewModelState.update {
-                    it.copy(suggestions = suggestions)
-                }
-            }
+//            userRepositoryImpl.getSuggestions().collect { suggestions ->
+//                viewModelState.update {
+//                    it.copy(suggestions = suggestions)
+//                }
+//            }
+        }
+    }
+
+    fun onSearch(query: String) {
+        viewModelScope.launch {
+            val recentSearch = RecentSearch.Text(text = query)
+            searchUseCases.createRecentUserUseCase(recentSearch)
         }
     }
 }

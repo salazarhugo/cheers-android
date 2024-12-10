@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,12 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.salazar.cheers.core.ui.ShareButton
-import com.salazar.cheers.feature.parties.ui.PartyDetails
-import androidx.compose.material3.HorizontalDivider
 import com.salazar.cheers.core.ui.ui.LoadingScreen
-import com.salazar.cheers.ui.main.party.create.CategorySection
-import com.salazar.cheers.ui.main.party.create.Description
-import com.salazar.cheers.ui.main.party.create.TopAppBar
+import com.salazar.cheers.core.ui.ui.Toolbar
+import com.salazar.cheers.feature.parties.ui.PartyDetails
+import com.salazar.cheers.ui.main.party.create.recap.AddDescriptionItem
 
 @Composable
 fun EditEventScreen(
@@ -33,7 +32,10 @@ fun EditEventScreen(
     else
         Scaffold(
             topBar = {
-                TopAppBar(title = "Edit event", onDismiss = onDismiss)
+                Toolbar(
+                    title = "Edit event",
+                    onBackPressed = onDismiss,
+                )
             },
         ) {
             Column(
@@ -57,14 +59,8 @@ fun EditEventScreen(
                     onPartyDetailsClick = {}
                 )
                 HorizontalDivider()
-                Description(
-                    description = event.description,
+                AddDescriptionItem(
                     onDescriptionClick = {}
-                )
-                HorizontalDivider()
-                CategorySection(
-                    category = "",
-                    onClick = {},
                 )
                 HorizontalDivider()
                 ShareButton(

@@ -3,10 +3,16 @@ package com.salazar.cheers.feature.parties.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.WatchStatus
+import com.salazar.cheers.data.party.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -50,11 +56,12 @@ private data class PartyDetailViewModelState(
 @HiltViewModel
 class PartyDetailViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
+    private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
+    private val partyDetailScreen = stateHandle.toRoute<PartyDetailScreen>()
     private val viewModelState = MutableStateFlow(PartyDetailViewModelState(isLoading = true))
-    private lateinit var partyId: String
+    private var partyId: String = partyDetailScreen.partyID
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -65,12 +72,17 @@ class PartyDetailViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>(PARTY_ID)?.let { partyId ->
-            this.partyId = partyId
-            viewModelScope.launch {
-                partyRepository.getParty(partyId = partyId).collect { party ->
-                    onPartyChange(party = party)
-                }
+        viewModelScope.launch {
+            partyRepository.getParty(partyId = partyId).collect { party ->
+                onPartyChange(party = party)
+            }
+        }
+    }
+
+    private fun fetchParty() {
+        viewModelScope.launch {
+            partyRepository.getParty(partyId = partyId).collect { party ->
+                onPartyChange(party = party)
             }
         }
     }

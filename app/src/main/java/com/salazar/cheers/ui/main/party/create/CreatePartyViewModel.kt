@@ -2,18 +2,21 @@ package com.salazar.cheers.ui.main.party.create
 
 import android.app.Application
 import android.net.Uri
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.salazar.cheers.core.PostType
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.SearchSuggestion
+import com.salazar.cheers.core.util.Constants
+import com.salazar.cheers.domain.get_last_known_location.GetLastKnownLocationUseCase
+import com.salazar.cheers.domain.get_location_name.GetLocationNameUseCase
+import com.salazar.cheers.domain.list_search_location.ListSearchLocationUseCase
+import com.salazar.cheers.shared.util.result.getOrNull
 import com.salazar.cheers.workers.CreatePartyWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -23,51 +26,17 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Date
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-
-
-sealed class CreatePartyUIAction {
-    object OnShowMapChange : CreatePartyUIAction()
-    object OnDismiss : CreatePartyUIAction()
-    object OnAddPhoto : CreatePartyUIAction()
-    object OnPartyDetailsClick : CreatePartyUIAction()
-    object OnDescriptionClick : CreatePartyUIAction()
-    object OnLocationClick : CreatePartyUIAction()
-    object OnUploadParty : CreatePartyUIAction()
-    object OnAddPeopleClick : CreatePartyUIAction()
-    object OnHasEndDateToggle : CreatePartyUIAction()
-}
-
-data class CreatePartyUiState(
-    val isLoading: Boolean,
-    val errorMessage: String? = null,
-    val name: String = "",
-    val participants: List<String> = emptyList(),
-    val startTimeSeconds: Long = Date().time / 1000,
-    val endTimeSeconds: Long = Date().time / 1000,
-    val endDate: String = "End date",
-    val endTime: String = "End time",
-    val address: String = "",
-    val photo: Uri? = null,
-    val description: String = "",
-    val hasEndDate: Boolean = false,
-    val showGuestList: Boolean = false,
-    val locationName: String = "",
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0,
-    val locationQuery: String = "",
-    val locationResults: List<SearchSuggestion> = emptyList(),
-    val privacyState: ModalBottomSheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    val privacy: Privacy = Privacy.PUBLIC
-)
 
 
 @HiltViewModel
 class CreatePartyViewModel @Inject constructor(
     application: Application,
-    private val partyRepository: com.salazar.cheers.data.party.data.repository.PartyRepository,
+    internal val listSearchLocationUseCase: ListSearchLocationUseCase,
+    internal val getLocationNameUseCase: GetLocationNameUseCase,
+    private val getLastKnownLocationUseCase: GetLastKnownLocationUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(CreatePartyUiState(isLoading = false))
@@ -81,48 +50,26 @@ class CreatePartyViewModel @Inject constructor(
             viewModelState.value
         )
 
-//    val searchEngine = SearchEngine.createSearchEngine(
-//            SearchEngineSettings(application.applicationContext.getString(R.string.mapbox_access_token))
-//        )
-//    val searchCallback = object : SearchSelectionCallback {
-//        override fun onCategoryResult(
-//            suggestion: com.mapbox.search.result.SearchSuggestion,
-//            results: List<SearchResult>,
-//            responseInfo: ResponseInfo
-//        ) {
-////                updateResults(results)
-//        }
-//
-//        override fun onError(e: Exception) {
-//            Log.e("GEOCODING", e.toString())
-//        }
-//
-//        override fun onResult(
-//            suggestion: com.mapbox.search.result.SearchSuggestion,
-//            result: SearchResult,
-//            responseInfo: ResponseInfo
-//        ) {
-//            val location = result.coordinate!!
-//            viewModelState.update {
-//                it.copy(
-//                    locationName = result.name,
-//                    latitude = location.latitude(),
-//                    longitude = location.longitude(),
-//                    address = result.address?.formattedAddress() ?: "",
-//                )
-//            }
-//        }
-//
-//        override fun onSuggestions(
-//            suggestions: List<com.mapbox.search.result.SearchSuggestion>,
-//            responseInfo: ResponseInfo
-//        ) {
-//            updateResults(suggestions.map { it.toSearchSuggestion() })
-//        }
-//    }
-    val caption = mutableStateOf("")
-    val postType = mutableStateOf(PostType.TEXT)
-
+    init {
+        viewModelScope.launch {
+            val location = getLastKnownLocationUseCase() ?: return@launch
+            getLocationNameUseCase(
+                location.longitude,
+                location.latitude,
+            ).getOrNull()?.let {
+                updateResults(
+                    results = it.map {
+                        SearchSuggestion(
+                            name = it,
+                            address = it,
+                            latitude = location.latitude,
+                            longitude = location.latitude,
+                        )
+                    },
+                )
+            }
+        }
+    }
 
     fun setPhoto(photo: Uri?) {
         if (photo == null) return
@@ -143,8 +90,16 @@ class CreatePartyViewModel @Inject constructor(
         }
     }
 
-    fun onLocationClick(result: SearchSuggestion) {
-//        searchEngine.select(result, searchCallback)
+    fun onLocationClick(location: SearchSuggestion) {
+        viewModelState.update {
+            it.copy(
+                locationName = location.name,
+                latitude = location.latitude,
+                longitude = location.longitude,
+                address = location.address.orEmpty(),
+                city = location.city,
+            )
+        }
     }
 
     fun onDescriptionChange(description: String) {
@@ -165,19 +120,22 @@ class CreatePartyViewModel @Inject constructor(
         }
     }
 
-    fun onStartTimeSecondsChange(epoch: Long) {
+    fun onStartTimeSecondsChange(dateMillis: Long) {
         viewModelState.update {
-            it.copy(startTimeSeconds = epoch)
+            if (it.endDateTimeMillis < dateMillis) {
+                onEndTimeSecondsChange(dateMillis + TimeUnit.HOURS.toMillis(7))
+            }
+            it.copy(startDateTimeMillis = dateMillis)
         }
     }
 
-    fun onEndTimeSecondsChange(epoch: Long) {
+    fun onEndTimeSecondsChange(dateMillis: Long) {
         viewModelState.update {
-            it.copy(endTimeSeconds = epoch)
+            it.copy(endDateTimeMillis = dateMillis)
         }
     }
 
-    fun setName(name: String) {
+    fun onNameChange(name: String) {
         viewModelState.update {
             it.copy(name = name)
         }
@@ -197,18 +155,19 @@ class CreatePartyViewModel @Inject constructor(
 
         viewModelScope.launch {
             state.apply {
+                val imageUri = photo?.toString() ?: ""
                 val uploadWorkRequest = OneTimeWorkRequestBuilder<CreatePartyWorker>()
                     .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                     .setInputData(
                         workDataOf(
                             "NAME" to name,
                             "ADDRESS" to address,
+                            "CITY" to city,
                             "DESCRIPTION" to description,
                             "EVENT_PRIVACY" to privacy.name,
-                            "IMAGE_URI" to photo.toString(),
-                            "START_DATETIME" to startTimeSeconds,
-                            "END_DATETIME" to endDate,
-                            "LOCATION_NAME" to locationName,
+                            "IMAGE_URI" to imageUri,
+                            "START_DATETIME" to startDateTimeMillis / 1000,
+                            "END_DATETIME" to endDateTimeMillis / 1000,
                             "LATITUDE" to latitude,
                             "SHOW_GUEST_LIST" to showGuestList,
                             "LONGITUDE" to longitude,
@@ -216,21 +175,28 @@ class CreatePartyViewModel @Inject constructor(
                     )
                     .build()
 
-                workManager.enqueue(uploadWorkRequest)
+                workManager.enqueueUniqueWork(
+                    Constants.PARTY_UNIQUE_WORKER_NAME,
+                    ExistingWorkPolicy.REPLACE,
+                    uploadWorkRequest
+                )
             }
         }
     }
 
-    fun getLocations(query: String) {
-//        val options = SearchOptions(
-//            limit = 10
-//        )
-//        searchEngine.search(query, options, searchCallback)
+    private fun getLocations(query: String) {
+        viewModelScope.launch {
+            val result = listSearchLocationUseCase(query).getOrNull() ?: return@launch
+            updateResults(result)
+        }
     }
 
-    fun updateResults(results: List<SearchSuggestion>) {
+    private fun updateResults(results: List<SearchSuggestion>) {
         viewModelState.update {
             it.copy(locationResults = results)
         }
+    }
+
+    fun onPrivacyChange(privacy: Privacy) {
     }
 }

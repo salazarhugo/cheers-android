@@ -4,17 +4,19 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import com.salazar.cheers.R
-import com.salazar.cheers.core.ui.ui.CheersDestinations
-import com.salazar.cheers.feature.home.navigation.home.navigateToHome
-import com.softimpact.feature.passcode.passcode.passcodeNavigationRoute
+import com.salazar.cheers.feature.home.home.navigateToHome
+import com.softimpact.feature.passcode.passcode.Passcode
 import com.softimpact.feature.passcode.passcode.passcodeScreen
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object PasscodeNavGraph
 
 fun NavGraphBuilder.passcodeNavGraph(
     navController: NavController,
 ) {
-    navigation(
-        route = CheersDestinations.PASSCODE_ROUTE,
-        startDestination = passcodeNavigationRoute,
+    navigation<PasscodeNavGraph>(
+        startDestination = Passcode,
     ) {
         passcodeScreen(
             banner = R.drawable.ic_splash,

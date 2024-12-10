@@ -1,5 +1,7 @@
 package com.salazar.cheers.core.model
 
+import com.salazar.cheers.core.model.ActivityType.FRIEND_ADDED
+import com.salazar.cheers.core.model.ActivityType.INFORMATION
 import com.salazar.cheers.core.model.ActivityType.NONE
 import java.util.UUID
 
@@ -32,4 +34,9 @@ enum class ActivityType {
     CREATE_POST,
     CREATE_EVENT,
     CREATE_STORY,
+    INFORMATION,
 }
+
+val emptyActivity = Activity()
+val followActivity = emptyActivity.copy(type = FRIEND_ADDED)
+val infoActivity = emptyActivity.copy(type = INFORMATION, text = "Your account has been verified.")

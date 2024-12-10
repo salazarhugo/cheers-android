@@ -6,7 +6,6 @@ plugins {
 
 android {
     namespace = "com.salazar.cheers.data.remote_config"
-    compileSdk = 34
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

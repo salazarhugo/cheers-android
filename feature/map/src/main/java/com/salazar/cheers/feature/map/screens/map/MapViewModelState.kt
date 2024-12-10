@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.map.screens.map
 
-import androidx.compose.material3.SheetState
 import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.core.Post
 
@@ -12,7 +11,6 @@ data class MapViewModelState(
     val selected: MapAnnotation? = null,
     val isLoading: Boolean = false,
     val isPublic: Boolean = false,
-    val sheetState: SheetState = SheetState(skipPartiallyExpanded = true),
     val errorMessages: List<String> = emptyList(),
     val searchInput: String = "",
     val userLocation: com.salazar.cheers.data.map.UserLocation? = null,
@@ -28,7 +26,6 @@ data class MapViewModelState(
                 selected = selected,
                 isLoading = isLoading,
                 isPublic = isPublic,
-                sheetState = sheetState,
                 errorMessages = errorMessages,
                 searchInput = searchInput,
                 userLocation = userLocation,

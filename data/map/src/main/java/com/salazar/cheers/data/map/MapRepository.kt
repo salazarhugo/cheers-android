@@ -1,5 +1,6 @@
 package com.salazar.cheers.data.map
 
+import com.salazar.cheers.core.model.SearchSuggestion
 import com.salazar.cheers.shared.util.result.DataError
 
 interface MapRepository {
@@ -19,4 +20,8 @@ interface MapRepository {
     ): Result<Unit>
 
     suspend fun listFriendLocation(): Result<List<UserLocation>>
+
+    suspend fun listSearchLocation(
+        query: String,
+    ): com.salazar.cheers.shared.util.result.Result<List<SearchSuggestion>, DataError>
 }

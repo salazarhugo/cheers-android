@@ -36,7 +36,6 @@ data class StoryFeedUiState(
     val isPaused: Boolean = false,
     val usersWithStories: List<UserWithStories>? = null,
     val page: Int = 0,
-    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
 )
 
 @HiltViewModel

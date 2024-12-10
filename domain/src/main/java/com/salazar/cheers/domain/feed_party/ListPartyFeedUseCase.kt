@@ -2,13 +2,16 @@ package com.salazar.cheers.domain.feed_party
 
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
-import kotlinx.coroutines.flow.Flow
+import com.salazar.cheers.domain.get_current_city.GetCurrentCityFlowUseCase
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class ListPartyFeedUseCase @Inject constructor(
+    private val getCurrentCityUseCase: GetCurrentCityFlowUseCase,
     private val partyRepository: PartyRepository,
 ) {
-    suspend operator fun invoke(): Flow<List<Party>> {
-        return partyRepository.feedParty(page = 0, pageSize = 10)
+    suspend operator fun invoke(): Result<List<Party>> {
+        val city = getCurrentCityUseCase().firstOrNull().orEmpty()
+        return partyRepository.fetchFeedParty(city, 1, 10)
     }
 }

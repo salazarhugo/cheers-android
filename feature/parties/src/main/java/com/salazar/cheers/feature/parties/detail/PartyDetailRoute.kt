@@ -1,11 +1,9 @@
 package com.salazar.cheers.feature.parties.detail
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 
 @Composable
 fun PartyDetailRoute(
@@ -17,17 +15,17 @@ fun PartyDetailRoute(
     navigateToEditParty: (String) -> Unit,
     navigateToGuestList: (String) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val context = LocalContext.current
 
-    if (uiState is PartyDetailUiState.HasParty)
+    if (uiState is PartyDetailUiState.HasParty) {
         PartyDetailScreen(
-            uiState = uiState as PartyDetailUiState.HasParty,
+            uiState = uiState,
             onMapClick = navigateToMap,
             onUserClicked = navigateToOtherProfile,
             onWatchStatusChange = viewModel::onWatchStatusChange,
             onCopyLink = {
-                val eventId = (uiState as PartyDetailUiState.HasParty).party.id
+                val eventId = uiState.party.id
 //                FirebaseDynamicLinksUtil.createShortLink("event/$eventId")
 //                    .addOnSuccessListener { shortLink ->
 //                        context.copyToClipboard(shortLink.shortLink.toString())
@@ -35,7 +33,7 @@ fun PartyDetailRoute(
                 navigateBack()
             },
             onEditClick = {
-                val eventId = (uiState as PartyDetailUiState.HasParty).party.id
+                val eventId = uiState.party.id
                 navigateToEditParty(eventId)
             },
             onDeleteClick = {
@@ -43,17 +41,23 @@ fun PartyDetailRoute(
                 navigateBack()
             },
             onGoingCountClick = {
-                val eventId = (uiState as PartyDetailUiState.HasParty).party.id
+                val eventId = uiState.party.id
                 navigateToGuestList(eventId)
             },
             onInterestedCountClick = {
-                val eventId = (uiState as PartyDetailUiState.HasParty).party.id
+                val eventId = uiState.party.id
                 navigateToGuestList(eventId)
             },
             onTicketingClick = {
                 navigateToTicketing(it)
             },
+            onAnswersClick = {
+                val eventId = uiState.party.id
+                navigateToGuestList(eventId)
+            }
         )
-    else
-        LoadingScreen()
+    }
+    else {
+        PartyDetailLoadingScreen()
+    }
 }

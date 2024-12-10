@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.settings
 
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -25,12 +26,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.Divider
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.item.SettingItem
 import com.salazar.cheers.core.ui.item.SettingTitle
@@ -60,14 +67,28 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             AccountSection(navigateToBecomeVip = navigateToBecomeVip)
-            Spacer(modifier = Modifier.height(16.dp))
+            Divider(
+                modifier = Modifier.padding(vertical = 5.dp),
+                thickness = 6.dp,
+            )
             SettingsSection(onSettingsUIAction = onSettingsUIAction)
-            Spacer(modifier = Modifier.height(16.dp))
+            Divider(
+                modifier = Modifier.padding(vertical = 5.dp),
+                thickness = 6.dp,
+            )
             HelpSection(onSettingsUIAction = onSettingsUIAction)
-            Spacer(modifier = Modifier.height(16.dp))
+            Divider(
+                modifier = Modifier.padding(vertical = 5.dp),
+                thickness = 6.dp,
+            )
             LoginsSection(onSignOut = onSignOut, onDeleteAccount = onDeleteAccount)
-            ErrorMessage(errorMessage = uiState.errorMessage, paddingValues = PaddingValues(16.dp))
-            Spacer(modifier = Modifier.height(16.dp))
+            ErrorMessage(
+                errorMessage = uiState.errorMessage,
+                paddingValues = PaddingValues(16.dp),
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
             VersionSection()
         }
     }
@@ -75,15 +96,34 @@ fun SettingsScreen(
 
 @Composable
 fun VersionSection() {
-    Text(text = "")
-//    Text(
-//        text = "${stringResource(id = R.string.app_name)} v.${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-//        style = MaterialTheme.typography.bodyMedium,
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(16.dp),
-//        textAlign = TextAlign.Center,
-//    )
+    val context = LocalContext.current
+
+    var versionName by remember {
+        mutableStateOf("")
+    }
+    var versionCode by remember {
+        mutableStateOf("")
+    }
+
+    SideEffect {
+        try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            pInfo.longVersionCode
+            versionName = pInfo.versionName.toString()
+            versionCode = pInfo.longVersionCode.toString()
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+    }
+
+    Text(
+        text = "${stringResource(id = R.string.app_name)} $versionName (${versionCode})",
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        textAlign = TextAlign.Center,
+    )
 }
 
 @Composable
@@ -163,7 +203,7 @@ fun SettingsSection(
             },
         )
         SettingItem(
-            title  = "Chat Settings",
+            title = "Chat Settings",
             icon = Icons.Outlined.ChatBubbleOutline,
             onClick = {
                 onSettingsUIAction(SettingsUIAction.OnNotificationsClick)

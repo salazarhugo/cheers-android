@@ -28,7 +28,7 @@ import com.salazar.cheers.core.db.model.FriendRequestEntity
 import com.salazar.cheers.core.db.model.NoteEntity
 import com.salazar.cheers.core.db.model.PartyEntity
 import com.salazar.cheers.core.db.model.PostEntity
-import com.salazar.cheers.core.db.model.RecentUserEntity
+import com.salazar.cheers.core.db.model.RecentSearchEntity
 import com.salazar.cheers.core.db.model.RemoteKey
 import com.salazar.cheers.core.db.model.Story
 import com.salazar.cheers.core.db.model.StoryRemoteKey
@@ -38,15 +38,12 @@ import com.salazar.cheers.core.db.model.UserItemEntity
 import com.salazar.cheers.core.db.model.UserPreferenceEntity
 import com.salazar.cheers.core.db.model.UserStatsEntity
 import com.salazar.cheers.core.db.model.UserSuggestionEntity
-import com.salazar.cheers.core.model.Comment
-import com.salazar.cheers.core.model.Drink
-import com.salazar.cheers.core.model.Ticket
 
 
 @TypeConverters(Converters::class)
 @Database(
     entities = [
-        RecentUserEntity::class,
+        RecentSearchEntity::class,
         PostEntity::class,
         PartyEntity::class,
         UserItemEntity::class,
@@ -67,7 +64,7 @@ import com.salazar.cheers.core.model.Ticket
         NoteEntity::class,
         DrinkEntity::class,
     ],
-    version = 38,
+    version = 42,
     exportSchema = false,
     autoMigrations = []
 )

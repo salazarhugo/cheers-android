@@ -2,16 +2,16 @@ package com.salazar.cheers.shared.data.mapper
 
 import cheers.user.v1.GetUserResponse
 import com.salazar.cheers.core.model.Drink
-import com.salazar.cheers.core.model.RecentUser
+import com.salazar.cheers.core.model.RecentSearch
 import com.salazar.cheers.core.model.User
 
-fun RecentUser.toUser(): User {
+fun RecentSearch.User.toUser(): User {
     return User().copy(
-        id = id,
-        name = fullName,
-        username = username,
-        picture = profilePictureUrl,
-        verified = verified,
+        id = user.id,
+        name = user.name,
+        username = user.username,
+        picture = user.picture,
+        verified = user.verified,
     )
 }
 

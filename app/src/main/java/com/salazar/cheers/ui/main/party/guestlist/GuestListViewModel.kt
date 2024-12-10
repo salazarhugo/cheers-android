@@ -3,6 +3,7 @@ package com.salazar.cheers.ui.main.party.guestlist
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,12 +23,12 @@ data class GuestListUiState(
 
 @HiltViewModel
 class GuestListViewModel @Inject constructor(
-    stateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
+    private val guestListScreen = savedStateHandle.toRoute<GuestListScreen>()
     private val viewModelState = MutableStateFlow(GuestListUiState(isLoading = true))
-    lateinit var eventId: String
 
     val uiState = viewModelState
         .stateIn(
@@ -37,16 +38,12 @@ class GuestListViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>("eventId")?.let {
-            eventId = it
-        }
-
         load()
     }
 
     private fun load() {
         viewModelScope.launch {
-//            partyRepository.interestedList(eventId = eventId)?.let {
+//            partyRepository.interestedList(eventId = guestListScreen.partyID)?.let {
 //                updateInterested(users = it)
 //            }
         }

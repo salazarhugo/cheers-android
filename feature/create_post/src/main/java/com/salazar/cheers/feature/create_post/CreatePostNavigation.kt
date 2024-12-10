@@ -3,36 +3,32 @@ package com.salazar.cheers.feature.create_post
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
+import kotlinx.serialization.Serializable
 
-const val PHOTO_URI = "photoUri"
-const val createPostNavigationRoute = "create_post_route?$PHOTO_URI={$PHOTO_URI}"
-private const val DEEP_LINK_URI_PATTERN = "https://maparty.app/create_post"
+@Serializable
+data class CreatePost(
+    val photoUri: String? = null,
+)
+
+private const val DEEP_LINK_URI_PATTERN = "${Constants.BASE_URL}/createPost"
 
 fun NavController.navigateToCreatePost(
     photoUri: String? = null,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("create_post_route?$PHOTO_URI=$photoUri", navOptions)
+    this.navigate(CreatePost(photoUri = photoUri), navOptions)
 }
 
 fun NavGraphBuilder.createPostScreen(
     navigateBack: () -> Unit,
     navigateToCamera: () -> Unit,
 ) {
-    composable(
-        route = createPostNavigationRoute,
+    composable<CreatePost>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
-        ),
-        arguments = listOf(
-            navArgument(PHOTO_URI) {
-                type = NavType.StringType
-                nullable = true
-            },
+            navDeepLink<CreatePost>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         CreatePostRoute(

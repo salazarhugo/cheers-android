@@ -1,14 +1,17 @@
 package com.salazar.cheers.shared.data
 
 import com.salazar.cheers.shared.data.request.FinishLoginRequest
-import com.salazar.cheers.shared.data.request.LoginRequest
 import com.salazar.cheers.shared.data.request.FinishRegistrationRequest
+import com.salazar.cheers.shared.data.request.LoginRequest
 import com.salazar.cheers.shared.data.response.BeginLoginResponse
 import com.salazar.cheers.shared.data.response.BeginRegistrationResponse
 import com.salazar.cheers.shared.data.response.FinishLoginResponse
-import com.salazar.cheers.shared.data.response.LoginResponse
 import com.salazar.cheers.shared.data.response.FinishRegistrationResponse
-import retrofit2.http.*
+import com.salazar.cheers.shared.data.response.LoginResponse
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 
 interface BffApiService {
@@ -38,6 +41,6 @@ interface BffApiService {
     ): FinishRegistrationResponse
 
     companion object {
-        const val GATEWAY_BASE_URL = "https://android-gateway-clzdlli7.nw.gateway.dev"
+        const val GATEWAY_BASE_URL = "https://api.cheers.social"
     }
 }

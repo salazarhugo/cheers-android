@@ -2,9 +2,9 @@ package com.salazar.cheers.ui.compose.bottombar
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.salazar.cheers.core.data.internal.ClearRippleTheme
+import com.salazar.cheers.core.data.internal.clearRippleConfiguration
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
@@ -25,7 +25,7 @@ import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 fun CheersBottomBar(
     currentDestination: NavDestination?,
     modifier: Modifier = Modifier,
-    onNavigate: (String) -> Unit = {},
+    onNavigate: (Any) -> Unit = {},
 ) {
     val items = listOf(
         BottomNavigationItem.Home,
@@ -36,7 +36,7 @@ fun CheersBottomBar(
     )
 
     CompositionLocalProvider(
-        LocalRippleTheme provides ClearRippleTheme
+        LocalRippleConfiguration provides clearRippleConfiguration
     ) {
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.background.compositeOver(Color.White),
@@ -51,7 +51,7 @@ fun CheersBottomBar(
                 val isSelected =
                     currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
-                val icon = when(bottomNavigationItem.icon) {
+                val icon = when (bottomNavigationItem.icon) {
                     null -> {
                         val icon = when (isSelected) {
                             true -> screen.selectedIcon
@@ -65,6 +65,7 @@ fun CheersBottomBar(
                             )
                         }
                     }
+
                     else -> bottomNavigationItem.icon
                 }
                 NavigationBarItem(

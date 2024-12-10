@@ -2,12 +2,13 @@ package com.salazar.cheers.ui.main.story
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun StoryRoute(
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    lifecycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
     storyViewModel: StoryViewModel = hiltViewModel(),
     navActions: CheersNavigationActions,
     bottomSheetNavigator: BottomSheetNavigator,
@@ -32,6 +33,7 @@ fun StoryRoute(
     val systemUiController = rememberSystemUiController()
     val darkIcons = !isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
+    val sheetState = SheetState(skipPartiallyExpanded = true, density = LocalDensity.current)
 
     val background = MaterialTheme.colorScheme.background
 
@@ -56,7 +58,7 @@ fun StoryRoute(
                 is StoryUIAction.OnActivity -> navActions.navigateToStoryStats(storyId)
                 is StoryUIAction.OnMore -> {
                     scope.launch {
-                        uiState.sheetState.show()
+                        sheetState.show()
                     }
                 }
 

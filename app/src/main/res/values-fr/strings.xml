@@ -37,4 +37,5 @@
     <string name="new_note">Nouvelle note</string>
     <string name="map">Carte</string>
     <string name="dismiss">Rejeter</string>
+    <string name="spotlight">En ce moment</string>
 </resources>

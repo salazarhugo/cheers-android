@@ -16,7 +16,7 @@ enum class Privacy(
     PRIVATE(
         title = "Private",
         subtitle = "Only people who are invited",
-        Icons.Filled.Lock,
+        icon = Icons.Filled.Lock,
     ),
     PUBLIC(
         title = "Public",
@@ -34,11 +34,3 @@ enum class Privacy(
         icon = Icons.Filled.Groups,
     ),
 }
-
-//class PrivacyAdapter {
-//    @ToJson
-//    fun toJson(value: Privacy): String = value.name
-//
-//    @FromJson
-//    fun fromJson(value: String): Privacy = Privacy.valueOf(value)
-//}

@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Drink
-import com.salazar.cheers.core.model.coronaExtraDrink
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.components.post.PostComponent
@@ -187,7 +186,7 @@ fun LazyListScope.postsAndParties(
                     1 -> parties?.forEach { party ->
                         PartyItem(
                             party = party,
-                            onPartyClicked = {},
+                            onClick = {},
                             onMoreClick = {},
                         )
                     }

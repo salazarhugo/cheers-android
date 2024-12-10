@@ -4,8 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.salazar.cheers.map.ui.dialogs.BottomSheetM3
+import com.salazar.cheers.feature.map.ui.dialogs.BottomSheetM3
 
 @Composable
 fun NoteRoute(

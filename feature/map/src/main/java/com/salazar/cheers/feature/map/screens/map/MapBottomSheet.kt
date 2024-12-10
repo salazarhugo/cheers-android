@@ -28,14 +28,15 @@ fun MapBottomSheet(
         onDismissRequest = onDismissRequest,
         scrimColor = Color.Transparent,
         sheetState = state,
-        windowInsets = WindowInsets(0,0,0,0),
+        contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
     ) {
-        when(type) {
+        when (type) {
             is MapAnnotation.PostAnnotation -> {
                 PostMapDialog(
                     post = type.post,
                 )
             }
+
             is MapAnnotation.UserAnnotation -> {
                 UserMapDialog(
                     userLocation = type.user,

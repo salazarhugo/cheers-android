@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PartiesTopBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
     onTicketsClick: () -> Unit,
     onCreatePartyClick: () -> Unit,
 ) {

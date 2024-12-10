@@ -49,6 +49,9 @@ class CreatePostWorker @AssistedInject constructor(
         val privacy = inputData.getString("PRIVACY") ?: return Result.failure()
         val tagUserIds = inputData.getStringArray("TAG_USER_IDS") ?: emptyArray()
         val notify = inputData.getBoolean("NOTIFY", true)
+        val likesEnabled = inputData.getBoolean("LIKES_ENABLED", true)
+        val commentsEnabled = inputData.getBoolean("COMMENTS_ENABLED", true)
+        val shareEnabled = inputData.getBoolean("SHARE_ENABLED", true)
 
         val postBuilder = CreatePostRequest.newBuilder()
             .setCaption(photoCaption)
@@ -56,6 +59,10 @@ class CreatePostWorker @AssistedInject constructor(
             .setLongitude(longitude)
             .setDrunkenness(drunkenness.toLong())
             .setLocationName(locationName)
+            .setLikesEnabled(likesEnabled)
+            .setCommentsEnabled(commentsEnabled)
+            .setSharesEnabled(shareEnabled)
+            .setNotificationsEnabled(notify)
 
         Log.d("CreatePostWorker", drinkID.toString())
         if (drinkID != null) {
@@ -84,10 +91,10 @@ class CreatePostWorker @AssistedInject constructor(
                         photos.toList().forEach { photoUri ->
                             val photoBytes = extractImage(Uri.parse(photoUri))
                             launch {
-                                val uploadResult = mediaRepository.uploadMedia(photoBytes)
-                                val uploadID = uploadResult.getOrNull()
-                                if (uploadID != null) {
-                                    uploadIds.add(uploadID)
+                                val media = mediaRepository.uploadMedia(photoBytes).getOrNull()
+                                val mediaID = media?.id
+                                if (mediaID != null) {
+                                    uploadIds.add(mediaID)
                                 }
                             }
                         }

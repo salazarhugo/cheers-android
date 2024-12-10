@@ -3,8 +3,8 @@ package com.salazar.cheers.feature.comment.comments
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.domain.create_comment.CreateCommentUseCase
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
 import com.salazar.cheers.domain.like_comment.LikeCommentUseCase
@@ -23,6 +23,7 @@ data class CommentsUiState(
     val avatar: String? = null,
     val comments: List<Comment>? = null,
     val isLoading: Boolean = false,
+    val showBanner: Boolean = true,
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
     val isFollowing: Boolean = false,
@@ -155,13 +156,20 @@ class CommentsViewModel @Inject constructor(
             likeCommentUseCase(commentId = commentID)
         }
     }
+
+    fun onCloseBannerClick() {
+        viewModelState.update {
+            it.copy(showBanner = false)
+        }
+    }
 }
 
 sealed class CommentsUIAction {
-    object OnBackPressed : CommentsUIAction()
-    object OnSwipeRefresh : CommentsUIAction()
-    object OnFriendRequestsClick : CommentsUIAction()
-    object OnRemoveReplyComment : CommentsUIAction()
+    data object OnBackPressed : CommentsUIAction()
+    data object OnSwipeRefresh : CommentsUIAction()
+    data object OnFriendRequestsClick : CommentsUIAction()
+    data object OnRemoveReplyComment : CommentsUIAction()
+    data object OnCloseBannerClick : CommentsUIAction()
     data class OnReplyClick(val comment: Comment) : CommentsUIAction()
     data class OnUserClick(val userId: String) : CommentsUIAction()
     data class OnCommentLongClick(val commentID: String) : CommentsUIAction()

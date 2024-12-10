@@ -25,7 +25,8 @@ class RegisterPasskeyUseCase @Inject constructor(
             result.onFailure {
                 return@withContext Result.failure(it)
             }
-            val beginRegistrationResponse = result.getOrNull() ?: return@withContext Result.failure(Exception(""))
+            val beginRegistrationResponse =
+                result.getOrNull() ?: return@withContext Result.failure(Exception(""))
 
             // Launch FIDO flow
             val fidoResult = authRepository.launchFidoFlow(
@@ -39,8 +40,8 @@ class RegisterPasskeyUseCase @Inject constructor(
                     authRepository.finishRegistration(
                         username = username,
                         passkey = passkey,
-                        challenge = beginRegistrationResponse.challenge,
-                        userId = beginRegistrationResponse.userId,
+                        challenge = beginRegistrationResponse.publicKey.challenge,
+                        userId = beginRegistrationResponse.publicKey.user.id.toString(),
                     )
                     // Save username in data store
                     dataStoreRepository.updateUsername(username)

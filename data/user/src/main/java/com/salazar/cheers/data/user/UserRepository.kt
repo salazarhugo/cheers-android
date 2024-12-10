@@ -20,7 +20,6 @@ interface UserRepository {
         email: String,
     ): Result<User>
 
-    suspend fun insertRecent(username: String)
     suspend fun blockUser(userId: String)
 
     suspend fun getFollowers(userIdOrUsername: String): List<UserItem>?

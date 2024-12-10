@@ -6,7 +6,6 @@ plugins {
 
 android {
     namespace = "com.salazar.cheers.data.search"
-    compileSdk = 34
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -15,6 +14,12 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.db)
+    implementation(projects.core.model)
+    implementation(projects.core.protobuf)
+    implementation(projects.core.util)
+    implementation(projects.core.shared)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

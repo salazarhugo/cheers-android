@@ -32,6 +32,7 @@ fun CommentsRoute(
                 CommentsUIAction.OnRemoveReplyComment -> commentsViewModel.onRemoveReplyComment()
                 is CommentsUIAction.OnCommentLongClick -> navigateToCommentMoreSheet(action.commentID)
                 is CommentsUIAction.OnCommentLike -> commentsViewModel.onLike(action.commentID)
+                CommentsUIAction.OnCloseBannerClick -> commentsViewModel.onCloseBannerClick()
             }
         }
     )

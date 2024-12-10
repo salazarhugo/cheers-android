@@ -52,4 +52,6 @@
         <item quantity="one">party</item>
         <item quantity="other">parties</item>
     </plurals>
+    <string name="spotlight">Spotlight</string>
+    <string name="tickets">Your tickets</string>
 </resources>

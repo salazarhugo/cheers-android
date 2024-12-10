@@ -30,6 +30,7 @@ service PostService {
   rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v1/posts"
+      body: "*"
     };
   }
 
@@ -106,13 +107,14 @@ message CreatePostRequest {
   string location_name = 2;
   string drink_id = 3;
   int64 drunkenness = 4;
-  bool can_comment = 5;
-  bool can_share = 6;
-  double latitude = 7;
-  double longitude = 8;
-  bool send_notification_to_friends = 9;
-  repeated string media_ids = 10;
-  cheers.type.Audio audio = 11;
+  bool likes_enabled = 5;
+  bool comments_enabled = 6;
+  bool shares_enabled = 7;
+  double latitude = 8;
+  double longitude = 9;
+  bool notifications_enabled = 10;
+  repeated string media_ids = 11;
+  cheers.type.Audio audio = 12;
 }
 
 message GetPostRequest {

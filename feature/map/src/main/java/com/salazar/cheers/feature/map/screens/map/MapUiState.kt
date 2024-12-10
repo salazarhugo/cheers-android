@@ -1,6 +1,7 @@
 package com.salazar.cheers.feature.map.screens.map
 
 import androidx.compose.material3.SheetState
+import androidx.compose.ui.platform.LocalDensity
 import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.core.Post
 
@@ -17,7 +18,6 @@ sealed interface MapUiState {
         val selected: MapAnnotation?,
         val isLoading: Boolean,
         val isPublic: Boolean,
-        val sheetState: SheetState = SheetState(skipPartiallyExpanded = true),
         val errorMessages: List<String>,
         val searchInput: String,
         val userLocation: com.salazar.cheers.data.map.UserLocation,

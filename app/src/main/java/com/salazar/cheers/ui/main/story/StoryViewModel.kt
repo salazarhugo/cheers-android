@@ -33,7 +33,6 @@ data class StoryUiState(
     val isPaused: Boolean = false,
     val stories: List<Story>? = null,
     val currentStep: Int = 0,
-    val sheetState: ModalBottomSheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
 )
 
 @HiltViewModel
@@ -61,12 +60,6 @@ class StoryViewModel @Inject constructor(
             storyRepository.getUserStory(username = username).collect { stories ->
                 updateStories(stories = stories)
             }
-        }
-    }
-
-    fun openSheet() {
-        viewModelScope.launch {
-            uiState.value.sheetState.show()
         }
     }
 

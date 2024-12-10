@@ -6,15 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.salazar.cheers.Settings
-import com.salazar.cheers.data.account.Account
-import com.salazar.cheers.data.account.AccountRepository
 import com.salazar.cheers.core.model.Theme
 import com.salazar.cheers.core.model.UserPreference
+import com.salazar.cheers.data.account.Account
+import com.salazar.cheers.data.account.AccountRepository
+import com.salazar.cheers.data.chat.repository.ChatRepository
+import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
-import com.salazar.cheers.data.chat.repository.ChatRepository
-import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -108,23 +108,27 @@ class CheersViewModel @Inject constructor(
     }
 
     fun onAuthChange(auth: FirebaseAuth) {
-        Log.i("AUTH1", auth.currentUser?.uid.toString())
+        try {
+            Log.i("AUTH1", auth.currentUser?.uid.toString())
 
-        if (auth.currentUser == null) {
-            viewModelState.update {
-                it.copy(isLoggedIn = false)
+            if (auth.currentUser == null) {
+                viewModelState.update {
+                    it.copy(isLoggedIn = false)
+                }
+                return
             }
-            return
-        }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val idTokenResult = auth.currentUser?.getIdToken(false)?.await()
-            val idToken = idTokenResult?.token
-            if (idToken != null) {
-                updateIdTokenUseCase(idToken)
+            viewModelScope.launch(Dispatchers.IO) {
+                val idTokenResult = auth.currentUser?.getIdToken(false)?.await()
+                val idToken = idTokenResult?.token
+                if (idToken != null) {
+                    updateIdTokenUseCase(idToken)
+                }
             }
-        }
 
+        } catch (e: Exception) {
+           e.printStackTrace()
+        }
         viewModelScope.launch(Dispatchers.IO) {
             getAndSaveRegistrationToken()
         }

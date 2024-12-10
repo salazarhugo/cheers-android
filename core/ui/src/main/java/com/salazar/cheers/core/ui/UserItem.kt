@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,16 +16,16 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.cheersUserItem
-import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import com.salazar.cheers.core.ui.ui.Username
 
 
 @Composable
 fun UserItem(
     userItem: UserItem,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit = {},
+    onClick: (username: String) -> Unit = {},
     onStoryClick: (String) -> Unit = {},
     content: @Composable RowScope.() -> Unit = {},
 ) {
@@ -41,6 +39,7 @@ fun UserItem(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AvatarComponent(
                 avatar = userItem.picture,
@@ -51,7 +50,6 @@ fun UserItem(
                         onStoryClick(userItem.username)
                 }
             )
-            Spacer(modifier = Modifier.width(12.dp))
             Column {
                 if (userItem.name.isNotBlank()) {
                     Text(
@@ -59,11 +57,13 @@ fun UserItem(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
-                Username(
-                    username = userItem.username,
-                    verified = userItem.verified,
-                    textStyle = MaterialTheme.typography.bodyMedium
-                )
+                if (userItem.username.isNotBlank()) {
+                    Username(
+                        username = userItem.username,
+                        verified = userItem.verified,
+                        textStyle = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
         content()
@@ -76,6 +76,17 @@ private fun UserItemPreview() {
     CheersPreview {
         UserItem(
             userItem = cheersUserItem,
+            modifier = Modifier,
+        )
+    }
+}
+
+@ComponentPreviews
+@Composable
+private fun UserItem2Preview() {
+    CheersPreview {
+        UserItem(
+            userItem = cheersUserItem.copy(username = "", verified = false),
             modifier = Modifier,
         )
     }

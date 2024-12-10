@@ -2,11 +2,14 @@ package com.salazar.cheers.data.map
 
 import cheers.location.v1.GeocodeRequest
 import cheers.location.v1.ListFriendLocationRequest
+import cheers.location.v1.Location
 import cheers.location.v1.LocationServiceGrpcKt
+import cheers.location.v1.TextSearchRequest
 import cheers.location.v1.UpdateGhostModeRequest
 import cheers.location.v1.UpdateLocationRequest
 import com.mapbox.search.QueryType
 import com.mapbox.search.SearchEngine
+import com.salazar.cheers.core.model.SearchSuggestion
 import com.salazar.cheers.shared.util.result.DataError
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,6 +69,30 @@ class MapRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun listSearchLocation(query: String): com.salazar.cheers.shared.util.result.Result<List<SearchSuggestion>, DataError> {
+        val request = TextSearchRequest.newBuilder()
+            .setQuery(query)
+            .build()
+
+        return try {
+            val locations = locationService.textSearch(request)
+            val userLocation = locations.locationsList.map { it.toSearchSuggestion() }
+            com.salazar.cheers.shared.util.result.Result.Success(userLocation)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            com.salazar.cheers.shared.util.result.Result.Error(DataError.Network.UNKNOWN)
+        }
+    }
+
+    private fun Location.toSearchSuggestion(): SearchSuggestion {
+        return SearchSuggestion(
+            name = name,
+            address = name,
+            longitude = longitude,
+            latitude = latitude,
+            city = city,
+        )
+    }
 
     override suspend fun getLocationName(
         longitude: Double,

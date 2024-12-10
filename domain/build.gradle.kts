@@ -36,6 +36,7 @@ dependencies {
     implementation(projects.data.map)
     implementation(projects.data.chat)
     implementation(projects.data.billing)
+    implementation(projects.data.search)
 
     // Firebase BOM
     implementation(platform(libs.firebase.bom)) {

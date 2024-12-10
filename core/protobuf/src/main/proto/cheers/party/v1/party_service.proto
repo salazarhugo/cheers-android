@@ -5,6 +5,8 @@ package cheers.party.v1;
 import "cheers/type/party/party.proto";
 import "cheers/type/user/user.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "cheers/type/privacy/privacy.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/party/v1;party";
@@ -23,6 +25,13 @@ service PartyService {
     };
   }
 
+  rpc UpsertParty (UpsertPartyRequest) returns (UpsertPartyResponse) {
+    option (google.api.http) = {
+      put: "/v1/parties"
+      body: "*"
+    };
+  }
+
   rpc UpdateParty (UpdatePartyRequest) returns (UpdatePartyResponse) {
     option (google.api.http) = {
       patch: "/v1/parties"
@@ -33,6 +42,7 @@ service PartyService {
   rpc DeleteParty (DeletePartyRequest) returns (DeletePartyResponse) {
     option (google.api.http) = {
       delete: "/v1/parties/{party_id}"
+      body: "*"
     };
   }
 
@@ -128,7 +138,21 @@ message AnswerPartyResponse {
 }
 
 message CreatePartyRequest {
-  cheers.type.Party party = 1;
+  string name = 1;
+  string description = 2;
+  Geolocation geolocation = 3;
+  cheers.type.Privacy privacy = 4;
+  string banner_url = 5;
+  int64 start_date = 6;
+  int64 end_date = 7;
+  string location_name = 10;
+}
+
+message Geolocation {
+  string city = 1;
+  string address = 2;
+  double latitude = 3;
+  double longitude = 4;
 }
 
 message CreatePartyResponse {
@@ -151,8 +175,27 @@ message GetPartyItemResponse {
   PartyItem item = 1;
 }
 
-message UpdatePartyRequest {
+message UpsertPartyRequest {
   cheers.type.Party party = 1;
+}
+
+message UpsertPartyResponse {
+  cheers.type.Party party = 1;
+}
+
+message UpdatePartyRequest {
+  optional google.protobuf.FieldMask update_mask = 1;
+  string party_id = 2;
+  string name = 3;
+  string description = 4;
+  string address = 5;
+  string banner_url = 6;
+  int64 start_date = 7;
+  int64 end_date = 8;
+  string location_name = 9;
+  double latitude = 10;
+  double longitude = 11;
+  string city = 12;
 }
 
 message UpdatePartyResponse {
@@ -168,13 +211,16 @@ message DeletePartyResponse {
 
 message FeedPartyRequest {
   string parent = 1;
+  // Optional. The maximum number of Parties to return in the response.
   int32 page_size = 2;
-  string page_token = 3;
+  int32 page = 3;
+  string city = 4;
 }
 
 message FeedPartyResponse {
   repeated PartyItem items = 1;
   string next_page_token = 2;
+  int32 total_page = 3;
 }
 
 message PartyItem {

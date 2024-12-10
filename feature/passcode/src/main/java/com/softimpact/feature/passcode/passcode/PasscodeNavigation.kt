@@ -5,23 +5,23 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
+import kotlinx.serialization.Serializable
 
-const val passcodeNavigationRoute = "passcode_route"
-private const val DEEP_LINK_URI_PATTERN =
-    "https://mobile.soft-impact.com/passcode"
+@Serializable
+data object Passcode
 
 fun NavController.navigateToPasscode(navOptions: NavOptions? = null) {
-    this.navigate(passcodeNavigationRoute, navOptions)
+    this.navigate(Passcode, navOptions)
 }
 
 fun NavGraphBuilder.passcodeScreen(
     banner: Int,
     navigateToHome: () -> Unit,
 ) {
-    composable(
-        route = passcodeNavigationRoute,
+    composable<Passcode>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<Passcode>(basePath = "${Constants.BASE_URL}/passcode")
         ),
     ) {
         PasscodeRoute(

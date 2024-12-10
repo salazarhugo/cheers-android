@@ -7,11 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +21,8 @@ import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
+import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.ui.main.party.create.TopAppBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -33,7 +33,12 @@ fun GuestListScreen(
     onDismiss: () -> Unit,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = "Guest list", onDismiss = onDismiss) }
+        topBar = {
+            Toolbar(
+                title = "Guest list",
+                onBackPressed = onDismiss,
+            )
+        }
     ) {
         SwipeToRefresh(
             state = rememberSwipeToRefreshState(uiState.isLoading),

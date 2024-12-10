@@ -5,15 +5,22 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 
-sealed class Media {
+sealed interface Media {
+    val id: String
+    val url: String
+
     data class Video(
+        override val id: String = String(),
+        override val url: String = String(),
         val uri: Uri,
         val hasSound: Boolean,
-    ): Media()
+    ) : Media
 
     data class Image(
-       val uri: Uri
-    ): Media()
+        override val id: String = String(),
+        override val url: String = String(),
+        val uri: Uri = Uri.EMPTY,
+    ) : Media
 }
 
 fun Uri.toMedia(context: Context): Media {
@@ -21,18 +28,20 @@ fun Uri.toMedia(context: Context): Media {
     val cR: ContentResolver = context.contentResolver
     val extension = mime.getExtensionFromMimeType(cR.getType(this))
 
-    return when(extension) {
+    return when (extension) {
         "mp4" -> {
             Media.Video(
                 uri = this,
                 hasSound = true,
             )
         }
+
         "jpg", "png" -> {
             Media.Image(
                 uri = this
             )
         }
+
         else -> {
             Media.Image(uri = this)
         }

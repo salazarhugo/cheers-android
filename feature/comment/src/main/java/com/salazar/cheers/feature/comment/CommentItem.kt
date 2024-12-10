@@ -31,9 +31,9 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.Utils.conditional
-import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import java.util.Date
 
 @Composable
@@ -150,7 +150,7 @@ fun CommentItem(
 
 @ComponentPreviews
 @Composable
-fun CommentItemPreview() {
+private fun CommentItemPreview() {
     CheersPreview {
         CommentItem(
             comment = Comment(

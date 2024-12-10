@@ -7,8 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
-import com.salazar.cheers.data.account.mapper.toAccount
-import com.salazar.cheers.shared.data.response.LoginResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -47,11 +45,15 @@ class LocalAccountDataSource @Inject constructor(
 
     fun getAccountFlow(): Flow<Account?> {
         return dataStore.data.map { prefs ->
-            prefs[accountKey]?.let {
-                runCatching {
-                    gson.fromJson(it, Account::class.java)
-                }.getOrNull()
+            val accountPref = prefs[accountKey]
+
+            if (accountPref.isNullOrBlank()) {
+                return@map null
             }
+
+            runCatching {
+                gson.fromJson(accountPref, Account::class.java)
+            }.getOrNull()
         }
     }
 

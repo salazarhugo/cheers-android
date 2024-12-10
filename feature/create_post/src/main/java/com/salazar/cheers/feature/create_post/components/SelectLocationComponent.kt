@@ -1,13 +1,8 @@
 package com.salazar.cheers.feature.create_post.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MyLocation
-import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.Icon
@@ -19,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.ui.components.row.AddLocationItem
 
 
 @Composable
@@ -36,7 +31,7 @@ internal fun SelectLocationComponent(
     if (location.isNullOrBlank()) {
         AddLocationItem(
             modifier = modifier,
-            navigateToChooseOnMap = onMapClick,
+            onClick = onMapClick,
         )
         LocationResultsComponent(
             modifier = modifier,
@@ -49,36 +44,6 @@ internal fun SelectLocationComponent(
             modifier = modifier,
             onDeleteLocation = onDeleteLocation,
         )
-    }
-}
-
-@Composable
-private fun AddLocationItem(
-    modifier: Modifier = Modifier,
-    navigateToChooseOnMap: () -> Unit
-) {
-    Row(
-        modifier = Modifier.clickable { navigateToChooseOnMap() }.then(modifier),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.LocationOn,
-            contentDescription = null,
-        )
-        Text(
-            text = "Add location",
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-        )
-        IconButton(
-            onClick = { /*TODO*/ },
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.ChevronRight,
-                contentDescription = null,
-            )
-        }
     }
 }
 

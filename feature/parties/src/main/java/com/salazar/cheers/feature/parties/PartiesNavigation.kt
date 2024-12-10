@@ -32,6 +32,7 @@ fun NavGraphBuilder.partiesScreen(
             navigateToPartyMoreSheet = navigateToPartyMoreSheet,
             navigateToTickets = navigateToTickets,
             navigateToCreateParty = navigateToCreateParty,
+            onChangeCityClick = { TODO() },
         )
     }
 }

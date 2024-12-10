@@ -20,21 +20,22 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.model.mirageParty
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.EventItemDetails
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.core.model.Party
 
 @Composable
 fun PartyItem(
     party: Party,
     modifier: Modifier = Modifier,
-    onPartyClicked: (String) -> Unit = {},
+    onClick: (String) -> Unit = {},
     onMoreClick: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier
-            .clickable { onPartyClicked(party.id) },
+            .clickable { onClick(party.id) },
     ) {
         Box(contentAlignment = Alignment.TopEnd) {
             AsyncImage(
@@ -63,6 +64,7 @@ fun PartyItem(
             hostName = party.hostName,
             price = party.price,
             startTimeSeconds = party.startDate,
+            endTimeSeconds = party.endDate,
         )
         MutualFriendsComponent(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -73,13 +75,10 @@ fun PartyItem(
 
 @ComponentPreviews
 @Composable
-fun PartyComponentPreview() {
+private fun PartyComponentPreview() {
     CheersPreview {
         PartyItem(
-            party = Party(
-                name = "Mirage presents Serum w/ Sara Bluma, Aaron Julian, Gianni",
-                mutualGoing = mapOf("esf" to "cheers", "afw" to "mcdo", "wf" to "nike"),
-            ),
+            party = mirageParty,
         )
     }
 }

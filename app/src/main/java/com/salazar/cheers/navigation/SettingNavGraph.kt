@@ -46,7 +46,9 @@ fun NavGraphBuilder.settingNavGraph(
             navigateToAddPaymentMethod = {},
             navigateToLanguage = {},
             navigateToNotifications = {},
-            navigateToTheme = {},
+            navigateToTheme = {
+                navController.navigate(SettingDestinations.THEME_ROUTE)
+            },
             navigateToRecharge = navController::navigateToRecharge,
             navigateToSecurity = navController::navigateToSecurity,
             navigateToPaymentHistory = {},

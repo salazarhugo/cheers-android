@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -43,17 +41,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.AnimatedLogo
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
@@ -114,12 +105,6 @@ fun SignInScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(60.dp)
-                )
                 AnimatedLogo()
                 Spacer(modifier = Modifier.height(30.dp))
 
@@ -134,6 +119,7 @@ fun SignInScreen(
                     )
                 }
                 GoogleButton(
+                    isLoading = uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),

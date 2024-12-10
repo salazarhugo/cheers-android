@@ -4,8 +4,9 @@ import com.salazar.cheers.shared.util.result.DataError
 import io.grpc.Status
 import io.grpc.StatusException
 
+// StatusException is a wrapper around GRPC Status
 fun StatusException.toDataError(): DataError.Network {
-    return when(status.code) {
+    return when (status.code) {
         Status.Code.OK -> DataError.Network.UNKNOWN
         Status.Code.CANCELLED -> DataError.Network.UNKNOWN
         Status.Code.UNKNOWN -> DataError.Network.UNKNOWN

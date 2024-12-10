@@ -20,14 +20,14 @@ import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
-import com.salazar.cheers.feature.chat.ui.screens.messages.messagesNavigationRoute
+import com.salazar.cheers.feature.chat.ui.screens.messages.Messages
 import com.salazar.cheers.feature.create_note.createNoteNavigationRoute
-import com.salazar.cheers.feature.create_post.createPostNavigationRoute
+import com.salazar.cheers.feature.create_post.CreatePost
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
 import com.salazar.cheers.feature.signin.signInNavigationRoute
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.bottombar.CheersBottomBar
-
+import com.salazar.cheers.ui.main.party.create.CreatePartyGraph
 
 @Composable
 fun CheersNavGraph(
@@ -39,8 +39,8 @@ fun CheersNavGraph(
     val startDestination =
         remember {
             when (passcodeEnabled) {
-                true -> CheersDestinations.PASSCODE_ROUTE
-                false -> CheersDestinations.MAIN_ROUTE
+                true -> PasscodeNavGraph
+                false -> MainNavGraph
             }
         }
 
@@ -53,8 +53,9 @@ fun CheersNavGraph(
     val hide =
         navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
                 || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
+                || navBackStackEntry?.destination?.hierarchy?.any { it.route?.contains(CreatePartyGraph.toString()) == true } == true
                 || currentRoute.contains(MainDestinations.STORY_ROUTE)
-                || currentRoute.contains(messagesNavigationRoute)
+                || currentRoute.contains(Messages.toString())
                 || currentRoute.contains(MainDestinations.CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.NEW_CHAT_ROUTE)
                 || currentRoute.contains(MainDestinations.ROOM_DETAILS)
@@ -63,7 +64,7 @@ fun CheersNavGraph(
                 || currentRoute.contains(MainDestinations.COMMENT_MORE_SHEET)
                 || currentRoute.contains(MainDestinations.COMMENT_DELETE)
                 || currentRoute.contains(MainDestinations.TICKETING_ROUTE)
-                || currentRoute.contains(createPostNavigationRoute)
+                || currentRoute.contains(CreatePost.toString())
                 || currentRoute.contains(createNoteNavigationRoute)
                 || currentRoute.contains(MainDestinations.EDIT_PROFILE_ROUTE)
                 || currentRoute.contains(MainDestinations.CAMERA_ROUTE)
@@ -97,7 +98,6 @@ fun CheersNavGraph(
             }
             NavHost(
                 modifier = Modifier.padding(bottom = padding),
-                route = CheersDestinations.ROOT_ROUTE,
                 navController = appState.navController,
                 startDestination = startDestination,
             ) {
@@ -113,6 +113,7 @@ fun CheersNavGraph(
 
                 mainNavGraph(
                     appState = appState,
+                    appSettings = uiState.settings,
                 )
 
                 passcodeNavGraph(

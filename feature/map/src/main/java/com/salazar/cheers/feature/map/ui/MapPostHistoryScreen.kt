@@ -29,6 +29,8 @@ fun MapPostHistoryScreen(
                     .fillMaxSize()
                     .align(Alignment.TopCenter),
                 onMapUIAction = {},
+                onZoomTo = {},
+                zoom = 15.0,
             )
         }
     ) {

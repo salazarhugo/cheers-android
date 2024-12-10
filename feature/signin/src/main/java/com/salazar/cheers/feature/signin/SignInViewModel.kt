@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.ErrorMessage
 import com.salazar.cheers.data.auth.AuthRepository
-import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.cheers.domain.get_remote_config.CheckFeatureEnabledUseCase
 import com.salazar.cheers.domain.models.RemoteConfigParameter
 import com.salazar.cheers.domain.usecase.SignInWithCredentialManagerFlowUseCase
@@ -15,7 +14,6 @@ import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -27,6 +25,7 @@ data class SignInUiState(
     val navigateToRegister: String? = null,
     val isSignedIn: Boolean? = null,
     val isLoading: Boolean,
+    val isGoogleLoading: Boolean = false,
     val errorMessage: String? = null,
     val username: String = "",
     val dialog: StateEventWithContent<ErrorMessage> = consumed(),
@@ -95,6 +94,7 @@ class SignInViewModel @Inject constructor(
     fun onGoogleButtonClick(
         context: Context,
     ) {
+        updateIsLoading(true)
         showSigningOptions(
             context = context,
             username = "cheers.social",

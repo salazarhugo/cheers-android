@@ -1,4 +1,4 @@
-package com.salazar.cheers.map.ui
+package com.salazar.cheers.feature.map.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,7 +40,7 @@ fun GhostModeCard(
     Card(
         modifier = Modifier
             .fillMaxWidth(),
-        onClick = { /*TODO*/ },
+        onClick = { onChange(!ghostMode) },
     ) {
         Row(
             modifier = Modifier

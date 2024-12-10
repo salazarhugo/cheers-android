@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package cheers.search.v1;
+
+import "cheers/type/user/user.proto";
+//import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto";
+import "cheers/party/v1/party_service.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/search/v1;search";
+
+service SearchService {
+  rpc Search (SearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      post: "/v1/search"
+      body: "*"
+    };
+  };
+}
+
+message SearchResponse {
+  repeated cheers.type.UserItem users = 1;
+  repeated cheers.party.v1.PartyItem events = 2;
+}
+
+message SearchRequest {
+  string query = 1;
+  SearchType type = 2;
+}
+
+enum SearchType {
+  USERS = 0;
+  EVENTS = 1;
+}

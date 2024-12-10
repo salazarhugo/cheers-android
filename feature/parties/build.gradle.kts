@@ -21,6 +21,9 @@ dependencies {
     
     implementation(projects.domain)
 
+    // Work Manager
+    implementation(libs.androidx.work.runtime.ktx)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

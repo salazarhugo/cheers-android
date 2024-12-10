@@ -2,7 +2,6 @@ package com.salazar.cheers.data.auth
 
 import android.content.Context
 import android.os.Build
-import android.provider.ContactsContract.Data
 import android.util.Log
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
@@ -15,7 +14,6 @@ import androidx.credentials.PublicKeyCredential
 import androidx.credentials.exceptions.GetCredentialException
 import cheers.auth.v1.AuthServiceGrpcKt
 import cheers.auth.v1.ListCredentialsRequest
-import cheers.notification.v1.NotificationServiceGrpcKt
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -50,7 +48,6 @@ import com.salazar.cheers.shared.data.response.FinishLoginResponse
 import com.salazar.cheers.shared.data.response.LoginResponse
 import com.salazar.cheers.shared.util.Resource
 import com.salazar.cheers.shared.util.result.DataError
-import com.salazar.cheers.shared.util.result.Error
 import com.salazar.cheers.shared.util.result.RootError
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -101,9 +98,11 @@ class AuthRepository @Inject constructor(
         activityContext: Context,
         request: CreatePasskeyRequest,
     ): Result<Passkey> {
+        println(request)
         return try {
             val createCredentialRequest = CreatePublicKeyCredentialRequest(
                 requestJson = gson.toJson(request),
+                isAutoSelectAllowed = true,
             )
             // Launch the FIDO2 flow
             val response = credentialManager.createCredential(

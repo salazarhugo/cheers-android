@@ -3,23 +3,23 @@ package com.salazar.cheers.data.party.data.repository.impl
 import cheers.party.v1.AnswerPartyRequest
 import cheers.party.v1.CreatePartyRequest
 import cheers.party.v1.FeedPartyRequest
+import cheers.party.v1.GetPartyItemRequest
 import cheers.party.v1.ListPartyRequest
 import cheers.party.v1.PartyServiceGrpcKt
-import cheers.type.PartyOuterClass
-import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.core.db.dao.PartyDao
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.WatchStatus
-import com.salazar.cheers.data.party.data.mapper.toPartyAnswer
 import com.salazar.cheers.data.party.data.repository.PartyRepository
-import com.salazar.cheers.data.party.toParty
+import com.salazar.cheers.shared.data.mapper.toParty
+import com.salazar.cheers.shared.data.mapper.toPartyAnswer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,7 +33,7 @@ class PartyRepositoryImpl @Inject constructor(
     suspend fun getPartyFeed(page: Int, pageSize: Int): Result<List<Party>> {
         val request = FeedPartyRequest.newBuilder()
             .setPageSize(pageSize)
-            .setPageToken(page.toString())
+            .setPage(page)
             .build()
 
         val response = service.feedParty(request)
@@ -45,13 +45,9 @@ class PartyRepositoryImpl @Inject constructor(
         return Result.success(parties)
     }
 
-    override suspend fun createParty(party: PartyOuterClass.Party): Result<Unit> {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-
-        val request = CreatePartyRequest.newBuilder()
-            .setParty(party)
-            .build()
-
+    override suspend fun createParty(
+        request: CreatePartyRequest,
+    ): Result<Unit> {
         return try {
             val response = service.createParty(request)
 //            partyDao.insert(response.toParty(uid, uid))
@@ -63,7 +59,22 @@ class PartyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getParty(partyId: String): Flow<Party> {
-        return partyDao.getEvent(partyId).map { it.asExternalModel() }
+        val request = GetPartyItemRequest.newBuilder()
+            .setPartyId(partyId)
+            .build()
+
+        try {
+            val response = service.getPartyItem(request)
+            val party = response.item.toParty()
+            partyDao.insert(party.asEntity())
+
+            Result.success(party)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+
+        return partyDao.getEvent(partyId).mapNotNull { it?.asExternalModel() }
     }
 
     override suspend fun feedParty(
@@ -74,14 +85,17 @@ class PartyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchFeedParty(
+        city: String,
         page: Int,
         pageSize: Int
     ): Result<List<Party>> {
         val request = FeedPartyRequest.newBuilder()
             .setPageSize(pageSize)
-            .setPageToken("")
+            .setPage(page)
+            .setCity(city)
             .build()
 
+        println(request)
         return try {
             val response = service.feedParty(request)
             val parties = response.itemsList.map {
@@ -150,7 +164,7 @@ class PartyRepositoryImpl @Inject constructor(
                 .build()
             val response = service.answerParty(request = request)
             Result.success(Unit)
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }

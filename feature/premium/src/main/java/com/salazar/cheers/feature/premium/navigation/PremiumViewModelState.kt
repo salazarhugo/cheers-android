@@ -12,7 +12,6 @@ internal data class PremiumViewModelState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val errorMessages: String = "",
-    val sheetState: SheetState = SheetState(true),
 ) {
     fun toUiState(): PremiumUiState {
         return when (user != null) {
@@ -22,7 +21,6 @@ internal data class PremiumViewModelState(
                 parties = parties,
                 isLoading = isLoading,
                 errorMessages = errorMessages,
-                sheetState = sheetState,
                 isRefreshing = isRefreshing,
             )
 
@@ -30,7 +28,6 @@ internal data class PremiumViewModelState(
                 PremiumUiState.NoAccount(
                     isLoading = isLoading,
                     errorMessages = errorMessages,
-                    sheetState = sheetState,
                     isRefreshing = isRefreshing,
                 )
             }

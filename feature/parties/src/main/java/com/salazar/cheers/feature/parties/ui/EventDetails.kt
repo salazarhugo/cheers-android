@@ -15,6 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.util.dateTimeFormatter
 
 @Composable
 fun PartyDetails(
@@ -33,14 +36,16 @@ fun PartyDetails(
     ) {
         Column {
             Text(
-                text = com.salazar.cheers.core.util.dateTimeFormatter(timestamp = startTimeSeconds),
+                text = dateTimeFormatter(startTimestamp = startTimeSeconds),
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
                 color = MaterialTheme.colorScheme.error,
             )
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
+            if (name.isNotBlank()) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
             Text(
                 text = "${privacy.title} - ${privacy.subtitle}",
                 style = MaterialTheme.typography.labelLarge
@@ -49,3 +54,15 @@ fun PartyDetails(
     }
 }
 
+@ComponentPreviews
+@Composable
+private fun PartyDetailsPreview() {
+    CheersPreview {
+        PartyDetails(
+            name = "",
+            privacy = Privacy.PUBLIC,
+            startTimeSeconds = 90,
+            onPartyDetailsClick = {},
+        )
+    }
+}

@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.ui.Toolbar
-import com.salazar.cheers.map.ui.GhostModeCard
+import com.salazar.cheers.feature.map.ui.GhostModeCard
 
 @Composable
 fun MapSettingsScreen(

@@ -11,7 +11,6 @@ import com.salazar.cheers.shared.data.request.Passkey
 import com.salazar.cheers.shared.data.request.Response
 import com.salazar.cheers.shared.data.response.BeginLoginResponse
 import com.salazar.cheers.shared.data.response.BeginRegistrationResponse
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 
@@ -52,23 +51,23 @@ private fun String.encodeB64(): String {
 
 fun BeginLoginResponse.toGetPasskeyRequest(): GetPasskeyRequest {
     return GetPasskeyRequest(
-        challenge = challenge,
+        challenge = publicKey.challenge,
         timeout = 1_800_000,
-        rpId = relyingPartyId,
-        userVerification = userVerification,
+        rpId = publicKey.rp.id,
+        userVerification = publicKey.userVerification,
         allowCredentials = emptyList()
     )
 }
 
 fun BeginRegistrationResponse.toCreatePasskeyRequest(username: String): CreatePasskeyRequest {
     return CreatePasskeyRequest(
-        challenge = challenge,
+        challenge = publicKey.challenge,
         rp = CreatePasskeyRequest.Rp(
-            name = "Cheers",
-            id = RELYING_PARTY_ID
+            id = publicKey.rp.id,
+            name = publicKey.rp.name,
         ),
         user = CreatePasskeyRequest.User(
-            id = userId,
+            id = publicKey.user.id.toString(),
             name = username,
             displayName = username,
         ),

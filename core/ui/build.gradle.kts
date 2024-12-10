@@ -21,8 +21,9 @@ dependencies {
     implementation(projects.core.util)
     implementation(projects.core.model)
     implementation(projects.core.shared)
+    implementation(libs.androidx.compose.runtime.runtime.livedata)
 
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+    debugImplementation(libs.androidx.ui.tooling)
 
     implementation(projects.data.party)
     implementation(projects.data.post)
@@ -31,10 +32,13 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    // Work Manager
+    implementation(libs.androidx.work.runtime.ktx)
+
     // ExoPlayer 3
-    implementation("androidx.media3:media3-exoplayer:1.2.1")
-    implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
-    implementation("androidx.media3:media3-ui:1.2.1")
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
 
     // Jetpack Compose
     implementation(libs.androidx.compose.ui.util)
@@ -47,8 +51,8 @@ dependencies {
     implementation(libs.composed.barcodes)
 
     // Amplituda
-    implementation("com.github.lincollincol:compose-audiowaveform:1.1.1")
-    implementation("com.github.lincollincol:amplituda:2.2.2")
+    implementation(libs.compose.audiowaveform)
+    implementation(libs.amplituda)
 
     // Accompanist
     implementation(libs.accompanist.navigation.material)
@@ -58,7 +62,7 @@ dependencies {
 
     // Map Box SDK
     implementation(libs.mapbox)
-    implementation("com.mapbox.extension:maps-compose:11.0.0")
+    implementation(libs.mapbox.compose)
     implementation(libs.mapbox.sdk.services)
 
     // Coil

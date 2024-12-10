@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
@@ -97,10 +96,10 @@ fun CommentsScreen(
         ) {
             val comments = uiState.comments
             if (comments == null || uiState.isLoading) {
-                LoadingScreen()
-            }
-            else {
+                CommentsScreenLoading()
+            } else {
                 Comments(
+                    showBanner = uiState.showBanner,
                     comments = comments,
                     onCommentsUIAction = onCommentsUIAction,
                 )
@@ -111,16 +110,21 @@ fun CommentsScreen(
 
 @Composable
 fun Comments(
+    showBanner: Boolean,
     comments: List<Comment>,
     onCommentsUIAction: (CommentsUIAction) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
     ) {
-        item {
-            GuidelinesBanner()
-            HorizontalDivider()
+        if (showBanner) {
+            guidelinesBanner(
+                onCloseClick = {
+                    onCommentsUIAction(CommentsUIAction.OnCloseBannerClick)
+                },
+            )
         }
+
         if (comments.isEmpty()) {
             emptyComments()
         }
@@ -206,28 +210,56 @@ fun Caption(
     }
 }
 
+private fun LazyListScope.guidelinesBanner(
+    onCloseClick: () -> Unit,
+) {
+    item {
+        GuidelinesBanner(
+            modifier = Modifier.animateItem(),
+            onCloseClick = onCloseClick,
+        )
+        HorizontalDivider()
+    }
+}
+
 @Composable
-fun GuidelinesBanner() {
-    Column(
-        modifier = Modifier
+private fun GuidelinesBanner(
+    modifier: Modifier = Modifier,
+    onCloseClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.secondaryContainer)
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        val annotatedString = buildAnnotatedString {
-            append("Remember to keep comments respectful and to follow our ")
-            pushStringAnnotation(
-                tag = "Community Guidelines",
-                annotation = "https://google.com/terms"
-            )
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSecondaryContainer)) {
-                append("Community Guidelines")
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            val annotatedString = buildAnnotatedString {
+                append("Remember to keep comments respectful and to follow our ")
+                pushStringAnnotation(
+                    tag = "Community Guidelines",
+                    annotation = "https://google.com/terms"
+                )
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSecondaryContainer)) {
+                    append("Community Guidelines")
+                }
             }
+            Text(
+                text = annotatedString,
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
-        Text(
-            text = annotatedString,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        IconButton(
+            onClick = onCloseClick,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Close icon",
+            )
+        }
     }
 }
 

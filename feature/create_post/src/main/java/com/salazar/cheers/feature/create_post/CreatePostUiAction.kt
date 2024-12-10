@@ -18,4 +18,7 @@ sealed class CreatePostUIAction {
     data class OnSelectLocation(val location: String?) : CreatePostUIAction()
     data class OnCaptionChange(val text: String) : CreatePostUIAction()
     data class OnNotificationChange(val enabled: Boolean) : CreatePostUIAction()
+    data class OnEnableLikesChange(val enabled: Boolean) : CreatePostUIAction()
+    data class OnEnableCommentsChange(val enabled: Boolean) : CreatePostUIAction()
+    data class OnEnableShareChange(val enabled: Boolean) : CreatePostUIAction()
 }

@@ -1,14 +1,25 @@
 package com.salazar.cheers.data.comment
 
 import android.content.res.Resources.NotFoundException
-import cheers.comment.v1.*
+import cheers.comment.v1.CommentServiceGrpcKt
+import cheers.comment.v1.CreateCommentRequest
+import cheers.comment.v1.CreateLikeCommentRequest
+import cheers.comment.v1.DeleteCommentRequest
+import cheers.comment.v1.DeleteLikeCommentRequest
+import cheers.comment.v1.ListCommentRequest
+import cheers.comment.v1.ListRepliesRequest
 import com.salazar.cheers.comment.data.mapper.toComment
 import com.salazar.cheers.core.db.dao.CommentDao
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.shared.util.Resource
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor(
@@ -61,7 +72,9 @@ class CommentRepositoryImpl @Inject constructor(
 
         val localComments = commentDao.listPostComments(postId = postId).first()
 
-        emit(Resource.Success(localComments.asExternalModel()))
+        if (localComments.isNotEmpty()) {
+            emit(Resource.Success(localComments.asExternalModel()))
+        }
 
         val request = ListCommentRequest.newBuilder()
             .setPostId(postId)

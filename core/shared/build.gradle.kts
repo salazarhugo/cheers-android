@@ -32,12 +32,15 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // OkHttp BOM
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))
-    implementation("com.squareup.okhttp3:okhttp")
-    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation(platform(libs.okhttp3.bom))
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     // Google"s Fused Location Provider
     implementation(libs.play.services.location)
+
+    // Work Manager
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

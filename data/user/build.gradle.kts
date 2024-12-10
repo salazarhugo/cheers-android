@@ -28,7 +28,7 @@ dependencies {
         exclude(group = "com.google.protobuf")
     }
 
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.firebase.auth.ktx)
 
     // Datastore
     implementation(libs.androidx.datastore.preferences)

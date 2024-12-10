@@ -5,19 +5,23 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import kotlinx.serialization.Serializable
 
-const val PARTY_ID = "partyID"
-const val partyDetailNavigationRoute = "party_route/{$PARTY_ID}"
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/party/{$PARTY_ID}"
+    "https://maparty.app/party/{partyID}"
+
+@Serializable
+data class PartyDetailScreen(
+    val partyID: String,
+)
 
 fun NavController.navigateToPartyDetail(
     partyID: String,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate(
-        "party_route/$partyID",
-        navOptions,
+    navigate(
+        route = PartyDetailScreen(partyID = partyID),
+        navOptions = navOptions,
     )
 }
 
@@ -29,10 +33,9 @@ fun NavGraphBuilder.partyDetailScreen(
     navigateToEditParty: (String) -> Unit,
     navigateToGuestList: (String) -> Unit,
 ) {
-    composable(
-        route = partyDetailNavigationRoute,
+    composable<PartyDetailScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<PartyDetailScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         PartyDetailRoute(

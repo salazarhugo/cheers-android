@@ -11,19 +11,16 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.NavType
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.bottomSheet
+import com.salazar.cheers.Settings
 import com.salazar.cheers.auth.ui.components.delete_account.DeleteAccountDialog
-import com.salazar.cheers.feature.comment.comment_more.CommentMoreRoute
-import com.salazar.cheers.feature.comment.delete.DeleteCommentDialog
 import com.salazar.cheers.core.ui.theme.CheersTheme
-import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.util.Constants.URI
 import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
@@ -38,8 +35,10 @@ import com.salazar.cheers.feature.chat.ui.screens.messages.messagesScreen
 import com.salazar.cheers.feature.chat.ui.screens.messages.navigateToMessages
 import com.salazar.cheers.feature.chat.ui.screens.room.chatInfoScreen
 import com.salazar.cheers.feature.chat.ui.screens.room.navigateToChatInfo
+import com.salazar.cheers.feature.comment.comment_more.CommentMoreRoute
 import com.salazar.cheers.feature.comment.comments.navigateToPostComments
 import com.salazar.cheers.feature.comment.comments.postCommentsScreen
+import com.salazar.cheers.feature.comment.delete.DeleteCommentDialog
 import com.salazar.cheers.feature.comment.replies.navigateToReplies
 import com.salazar.cheers.feature.comment.replies.repliesScreen
 import com.salazar.cheers.feature.create_note.createNoteScreen
@@ -52,30 +51,45 @@ import com.salazar.cheers.feature.friend_list.friendListScreen
 import com.salazar.cheers.feature.friend_list.navigateToFriendList
 import com.salazar.cheers.feature.friend_request.friendRequestsScreen
 import com.salazar.cheers.feature.friend_request.navigateToFriendRequests
-import com.salazar.cheers.feature.home.navigation.home.homeNavigationRoute
-import com.salazar.cheers.feature.home.navigation.home.homeScreen
+import com.salazar.cheers.feature.home.home.Home
+import com.salazar.cheers.feature.home.home.homeScreen
 import com.salazar.cheers.feature.map.navigation.mapPostHistoryScreen
 import com.salazar.cheers.feature.map.navigation.mapScreen
 import com.salazar.cheers.feature.map.navigation.mapSettingsScreen
+import com.salazar.cheers.feature.map.navigation.navigateToMap
 import com.salazar.cheers.feature.map.navigation.navigateToMapPostHistory
 import com.salazar.cheers.feature.map.navigation.navigateToMapSettings
 import com.salazar.cheers.feature.notifications.navigation.navigateToNotifications
 import com.salazar.cheers.feature.notifications.navigation.notificationsScreen
+import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
+import com.salazar.cheers.feature.parties.detail.partyDetailScreen
 import com.salazar.cheers.feature.parties.navigateToParties
 import com.salazar.cheers.feature.parties.partiesScreen
+import com.salazar.cheers.feature.post_likes.navigateToPostLikes
+import com.salazar.cheers.feature.post_likes.postLikesScreen
 import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
 import com.salazar.cheers.feature.profile.ProfileSheetUIAction
 import com.salazar.cheers.feature.profile.ProfileStatsRoute
 import com.salazar.cheers.feature.profile.ProfileStatsViewModel
+import com.salazar.cheers.feature.profile.navigation.cheersCodeScreen
+import com.salazar.cheers.feature.profile.navigation.navigateToCheerscode
 import com.salazar.cheers.feature.profile.navigation.navigateToOtherProfile
 import com.salazar.cheers.feature.profile.navigation.otherProfileScreen
 import com.salazar.cheers.feature.profile.navigation.profileScreen
+import com.salazar.cheers.feature.profile.other_profile.OtherProfileStatsRoute
 import com.salazar.cheers.feature.search.navigation.navigateToSearch
 import com.salazar.cheers.feature.search.navigation.searchScreen
 import com.salazar.cheers.feature.settings.navigateToSettings
+import com.salazar.cheers.feature.signin.navigateToSignIn
+import com.salazar.cheers.feature.signup.navigateToSignUp
+import com.salazar.cheers.feature.ticket.details.navigateToTicketDetails
+import com.salazar.cheers.feature.ticket.details.ticketDetailsScreen
+import com.salazar.cheers.feature.ticket.navigateToTickets
+import com.salazar.cheers.feature.ticket.ticketsScreen
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
 import com.salazar.cheers.notes.ui.note.NoteRoute
+import com.salazar.cheers.shared.util.result.getOrNull
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
@@ -85,46 +99,36 @@ import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
 import com.salazar.cheers.ui.main.party.EventMoreSheetViewModel
-import com.salazar.cheers.ui.main.party.create.CreatePartyRoute
-import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
-import com.salazar.cheers.feature.parties.detail.partyDetailScreen
-import com.salazar.cheers.feature.post_likes.navigateToPostLikes
-import com.salazar.cheers.feature.post_likes.postLikesScreen
-import com.salazar.cheers.feature.profile.navigation.cheersCodeScreen
-import com.salazar.cheers.feature.profile.navigation.navigateToCheerscode
-import com.salazar.cheers.feature.profile.other_profile.OtherProfileStatsRoute
-import com.salazar.cheers.feature.signin.navigateToSignIn
-import com.salazar.cheers.feature.signup.navigateToSignUp
-import com.salazar.cheers.feature.ticket.ticketsScreen
-import com.salazar.cheers.ui.main.party.edit.EditEventRoute
-import com.salazar.cheers.ui.main.party.guestlist.GuestListRoute
+import com.salazar.cheers.ui.main.party.create.createPartyGraph
+import com.salazar.cheers.ui.main.party.create.navigateToCreateParty
+import com.salazar.cheers.ui.main.party.guestlist.guestListScreen
+import com.salazar.cheers.ui.main.party.guestlist.navigateToGuestList
 import com.salazar.cheers.ui.main.share.ShareRoute
 import com.salazar.cheers.ui.main.stats.DrinkingStatsRoute
 import com.salazar.cheers.ui.main.story.StoryRoute
 import com.salazar.cheers.ui.main.story.feed.StoryFeedRoute
 import com.salazar.cheers.ui.main.story.stats.StoryStatsRoute
 import com.salazar.cheers.ui.main.ticketing.TicketingRoute
-import com.salazar.cheers.feature.ticket.details.navigateToTicketDetails
-import com.salazar.cheers.feature.ticket.details.ticketDetailsScreen
-import com.salazar.cheers.feature.ticket.navigateToTickets
-import com.salazar.cheers.ui.sheets.DeletePostDialog
 import com.salazar.cheers.ui.sheets.DeleteStoryDialog
 import com.salazar.cheers.ui.sheets.SendGiftRoute
-import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
-import com.salazar.cheers.shared.util.result.getOrNull
 import com.salazar.cheers.ui.sheets.deletePostDialog
 import com.salazar.cheers.ui.sheets.navigateToDeletePostDialog
+import com.salazar.cheers.ui.sheets.post_more.PostMoreRoute
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
+
+@Serializable
+data object MainNavGraph
 
 fun NavGraphBuilder.mainNavGraph(
+    appSettings: Settings,
     appState: CheersAppState,
 ) {
     val navController = appState.navController
 
-    navigation(
-        route = CheersDestinations.MAIN_ROUTE,
-        startDestination = homeNavigationRoute,
+    navigation<MainNavGraph>(
+        startDestination = Home,
     ) {
         friendRequestsScreen(
             navigateBack = navController::popBackStack,
@@ -196,14 +200,10 @@ fun NavGraphBuilder.mainNavGraph(
             }
         }
 
-        composable(
-            route = "${MainDestinations.CREATE_PARTY_ROUTE}?photoUri={photoUri}",
-            arguments = listOf(navArgument("photoUri") { nullable = true })
-        ) {
-            CreatePartyRoute(
-                navActions = appState.navActions,
-            )
-        }
+        createPartyGraph(
+            navController = navController,
+            navigateBack = navController::popBackStack,
+        )
 
         createNoteScreen(
             navigateBack = navController::popBackStack,
@@ -211,8 +211,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         createPostScreen(
             navigateBack = navController::popBackStack,
-            navigateToCamera = {
-            },
+            navigateToCamera = {},
         )
 
         partiesScreen(
@@ -235,10 +234,11 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         deletePostDialog(
-            onBackPressed =  navController::popBackStack,
+            onBackPressed = navController::popBackStack,
         )
 
         homeScreen(
+            appSettings = appSettings,
             onActivityClick = navController::navigateToNotifications,
             navigateToParties = navController::navigateToParties,
             onPostClick = {},
@@ -264,9 +264,9 @@ fun NavGraphBuilder.mainNavGraph(
                 }
             },
             navigateToDeletePostDialog = navController::navigateToDeletePostDialog,
-//            {
-//                navController.navigate(DeletePostDialog(postID = it))
-//            },
+            navigateToPartyDetail = navController::navigateToPartyDetail,
+            navigateToCreateParty = navController::navigateToCreateParty,
+            navigateToMap = navController::navigateToMap,
         )
 
         mapScreen(
@@ -306,6 +306,9 @@ fun NavGraphBuilder.mainNavGraph(
 
         searchScreen(
             navigateToOtherProfile = navController::navigateToOtherProfile,
+            navigateToMap = navController::navigateToMap,
+            onBackPressed = navController::popBackStack,
+            navigateToParty = navController::navigateToPartyDetail,
         )
 
         postCommentsScreen(
@@ -384,32 +387,19 @@ fun NavGraphBuilder.mainNavGraph(
             },
         )
 
-        composable(
-            route = "${MainDestinations.GUEST_LIST_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/{eventId}" })
-        ) {
-            GuestListRoute(
-                navActions = appState.navActions,
-            )
-        }
-
         partyDetailScreen(
             navigateBack = navController::popBackStack,
             navigateToTicketing = {},
-            navigateToMap = {},
-            navigateToGuestList = {},
+            navigateToMap = navController::navigateToMap,
+            navigateToGuestList = navController::navigateToGuestList,
             navigateToEditParty = {},
             navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
-        composable(
-            route = "${MainDestinations.EDIT_EVENT_ROUTE}/{eventId}",
-            deepLinks = listOf(navDeepLink { uriPattern = "$URI/event/edit/{eventId}" })
-        ) {
-            EditEventRoute(
-                navActions = appState.navActions,
-            )
-        }
+        guestListScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+        )
 
         composable(
             route = "${MainDestinations.STORY_STATS_ROUTE}/{storyId}",

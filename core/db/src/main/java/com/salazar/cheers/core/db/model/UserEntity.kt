@@ -4,10 +4,12 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.RoomWarnings
 import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.model.User
 import java.util.UUID
 
+@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 @Entity(
     tableName = "users",
     indices = [Index(value = ["username"], unique = true)]

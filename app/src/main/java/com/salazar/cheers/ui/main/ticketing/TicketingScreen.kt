@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,13 +34,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.core.ui.ui.LoadingScreen
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.ui.PriceTag
 import com.salazar.cheers.core.ui.ui.ButtonWithLoading
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.core.model.Party
-import androidx.compose.material3.HorizontalDivider
+import com.salazar.cheers.core.util.dateTimeFormatter
 
 @Composable
 fun TicketingScreen(
@@ -141,7 +142,10 @@ fun TicketingHeader(
                 Icon(Icons.Default.Event, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = com.salazar.cheers.core.util.dateTimeFormatter(timestamp = party.startDate.toLong()),
+                    text = dateTimeFormatter(
+                        startTimestamp = party.startDate,
+                        endTimestamp = party.endDate,
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }

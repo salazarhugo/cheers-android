@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.shared.util.LocalActivity
 
 @Composable
 fun CreatePostRoute(
@@ -52,6 +51,7 @@ fun CreatePostRoute(
                         }
 
                         is CreatePostUIAction.OnNotificationChange -> viewModel.toggleNotify(it.enabled)
+                        is CreatePostUIAction.OnEnableCommentsChange -> viewModel.onEnableCommentsChange(it.enabled)
                         is CreatePostUIAction.OnSelectPrivacy -> viewModel.selectPrivacy(it.privacy)
                         is CreatePostUIAction.OnSelectDrink -> viewModel.selectDrink(it.drink)
                         is CreatePostUIAction.OnAddAudio -> viewModel.addAudio(it.localAudio)
@@ -61,6 +61,8 @@ fun CreatePostRoute(
                         }
 
                         is CreatePostUIAction.OnSelectLocation -> viewModel.updateLocation(it.location)
+                        is CreatePostUIAction.OnEnableShareChange ->viewModel.onEnableShareChange(it.enabled)
+                        is CreatePostUIAction.OnEnableLikesChange -> viewModel.onEnabledLikesChange(it.enabled)
                     }
                 }
             )

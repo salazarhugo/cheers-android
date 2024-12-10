@@ -6,33 +6,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import kotlin.math.abs
 
 @Composable
 fun relativeTimeFormatterMilli(
-    milliSeconds: Long,
+    value: Long,
+    initialTimeMillis: Long = System.currentTimeMillis(),
 ): AnnotatedString {
-    return relativeTimeFormatter(seconds = milliSeconds / 1000)
+    return relativeTimeFormatter(
+        seconds = value / 1000,
+        initialTimeMillis = initialTimeMillis,
+    )
 }
 
 @Composable
 fun relativeTimeFormatter(
     seconds: Long,
+    initialTimeMillis: Long = System.currentTimeMillis(),
 ): AnnotatedString {
 
     return buildAnnotatedString {
 
-        val elapsedSeconds = abs(System.currentTimeMillis() / 1000 - seconds)
+        val elapsedSeconds = abs(initialTimeMillis / 1000 - seconds)
+        val elapsedMinutes = elapsedSeconds / 60
 
         val res = when {
             elapsedSeconds < 2 -> "just now"
-            elapsedSeconds < 60 -> "$elapsedSeconds s"
-            elapsedSeconds < 60 * 60 -> "${elapsedSeconds / 60}m"
-            elapsedSeconds < 60 * 60 * 24 -> "${elapsedSeconds / (60 * 60)}h"
-            elapsedSeconds < 60 * 60 * 24 * 7 -> "${elapsedSeconds / (60 * 60 * 24)}d"
-            elapsedSeconds < 60 * 60 * 24 * 30 -> "${elapsedSeconds / (60 * 60 * 24 * 7)}w"
-            elapsedSeconds < 60 * 60 * 24 * 365 -> "${elapsedSeconds / (60 * 60 * 24 * 30)}mo"
+            elapsedSeconds <= 60 -> "$elapsedSeconds s"
+            elapsedSeconds <= 60 * 60 -> "${elapsedMinutes}m"
+            elapsedSeconds <= 60 * 60 * 24 -> "${elapsedSeconds / (60 * 60)}h"
+            elapsedSeconds <= 60 * 60 * 24 * 7 -> "${elapsedSeconds / (60 * 60 * 24)}d"
+            elapsedSeconds <= 60 * 60 * 24 * 30 -> "${elapsedSeconds / (60 * 60 * 24 * 7)}w"
+            elapsedSeconds <= 60 * 60 * 24 * 365 -> "${elapsedSeconds / (60 * 60 * 24 * 30)}mo"
             else -> "${elapsedSeconds / (60 * 60 * 24 * 365)}y"
         }
 
@@ -41,26 +48,26 @@ fun relativeTimeFormatter(
 }
 
 /*
- *  timestamp in seconds
+ *  timestamp in millis
  */
 @Composable
 fun startDateFormatter(
     timestamp: Long,
 ): AnnotatedString {
     return buildAnnotatedString {
-        val date = Date(timestamp * 1000)
+        val date = Date(timestamp)
 
-        if (DateUtils.isToday(timestamp * 1000)) {
+        if (DateUtils.isToday(timestamp)) {
             append("Today")
             return@buildAnnotatedString
         }
 
-        if (DateUtils.isToday(timestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
+        if (DateUtils.isToday(timestamp - DateUtils.DAY_IN_MILLIS)) {
             append("Tomorrow")
             return@buildAnnotatedString
         }
 
-        if (Date().time > timestamp * 1000 - 5 * DateUtils.DAY_IN_MILLIS) {
+        if (Date().time > timestamp - 5 * DateUtils.DAY_IN_MILLIS) {
             val res = SimpleDateFormat("EEEE").format(date)
             append(res)
             return@buildAnnotatedString
@@ -73,7 +80,7 @@ fun startDateFormatter(
 }
 
 /*
- *  timestamp in seconds
+ *  timestamp in millis
  */
 @Composable
 fun timeFormatter(
@@ -81,7 +88,7 @@ fun timeFormatter(
 ): AnnotatedString {
 
     return buildAnnotatedString {
-        val date = Date(timestamp * 1000)
+        val date = Date(timestamp)
         val res = SimpleDateFormat("HH:mm").format(date)
         append(res)
         return@buildAnnotatedString
@@ -93,25 +100,34 @@ fun timeFormatter(
  */
 @Composable
 fun dateTimeFormatter(
-    timestamp: Long,
+    startTimestamp: Long,
+    endTimestamp: Long = 0L,
 ): AnnotatedString {
+    val now = System.currentTimeMillis() / 1000
+    val isOngoing = (startTimestamp < now) && (endTimestamp > now)
 
     return buildAnnotatedString {
-        val date = Date(timestamp * 1000)
+        val date = Date(startTimestamp * 1000)
 
         val time = SimpleDateFormat("HH:mm").format(date)
 
-        if (DateUtils.isToday(timestamp * 1000)) {
+        if (isOngoing) {
+            val timeLeft = relativeTimeFormatter(endTimestamp)
+            append("Ongoing | $timeLeft left")
+            return@buildAnnotatedString
+        }
+
+        if (DateUtils.isToday(startTimestamp * 1000)) {
             append("${stringResource(id = R.string.today)}, $time")
             return@buildAnnotatedString
         }
 
-        if (DateUtils.isToday(timestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
+        if (DateUtils.isToday(startTimestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
             append("${stringResource(id = R.string.tomorrow)}, $time")
             return@buildAnnotatedString
         }
 
-        if (Date().time > timestamp * 1000 - 5 * DateUtils.DAY_IN_MILLIS) {
+        if (Date().time > startTimestamp * 1000 - 5 * DateUtils.DAY_IN_MILLIS) {
             val res = SimpleDateFormat("EEEE, HH:mm", Locale.getDefault()).format(date)
             append(res)
             return@buildAnnotatedString

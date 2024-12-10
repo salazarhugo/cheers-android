@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
+import com.salazar.cheers.domain.feed_party.ListPartyFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -23,11 +23,11 @@ data class PartiesUiState(
 
 @HiltViewModel
 class PartiesViewModel @Inject constructor(
+    private val listPartyFeedUseCase: ListPartyFeedUseCase,
     private val partyRepository: PartyRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PartiesUiState(isLoading = true))
-    private var searchJob: Job? = null
 
     val uiState = viewModelState
         .stateIn(
@@ -38,6 +38,7 @@ class PartiesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+//            listPartyFeedUseCase()
             partyRepository.feedParty(1, 10).collect {
                 updateParties(it)
             }
@@ -48,7 +49,7 @@ class PartiesViewModel @Inject constructor(
     fun onSwipeToRefresh() {
         updateIsRefreshing(true)
         viewModelScope.launch {
-            val result = partyRepository.fetchFeedParty(1, 10)
+            val result = listPartyFeedUseCase()
             result.onFailure {
                 updateError("Couldn't refresh party feed")
             }
@@ -72,13 +73,6 @@ class PartiesViewModel @Inject constructor(
         viewModelState.update {
             it.copy(parties = parties, isLoading = false)
         }
-    }
-
-    fun onQueryChange(query: String) {
-        viewModelState.update {
-            it.copy(query = query)
-        }
-        queryPartys(query = query)
     }
 
     private fun queryPartys(

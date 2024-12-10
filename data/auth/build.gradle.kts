@@ -14,7 +14,6 @@ android {
         }
     }
     defaultConfig {
-        minSdk = 28
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
     }
@@ -49,7 +48,7 @@ dependencies {
     implementation(platform(libs.firebase.bom)) {
         exclude(group = "com.google.protobuf")
     }
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.firebase.auth.ktx)
 
     // Datastore
     implementation(libs.androidx.datastore.preferences)

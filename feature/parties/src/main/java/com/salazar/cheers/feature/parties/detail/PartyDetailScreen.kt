@@ -1,12 +1,20 @@
 package com.salazar.cheers.feature.parties.detail
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -17,20 +25,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.salazar.cheers.core.util.numberFormatter
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.WatchStatus
+import com.salazar.cheers.core.ui.components.party.PartyBannerComponent
+import com.salazar.cheers.core.util.numberFormatter
 import com.salazar.cheers.feature.parties.ui.PartyDescription
 import com.salazar.cheers.feature.parties.ui.PartyDetails
 import com.salazar.cheers.feature.parties.ui.PartyHeaderButtons
 import com.salazar.cheers.feature.parties.ui.PartyInfo
 import com.salazar.cheers.feature.parties.ui.PartyVenue
+import com.salazar.cheers.shared.util.LocalActivity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,6 +50,7 @@ fun PartyDetailScreen(
     onGoingCountClick: () -> Unit,
     onInterestedCountClick: () -> Unit,
     onTicketingClick: (String) -> Unit,
+    onAnswersClick: () -> Unit,
 ) {
     val state = rememberModalBottomSheetState(true)
     val scope = rememberCoroutineScope()
@@ -83,7 +89,9 @@ fun PartyDetailScreen(
                     onGoingCountClick = onGoingCountClick,
                     onInterestedCountClick = onInterestedCountClick,
                     onTicketingClick = onTicketingClick,
+                    onAnswersClick = onAnswersClick,
                 )
+
                 is PartyDetailUiState.NoPartys -> {
                     Text("No event")
                 }
@@ -102,6 +110,7 @@ fun PartyDetail(
     onGoingCountClick: () -> Unit,
     onInterestedCountClick: () -> Unit,
     onTicketingClick: (String) -> Unit,
+    onAnswersClick: () -> Unit,
 ) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -120,18 +129,21 @@ fun PartyDetail(
                 onWatchStatusChange = onWatchStatusChange,
                 onTicketingClick = onTicketingClick,
                 onUserClick = onUserClicked,
+                onAnswersClick = onAnswersClick,
             )
         }
 
         guestList(party)
 
-        item {
-            PartyDescription(
-                description = party.description,
-                modifier = Modifier.padding(16.dp),
-                onUserClicked = onUserClicked,
-            )
-            HorizontalDivider()
+        if (party.description.isNotBlank()) {
+            item {
+                PartyDescription(
+                    description = party.description,
+                    modifier = Modifier.padding(16.dp),
+                    onUserClicked = onUserClicked,
+                )
+                HorizontalDivider()
+            }
         }
 
         item {
@@ -227,35 +239,17 @@ fun PartyHeader(
     onManageClick: () -> Unit,
     onWatchStatusChange: (WatchStatus) -> Unit,
     onTicketingClick: (String) -> Unit,
-    onUserClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    onAnswersClick: () -> Unit,
 ) {
-    Box() {
-        AsyncImage(
-            model = party.bannerUrl,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .blur(
-                    radius = 150.dp,
-                    edgeTreatment = BlurredEdgeTreatment.Unbounded
-                )
-                .aspectRatio(16 / 11f),
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.Center,
-        )
-        AsyncImage(
-            model = party.bannerUrl,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(top = 16.dp, start = 8.dp, end = 8.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .aspectRatio(16 / 9f),
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.Center,
-        )
-    }
+    val activity = LocalActivity.current
+    val gmmIntentUri = Uri.parse("geo:${party.longitude},${party.latitude}?q=${party.address}")
+    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+
+    PartyBannerComponent(
+        modifier = Modifier.statusBarsPadding(),
+        bannerUrl = party.bannerUrl,
+    )
     Column {
         PartyDetails(
             name = party.name,
@@ -271,9 +265,21 @@ fun PartyHeader(
             watchStatus = party.watchStatus,
         )
         PartyInfo(
-            party = party,
+            city = party.city,
+            startDate = party.startDate,
+            privacy = party.privacy,
+            goingCount = party.goingCount,
+            interestedCount = party.interestedCount,
+            price = party.price,
+            hostName = party.hostName,
+            address = party.address,
+            hostId = party.hostId,
             onTicketingClick = { onTicketingClick(party.id) },
             onUserClick = onUserClick,
+            onAddressClick = {
+                activity.startActivity(mapIntent)
+            },
+            onAnswersClick = onAnswersClick,
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),

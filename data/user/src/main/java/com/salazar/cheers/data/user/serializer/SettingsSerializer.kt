@@ -11,7 +11,9 @@ import java.io.InputStream
 import java.io.OutputStream
 
 object SettingsSerializer : Serializer<Settings> {
-    override val defaultValue: Settings = Settings.getDefaultInstance()
+    override val defaultValue: Settings = Settings.newBuilder()
+        .setAutoLocationEnabled(true)
+        .build()
 
     override suspend fun readFrom(input: InputStream): Settings {
         try {

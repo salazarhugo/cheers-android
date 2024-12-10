@@ -9,7 +9,7 @@ import com.salazar.cheers.auth.ui.register.RegisterRoute
 import com.salazar.cheers.core.ui.ui.AuthDestinations
 import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
-import com.salazar.cheers.feature.home.navigation.home.navigateToHome
+import com.salazar.cheers.feature.home.home.navigateToHome
 import com.salazar.cheers.feature.signin.signInScreen
 import com.salazar.cheers.feature.signup.navigateToSignUp
 import com.salazar.cheers.feature.signup.signUpScreen

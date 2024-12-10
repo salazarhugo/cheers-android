@@ -5,14 +5,21 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.profile.profile.ProfileRoute
+import kotlinx.serialization.Serializable
 
-const val profileNavigationRoute = "profile_route"
+@Serializable
+data object Profile
+
 private const val DEEP_LINK_URI_PATTERN =
-    "https://profilearty.app/profile"
+    "${Constants.BASE_URL}/profile"
 
 fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
-    this.navigate(profileNavigationRoute, navOptions)
+    this.navigate(
+        route = Profile,
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.profileScreen(
@@ -26,10 +33,9 @@ fun NavGraphBuilder.profileScreen(
     navigateToPostDetails: (String) -> Unit,
     navigateToOtherProfile: (String) -> Unit,
 ) {
-    composable(
-        route = profileNavigationRoute,
+    composable<Profile>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<Profile>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         ProfileRoute(

@@ -1,32 +1,29 @@
 package com.salazar.cheers.feature.create_post
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.core.ui.theme.GreySheet
-import kotlinx.coroutines.launch
+import com.salazar.cheers.core.util.Utils.clickableIf
+import com.salazar.cheers.core.util.Utils.conditional
 
 @Composable
 fun PrivacyBottomSheet(
@@ -39,10 +36,10 @@ fun PrivacyBottomSheet(
     ModalBottomSheet(
         modifier = modifier,
         sheetState = privacyState,
-        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
+//        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
         shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         onDismissRequest = onDismiss,
-        windowInsets = WindowInsets(0,0,0,0),
+//        contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
         content = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,9 +58,11 @@ fun PrivacyBottomSheet(
             }
 
             Privacy.entries.forEach {
+                val enabled = listOf(Privacy.PRIVATE, Privacy.FRIENDS)
                 PrivacyItem(
                     privacy = it,
                     selected = it == privacy,
+                    enabled = it in enabled,
                     onSelectPrivacy = {
                         onSelectPrivacy(it)
                     }
@@ -82,30 +81,48 @@ fun PrivacyBottomSheet(
         }
     )
 }
+
 @Composable
 fun PrivacyItem(
     privacy: Privacy,
     selected: Boolean,
+    enabled: Boolean,
     onSelectPrivacy: () -> Unit,
 ) {
     Row(
         modifier = Modifier
-            .clickable { onSelectPrivacy() }
+            .clickableIf(enabled) {
+                onSelectPrivacy()
+            }
             .padding(vertical = 12.dp, horizontal = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(privacy.icon, null)
+        Row(
+            modifier = Modifier
+                .conditional(!enabled) {
+                    alpha(0.38f)
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = privacy.icon,
+                contentDescription = null,
+            )
             Column(modifier = Modifier.padding(start = 16.dp)) {
-                Text(privacy.title)
-                Text(privacy.subtitle)
+                Text(
+                    text = privacy.title,
+                )
+                Text(
+                    text = privacy.subtitle,
+                )
             }
         }
-        Checkbox(
-            checked = selected,
-            onCheckedChange = { onSelectPrivacy() },
+        RadioButton(
+            selected = selected,
+            enabled = enabled,
+            onClick = { onSelectPrivacy() },
         )
     }
 }
@@ -115,6 +132,7 @@ fun PrivacyItem(
 private fun PrivacyBottomSheetPreview() {
     CheersPreview {
         PrivacyBottomSheet(
+            privacyState = rememberModalBottomSheetState(),
             privacy = Privacy.PUBLIC,
             modifier = Modifier,
         )

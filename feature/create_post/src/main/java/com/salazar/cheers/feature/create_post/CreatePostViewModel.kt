@@ -6,7 +6,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.mapbox.geojson.Point
+import com.salazar.cheers.core.PostType
 import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
@@ -14,7 +16,6 @@ import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.toMedia
 import com.salazar.cheers.core.util.audio.LocalAudio
 import com.salazar.cheers.core.util.playback.AndroidAudioPlayer
-import com.salazar.cheers.core.PostType
 import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,11 +30,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
-    stateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val createPostUseCases: CreatePostUseCases,
     private val audioPlayer: AndroidAudioPlayer,
 ) : ViewModel() {
 
+    private val createPost = savedStateHandle.toRoute<CreatePost>()
     private val viewModelState = MutableStateFlow(CreatePostUiState(isLoading = false))
 
     val uiState = viewModelState
@@ -44,7 +46,7 @@ class CreatePostViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>("photoUri")?.let {
+        createPost.photoUri?.let {
 //            addPhoto(Uri.parse(it))
         }
 
@@ -161,6 +163,24 @@ class CreatePostViewModel @Inject constructor(
 //        }
 //    }
 
+    fun onEnabledLikesChange(enabled: Boolean) {
+        viewModelState.update {
+            it.copy(likesEnabled = enabled)
+        }
+    }
+
+    fun onEnableShareChange(enabled: Boolean) {
+        viewModelState.update {
+            it.copy(shareEnabled = enabled)
+        }
+    }
+
+    fun onEnableCommentsChange(enabled: Boolean) {
+        viewModelState.update {
+            it.copy(commentsEnabled = enabled)
+        }
+    }
+
     fun toggleNotify(notify: Boolean) {
         viewModelState.update {
             it.copy(notify = notify)
@@ -274,6 +294,9 @@ class CreatePostViewModel @Inject constructor(
                 "TAG_USER_IDS" to uiState.selectedTagUsers.map { it.id }.toTypedArray(),
                 "PRIVACY" to uiState.privacy.name,
                 "NOTIFY" to uiState.notify,
+                "LIKES_ENABLED" to uiState.likesEnabled,
+                "COMMENTS_ENABLED" to uiState.commentsEnabled,
+                "SHARE_ENABLED" to uiState.shareEnabled,
             )
         }
 

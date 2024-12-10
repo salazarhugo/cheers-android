@@ -16,43 +16,38 @@ import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.salazar.cheers.R
-import com.salazar.cheers.feature.chat.ui.screens.messages.messagesNavigationRoute
-import com.salazar.cheers.feature.create_post.createPostNavigationRoute
-import com.salazar.cheers.feature.home.navigation.home.homeNavigationRoute
 import com.salazar.cheers.feature.map.navigation.mapNavigationRoute
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
-import com.salazar.cheers.feature.profile.navigation.profileNavigationRoute
-import com.salazar.cheers.feature.search.navigation.searchNavigationRoute
 
 sealed class Screen(
-    val route: String,
+    val route: Any,
     val icon: ImageVector,
     val selectedIcon: ImageVector,
     @StringRes val label: Int,
 ) {
     data object Home : Screen(
-        route = homeNavigationRoute,
+        route = com.salazar.cheers.feature.home.home.Home,
         icon = Icons.Outlined.Home,
         selectedIcon = Icons.Default.Home,
         label = R.string.menu_home,
     )
 
     data object Search : Screen(
-        route = searchNavigationRoute,
+        route = com.salazar.cheers.feature.search.navigation.Search,
         icon = Icons.Outlined.Search,
         selectedIcon = Icons.Filled.Search,
         label = R.string.search,
     )
 
     data object Messages : Screen(
-        route = messagesNavigationRoute,
+        route = com.salazar.cheers.feature.chat.ui.screens.messages.Messages,
         icon = Icons.Outlined.ChatBubbleOutline,
         selectedIcon = Icons.Filled.ChatBubble,
         label = R.string.chat,
     )
 
     data object CreatePost : Screen(
-        route = createPostNavigationRoute,
+        route = com.salazar.cheers.feature.create_post.CreatePost(),
         icon = Icons.Outlined.AddBox,
         selectedIcon = Icons.Outlined.AddBox,
         label = R.string.search,
@@ -66,7 +61,7 @@ sealed class Screen(
     )
 
     data object Profile : Screen(
-        route = profileNavigationRoute,
+        route = com.salazar.cheers.feature.profile.navigation.Profile,
         icon = Icons.Outlined.PersonOutline,
         selectedIcon = Icons.Filled.Person,
         label = R.string.profile,

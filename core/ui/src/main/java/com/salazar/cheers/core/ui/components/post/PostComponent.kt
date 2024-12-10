@@ -14,16 +14,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.PostCaption
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
-import com.salazar.cheers.core.util.playback.AudioState
-import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.ui.components.post.footer.PostFooter
 import com.salazar.cheers.core.ui.components.post.more.PostMoreBottomSheet
+import com.salazar.cheers.core.util.playback.AudioState
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -76,17 +80,19 @@ fun PostComponent(
             onUserClicked = onUserClick,
             onPostClicked = {},
         )
-        PostMedia(
-            medias = post.photos.map { Media.Image(uri = Uri.parse(it)) },
-            pagerState = pagerState,
-            modifier = Modifier,
-            onPostClick = { },
-            onDoubleTap = {
-                if (post.liked.not()) {
-                    onLikeClick()
-                }
-            },
-        )
+        if (post.photos.isNotEmpty()) {
+            PostMedia(
+                medias = post.photos.map { Media.Image(uri = Uri.parse(it)) },
+                pagerState = pagerState,
+                modifier = Modifier,
+                onPostClick = { },
+                onDoubleTap = {
+                    if (post.liked.not()) {
+                        onLikeClick()
+                    }
+                },
+            )
+        }
         if (post.audioWaveform.isNotEmpty()) {
             PlaybackComponent(
                 modifier = Modifier
@@ -105,14 +111,20 @@ fun PostComponent(
         PostFooter(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
             likeCount = post.likes,
+            canLike = post.canLike,
+            canComment = post.canComment,
+            canShare = post.canShare,
             commentCount = post.comments,
             hasViewerLiked = post.liked,
             onLikeClick = onLikeClick,
             onLikeCountClick = onLikeCountClick,
             onCommentClick = onCommentClick,
             onShareClick = { },
+            commentText = post.lastCommentText,
+            commentUsername = post.lastCommentUsername,
         )
     }
 
@@ -138,7 +150,6 @@ fun PostComponent(
 private fun PostComponentPreview() {
     CheersPreview {
         PostComponent(
-            modifier = Modifier.padding(16.dp),
             post = Post(
                 username = "cheers",
                 isAuthor = true,
@@ -155,12 +166,14 @@ private fun PostComponentPreview() {
 
 @ComponentPreviews
 @Composable
-private fun PostComponentPreviewImages() {
+private fun PostComponentPreviewImages(
+    @PreviewParameter(LoremIpsum::class) text: String
+) {
     CheersPreview {
+        val user = cheersUserItem
         PostComponent(
-//            modifier = Modifier.padding(16.dp),
             post = Post(
-                username = "cheers",
+                username = user.username,
                 isAuthor = true,
                 drinkName = "Beer",
                 caption = "\uD83D\uDCE2 Invest in a warehouse with showroom in Agios Nicolaos, Larnaka!",
@@ -171,6 +184,8 @@ private fun PostComponentPreviewImages() {
                 audioWaveform = listOf(4, 5, 3, 7, 2, 3, 5, 2, 5, 3, 5, 6, 7, 8, 9),
                 drinkPicture = "wf",
                 drinkId = "",
+                lastCommentUsername = user.username,
+                lastCommentText = text,
             ),
         )
     }

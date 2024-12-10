@@ -12,8 +12,9 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="Theme.Cheers.Splash" parent="NightAdjusted.Theme.Splash">
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+    <style name="Theme.Cheers.Splash">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/cheers_logo_avd</item>
+        <item name="android:windowSplashScreenAnimationDuration">500</item>
         <item name="postSplashScreenTheme">@style/Theme.Cheers</item>
     </style>
 </resources>

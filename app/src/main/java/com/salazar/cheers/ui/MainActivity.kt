@@ -12,7 +12,6 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -21,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,11 +45,9 @@ import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.CheersViewModel
 import com.salazar.cheers.shared.util.LocalActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -76,6 +74,7 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
     private val viewModel: CheersViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
         var uiState: CheersUiState by mutableStateOf(CheersUiState.Loading)
@@ -141,24 +140,29 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
     override fun onResume() {
         super.onResume()
 
-        Log.d("INTENT", intent.data.toString())
-        val data = intent.data ?: return
-        val auth = Firebase.auth
 
-        if (!auth.isSignInWithEmailLink(data.toString()))
-            return
+        try {
+            Log.d("INTENT", intent.data.toString())
+            val data = intent.data ?: return
+            val auth = Firebase.auth
+            if (!auth.isSignInWithEmailLink(data.toString()))
+                return
+            val continueUrl = data.getQueryParameter("continueUrl") ?: return
 
-        val continueUrl = data.getQueryParameter("continueUrl") ?: return
-        val encodedUrl = URLEncoder.encode(data.toString(), StandardCharsets.UTF_8.toString())
+            val encodedUrl = data.toString().encodeToByteArray().decodeToString()
 
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            "$continueUrl/$encodedUrl".toUri(),
-            this,
-            MainActivity::class.java,
-        )
+            val deepLinkIntent = Intent(
+                Intent.ACTION_VIEW,
+                "$continueUrl/$encodedUrl".toUri(),
+                this,
+                MainActivity::class.java,
+            )
 
-        startActivity(deepLinkIntent)
+            startActivity(deepLinkIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     private fun checkForAppUpdates() {

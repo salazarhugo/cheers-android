@@ -16,14 +16,14 @@ android {
         }
     }
     namespace = "com.salazar.cheers"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.salazar.cheers"
-        minSdk = 28
-        targetSdk = 34
-        versionCode = 72
-        versionName = "1.0.0-072"
+        minSdk = 31
+        targetSdk = 35
+        versionCode = 73
+        versionName = "1.0.0-073"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
     }
@@ -36,15 +36,22 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
         }
-
         getByName("debug") {
             isDebuggable = true
             isMinifyEnabled = false
             versionNameSuffix = "_dev_debug"
 //            applicationIdSuffix = ".dev"
             signingConfig = signingConfigs.getByName("debug")
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     packaging.resources {
@@ -125,11 +132,12 @@ dependencies {
 
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.navigation.compose)
 
     // Jetpack Compose BOM
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.activity.compose)
-    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation(libs.androidx.compose.runtime.runtime.livedata)
 
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
@@ -185,7 +193,7 @@ dependencies {
     }
 
     // App Check Play Integrity
-    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation(libs.firebase.appcheck.playintegrity)
 
     // App Check Debug
     implementation(libs.firebase.appcheck.debug) {
@@ -193,27 +201,19 @@ dependencies {
     }
 
     // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.auth)
 
     //Firebase Dynamic-Links
-    implementation("com.google.firebase:firebase-dynamic-links-ktx")
-
-    // Firebase Firestore
-//    implementation("com.google.firebase:firebase-firestore-ktx"
-
-    // Firebase Functions
-    implementation("com.google.firebase:firebase-functions-ktx") {
-        exclude(group = "com.google.protobuf")
-    }
+    implementation(libs.firebase.dynamic.links.ktx)
 
     // Firebase Messaging
-    implementation("com.google.firebase:firebase-messaging-ktx") {
+    implementation(libs.firebase.messaging.ktx) {
         exclude(group = "com.google.protobuf")
     }
 
     // Firebase Storage
-    implementation("com.google.firebase:firebase-storage-ktx") {
+    implementation(libs.firebase.storage.ktx) {
         exclude(group = "com.google.protobuf")
     }
 

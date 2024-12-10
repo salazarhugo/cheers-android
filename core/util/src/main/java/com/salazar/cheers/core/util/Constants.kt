@@ -10,4 +10,7 @@ object Constants {
     const val PRIVACY_POLICY_LINK = "https://policies.cheers.social/privacy"
     const val TERMS_AND_CONDITIONS_LINK = "https://policies.cheers.social/terms"
     const val FEEDBACK_LINK = "https://cheers.featurebase.app"
+    const val BASE_URL = "https://cheers.social"
+    const val PARTY_UNIQUE_WORKER_NAME = "party_upload"
+
 }

@@ -23,11 +23,9 @@ import androidx.compose.material.icons.outlined.Celebration
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -220,7 +218,7 @@ fun ProfileList(
                         1 -> parties?.forEach {
                             PartyItem(
                                 party = it,
-                                onPartyClicked = {},
+                                onClick = {},
                                 onMoreClick = {},
                             )
                         }
@@ -272,7 +270,7 @@ fun PartyList(
             items(parties, key = { it.id }) { event ->
                 PartyItem(
                     party = event,
-                    onPartyClicked = {},
+                    onClick = {},
                     onMoreClick = {},
                 )
             }

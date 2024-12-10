@@ -25,5 +25,12 @@ message UploadMediaRequest {
 }
 
 message UploadMediaResponse {
-  string media_id = 1;
+  Media media = 1;
+}
+
+message Media {
+  string id = 1;
+  string url = 2;
+  string ref = 3;
+  string type = 4;
 }

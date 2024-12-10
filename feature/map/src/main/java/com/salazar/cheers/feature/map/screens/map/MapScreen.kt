@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.PublicOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,18 +31,22 @@ import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.maps.extension.compose.annotation.ViewAnnotation
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import com.salazar.cheers.feature.map.ui.annotations.CurrentUserAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.FriendAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.PostAnnotation
 import com.salazar.cheers.feature.map.ui.components.MapComponent
-import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import kotlinx.coroutines.launch
+
+const val INITIAL_ZOOM = 13.0
 
 @Composable
 fun MapScreen(
+    sheetState: SheetState,
     uiState: MapUiState.Initialized,
     mapViewportState: MapViewportState,
     onMapUIAction: (MapUIAction) -> Unit,
@@ -58,19 +63,19 @@ fun MapScreen(
                         uiState.userLocation.latitude
                     )
                 )
-                zoom(13.0)
+                zoom(INITIAL_ZOOM)
             }
         )
     }
 
     if (selectedAnnotation != null) {
         MapBottomSheet(
-            state = uiState.sheetState,
+            state = sheetState,
             type = selectedAnnotation,
             onMapUIAction = onMapUIAction,
             onDismissRequest = {
                 scope.launch {
-                    uiState.sheetState.hide()
+                    sheetState.hide()
                 }.invokeOnCompletion {
                     onMapUIAction(MapUIAction.OnDismissBottomSheet)
                 }
@@ -83,12 +88,23 @@ fun MapScreen(
         mapViewportState = mapViewportState,
         overlay = {
             UiLayer(
+                zoom = mapViewportState.cameraState.zoom,
                 isPublic = uiState.isPublic,
                 modifier = Modifier
                     .systemBarsPadding()
                     .fillMaxSize()
                     .align(Alignment.TopCenter),
                 onMapUIAction = onMapUIAction,
+                onZoomTo = {
+                    mapViewportState.easeTo(
+                        cameraOptions = cameraOptions {
+                            zoom(it)
+                        },
+                        animationOptions = MapAnimationOptions.mapAnimationOptions {
+                            duration(0)
+                        }
+                    )
+                }
             )
         }
     ) {
@@ -143,7 +159,7 @@ fun CurrentUserViewAnnotation(
     }
 
     ViewAnnotation(
-        options = options
+        options = options,
     ) {
         CurrentUserAnnotation(
             name = "Me",
@@ -235,9 +251,11 @@ fun AddPostViewAnnotation(
 
 @Composable
 fun UiLayer(
+    zoom: Double,
     isPublic: Boolean,
     modifier: Modifier = Modifier,
     onMapUIAction: (MapUIAction) -> Unit,
+    onZoomTo: (Double) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -246,6 +264,13 @@ fun UiLayer(
         MapTopBar(
             isPublic = isPublic,
             onMapUIAction = onMapUIAction,
+        )
+        MapSliderComponent(
+            zoom = zoom,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(16.dp),
+            onValueChange = onZoomTo,
         )
         MapBottomBar(
             onMapUIAction = onMapUIAction,

@@ -24,4 +24,7 @@ message Settings {
   string idToken = 7;
   string username = 8;
   bool passcode_enabled = 9;
+  bool auto_location_enabled = 10;
+  string city = 11;
+  int32 selected_home_tab = 12;
 }
