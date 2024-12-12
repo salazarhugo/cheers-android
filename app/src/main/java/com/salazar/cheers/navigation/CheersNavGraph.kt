@@ -53,7 +53,11 @@ fun CheersNavGraph(
     val hide =
         navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.AUTH_ROUTE } == true
                 || navBackStackEntry?.destination?.hierarchy?.any { it.route == CheersDestinations.SETTING_ROUTE } == true
-                || navBackStackEntry?.destination?.hierarchy?.any { it.route?.contains(CreatePartyGraph.toString()) == true } == true
+                || navBackStackEntry?.destination?.hierarchy?.any {
+            it.route?.contains(
+                CreatePartyGraph.toString()
+            ) == true
+        } == true
                 || currentRoute.contains(MainDestinations.STORY_ROUTE)
                 || currentRoute.contains(Messages.toString())
                 || currentRoute.contains(MainDestinations.CHAT_ROUTE)
@@ -106,7 +110,6 @@ fun CheersNavGraph(
                 )
 
                 authNavGraph(
-                    navActions = navActions,
                     navController = appState.navController,
                     startDestination = signInNavigationRoute,
                 )

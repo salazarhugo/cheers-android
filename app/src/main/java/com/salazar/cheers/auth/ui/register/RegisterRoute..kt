@@ -12,7 +12,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,23 +36,26 @@ fun RegisterRoute(
     ) { page ->
         Column(modifier = Modifier.fillMaxHeight()) {
             when (page) {
-                0 -> WelcomeScreen(onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(1)
-                    }
-                })
+                0 -> WelcomeScreen(
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(1)
+                        }
+                    },
+                )
 
-                1 -> {
-                }
+                1 -> {}
 
-                2 -> RegisterScreen(uiState = uiState,
+                2 -> RegisterScreen(
+                    uiState = uiState,
                     onRegisterClick = registerViewModel::registerUser,
                     onAcceptTermsChange = registerViewModel::onAcceptTermsChange,
                     onBackPressed = {
                         scope.launch {
                             pagerState.animateScrollToPage(1)
                         }
-                    })
+                    },
+                )
             }
         }
     }

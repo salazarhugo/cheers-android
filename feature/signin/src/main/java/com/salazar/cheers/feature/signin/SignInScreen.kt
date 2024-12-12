@@ -112,7 +112,12 @@ fun SignInScreen(
                     visible = uiState.isPasskeyEnabled && !uiState.isGoogleLoading,
                 ) {
                     Column {
-                        UsernameTextField(uiState, onUsernameChanged = onUsernameChanged)
+                        UsernameTextField(
+                            username= uiState.username,
+                            isLoading = uiState.isLoading,
+                            onUsernameChanged = onUsernameChanged,
+                            onDoneClick = onSignInClick,
+                        )
                         Spacer(Modifier.height(8.dp))
                         LoginButton(
                             isLoading = uiState.isLoading,
@@ -155,11 +160,13 @@ fun SignInScreen(
 
 @Composable
 fun UsernameTextField(
-    uiState: SignInUiState,
+    username: String,
+    isLoading: Boolean,
     onUsernameChanged: (String) -> Unit,
+    onDoneClick: (String) -> Unit,
 ) {
-    val username = uiState.username
     val focusManager = LocalFocusManager.current
+
     TextField(
         value = username,
         colors = TextFieldDefaults.colors(
@@ -173,14 +180,15 @@ fun UsernameTextField(
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done,
         ),
         textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus()
+            onDoneClick(username)
         }),
         placeholder = { Text("Username") },
-        enabled = !uiState.isLoading,
+        enabled = !isLoading,
     )
 }
 

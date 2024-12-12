@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.salazar.cheers.feature.map.screens.map.AddPostViewAnnotation
-import com.salazar.cheers.feature.map.screens.map.UiLayer
+import com.salazar.cheers.feature.map.screens.map.MapUILayer
 import com.salazar.cheers.feature.map.ui.components.MapComponent
 
 @Composable
@@ -22,7 +22,7 @@ fun MapPostHistoryScreen(
         modifier = Modifier.fillMaxSize(),
         mapViewportState = mapViewportState,
         overlay = {
-            UiLayer(
+            MapUILayer(
                 isPublic = false,
                 modifier = Modifier
                     .systemBarsPadding()

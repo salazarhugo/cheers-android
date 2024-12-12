@@ -2,29 +2,13 @@
 
 package com.salazar.cheers.feature.map.screens.map
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NearMe
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.PublicOff
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.dsl.cameraOptions
@@ -34,7 +18,6 @@ import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import com.salazar.cheers.core.Post
-import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import com.salazar.cheers.feature.map.ui.annotations.CurrentUserAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.FriendAnnotation
 import com.salazar.cheers.feature.map.ui.annotations.PostAnnotation
@@ -73,7 +56,7 @@ fun MapScreen(
         modifier = Modifier.fillMaxSize(),
         mapViewportState = mapViewportState,
         overlay = {
-            UiLayer(
+            MapUILayer(
                 zoom = mapViewportState.cameraState.zoom,
                 isPublic = uiState.isPublic,
                 modifier = Modifier
@@ -234,91 +217,3 @@ fun AddPostViewAnnotation(
 //        }
 //    )
 //}
-
-@Composable
-fun UiLayer(
-    zoom: Double,
-    isPublic: Boolean,
-    modifier: Modifier = Modifier,
-    onMapUIAction: (MapUIAction) -> Unit,
-    onZoomTo: (Double) -> Unit,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        MapTopBar(
-            isPublic = isPublic,
-            onMapUIAction = onMapUIAction,
-        )
-        MapSliderComponent(
-            zoom = zoom,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(16.dp),
-            onValueChange = onZoomTo,
-        )
-        MapBottomBar(
-            onMapUIAction = onMapUIAction,
-        )
-    }
-}
-
-@Composable
-fun MapTopBar(
-    isPublic: Boolean,
-    onMapUIAction: (MapUIAction) -> Unit,
-) {
-    val icon = when (isPublic) {
-        true -> Icons.Default.Public
-        false -> Icons.Default.PublicOff
-    }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        MapButton(
-            icon = icon,
-            onClick = { onMapUIAction(MapUIAction.OnPublicToggle) },
-        )
-        MapButton(
-            icon = Icons.Default.Settings,
-            onClick = { onMapUIAction(MapUIAction.OnSettingsClick) },
-        )
-    }
-}
-
-@Composable
-fun MapBottomBar(
-    onMapUIAction: (MapUIAction) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        MapButton(
-            icon = Icons.Default.NearMe,
-            onClick = { onMapUIAction(MapUIAction.OnMyLocationClick) },
-        )
-    }
-}
-
-@Composable
-fun MapButton(
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
-    Surface(
-        shape = RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier
-            .padding(8.dp)
-            .noRippleClickable { onClick() },
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        )
-    }
-}

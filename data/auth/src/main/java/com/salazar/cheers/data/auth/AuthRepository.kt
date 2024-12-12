@@ -370,7 +370,7 @@ class AuthRepository @Inject constructor(
                 request = request.build(),
             )
             Result.success(result)
-        } catch (e: GetCredentialException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }

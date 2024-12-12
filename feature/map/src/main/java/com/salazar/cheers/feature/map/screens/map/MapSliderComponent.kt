@@ -66,7 +66,7 @@ fun MapSliderComponent(
                     },
                 )
             }
-            .width(100.dp)
+            .width(50.dp)
             .fillMaxHeight(),
         contentAlignment = Alignment.CenterEnd,
     ) {

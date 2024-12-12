@@ -8,16 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -60,8 +60,7 @@ fun ChooseOnMapScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-            }) {
+            FloatingActionButton(onClick = {}) {
                 Icon(Icons.Default.MyLocation, contentDescription = null)
             }
         }
@@ -186,32 +185,35 @@ fun ChooseOnMapAppBar(
     onBackPressed: () -> Unit,
     onSelectLocation: (Point, Double) -> Unit,
 ) {
-    TopAppBar(title = {
-        Column {
-            Text(
-                text = "Choose post location",
-                fontWeight = FontWeight.Bold,
-                fontFamily = Roboto,
-                fontSize = 14.sp
-            )
-            Text(
-                text = "Pan and zoom map under pin",
-                fontSize = 14.sp
-            )
-        }
-    },
+    TopAppBar(
+        title = {
+            Column {
+                Text(
+                    text = "Choose post location",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Roboto,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Pan and zoom map under pin",
+                    fontSize = 14.sp
+                )
+            }
+        },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
-                Icon(Icons.Default.ArrowBack, null)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
             }
         },
         actions = {
-            TextButton(onClick = {
-                val center = mapView.mapboxMap.cameraState.center
-                val zoom = mapView.mapboxMap.cameraState.zoom
-                onSelectLocation(center, zoom)
-            }) {
-                Text("DONE")
+            Button(
+                onClick = {
+                    val center = mapView.mapboxMap.cameraState.center
+                    val zoom = mapView.mapboxMap.cameraState.zoom
+                    onSelectLocation(center, zoom)
+                },
+            ) {
+                Text("Done")
             }
         })
 }
