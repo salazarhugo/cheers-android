@@ -68,7 +68,6 @@ class SignInViewModel @Inject constructor(
     private fun checkIfAlreadySignedIn() {
         viewModelScope.launch {
             val signedIn = signInUseCases.checkAlreadySignedInUseCase()
-            println(signedIn)
             updateIsSignedIn(signedIn)
         }
     }
@@ -85,6 +84,12 @@ class SignInViewModel @Inject constructor(
         }
     }
 
+    private fun updateIsGoogleLoading(isGoogleLoading: Boolean) {
+        viewModelState.update {
+            it.copy(isGoogleLoading = isGoogleLoading)
+        }
+    }
+
     private fun updateIsLoading(isLoading: Boolean) {
         viewModelState.update {
             it.copy(isLoading = isLoading)
@@ -94,8 +99,9 @@ class SignInViewModel @Inject constructor(
     fun onGoogleButtonClick(
         context: Context,
     ) {
-        updateIsLoading(true)
+        updateIsGoogleLoading(true)
         showSigningOptions(
+            showGoogleOptions = true,
             context = context,
             username = "cheers.social",
         )
@@ -110,10 +116,10 @@ class SignInViewModel @Inject constructor(
         updateIsLoading(true)
         viewModelScope.launch {
             showSigningOptions(
+                showGoogleOptions = false,
                 context = context,
                 username = username
             )
-            updateIsLoading(false)
         }
     }
 
@@ -130,11 +136,13 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun showSigningOptions(
+        showGoogleOptions: Boolean,
         context: Context,
         username: String? = null,
     ) {
         viewModelScope.launch {
             signInWithCredentialManagerFlowUseCase(
+                showGoogleOptions = showGoogleOptions,
                 activityContext = context,
                 username = username,
             ).collect {

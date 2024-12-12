@@ -8,14 +8,8 @@ plugins {
 android {
     namespace = "com.salazar.cheers.data.auth"
 
-    signingConfigs {
-        getByName("debug") {
-            storeFile = File("/home/hugo/.android/cheers_debug.keystore")
-        }
-    }
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        signingConfig = signingConfigs.getByName("debug")
     }
 }
 

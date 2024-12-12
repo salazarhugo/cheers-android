@@ -4,10 +4,9 @@ package com.salazar.cheers.feature.map.screens.map
 
 import android.Manifest
 import android.annotation.SuppressLint
-import androidx.compose.material3.SheetState
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
@@ -29,18 +28,10 @@ fun MapRoute(
     navigateToCreatePost: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val sheetState  = SheetState(skipPartiallyExpanded = true, LocalDensity.current)
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
     val scope = rememberCoroutineScope()
-
-    val paris = Point.fromLngLat(2.3522, 48.8566)
-
-    val mapViewportState = rememberMapViewportState {
-        setCameraOptions {
-            center(paris)
-            zoom(1.0)
-            pitch(0.0)
-        }
-    }
 
     Permission(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -50,11 +41,24 @@ fun MapRoute(
     ) {
     }
 
-    when(uiState) {
+    when (uiState) {
         is MapUiState.NotInitialized -> {
             LoadingScreen()
         }
+
         is MapUiState.Initialized -> {
+            val currentLocation = Point.fromLngLat(
+                uiState.userLocation.longitude,
+                uiState.userLocation.latitude,
+            )
+            val mapViewportState = rememberMapViewportState {
+                setCameraOptions {
+                    center(currentLocation)
+                    zoom(INITIAL_ZOOM)
+                    pitch(0.0)
+                }
+            }
+
             MapScreen(
                 uiState = uiState,
                 sheetState = sheetState,
@@ -73,14 +77,9 @@ fun MapRoute(
                         MapUIAction.OnMyLocationClick -> {
                             viewModel.onMyLocationClick()
 
-                            val point = Point.fromLngLat(
-                                uiState.userLocation.longitude ?: 0.0,
-                                uiState.userLocation.latitude ?: 0.0,
-                            )
-
                             mapViewportState.flyTo(
                                 cameraOptions = CameraOptions.Builder()
-                                    .center(point)
+                                    .center(currentLocation)
                                     .zoom(13.0)
                                     .build(),
                                 animationOptions = MapAnimationOptions.mapAnimationOptions {
@@ -88,6 +87,7 @@ fun MapRoute(
                                 }
                             )
                         }
+
                         is MapUIAction.OnPostViewAnnotationClick -> {
                             val post = action.post
 
@@ -114,6 +114,7 @@ fun MapRoute(
 
                             viewModel.onPostViewAnnotationClick(action.post)
                         }
+
                         is MapUIAction.OnUserViewAnnotationClick -> {
                             val userLocation = action.userLocation
 

@@ -22,6 +22,7 @@ import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
 import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.cheers.shared.util.Resource
 import kotlinx.coroutines.Dispatchers
@@ -146,7 +147,7 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun uploadPost(vararg pairs: Pair<String, Any?>) {
+    fun uploadPost(vararg pairs: Pair<String, Any?>) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -159,7 +160,7 @@ class PostRepository @Inject constructor(
                 .build()
 
         workManager.enqueueUniqueWork(
-            "post_upload",
+            Constants.POST_UNIQUE_WORKER_NAME,
             ExistingWorkPolicy.REPLACE,
             uploadWorkRequest,
         )

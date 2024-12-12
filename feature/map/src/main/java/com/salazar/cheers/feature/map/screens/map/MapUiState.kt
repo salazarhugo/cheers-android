@@ -1,7 +1,5 @@
 package com.salazar.cheers.feature.map.screens.map
 
-import androidx.compose.material3.SheetState
-import androidx.compose.ui.platform.LocalDensity
 import com.mapbox.geojson.FeatureCollection
 import com.salazar.cheers.core.Post
 

@@ -9,7 +9,6 @@ import androidx.credentials.PublicKeyCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.salazar.cheers.data.account.AccountRepository
-import com.salazar.cheers.data.account.toAccount
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.auth.mapper.toPasskey
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
@@ -29,10 +28,12 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val signInWithEmailAndPasswordUseCase: SignInWithEmailAndPasswordUseCase,
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val signInWithPasskeyUseCase: SignInWithPasskeyUseCase,
     private val dataStoreRepository: DataStoreRepository,
     private val accountRepository: AccountRepository,
 ) {
     suspend operator fun invoke(
+        showGoogleOptions: Boolean,
         activityContext: Context,
         username: String?,
     ): Flow<Resource<Throwable>> = withContext(ioDispatcher) {
@@ -45,6 +46,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
             val beginLoginResponse = authRepository.beginLogin(username = username1).getOrNull()
 
             val result = authRepository.showSigninOptions(
+                showGoogleOptions = showGoogleOptions,
                 activityContext = activityContext,
                 beginLoginResponse = beginLoginResponse,
             )
@@ -85,7 +87,7 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                 val response = authRepository.parseGetPasskeyResponse(credential)
                     ?: return Result.failure(Exception("failed to parse get passkey response"))
                 if (username == null || beginLoginResponse == null) {
-                   return Result.failure(Exception(""))
+                    return Result.failure(Exception(""))
                 }
                 authRepository.finishLogin(
                     username = username,
@@ -93,12 +95,10 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
                     challenge = beginLoginResponse.publicKey.challenge,
                 ).fold(
                     onSuccess = { response ->
-                        accountRepository.putAccount(
-                            account = response.user.toAccount(),
+                        return signInWithPasskeyUseCase(
+                            user = response.user,
+                            customToken = response.token,
                         )
-                        // Save username in data store
-                        dataStoreRepository.updateUsername(username)
-                        return authRepository.signInWithCustomToken(response.token)
                     },
                     onFailure = {
                         return Result.failure(it)
@@ -116,35 +116,33 @@ class SignInWithCredentialManagerFlowUseCase @Inject constructor(
             }
 
             is CustomCredential -> {
-                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    try {
-                        val googleIdTokenCredential = GoogleIdTokenCredential
-                            .createFrom(credential.data)
-                        signInWithGoogleUseCase(
-                            idToken = googleIdTokenCredential.idToken
-                        ).fold(
-                            onSuccess = {
-                                return Result.success(Unit)
-                            },
-                            onFailure = {
-                                it.printStackTrace()
-                                return Result.failure(it)
-                            }
-                        )
-                    } catch (e: GoogleIdTokenParsingException) {
-                        Log.e("Passkeys", "Received an invalid google id token response", e)
-                        Result.failure(e)
-                    }
-                } else {
+                if (credential.type != GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     // Catch any unrecognized custom credential type here.
                     Log.e("Passkeys", "Unexpected type of credential")
-                    Result.failure(Exception("Unexpected type of credential"))
+                    return Result.failure(Exception("Unexpected type of credential"))
+                }
+
+                try {
+                    val googleIdTokenCredential = GoogleIdTokenCredential
+                        .createFrom(credential.data)
+                    signInWithGoogleUseCase(
+                        idToken = googleIdTokenCredential.idToken
+                    ).fold(
+                        onSuccess = {
+                            return Result.success(Unit)
+                        },
+                        onFailure = {
+                            it.printStackTrace()
+                            return Result.failure(it)
+                        }
+                    )
+                } catch (e: GoogleIdTokenParsingException) {
+                    Log.e("Passkeys", "Received an invalid google id token response", e)
+                    Result.failure(e)
                 }
             }
 
-            else -> {
-                Result.failure(Exception("Unexpected type of credential"))
-            }
+            else -> Result.failure(Exception("Unexpected type of credential"))
         }
     }
 }

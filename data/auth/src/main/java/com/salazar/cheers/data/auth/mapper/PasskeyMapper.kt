@@ -54,8 +54,19 @@ fun BeginLoginResponse.toGetPasskeyRequest(): GetPasskeyRequest {
         challenge = publicKey.challenge,
         timeout = 1_800_000,
         rpId = publicKey.rp.id,
-        userVerification = publicKey.userVerification,
-        allowCredentials = emptyList()
+        userVerification = "required",
+        allowCredentials = this.publicKey.allowCredentials.map {
+            val decodedBytes = it.id
+                .replace('+', '-')
+                .replace('/', '_')
+                .replace("=", "")
+            println(decodedBytes)
+            GetPasskeyRequest.AllowCredentials(
+                id = decodedBytes,
+                type = "public-key",
+                transports = it.transport.orEmpty(),
+            )
+        },
     )
 }
 
@@ -67,7 +78,7 @@ fun BeginRegistrationResponse.toCreatePasskeyRequest(username: String): CreatePa
             name = publicKey.rp.name,
         ),
         user = CreatePasskeyRequest.User(
-            id = publicKey.user.id.toString(),
+            id = publicKey.user.id,
             name = username,
             displayName = username,
         ),
@@ -75,16 +86,20 @@ fun BeginRegistrationResponse.toCreatePasskeyRequest(username: String): CreatePa
             CreatePasskeyRequest.PubKeyCredParams(
                 type = "public-key",
                 alg = -7
-            )
+            ),
+            CreatePasskeyRequest.PubKeyCredParams(
+                type = "public-key",
+                alg = -257
+            ),
         ),
         timeout = 1_800_000,
-        attestation = "Android Key Attestation",
+        attestation = "direct",
         excludeCredentials = emptyList(),
         authenticatorSelection = CreatePasskeyRequest.AuthenticatorSelection(
             authenticatorAttachment = "platform",
-            requireResidentKey = false,
+            requireResidentKey = true,
             residentKey = "required",
-            userVerification = "preferred"
+            userVerification = "required"
         )
     )
 }

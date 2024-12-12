@@ -2,7 +2,6 @@ package com.salazar.cheers.feature.create_post
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -278,7 +277,6 @@ class CreatePostViewModel @Inject constructor(
 
         updateIsLoading(true)
 
-        Log.d("CreatePostViewModel", drinkID.toString())
         viewModelScope.launch {
             createPostUseCases.createPostUseCase(
                 "PHOTOS" to uiState.medias.filterIsInstance(Media.Image::class.java).map { it.uri.toString() }.toTypedArray(),

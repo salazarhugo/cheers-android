@@ -5,6 +5,7 @@ import androidx.credentials.exceptions.CreateCredentialException
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.data.auth.mapper.toCreatePasskeyRequest
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
+import com.salazar.cheers.shared.data.response.FinishRegistrationResponse
 import com.salazar.cheers.shared.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -18,7 +19,7 @@ class RegisterPasskeyUseCase @Inject constructor(
     suspend operator fun invoke(
         context: Context,
         username: String,
-    ): Result<Unit> = withContext(ioDispatcher) {
+    ): Result<FinishRegistrationResponse> = withContext(ioDispatcher) {
         return@withContext try {
             // Begin registration
             val result = authRepository.beginRegistration(username = username)
@@ -37,16 +38,17 @@ class RegisterPasskeyUseCase @Inject constructor(
             return@withContext fidoResult.fold(
                 onSuccess = { passkey ->
                     // Finish registration
-                    authRepository.finishRegistration(
+                    val response = authRepository.finishRegistration(
                         username = username,
                         passkey = passkey,
                         challenge = beginRegistrationResponse.publicKey.challenge,
-                        userId = beginRegistrationResponse.publicKey.user.id.toString(),
-                    )
+                        userId = beginRegistrationResponse.publicKey.user.id,
+                    ).getOrNull() ?: return@withContext Result.failure(Exception("missing id token"))
+
                     // Save username in data store
                     dataStoreRepository.updateUsername(username)
 
-                    Result.success(Unit)
+                    Result.success(response)
                 },
                 onFailure = {
                     Result.failure(it)

@@ -35,6 +35,7 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.model.WorkerState
 import com.salazar.cheers.core.ui.AddFriendButton
 import com.salazar.cheers.core.ui.EmptyFriendFeed
 import com.salazar.cheers.core.ui.UserItem
@@ -43,6 +44,7 @@ import com.salazar.cheers.core.ui.components.circular_progress.CircularProgressC
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.components.worker.WorkerProgressComponent
 import com.salazar.cheers.core.ui.text.HomeTitle
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.core.util.playback.AudioState
 import com.salazar.cheers.feature.home.NoteList
 import com.salazar.cheers.feature.home.ads.NativeAdView
@@ -55,6 +57,15 @@ internal fun FriendFeedScreen(
     uiState: HomeUiState,
     onHomeUIAction: (HomeUIAction) -> Unit,
 ) {
+    val context = LocalContext.current
+    val workManager = WorkManager.getInstance(context)
+    val workName = Constants.POST_UNIQUE_WORKER_NAME
+    val workInfos = workManager.getWorkInfosForUniqueWorkLiveData(workName)
+        .observeAsState()
+        .value
+    val uploadInfo = workInfos?.firstOrNull()
+    val state = uploadInfo?.state
+
     LazyColumn(
         state = uiState.listState,
     ) {
@@ -71,7 +82,10 @@ internal fun FriendFeedScreen(
             HorizontalDivider()
         }
 
-        uploadingSection()
+        uploadingSection(
+            workerState = state?.toWorkerState(),
+            onCancelClick = { workManager.cancelUniqueWork(workName) }
+        )
 
         spotlight(
             parties = uiState.spotlight,
@@ -378,21 +392,18 @@ private fun WhatsUpSection(
 //}
 
 fun LazyListScope.uploadingSection(
-    workName: String = "post_upload"
+    workerState: WorkerState?,
+    onCancelClick: () -> Unit,
 ) {
-    item(key = "uploading") {
-        val context = LocalContext.current
-        val workManager = WorkManager.getInstance(context)
-        val workInfos = workManager.getWorkInfosForUniqueWorkLiveData(workName)
-            .observeAsState()
-            .value
-        val uploadInfo = workInfos?.firstOrNull()
-        val state = uploadInfo?.state ?: return@item
+    if (workerState == null || workerState.isFinished) {
+        return
+    }
 
+    item(key = "uploading") {
         WorkerProgressComponent(
-            workerState = state.toWorkerState(),
+            workerState = workerState,
             modifier = Modifier.animateItem(),
-            onCancelClick = { workManager.cancelUniqueWork(workName) },
+            onCancelClick = onCancelClick,
         )
         HorizontalDivider()
     }

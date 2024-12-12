@@ -4,9 +4,9 @@ plugins {
     alias(libs.plugins.cheers.android.application.firebase)
     alias(libs.plugins.cheers.android.room)
     alias(libs.plugins.kotlin.serialization)
-    id("kotlin-kapt")
-    id("com.google.devtools.ksp")
-    id("dagger.hilt.android.plugin")
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {

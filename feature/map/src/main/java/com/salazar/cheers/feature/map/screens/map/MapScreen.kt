@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,19 +53,6 @@ fun MapScreen(
     val scope = rememberCoroutineScope()
     val selectedAnnotation = uiState.selected
 
-    LaunchedEffect(Unit) {
-        mapViewportState.flyTo(
-            cameraOptions = cameraOptions {
-                center(
-                    Point.fromLngLat(
-                        uiState.userLocation.longitude,
-                        uiState.userLocation.latitude
-                    )
-                )
-                zoom(INITIAL_ZOOM)
-            }
-        )
-    }
 
     if (selectedAnnotation != null) {
         MapBottomSheet(

@@ -4,11 +4,14 @@ import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.domain.RegisterPasskeyUseCase
+import com.salazar.cheers.domain.RegisterPasskeyAndSignInUseCase
 import com.salazar.cheers.domain.register.RegisterUseCase
-import com.salazar.cheers.domain.usecase.SignInUseCase
+import com.salazar.cheers.domain.usecase.GetUsernameAvailabilityUseCase
+import com.salazar.cheers.domain.usecase.SignInCheersUseCase
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -27,16 +30,19 @@ data class SignUpUiState(
     val isSignedIn: Boolean = false,
     val acceptTerms: Boolean = false,
     val page: Int = 0,
+    val usernameAvailabilityState: Resource<Boolean> = Resource.Error(""),
 )
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
     private val registerUseCase: RegisterUseCase,
-    private val registerPasskeyUseCase: RegisterPasskeyUseCase,
-    private val signInUseCase: SignInUseCase,
+    private val registerPasskeyAndSignInUseCase: RegisterPasskeyAndSignInUseCase,
+    private val signInUseCase: SignInCheersUseCase,
+    private val getUsernameAvailabilityUseCase: GetUsernameAvailabilityUseCase,
 ) : ViewModel() {
 
+    private var checkUsernameJob: Job? = null
     private val viewModelState = MutableStateFlow(SignUpUiState(isLoading = false))
 
     val uiState = viewModelState
@@ -65,11 +71,26 @@ class SignUpViewModel @Inject constructor(
         viewModelState.update {
             it.copy(username = username)
         }
+        checkUsernameJob?.cancel()
+        checkUsernameJob = viewModelScope.launch {
+            viewModelState.update {
+                it.copy(usernameAvailabilityState = Resource.Loading(true))
+            }
+            delay(500L)
+            val state = getUsernameAvailabilityUseCase(username = username)
+            viewModelState.update { it.copy(usernameAvailabilityState = state) }
+        }
     }
 
     fun onEmailChange(email: String) {
         viewModelState.update {
             it.copy(email = email)
+        }
+    }
+
+    private fun updateErrorMessage(error: Throwable) {
+        viewModelState.update {
+            it.copy(errorMessage = error.localizedMessage)
         }
     }
 
@@ -119,7 +140,7 @@ class SignUpViewModel @Inject constructor(
         if (!idToken.isNullOrBlank()) {
             viewModelScope.launch {
                 val result = registerUseCase(username)
-                when(result) {
+                when (result) {
                     is Resource.Error -> updateErrorMessage(result.message)
                     is Resource.Loading -> {}//
                     is Resource.Success -> {
@@ -132,11 +153,12 @@ class SignUpViewModel @Inject constructor(
             }
         } else {
             viewModelScope.launch {
-                registerPasskeyUseCase(activity, username).onSuccess {
-                    updateIsSignedIn(true)
-                }.onFailure {
-                    updateErrorMessage(it.localizedMessage)
-                }
+                registerPasskeyAndSignInUseCase(activity, username).fold(
+                    onSuccess = {
+                        updateIsSignedIn(true)
+                    },
+                    onFailure = ::updateErrorMessage,
+                )
                 updateIsLoading(false)
             }
         }

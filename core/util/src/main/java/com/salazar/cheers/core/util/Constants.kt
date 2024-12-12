@@ -12,5 +12,5 @@ object Constants {
     const val FEEDBACK_LINK = "https://cheers.featurebase.app"
     const val BASE_URL = "https://cheers.social"
     const val PARTY_UNIQUE_WORKER_NAME = "party_upload"
-
+    const val POST_UNIQUE_WORKER_NAME = "post_upload"
 }

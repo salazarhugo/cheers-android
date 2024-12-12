@@ -28,14 +28,20 @@ class GetCurrentCityFlowUseCase @Inject constructor(
 
                     val location = getLastKnownLocationUseCase() ?: return@flatMapConcat flowOf("")
 
-                    val city = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        ?.firstOrNull()?.locality.orEmpty()
+                    try {
+                        val city = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                            ?.firstOrNull()?.locality.orEmpty()
 
-                    if (city.isNotBlank()) {
-                        dataStoreRepository.updateCity(city)
+                        if (city.isNotBlank()) {
+                            dataStoreRepository.updateCity(city)
+                        }
+
+                        return@flatMapConcat flowOf(city)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        return@flatMapConcat flowOf("")
                     }
 
-                    return@flatMapConcat flowOf(city)
                 }
         }
     }

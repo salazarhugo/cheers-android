@@ -28,8 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -108,23 +108,31 @@ fun SignInScreen(
                 AnimatedLogo()
                 Spacer(modifier = Modifier.height(30.dp))
 
-                if (uiState.isPasskeyEnabled) {
-                    UsernameTextField(uiState, onUsernameChanged = onUsernameChanged)
-                    Spacer(Modifier.height(8.dp))
-                    LoginButton(
-                        isLoading = uiState.isLoading,
-                        signInWithEmailPassword = {
-                            onSignInClick(uiState.username)
-                        },
+                AnimatedVisibility(
+                    visible = uiState.isPasskeyEnabled && !uiState.isGoogleLoading,
+                ) {
+                    Column {
+                        UsernameTextField(uiState, onUsernameChanged = onUsernameChanged)
+                        Spacer(Modifier.height(8.dp))
+                        LoginButton(
+                            isLoading = uiState.isLoading,
+                            signInWithEmailPassword = {
+                                onSignInClick(uiState.username)
+                            },
+                        )
+                    }
+                }
+                AnimatedVisibility(
+                    visible = !uiState.isLoading,
+                ) {
+                    GoogleButton(
+                        isLoading = uiState.isGoogleLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        onClicked = onGoogleClick,
                     )
                 }
-                GoogleButton(
-                    isLoading = uiState.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    onClicked = onGoogleClick,
-                )
                 ErrorMessage(
                     errorMessage = uiState.errorMessage,
                     paddingValues = PaddingValues(vertical = 8.dp)
@@ -133,7 +141,7 @@ fun SignInScreen(
                     modifier = Modifier.padding(vertical = 16.dp),
                     dayString = "OR",
                 )
-                OutlinedButton(
+                TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = navigateToSignUp,
                 ) {

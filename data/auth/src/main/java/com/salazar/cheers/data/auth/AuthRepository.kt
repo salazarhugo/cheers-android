@@ -45,6 +45,7 @@ import com.salazar.cheers.shared.data.request.Passkey
 import com.salazar.cheers.shared.data.response.BeginLoginResponse
 import com.salazar.cheers.shared.data.response.BeginRegistrationResponse
 import com.salazar.cheers.shared.data.response.FinishLoginResponse
+import com.salazar.cheers.shared.data.response.FinishRegistrationResponse
 import com.salazar.cheers.shared.data.response.LoginResponse
 import com.salazar.cheers.shared.util.Resource
 import com.salazar.cheers.shared.util.result.DataError
@@ -102,7 +103,7 @@ class AuthRepository @Inject constructor(
         return try {
             val createCredentialRequest = CreatePublicKeyCredentialRequest(
                 requestJson = gson.toJson(request),
-                isAutoSelectAllowed = true,
+                isAutoSelectAllowed = false,
             )
             // Launch the FIDO2 flow
             val response = credentialManager.createCredential(
@@ -121,16 +122,16 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    suspend fun parseGetPasskeyResponse(credential: Credential): GetPasskeyResponseData? {
+    fun parseGetPasskeyResponse(credential: Credential): GetPasskeyResponseData? {
         val json = (credential as PublicKeyCredential).authenticationResponseJson
         return gson.fromJson(json, GetPasskeyResponseData::class.java)
     }
 
-    suspend fun signInWithCustomToken(token: String): Result<Unit> {
+    suspend fun signInWithCustomToken(token: String): Result<AuthResult> {
         return try {
             val response = auth.signInWithCustomToken(token).await()
             when {
-                response.user != null -> Result.success(Unit)
+                response.user != null -> Result.success(response)
                 else -> Result.failure(Exception("Failed to sign in with custom token"))
             }
         } catch (e: Exception) {
@@ -156,7 +157,7 @@ class AuthRepository @Inject constructor(
 
     class NotRegisteredException(idToken: String) : Exception(idToken)
 
-    suspend fun signInWithOneTap(
+    suspend fun signInWithFirebaseIdToken(
         idToken: String?,
     ): AuthResult? {
         val credential = getFirebaseCredentialFromIdToken(idToken = idToken)
@@ -316,7 +317,7 @@ class AuthRepository @Inject constructor(
         userId: String,
         username: String,
         passkey: Passkey,
-    ): Result<Unit> {
+    ): Result<FinishRegistrationResponse> {
         val deviceName = Build.MODEL
         return try {
             val request = FinishRegistrationRequest(
@@ -328,7 +329,7 @@ class AuthRepository @Inject constructor(
                 deviceName = deviceName,
             )
             val response = bffApiService.finishRegistration(request = request)
-            Result.success(Unit)
+            Result.success(response)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             e.printStackTrace()
@@ -337,6 +338,7 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun showSigninOptions(
+        showGoogleOptions: Boolean,
         activityContext: Context,
         beginLoginResponse: BeginLoginResponse?,
     ): Result<GetCredentialResponse> {
@@ -349,7 +351,10 @@ class AuthRepository @Inject constructor(
             .build()
 
         var request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
+
+        if (showGoogleOptions) {
+            request = request.addCredentialOption(googleIdOption)
+        }
 
         if (beginLoginResponse != null) {
             // Get passkey from the user's public key credential provider.

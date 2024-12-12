@@ -27,7 +27,7 @@ dependencies {
     implementation(libs.play.services.ads)
 
     // Jetpack Compose
-    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation(libs.androidx.compose.runtime.runtime.livedata)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,6 +1,8 @@
 package com.salazar.cheers.feature.signup
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.shared.util.LocalActivity
@@ -22,7 +24,7 @@ fun SignUpRoute(
         username = uiState.username,
         errorMessage = uiState.errorMessage,
         isLoading = uiState.isLoading,
-        isUsernameAvailable = true,
+        usernameAvailabilityState = uiState.usernameAvailabilityState,
         onClearUsername = {},
         onUsernameChanged = viewModel::onUsernameChange,
         onNextClicked = {

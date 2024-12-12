@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class SignInUseCase @Inject constructor(
+class SignInCheersUseCase @Inject constructor(
     @IODispatcher
     private val ioDispatcher: CoroutineDispatcher,
     private val authRepository: AuthRepository,
@@ -19,6 +19,7 @@ class SignInUseCase @Inject constructor(
     private val storeUserEmail: StoreUserEmail,
     private val getIdTokenUseCase: GetIdTokenUseCase,
 ) {
+    // requires firebase sign in
     suspend operator fun invoke(): Result<Boolean> = withContext(ioDispatcher) {
         return@withContext try {
             val currentUser = FirebaseAuth.getInstance().currentUser
