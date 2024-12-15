@@ -1,6 +1,5 @@
 package com.salazar.cheers.domain.usecase
 
-import android.util.Log
 import com.salazar.cheers.data.auth.AuthRepository
 import com.salazar.cheers.domain.update_id_token.UpdateIdTokenUseCase
 import com.salazar.cheers.shared.di.IODispatcher
@@ -25,7 +24,6 @@ class SignInWithGoogleUseCase @Inject constructor(
 
             val token = authResult.user?.getIdToken(true)?.await()
                 ?: return@withContext Result.failure(Exception("failed to refresh id token"))
-            Log.d("SIgnInWithGoogleUseCase", "invoke: ${token.token}")
 
             updateIdTokenUseCase(token.token.orEmpty())
 
