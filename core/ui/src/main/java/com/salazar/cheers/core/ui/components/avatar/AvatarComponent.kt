@@ -9,6 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -26,8 +28,10 @@ import com.salazar.cheers.core.ui.components.image.InspectionAwareComponent
 fun AvatarComponent(
     avatar: String?,
     modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
     size: Dp = 54.dp,
     placeHolder: Int = R.drawable.default_profile_picture,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     onClick: () -> Unit = {},
 ) {
     val painter = ImageRequest.Builder(LocalContext.current)
@@ -40,9 +44,9 @@ fun AvatarComponent(
 
     val modifier = modifier
         .size(size)
-        .clip(CircleShape)
+        .clip(shape)
         .clickable { onClick() }
-        .background(MaterialTheme.colorScheme.background)
+        .background(backgroundColor)
 
     InspectionAwareComponent(
         modifier = modifier,

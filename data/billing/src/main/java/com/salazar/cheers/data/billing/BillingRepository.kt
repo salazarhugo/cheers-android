@@ -4,14 +4,26 @@ import android.app.Activity
 import android.app.Application
 import android.content.res.Resources.NotFoundException
 import android.util.Log
-import com.android.billingclient.api.*
+import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
-import com.google.common.collect.ImmutableList
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
+import com.android.billingclient.api.ConsumeResult
+import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesResponseListener
+import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.UserChoiceBillingListener
+import com.android.billingclient.api.consumePurchase
+import com.android.billingclient.api.queryProductDetails
 import com.salazar.cheers.data.billing.api.ApiService
 import com.salazar.cheers.data.billing.response.RechargeCoinRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -52,7 +64,7 @@ class BillingRepository @Inject constructor(
 
     var billingClient = BillingClient.newBuilder(application)
         .setListener(this)
-        .enableUserChoiceBilling(UserChoiceBillingListener {  })
+        .enableUserChoiceBilling(UserChoiceBillingListener { })
         .enablePendingPurchases(
             PendingPurchasesParams.newBuilder()
                 .enablePrepaidPlans()
@@ -122,9 +134,10 @@ class BillingRepository @Inject constructor(
         userID: String,
         activity: Activity,
         productDetails: com.salazar.cheers.core.model.ProductDetails,
-    ) {
-        val productDetails = getProduct(productId = productDetails.id).getOrNull() ?: return
-        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return
+    ): Int {
+        val productDetails = getProduct(productId = productDetails.id).getOrNull() ?: return -1
+        val offerToken =
+            productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return -1
 
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
@@ -142,6 +155,8 @@ class BillingRepository @Inject constructor(
             activity,
             flowParams
         ).responseCode
+
+        return responseCode
     }
 
     suspend fun queryProductDetails(): Result<List<com.salazar.cheers.core.model.ProductDetails>> {

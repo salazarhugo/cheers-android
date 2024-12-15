@@ -5,14 +5,20 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import kotlinx.serialization.Serializable
 
-const val settingsNavigationRoute = "settings_route"
 private const val DEEP_LINK_URI_PATTERN = "https://maparty.app/settings_note"
+
+@Serializable
+data object SettingsScreen
 
 fun NavController.navigateToSettings(
     navOptions: NavOptions? = null,
 ) {
-    this.navigate(settingsNavigationRoute, navOptions)
+    this.navigate(
+        route = SettingsScreen,
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.settingsScreen(
@@ -28,10 +34,9 @@ fun NavGraphBuilder.settingsScreen(
     navigateToDeleteAccount: () -> Unit,
     navigateToPremium: () -> Unit,
 ) {
-    composable(
-        route = settingsNavigationRoute,
+    composable<SettingsScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<SettingsScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         SettingsRoute(

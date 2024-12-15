@@ -28,12 +28,15 @@ import com.salazar.cheers.core.db.dao.UserItemDao
 import com.salazar.cheers.core.db.dao.UserStatsDao
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
+import com.salazar.cheers.core.model.CheckUsernameResult
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.UserID
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.UserStats
 import com.salazar.cheers.core.model.UserSuggestion
 import com.salazar.cheers.data.user.workers.UploadProfileBanner
 import com.salazar.cheers.data.user.workers.UploadProfilePicture
+import com.salazar.cheers.shared.data.mapper.toCheckUsernameResult
 import com.salazar.cheers.shared.data.mapper.toUser
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.cheers.shared.util.Resource
@@ -77,14 +80,14 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun checkUsername(
         username: String,
-    ): Result<Boolean> {
+    ): Result<CheckUsernameResult> {
         return try {
             val request = CheckUsernameRequest.newBuilder()
                 .setUsername(username)
                 .build()
 
             val response = userService.checkUsername(request = request)
-            Result.success(response.valid)
+            Result.success(response.toCheckUsernameResult())
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
             Result.failure(e)
@@ -325,12 +328,12 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun listFriend(): Flow<Resource<List<UserItem>>> =
+    override suspend fun listFriends(userID: UserID): Flow<Resource<List<UserItem>>> =
         flow {
             emit(Resource.Loading(true))
 
             val request = ListFriendRequest.newBuilder()
-                .setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+                .setUserId(userID)
                 .build()
 
             val remoteFriendRequests = try {
@@ -365,7 +368,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserItem(userIdOrUsername: String): Flow<UserItem> {
         return userItemDao.getUserItem(userIdOrUsername = userIdOrUsername)
-            .map { it.asExternalModel() }
+            .mapNotNull { it?.asExternalModel() }
     }
 
     override fun getUserFlow(userIdOrUsername: String): Flow<User> {

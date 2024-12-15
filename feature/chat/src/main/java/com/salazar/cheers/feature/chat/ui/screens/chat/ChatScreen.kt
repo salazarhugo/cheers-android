@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.salazar.cheers.feature.chat.ui.screens.chat
 
 import OnMessageLongClickDialog
@@ -8,12 +10,15 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imeNestedScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -46,12 +51,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.salazar.cheers.core.ui.SymbolAnnotationType
-import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.model.ChatMessageStatus
 import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.core.model.ChatType
+import com.salazar.cheers.core.ui.SymbolAnnotationType
+import com.salazar.cheers.core.ui.messageFormatter
 import com.salazar.cheers.feature.chat.ui.components.ChatBottomBar
 import com.salazar.cheers.feature.chat.ui.components.ChatPresenceIndicator
 import com.salazar.cheers.feature.chat.ui.components.DirectChatBar
@@ -75,8 +80,12 @@ fun ChatScreen(
     val selectedMessage = remember { mutableStateOf<ChatMessage?>(null) }
     val channel = uiState.channel
 
-    Surface(color = MaterialTheme.colorScheme.background) {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -86,17 +95,11 @@ fun ChatScreen(
                     seen = uiState.channel?.status == ChatStatus.OPENED,
                     isGroup = uiState.channel?.type == ChatType.GROUP,
                     messages = uiState.messages,
-                    navigateToProfile = {
-                        onChatUIAction(ChatUIAction.OnUserClick(it))
-                    },
+                    navigateToProfile = { onChatUIAction(ChatUIAction.OnUserClick(it)) },
                     modifier = Modifier.weight(1f),
                     scrollState = scrollState,
-                    onLongClickMessage = {
-                        openDialog.value = true
-                    },
-                    onDoubleTapMessage = {
-                        onChatUIAction(ChatUIAction.OnLikeClick(it))
-                    },
+                    onLongClickMessage = { openDialog.value = true },
+                    onDoubleTapMessage = { onChatUIAction(ChatUIAction.OnLikeClick(it)) },
                     onChatUIAction = onChatUIAction,
                 )
                 ChatPresenceIndicator(
@@ -202,11 +205,13 @@ fun Messages(
 
     Box(modifier = modifier) {
         LazyColumn(
-            reverseLayout = true,
             state = scrollState,
-            contentPadding = PaddingValues(top = 56.dp),
             modifier = Modifier
                 .fillMaxSize()
+                .imePadding()
+                .imeNestedScroll(),
+            contentPadding = PaddingValues(top = 56.dp),
+            reverseLayout = true,
         ) {
             for (index in messages.indices) {
                 val prevAuthor = messages.getOrNull(index - 1)?.senderId

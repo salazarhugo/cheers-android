@@ -5,25 +5,35 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import kotlinx.serialization.Serializable
 
-const val CHANNEL_ID = "channel_id"
-const val USER_ID = "user_id"
-const val chatNavigationRoute = "chat_route?$CHANNEL_ID={$CHANNEL_ID}&$USER_ID={$USER_ID}"
 private const val DEEP_LINK_URI_PATTERN =
     "https://maparty.app/chat"
+
+@Serializable
+data class ChatScreen(
+    val userID: String? = null,
+    val channelID: String? = null,
+)
 
 fun NavController.navigateToChatWithChannelId(
     channelId: String,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("chat_route?$CHANNEL_ID=$channelId", navOptions)
+    this.navigate(
+        route = ChatScreen(channelID = channelId),
+        navOptions = navOptions,
+    )
 }
 
 fun NavController.navigateToChatWithUserId(
     userId: String,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("chat_route?$USER_ID=$userId", navOptions)
+    this.navigate(
+        route = ChatScreen(userID = userId),
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.chatScreen(
@@ -31,10 +41,9 @@ fun NavGraphBuilder.chatScreen(
     navigateToOtherProfile: (String) -> Unit,
     navigateToRoomDetails: (String) -> Unit,
 ) {
-    composable(
-        route = chatNavigationRoute,
+    composable<ChatScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<ChatScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         ChatRoute(

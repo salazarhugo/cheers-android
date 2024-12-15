@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
+@file:OptIn(
+    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class,
+    ExperimentalLayoutApi::class
+)
 
 package com.salazar.cheers.feature.chat.ui.components
 
@@ -11,12 +14,15 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -51,6 +57,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,8 +92,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.feature.chat.R
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatUIAction
 
@@ -137,6 +144,17 @@ fun ChatBottomBar(
 
     // Used to decide if the keyboard should be shown
     var textFieldFocusState by remember { mutableStateOf(false) }
+    val inputFocusRequester = remember { FocusRequester() }
+
+    // Focus input when the user opens the keyboard
+    val isImeVisible = WindowInsets.isImeVisible
+    LaunchedEffect(isImeVisible) {
+        if (isImeVisible) {
+            inputFocusRequester.requestFocus()
+        } else {
+            inputFocusRequester.freeFocus()
+        }
+    }
 
     Surface(tonalElevation = 2.dp) {
         Column(modifier = modifier) {
@@ -145,6 +163,7 @@ fun ChatBottomBar(
                 onChatUIAction = onChatUIAction,
             )
             UserInputText(
+                focusRequester = inputFocusRequester,
                 onKeyboardSend = {
                     onMessageSent(textState.text)
                     // Reset text field and close keyboard
@@ -440,6 +459,7 @@ var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
 @ExperimentalFoundationApi
 @Composable
 private fun UserInputText(
+    focusRequester: FocusRequester,
     onKeyboardSend: () -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
     onTextChanged: (TextFieldValue) -> Unit,
@@ -483,6 +503,7 @@ private fun UserInputText(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
+                            .focusRequester(focusRequester = focusRequester)
                             .onFocusChanged { state ->
                                 if (lastFocusState != state.isFocused) {
                                     onTextFieldFocused(state.isFocused)

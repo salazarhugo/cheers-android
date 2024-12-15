@@ -24,7 +24,6 @@ import com.salazar.cheers.core.ui.theme.CheersTheme
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.util.Constants.URI
 import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
-import com.salazar.cheers.core.util.Utils.shareToSnapchat
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
 import com.salazar.cheers.feature.chat.ui.screens.chat.chatScreen
 import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithChannelId
@@ -45,7 +44,7 @@ import com.salazar.cheers.feature.create_note.createNoteScreen
 import com.salazar.cheers.feature.create_note.navigateToCreateNote
 import com.salazar.cheers.feature.create_post.createPostScreen
 import com.salazar.cheers.feature.create_post.navigateToCreatePost
-import com.salazar.cheers.feature.edit_profile.navigation.editProfileScreen
+import com.salazar.cheers.feature.edit_profile.navigation.editProfileGraph
 import com.salazar.cheers.feature.edit_profile.navigation.navigateToEditProfile
 import com.salazar.cheers.feature.friend_list.friendListScreen
 import com.salazar.cheers.feature.friend_list.navigateToFriendList
@@ -67,8 +66,6 @@ import com.salazar.cheers.feature.parties.navigateToParties
 import com.salazar.cheers.feature.parties.partiesScreen
 import com.salazar.cheers.feature.post_likes.navigateToPostLikes
 import com.salazar.cheers.feature.post_likes.postLikesScreen
-import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
-import com.salazar.cheers.feature.profile.ProfileSheetUIAction
 import com.salazar.cheers.feature.profile.ProfileStatsRoute
 import com.salazar.cheers.feature.profile.ProfileStatsViewModel
 import com.salazar.cheers.feature.profile.navigation.cheersCodeScreen
@@ -76,7 +73,8 @@ import com.salazar.cheers.feature.profile.navigation.navigateToCheerscode
 import com.salazar.cheers.feature.profile.navigation.navigateToOtherProfile
 import com.salazar.cheers.feature.profile.navigation.otherProfileScreen
 import com.salazar.cheers.feature.profile.navigation.profileScreen
-import com.salazar.cheers.feature.profile.other_profile.OtherProfileStatsRoute
+import com.salazar.cheers.feature.profile.other_profile.navigateToOtherProfileStats
+import com.salazar.cheers.feature.profile.other_profile.otherProfileStatsScreen
 import com.salazar.cheers.feature.search.navigation.navigateToSearch
 import com.salazar.cheers.feature.search.navigation.searchScreen
 import com.salazar.cheers.feature.settings.navigateToSettings
@@ -273,6 +271,7 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
             navigateToMapSettings = navController::navigateToMapSettings,
             navigateToCreatePost = {},
+            navigateToChatWithUserId = navController::navigateToChatWithUserId,
         )
 
         mapPostHistoryScreen(
@@ -368,10 +367,11 @@ fun NavGraphBuilder.mainNavGraph(
         otherProfileScreen(
             navigateBack = navController::popBackStack,
             navigateToOtherProfileStats = { user ->
-                navController.navigate("${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/${user.username}/${user.verified}") {
-                    launchSingleTop = true
-                    restoreState = true
-                }
+                navController.navigateToOtherProfileStats(
+                    otherUserID = user.id,
+                    username = user.username,
+                    verified = user.verified,
+                )
             },
             navigateToManageFriendship = { userID ->
                 navController.navigate("${MainDestinations.MANAGE_FRIENDSHIP_SHEET}/$userID") {
@@ -419,17 +419,10 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(
-            route = "${MainDestinations.OTHER_PROFILE_STATS_ROUTE}/{username}/{verified}",
-            arguments = listOf(
-                navArgument("username") { nullable = false },
-                navArgument("verified") { defaultValue = false }
-            ),
-        ) {
-            OtherProfileStatsRoute(
-                navActions = appState.navActions,
-            )
-        }
+        otherProfileStatsScreen(
+            navigateBack = navController::popBackStack,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
+        )
 
         composable(
             route = "${MainDestinations.PROFILE_STATS_ROUTE}/{username}/{verified}",
@@ -475,7 +468,8 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
-        editProfileScreen(
+        editProfileGraph(
+            navController = navController,
             navigateBack = navController::popBackStack,
         )
 
@@ -489,12 +483,13 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToPostDetails = { postID ->
                 navController.navigate(route = "${MainDestinations.POST_DETAIL_ROUTE}/$postID")
             },
-            navigateToProfileMore = {
-                navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$it")
-            },
             navigateToPostMore = {
                 navController.navigate("${MainDestinations.POST_MORE_SHEET}/$it")
             },
+            navigateToMapPostHistory = navController::navigateToMapPostHistory,
+            navigateToCheerscode = navController::navigateToCheerscode,
+            navigateToNfc = {},
+            navigateToSettings = navController::navigateToSettings,
         )
 
         cheersCodeScreen(
@@ -612,41 +607,6 @@ fun NavGraphBuilder.mainNavGraph(
         }
     }
 
-    bottomSheet(
-        route = "${MainDestinations.PROFILE_MORE_SHEET}/{username}",
-    ) {
-        val context = LocalContext.current
-        val username = it.arguments?.getString("username")!!
-        val clipboardManager = LocalClipboardManager.current
-        val scope = rememberCoroutineScope()
-
-        ProfileMoreBottomSheet(
-            onProfileSheetUIAction = { action ->
-                when (action) {
-                    is ProfileSheetUIAction.OnNfcClick -> appState.navActions.navigateToNfc()
-                    is ProfileSheetUIAction.OnSettingsClick -> navController.navigateToSettings()
-                    is ProfileSheetUIAction.OnCopyProfileClick -> {
-                        scope.launch {
-                            val link =
-                                FirebaseDynamicLinksUtil.createShortLink("u/$username").getOrNull()
-                                    ?: return@launch
-                            clipboardManager.setText(AnnotatedString(link))
-                        }
-                        appState.navActions.navigateBack()
-                    }
-
-                    is ProfileSheetUIAction.OnAddSnapchatFriends -> {
-                        scope.launch {
-                            context.shareToSnapchat(username)
-                        }
-                    }
-
-                    is ProfileSheetUIAction.OnPostHistoryClick -> navController.navigateToMapPostHistory()
-                    ProfileSheetUIAction.OnQrCodeClick -> navController.navigateToCheerscode()
-                }
-            },
-        )
-    }
 
     bottomSheet(
         route = "${MainDestinations.MESSAGES_MORE_SHEET}/{channelId}",

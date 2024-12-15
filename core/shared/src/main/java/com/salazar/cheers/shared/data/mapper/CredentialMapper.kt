@@ -5,7 +5,7 @@ import cheers.auth.v1.Credential
 fun Credential.toCredential(): com.salazar.cheers.core.model.Credential {
     return com.salazar.cheers.core.model.Credential(
         id = id.toString(),
-        name = "",
+        name = device.name,
         deviceName = device.name,
         lastUsed = lastUsed,
     )

@@ -1,5 +1,6 @@
 package com.salazar.cheers.core.data.remote
 
+import android.util.Log
 import com.salazar.cheers.BuildConfig
 import io.grpc.CallOptions
 import io.grpc.Channel
@@ -24,7 +25,8 @@ class LoggerInterceptor @Inject constructor(
         return object : ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(delegateCall) {
             override fun sendMessage(message: ReqT) {
                 if (BuildConfig.DEBUG) {
-                    println("Request Message: $callOptions.")
+                    Log.i("LoggerInterceptor", "Calling: ${method.fullMethodName}")
+                    Log.i("LoggerInterceptor", (message as com.google.protobuf.GeneratedMessageLite<*, *>).toString())
                 }
                 super.sendMessage(message)
             }

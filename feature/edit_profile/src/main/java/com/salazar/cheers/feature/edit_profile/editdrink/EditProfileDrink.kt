@@ -1,4 +1,4 @@
-package com.salazar.cheers.feature.edit_profile
+package com.salazar.cheers.feature.edit_profile.editdrink
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,7 +12,6 @@ import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.emptyDrink
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.core.ui.components.drink.DrinkComponent
 import com.salazar.cheers.core.ui.components.favorite_drink.FavoriteDrinkComponent
 
 

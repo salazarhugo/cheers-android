@@ -3,6 +3,7 @@ package com.salazar.cheers.feature.comment.replies
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.domain.create_comment.CreateCommentUseCase
@@ -14,7 +15,7 @@ import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ data class RepliesUiState(
 
 @HiltViewModel
 class RepliesViewModel @Inject constructor(
-    stateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val createCommentUseCase: CreateCommentUseCase,
     private val getCommentUseCase: GetCommentUseCase,
     private val listRepliesUseCase: ListRepliesUseCase,
@@ -41,8 +42,10 @@ class RepliesViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
 ) : ViewModel() {
 
+    private val repliesScreen = savedStateHandle.toRoute<RepliesScreen>()
+
     private val viewModelState = MutableStateFlow(RepliesUiState(isLoading = true))
-    private lateinit var commentId: String
+    private val commentId = repliesScreen.commentID
 
     val uiState = viewModelState
         .stateIn(
@@ -52,12 +55,8 @@ class RepliesViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>(COMMENT_ID)?.let {
-            commentId = it
-        }
-
         viewModelScope.launch {
-            val account = getAccountUseCase().first()
+            val account = getAccountUseCase().firstOrNull() ?: return@launch
             viewModelState.update {
                 it.copy(account = account)
             }
@@ -75,13 +74,15 @@ class RepliesViewModel @Inject constructor(
     }
 
     private fun updateReplies(resource: Resource<List<Comment>>) {
-        when(resource) {
-            is Resource.Error ->  viewModelState.update {
+        when (resource) {
+            is Resource.Error -> viewModelState.update {
                 it.copy(errorMessage = resource.message, isLoading = false)
             }
+
             is Resource.Loading -> viewModelState.update {
                 it.copy(isLoading = resource.isLoading)
             }
+
             is Resource.Success -> viewModelState.update {
                 it.copy(replies = resource.data, isLoading = false)
             }

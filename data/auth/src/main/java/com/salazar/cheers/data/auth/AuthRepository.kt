@@ -11,7 +11,6 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
-import androidx.credentials.exceptions.GetCredentialException
 import cheers.auth.v1.AuthServiceGrpcKt
 import cheers.auth.v1.ListCredentialsRequest
 import com.google.android.gms.common.api.ApiException
@@ -37,6 +36,7 @@ import com.salazar.cheers.data.auth.model.CreatePasskeyResponseData
 import com.salazar.cheers.data.auth.model.GetPasskeyResponseData
 import com.salazar.cheers.shared.data.BffApiService
 import com.salazar.cheers.shared.data.mapper.toCredential
+import com.salazar.cheers.shared.data.request.Device
 import com.salazar.cheers.shared.data.request.FinishLoginPasskey
 import com.salazar.cheers.shared.data.request.FinishLoginRequest
 import com.salazar.cheers.shared.data.request.FinishRegistrationRequest
@@ -318,7 +318,6 @@ class AuthRepository @Inject constructor(
         username: String,
         passkey: Passkey,
     ): Result<FinishRegistrationResponse> {
-        val deviceName = Build.MODEL
         return try {
             val request = FinishRegistrationRequest(
                 email = "",
@@ -326,7 +325,10 @@ class AuthRepository @Inject constructor(
                 passkey = passkey,
                 challenge = challenge,
                 userId = userId,
-                deviceName = deviceName,
+                device = Device(
+                    name = "${Build.MANUFACTURER} ${Build.MODEL}",
+                    model = Build.MODEL,
+                ),
             )
             val response = bffApiService.finishRegistration(request = request)
             Result.success(response)

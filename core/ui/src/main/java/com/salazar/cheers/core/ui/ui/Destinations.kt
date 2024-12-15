@@ -6,11 +6,8 @@ import androidx.navigation.NavHostController
  * Destinations used in the [CheersApp].
  */
 object CheersDestinations {
-    const val ROOT_ROUTE = "root"
     const val AUTH_ROUTE = "auth"
     const val MAIN_ROUTE = "main"
-    const val SETTING_ROUTE = "setting"
-    const val PASSCODE_ROUTE = "passcode"
 }
 
 /**
@@ -41,7 +38,6 @@ object MainDestinations {
     const val POST_DETAIL_ROUTE = "postDetail"
     const val GUEST_LIST_ROUTE = "guestList"
     const val CREATE_PARTY_ROUTE = "create_party_route"
-    const val PROFILE_MORE_SHEET = "profileMoreSheet"
     const val POST_MORE_SHEET = "postMoreSheet"
     const val STORY_MORE_SHEET = "storyMoreSheet"
     const val STORY_ROUTE = "story"
@@ -274,13 +270,6 @@ class CheersNavigationActions(
 
     val navigateToPostMoreSheet: (postId: String) -> Unit = { postId  ->
         navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postId") {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
-    val navigateToProfileMoreSheet: (username: String) -> Unit = { username ->
-        navController.navigate("${MainDestinations.PROFILE_MORE_SHEET}/$username") {
             launchSingleTop = true
             restoreState = true
         }

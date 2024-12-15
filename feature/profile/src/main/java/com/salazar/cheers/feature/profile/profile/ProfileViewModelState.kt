@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.profile.profile
 
-import androidx.compose.material3.SheetState
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.User
@@ -14,8 +13,12 @@ internal data class ProfileViewModelState(
     val errorMessages: String = "",
 ) {
     fun toUiState(): ProfileUiState {
-        return when (user != null) {
-            true -> ProfileUiState.HasUser(
+        return if (isLoading) {
+            ProfileUiState.Loading
+        } else if (user == null) {
+            ProfileUiState.NotSignIn
+        } else {
+            ProfileUiState.HasUser(
                 posts = posts,
                 user = user,
                 parties = parties,
@@ -23,14 +26,6 @@ internal data class ProfileViewModelState(
                 errorMessages = errorMessages,
                 isRefreshing = isRefreshing,
             )
-
-            else -> {
-                ProfileUiState.NoAccount(
-                    isLoading = isLoading,
-                    errorMessages = errorMessages,
-                    isRefreshing = isRefreshing,
-                )
-            }
         }
     }
 }

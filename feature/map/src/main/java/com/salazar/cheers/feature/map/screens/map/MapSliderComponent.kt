@@ -72,7 +72,7 @@ fun MapSliderComponent(
     ) {
         Box(
             modifier = modifier
-                .background(MaterialTheme.colorScheme.onBackground)
+                .background(MaterialTheme.colorScheme.background)
                 .clip(CircleShape)
                 .width(4.dp)
                 .fillMaxHeight()

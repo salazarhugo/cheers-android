@@ -9,7 +9,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.shared.util.LocalActivity
-import com.salazar.cheers.shared.util.getActivity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,7 +34,9 @@ fun PremiumRoute(
         uiState = uiState,
         onBackPressed = onBackPressed,
         onSubscribeClick = {
-            viewModel.onSubscribeClick(activity)
+            viewModel.onSubscribeClick(activity) {
+
+            }
         },
     )
 }

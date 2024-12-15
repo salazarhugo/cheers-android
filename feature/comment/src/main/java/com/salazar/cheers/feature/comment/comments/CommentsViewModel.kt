@@ -3,6 +3,7 @@ package com.salazar.cheers.feature.comment.comments
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.domain.create_comment.CreateCommentUseCase
@@ -41,9 +42,10 @@ class CommentsViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val listPostCommentsUseCase: ListPostCommentsUseCase,
 ) : ViewModel() {
+    private val commentsScreen = stateHandle.toRoute<PostCommentsScreen>()
 
     private val viewModelState = MutableStateFlow(CommentsUiState(isLoading = true))
-    private lateinit var postId: String
+    private val postID: String = commentsScreen.postID
 
     val uiState = viewModelState
         .stateIn(
@@ -53,9 +55,6 @@ class CommentsViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>(POST_ID)?.let {
-            postId = it
-        }
 
         viewModelScope.launch {
             val account = getAccountUseCase().first()
@@ -71,7 +70,7 @@ class CommentsViewModel @Inject constructor(
 //            }
         }
         viewModelScope.launch {
-            listPostCommentsUseCase(postID = postId).collect(::updateComments)
+            listPostCommentsUseCase(postID = postID).collect(::updateComments)
         }
     }
 
@@ -130,13 +129,13 @@ class CommentsViewModel @Inject constructor(
             username = "cheers",
             verified = true,
             avatar = state.avatar,
-            postId = postId,
+            postId = postID,
 //            authorId = FirebaseAuth.getInstance().currentUser?.uid!!,
             text = text,
         )
         viewModelScope.launch {
             createCommentUseCase(
-                postId = postId,
+                postId = postID,
                 comment = comment.text,
                 replyToCommentId = state.replyComment?.id
             )

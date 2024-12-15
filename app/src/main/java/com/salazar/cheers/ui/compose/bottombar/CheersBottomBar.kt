@@ -2,9 +2,11 @@ package com.salazar.cheers.ui.compose.bottombar
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.salazar.cheers.core.data.internal.clearRippleConfiguration
 import com.salazar.cheers.core.ui.CheersPreview
@@ -72,69 +75,76 @@ fun CheersBottomBar(
     CompositionLocalProvider(
         LocalRippleConfiguration provides clearRippleConfiguration
     ) {
-        NavigationBar(
-            containerColor = MaterialTheme.colorScheme.background.compositeOver(Color.White),
-            modifier = modifier
-                .navigationBarsPadding()
-                .height(52.dp),
-            windowInsets = BottomAppBarDefaults.windowInsets,
-            tonalElevation = 0.dp,
-        ) {
-            items.forEachIndexed { index, bottomNavigationItem ->
-                val interactionSource = remember { MutableInteractionSource() }
-                val screen = bottomNavigationItem.screen
-                val isSelected =
-                    currentDestination?.hierarchy?.any { it.route == screen.route } == true
+        Column {
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.background.compositeOver(Color.White),
+                modifier = modifier
+                    .navigationBarsPadding()
+                    .height(52.dp),
+                windowInsets = BottomAppBarDefaults.windowInsets,
+                tonalElevation = 0.dp,
+            ) {
+                items.forEachIndexed { index, bottomNavigationItem ->
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val screen = bottomNavigationItem.screen
+                    val isSelected = currentDestination?.hierarchy?.any {
+                        it.hasRoute(screen.route::class)
+                    } == true
 
-                val icon = when (bottomNavigationItem.icon) {
-                    null -> {
-                        val icon = when (isSelected) {
-                            true -> screen.selectedIcon
-                            false -> screen.icon
+
+                    val icon = when (bottomNavigationItem.icon) {
+                        null -> {
+                            val icon = when (isSelected) {
+                                true -> screen.selectedIcon
+                                false -> screen.icon
+                            }
+                            {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = screen.route::class.simpleName,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
-                        {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
+
+                        else -> bottomNavigationItem.icon
+                    }
+                    LaunchedEffect(interactionSource) {
+                        var isLongClick = false
+
+                        interactionSource.interactions.collectLatest { interaction ->
+                            when (interaction) {
+                                is PressInteraction.Press -> {
+                                    isLongClick = false
+                                    delay(viewConfiguration.longPressTimeoutMillis)
+                                    isLongClick = true
+                                    hapticFeedback.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
+                                    if (bottomNavigationItem == BottomNavigationItem.Profile) {
+                                        showAccountBottomSheet = true
+                                    }
+                                }
+
+                                is PressInteraction.Release -> {
+                                    if (isLongClick.not()) {
+                                        onNavigate(screen.route)
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    else -> bottomNavigationItem.icon
+                    NavigationBarItem(
+                        modifier = Modifier
+                            .zIndex(bottomNavigationItem.order.toFloat()),
+                        icon = icon,
+                        selected = isSelected,
+                        onClick = {},
+                        interactionSource = interactionSource,
+                    )
                 }
-                LaunchedEffect(interactionSource) {
-                    var isLongClick = false
-
-                    interactionSource.interactions.collectLatest { interaction ->
-                        when (interaction) {
-                            is PressInteraction.Press -> {
-                                isLongClick = false
-                                delay(viewConfiguration.longPressTimeoutMillis)
-                                isLongClick = true
-                                hapticFeedback.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
-                                if (bottomNavigationItem == BottomNavigationItem.Profile) {
-                                    showAccountBottomSheet = true
-                                }
-                            }
-
-                            is PressInteraction.Release -> {
-                                if (isLongClick.not()) {
-                                    onNavigate(screen.route)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                NavigationBarItem(
-                    modifier = Modifier
-                        .zIndex(bottomNavigationItem.order.toFloat()),
-                    icon = icon,
-                    selected = isSelected,
-                    onClick = {},
-                    interactionSource = interactionSource,
-                )
             }
         }
     }

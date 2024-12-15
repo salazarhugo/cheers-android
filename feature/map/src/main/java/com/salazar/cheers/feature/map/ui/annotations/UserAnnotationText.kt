@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +14,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -33,13 +33,14 @@ internal fun UserAnnotationText(
         withStyle(style = MaterialTheme.typography.bodyMedium.toSpanStyle()) {
             append(name)
         }
-        val timestamp = com.salazar.cheers.core.util.relativeTimeFormatter(seconds = lastUpdated).text
+        val timestamp =
+            com.salazar.cheers.core.util.relativeTimeFormatter(seconds = lastUpdated).text
 
-        withStyle(style = MaterialTheme.typography.labelSmall.toSpanStyle()) {
+        withStyle(style = MaterialTheme.typography.labelSmall.toSpanStyle().copy(fontWeight = FontWeight.Bold)) {
             append(" ")
-            if (timestamp == "just now") {
+            if (((Date().time / 1000) - lastUpdated) < 2 ) {
                 withStyle(style = SpanStyle(color = GreenGoogle)) {
-                    append(timestamp)
+                    append("now")
                 }
             } else {
                 append(timestamp)
@@ -51,7 +52,7 @@ internal fun UserAnnotationText(
         text = annotatedString,
         modifier = modifier
             .offset(y = (-8).dp)
-            .shadow(elevation = 9.dp, shape = CircleShape)
+            .shadow(elevation = 9.dp, shape = RoundedCornerShape(4.dp))
             .clip(RoundedCornerShape(4.dp))
             .border(1.dp, Color(0xFFE5E5E5), RoundedCornerShape(4.dp))
             .background(Color.White)

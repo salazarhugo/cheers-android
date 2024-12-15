@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.core.model.CheckUsernameResult
 import com.salazar.cheers.domain.RegisterPasskeyAndSignInUseCase
 import com.salazar.cheers.domain.register.RegisterUseCase
 import com.salazar.cheers.domain.usecase.GetUsernameAvailabilityUseCase
@@ -30,7 +31,7 @@ data class SignUpUiState(
     val isSignedIn: Boolean = false,
     val acceptTerms: Boolean = false,
     val page: Int = 0,
-    val usernameAvailabilityState: Resource<Boolean> = Resource.Error(""),
+    val usernameAvailabilityState: Resource<CheckUsernameResult> = Resource.Error(""),
 )
 
 @HiltViewModel

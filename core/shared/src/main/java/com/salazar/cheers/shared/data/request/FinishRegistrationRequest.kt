@@ -10,7 +10,13 @@ data class FinishRegistrationRequest(
     val username: String,
     val passkey: Passkey,
     val challenge: String,
-    val deviceName: String,
+    val device: Device,
+)
+
+@JsonClass(generateAdapter = true)
+data class Device(
+    val name: String,
+    val model: String,
 )
 
 @JsonClass(generateAdapter = true)

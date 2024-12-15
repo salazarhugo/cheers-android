@@ -3,7 +3,7 @@ package com.salazar.cheers.feature.create_post
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.domain.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +23,7 @@ data class AddPeopleUiState(
 
 @HiltViewModel
 class AddPeopleViewModel @Inject constructor(
-    private val listFriendUseCase: ListFriendUseCase,
+    private val listFriendUseCase: ListMyFriendsUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(AddPeopleUiState(isLoading = true))

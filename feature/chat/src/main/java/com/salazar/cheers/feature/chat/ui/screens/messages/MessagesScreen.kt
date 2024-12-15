@@ -3,26 +3,42 @@ package com.salazar.cheers.feature.chat.ui.screens.messages
 import RoomsUIAction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.components.message.MessageComponent
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.feature.chat.ui.chats.EmptyChatsMessage
 import com.salazar.cheers.feature.chat.ui.components.SwipeableChatItem
 import com.salazar.cheers.feature.chat.ui.components.chat_item.DirectChatComponent
@@ -125,7 +141,7 @@ fun ConversationList(
 
             SwipeableChatItem(
                 modifier = Modifier
-                    .animateItemPlacement()
+                    .animateItem()
                     .clip(RoundedCornerShape(8.dp)),
                 state = dismissState,
             ) {

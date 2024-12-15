@@ -1,20 +1,15 @@
 package com.salazar.cheers.feature.map.screens.map
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.data.map.UserLocation
 import com.salazar.cheers.feature.map.ui.dialogs.PostMapDialog
 import com.salazar.cheers.feature.map.ui.dialogs.UserMapDialog
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun MapBottomSheet(
     state: SheetState,
@@ -26,9 +21,7 @@ fun MapBottomSheet(
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
-        scrimColor = Color.Transparent,
         sheetState = state,
-        contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
     ) {
         when (type) {
             is MapAnnotation.PostAnnotation -> {

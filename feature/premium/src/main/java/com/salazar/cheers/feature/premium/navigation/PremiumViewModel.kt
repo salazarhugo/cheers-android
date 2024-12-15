@@ -1,15 +1,13 @@
 package com.salazar.cheers.feature.premium.navigation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.model.Activity
+import com.android.billingclient.api.BillingClient
 import com.salazar.cheers.core.model.ProductDetails
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.data.billing.BillingRepository
 import com.salazar.cheers.domain.get_in_app_product.GetInAppProductUseCase
 import com.salazar.cheers.domain.get_in_app_product.LaunchBillingFlowUseCase
-import com.salazar.cheers.domain.get_in_app_product.ListInAppProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,10 +40,23 @@ class PremiumViewModel @Inject constructor(
 
     fun onSubscribeClick(
         activity: android.app.Activity,
+        onSuccessfulPurchase: () -> Unit,
     ) {
         val productDetails = ProductDetails(id = "cheers_premium")
+
         viewModelScope.launch {
-            launchBillingFlowUseCase(activity, productDetails)
+            val responseCode = launchBillingFlowUseCase(activity, productDetails)
+            when (responseCode) {
+                BillingClient.BillingResponseCode.OK -> {
+                    onSuccessfulPurchase()
+                }
+
+                BillingClient.BillingResponseCode.USER_CANCELED -> {
+                }
+
+                else -> {
+                }
+            }
         }
     }
 

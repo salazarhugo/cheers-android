@@ -1,6 +1,6 @@
 package com.salazar.cheers.feature.chat.ui.screens.messages
 
-import androidx.compose.foundation.layout.navigationBarsPadding
+import RoomsUIAction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +49,7 @@ fun MessagesRoute(
     if (chat != null) {
         ChatsMoreBottomSheet(
             chat = chat,
-            modifier = Modifier.navigationBarsPadding(),
+            modifier = Modifier,
             onDismissRequest = {
                 showChatMoreDialog = null
             }

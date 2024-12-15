@@ -2,6 +2,7 @@ package com.salazar.cheers.auth.ui.register
 
 import androidx.compose.runtime.Composable
 import com.salazar.cheers.auth.ui.signin.CreateAccountScreen
+import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 
@@ -28,7 +29,7 @@ fun RegisterScreen(
 fun RegisterScreenPreview() {
     CheersPreview {
         RegisterScreen(
-            uiState = RegisterUiState(),
+            uiState = RegisterUiState(username = cheersUserItem.username),
             onRegisterClick = {},
             onAcceptTermsChange = {},
             onBackPressed = {},

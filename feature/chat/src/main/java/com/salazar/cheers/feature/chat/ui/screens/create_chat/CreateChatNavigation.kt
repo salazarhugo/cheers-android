@@ -5,23 +5,29 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
+import kotlinx.serialization.Serializable
 
-const val createChatNavigationRoute = "create_chat_route"
+@Serializable
+data object CreateChatScreen
+
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/create_chat"
+    "${Constants.DEEPLINK_BASE_URL}/chat/create"
 
 fun NavController.navigateToCreateChat(navOptions: NavOptions? = null) {
-    this.navigate(createChatNavigationRoute, navOptions)
+    this.navigate(
+        route = CreateChatScreen,
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.createChatScreen(
     navigateBack: () -> Unit,
     navigateToChatWithChannelId: (String) -> Unit,
 ) {
-    composable(
-        route = createChatNavigationRoute,
+    composable<CreateChatScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<CreateChatScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         CreateChatRoute(

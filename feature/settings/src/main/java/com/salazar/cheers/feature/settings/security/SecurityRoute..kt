@@ -4,38 +4,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.shared.util.LocalActivity
 
 @Composable
 fun SecurityRoute(
     viewModel: SecurityViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
-    navigateToPassword: () -> Unit,
     navigateToPasscodeSettings: () -> Unit,
     navigateToCreatePasscode: () -> Unit,
+    navigateToPasskeys: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-//    val authResultLauncher =
-//        rememberLauncherForActivityResult(
-//            contract = com.salazar.cheers.data.auth.AuthResultContract(),
-//            securityViewModel::onResult
-//        )
+    val activity = LocalActivity.current
 
     SecurityScreen(
         uiState = uiState,
         onBackPressed = navigateBack,
-        onUnlink = {},
-        onAddPassword = {
-            navigateToPassword()
-        },
-        onLink = {
-//                if (it == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)
-//                    authResultLauncher.launch(1)
-        },
+        onPasskeysClick = navigateToPasskeys,
         onPasscodeClick = {
             if (uiState.passcodeEnabled)
                 navigateToPasscodeSettings()
             else
                 navigateToCreatePasscode()
+        },
+        onCreatePasskeyClick = {
+            viewModel.onCreatePasskeyClick(activity = activity)
         },
     )
 }

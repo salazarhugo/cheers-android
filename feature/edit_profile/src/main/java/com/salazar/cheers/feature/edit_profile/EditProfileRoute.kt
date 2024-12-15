@@ -2,13 +2,13 @@ package com.salazar.cheers.feature.edit_profile
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun EditProfileRoute(
-    viewModel: EditProfileViewModel = hiltViewModel(),
-    navigateBack: () -> Unit = {},
+    navigateBack: () -> Unit,
+    navigateToGender: () -> Unit,
+    viewModel: EditProfileViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -26,5 +26,6 @@ fun EditProfileRoute(
             navigateBack()
         },
         onDrinkClick = viewModel::selectDrink,
+        onGenderClick = navigateToGender,
     )
 }

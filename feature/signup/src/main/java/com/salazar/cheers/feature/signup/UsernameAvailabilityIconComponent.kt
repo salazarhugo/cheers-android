@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.salazar.cheers.core.model.CheckUsernameResult
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.circular_progress.CircularProgressComponent
@@ -19,7 +20,7 @@ import com.salazar.cheers.shared.util.Resource
 
 @Composable
 fun UsernameAvailabilityIconComponent(
-    state: Resource<Boolean>,
+    state: Resource<CheckUsernameResult>,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -36,7 +37,7 @@ fun UsernameAvailabilityIconComponent(
             }
 
             is Resource.Success -> {
-                if (state.data == true) {
+                if (state.data?.valid == true) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Check icon",

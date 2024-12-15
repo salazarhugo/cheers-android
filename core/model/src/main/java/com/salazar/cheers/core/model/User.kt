@@ -33,4 +33,7 @@ data class User(
     val isBusinessAccount: Boolean = false,
     val birthDate: Long = 0L,
     val favouriteDrink: Drink? = null,
+    val gender: Gender = Gender.MALE,
+    val work: String = "",
+    val education: String = "",
 )

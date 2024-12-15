@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.addOrRemove
-import com.salazar.cheers.domain.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.shared.util.Resource
 import com.salazar.cheers.shared.util.result.Result
@@ -29,7 +29,7 @@ data class NewChatUiState(
 @HiltViewModel
 class NewChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val listFriendUseCase: ListFriendUseCase,
+    private val listFriendUseCase: ListMyFriendsUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(NewChatUiState())

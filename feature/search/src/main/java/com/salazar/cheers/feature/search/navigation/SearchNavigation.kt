@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 data object Search
 
 private const val DEEP_LINK_URI_PATTERN =
-    "${Constants.BASE_URL}/search"
+    "${Constants.DEEPLINK_BASE_URL}/search"
 
 fun NavController.navigateToSearch(navOptions: NavOptions? = null) {
     this.navigate(

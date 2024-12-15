@@ -34,6 +34,9 @@ val cheersUser = User(
     picture = null,
     friend = true,
     requested = false,
+    gender = Gender.MALE,
+    work = "Software Engineer",
+    education = "University of Toronto",
 )
 
 val cheersUserItemList = List(20) {

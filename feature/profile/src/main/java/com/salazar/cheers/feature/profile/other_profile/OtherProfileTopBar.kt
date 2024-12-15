@@ -1,8 +1,8 @@
 package com.salazar.cheers.feature.profile.other_profile
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -12,10 +12,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.Username
 
 
 @Composable
@@ -43,7 +43,7 @@ internal fun OtherProfileTopBar(
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
-                Icon(Icons.Outlined.ArrowBack, "Back button")
+                Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back button")
             }
         },
         actions = {

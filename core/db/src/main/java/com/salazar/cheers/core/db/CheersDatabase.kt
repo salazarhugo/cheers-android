@@ -64,7 +64,7 @@ import com.salazar.cheers.core.db.model.UserSuggestionEntity
         NoteEntity::class,
         DrinkEntity::class,
     ],
-    version = 42,
+    version = 43,
     exportSchema = false,
     autoMigrations = []
 )

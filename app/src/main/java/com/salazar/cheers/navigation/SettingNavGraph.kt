@@ -1,24 +1,23 @@
 package com.salazar.cheers.navigation
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.salazar.cheers.core.ui.ui.CheersDestinations
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.ui.ui.SettingDestinations
 import com.salazar.cheers.feature.premium.navigation.navigateToPremium
 import com.salazar.cheers.feature.premium.navigation.premiumScreen
-import com.salazar.cheers.feature.settings.language.LanguageRoute
+import com.salazar.cheers.feature.settings.SettingsScreen
+import com.salazar.cheers.feature.settings.language.languagesScreen
+import com.salazar.cheers.feature.settings.language.navigateToLanguage
 import com.salazar.cheers.feature.settings.notifications.NotificationsRoute
 import com.salazar.cheers.feature.settings.password.createPasswordScreen
-import com.salazar.cheers.feature.settings.password.navigateToCreatePassword
-import com.salazar.cheers.feature.settings.recharge.RechargeRoute
 import com.salazar.cheers.feature.settings.recharge.navigateToRecharge
 import com.salazar.cheers.feature.settings.recharge.rechargeScreen
 import com.salazar.cheers.feature.settings.security.navigateToSecurity
+import com.salazar.cheers.feature.settings.security.passkeys.navigateToPasskeys
+import com.salazar.cheers.feature.settings.security.passkeys.passkeysScreen
 import com.salazar.cheers.feature.settings.security.securityScreen
-import com.salazar.cheers.feature.settings.settingsNavigationRoute
 import com.salazar.cheers.feature.settings.settingsScreen
 import com.salazar.cheers.feature.settings.theme.ThemeRoute
 import com.salazar.cheers.feature.signin.navigateToSignIn
@@ -29,22 +28,25 @@ import com.softimpact.feature.passcode.create.createPasscodeScreen
 import com.softimpact.feature.passcode.create.navigateToCreatePasscode
 import com.softimpact.feature.passcode.settings.navigateToPasscodeSettings
 import com.softimpact.feature.passcode.settings.passcodeSettingsScreen
+import kotlinx.serialization.Serializable
 
-fun NavGraphBuilder.settingNavGraph(
+@Serializable
+data object SettingsNavGraph
+
+fun NavGraphBuilder.settingsNavGraph(
     appState: CheersAppState,
 ) {
     val navActions = appState.navActions
     val navController = appState.navController
 
-    navigation(
-        route = CheersDestinations.SETTING_ROUTE,
-        startDestination = settingsNavigationRoute,
+    navigation<SettingsNavGraph>(
+        startDestination = SettingsScreen,
     ) {
 
         settingsScreen(
             navigateBack = navController::popBackStack,
             navigateToAddPaymentMethod = {},
-            navigateToLanguage = {},
+            navigateToLanguage = navController::navigateToLanguage,
             navigateToNotifications = {},
             navigateToTheme = {
                 navController.navigate(SettingDestinations.THEME_ROUTE)
@@ -55,6 +57,10 @@ fun NavGraphBuilder.settingNavGraph(
             navigateToSignIn = navController::navigateToSignIn,
             navigateToDeleteAccount = { navController.navigate(MainDestinations.ACCOUNT_DELETE) },
             navigateToPremium = navController::navigateToPremium,
+        )
+
+        languagesScreen(
+            navigateBack = navController::popBackStack,
         )
 
         premiumScreen(
@@ -77,9 +83,13 @@ fun NavGraphBuilder.settingNavGraph(
 
         securityScreen(
             navigateBack = navController::popBackStack,
-            navigateToPassword = navController::navigateToCreatePassword,
+            navigateToPasskeys = navController::navigateToPasskeys,
             navigateToPasscodeSettings = navController::navigateToPasscodeSettings,
             navigateToCreatePasscode = navController::navigateToCreatePasscode,
+        )
+
+        passkeysScreen(
+            navigateBack = navController::popBackStack,
         )
 
         createPasswordScreen(
@@ -107,19 +117,6 @@ fun NavGraphBuilder.settingNavGraph(
 //                onAddCard = {}
 //            )
         }
-
-        composable(
-            route = SettingDestinations.LANGUAGE_ROUTE,
-        ) {
-            val settingsViewModel =
-                hiltViewModel<com.salazar.cheers.feature.settings.SettingsViewModel>()
-
-            LanguageRoute(
-                navActions = navActions,
-                settingsViewModel = settingsViewModel,
-            )
-        }
-
         composable(
             route = SettingDestinations.NOTIFICATIONS_ROUTE,
         ) {

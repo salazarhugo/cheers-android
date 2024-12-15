@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Party
-import com.salazar.cheers.domain.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
 import com.salazar.cheers.parties.domain.usecase.get_party.GetPartyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +31,7 @@ data class ShareUiState(
 @HiltViewModel
 class ShareViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val listFriendUseCase: ListFriendUseCase,
+    private val listFriendUseCase: ListMyFriendsUseCase,
     private val getPartyUseCase: GetPartyUseCase,
 ) : ViewModel() {
 

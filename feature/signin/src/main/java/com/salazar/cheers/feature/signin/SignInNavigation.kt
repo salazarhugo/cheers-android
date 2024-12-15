@@ -5,23 +5,28 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
+import kotlinx.serialization.Serializable
 
-const val signInNavigationRoute = "sign_in_route"
-private const val DEEP_LINK_URI_PATTERN =
-    "https://cheers-a275e.web.app/signIn/{emailLink}"
+@Serializable
+data object SignInScreen
+
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/signin"
 
 fun NavController.navigateToSignIn(navOptions: NavOptions? = null) {
-    this.navigate(signInNavigationRoute, navOptions)
+    this.navigate(
+        route = SignInScreen,
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.signInScreen(
     navigateToHome: () -> Unit,
     navigateToSignUp: (String?) -> Unit,
 ) {
-    composable(
-        route = signInNavigationRoute,
+    composable<SignInScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<SignInScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         SignInRoute(

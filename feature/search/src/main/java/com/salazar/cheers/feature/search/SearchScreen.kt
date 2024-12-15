@@ -175,7 +175,6 @@ fun SearchScreen(
             content = {
                 SearchBody(
                     query = query,
-                    page = pagerState.currentPage,
                     recentSearches = uiState.recentSearch,
                     searchResultState = searchResultState,
                     onUserClick = onUserClick,
@@ -240,7 +239,6 @@ fun PartiesTab(modifier: Modifier = Modifier) {
 
 @Composable
 private fun SearchBody(
-    page: Int,
     query: String,
     recentSearches: List<RecentSearch>,
     searchResultState: SearchResultState,
@@ -267,7 +265,6 @@ private fun SearchBody(
 
         searchResult(
             query = query,
-            page = page,
             searchResultState = searchResultState,
             onUserClick = onUserClick,
             onPartyClick = onPartyClick,
@@ -330,7 +327,7 @@ private fun LazyListScope.recentSearch(
 }
 
 private fun LazyListScope.searchResult(
-    page: Int,
+    page: Int? = null,
     query: String,
     searchResultState: SearchResultState,
     onUserClick: (UserItem) -> Unit,
@@ -357,16 +354,30 @@ private fun LazyListScope.searchResult(
             }
 
             when (page) {
-                0 -> parties(
-                    parties = parties,
-                    onPartyClick = onPartyClick,
-                )
-
-                1 -> users(
-                    users = users,
-                    onStoryClick = onStoryClick,
-                    onUserClick = onUserClick,
-                )
+                null -> {
+                    parties(
+                        parties = parties,
+                        onPartyClick = onPartyClick,
+                    )
+                    users(
+                        users = users,
+                        onStoryClick = onStoryClick,
+                        onUserClick = onUserClick,
+                    )
+                }
+                0 -> {
+                    parties(
+                        parties = parties,
+                        onPartyClick = onPartyClick,
+                    )
+                }
+                1 -> {
+                    users(
+                        users = users,
+                        onStoryClick = onStoryClick,
+                        onUserClick = onUserClick,
+                    )
+                }
             }
         }
     }

@@ -79,7 +79,9 @@ internal fun FriendFeedScreen(
                 avatar = uiState.account?.picture.orEmpty(),
                 onClick = { onHomeUIAction(HomeUIAction.OnCreatePostClick) },
             )
-            HorizontalDivider()
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
         }
 
         uploadingSection(
@@ -230,7 +232,9 @@ private fun LazyListScope.notes(
             onNoteClick = { onHomeUIAction(HomeUIAction.OnNoteClick(it)) },
             onUserClick = { onHomeUIAction(HomeUIAction.OnUserClick(it)) }
         )
-        HorizontalDivider()
+        HorizontalDivider(
+            thickness = 0.5.dp,
+        )
     }
 }
 

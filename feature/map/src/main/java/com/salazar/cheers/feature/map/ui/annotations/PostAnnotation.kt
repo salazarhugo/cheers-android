@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,12 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.Bounce
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.BlueCheers
-import com.salazar.cheers.core.Post
 
 @Composable
 fun PostAnnotation(
@@ -56,14 +55,17 @@ fun PostAnnotation(
             AvatarComponent(
                 avatar = picture,
                 onClick = onClick,
+                shape = RoundedCornerShape(8.dp),
+                placeHolder = com.salazar.cheers.core.ui.R.drawable.beer,
+                backgroundColor = Color.Transparent,
                 size = 48.dp,
             )
         }
         Text(
-            text = post.name,
+            text = post.name.ifBlank { post.username },
             modifier = Modifier
                 .offset(y = (-8).dp)
-                .shadow(elevation = 9.dp, shape = CircleShape)
+                .shadow(elevation = 9.dp, shape = RoundedCornerShape(4.dp))
                 .clip(RoundedCornerShape(4.dp))
                 .border(1.dp, Color(0xFFE5E5E5), RoundedCornerShape(4.dp))
                 .background(Color.White)

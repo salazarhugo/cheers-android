@@ -7,16 +7,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import cheers.type.UserOuterClass.UserItem
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.model.ChatMessage
-import com.salazar.cheers.feature.chat.data.GetChatChannelUseCase
-import com.salazar.cheers.domain.seen_room.SeenRoomUseCase
-import com.salazar.cheers.domain.send_message.SendMessageUseCase
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatEvent
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.domain.get_chat.GetChatFlowUseCase
+import com.salazar.cheers.domain.seen_room.SeenRoomUseCase
+import com.salazar.cheers.domain.send_message.SendMessageUseCase
+import com.salazar.cheers.feature.chat.data.GetChatChannelUseCase
 import com.salazar.cheers.shared.util.Resource
 import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
@@ -42,7 +46,8 @@ class ChatViewModel @Inject constructor(
     private val getChatFlowUseCase: GetChatFlowUseCase,
 ) : ViewModel() {
 
-    lateinit var userID: String
+    private val chatScreen = statsHandle.toRoute<ChatScreen>()
+
     var hasChannel = true
     private var typingJob: Job? = null
     lateinit var chatID: String
@@ -57,15 +62,15 @@ class ChatViewModel @Inject constructor(
         )
 
     init {
-        val channelID = statsHandle.get<String>(CHANNEL_ID)
+        val channelID = chatScreen.channelID
+        val userID = chatScreen.userID
 
         if (channelID != null) {
             chatID = channelID
             loadChannel(channelID)
         } else {
             viewModelScope.launch {
-                val userId = statsHandle.get<String>(USER_ID)!!
-                userID = userId
+                val userID = chatScreen.userID!!
                 getChatChannelUseCase(userID).collect(::updateChatChannel)
             }
         }

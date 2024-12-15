@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.Gender
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.list_drink.ListDrinkUseCase
 import com.salazar.cheers.domain.update_profile.UpdateProfileUseCase
@@ -153,6 +154,12 @@ class EditProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             userRepositoryImpl.uploadProfilePicture(profilePicture)
+        }
+    }
+
+    fun updateGender(gender: Gender) {
+        viewModelState.update {
+            it.copy(user = it.user?.copy(gender = gender))
         }
     }
 }

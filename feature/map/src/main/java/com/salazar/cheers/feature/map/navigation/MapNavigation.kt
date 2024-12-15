@@ -19,6 +19,7 @@ fun NavGraphBuilder.mapScreen(
     navigateBack: () -> Unit,
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
+    navigateToChatWithUserId: (String) -> Unit,
 ) {
     composable(
         route = mapNavigationRoute,
@@ -30,6 +31,7 @@ fun NavGraphBuilder.mapScreen(
             navigateBack = navigateBack,
             navigateToCreatePost = navigateToCreatePost,
             navigateToMapSettings = navigateToMapSettings,
+            navigateToChatWithUserId = navigateToChatWithUserId,
         )
     }
 }

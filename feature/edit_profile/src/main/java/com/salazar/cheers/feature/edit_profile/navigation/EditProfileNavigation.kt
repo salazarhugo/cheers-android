@@ -1,31 +1,71 @@
 package com.salazar.cheers.feature.edit_profile.navigation
 
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
+import androidx.navigation.navigation
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.edit_profile.EditProfileRoute
+import com.salazar.cheers.feature.edit_profile.EditProfileViewModel
+import com.salazar.cheers.feature.edit_profile.editgender.editGenderScreen
+import com.salazar.cheers.feature.edit_profile.editgender.navigateToEditGender
+import kotlinx.serialization.Serializable
 
-const val editProfileNavigationRoute = "edit_profile_route"
+@Serializable
+data object EditProfileGraph
+
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/edit_profile"
+    "${Constants.DEEPLINK_BASE_URL}/edit_profile"
 
 fun NavController.navigateToEditProfile(navOptions: NavOptions? = null) {
-    this.navigate(editProfileNavigationRoute, navOptions)
+    this.navigate(
+        route = EditProfileGraph,
+        navOptions = navOptions,
+    )
 }
 
-fun NavGraphBuilder.editProfileScreen(
+fun NavGraphBuilder.editProfileGraph(
+    navController: NavController,
     navigateBack: () -> Unit,
 ) {
-    composable(
-        route = editProfileNavigationRoute,
-        deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
-        ),
+    navigation<EditProfileGraph>(
+        startDestination = EditProfileRecapScreen,
     ) {
-        EditProfileRoute(
+        editProfileRecapScreen(
+            navController = navController,
             navigateBack = navigateBack,
+            navigateToGender = navController::navigateToEditGender,
+        )
+
+        editGenderScreen(
+            navController = navController,
+            navigateBack = navigateBack,
+        )
+    }
+}
+
+@Serializable
+data object EditProfileRecapScreen
+
+fun NavGraphBuilder.editProfileRecapScreen(
+    navController: NavController,
+    navigateBack: () -> Unit,
+    navigateToGender: () -> Unit,
+) {
+    composable<EditProfileRecapScreen> { backStackEntry ->
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry(EditProfileGraph)
+        }
+
+        val viewModel: EditProfileViewModel = hiltViewModel(parentEntry)
+
+        EditProfileRoute(
+            viewModel = viewModel,
+            navigateBack = navigateBack,
+            navigateToGender = navigateToGender,
         )
     }
 }

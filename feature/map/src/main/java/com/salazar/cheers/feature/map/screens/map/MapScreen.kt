@@ -157,7 +157,7 @@ fun AddFriendViewAnnotation(
     ) {
         FriendAnnotation(
             isSelected = isSelected,
-            name = userLocation.name,
+            name = userLocation.name.ifBlank { userLocation.username },
             picture = userLocation.picture,
             lastUpdated = userLocation.lastUpdated,
             onClick = onClick,

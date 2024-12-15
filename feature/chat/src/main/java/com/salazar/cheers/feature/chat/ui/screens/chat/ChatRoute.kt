@@ -1,7 +1,6 @@
 package com.salazar.cheers.feature.chat.ui.screens.chat
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -68,13 +67,12 @@ fun ChatRoute(
         }
     }
 
-
     NoScreenshot()
 
     val channel = uiState.channel
     if (channel == null)
         LoadingScreen()
-    else
+    else {
         ChatScreen(
             uiState = uiState,
             onChatUIAction = { action ->
@@ -94,4 +92,5 @@ fun ChatRoute(
                 }
             },
         )
+    }
 }

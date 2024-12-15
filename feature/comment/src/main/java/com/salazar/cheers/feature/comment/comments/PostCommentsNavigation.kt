@@ -5,16 +5,24 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
+import kotlinx.serialization.Serializable
 
-internal const val POST_ID = "postID"
-const val postCommentsNavigationRoute = "post_comments_route/{$POST_ID}"
-private const val DEEP_LINK_URI_PATTERN = "https://maparty.app/post/{${POST_ID}/comments"
+@Serializable
+data class PostCommentsScreen(
+    val postID: String = "",
+)
+
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/post/{postID}/comments"
 
 fun NavController.navigateToPostComments(
     postID: String,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("post_comments_route/$postID", navOptions)
+    this.navigate(
+        route = PostCommentsScreen(postID = postID),
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.postCommentsScreen(
@@ -22,10 +30,9 @@ fun NavGraphBuilder.postCommentsScreen(
     navigateToCommentMoreSheet: (String) -> Unit,
     navigateToCommentReplies: (String) -> Unit,
 ) {
-    composable(
-        route = postCommentsNavigationRoute,
+    composable<PostCommentsScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<PostCommentsScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         CommentsRoute(

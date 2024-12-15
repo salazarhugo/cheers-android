@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 data object Messages
 
 private const val DEEP_LINK_URI_PATTERN =
-    "${Constants.BASE_URL}/messages"
+    "${Constants.DEEPLINK_BASE_URL}/messages"
 
 fun NavController.navigateToMessages(navOptions: NavOptions? = null) {
     this.navigate(

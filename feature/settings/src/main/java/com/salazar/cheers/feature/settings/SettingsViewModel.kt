@@ -2,11 +2,11 @@ package com.salazar.cheers.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.Language
 import com.salazar.cheers.Theme
+import com.salazar.cheers.core.model.Language
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
-import com.salazar.cheers.domain.delete_account.DeleteAccountUseCase
 import com.salazar.cheers.domain.usecase.SignOutUseCase
+import com.salazar.cheers.shared.data.mapper.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,7 +43,7 @@ class SettingsViewModel @Inject constructor(
                 viewModelState.update {
                     it.copy(
                         theme = appSettings.theme,
-                        language = appSettings.language,
+                        language = appSettings.language.toDomain(),
                     )
                 }
             }
@@ -71,7 +71,7 @@ class SettingsViewModel @Inject constructor(
 
     fun persistLanguage(language: Language) {
         viewModelScope.launch {
-            dataStoreRepository.updateLanguage(language)
+            dataStoreRepository.updateLanguage(com.salazar.cheers.Language.ENGLISH)
         }
     }
 }

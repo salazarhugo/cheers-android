@@ -3,7 +3,6 @@ package com.salazar.cheers.feature.comment.comments
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,7 +53,6 @@ import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.Post
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.core.ui.theme.GreySheet
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
@@ -296,16 +294,14 @@ fun CommentBottomBar(
     replyComment: Comment? = null,
     onDeleteReplyCommentClick: () -> Unit = {},
 ) {
-    val color =
-        if (isSystemInDarkTheme()) GreySheet else MaterialTheme.colorScheme.background
     val focusRequester = remember { FocusRequester() }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .imePadding()
             .navigationBarsPadding()
-            .background(color = color)
     ) {
         if (replyComment != null) {
             ReplyComment(

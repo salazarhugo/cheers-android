@@ -11,6 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Height
+import androidx.compose.material.icons.outlined.PersonOutline
+import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.SettingsAccessibility
+import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -38,7 +44,10 @@ import com.salazar.cheers.core.ui.MyTopAppBar
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
+import com.salazar.cheers.core.ui.item.SettingItem
+import com.salazar.cheers.core.ui.item.SettingTitle
 import com.salazar.cheers.core.ui.ui.LoadingScreen
+import com.salazar.cheers.feature.edit_profile.editdrink.EditProfileDrink
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,6 +62,7 @@ fun EditProfileScreen(
     onDismiss: () -> Unit = {},
     onSave: () -> Unit = {},
     onDrinkClick: (Drink) -> Unit = {},
+    onGenderClick: () -> Unit,
 ) {
     var showSelectDrinkSheet by remember { mutableStateOf(false) }
     val drinkSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -62,7 +72,7 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             MyTopAppBar(
-                title = "Edit Profile",
+                title = "Edit profile",
                 onPop = onDismiss,
                 onSave = onSave,
             )
@@ -95,6 +105,7 @@ fun EditProfileScreen(
                     onNameChanged = onNameChanged,
                     onWebsiteChanged = onWebsiteChanged,
                     onUsernameChange = onUsernameChanged,
+                    onGenderClick = onGenderClick,
                 )
             }
         }
@@ -205,6 +216,7 @@ fun EditProfileBody(
     onNameChanged: (String) -> Unit,
     onUsernameChange: (String) -> Unit,
     onWebsiteChanged: (String) -> Unit,
+    onGenderClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -282,6 +294,68 @@ fun EditProfileBody(
             },
         )
     }
+    SettingTitle(
+        title = "About you",
+    )
+    SettingItem(
+        title = "Work",
+        icon = Icons.Outlined.Work,
+        trailingContent = {
+            Text(
+                text = user.work,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    )
+    SettingItem(
+        title = "Education",
+        icon = Icons.Outlined.School,
+        trailingContent = {
+            Text(
+                text = user.education,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    )
+    SettingItem(
+        title = "Gender",
+        icon = Icons.Outlined.PersonOutline,
+        trailingContent = {
+            Text(
+                text = user.gender.value,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        },
+        onClick = onGenderClick,
+    )
+    SettingTitle(
+        title = "More about you",
+    )
+    SettingItem(
+        title = "Height",
+        icon = Icons.Outlined.Height,
+        trailingContent = {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    )
+    SettingItem(
+        title = "Religion",
+        icon = Icons.Outlined.SettingsAccessibility,
+        trailingContent = {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    )
 }
 
 @ScreenPreviews
@@ -299,6 +373,7 @@ private fun EditProfileScreenPreview() {
                 profilePictureUri = null,
                 drinks = listOf(emptyDrink, coronaExtraDrink)
             ),
+            onGenderClick = {},
         )
     }
 }

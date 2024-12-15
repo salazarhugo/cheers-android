@@ -3,4 +3,8 @@
     <string name="profile_empty_post" translatable="false">When you share photos and videos,\n they\'ll appear on your profile.</string>
     <string name="profile">Profile</string>
     <string name="edit_profile">Edit Profile</string>
+    <plurals name="numberOfFriends">
+        <item quantity="one">%d friend</item>
+        <item quantity="other">%d friends</item>
+    </plurals>
 </resources>

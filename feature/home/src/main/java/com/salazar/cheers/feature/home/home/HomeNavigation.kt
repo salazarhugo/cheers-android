@@ -9,7 +9,7 @@ import com.salazar.cheers.Settings
 import com.salazar.cheers.core.util.Constants
 import kotlinx.serialization.Serializable
 
-private const val DEEP_LINK_URI_PATTERN = "${Constants.BASE_URL}/home"
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/home"
 
 @Serializable
 data object Home

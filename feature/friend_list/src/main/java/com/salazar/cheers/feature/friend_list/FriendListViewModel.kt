@@ -3,7 +3,7 @@ package com.salazar.cheers.feature.friend_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.domain.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
 import com.salazar.cheers.domain.remove_friend.RemoveFriendUseCase
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ data class FriendListUiState(
 
 @HiltViewModel
 class FriendListViewModel @Inject constructor(
-    private val listFriendUseCase: ListFriendUseCase,
+    private val listFriendUseCase: ListMyFriendsUseCase,
     private val removeFriendUseCase: RemoveFriendUseCase,
 ) : ViewModel() {
 

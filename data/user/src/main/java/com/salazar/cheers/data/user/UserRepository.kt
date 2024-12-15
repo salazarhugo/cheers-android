@@ -1,6 +1,7 @@
 package com.salazar.cheers.data.user
 
 import android.net.Uri
+import com.salazar.cheers.core.model.CheckUsernameResult
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.UserStats
@@ -13,7 +14,7 @@ interface UserRepository {
 
     suspend fun checkUsername(
         username: String,
-    ): Result<Boolean>
+    ): Result<CheckUsernameResult>
 
     suspend fun createUser(
         username: String,
@@ -60,7 +61,7 @@ interface UserRepository {
 
     suspend fun getUserSignIn(userId: String): Flow<Resource<User>>
 
-    suspend fun listFriend(): Flow<Resource<List<UserItem>>>
+    suspend fun listFriends(userID: String): Flow<Resource<List<UserItem>>>
 
     fun getCurrentUserFlow(): Flow<User>
 

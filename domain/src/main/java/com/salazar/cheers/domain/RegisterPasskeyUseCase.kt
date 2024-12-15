@@ -43,7 +43,8 @@ class RegisterPasskeyUseCase @Inject constructor(
                         passkey = passkey,
                         challenge = beginRegistrationResponse.publicKey.challenge,
                         userId = beginRegistrationResponse.publicKey.user.id,
-                    ).getOrNull() ?: return@withContext Result.failure(Exception("missing id token"))
+                    ).getOrNull()
+                        ?: return@withContext Result.failure(Exception("missing id token"))
 
                     // Save username in data store
                     dataStoreRepository.updateUsername(username)

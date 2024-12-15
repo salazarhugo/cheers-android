@@ -28,15 +28,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.relativeTimeFormatterMilli
-import com.salazar.cheers.core.model.ChatChannel
-import com.salazar.cheers.core.model.ChatStatus
 
 @Composable
 fun DirectChatComponent(
@@ -86,8 +87,10 @@ fun DirectChatComponent(
                     )
                     if (channel.status != ChatStatus.EMPTY) {
                         val subtitle = buildAnnotatedString {
-                            append("  •  ")
-                            append(relativeTimeFormatterMilli(value = channel.lastMessageTime))
+                            withStyle(style = MaterialTheme.typography.labelMedium.toSpanStyle()) {
+                                append("  •  ")
+                                append(relativeTimeFormatterMilli(value = channel.lastMessageTime))
+                            }
                         }
                         val fontWeight = when (channel.status) {
                             ChatStatus.NEW -> FontWeight.Bold

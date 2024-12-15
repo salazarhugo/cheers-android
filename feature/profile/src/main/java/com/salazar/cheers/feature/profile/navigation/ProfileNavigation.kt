@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 data object Profile
 
 private const val DEEP_LINK_URI_PATTERN =
-    "${Constants.BASE_URL}/profile"
+    "${Constants.DEEPLINK_BASE_URL}/profile"
 
 fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
     this.navigate(
@@ -25,13 +25,16 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.profileScreen(
     navigateBack: () -> Unit,
     navigateToEditProfile: () -> Unit,
-    navigateToProfileMore: (String) -> Unit,
     navigateToPostMore: (String) -> Unit,
     navigateToSignIn: () -> Unit,
     navigateToSignUp: () -> Unit,
     navigateToFriendList: () -> Unit,
     navigateToPostDetails: (String) -> Unit,
     navigateToOtherProfile: (String) -> Unit,
+    navigateToMapPostHistory: () -> Unit,
+    navigateToCheerscode: () -> Unit,
+    navigateToNfc: () -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
     composable<Profile>(
         deepLinks = listOf(
@@ -41,13 +44,16 @@ fun NavGraphBuilder.profileScreen(
         ProfileRoute(
             navigateBack = navigateBack,
             navigateToEditProfile = navigateToEditProfile,
-            navigateToProfileMore = navigateToProfileMore,
             navigateToSignIn = navigateToSignIn,
             navigateToSignUp = navigateToSignUp,
             navigateToFriendList = navigateToFriendList,
             navigateToPostDetails = navigateToPostDetails,
             navigateToOtherProfile = navigateToOtherProfile,
             navigateToPostMore = navigateToPostMore,
+            navigateToMapPostHistory = navigateToMapPostHistory,
+            navigateToCheerscode = navigateToCheerscode,
+            navigateToNfc = navigateToNfc,
+            navigateToSettings = navigateToSettings,
         )
     }
 }

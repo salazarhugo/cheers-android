@@ -13,7 +13,7 @@ data class CreatePost(
     val photoUri: String? = null,
 )
 
-private const val DEEP_LINK_URI_PATTERN = "${Constants.BASE_URL}/createPost"
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/createPost"
 
 fun NavController.navigateToCreatePost(
     photoUri: String? = null,

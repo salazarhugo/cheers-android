@@ -9,14 +9,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.feature.profile.Following
+import com.salazar.cheers.feature.profile.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,11 +65,18 @@ fun Tabs(
     val friendsTitle =
         if (uiState.friends == null)
             "Friends"
-        else
-            "${uiState.friends.size} friends"
-    val pages = listOf(friendsTitle)
+        else {
+            pluralStringResource(R.plurals.numberOfFriends, uiState.friends.size, uiState.friends.size)
+        }
+
+    val pages = listOf(
+        "Mutual",
+        friendsTitle,
+        "Suggested",
+    )
     val pagerState = rememberPagerState(
         pageCount = { pages.size },
+        initialPage = 1,
     )
     val scope = rememberCoroutineScope()
 
@@ -100,7 +108,7 @@ fun Tabs(
     ) { page ->
         Column(modifier = Modifier.fillMaxSize()) {
             when (page) {
-                0 -> Following(
+                1 -> Following(
                     following = uiState.friends,
                     onUserClicked = onUserClicked,
                     onStoryClick = onStoryClick,

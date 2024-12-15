@@ -125,4 +125,5 @@
     <string name="new_note">New note</string>
     <string name="map">Map</string>
     <string name="dismiss">Dismiss</string>
+    <string name="spotlight">En ce moment</string>
 </resources>

@@ -8,11 +8,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.premium.PremiumCard
-import com.salazar.cheers.feature.premium.R
 
 @Composable
 fun PremiumScreen(
@@ -26,9 +25,9 @@ fun PremiumScreen(
 ) {
     Scaffold(
         topBar = {
-             PremiumTopBar(
-                 onBackPressed = onBackPressed,
-             )
+            PremiumTopBar(
+                onBackPressed = onBackPressed,
+            )
         },
         bottomBar = {
             PremiumBottomBar(
@@ -53,5 +52,16 @@ fun PremiumScreen(
 @Composable
 private fun PremiumScreenPreview() {
     CheersPreview {
+        PremiumScreen(
+            uiState = PremiumUiState.HasUser(
+                user = cheersUser,
+                posts = emptyList(),
+                isLoading = false,
+                parties = emptyList(),
+                isRefreshing = true,
+                errorMessages = "",
+            ),
+            onBackPressed = {},
+        )
     }
 }

@@ -26,9 +26,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,26 +41,28 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.ui.LoadingScreen
+import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.PostType
+import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.core.model.User
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.PrettyPanel
 import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
+import com.salazar.cheers.core.ui.components.favorite_drink.FavoriteDrinkComponent
 import com.salazar.cheers.core.ui.components.login_message.LoginMessageScreen
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.core.ui.item.party.PartyItem
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.PrettyImage
-import com.salazar.cheers.core.model.Party
-import com.salazar.cheers.core.Post
-import com.salazar.cheers.core.PostType
-import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.profile.ProfileItem
+import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
+import com.salazar.cheers.feature.profile.ProfileSheetUIAction
 import com.salazar.cheers.feature.profile.ProfileTopBar
 import com.salazar.cheers.feature.profile.R
-import com.salazar.cheers.core.ui.components.favorite_drink.FavoriteDrinkComponent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,21 +70,52 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     navigateToSignIn: () -> Unit = {},
     navigateToSignUp: () -> Unit = {},
-    navigateToProfileMoreSheet: (String) -> Unit = {},
     onProfileUIAction: (ProfileUIAction) -> Unit = {},
+    onProfileSheetUIAction: (ProfileSheetUIAction) -> Unit = {},
 ) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+
     when (uiState) {
-        is ProfileUiState.NoAccount -> {
+        is ProfileUiState.HasUser -> Profile(
+            uiState = uiState,
+            navigateToProfileMoreSheet = {
+                showBottomSheet = true
+            },
+            onProfileUIAction = onProfileUIAction,
+        )
+
+        ProfileUiState.Loading -> {
+            LoadingScreen()
+        }
+
+        ProfileUiState.NotSignIn -> {
             LoginMessageScreen(
                 onSignInClick = navigateToSignIn,
                 onRegisterClick = navigateToSignUp,
             )
         }
+    }
 
-        is ProfileUiState.HasUser -> Profile(
-            uiState = uiState,
-            navigateToProfileMoreSheet = navigateToProfileMoreSheet,
-            onProfileUIAction = onProfileUIAction,
+    if (showBottomSheet) {
+        ProfileMoreBottomSheet(
+            sheetState = sheetState,
+            onDismiss = {
+                scope.launch {
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    showBottomSheet = false
+                }
+            },
+            onProfileSheetUIAction = { action ->
+                scope.launch {
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    showBottomSheet = false
+                    onProfileSheetUIAction(action)
+                }
+            },
         )
     }
 }
@@ -414,3 +452,10 @@ private fun ProfileScreenPreview() {
 //        )
     }
 }
+//        val context = LocalContext.current
+//        val username = it.arguments?.getString("username")!!
+//        val clipboardManager = LocalClipboardManager.current
+//        val scope = rememberCoroutineScope()
+//
+//        ProfileMoreBottomSheet(
+//        )

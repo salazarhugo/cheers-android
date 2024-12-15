@@ -2,18 +2,15 @@ package com.salazar.cheers.feature.home.home
 
 import android.Manifest
 import android.os.Build
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.Settings
 import com.salazar.cheers.core.ui.ui.RequestPermission
-import nl.dionsegijn.konfetti.compose.KonfettiView
 
 @Composable
 fun HomeRoute(
@@ -98,9 +95,5 @@ fun HomeRoute(
                 HomeUIAction.OnMapClick -> navigateToMap()
             }
         }
-    )
-    KonfettiView(
-        modifier = Modifier.fillMaxSize(),
-        parties = Presets.festive(),
     )
 }

@@ -1,6 +1,11 @@
 package com.salazar.cheers.core.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.salazar.cheers.core.db.model.UserItemEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -17,7 +22,7 @@ interface UserItemDao {
     suspend fun update(user: UserItemEntity)
 
     @Query("SELECT * FROM user_item WHERE id = :userIdOrUsername OR username = :userIdOrUsername")
-    fun getUserItem(userIdOrUsername: String): Flow<UserItemEntity>
+    fun getUserItem(userIdOrUsername: String): Flow<UserItemEntity?>
 
     @Query("SELECT * FROM user_item")
     fun listUserItems(): Flow<List<UserItemEntity>>

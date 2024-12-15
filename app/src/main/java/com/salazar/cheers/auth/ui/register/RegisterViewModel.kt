@@ -105,17 +105,6 @@ class RegisterViewModel @Inject constructor(
             updateIsLoading(false)
             return
         }
-
-        viewModelScope.launch {
-            val result = userRepositoryImpl.checkUsername(username = username)
-            result.onSuccess { valid ->
-                updateUsernameAvailable(valid)
-                onComplete(valid)
-                if (!valid)
-                    updateErrorMessage("This username is taken")
-            }
-            updateIsLoading(false)
-        }
     }
 
     fun registerUser() {

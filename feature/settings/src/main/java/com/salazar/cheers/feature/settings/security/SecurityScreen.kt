@@ -1,15 +1,11 @@
 package com.salazar.cheers.feature.settings.security
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.outlined.Gamepad
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.MaterialTheme
@@ -18,22 +14,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.model.Credential
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.item.SettingItem
 import com.salazar.cheers.core.ui.item.SettingTitle
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.ui.ui.Toolbar
+import com.salazar.cheers.feature.settings.security.passkeys.CreatePasskeyCardComponent
 
 @Composable
 fun SecurityScreen(
     uiState: SecurityUiState,
     onBackPressed: () -> Unit = {},
-    onUnlink: (String) -> Unit = {},
-    onLink: (String) -> Unit = {},
-    onAddPassword: (Boolean) -> Unit = {},
     onPasscodeClick: () -> Unit = {},
+    onPasskeysClick: () -> Unit,
+    onCreatePasskeyClick: () -> Unit,
 ) {
     Scaffold(
         topBar = { Toolbar(onBackPressed = onBackPressed, title = "Security") },
@@ -44,14 +39,12 @@ fun SecurityScreen(
         ) {
             val passcodeEnabled = uiState.passcodeEnabled
 
-            passkeys(
-                credentials = uiState.credentials,
-            )
-
             signInMethods(
+                hasPasskeys = uiState.passkeys.isNotEmpty(),
                 passcodeEnabled = passcodeEnabled,
                 onPasscodeClick = onPasscodeClick,
-                onAddPassword = onAddPassword,
+                onPasskeysClick = onPasskeysClick,
+                onCreatePasskeyClick = onCreatePasskeyClick,
             )
 
             item {
@@ -64,37 +57,16 @@ fun SecurityScreen(
     }
 }
 
-private fun LazyListScope.passkeys(
-    credentials: List<Credential>,
-) {
-    if (credentials.isEmpty()) return
-
-    item {
-        SettingTitle(title = "Passkeys")
-    }
-
-    items(
-        items = credentials,
-    ) { passkey ->
-        PasskeyItem(
-            credential = passkey,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-        )
-    }
-}
-
 private fun LazyListScope.signInMethods(
+    hasPasskeys: Boolean,
     passcodeEnabled: Boolean,
     onPasscodeClick: () -> Unit,
-    onAddPassword: (Boolean) -> Unit,
+    onPasskeysClick: () -> Unit,
+    onCreatePasskeyClick: () -> Unit,
 ) {
     item {
         SettingTitle(title = "Sign in methods")
 
-        val hasEmailPassword = true
-        val hasEmailLink = true
         val hasGoogle = true
 
         SettingItem(
@@ -111,23 +83,22 @@ private fun LazyListScope.signInMethods(
             },
         )
 
-        SignInMethodItem(
-            method = "Password",
-            icon = Icons.Default.Password,
-            onUnlink = {},
-            linked = hasEmailPassword,
-            onClick = { onAddPassword(hasEmailPassword) },
-            onLink = { onAddPassword(hasEmailPassword) },
-        )
-
-        SignInMethodItem(
-            method = "Email-Link",
-            icon = Icons.Outlined.Email,
-            onUnlink = {
-//                    onUnlink(EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD)
-            },
-            linked = hasEmailLink,
-        )
+        if (hasPasskeys) {
+            SignInMethodItem(
+                method = "Passkeys",
+                icon = Icons.Default.Key,
+                onUnlink = {},
+                linked = true,
+                unlinkable = false,
+                onClick = onPasskeysClick,
+                onLink = {},
+            )
+        } else {
+            CreatePasskeyCardComponent(
+                modifier = Modifier.padding(16.dp),
+                onClick = onCreatePasskeyClick,
+            )
+        }
 
         SignInMethodItem(
             method = "Google",
@@ -151,6 +122,9 @@ private fun SecurityScreenPreview() {
         SecurityScreen(
             uiState = SecurityUiState(),
             onBackPressed = { /*TODO*/ },
+            onPasskeysClick = {},
+            onPasscodeClick = {},
+            onCreatePasskeyClick = {}
         )
     }
 }

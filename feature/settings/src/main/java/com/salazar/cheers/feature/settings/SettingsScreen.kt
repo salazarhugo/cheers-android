@@ -71,7 +71,10 @@ fun SettingsScreen(
                 modifier = Modifier.padding(vertical = 5.dp),
                 thickness = 6.dp,
             )
-            SettingsSection(onSettingsUIAction = onSettingsUIAction)
+            SettingsSection(
+                language = uiState.language.value,
+                onSettingsUIAction = onSettingsUIAction,
+            )
             Divider(
                 modifier = Modifier.padding(vertical = 5.dp),
                 thickness = 6.dp,
@@ -189,6 +192,7 @@ fun AccountSection(
 
 @Composable
 fun SettingsSection(
+    language: String,
     onSettingsUIAction: (SettingsUIAction) -> Unit,
 ) {
     Column {
@@ -237,10 +241,17 @@ fun SettingsSection(
 //        }
         SettingItem(
             title = stringResource(id = R.string.language),
-            Icons.Outlined.Language,
+            icon = Icons.Outlined.Language,
             onClick = {
                 onSettingsUIAction(SettingsUIAction.OnLanguageClick)
             },
+            trailingContent = {
+                Text(
+                    text = language,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         )
         SettingItem(
             title = stringResource(id = R.string.theme),

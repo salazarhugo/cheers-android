@@ -21,7 +21,7 @@ fun NavGraphBuilder.passcodeScreen(
 ) {
     composable<Passcode>(
         deepLinks = listOf(
-            navDeepLink<Passcode>(basePath = "${Constants.BASE_URL}/passcode")
+            navDeepLink<Passcode>(basePath = "${Constants.DEEPLINK_BASE_URL}/passcode")
         ),
     ) {
         PasscodeRoute(

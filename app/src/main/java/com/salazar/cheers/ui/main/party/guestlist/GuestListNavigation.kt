@@ -14,7 +14,7 @@ data class GuestListScreen(
     val partyID: String,
 )
 
-private const val DEEP_LINK_URI_PATTERN = "${Constants.BASE_URL}/guestList"
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/guestList"
 
 fun NavController.navigateToGuestList(
     partyID: String,

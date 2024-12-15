@@ -26,6 +26,7 @@ fun MapRoute(
     navigateBack: () -> Unit,
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
+    navigateToChatWithUserId: (String) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val sheetState = rememberModalBottomSheetState(
@@ -141,7 +142,7 @@ fun MapRoute(
                             viewModel.onUserViewAnnotationClick(userLocation = userLocation)
                         }
 
-                        is MapUIAction.OnChatClick -> {}//navigateToChatWithUserId(action.userID)
+                        is MapUIAction.OnChatClick -> navigateToChatWithUserId(action.userID)
                         is MapUIAction.OnCommentClick -> {} //navActions.navigateToComments(action.postID)
                         MapUIAction.OnDismissBottomSheet -> viewModel.onDismissBottomSheet()
                     }

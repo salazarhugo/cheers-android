@@ -3,9 +3,9 @@ package com.salazar.cheers.feature.profile.other_profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.cheers.domain.list_friend.ListFriendUseCase
+import com.salazar.cheers.domain.list_friend.ListFriendsUseCase
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,14 +30,19 @@ data class OtherProfileStatsUiState(
 @HiltViewModel
 class OtherProfileStatsViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val userRepositoryImpl: UserRepositoryImpl,
-    private val listFriendUseCase: ListFriendUseCase,
+    private val listFriendsUseCase: ListFriendsUseCase,
 ) : ViewModel() {
 
-    private val viewModelState =
-        MutableStateFlow(OtherProfileStatsUiState())
+    private val args = stateHandle.toRoute<OtherProfileStatsScreen>()
 
-    private lateinit var username: String
+    private val viewModelState =
+        MutableStateFlow(
+            OtherProfileStatsUiState(
+                verified = args.verified,
+                username = args.username,
+            )
+        )
+
 
     val uiState = viewModelState
         .stateIn(
@@ -47,13 +52,6 @@ class OtherProfileStatsViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<Boolean>("verified")?.let { verified ->
-            viewModelState.update { it.copy(verified = verified) }
-        }
-        stateHandle.get<String>("username")?.let { username ->
-            viewModelState.update { it.copy(username = username) }
-            this.username = username
-        }
         onSwipeRefresh()
     }
 
@@ -67,7 +65,7 @@ class OtherProfileStatsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            listFriendUseCase().collect { result ->
+            listFriendsUseCase(otherUserID = args.otherUserID).collect { result ->
                 when (result) {
                     is Resource.Loading -> updateIsLoading(result.isLoading)
                     is Resource.Error -> updateMessage(result.message)
