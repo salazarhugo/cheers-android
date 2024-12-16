@@ -42,11 +42,10 @@ class CommentsViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val listPostCommentsUseCase: ListPostCommentsUseCase,
 ) : ViewModel() {
-    private val commentsScreen = stateHandle.toRoute<PostCommentsScreen>()
 
+    private val commentsScreen = stateHandle.toRoute<PostCommentsScreen>()
     private val viewModelState = MutableStateFlow(CommentsUiState(isLoading = true))
     private val postID: String = commentsScreen.postID
-
     val uiState = viewModelState
         .stateIn(
             viewModelScope,
@@ -55,7 +54,6 @@ class CommentsViewModel @Inject constructor(
         )
 
     init {
-
         viewModelScope.launch {
             val account = getAccountUseCase().first()
             viewModelState.update {
@@ -63,12 +61,6 @@ class CommentsViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
-//            val post = postRepository.getPost(postId)
-//            viewModelState.update {
-//                it.copy(post = post)
-//            }
-        }
         viewModelScope.launch {
             listPostCommentsUseCase(postID = postID).collect(::updateComments)
         }
@@ -80,42 +72,27 @@ class CommentsViewModel @Inject constructor(
         }
     }
 
-    fun onReplyCommentClick(comment: Comment) {
-        viewModelState.update {
-            it.copy(replyComment = comment)
-        }
-    }
-
     fun onSwipeRefresh() {
         viewModelState.update { it.copy(isRefreshing = true) }
         viewModelScope.launch {
-//            commentRepository.listComment(postId = postId).collect(::updateComments)
+            listPostCommentsUseCase(postID = postID).collect(::updateComments)
         }
     }
 
     private fun updateComments(resource: Resource<List<Comment>>) {
-        when(resource) {
-            is Resource.Error ->  viewModelState.update {
+        when (resource) {
+            is Resource.Error -> viewModelState.update {
                 it.copy(errorMessage = resource.message, isLoading = false, isRefreshing = false)
             }
+
             is Resource.Loading -> viewModelState.update {
-                it.copy(isLoading = resource.isLoading)
+                it.copy(isLoading = false)
             }
+
             is Resource.Success -> viewModelState.update {
                 it.copy(comments = resource.data, isLoading = false, isRefreshing = false)
             }
         }
-    }
-
-    private fun toggleIsFollowed() {
-//        val isFollowed = viewModelState.value.user?.followBack ?: return
-//        updateIsFollowed(isFollowed = !isFollowed)
-    }
-
-    private fun updateIsFollowed(isFollowed: Boolean) {
-//        viewModelState.update {
-//            it.copy(user = it.user?.copy(followBack = isFollowed))
-//        }
     }
 
     fun deleteComment(commentId: String) {

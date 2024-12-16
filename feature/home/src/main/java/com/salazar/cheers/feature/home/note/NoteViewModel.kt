@@ -1,11 +1,12 @@
-package com.salazar.cheers.notes.ui.note
+package com.salazar.cheers.feature.home.note
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Note
-import com.salazar.cheers.data.note.repository.NoteRepository
+import com.salazar.cheers.core.model.UserID
 import com.salazar.cheers.domain.delete_note.DeleteNoteUseCase
+import com.salazar.cheers.domain.get_note.GetNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,8 +25,8 @@ data class NoteUiState(
 @HiltViewModel
 class NoteViewModel @Inject constructor(
     stateHandle: SavedStateHandle,
-    private val noteRepository: NoteRepository,
     private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val getNoteUseCase: GetNoteUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(NoteUiState(isLoading = false))
@@ -38,16 +39,14 @@ class NoteViewModel @Inject constructor(
             viewModelState.value
         )
 
-    init {
-        stateHandle.get<String>("userID")?.let { userID ->
-            this.userID = userID
-            getNote()
-        }
+    fun setUserId(userID: UserID) {
+        this.userID = userID
+        getNote()
     }
 
     private fun getNote() {
         viewModelScope.launch {
-            noteRepository.getNote(userID = userID).collect(::updateNote)
+            getNoteUseCase(userID).collect(::updateNote)
         }
     }
 

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="app_name">هتافات</string>
+
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoic2FsYXphcmJyb2NrIiwiYSI6ImNqd3hxaDBleTFobGQ0Y2sxc3lpdnNwYXMifQ.TgYFgyclmL6pGXXANhnlsw</string>
+
+    <string name="asset_statements" translatable="false">
+    [{
+      \"include\": \"https://cheers.social/.well-known/assetlinks.json\"
+    }]
+    </string>
+
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+
+    <string name="nav_header_title" translatable="false">Composer</string>
+
+    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
+
+    <string name="nav_header_desc" translatable="false">Navigation header</string>
+
+    <string name="action_settings" translatable="false">Settings</string>
+
+    <!-- Stripe -->
+
+    <string name="stripe_pk" translatable="false" />
+
+    <!-- Notifications -->
+
+    <string name="general_group_id" translatable="false">GENERAL_GROUP</string>
+
+    <string name="general_group_name" translatable="false">General</string>
+
+    <string name="messaging_group_id" translatable="false">MESSAGING_GROUP</string>
+
+    <string name="messaging_group_name" translatable="false">Messaging</string>
+
+    <string name="new_post_notification_channel_id" translatable="false">NEW_POST_CHANNEL</string>
+
+    <string name="new_post_notification_channel_name" translatable="false">Posts</string>
+
+    <string name="chat_notification_channel_id" translatable="false">CHAT_CHANNEL</string>
+
+    <string name="chat_notification_channel_name" translatable="false">Chats</string>
+
+    <string name="new_follower_notification_channel_id" translatable="false">NEW_FOLLOW_CHANNEL</string>
+
+    <string name="new_follower_notification_channel_name" translatable="false">New followers</string>
+
+    <string name="cheers_notification_channel_id" translatable="false">CHEERS_CHANNEL</string>
+
+    <string name="cheers_notification_channel_name" translatable="false">Likes</string>
+
+    <string name="default_notification_channel_id" translatable="false">DEFAULT_CHANNEL</string>
+
+    <string name="default_notification_channel_name" translatable="false">Other</string>
+
+    <string name="default_notification_channel_description" translatable="false">Channel for chat messages</string>
+
+    <string name="upload_notification_channel_id" translatable="false">UPLOAD_CHANNEL</string>
+
+    <string name="upload_notification_channel_name" translatable="false">Upload</string>
+
+    <string name="upload_notification_channel_description" translatable="false">Channel for uploads</string>
+
+    <string name="post_notification_channel_id" translatable="false">POST_CHANNEL</string>
+
+    <string name="post_notification_channel_name" translatable="false">Post</string>
+
+    <string name="post_notification_channel_description" translatable="false">Channel for posts</string>
+
+    <string name="cheers_direct_notification_channel_id" translatable="false">CHEERS_DIRECT</string>
+
+    <string name="cheers_direct_notification_channel_name" translatable="false">Cheers direct</string>
+
+    <string name="cheers_direct_notification_description" translatable="false">Cheers direct messages</string>
+
+    <string name="menu_home">بيت</string>
+
+    <string name="menu_gallery">معرض الصور</string>
+
+    <string name="menu_slideshow">عرض الشرائح</string>
+
+    <string name="conversations">المحادثات</string>
+
+    <string name="profile">حساب تعريفي</string>
+
+    <string name="jumpBottom">القفز إلى الأسفل</string>
+
+    <string name="send">يرسل</string>
+
+    <string name="author_me">أنا</string>
+
+    <string name="now">8:30 مساءا</string>
+
+    <string name="members">%d أعضاء</string>
+
+    <string name="message">رسالة</string>
+
+    <string name="edit_profile">تعديل الملف الشخصي</string>
+
+    <string name="profile_error">حدث خطأ أثناء تحميل الملف الشخصي</string>
+
+    <string name="bio">السيرة الذاتية</string>
+
+    <string name="display_name">اسم العرض</string>
+
+    <string name="status">حالة</string>
+
+    <string name="timezone">المنطقة الزمنية</string>
+
+    <string name="twitter">تغريد</string>
+
+    <string name="common_channels">القنوات المشتركة</string>
+
+    <string name="lorem">لوريم أو إيبسوم</string>
+
+    <!-- Accessibility descriptions -->
+
+    <string name="attached_image">الصورة المرفقة</string>
+
+    <string name="search">يبحث</string>
+
+    <string name="info">معلومة</string>
+
+    <string name="more_options">المزيد من الخيارات</string>
+
+    <string name="title_activity_chat">نشاط الدردشة</string>
+
+    <!-- Strings used for fragments for navigation -->
+
+    <string name="first_fragment_label">القطعة الأولى</string>
+
+    <string name="second_fragment_label">القطعة الثانية</string>
+
+    <string name="next">التالي</string>
+
+    <string name="previous">سابق</string>
+
+    <string name="hello_first_fragment">مرحباً بالشظية الأولى</string>
+
+    <string name="hello_second_fragment">مرحبا بالجزء الثاني. أرج: %1$s</string>
+
+    <string name="snap_oauth_client_id" translatable="false">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
+
+    <string name="snap_oauth_client_id_staging" translatable="false">de91522e-6a90-4447-9f80-f4e78de0b69b</string>
+
+    <string name="snap_redirect_url" translatable="false">cheers://snap-kit/oauth2</string>
+
+    <string name="on_display">معروض</string>
+
+    <string name="today">اليوم</string>
+
+    <string name="tomorrow">غداً</string>
+
+    <string name="language">لغة</string>
+
+    <string name="theme">سمة</string>
+
+    <string name="about">عن</string>
+
+    <string name="security">حماية</string>
+
+    <string name="recharge_coins">إعادة شحن العملات</string>
+
+    <string name="devices">الأجهزة</string>
+
+    <string name="settings">إعدادات</string>
+
+    <string name="account">حساب</string>
+
+    <string name="help">يساعد</string>
+
+    <string name="ask_a_question">اطرح سؤالا</string>
+
+    <string name="privacy_policy">سياسة الخصوصية</string>
+
+    <string name="terms_of_use">شروط الاستخدام</string>
+
+    <string name="logins">تسجيلات الدخول</string>
+
+    <string name="delete_account">حذف الحساب</string>
+
+    <string name="delete">يمسح</string>
+
+    <string name="accept">يقبل</string>
+
+    <string name="tickets">التذاكر</string>
+
+    <string name="post">بريد</string>
+
+    <string name="replies">الردود</string>
+
+    <string name="comments">تعليقات</string>
+
+    <string name="chat">محادثة</string>
+
+    <string name="share_live">شارك البث المباشر</string>
+
+    <string name="share">يشارك</string>
+
+    <string name="remove">يزيل</string>
+
+    <string name="cancel">يلغي</string>
+
+    <string name="new_note">ملاحظة جديدة</string>
+
+    <string name="map">رسم خريطة</string>
+
+    <string name="dismiss">رفض</string>
+
+    <string name="spotlight">في هذه اللحظة</string>
+
+</resources>

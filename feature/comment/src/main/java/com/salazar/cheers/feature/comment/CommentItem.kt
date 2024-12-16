@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -44,8 +44,10 @@ fun CommentItem(
     readOnly: Boolean = false,
     onLike: () -> Unit = {},
     onReply: () -> Unit = {},
+    onUserClick: () -> Unit = {},
     onCommentClicked: () -> Unit = {},
-    onLongClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
+    onDoubleClick: (() -> Unit)? = null,
 ) {
 
     val secondaryContainer = MaterialTheme.colorScheme.secondaryContainer
@@ -58,22 +60,22 @@ fun CommentItem(
             .combinedClickable(
                 onClick = onCommentClicked,
                 onLongClick = onLongClick,
+                onDoubleClick = onDoubleClick,
             )
             .padding(padding),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
-            modifier = Modifier.weight(1f),
+//            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             AvatarComponent(
                 modifier = Modifier.padding(top = 4.dp),
                 avatar = comment.avatar,
                 size = 36.dp
             )
-            Spacer(Modifier.width(8.dp))
             Column(
                 modifier = Modifier.padding(top = 2.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -83,12 +85,14 @@ fun CommentItem(
                         username = comment.username,
                         verified = comment.verified,
                         textStyle = MaterialTheme.typography.bodyMedium,
+                        onClick = onUserClick,
                     )
                     Text(
                         text = com.salazar.cheers.core.util.relativeTimeFormatter(seconds = comment.createTime),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
+                Spacer(Modifier.height(6.dp))
 
                 Text(
                     text = comment.text,
@@ -105,13 +109,13 @@ fun CommentItem(
                 }
 
                 if (!readOnly && comment.replyToCommentId == null) {
-                    val text = when(replyCount > 0) {
-                        true ->  "$replyCount ${if (replyCount > 1) "replies" else "reply"}"
+                    val text = when (replyCount > 0) {
+                        true -> "$replyCount ${if (replyCount > 1) "replies" else "reply"}"
                         false -> "Reply"
                     }
                     TextButton(
-                        onClick = { onReply() },
-                        modifier = Modifier.offset(x = (-12).dp, y = -(12).dp)
+                        onClick = onReply,
+                        modifier = Modifier.offset(x = (-12).dp, y = 0.dp)
                     ) {
                         Text(
                             text = text,
@@ -158,7 +162,8 @@ private fun CommentItemPreview() {
                 verified = true,
                 hasLiked = true,
                 text = "this is my very interesting comment!",
-                createTime = Date().time / 1000 - 3600 * 4
+                createTime = Date().time / 1000 - 3600 * 4,
+                replyToCommentId = null,
             ),
         )
     }

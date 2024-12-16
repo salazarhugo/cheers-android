@@ -29,4 +29,6 @@ message Party {
   int64 minimum_price = 16;
   string slug = 17;
   string city = 18;
+  repeated string lineup = 19;
+  repeated string music_genres = 20;
 }

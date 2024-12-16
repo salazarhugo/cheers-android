@@ -39,6 +39,8 @@ data class PartyEntity(
     val type: String = Privacy.PUBLIC.name,
     val accountId: String = "",
     val mutualGoing: Map<String, String> = emptyMap(),
+    val lineup: List<String> = emptyList(),
+    val musicGenres: List<String> = emptyList(),
 )
 
 fun PartyEntity.asExternalModel() = Party(
@@ -68,6 +70,8 @@ fun PartyEntity.asExternalModel() = Party(
     type = type,
     accountId = accountId,
     mutualGoing = mutualGoing,
+    lineup = lineup,
+    musicGenres = musicGenres,
 )
 
 fun Party.asEntity() = PartyEntity(
@@ -97,6 +101,8 @@ fun Party.asEntity() = PartyEntity(
     type = type,
     accountId = accountId,
     mutualGoing = mutualGoing,
+    lineup = lineup,
+    musicGenres = musicGenres,
 )
 
 fun List<PartyEntity>.asExternalModel() = this.map { it.asExternalModel() }

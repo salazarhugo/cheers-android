@@ -146,6 +146,8 @@ message CreatePartyRequest {
   int64 start_date = 6;
   int64 end_date = 7;
   string location_name = 10;
+  repeated string lineup = 11;
+  repeated string music_genres = 12;
 }
 
 message Geolocation {
@@ -196,6 +198,8 @@ message UpdatePartyRequest {
   double latitude = 10;
   double longitude = 11;
   string city = 12;
+  repeated string lineup = 13;
+  repeated string music_genres = 14;
 }
 
 message UpdatePartyResponse {

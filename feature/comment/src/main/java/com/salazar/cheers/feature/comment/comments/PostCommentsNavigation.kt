@@ -29,6 +29,7 @@ fun NavGraphBuilder.postCommentsScreen(
     navigateBack: () -> Unit,
     navigateToCommentMoreSheet: (String) -> Unit,
     navigateToCommentReplies: (String) -> Unit,
+    navigateToUser: (String) -> Unit,
 ) {
     composable<PostCommentsScreen>(
         deepLinks = listOf(
@@ -39,6 +40,7 @@ fun NavGraphBuilder.postCommentsScreen(
             onBackPressed = navigateBack,
             navigateToCommentMoreSheet = navigateToCommentMoreSheet,
             navigateToCommentReplies = navigateToCommentReplies,
+            navigateToUser = navigateToUser,
         )
     }
 }

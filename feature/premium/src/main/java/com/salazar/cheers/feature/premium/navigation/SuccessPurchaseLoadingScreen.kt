@@ -10,6 +10,7 @@ import com.salazar.cheers.core.ui.ui.LoadingScreen
 fun SuccessPurchaseLoadingScreen(
 ) {
     LoadingScreen(
+        text = "Success purchase",
         modifier = Modifier,
     )
 }

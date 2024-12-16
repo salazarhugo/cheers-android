@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.salazar.cheers.feature.comment.comments
 
 import androidx.compose.foundation.Image
@@ -5,10 +7,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -40,6 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -63,7 +69,6 @@ import com.salazar.cheers.feature.comment.R
 @Composable
 fun CommentsScreen(
     uiState: CommentsUiState,
-    profilePictureUrl: String?,
     onComment: () -> Unit,
     onInputChange: (String) -> Unit,
     onSwipeRefresh: () -> Unit,
@@ -88,7 +93,7 @@ fun CommentsScreen(
         }
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(uiState.isLoading),
+            state = rememberSwipeToRefreshState(uiState.isRefreshing),
             onRefresh = onSwipeRefresh,
             modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
@@ -112,8 +117,13 @@ fun Comments(
     comments: List<Comment>,
     onCommentsUIAction: (CommentsUIAction) -> Unit,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
+
     LazyColumn(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+            .imeNestedScroll(),
     ) {
         if (showBanner) {
             guidelinesBanner(
@@ -126,21 +136,23 @@ fun Comments(
         if (comments.isEmpty()) {
             emptyComments()
         }
+
         items(
             items = comments,
             key = { it.id },
         ) { comment ->
             CommentItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 comment = comment,
-                onLike = {
-                    onCommentsUIAction(CommentsUIAction.OnCommentLike(comment.id))
-                },
-                onReply = {
-                    onCommentsUIAction(CommentsUIAction.OnReplyClick(comment))
-                },
+                onLike = { onCommentsUIAction(CommentsUIAction.OnCommentLike(comment.id)) },
+                onReply = { onCommentsUIAction(CommentsUIAction.OnReplyClick(comment)) },
+                onUserClick = { onCommentsUIAction(CommentsUIAction.OnUserClick(comment.username)) },
                 onCommentClicked = {},
                 onLongClick = { onCommentsUIAction(CommentsUIAction.OnCommentLongClick(comment.id)) },
+                onDoubleClick = {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onCommentsUIAction(CommentsUIAction.OnCommentLike(comment.id))
+                }
             )
         }
     }

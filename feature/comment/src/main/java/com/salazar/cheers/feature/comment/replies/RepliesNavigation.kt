@@ -29,6 +29,7 @@ fun NavController.navigateToReplies(
 fun NavGraphBuilder.repliesScreen(
     navigateBack: () -> Unit,
     navigateToCommentMoreSheet: (String) -> Unit,
+    navigateToUser: (String) -> Unit,
 ) {
     composable<RepliesScreen>(
         deepLinks = listOf(
@@ -38,6 +39,7 @@ fun NavGraphBuilder.repliesScreen(
         RepliesRoute(
             navigateToCommentMoreSheet = navigateToCommentMoreSheet,
             navigateBack = navigateBack,
+            navigateToUser = navigateToUser,
         )
     }
 }

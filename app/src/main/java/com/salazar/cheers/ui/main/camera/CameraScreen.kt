@@ -9,20 +9,50 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.webkit.MimeTypeMap
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoAlbum
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.ChevronLeft
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.FlashAuto
+import androidx.compose.material.icons.outlined.FlashOff
+import androidx.compose.material.icons.outlined.FlashOn
+import androidx.compose.material.icons.outlined.FlipCameraAndroid
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.StickyNote2
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -31,19 +61,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
-import com.salazar.cheers.R
 import com.salazar.cheers.core.ui.animations.Bounce
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.ui.Permission
 import com.salazar.cheers.core.util.Utils.createFile
 import com.salazar.cheers.core.util.Utils.getOutputDirectory
@@ -53,15 +79,15 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 sealed class CameraUIAction {
-    object OnAddContent : CameraUIAction()
-    object OnSettingsClick : CameraUIAction()
-    object OnCloseClick : CameraUIAction()
-    object OnBackClick : CameraUIAction()
-    object OnCameraClick : CameraUIAction()
-    object OnFlashClick : CameraUIAction()
-    object OnGalleryViewClick : CameraUIAction()
-    object OnSendClick : CameraUIAction()
-    object OnSwitchCameraClick : CameraUIAction()
+    data object OnAddContent : CameraUIAction()
+    data object OnSettingsClick : CameraUIAction()
+    data object OnCloseClick : CameraUIAction()
+    data object OnBackClick : CameraUIAction()
+    data object OnCameraClick : CameraUIAction()
+    data object OnFlashClick : CameraUIAction()
+    data object OnGalleryViewClick : CameraUIAction()
+    data object OnSendClick : CameraUIAction()
+    data object OnSwitchCameraClick : CameraUIAction()
 }
 
 @Composable
@@ -92,7 +118,6 @@ fun CameraScreen(
         it
         Permission(Manifest.permission.CAMERA) {
             CameraPreview(
-//                modifier = Modifier.padding(it),
                 imageCapture = imageCapture,
                 lensFacing = uiState.lensFacing,
                 onCameraUIAction = onCameraUIAction,
@@ -145,20 +170,9 @@ fun CameraFooterSendTo(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current).data(data = picture)
-                            .apply(block = fun ImageRequest.Builder.() {
-                                transformations(CircleCropTransformation())
-                                error(R.drawable.default_profile_picture)
-                                fallback(R.drawable.default_profile_picture)
-                            }).build()
-                    ),
-                    contentDescription = "Profile picture",
-                    modifier = Modifier
-                        .size(ButtonDefaults.IconSize)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                AvatarComponent(
+                    avatar = picture,
+                    size = ButtonDefaults.IconSize,
                 )
                 Spacer(Modifier.width(4.dp))
                 Text("Your Story")
@@ -344,9 +358,10 @@ fun CameraPreview(
     onCameraUIAction: (CameraUIAction) -> Unit,
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
-    val preview = Preview.Builder().build()
+    val preview = Preview.Builder()
+        .build()
     val cameraSelector = CameraSelector.Builder()
         .requireLensFacing(lensFacing)
         .build()

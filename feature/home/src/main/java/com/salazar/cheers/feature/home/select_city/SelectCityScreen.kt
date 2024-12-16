@@ -1,11 +1,9 @@
 package com.salazar.cheers.feature.home.select_city
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +16,6 @@ import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
-import com.salazar.cheers.core.ui.theme.GreySheet
 
 @Composable
 fun SelectCityScreen(
@@ -47,7 +44,6 @@ fun SelectCityScreen(
                 },
             )
         },
-        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
     ) { insets ->
         PullToRefreshComponent(
             state = state,

@@ -3,8 +3,11 @@ package com.salazar.cheers.ui.main.camera
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.AspectRatio.RATIO_16_9
+import androidx.annotation.OptIn
+import androidx.camera.core.ExperimentalZeroShutterLag
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,26 +30,25 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import kotlinx.coroutines.launch
 
-/**
- * Stateful composable that displays the Navigation route for the Camera screen.
- *
- * @param cameraViewModel ViewModel that handles the business logic of this screen
- */
+@OptIn(ExperimentalZeroShutterLag::class)
 @Composable
 fun CameraRoute(
     cameraViewModel: CameraViewModel = hiltViewModel(),
-    navActions: CheersNavigationActions,
+    navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val uiState by cameraViewModel.uiState.collectAsStateWithLifecycle()
-    val imageCapture: ImageCapture = remember {
+    val resolutionSelector = ResolutionSelector.Builder()
+        .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+        .build()
+    val imageCapture = remember {
         ImageCapture.Builder()
-            .setTargetAspectRatio(RATIO_16_9)
+            .setResolutionSelector(resolutionSelector)
             .setJpegQuality(75)
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_ZERO_SHUTTER_LAG)
             .build()
     }
     val launcher =
@@ -94,6 +96,7 @@ fun CameraRoute(
                 when (cameraUIAction) {
                     is CameraUIAction.OnSwitchCameraClick ->
                         cameraViewModel.onSwitchCameraClicked()
+
                     is CameraUIAction.OnCameraClick -> {
                         imageCapture.takePicture(
                             context = context,
@@ -105,21 +108,26 @@ fun CameraRoute(
                             onError = {},
                         )
                     }
+
                     is CameraUIAction.OnGalleryViewClick -> {
                         launcher.launch("image/* video/*")
                     }
-                    is CameraUIAction.OnCloseClick -> navActions.navigateBack()
+
+                    is CameraUIAction.OnCloseClick -> navigateBack()
                     is CameraUIAction.OnBackClick -> {
                         cameraViewModel.setImageUri(null)
                     }
+
                     is CameraUIAction.OnFlashClick -> {
                         cameraViewModel.onSwitchFlash()
                     }
+
                     is CameraUIAction.OnAddContent -> {
                         scope.launch {
                             sheetState.show()
                         }
                     }
+
                     else -> {}
                 }
             },

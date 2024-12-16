@@ -31,6 +31,8 @@ data class Party(
     val privacy: Privacy = Privacy.PUBLIC,
     val type: String = Privacy.PUBLIC.name,
     val accountId: String = "",
+    val lineup: List<String> = emptyList(),
+    val musicGenres: List<String> = emptyList(),
     val mutualGoing: Map<String, String> = emptyMap(),
 )
 
@@ -59,4 +61,6 @@ val duplexParty = Party(
     address = "2 Avenue Foch, 75016 Paris",
     startDate = Date().time / 1000,
     endDate = (Date().time + TimeUnit.HOURS.toMillis(7)) / 1000,
+    musicGenres = listOf("POP", "TECHNO"),
+    lineup = listOf("Cheers", "DJ Snake"),
 )

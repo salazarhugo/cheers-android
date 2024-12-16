@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -93,7 +92,6 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
         // This also sets up the initial system bar style based on the platform theme
         enableEdgeToEdge()
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         checkForAppUpdates()
 
         setContent {
@@ -139,7 +137,6 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
 
     override fun onResume() {
         super.onResume()
-
 
         try {
             Log.d("INTENT", intent.data.toString())

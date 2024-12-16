@@ -1,4 +1,4 @@
-package com.salazar.cheers.feature.create_note
+package com.salazar.cheers.ui.main.camera
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -8,29 +8,30 @@ import androidx.navigation.navDeepLink
 import com.salazar.cheers.core.util.Constants
 import kotlinx.serialization.Serializable
 
+private const val DEEP_LINK_URI_PATTERN =
+    "${Constants.DEEPLINK_BASE_URL}/camera"
+
 @Serializable
-data object CreateNoteScreen
+data object CameraScreen
 
-private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/note/create"
-
-fun NavController.navigateToCreateNote(
+fun NavController.navigateToCamera(
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
-        route = CreateNoteScreen,
+        route = CameraScreen,
         navOptions = navOptions,
     )
 }
 
-fun NavGraphBuilder.createNoteScreen(
+fun NavGraphBuilder.cameraScreen(
     navigateBack: () -> Unit,
 ) {
-    composable<CreateNoteScreen>(
+    composable<CameraScreen>(
         deepLinks = listOf(
-            navDeepLink<CreateNoteScreen>(basePath = DEEP_LINK_URI_PATTERN),
+            navDeepLink<CameraScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
-        CreateNoteRoute(
+        CameraRoute(
             navigateBack = navigateBack,
         )
     }

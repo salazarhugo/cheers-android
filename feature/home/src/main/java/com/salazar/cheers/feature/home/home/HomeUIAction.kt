@@ -3,6 +3,7 @@ package com.salazar.cheers.feature.home.home
 import com.salazar.cheers.core.Post
 
 sealed class HomeUIAction {
+    data object OnCameraClick : HomeUIAction()
     data object OnMapClick : HomeUIAction()
     data object OnChatClick : HomeUIAction()
     data object OnActivityClick : HomeUIAction()

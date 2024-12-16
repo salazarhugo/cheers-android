@@ -26,7 +26,6 @@ fun NavGraphBuilder.homeScreen(
     navigateToCreateNote: () -> Unit = {},
     navigateToCreateParty: () -> Unit,
     navigateToParties: () -> Unit = {},
-    navigateToNote: (String) -> Unit = {},
     navigateToMessages: () -> Unit = {},
     navigateToPostMoreSheet: (String) -> Unit = {},
     navigateToPostComments: (String) -> Unit = {},
@@ -39,18 +38,13 @@ fun NavGraphBuilder.homeScreen(
     navigateToPartyDetail: (String) -> Unit,
     navigateToMap: () -> Unit = {},
 ) {
-    composable<Home>(
-        deepLinks = listOf(
-            navDeepLink<Home>(basePath = DEEP_LINK_URI_PATTERN),
-        ),
-    ) {
+    composable<Home>(deepLinks = listOf(navDeepLink<Home>(basePath = DEEP_LINK_URI_PATTERN))) {
         HomeRoute(
             appSettings = appSettings,
             onActivityClick = onActivityClick,
             onPostClick = onPostClick,
             navigateToCreatePost = navigateToCreatePost,
             navigateToCreateNote = navigateToCreateNote,
-            navigateToNote = navigateToNote,
             navigateToParties = navigateToParties,
             navigateToMessages = navigateToMessages,
             navigateToPostMoreSheet = navigateToPostMoreSheet,

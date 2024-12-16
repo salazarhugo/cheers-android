@@ -3,17 +3,18 @@ package com.salazar.cheers.feature.profile.other_profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.model.Party
-import com.salazar.cheers.data.party.data.repository.PartyRepository
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.Post
-import com.salazar.cheers.data.post.repository.PostRepository
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.data.party.data.repository.PartyRepository
+import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
-import com.salazar.cheers.feature.profile.navigation.USERNAME
+import com.salazar.cheers.feature.profile.navigation.OtherProfileScreen
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -70,9 +71,15 @@ class OtherProfileViewModel @Inject constructor(
     private val acceptFriendRequestUseCase: AcceptFriendRequestUseCase,
     private val listPostUseCase: ListPostUseCase,
 ) : ViewModel() {
+    val args = savedStateHandle.toRoute<OtherProfileScreen>()
+    val username = args.username
 
-    private val viewModelState = MutableStateFlow(OtherProfileViewModelState(isLoading = true))
-    lateinit var username: String
+    private val viewModelState = MutableStateFlow(
+        OtherProfileViewModelState(
+            isLoading = true,
+            username = username,
+        )
+    )
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -83,10 +90,6 @@ class OtherProfileViewModel @Inject constructor(
         )
 
     init {
-        savedStateHandle.get<String>(USERNAME)?.let { username ->
-            this.username = username
-            updateUsername(username)
-        }
         viewModelScope.launch {
             userRepositoryImpl.getUserFlow(userIdOrUsername = username).collect { user ->
                 updateUser(user)
@@ -100,7 +103,7 @@ class OtherProfileViewModel @Inject constructor(
         viewModelScope.launch {
             updateIsRefreshing(true)
             val result = userRepositoryImpl.fetchUser(username)
-            when(result) {
+            when (result) {
                 is Resource.Error -> {}
                 is Resource.Loading -> updateIsRefreshing(result.isLoading)
                 is Resource.Success -> {}

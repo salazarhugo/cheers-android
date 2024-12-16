@@ -1,6 +1,12 @@
-package com.salazar.cheers.notes.ui.note
+package com.salazar.cheers.feature.home.note
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,8 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
-import com.salazar.cheers.R
+import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 
 @Composable
@@ -64,8 +69,7 @@ fun NoteScreen(
             }
         }
     }
-    val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-    if (note.userId == uid) {
+    if (note.isViewer) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

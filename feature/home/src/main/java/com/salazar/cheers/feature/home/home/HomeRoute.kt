@@ -18,7 +18,6 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     onActivityClick: () -> Unit,
     onPostClick: (String) -> Unit,
-    navigateToNote: (String) -> Unit,
     navigateToCreatePost: () -> Unit,
     navigateToCreateNote: () -> Unit,
     navigateToCreateParty: () -> Unit,
@@ -82,7 +81,6 @@ fun HomeRoute(
                 is HomeUIAction.OnChatClick -> navigateToMessages()
                 is HomeUIAction.OnShareClick -> {}// navActions.navigateToShare(action.postID)
                 HomeUIAction.OnCreateNoteClick -> navigateToCreateNote()
-                is HomeUIAction.OnNoteClick -> navigateToNote(action.userID)
                 is HomeUIAction.OnAddFriendClick -> viewModel.onAddFriendClick(action.userID)
                 HomeUIAction.OnPartiesClick -> navigateToParties()
                 is HomeUIAction.OnAudioClick -> viewModel.onAudioClick(
@@ -93,6 +91,8 @@ fun HomeRoute(
                 is HomeUIAction.OnDeletePostClick -> navigateToDeletePostDialog(action.postID)
                 is HomeUIAction.OnSelectPage -> viewModel.updatePage(action.page)
                 HomeUIAction.OnMapClick -> navigateToMap()
+                HomeUIAction.OnCameraClick -> navigateToCamera()
+                else -> Unit
             }
         }
     )

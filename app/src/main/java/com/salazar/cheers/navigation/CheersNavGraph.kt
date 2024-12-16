@@ -21,11 +21,13 @@ import com.salazar.cheers.feature.chat.ui.screens.chat.ChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.CreateChatScreen
 import com.salazar.cheers.feature.comment.comments.PostCommentsScreen
 import com.salazar.cheers.feature.comment.replies.RepliesScreen
+import com.salazar.cheers.feature.create_note.CreateNoteScreen
 import com.salazar.cheers.feature.create_post.CreatePost
 import com.salazar.cheers.feature.edit_profile.navigation.EditProfileGraph
-import com.salazar.cheers.feature.parties.partiesNavigationRoute
+import com.salazar.cheers.feature.parties.detail.PartyDetailScreen
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.bottombar.CheersBottomBar
+import com.salazar.cheers.ui.main.camera.CameraScreen
 import com.salazar.cheers.ui.main.party.create.CreatePartyGraph
 
 @Composable
@@ -35,19 +37,15 @@ fun CheersNavGraph(
 ) {
     val passcodeEnabled = uiState.settings.passcodeEnabled
 
-    val startDestination =
-        remember {
-            when (passcodeEnabled) {
-                true -> PasscodeNavGraph
-                false -> MainNavGraph
-            }
+    val startDestination = remember {
+        when (passcodeEnabled) {
+            true -> PasscodeNavGraph
+            false -> MainNavGraph
         }
+    }
 
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val currentRoute =
-        navBackStackEntry?.destination?.route ?: partiesNavigationRoute
-    val navActions = appState.navActions
 
     val routesToHideBottomBar = listOf(
         AuthNavGraph,
@@ -59,6 +57,9 @@ fun CheersNavGraph(
         PostCommentsScreen(),
         RepliesScreen(),
         EditProfileGraph,
+        CameraScreen,
+        CreateNoteScreen,
+        PartyDetailScreen(""),
     )
 
     val hide = currentDestination?.hierarchy?.any { destination ->

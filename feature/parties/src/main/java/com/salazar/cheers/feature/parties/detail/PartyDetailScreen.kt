@@ -1,7 +1,5 @@
 package com.salazar.cheers.feature.parties.detail
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,13 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,14 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.WatchStatus
-import com.salazar.cheers.core.ui.components.party.PartyBannerComponent
 import com.salazar.cheers.core.util.numberFormatter
 import com.salazar.cheers.feature.parties.ui.PartyDescription
-import com.salazar.cheers.feature.parties.ui.PartyDetails
-import com.salazar.cheers.feature.parties.ui.PartyHeaderButtons
-import com.salazar.cheers.feature.parties.ui.PartyInfo
+import com.salazar.cheers.feature.parties.ui.PartyLineup
+import com.salazar.cheers.feature.parties.ui.PartyMood
 import com.salazar.cheers.feature.parties.ui.PartyVenue
-import com.salazar.cheers.shared.util.LocalActivity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -116,45 +108,110 @@ fun PartyDetail(
     val scope = rememberCoroutineScope()
 
     LazyColumn(state = state) {
+        header(
+            party = party,
+            onManageClick = onManageClick,
+            onWatchStatusChange = onWatchStatusChange,
+            onTicketingClick = onTicketingClick,
+            onUserClick = onUserClicked,
+            onAnswersClick = onAnswersClick,
+            onAboutClick = {
+                scope.launch {
+                    state.animateScrollToItem(1)
+                }
+            },
+        )
+        description(
+            description = party.description,
+            onUserClicked = onUserClicked,
+        )
+        guestList(party = party)
+        lineup(lineup = party.lineup)
+        mood(musicGenres = party.musicGenres)
+        venue(
+            address = party.address,
+            latitude = party.latitude,
+            longitude = party.longitude,
+            onMapClick = onMapClick,
+        )
+    }
+}
 
-        item {
-            PartyHeader(
-                party = party,
-                onAboutClick = {
-                    scope.launch {
-                        state.animateScrollToItem(1)
-                    }
-                },
-                onManageClick = onManageClick,
-                onWatchStatusChange = onWatchStatusChange,
-                onTicketingClick = onTicketingClick,
-                onUserClick = onUserClicked,
-                onAnswersClick = onAnswersClick,
-            )
-        }
+fun LazyListScope.header(
+    party: Party,
+    onAboutClick: () -> Unit,
+    onManageClick: () -> Unit,
+    onWatchStatusChange: (WatchStatus) -> Unit,
+    onTicketingClick: (String) -> Unit,
+    onUserClick: (String) -> Unit,
+    onAnswersClick: () -> Unit,
+) {
+    item {
+        PartyHeader(
+            party = party,
+            onAboutClick = onAboutClick,
+            onManageClick = onManageClick,
+            onWatchStatusChange = onWatchStatusChange,
+            onTicketingClick = onTicketingClick,
+            onUserClick = onUserClick,
+            onAnswersClick = onAnswersClick,
+        )
+    }
+}
 
-        guestList(party)
+fun LazyListScope.description(
+    description: String,
+    onUserClicked: (String) -> Unit,
+) {
+    if (description.isBlank()) return
 
-        if (party.description.isNotBlank()) {
-            item {
-                PartyDescription(
-                    description = party.description,
-                    modifier = Modifier.padding(16.dp),
-                    onUserClicked = onUserClicked,
-                )
-                HorizontalDivider()
-            }
-        }
+    item {
+        PartyDescription(
+            description = description,
+            modifier = Modifier.padding(16.dp),
+            onUserClicked = onUserClicked,
+        )
+    }
+}
 
-        item {
-            PartyVenue(
-                address = party.address,
-                latitude = party.latitude,
-                longitude = party.longitude,
-                modifier = Modifier.padding(16.dp),
-                onMapClick = onMapClick,
-            )
-        }
+fun LazyListScope.venue(
+    address: String,
+    latitude: Double,
+    longitude: Double,
+    onMapClick: () -> Unit,
+) {
+    item {
+        PartyVenue(
+            modifier = Modifier
+                .animateItem()
+                .padding(16.dp),
+            address = address,
+            latitude = latitude,
+            longitude = longitude,
+            onMapClick = onMapClick,
+        )
+    }
+}
+
+fun LazyListScope.lineup(lineup: List<String>) {
+    if (lineup.isEmpty()) return
+
+    item {
+        PartyLineup(
+            modifier = Modifier.padding(top = 16.dp),
+            lineup = lineup,
+        )
+    }
+}
+
+fun LazyListScope.mood(musicGenres: List<String>) {
+    if (musicGenres.isEmpty()) return
+
+    item {
+        PartyMood(
+            modifier = Modifier.padding(top = 16.dp),
+            musicGenres = musicGenres,
+        )
     }
 }
 
@@ -169,7 +226,6 @@ fun LazyListScope.guestList(party: Party) {
             onGoingCountClick = {},
             onInterestedCountClick = {},
         )
-        HorizontalDivider()
     }
 }
 
@@ -229,75 +285,5 @@ fun PartyResponses(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun PartyHeader(
-    party: Party,
-    onAboutClick: () -> Unit,
-    onManageClick: () -> Unit,
-    onWatchStatusChange: (WatchStatus) -> Unit,
-    onTicketingClick: (String) -> Unit,
-    onUserClick: (String) -> Unit,
-    onAnswersClick: () -> Unit,
-) {
-    val activity = LocalActivity.current
-    val gmmIntentUri = Uri.parse("geo:${party.longitude},${party.latitude}?q=${party.address}")
-    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-
-    PartyBannerComponent(
-        modifier = Modifier.statusBarsPadding(),
-        bannerUrl = party.bannerUrl,
-    )
-    Column {
-        PartyDetails(
-            name = party.name,
-            privacy = party.privacy,
-            startTimeSeconds = party.startDate,
-            onPartyDetailsClick = {},
-        )
-        PartyHeaderButtons(
-            isHost = party.isHost,
-            onManageClick = onManageClick,
-            onWatchStatusChange = onWatchStatusChange,
-            onInviteClick = {},
-            watchStatus = party.watchStatus,
-        )
-        PartyInfo(
-            city = party.city,
-            startDate = party.startDate,
-            privacy = party.privacy,
-            goingCount = party.goingCount,
-            interestedCount = party.interestedCount,
-            price = party.price,
-            hostName = party.hostName,
-            address = party.address,
-            hostId = party.hostId,
-            onTicketingClick = { onTicketingClick(party.id) },
-            onUserClick = onUserClick,
-            onAddressClick = {
-                activity.startActivity(mapIntent)
-            },
-            onAnswersClick = onAnswersClick,
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(16.dp),
-        ) {
-            FilledTonalButton(
-                onClick = onAboutClick,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("About")
-            }
-            FilledTonalButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Discussion")
-            }
-        }
-        HorizontalDivider()
     }
 }

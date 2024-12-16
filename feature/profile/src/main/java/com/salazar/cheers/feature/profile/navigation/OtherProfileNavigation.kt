@@ -3,17 +3,20 @@ package com.salazar.cheers.feature.profile.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.profile.other_profile.OtherProfileRoute
+import kotlinx.serialization.Serializable
 
-const val USERNAME = "username"
-const val otherProfileNavigationRoute = "other_profile_route/{$USERNAME}"
+@Serializable
+data class OtherProfileScreen(
+    val username: String,
+)
+
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/otherProfile/{$USERNAME}"
+    "${Constants.DEEPLINK_BASE_URL}/{username}"
 
 fun NavController.navigateToOtherProfile(
     username: String,
@@ -22,7 +25,10 @@ fun NavController.navigateToOtherProfile(
     if (username.isBlank()) {
         return
     }
-    this.navigate("other_profile_route/$username", navOptions)
+    this.navigate(
+        route = OtherProfileScreen(username = username),
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.otherProfileScreen(
@@ -33,13 +39,9 @@ fun NavGraphBuilder.otherProfileScreen(
     navigateToManageFriendship: (String) -> Unit,
     navigateToChat: (String) -> Unit,
 ) {
-    composable(
-        route = otherProfileNavigationRoute,
+    composable<OtherProfileScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
-        ),
-        arguments = listOf(
-            navArgument(USERNAME) { type = NavType.StringType },
+            navDeepLink<OtherProfileScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
     ) {
         OtherProfileRoute(

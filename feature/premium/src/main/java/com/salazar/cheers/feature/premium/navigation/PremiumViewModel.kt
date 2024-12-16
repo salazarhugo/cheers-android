@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.BillingClient
 import com.salazar.cheers.core.model.ProductDetails
-import com.salazar.cheers.core.model.User
 import com.salazar.cheers.data.billing.BillingRepository
 import com.salazar.cheers.domain.get_in_app_product.GetInAppProductUseCase
 import com.salazar.cheers.domain.get_in_app_product.LaunchBillingFlowUseCase
@@ -40,7 +39,6 @@ class PremiumViewModel @Inject constructor(
 
     fun onSubscribeClick(
         activity: android.app.Activity,
-        onSuccessfulPurchase: () -> Unit,
     ) {
         val productDetails = ProductDetails(id = "cheers_premium")
 
@@ -48,7 +46,9 @@ class PremiumViewModel @Inject constructor(
             val responseCode = launchBillingFlowUseCase(activity, productDetails)
             when (responseCode) {
                 BillingClient.BillingResponseCode.OK -> {
-                    onSuccessfulPurchase()
+                    viewModelState.update {
+                        it.copy(success = true)
+                    }
                 }
 
                 BillingClient.BillingResponseCode.USER_CANCELED -> {
@@ -68,12 +68,6 @@ class PremiumViewModel @Inject constructor(
     private fun updateIsRefreshing(isRefreshing: Boolean) {
         viewModelState.update {
             it.copy(isRefreshing = isRefreshing)
-        }
-    }
-
-    private fun updateUser(user: User) {
-        viewModelState.update {
-            it.copy(user = user, isLoading = false)
         }
     }
 }

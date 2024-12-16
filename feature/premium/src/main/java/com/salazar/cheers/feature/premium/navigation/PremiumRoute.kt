@@ -2,7 +2,6 @@ package com.salazar.cheers.feature.premium.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,27 +15,30 @@ fun PremiumRoute(
     viewModel: PremiumViewModel = hiltViewModel(),
     onBackPressed: () -> Unit = {},
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val state = rememberRefreshLayoutState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = LocalActivity.current
 
-    LaunchedEffect(uiState.isRefreshing) {
-        if (!uiState.isRefreshing) {
-            scope.launch {
-                state.finishRefresh(true)
+    when (uiState) {
+        PremiumUiState.SuccessPurchaseLoading -> SuccessPurchaseLoadingScreen()
+        is PremiumUiState.HasOffer -> {
+            LaunchedEffect(uiState.isRefreshing) {
+                if (!uiState.isRefreshing) {
+                    scope.launch {
+                        state.finishRefresh(true)
+                    }
+                }
             }
+
+            PremiumScreen(
+                uiState = uiState,
+                onBackPressed = onBackPressed,
+                onSubscribeClick = {
+                    viewModel.onSubscribeClick(activity)
+                },
+            )
         }
     }
-
-    PremiumScreen(
-        uiState = uiState,
-        onBackPressed = onBackPressed,
-        onSubscribeClick = {
-            viewModel.onSubscribeClick(activity) {
-
-            }
-        },
-    )
 }

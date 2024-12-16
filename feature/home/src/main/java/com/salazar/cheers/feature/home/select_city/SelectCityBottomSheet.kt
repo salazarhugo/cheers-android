@@ -1,8 +1,6 @@
 package com.salazar.cheers.feature.home.select_city
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -14,7 +12,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
-import com.salazar.cheers.core.ui.theme.GreySheet
 
 
 @Composable
@@ -30,7 +27,6 @@ fun SelectCityBottomSheet(
     ModalBottomSheet(
         modifier = modifier,
         sheetState = sheetState,
-        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
         shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         onDismissRequest = onDismiss,
     ) {

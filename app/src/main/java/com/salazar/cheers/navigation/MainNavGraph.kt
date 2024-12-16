@@ -86,13 +86,13 @@ import com.salazar.cheers.feature.ticket.navigateToTickets
 import com.salazar.cheers.feature.ticket.ticketsScreen
 import com.salazar.cheers.friendship.ui.manage_friendship.ManageFriendshipRoute
 import com.salazar.cheers.friendship.ui.manage_friendship.RemoveFriendDialog
-import com.salazar.cheers.notes.ui.note.NoteRoute
 import com.salazar.cheers.shared.util.result.getOrNull
 import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.sheets.StoryMoreBottomSheet
 import com.salazar.cheers.ui.compose.sheets.StorySheetUIAction
-import com.salazar.cheers.ui.main.camera.CameraRoute
 import com.salazar.cheers.ui.main.camera.ChatCameraRoute
+import com.salazar.cheers.ui.main.camera.cameraScreen
+import com.salazar.cheers.ui.main.camera.navigateToCamera
 import com.salazar.cheers.ui.main.detail.PostDetailRoute
 import com.salazar.cheers.ui.main.nfc.NfcRoute
 import com.salazar.cheers.ui.main.party.EventMoreBottomSheet
@@ -244,7 +244,6 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToCreatePost = navController::navigateToCreatePost,
             navigateToCreateNote = navController::navigateToCreateNote,
             navigateToUser = navController::navigateToOtherProfile,
-            navigateToNote = appState.navActions.navigateToNote,
             navigateToMessages = navController::navigateToMessages,
             navigateToPostMoreSheet = { postID ->
                 navController.navigate("${MainDestinations.POST_MORE_SHEET}/$postID") {
@@ -255,12 +254,7 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToPostComments = navController::navigateToPostComments,
             navigateToPostLikes = navController::navigateToPostLikes,
             navigateToSignIn = navController::navigateToSignIn,
-            navigateToCamera = {
-                navController.navigate(MainDestinations.CAMERA_ROUTE) {
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
+            navigateToCamera = navController::navigateToCamera,
             navigateToDeletePostDialog = navController::navigateToDeletePostDialog,
             navigateToPartyDetail = navController::navigateToPartyDetail,
             navigateToCreateParty = navController::navigateToCreateParty,
@@ -291,11 +285,9 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
-        composable(MainDestinations.CAMERA_ROUTE) {
-            CameraRoute(
-                navActions = appState.navActions
-            )
-        }
+        cameraScreen(
+            navigateBack = navController::popBackStack,
+        )
 
         composable("${MainDestinations.TICKETING_ROUTE}/{eventId}") {
             TicketingRoute(
@@ -314,6 +306,7 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
             navigateToCommentMoreSheet = {},
             navigateToCommentReplies = navController::navigateToReplies,
+            navigateToUser = navController::navigateToOtherProfile,
         )
 
         postLikesScreen(
@@ -324,6 +317,7 @@ fun NavGraphBuilder.mainNavGraph(
         repliesScreen(
             navigateBack = navController::popBackStack,
             navigateToCommentMoreSheet = {},
+            navigateToUser = navController::navigateToOtherProfile,
         )
 //            deepLinks = listOf(navDeepLink { uriPattern = "$URI/comments/{commentId}/replies" }),
 
@@ -526,18 +520,6 @@ fun NavGraphBuilder.mainNavGraph(
         ) {
             RemoveFriendDialog(
                 navActions = appState.navActions
-            )
-        }
-
-        bottomSheet(
-            route = "${MainDestinations.NOTE_SHEET}/{userID}",
-            arguments = listOf(
-                navArgument("userID") { nullable = false },
-            )
-        ) {
-            NoteRoute(
-                navigateBack = navController::popBackStack,
-                navigateToCreateNote = navController::navigateToCreateNote,
             )
         }
 

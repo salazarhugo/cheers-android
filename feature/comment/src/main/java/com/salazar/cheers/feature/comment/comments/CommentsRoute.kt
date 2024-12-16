@@ -11,24 +11,25 @@ fun CommentsRoute(
     onBackPressed: () -> Unit,
     navigateToCommentMoreSheet: (String) -> Unit,
     navigateToCommentReplies: (String) -> Unit,
+    navigateToUser: (String) -> Unit,
 ) {
     val uiState by commentsViewModel.uiState.collectAsStateWithLifecycle()
 
     CommentsScreen(
         uiState = uiState,
         onComment = commentsViewModel::onComment,
-        profilePictureUrl = uiState.avatar,
         onInputChange = commentsViewModel::onInputChange,
         onSwipeRefresh = { commentsViewModel.onSwipeRefresh() },
         onCommentsUIAction = { action ->
-            when(action) {
+            when (action) {
                 CommentsUIAction.OnBackPressed -> onBackPressed()
                 CommentsUIAction.OnFriendRequestsClick -> TODO()
                 is CommentsUIAction.OnReplyClick -> {
                     navigateToCommentReplies(action.comment.id)
                 }
+
                 CommentsUIAction.OnSwipeRefresh -> TODO()
-                is CommentsUIAction.OnUserClick -> TODO()
+                is CommentsUIAction.OnUserClick -> navigateToUser(action.userId)
                 CommentsUIAction.OnRemoveReplyComment -> commentsViewModel.onRemoveReplyComment()
                 is CommentsUIAction.OnCommentLongClick -> navigateToCommentMoreSheet(action.commentID)
                 is CommentsUIAction.OnCommentLike -> commentsViewModel.onLike(action.commentID)

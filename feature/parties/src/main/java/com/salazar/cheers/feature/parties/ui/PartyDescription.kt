@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -44,9 +43,8 @@ fun PartyDescription(
             }
             .then(modifier),
     ) {
-        Text(
-            "What to expect",
-            style = MaterialTheme.typography.headlineMedium,
+        PartySectionTitle(
+            text = "What to expect",
             modifier = Modifier.padding(vertical = 8.dp)
         )
 

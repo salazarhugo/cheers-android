@@ -22,8 +22,8 @@ android {
         applicationId = "com.salazar.cheers"
         minSdk = 31
         targetSdk = 35
-        versionCode = 75
-        versionName = "1.0.0-075"
+        versionCode = 76
+        versionName = "1.0.0-076"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
     }
@@ -33,6 +33,9 @@ android {
             isMinifyEnabled = true
             isDebuggable = false
             signingConfig = signingConfigs.getByName("debug")
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

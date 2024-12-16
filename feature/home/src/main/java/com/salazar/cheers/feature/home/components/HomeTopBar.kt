@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.HorizontalDivider
@@ -39,6 +40,7 @@ internal fun HomeTopBar(
     onSearchClick: () -> Unit,
     onActivityClick: () -> Unit,
     onChatClick: () -> Unit,
+    onCameraClick: () -> Unit,
     onCityClick: () -> Unit,
     onMapClick: () -> Unit,
 ) {
@@ -80,10 +82,16 @@ internal fun HomeTopBar(
                 }
             },
             actions = {
+                IconButton(onClick = onCameraClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.CameraAlt,
+                        contentDescription = "Notification icon"
+                    )
+                }
                 CheersBadgeBox(count = notificationCount) {
                     IconButton(onClick = onActivityClick) {
                         Icon(
-                            Icons.Outlined.FavoriteBorder,
+                            imageVector = Icons.Outlined.FavoriteBorder,
                             contentDescription = "Notification icon"
                         )
                     }
@@ -134,6 +142,7 @@ private fun HomeTopBarPreview() {
             homeSelectedPage = HomeSelectedPage.FRIENDS,
             onCityClick = {},
             onMapClick = {},
+            onCameraClick = {},
         )
     }
 }
@@ -154,6 +163,7 @@ private fun HomeTopBarCollapsedPreview() {
             onActivityClick = {},
             onCityClick = {},
             onMapClick = {},
+            onCameraClick = {},
         )
     }
 }

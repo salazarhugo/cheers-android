@@ -29,11 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.model.UserID
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.feature.home.components.HomeTopBar
 import com.salazar.cheers.feature.home.friend_feed.FriendFeedScreen
+import com.salazar.cheers.feature.home.note.NoteBottomSheet
 import com.salazar.cheers.feature.home.party_feed.PartyFeedStateful
 import com.salazar.cheers.feature.home.select_city.SelectCityBottomSheet
 import kotlinx.coroutines.launch
@@ -63,7 +65,9 @@ fun HomeScreen(
         }
     }
     var showSelectCitySheet by remember { mutableStateOf(false) }
+    var showNoteSheet: UserID? = remember { mutableStateOf(null) }.value
     val citySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val noteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(pagerState.currentPage) {
         onHomeUIAction(HomeUIAction.OnSelectPage(pagerState.currentPage))
@@ -87,6 +91,7 @@ fun HomeScreen(
                     showSelectCitySheet = true
                 },
                 onMapClick = { onHomeUIAction(HomeUIAction.OnMapClick) },
+                onCameraClick = { onHomeUIAction(HomeUIAction.OnCameraClick) },
             )
         },
         floatingActionButton = {
@@ -120,7 +125,15 @@ fun HomeScreen(
             friendsTabContent = {
                 FriendFeedScreen(
                     uiState = uiState,
-                    onHomeUIAction = onHomeUIAction,
+                    onHomeUIAction = {
+                        when (it) {
+                            is HomeUIAction.OnNoteClick -> {
+                                showNoteSheet = it.userID
+                            }
+
+                            else -> onHomeUIAction(it)
+                        }
+                    },
                 )
             },
             partiesTabContent = {
@@ -134,32 +147,33 @@ fun HomeScreen(
                 )
             },
         )
-//        PullToRefreshComponent(
-//            state = state,
-//            onRefresh = { onHomeUIAction(HomeUIAction.OnSwipeRefresh) },
-//            modifier = Modifier.padding(top = it.calculateTopPadding()),
-//        ) {
-//            Column(
-//                modifier = Modifier
-//                    .background(MaterialTheme.colorScheme.background),
-//            ) {
-//                PostList(
-//                    uiState = uiState,
-//                    onHomeUIAction = onHomeUIAction,
-//                )
-//            }
-//        }
-        if (showSelectCitySheet) {
-            SelectCityBottomSheet(
-                onDismiss = {
-                    scope.launch {
-                        citySheetState.hide()
-                    }.invokeOnCompletion {
-                        showSelectCitySheet = false
-                    }
-                },
-            )
-        }
+    }
+
+    if (showNoteSheet != null) {
+        NoteBottomSheet(
+            userID = showNoteSheet!!,
+            sheetState = noteSheetState,
+            onDismiss = {
+                scope.launch {
+                    noteSheetState.hide()
+                }.invokeOnCompletion {
+                    showNoteSheet = null
+                }
+            },
+            modifier = Modifier,
+            navigateToCreateNote = { onHomeUIAction(HomeUIAction.OnCreateNoteClick) },
+        )
+    }
+    if (showSelectCitySheet) {
+        SelectCityBottomSheet(
+            onDismiss = {
+                scope.launch {
+                    citySheetState.hide()
+                }.invokeOnCompletion {
+                    showSelectCitySheet = false
+                }
+            },
+        )
     }
 }
 

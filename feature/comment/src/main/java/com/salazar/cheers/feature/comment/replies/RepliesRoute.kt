@@ -10,6 +10,7 @@ fun RepliesRoute(
     repliesViewModel: RepliesViewModel = hiltViewModel(),
     navigateBack: () -> Unit = {},
     navigateToCommentMoreSheet: (String) -> Unit = {},
+    navigateToUser: (String) -> Unit,
 ) {
     val uiState by repliesViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -23,7 +24,7 @@ fun RepliesRoute(
                 RepliesUIAction.OnBackPressed -> navigateBack()
                 RepliesUIAction.OnFriendRequestsClick -> TODO()
                 RepliesUIAction.OnSwipeRefresh -> TODO()
-                is RepliesUIAction.OnUserClick -> TODO()
+                is RepliesUIAction.OnUserClick -> navigateToUser(action.userId)
                 is RepliesUIAction.OnCommentLongClick -> navigateToCommentMoreSheet(action.commentID)
                 RepliesUIAction.OnRemoveReplyComment -> TODO()
                 is RepliesUIAction.OnReplyClick -> TODO()

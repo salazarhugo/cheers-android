@@ -9,6 +9,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Comment
@@ -50,14 +52,16 @@ fun RepliesScreen(
         ) {
             val replies = uiState.replies
             val comment = uiState.comment
-            if (replies == null || comment == null || uiState.isLoading)
+            if (replies == null || comment == null || uiState.isLoading) {
                 LoadingScreen()
-            else
+            }
+            else {
                 Replies(
                     parentComment = comment,
                     comments = replies,
                     onRepliesUIAction = onRepliesUIAction,
                 )
+            }
         }
     }
 }
@@ -68,10 +72,11 @@ fun Replies(
     comments: List<Comment>,
     onRepliesUIAction: (RepliesUIAction) -> Unit,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     LazyColumn(modifier = Modifier.fillMaxHeight()) {
         item {
             CommentItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 comment = parentComment,
                 onLike = {
                     onRepliesUIAction(RepliesUIAction.OnCommentLike(parentComment.id))
@@ -82,6 +87,13 @@ fun Replies(
                 onLongClick = {
                     onRepliesUIAction(RepliesUIAction.OnCommentLongClick(parentComment.id))
                 },
+                onUserClick = {
+                    onRepliesUIAction(RepliesUIAction.OnUserClick(userId = parentComment.username))
+                },
+                onDoubleClick = {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onRepliesUIAction(RepliesUIAction.OnCommentLike(parentComment.id))
+                }
             )
             HorizontalDivider()
         }

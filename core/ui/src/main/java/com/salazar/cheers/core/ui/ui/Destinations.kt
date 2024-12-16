@@ -30,7 +30,6 @@ object MainDestinations {
     const val COMMENT_MORE_SHEET = "commentMore"
     const val COMMENT_DELETE = "deleteComment"
     const val ACCOUNT_DELETE = "deleteAccount"
-    const val CAMERA_ROUTE = "camera"
     const val CHAT_CAMERA_ROUTE = "chatCamera"
     const val LIKES_ROUTE = "likes"
     const val STORY_STATS_ROUTE = "storyStats"
@@ -89,12 +88,6 @@ class CheersNavigationActions(
         navController.navigate("${MainDestinations.DIALOG_REMOVE_FRIEND}/$postId") {
             launchSingleTop = true
             restoreState = true
-        }
-    }
-
-    val navigateToNote: (String) -> Unit = { userID ->
-        navController.navigate("${MainDestinations.NOTE_SHEET}/$userID") {
-            launchSingleTop = true
         }
     }
 

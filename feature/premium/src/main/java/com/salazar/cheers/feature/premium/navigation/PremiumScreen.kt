@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.premium.PremiumCard
@@ -53,13 +52,8 @@ fun PremiumScreen(
 private fun PremiumScreenPreview() {
     CheersPreview {
         PremiumScreen(
-            uiState = PremiumUiState.HasUser(
-                user = cheersUser,
-                posts = emptyList(),
-                isLoading = false,
-                parties = emptyList(),
+            uiState = PremiumUiState.HasOffer(
                 isRefreshing = true,
-                errorMessages = "",
             ),
             onBackPressed = {},
         )

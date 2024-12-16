@@ -17,7 +17,6 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.UserChoiceBillingListener
 import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
 import com.salazar.cheers.data.billing.api.ApiService
@@ -40,11 +39,11 @@ class BillingRepository @Inject constructor(
         purchases: MutableList<Purchase>?
     ) {
         Log.d("Billing", "On purchase updated $purchases")
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+        if (billingResult.responseCode == BillingResponseCode.OK && purchases != null) {
             for (purchase in purchases) {
                 handlePurchase(purchase)
             }
-        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+        } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
             // TODO Handle an error caused by a user cancelling the purchase flow.
         } else {
             // TODO Handle any other error codes.
@@ -55,16 +54,16 @@ class BillingRepository @Inject constructor(
         billingResult: BillingResult,
         purchases: MutableList<Purchase>
     ) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+        if (billingResult.responseCode == BillingResponseCode.OK) {
             for (purchase in purchases) {
                 handlePurchase(purchase)
             }
         }
     }
 
-    var billingClient = BillingClient.newBuilder(application)
+    private var billingClient = BillingClient.newBuilder(application)
         .setListener(this)
-        .enableUserChoiceBilling(UserChoiceBillingListener { })
+        .enableUserChoiceBilling { }
         .enablePendingPurchases(
             PendingPurchasesParams.newBuilder()
                 .enablePrepaidPlans()
