@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.WatchStatus
 import com.salazar.cheers.core.util.numberFormatter
+import com.salazar.cheers.core.util.relativeTimeFormatter
 import com.salazar.cheers.feature.parties.ui.PartyDescription
 import com.salazar.cheers.feature.parties.ui.PartyLineup
 import com.salazar.cheers.feature.parties.ui.PartyMood
@@ -125,15 +127,42 @@ fun PartyDetail(
             description = party.description,
             onUserClicked = onUserClicked,
         )
-        guestList(party = party)
-        lineup(lineup = party.lineup)
-        mood(musicGenres = party.musicGenres)
+        guestList(
+            party = party,
+        )
+        lineup(
+            lineup = party.lineup,
+        )
+        mood(
+            musicGenres = party.musicGenres,
+        )
         venue(
             address = party.address,
             latitude = party.latitude,
             longitude = party.longitude,
             onMapClick = onMapClick,
         )
+        footer(
+            lastUpdateTime = party.updateTime,
+        )
+    }
+}
+
+fun LazyListScope.footer(
+    lastUpdateTime: Long,
+) {
+    item {
+        Column(
+            modifier = Modifier
+                .animateItem()
+                .navigationBarsPadding()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = "Last updated ${relativeTimeFormatter(lastUpdateTime)} ago.",
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
     }
 }
 

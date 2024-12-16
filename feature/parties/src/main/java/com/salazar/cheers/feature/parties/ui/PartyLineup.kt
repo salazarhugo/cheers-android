@@ -19,7 +19,6 @@ import com.salazar.cheers.core.model.duplexParty
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.modifier.ShimmerShape
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PartyLineup(
     lineup: List<String>,

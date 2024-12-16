@@ -12,6 +12,7 @@ data class Party(
     val startDate: Long = 0,
     val endDate: Long = 0,
     val createTime: Long = 0,
+    val updateTime: Long = 0,
     val hostId: String = "",
     val isHost: Boolean = false,
     val hostName: String = "",

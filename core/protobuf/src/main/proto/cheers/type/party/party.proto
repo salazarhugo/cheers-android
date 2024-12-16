@@ -31,4 +31,5 @@ message Party {
   string city = 18;
   repeated string lineup = 19;
   repeated string music_genres = 20;
+  int64 update_time = 21;
 }

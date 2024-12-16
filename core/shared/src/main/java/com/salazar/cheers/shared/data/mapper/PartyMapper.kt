@@ -13,6 +13,7 @@ fun PartyItem.toParty(): Party {
         startDate = party.startDate,
         endDate = party.endDate,
         createTime = party.createTime,
+        updateTime = party.updateTime,
         hostId = party.hostId,
         hostName = user.name,
         isHost = isCreator,
