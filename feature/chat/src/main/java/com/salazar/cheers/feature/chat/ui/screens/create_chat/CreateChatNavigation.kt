@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.chat.ui.screens.create_chat
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -29,6 +30,12 @@ fun NavGraphBuilder.createChatScreen(
         deepLinks = listOf(
             navDeepLink<CreateChatScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) {
         CreateChatRoute(
             navigateBack = navigateBack,

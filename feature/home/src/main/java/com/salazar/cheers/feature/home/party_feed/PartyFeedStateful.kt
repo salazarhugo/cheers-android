@@ -17,10 +17,13 @@ fun PartyFeedStateful(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     PartyFeedScreen(
+        isLoading = uiState.isLoading,
+        isLoadingMore = uiState.isLoadingMore,
         parties = uiState.parties,
         onPartyClicked = navigateToPartyDetail,
         onMoreClick = navigateToPartyMoreSheet,
         onChangeCityClick = onChangeCityClick,
         onCreatePartyClick = navigateToCreateParty,
+        onLoadMore = viewModel::onLoadMore,
     )
 }

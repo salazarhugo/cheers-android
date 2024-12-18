@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.WatchStatus
+import com.salazar.cheers.core.ui.navigation.PartyDetailScreen
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

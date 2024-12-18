@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.create_note
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -29,6 +30,18 @@ fun NavGraphBuilder.createNoteScreen(
         deepLinks = listOf(
             navDeepLink<CreateNoteScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Up)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Down)
+        }
     ) {
         CreateNoteRoute(
             navigateBack = navigateBack,

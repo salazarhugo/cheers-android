@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
-import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.animations.AnimatedIntCounter
+import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 
 @Composable
 fun ProfileStats(
@@ -52,10 +52,9 @@ fun ProfileStats(
                     }
                 }
             ) {
-                AnimatedTextCounter(
+                AnimatedIntCounter(
                     targetState = item.value,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                 )
                 Text(
                     text = pluralStringResource(

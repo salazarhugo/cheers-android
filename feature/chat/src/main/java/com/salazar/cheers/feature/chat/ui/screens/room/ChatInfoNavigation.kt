@@ -1,36 +1,52 @@
 package com.salazar.cheers.feature.chat.ui.screens.room
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
-import com.salazar.cheers.feature.chat.ui.screens.chat.ChatRoute
+import com.salazar.cheers.core.util.Constants
+import kotlinx.serialization.Serializable
 
-const val CHAT_ID = "channel_id"
-const val chatInfoNavigationRoute = "chat_info/{$CHAT_ID}"
+@Serializable
+data class ChatInfoScreen(
+    val chatID: String,
+)
+
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/chat/$CHAT_ID/info"
+    "${Constants.DEEPLINK_BASE_URL}/chat/{id}/info"
 
 fun NavController.navigateToChatInfo(
-    channelId: String,
+    chatID: String,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate("chat_info/$channelId", navOptions)
+    this.navigate(
+        route = ChatInfoScreen(chatID = chatID),
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.chatInfoScreen(
     navigateBack: () -> Unit,
     navigateToOtherProfile: (String) -> Unit,
 ) {
-    composable(
-        route = chatInfoNavigationRoute,
+    composable<ChatInfoScreen>(
         deepLinks = listOf(
-            navDeepLink {
-                uriPattern =
-                    DEEP_LINK_URI_PATTERN
-            },
+            navDeepLink<ChatInfoScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) {
         RoomRoute(
             navigateBack = navigateBack,

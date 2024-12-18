@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.cheers.android.library)
     alias(libs.plugins.cheers.android.library.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -8,4 +9,5 @@ android {
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.json)
 }

@@ -1,6 +1,5 @@
 package com.salazar.cheers.ui.main.camera
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
@@ -55,10 +54,6 @@ fun CameraRoute(
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
             cameraViewModel.setImageUri(it)
         }
-
-    BackHandler(enabled = true) {
-        cameraViewModel.setImageUri(null)
-    }
 
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 

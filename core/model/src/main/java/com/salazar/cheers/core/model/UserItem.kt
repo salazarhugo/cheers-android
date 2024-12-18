@@ -1,5 +1,8 @@
 package com.salazar.cheers.core.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserItem(
     val id: String = "",
     val username: String = "",
@@ -7,7 +10,6 @@ data class UserItem(
     val verified: Boolean = false,
     val picture: String? = null,
     val hasFollowed: Boolean = false,
-    val story_state: StoryState = StoryState.EMPTY,
     val friend: Boolean = false,
     val requested: Boolean = false,
 )

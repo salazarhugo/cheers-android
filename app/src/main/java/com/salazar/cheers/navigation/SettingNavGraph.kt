@@ -1,5 +1,6 @@
 package com.salazar.cheers.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
@@ -7,6 +8,7 @@ import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.ui.ui.SettingDestinations
 import com.salazar.cheers.feature.premium.navigation.navigateToPremium
 import com.salazar.cheers.feature.premium.navigation.premiumScreen
+import com.salazar.cheers.feature.settings.SettingsNavGraph
 import com.salazar.cheers.feature.settings.SettingsScreen
 import com.salazar.cheers.feature.settings.language.languagesScreen
 import com.salazar.cheers.feature.settings.language.navigateToLanguage
@@ -28,10 +30,6 @@ import com.softimpact.feature.passcode.create.createPasscodeScreen
 import com.softimpact.feature.passcode.create.navigateToCreatePasscode
 import com.softimpact.feature.passcode.settings.navigateToPasscodeSettings
 import com.softimpact.feature.passcode.settings.passcodeSettingsScreen
-import kotlinx.serialization.Serializable
-
-@Serializable
-data object SettingsNavGraph
 
 fun NavGraphBuilder.settingsNavGraph(
     appState: CheersAppState,
@@ -127,6 +125,12 @@ fun NavGraphBuilder.settingsNavGraph(
 
         composable(
             route = SettingDestinations.THEME_ROUTE,
+            enterTransition = {
+                slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+            },
+            popExitTransition = {
+                slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+            }
         ) {
             ThemeRoute(
                 navActions = navActions,

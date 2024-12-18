@@ -4,12 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.data.chat.repository.ChatRepository
-import com.salazar.cheers.domain.pin_room.PinRoomUseCase
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.data.chat.websocket.WebsocketState
 import com.salazar.cheers.domain.list_chats.ListChatsUseCase
+import com.salazar.cheers.domain.pin_room.PinRoomUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +26,7 @@ class MessagesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val viewModelState =
-        MutableStateFlow(MessagesViewModelState(isLoading = false))
+        MutableStateFlow(MessagesViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map(MessagesViewModelState::toUiState)
@@ -36,7 +40,9 @@ class MessagesViewModel @Inject constructor(
         viewModelScope.launch {
             listChatsUseCase().collect(::updateRooms)
         }
-        onSwipeRefresh()
+        viewModelScope.launch {
+            chatRepository.getInbox()
+        }
         listenWebsocket()
     }
 
@@ -58,9 +64,17 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
+    private fun updateIsRefreshing(isRefreshing: Boolean) {
+        viewModelState.update {
+            it.copy(isRefreshing = isRefreshing)
+        }
+    }
+
     fun onSwipeRefresh() {
+        updateIsRefreshing(isRefreshing = true)
         viewModelScope.launch {
             chatRepository.getInbox()
+            updateIsRefreshing(isRefreshing = false)
         }
     }
 

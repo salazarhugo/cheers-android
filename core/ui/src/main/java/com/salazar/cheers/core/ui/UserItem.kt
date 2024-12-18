@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
@@ -44,10 +43,7 @@ fun UserItem(
             AvatarComponent(
                 avatar = userItem.picture,
                 onClick = {
-                    if (userItem.story_state == StoryState.EMPTY)
-                        onClick(userItem.username)
-                    else
-                        onStoryClick(userItem.username)
+                    onClick(userItem.username)
                 }
             )
             Column {

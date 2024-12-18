@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.party.create.location
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,7 +23,20 @@ fun NavGraphBuilder.createPartyScreenLocation(
     navController: NavController,
     navigateBack: () -> Unit,
 ) {
-    composable<CreatePartyLocation> { backStackEntry ->
+    composable<CreatePartyLocation>(
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
+    ) { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
             navController.getBackStackEntry(CreatePartyGraph)
         }

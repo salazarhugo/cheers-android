@@ -3,8 +3,9 @@ package com.salazar.cheers.feature.chat.ui.screens.room
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.salazar.cheers.core.model.UserItem
+import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.domain.list_chat_members.ListChatMembersUseCase
 import com.salazar.cheers.shared.util.result.Result.Error
 import com.salazar.cheers.shared.util.result.Result.Success
@@ -62,9 +63,10 @@ class RoomViewModel @Inject constructor(
     val chatRepository: com.salazar.cheers.data.chat.repository.ChatRepository,
     val listChatMembersUseCase: ListChatMembersUseCase,
 ) : ViewModel() {
+    private val args = stateHandle.toRoute<ChatInfoScreen>()
 
     private val viewModelState = MutableStateFlow(RoomViewModelState(isLoading = true))
-    private lateinit var roomId: String
+    private val chatID = args.chatID
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -75,21 +77,18 @@ class RoomViewModel @Inject constructor(
         )
 
     init {
-        stateHandle.get<String>(CHAT_ID)?.let { roomId ->
-            this.roomId = roomId
-        }
-
         viewModelScope.launch {
-            chatRepository.getChannel(channelId = roomId).collect { room ->
+            chatRepository.getChannel(channelId = chatID).collect { room ->
                 onRoomChange(room = room)
             }
         }
 
         viewModelScope.launch {
-            when(val result = listChatMembersUseCase(roomId)) {
+            when (val result = listChatMembersUseCase(chatID)) {
                 is Success -> {
                     onMembersChange(members = result.data)
                 }
+
                 is Error -> {
                     updateError(message = result.error.name)
                 }
@@ -105,7 +104,7 @@ class RoomViewModel @Inject constructor(
 
     fun onLeaveRoom() {
         viewModelScope.launch {
-            chatRepository.leaveRoom(roomId = roomId)
+            chatRepository.leaveRoom(roomId = chatID)
         }
     }
 

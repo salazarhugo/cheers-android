@@ -30,7 +30,6 @@ fun UserItemEntity.asExternalModel() = UserItem(
     verified = verified,
     picture = picture,
     hasFollowed = has_followed,
-    story_state = story_state,
     friend = friend,
     requested = requested,
 )
@@ -43,7 +42,6 @@ fun UserItem.asEntity(): UserItemEntity {
         verified = verified,
         picture = picture,
         has_followed = hasFollowed,
-        story_state = story_state,
         friend = friend,
         requested = requested,
     )

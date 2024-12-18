@@ -8,9 +8,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import cheers.type.UserOuterClass.UserItem
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.model.ChatMessage
+import com.salazar.cheers.core.model.ChatType
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatEvent
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -46,13 +48,19 @@ class ChatViewModel @Inject constructor(
     private val getChatFlowUseCase: GetChatFlowUseCase,
 ) : ViewModel() {
 
-    private val chatScreen = statsHandle.toRoute<ChatScreen>()
+    private val chatScreen = statsHandle.toRoute<ChatScreen>(
+        typeMap = mapOf(typeOf<UserItem?>() to CustomNavType.UserItemType),
+    )
 
     var hasChannel = true
     private var typingJob: Job? = null
     lateinit var chatID: String
 
-    private val viewModelState = MutableStateFlow(ChatUiState(isLoading = false))
+    private val viewModelState = MutableStateFlow(
+        ChatUiState(
+            isLoading = false,
+        )
+    )
 
     val uiState = viewModelState
         .stateIn(
@@ -63,15 +71,22 @@ class ChatViewModel @Inject constructor(
 
     init {
         val channelID = chatScreen.channelID
-        val userID = chatScreen.userID
 
         if (channelID != null) {
             chatID = channelID
             loadChannel(channelID)
         } else {
+            val user = chatScreen.user!!
+            val channel = ChatChannel(
+                name = user.name,
+                verified = user.verified,
+                picture = user.picture,
+                otherUserId = user.id,
+                type = ChatType.DIRECT,
+            )
+            updateChatChannel(channel)
             viewModelScope.launch {
-                val userID = chatScreen.userID!!
-                getChatChannelUseCase(userID).collect(::updateChatChannel)
+                getChatChannelUseCase(user.id).collect(::updateChatChannel)
             }
         }
     }
@@ -105,7 +120,7 @@ class ChatViewModel @Inject constructor(
 
     suspend fun createGroupChat(): Resource<String> {
 //        val user = userRepository.getUserFlow(userID).first()
-        val user = UserItem.newBuilder()
+//        val user = UserItem.newBuilder()
         return Resource.Error("")
 //        return chatRepository.getOrCreateGroupChat(user.username, listOf(userID))
     }

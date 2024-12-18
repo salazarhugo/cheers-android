@@ -10,10 +10,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.core.ui.ui.LoadingScreen
-import com.salazar.cheers.core.model.User
+import com.salazar.cheers.shared.data.mapper.toUserItem
 import kotlinx.coroutines.launch
 
 @Composable
@@ -24,7 +26,7 @@ fun OtherProfileRoute(
     navigateToPostDetail: (String) -> Unit,
     navigateToOtherProfileStats: (User) -> Unit,
     navigateToManageFriendship: (String) -> Unit,
-    navigateToChat: (String) -> Unit,
+    navigateToChat: (UserItem) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val state = rememberRefreshLayoutState()
@@ -74,7 +76,7 @@ fun OtherProfileRoute(
                                 OtherProfileUIAction.OnBackPressed -> navigateBack()
                                 OtherProfileUIAction.OnEditProfileClick -> TODO()
                                 OtherProfileUIAction.OnFriendListClick -> navigateToOtherProfileStats(user)
-                                OtherProfileUIAction.OnSendMessageClick -> navigateToChat(user.id)
+                                OtherProfileUIAction.OnSendMessageClick -> navigateToChat(user.toUserItem())
                                 OtherProfileUIAction.OnSwipeRefresh -> viewModel.onSwipeRefresh()
                                 OtherProfileUIAction.OnGiftClick -> TODO()
                                 OtherProfileUIAction.OnFriendshipClick -> navigateToManageFriendship(user.id)

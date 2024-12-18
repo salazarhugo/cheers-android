@@ -1,6 +1,5 @@
 package com.salazar.cheers.feature.create_post
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,13 +25,6 @@ fun CreatePostRoute(
         },
     )
 
-    BackHandler {
-        if (uiState.page == CreatePostPage.CreatePost)
-            navigateBack()
-        else
-            viewModel.updatePage(CreatePostPage.CreatePost)
-    }
-
     when (uiState.page) {
         CreatePostPage.CreatePost ->
             CreatePostScreenStateful(
@@ -43,15 +35,24 @@ fun CreatePostRoute(
                         CreatePostUIAction.OnBackPressed -> navigateBack()
                         CreatePostUIAction.OnSwipeRefresh -> {}
                         CreatePostUIAction.OnCameraClick -> navigateToCamera()
-                        is CreatePostUIAction.OnCaptionChange -> viewModel.onCaptionChanged(it.text)
+                        is CreatePostUIAction.OnCaptionChange -> viewModel.onCaptionChanged(
+                            it.text
+                        )
+
                         CreatePostUIAction.OnGalleryClick -> {
                             launcher.launch(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
                             )
                         }
 
-                        is CreatePostUIAction.OnNotificationChange -> viewModel.toggleNotify(it.enabled)
-                        is CreatePostUIAction.OnEnableCommentsChange -> viewModel.onEnableCommentsChange(it.enabled)
+                        is CreatePostUIAction.OnNotificationChange -> viewModel.toggleNotify(
+                            it.enabled
+                        )
+
+                        is CreatePostUIAction.OnEnableCommentsChange -> viewModel.onEnableCommentsChange(
+                            it.enabled
+                        )
+
                         is CreatePostUIAction.OnSelectPrivacy -> viewModel.selectPrivacy(it.privacy)
                         is CreatePostUIAction.OnSelectDrink -> viewModel.selectDrink(it.drink)
                         is CreatePostUIAction.OnAddAudio -> viewModel.addAudio(it.localAudio)
@@ -60,9 +61,17 @@ fun CreatePostRoute(
                             viewModel.updatePage(CreatePostPage.ChooseOnMap)
                         }
 
-                        is CreatePostUIAction.OnSelectLocation -> viewModel.updateLocation(it.location)
-                        is CreatePostUIAction.OnEnableShareChange ->viewModel.onEnableShareChange(it.enabled)
-                        is CreatePostUIAction.OnEnableLikesChange -> viewModel.onEnabledLikesChange(it.enabled)
+                        is CreatePostUIAction.OnSelectLocation -> viewModel.updateLocation(
+                            it.location
+                        )
+
+                        is CreatePostUIAction.OnEnableShareChange -> viewModel.onEnableShareChange(
+                            it.enabled
+                        )
+
+                        is CreatePostUIAction.OnEnableLikesChange -> viewModel.onEnabledLikesChange(
+                            it.enabled
+                        )
                     }
                 }
             )

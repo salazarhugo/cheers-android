@@ -84,12 +84,14 @@ fun ChatScreen(
         color = MaterialTheme.colorScheme.background,
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+            ,
         ) {
             Column(
                 Modifier
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .imePadding()
             ) {
                 Messages(
                     seen = uiState.channel?.status == ChatStatus.OPENED,
@@ -107,7 +109,9 @@ fun ChatScreen(
                     modifier = Modifier.padding(16.dp),
                 )
                 ChatBottomBar(
-                    modifier = Modifier.navigationBarsPadding(),
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                    ,
                     textState = uiState.textState,
                     replyMessage = uiState.replyMessage,
                     onMessageSent = {

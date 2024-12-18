@@ -1,11 +1,14 @@
 package com.salazar.cheers.feature.home.home
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.salazar.cheers.Settings
+import com.salazar.cheers.core.ui.navigation.PartyDetailScreen
 import com.salazar.cheers.core.util.Constants
 import kotlinx.serialization.Serializable
 
@@ -38,7 +41,27 @@ fun NavGraphBuilder.homeScreen(
     navigateToPartyDetail: (String) -> Unit,
     navigateToMap: () -> Unit = {},
 ) {
-    composable<Home>(deepLinks = listOf(navDeepLink<Home>(basePath = DEEP_LINK_URI_PATTERN))) {
+    composable<Home>(
+        deepLinks = listOf(
+            navDeepLink<Home>(basePath = DEEP_LINK_URI_PATTERN),
+        ),
+        exitTransition = {
+            val toPartyDetails = targetState.destination.hasRoute(PartyDetailScreen("")::class)
+            if (toPartyDetails) {
+                slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+            } else {
+                null
+            }
+        },
+        popEnterTransition = {
+            val fromPartyDetails = initialState.destination.hasRoute(PartyDetailScreen("")::class)
+            if (fromPartyDetails) {
+                slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+            } else {
+                null
+            }
+        }
+    ) {
         HomeRoute(
             appSettings = appSettings,
             onActivityClick = onActivityClick,

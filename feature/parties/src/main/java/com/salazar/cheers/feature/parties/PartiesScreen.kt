@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.salazar.cheers.core.ui.PartiesTopBar
 import com.salazar.cheers.core.ui.item.party.PartyList
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 
@@ -20,6 +19,7 @@ fun PartiesScreen(
     navigateToTickets: () -> Unit,
     onCreatePartyClick: () -> Unit,
     onChangeCityClick: () -> Unit,
+    onLoadMore: (Int) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -31,22 +31,21 @@ fun PartiesScreen(
     ) {
         val parties = uiState.parties
 
-        if (parties == null) {
-            LoadingScreen()
-        } else {
-            SwipeToRefresh(
-                onRefresh = onSwipeToRefresh,
-                state = rememberSwipeToRefreshState(uiState.isRefreshing),
-                modifier = Modifier.padding(top = it.calculateTopPadding()),
-            ) {
-                PartyList(
-                    events = parties,
-                    onPartyClicked = onPartyClicked,
-                    onMoreClick = onMoreClick,
-                    onChangeCityClick = onChangeCityClick,
-                    onCreatePartyClick = onCreatePartyClick,
-                )
-            }
+        SwipeToRefresh(
+            onRefresh = onSwipeToRefresh,
+            state = rememberSwipeToRefreshState(uiState.isRefreshing),
+            modifier = Modifier.padding(top = it.calculateTopPadding()),
+        ) {
+            PartyList(
+                isLoading = uiState.isLoading,
+                isLoadingMore = uiState.isLoadingMore,
+                parties = parties,
+                onPartyClick = onPartyClicked,
+                onMoreClick = onMoreClick,
+                onChangeCityClick = onChangeCityClick,
+                onCreatePartyClick = onCreatePartyClick,
+                onLoadMore = onLoadMore,
+            )
         }
     }
 }

@@ -1,11 +1,13 @@
 package com.salazar.cheers.feature.profile.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.profile.other_profile.OtherProfileRoute
 import kotlinx.serialization.Serializable
@@ -37,12 +39,24 @@ fun NavGraphBuilder.otherProfileScreen(
     navigateToPostDetail: (String) -> Unit,
     navigateToOtherProfileStats: (User) -> Unit,
     navigateToManageFriendship: (String) -> Unit,
-    navigateToChat: (String) -> Unit,
+    navigateToChat: (UserItem) -> Unit,
 ) {
     composable<OtherProfileScreen>(
         deepLinks = listOf(
             navDeepLink<OtherProfileScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) {
         OtherProfileRoute(
             navigateBack = navigateBack,

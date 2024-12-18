@@ -27,7 +27,7 @@ import com.salazar.cheers.core.util.FirebaseDynamicLinksUtil
 import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
 import com.salazar.cheers.feature.chat.ui.screens.chat.chatScreen
 import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithChannelId
-import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithUserId
+import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithUserItem
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.createChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.navigateToCreateChat
 import com.salazar.cheers.feature.chat.ui.screens.messages.messagesScreen
@@ -265,7 +265,7 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
             navigateToMapSettings = navController::navigateToMapSettings,
             navigateToCreatePost = {},
-            navigateToChatWithUserId = navController::navigateToChatWithUserId,
+            navigateToChatWithUserId = navController::navigateToChatWithUserItem,
         )
 
         mapPostHistoryScreen(
@@ -374,11 +374,7 @@ fun NavGraphBuilder.mainNavGraph(
             },
             navigateToPostDetail = {},
             navigateToComments = {},
-            navigateToChat = { userID ->
-                navController.navigateToChatWithUserId(
-                    userId = userID,
-                )
-            },
+            navigateToChat = navController::navigateToChatWithUserItem,
         )
 
         partyDetailScreen(

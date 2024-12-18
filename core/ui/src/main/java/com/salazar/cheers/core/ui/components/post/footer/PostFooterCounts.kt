@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
-import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.animations.AnimatedIntCounter
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
 
@@ -34,7 +34,7 @@ fun PostFooterCounters(
                 modifier = Modifier.noRippleClickable { onCommentsClick() },
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                AnimatedTextCounter(
+                AnimatedIntCounter(
                     targetState = commentCount,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                 )
@@ -50,7 +50,7 @@ fun PostFooterCounters(
                 modifier = Modifier.noRippleClickable { onLikesClick() },
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                AnimatedTextCounter(
+                AnimatedIntCounter(
                     targetState = likeCount,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                 )

@@ -24,5 +24,6 @@ fun PartiesRoute(
         navigateToTickets = navigateToTickets,
         onCreatePartyClick = navigateToCreateParty,
         onChangeCityClick = onChangeCityClick,
+        onLoadMore = viewModel::onLoadMore,
     )
 }

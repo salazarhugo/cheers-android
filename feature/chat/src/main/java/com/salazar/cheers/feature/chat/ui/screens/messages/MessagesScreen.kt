@@ -1,6 +1,9 @@
 package com.salazar.cheers.feature.chat.ui.screens.messages
 
 import RoomsUIAction
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.ui.CheersSearchBar
+import com.salazar.cheers.core.ui.components.UserItemListLoading
 import com.salazar.cheers.core.ui.components.message.MessageComponent
 import com.salazar.cheers.core.ui.theme.Roboto
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
 import com.salazar.cheers.feature.chat.ui.chats.EmptyChatsMessage
@@ -62,7 +65,7 @@ fun MessagesScreen(
         },
     ) {
         SwipeToRefresh(
-            state = rememberSwipeToRefreshState(uiState.isLoading),
+            state = rememberSwipeToRefreshState(uiState.isRefreshing),
             onRefresh = { onRoomsUIAction(RoomsUIAction.OnSwipeRefresh) },
             modifier = Modifier.padding(it),
         ) {
@@ -86,11 +89,6 @@ fun Tabs(
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-
-        if (uiState.isLoading) {
-            LoadingScreen()
-        }
-
         CheersSearchBar(
             modifier = Modifier.padding(horizontal = 16.dp),
             searchInput = uiState.searchInput,
@@ -103,10 +101,21 @@ fun Tabs(
             },
         )
 
-        ConversationList(
-            channels = uiState.channels,
-            onRoomsUIAction = onRoomsUIAction,
-        )
+        val isLoading = uiState.isLoading
+        AnimatedVisibility(
+            visible = isLoading,
+            enter = fadeIn(),
+            exit = shrinkVertically(),
+        ) {
+            UserItemListLoading()
+        }
+
+        if (!isLoading) {
+            ConversationList(
+                channels = uiState.channels,
+                onRoomsUIAction = onRoomsUIAction,
+            )
+        }
     }
 }
 
@@ -115,8 +124,7 @@ fun ConversationList(
     channels: List<ChatChannel>?,
     onRoomsUIAction: (RoomsUIAction) -> Unit,
 ) {
-    if (channels == null)
-        return
+    if (channels == null) return
 
     if (channels.isEmpty()) {
         EmptyChatsMessage()

@@ -7,11 +7,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.feature.settings.SettingsViewModel
 
-/**
- * Stateful composable that displays the Navigation route for the Theme screen.
- *
- * @param settingsViewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun ThemeRoute(
     navActions: CheersNavigationActions,

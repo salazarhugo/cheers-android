@@ -101,7 +101,6 @@ class PartyRepositoryImpl @Inject constructor(
             val parties = response.itemsList.map {
                 it.toParty()
             }
-            partyDao.clearAll()
             partyDao.insertAll(parties.asEntity())
 
             Result.success(parties)

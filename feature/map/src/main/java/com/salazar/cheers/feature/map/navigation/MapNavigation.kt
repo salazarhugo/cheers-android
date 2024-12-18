@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.feature.map.screens.map.MapRoute
 
 const val mapNavigationRoute = "map_route"
@@ -19,7 +20,7 @@ fun NavGraphBuilder.mapScreen(
     navigateBack: () -> Unit,
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
-    navigateToChatWithUserId: (String) -> Unit,
+    navigateToChatWithUserId: (UserItem) -> Unit,
 ) {
     composable(
         route = mapNavigationRoute,
@@ -31,7 +32,7 @@ fun NavGraphBuilder.mapScreen(
             navigateBack = navigateBack,
             navigateToCreatePost = navigateToCreatePost,
             navigateToMapSettings = navigateToMapSettings,
-            navigateToChatWithUserId = navigateToChatWithUserId,
+            navigateToChatWithUserId = {},
         )
     }
 }

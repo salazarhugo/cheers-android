@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.model.Comment
 import com.salazar.cheers.core.ui.CheersPreview
-import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.animations.AnimatedIntCounter
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
@@ -143,7 +143,7 @@ fun CommentItem(
                         .size(ButtonDefaults.IconSize)
                         .noRippleClickable { onLike() }
                 )
-                AnimatedTextCounter(
+                AnimatedIntCounter(
                     targetState = comment.likeCount,
                     style = MaterialTheme.typography.labelMedium,
                 )

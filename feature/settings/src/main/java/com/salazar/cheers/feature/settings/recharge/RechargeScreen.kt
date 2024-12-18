@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.salazar.cheers.core.model.ProductDetails
-import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.animations.AnimatedIntCounter
 import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
@@ -43,7 +43,7 @@ fun RechargeScreen(
                     text = "Coins Balance",
                     style = MaterialTheme.typography.titleLarge,
                 )
-                AnimatedTextCounter(
+                AnimatedIntCounter(
                     targetState = coins,
                     style = MaterialTheme.typography.headlineLarge,
                 )

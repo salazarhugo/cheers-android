@@ -9,7 +9,6 @@ val emptyUserItem = UserItem(
     verified = false,
     picture = null,
     hasFollowed = false,
-    story_state = StoryState.EMPTY,
     friend = false,
     requested = false,
 )
@@ -21,7 +20,6 @@ val cheersUserItem = UserItem(
     verified = true,
     picture = null,
     hasFollowed = false,
-    story_state = StoryState.NOT_SEEN,
     friend = true,
     requested = false,
 )

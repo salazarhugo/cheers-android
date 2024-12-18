@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.cheers.android.library)
     alias(libs.plugins.cheers.android.library.compose)
     alias(libs.plugins.cheers.android.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -73,6 +74,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
 
     implementation(project(mapOf("path" to ":core:protobuf")))
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

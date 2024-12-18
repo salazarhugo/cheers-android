@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.settings
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -8,6 +9,9 @@ import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
 
 private const val DEEP_LINK_URI_PATTERN = "https://maparty.app/settings_note"
+
+@Serializable
+data object SettingsNavGraph
 
 @Serializable
 data object SettingsScreen
@@ -38,6 +42,18 @@ fun NavGraphBuilder.settingsScreen(
         deepLinks = listOf(
             navDeepLink<SettingsScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) {
         SettingsRoute(
             navigateBack = navigateBack,
@@ -54,3 +70,6 @@ fun NavGraphBuilder.settingsScreen(
         )
     }
 }
+//            val isFromGraph = this.initialState.destination.hierarchy.any {
+//               it.hasRoute(SettingsNavGraph::class)
+//            }

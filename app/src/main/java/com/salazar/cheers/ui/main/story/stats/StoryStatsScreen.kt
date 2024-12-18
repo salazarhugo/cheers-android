@@ -41,7 +41,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerScope
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
-import com.salazar.cheers.core.ui.animations.AnimatedTextCounter
+import com.salazar.cheers.core.ui.animations.AnimatedIntCounter
 import com.salazar.cheers.core.db.model.Story
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.feature.search.UserCard
@@ -136,7 +136,7 @@ fun ViewsHeader(
         ) {
             Icon(Icons.Outlined.Visibility, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            AnimatedTextCounter(
+            AnimatedIntCounter(
                 targetState = views,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
             )

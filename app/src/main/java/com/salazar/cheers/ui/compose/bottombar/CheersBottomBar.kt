@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.compose.bottombar
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Column
@@ -75,7 +76,9 @@ fun CheersBottomBar(
     CompositionLocalProvider(
         LocalRippleConfiguration provides clearRippleConfiguration
     ) {
-        Column {
+        Column(
+            modifier = modifier.background(MaterialTheme.colorScheme.background),
+        ) {
             HorizontalDivider(
                 thickness = 0.5.dp,
             )

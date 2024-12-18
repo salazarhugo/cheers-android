@@ -15,6 +15,7 @@ import javax.inject.Inject
 
 data class PartiesUiState(
     val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
     val isRefreshing: Boolean = false,
     val errorMessage: String = "",
     val query: String = "",
@@ -94,6 +95,22 @@ class PartiesViewModel @Inject constructor(
     fun onErrorMessageChange(message: String) {
         viewModelState.update {
             it.copy(errorMessage = message)
+        }
+    }
+
+    fun onLoadMore(lastLoadedIndex: Int) {
+        val nextItemIndex = lastLoadedIndex + 1
+        val nextPage = nextItemIndex / 10 + 1
+        viewModelState.update { it.copy(isLoadingMore = true) }
+
+        viewModelScope.launch {
+            listPartyFeedUseCase(page = nextPage)
+                .onFailure {
+                    updateError("Couldn't refresh party feed")
+                }
+                .onSuccess {
+                }
+            viewModelState.update { it.copy(isLoadingMore = false) }
         }
     }
 }

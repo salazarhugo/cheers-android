@@ -10,8 +10,16 @@ class ListPartyFeedUseCase @Inject constructor(
     private val getCurrentCityUseCase: GetCurrentCityFlowUseCase,
     private val partyRepository: PartyRepository,
 ) {
-    suspend operator fun invoke(): Result<List<Party>> {
+    suspend operator fun invoke(
+        page: Int = 1,
+        pageSize: Int = 10,
+    ): Result<List<Party>> {
         val city = getCurrentCityUseCase().firstOrNull().orEmpty()
-        return partyRepository.fetchFeedParty(city, 1, 10)
+
+        return partyRepository.fetchFeedParty(
+            city = city,
+            page = page,
+            pageSize = pageSize,
+        )
     }
 }

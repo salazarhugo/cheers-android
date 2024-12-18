@@ -1,10 +1,10 @@
 package com.salazar.cheers.core.ui.item.party
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -23,11 +23,14 @@ import com.salazar.cheers.shared.data.mapper.toWorkerState
 
 @Composable
 fun PartyList(
-    events: List<Party>,
-    onPartyClicked: (String) -> Unit,
+    isLoading: Boolean,
+    isLoadingMore: Boolean,
+    parties: List<Party>?,
+    onPartyClick: (String) -> Unit,
     onMoreClick: (String) -> Unit,
     onChangeCityClick: () -> Unit,
     onCreatePartyClick: () -> Unit,
+    onLoadMore: (Int) -> Unit,
 ) {
     val context = LocalContext.current
     val workName = Constants.PARTY_UNIQUE_WORKER_NAME
@@ -47,21 +50,64 @@ fun PartyList(
                 onCancelClick = { workManager.cancelUniqueWork(workName) }
             )
         }
+
         createParty(
             onClick = onCreatePartyClick,
         )
+
         emptyParties(
-            isEmpty = events.isEmpty(),
+            isEmpty = parties?.isEmpty() == true,
             onChangeCityClick = onChangeCityClick,
         )
 
+        if (parties != null) {
+            parties(
+                isLoading = isLoading,
+                parties = parties,
+                onPartyClick = onPartyClick,
+                onMoreClick = onMoreClick,
+                onLoadMore = onLoadMore,
+            )
+            if (isLoadingMore) {
+                item("LoadingMoreIndicator") {
+                    PlpLoadingIndicatorComponent(
+                        modifier = Modifier
+                            .animateItem()
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun LazyListScope.parties(
+    isLoading: Boolean,
+    parties: List<Party>,
+    onPartyClick: (String) -> Unit,
+    onMoreClick: (String) -> Unit,
+    onLoadMore: (Int) -> Unit,
+) {
+    if (isLoading) {
+        item {
+            PartyItemListLoading(
+                modifier = Modifier.animateItem(),
+            )
+        }
+    } else {
         items(
-            items = events,
-            key = { it.id },
-        ) { event ->
+            count = parties.size,
+        ) { index ->
+            val party = parties[index]
+
+            if (index >= parties.size - 1) {
+                onLoadMore(index)
+            }
             PartyItem(
-                party = event,
-                onClick = onPartyClicked,
+                party = party,
+                modifier = Modifier.animateItem(),
+                onClick = onPartyClick,
                 onMoreClick = onMoreClick,
             )
         }
@@ -81,12 +127,14 @@ fun LazyListScope.uploadingSection(
     }
 }
 
-fun LazyListScope.createParty(
+private fun LazyListScope.createParty(
     onClick: () -> Unit,
 ) {
     item {
         Button(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier
+                .animateItem()
+                .padding(horizontal = 16.dp),
             onClick = onClick,
             shape = RoundedCornerShape(8.dp),
         ) {
@@ -95,7 +143,7 @@ fun LazyListScope.createParty(
     }
 }
 
-fun LazyListScope.emptyParties(
+private fun LazyListScope.emptyParties(
     isEmpty: Boolean,
     onChangeCityClick: () -> Unit,
 ) {
