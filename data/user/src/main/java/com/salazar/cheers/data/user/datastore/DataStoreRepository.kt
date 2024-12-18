@@ -53,6 +53,10 @@ class DataStoreRepository @Inject constructor(
         return userPreferencesFlow.map { it.passcode }
     }
 
+    fun getPasscodeEnabled(): Flow<Boolean> {
+        return userPreferencesFlow.map { it.passcodeEnabled }
+    }
+
     fun getUsername(): Flow<String> {
         return userPreferencesFlow.map { it.username }
     }
@@ -83,8 +87,10 @@ class DataStoreRepository @Inject constructor(
 
     suspend fun updatePasscode(passcode: String) {
         settingsStore.updateData { currentPreferences ->
-            currentPreferences.toBuilder().setPasscode(passcode).build()
-            currentPreferences.toBuilder().setPasscodeEnabled(passcode.isNotBlank()).build()
+            currentPreferences.toBuilder()
+                .setPasscode(passcode)
+                .setPasscodeEnabled(passcode.isNotBlank())
+                .build()
         }
     }
 

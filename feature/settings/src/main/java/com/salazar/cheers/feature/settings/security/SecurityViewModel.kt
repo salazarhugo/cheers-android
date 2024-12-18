@@ -45,15 +45,18 @@ class SecurityViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dataStoreRepository.getPasscode().collect { passcode ->
-                viewModelState.update {
-                    it.copy(passcodeEnabled = passcode.isNotBlank())
-                }
-            }
+            dataStoreRepository.getPasscodeEnabled()
+                .collect(::updatePasscodeEnabled)
         }
         viewModelScope.launch {
             val passkeys = listPasskeysUseCase().getOrNull() ?: return@launch
             updatePasskeys(passkeys)
+        }
+    }
+
+    private fun updatePasscodeEnabled(passcodeEnabled: Boolean) {
+        viewModelState.update {
+            it.copy(passcodeEnabled = passcodeEnabled)
         }
     }
 

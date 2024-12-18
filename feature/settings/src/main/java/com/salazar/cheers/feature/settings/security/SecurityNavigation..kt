@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.settings.security
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -32,6 +33,18 @@ fun NavGraphBuilder.securityScreen(
         deepLinks = listOf(
             navDeepLink<SecurityScreen>(basePath = DEEP_LINK_URI_PATTERN)
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) {
         SecurityRoute(
             navigateBack = navigateBack,

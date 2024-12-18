@@ -1,5 +1,6 @@
 package com.softimpact.feature.passcode.settings
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -23,6 +24,18 @@ fun NavGraphBuilder.passcodeSettingsScreen(
         deepLinks = listOf(
             navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) {
         PasscodeSettingRoute(
             navigateBack = navigateBack,

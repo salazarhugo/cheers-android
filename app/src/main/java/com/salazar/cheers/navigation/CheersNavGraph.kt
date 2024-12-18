@@ -28,6 +28,7 @@ import com.salazar.cheers.ui.CheersAppState
 import com.salazar.cheers.ui.compose.bottombar.CheersBottomBar
 import com.salazar.cheers.ui.main.camera.CameraScreen
 import com.salazar.cheers.ui.main.party.create.CreatePartyGraph
+import com.softimpact.feature.passcode.passcode.Passcode
 
 @Composable
 fun CheersNavGraph(
@@ -60,6 +61,7 @@ fun CheersNavGraph(
         CreateNoteScreen,
         PartyDetailScreen(""),
         ChatInfoScreen(""),
+        Passcode,
     )
 
     val hide = currentDestination?.hierarchy?.any { destination ->

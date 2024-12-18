@@ -2,6 +2,7 @@ package com.salazar.cheers.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.salazar.cheers.core.ui.ui.MainDestinations
@@ -16,6 +17,7 @@ import com.salazar.cheers.feature.settings.notifications.NotificationsRoute
 import com.salazar.cheers.feature.settings.password.createPasswordScreen
 import com.salazar.cheers.feature.settings.recharge.navigateToRecharge
 import com.salazar.cheers.feature.settings.recharge.rechargeScreen
+import com.salazar.cheers.feature.settings.security.SecurityScreen
 import com.salazar.cheers.feature.settings.security.navigateToSecurity
 import com.salazar.cheers.feature.settings.security.passkeys.navigateToPasskeys
 import com.salazar.cheers.feature.settings.security.passkeys.passkeysScreen
@@ -67,7 +69,12 @@ fun NavGraphBuilder.settingsNavGraph(
 
         createPasscodeScreen(
             navigateBack = navController::popBackStack,
-            navigateToPasscodeSettings = navController::navigateToPasscodeSettings,
+            navigateToPasscodeSettings = {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(SecurityScreen, inclusive = false)
+                    .build()
+                navController.navigateToPasscodeSettings(navOptions =navOptions)
+            },
         )
 
         passcodeSettingsScreen(
