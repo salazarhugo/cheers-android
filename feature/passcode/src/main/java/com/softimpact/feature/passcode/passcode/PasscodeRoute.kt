@@ -7,12 +7,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.shared.util.getActivity
-import com.softimpact.feature.passcode.BiometricPromptUtils
+import com.salazar.cheers.shared.util.LocalActivity
 import com.softimpact.feature.passcode.util.gradientBackground
 
 
@@ -24,19 +21,29 @@ fun PasscodeRoute(
 ) {
     val uiState by pinLockViewModel.uiState.collectAsStateWithLifecycle()
     val biometricEnabled = uiState.biometricEnabled
-    val context = LocalContext.current
-
+    val activity = LocalActivity.current
+//    val promptManager by lazy {
+//        BiometricPromptManager(activity as AppCompatActivity)
+//    }
+//    val biometricResult by promptManager.promptResults.collectAsState(
+//        initial = null
+//    )
+//    LaunchedEffect(biometricResult) {
+//        if (biometricResult is BiometricPromptManager.BiometricResult.AuthenticationSuccess) {
+//            navigateToHome()
+//        }
+//    }
     fun promptBiometric() {
-        val activity = context.getActivity() ?: return
-        val biometricPrompt = BiometricPromptUtils.createBiometricPrompt(activity) {
-            navigateToHome()
-        }
-        val promptInfo = BiometricPromptUtils.createPromptInfo(activity)
-        biometricPrompt.authenticate(promptInfo)
+//        promptManager.showBiometricPrompt(
+//            title = "Sample prompt",
+//            description = "Sample prompt description"
+//        )
     }
 
-    LaunchedEffect(biometricEnabled) {
-        if (biometricEnabled) promptBiometric()
+    if (biometricEnabled) {
+        LaunchedEffect(Unit) {
+            promptBiometric()
+        }
     }
 
     val angle by animateFloatAsState(

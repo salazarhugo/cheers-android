@@ -1,5 +1,8 @@
 package com.salazar.cheers.data.map
 
+import com.salazar.cheers.core.model.cheersUserItem
+import java.util.UUID
+
 data class UserLocation(
     val id: String,
     val picture: String,
@@ -11,3 +14,22 @@ data class UserLocation(
     val lastUpdated: Long,
     val locationName: String,
 )
+
+val emptyUserLocation = UserLocation(
+    id = "",
+    username = "",
+    name = "",
+    verified = false,
+    picture = "",
+    longitude = 0.0,
+    latitude = 0.0,
+    locationName = "",
+    lastUpdated = 0L,
+)
+
+
+val cheersUserLocation = cheersUserItem.toUserLocation()
+
+val cheersUserLocationList = List(20) {
+    cheersUserLocation.copy(id = UUID.randomUUID().toString())
+}

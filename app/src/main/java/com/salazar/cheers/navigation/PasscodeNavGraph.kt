@@ -2,6 +2,7 @@ package com.salazar.cheers.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import com.salazar.cheers.R
 import com.salazar.cheers.feature.home.home.navigateToHome
@@ -20,7 +21,12 @@ fun NavGraphBuilder.passcodeNavGraph(
     ) {
         passcodeScreen(
             banner = R.drawable.ic_splash,
-            navigateToHome = navController::navigateToHome,
+            navigateToHome = {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(route = PasscodeNavGraph, inclusive = true)
+                    .build()
+                navController.navigateToHome(navOptions = navOptions)
+            },
         )
     }
 }

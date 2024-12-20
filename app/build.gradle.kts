@@ -22,8 +22,8 @@ android {
         applicationId = "com.salazar.cheers"
         minSdk = 31
         targetSdk = 35
-        versionCode = 76
-        versionName = "1.0.0-076"
+        versionCode = 77
+        versionName = "1.0.0-077"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
     }

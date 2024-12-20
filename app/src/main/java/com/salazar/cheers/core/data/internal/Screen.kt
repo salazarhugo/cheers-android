@@ -16,7 +16,7 @@ import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.salazar.cheers.R
-import com.salazar.cheers.feature.map.navigation.mapNavigationRoute
+import com.salazar.cheers.feature.map.navigation.MapScreen
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
 
 sealed class Screen(
@@ -68,7 +68,7 @@ sealed class Screen(
     )
 
     data object Map : Screen(
-        route = mapNavigationRoute,
+        route = MapScreen,
         icon = Icons.Outlined.Map,
         selectedIcon = Icons.Filled.Map,
         label = R.string.map,

@@ -4,14 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.Settings
 import com.salazar.cheers.core.Post
+import com.salazar.cheers.data.map.UserLocation
 import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import com.salazar.cheers.domain.get_account.GetAccountUseCase
+import com.salazar.cheers.domain.get_last_known_location.GetLastKnownLocationUseCase
+import com.salazar.cheers.domain.get_location_name.GetLocationNameUseCase
 import com.salazar.cheers.domain.get_location_updates.GetLocationUpdatesUseCase
 import com.salazar.cheers.domain.list_map_post.ListMapPostUseCase
 import com.salazar.cheers.feature.map.domain.usecase.update_location.UpdateLocationUseCase
+import com.salazar.cheers.shared.util.result.getOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -27,8 +32,8 @@ sealed class MapAnnotation {
     ) : MapAnnotation()
 
     data class UserAnnotation(
-        val user: com.salazar.cheers.data.map.UserLocation
-    ): MapAnnotation()
+        val user: UserLocation,
+    ) : MapAnnotation()
 }
 
 @HiltViewModel
@@ -39,6 +44,8 @@ class MapViewModel @Inject constructor(
     private val locationUpdatesUseCase: GetLocationUpdatesUseCase,
     private val accountUseCase: GetAccountUseCase,
     private val listMapPostUseCase: ListMapPostUseCase,
+    private val getLocationsUseCase: GetLocationNameUseCase,
+    private val getLastKnownLocationUseCase: GetLastKnownLocationUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(MapViewModelState(isLoading = true))
@@ -56,15 +63,28 @@ class MapViewModel @Inject constructor(
         updateLocation()
         listenPosts()
         refreshFriendsLocation()
+//        viewModelScope.launch {
+//            getCurrentCityFlowUseCase().collect(::updateCity)
+//        }
         viewModelScope.launch {
             dataStoreRepository.userPreferencesFlow.collect(::updateSettings)
+        }
+        viewModelScope.launch {
+            val location = getLastKnownLocationUseCase() ?: return@launch
+            val result = getLocationsUseCase(location.longitude, location.latitude).getOrNull()
+            viewModelState.update {
+                it.copy(city = result?.firstOrNull().orEmpty())
+            }
         }
     }
 
     private fun updateSettings(settings: Settings) {
         val ghostMode = settings.ghostMode
         viewModelState.update {
-            it.copy(ghostMode = ghostMode)
+            it.copy(
+                ghostMode = ghostMode,
+                isDarkMode = settings.theme,
+            )
         }
         refreshFriendsLocation()
     }
@@ -72,22 +92,23 @@ class MapViewModel @Inject constructor(
     private fun initUserLocation() {
         viewModelScope.launch {
             val account = accountUseCase().firstOrNull() ?: return@launch
-            locationUpdatesUseCase(interval = 2000).collect { location ->
-                val userLocation = com.salazar.cheers.data.map.UserLocation(
-                    id = "",
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    name = account.name,
-                    locationName = "",
-                    lastUpdated = Date().time / 1000,
-                    username = account.username,
-                    picture = account.picture,
-                    verified = false,
-                )
-                viewModelState.update {
-                    it.copy(userLocation = userLocation)
+            locationUpdatesUseCase(interval = 2000)
+                .collectLatest { location ->
+                    val userLocation = UserLocation(
+                        id = account.id,
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        name = account.name,
+                        username = account.username,
+                        locationName = "",
+                        lastUpdated = Date().time / 1000,
+                        picture = account.picture,
+                        verified = account.verified,
+                    )
+                    viewModelState.update {
+                        it.copy(userLocation = userLocation)
+                    }
                 }
-            }
         }
     }
 
@@ -122,7 +143,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateUserLocation(userLocation: List<com.salazar.cheers.data.map.UserLocation>) {
+    private fun updateUserLocation(userLocation: List<UserLocation>) {
         viewModelState.update {
             it.copy(users = userLocation)
         }
@@ -140,7 +161,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun onUserViewAnnotationClick(userLocation: com.salazar.cheers.data.map.UserLocation) {
+    fun onUserViewAnnotationClick(userLocation: UserLocation) {
         viewModelState.update {
             it.copy(selected = MapAnnotation.UserAnnotation(userLocation))
         }

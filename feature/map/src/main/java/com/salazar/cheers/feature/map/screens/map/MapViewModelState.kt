@@ -1,6 +1,7 @@
 package com.salazar.cheers.feature.map.screens.map
 
 import com.mapbox.geojson.FeatureCollection
+import com.salazar.cheers.Theme
 import com.salazar.cheers.core.Post
 
 data class MapViewModelState(
@@ -15,6 +16,7 @@ data class MapViewModelState(
     val searchInput: String = "",
     val userLocation: com.salazar.cheers.data.map.UserLocation? = null,
     val ghostMode: Boolean = false,
+    val isDarkMode: Theme = Theme.UNRECOGNIZED,
 ) {
     fun toUiState(): MapUiState {
          return if (userLocation != null) {
@@ -30,6 +32,7 @@ data class MapViewModelState(
                 searchInput = searchInput,
                 userLocation = userLocation,
                 ghostMode = ghostMode,
+                theme = isDarkMode,
             )
         } else {
             MapUiState.NotInitialized(isLoading = false)

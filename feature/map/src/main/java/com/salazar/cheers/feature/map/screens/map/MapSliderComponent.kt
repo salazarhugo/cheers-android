@@ -3,13 +3,11 @@ package com.salazar.cheers.feature.map.screens.map
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -23,7 +21,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.feature.map.BuildConfig
 import kotlin.math.abs
 
 @Composable
@@ -33,18 +30,6 @@ fun MapSliderComponent(
     onValueChange: (Double) -> Unit = {},
 ) {
     var initialZoom by remember { mutableDoubleStateOf(INITIAL_ZOOM) }
-
-    if (BuildConfig.DEBUG) {
-        Column {
-            Text(
-                text = zoom.toString(),
-            )
-            Text(
-                text = initialZoom.toString(),
-            )
-        }
-    }
-
 
     Box(
         modifier = modifier
@@ -72,7 +57,7 @@ fun MapSliderComponent(
     ) {
         Box(
             modifier = modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.1f))
                 .clip(CircleShape)
                 .width(4.dp)
                 .fillMaxHeight()

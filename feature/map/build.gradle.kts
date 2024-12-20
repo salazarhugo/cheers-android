@@ -13,6 +13,7 @@ android {
 }
 
 dependencies {
+    api(projects.domain)
     implementation(projects.data.user)
     implementation(projects.data.post)
     implementation(projects.data.map)

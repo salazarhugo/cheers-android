@@ -23,7 +23,7 @@ class GetCurrentCityFlowUseCase @Inject constructor(
             dataStoreRepository.getLocationEnabled()
                 .flatMapConcat { shouldUsePhoneLocation ->
                     if (!shouldUsePhoneLocation) {
-                        return@flatMapConcat dataStoreRepository.getCity()
+                        return@flatMapConcat dataStoreRepository.getCityFlow()
                     }
 
                     val location = getLastKnownLocationUseCase() ?: return@flatMapConcat flowOf("")

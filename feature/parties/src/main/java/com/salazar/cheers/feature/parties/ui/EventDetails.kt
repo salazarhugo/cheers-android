@@ -67,7 +67,7 @@ fun PartyDetails(
 }
 
 @Composable
-private fun PartyDetailsLoading(
+fun PartyDetailsLoading(
     modifier: Modifier
 ) {
     Column(

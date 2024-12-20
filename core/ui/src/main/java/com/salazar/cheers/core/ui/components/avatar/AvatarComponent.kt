@@ -1,7 +1,6 @@
 package com.salazar.cheers.core.ui.components.avatar
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +22,7 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.R
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.image.InspectionAwareComponent
+import com.salazar.cheers.core.ui.modifier.clickableNullable
 
 @Composable
 fun AvatarComponent(
@@ -32,7 +32,7 @@ fun AvatarComponent(
     size: Dp = 54.dp,
     placeHolder: Int = R.drawable.default_profile_picture,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
 ) {
     val painter = ImageRequest.Builder(LocalContext.current)
         .data(avatar)
@@ -45,7 +45,7 @@ fun AvatarComponent(
     val modifier = modifier
         .size(size)
         .clip(shape)
-        .clickable { onClick() }
+        .clickableNullable(onClick)
         .background(backgroundColor)
 
     InspectionAwareComponent(

@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface SearchRepository {
     suspend fun search(
         query: String,
+        page: Int,
+        pageSize: Int,
     ): Result<SearchResult, DataError>
 
     suspend fun getRecentSearch(): Flow<List<RecentSearch>>

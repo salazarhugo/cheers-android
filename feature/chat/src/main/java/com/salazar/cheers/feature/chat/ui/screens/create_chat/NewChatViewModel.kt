@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.addOrRemove
-import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
 import com.salazar.cheers.data.chat.repository.ChatRepository
+import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
 import com.salazar.cheers.shared.util.Resource
 import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -82,6 +82,7 @@ class NewChatViewModel @Inject constructor(
                     onErrorMessageChange(result.error.name)
                 }
                 is Result.Success -> {
+                    onSuccess(result.data.id)
                 }
             }
             updateIsLoading(false)

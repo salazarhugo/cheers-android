@@ -17,7 +17,13 @@ class SearchUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         query: String,
+        page: Int,
+        pageSize: Int,
     ): Flow<Result<SearchResult, DataError>> = withContext(ioDispatcher) {
-        return@withContext flowOf(searchRepository.search(query = query))
+        return@withContext flowOf(searchRepository.search(
+            query = query,
+            page = page,
+            pageSize = pageSize,
+        ))
     }
 }

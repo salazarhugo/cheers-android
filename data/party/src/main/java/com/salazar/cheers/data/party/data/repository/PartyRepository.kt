@@ -24,6 +24,7 @@ interface PartyRepository {
      * Get party feed from local database.
      */
     suspend fun feedParty(
+        city: String,
         page: Int,
         pageSize: Int,
     ): Flow<List<Party>>

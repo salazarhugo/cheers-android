@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.theme.GreenGoogle
+import com.salazar.cheers.core.util.isJustNow
 import java.util.Date
 
 @Composable
@@ -36,9 +37,12 @@ internal fun UserAnnotationText(
         val timestamp =
             com.salazar.cheers.core.util.relativeTimeFormatter(seconds = lastUpdated).text
 
-        withStyle(style = MaterialTheme.typography.labelSmall.toSpanStyle().copy(fontWeight = FontWeight.Bold)) {
+        withStyle(
+            style = MaterialTheme.typography.labelSmall.toSpanStyle()
+                .copy(fontWeight = FontWeight.Bold)
+        ) {
             append(" ")
-            if (((Date().time / 1000) - lastUpdated) < 2 ) {
+            if (isJustNow(lastUpdated * 1000)) {
                 withStyle(style = SpanStyle(color = GreenGoogle)) {
                     append("now")
                 }

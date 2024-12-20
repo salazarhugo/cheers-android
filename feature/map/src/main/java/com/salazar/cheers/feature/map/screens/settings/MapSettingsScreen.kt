@@ -1,8 +1,8 @@
 package com.salazar.cheers.feature.map.screens.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
@@ -18,7 +18,7 @@ fun MapSettingsScreen(
     onMapSettingsUIAction: (MapSettingsUIAction) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.navigationBarsPadding(),
+        modifier = Modifier,
         topBar = {
             Toolbar(
                 onBackPressed = { onMapSettingsUIAction(MapSettingsUIAction.OnBackPressed) },
@@ -27,7 +27,9 @@ fun MapSettingsScreen(
         },
     ) {
         Column(
-            modifier = Modifier.padding(top = it.calculateTopPadding()),
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
         ) {
             MapSettingsList(
                 uiState = uiState,

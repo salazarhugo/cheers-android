@@ -26,9 +26,11 @@ interface PartyDao{
     @Query("""
         SELECT * FROM events 
         WHERE endDate > :now
+        AND LOWER(city) = LOWER(:city)  
         ORDER BY events.startDate ASC
         """)
     fun feedParty(
+        city: String,
         now: Long = Date().time / 1000,
     ): Flow<List<PartyEntity>>
 

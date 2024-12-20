@@ -37,7 +37,7 @@ class DataStoreRepository @Inject constructor(
         return userPreferencesFlow.map { it.selectedHomeTab }
     }
 
-    fun getCity(): Flow<String> {
+    fun getCityFlow(): Flow<String> {
         return userPreferencesFlow.map { it.city }
     }
 

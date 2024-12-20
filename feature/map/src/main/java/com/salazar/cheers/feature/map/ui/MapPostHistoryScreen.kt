@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
+import com.salazar.cheers.data.map.cheersUserLocation
 import com.salazar.cheers.feature.map.screens.map.AddPostViewAnnotation
 import com.salazar.cheers.feature.map.screens.map.MapUILayer
 import com.salazar.cheers.feature.map.ui.components.MapComponent
@@ -19,11 +20,14 @@ fun MapPostHistoryScreen(
     mapViewportState: MapViewportState,
 ) {
     MapComponent(
+        isDarkMode = false,
         modifier = Modifier.fillMaxSize(),
         mapViewportState = mapViewportState,
         overlay = {
             MapUILayer(
                 isPublic = false,
+                friends = emptyList(),
+                showMyLocationButton = true,
                 modifier = Modifier
                     .systemBarsPadding()
                     .fillMaxSize()
@@ -31,6 +35,8 @@ fun MapPostHistoryScreen(
                 onMapUIAction = {},
                 onZoomTo = {},
                 zoom = 15.0,
+                city = "",
+                userLocation = cheersUserLocation,
             )
         }
     ) {

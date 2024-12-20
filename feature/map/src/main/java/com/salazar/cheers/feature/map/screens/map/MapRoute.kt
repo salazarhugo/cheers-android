@@ -3,8 +3,7 @@
 package com.salazar.cheers.feature.map.screens.map
 
 import android.Manifest
-import android.annotation.SuppressLint
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,23 +13,26 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.Permission
+import com.salazar.cheers.data.map.toUserItem
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import kotlin.math.max
 
-@SuppressLint("MissingPermission")
 @Composable
 fun MapRoute(
     viewModel: MapViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
-    navigateToChatWithUserId: (String) -> Unit,
+    navigateToChatWithUserId: (UserItem) -> Unit,
+    navigateToOtherProfile: (username: String) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
+    val sheetState = rememberStandardBottomSheetState(
+        skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
 
@@ -59,9 +61,14 @@ fun MapRoute(
                     pitch(0.0)
                 }
             }
+            val isMapCenteredOnMe = isMapCenteredOnMe(
+                mapCenter = mapViewportState.cameraState?.center,
+                currentLocation = currentLocation,
+            )
 
             MapScreen(
                 uiState = uiState,
+                isMapCenteredOnMe = isMapCenteredOnMe,
                 sheetState = sheetState,
                 mapViewportState = mapViewportState,
                 onMapUIAction = { action ->
@@ -71,7 +78,8 @@ fun MapRoute(
                         MapUIAction.OnPublicToggle -> viewModel.onTogglePublic()
                         MapUIAction.OnSwipeRefresh -> TODO()
                         MapUIAction.OnSettingsClick -> navigateToMapSettings()
-                        is MapUIAction.OnUserClick -> {}//navigateToOtherProfile(action.userID)
+                        is MapUIAction.OnChatClick -> navigateToChatWithUserId(action.user.toUserItem())
+                        is MapUIAction.OnUserClick -> navigateToOtherProfile(action.userID)
                         is MapUIAction.OnMapReady -> {
                         }
 
@@ -101,7 +109,7 @@ fun MapRoute(
                                 post.latitude,
                             )
 
-                            val zoom = max(14.0, mapViewportState.cameraState.zoom)
+                            val zoom = max(14.0, mapViewportState.cameraState?.zoom ?: INITIAL_ZOOM)
 
                             mapViewportState.flyTo(
                                 cameraOptions = CameraOptions.Builder()
@@ -128,7 +136,7 @@ fun MapRoute(
                                 userLocation.latitude,
                             )
 
-                            val zoom = max(14.0, mapViewportState.cameraState.zoom)
+                            val zoom = max(14.0, mapViewportState.cameraState?.zoom ?: INITIAL_ZOOM)
 
                             mapViewportState.flyTo(
                                 cameraOptions = CameraOptions.Builder()
@@ -142,7 +150,6 @@ fun MapRoute(
                             viewModel.onUserViewAnnotationClick(userLocation = userLocation)
                         }
 
-                        is MapUIAction.OnChatClick -> navigateToChatWithUserId(action.userID)
                         is MapUIAction.OnCommentClick -> {} //navActions.navigateToComments(action.postID)
                         MapUIAction.OnDismissBottomSheet -> viewModel.onDismissBottomSheet()
                     }
@@ -150,4 +157,16 @@ fun MapRoute(
             )
         }
     }
+}
+
+fun isMapCenteredOnMe(mapCenter: Point?, currentLocation: Point): Boolean {
+    if (mapCenter == null) return false
+
+    val currentCenter = Point.fromLngLat(currentLocation.longitude(), currentLocation.latitude())
+
+    // Calculate a reasonable tolerance for rounding errors and user location drift
+    val tolerance = 0.0001 // Adjust based on your desired accuracy (in degrees)
+
+    return (abs(mapCenter.longitude() - currentCenter.longitude()) <= tolerance &&
+            abs(mapCenter.latitude() - currentCenter.latitude()) <= tolerance)
 }

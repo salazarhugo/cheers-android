@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/pagination;pagination";
+
+message PaginationRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  int32 page = 3;
+}
+
+message PaginationResponse {
+  string next_page_token = 1;
+}

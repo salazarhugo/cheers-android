@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.core.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.modifier.clickableNullable
 
 
 @Composable
@@ -24,12 +24,10 @@ fun Username(
     verified: Boolean = false,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     color: Color = Color.Unspecified,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
 ) {
     Row(
-        modifier = modifier.noRippleClickable {
-            onClick()
-        },
+        modifier = modifier.clickableNullable(onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

@@ -2,6 +2,7 @@ package com.salazar.cheers.data.search
 
 import cheers.search.v1.SearchRequest
 import cheers.search.v1.SearchServiceGrpcKt
+import cheers.type.Pagination
 import com.salazar.cheers.core.db.dao.CheersDao
 import com.salazar.cheers.core.db.model.asEntity
 import com.salazar.cheers.core.db.model.asExternalModel
@@ -23,9 +24,17 @@ class SearchRepositoryImpl @Inject constructor(
 ) : SearchRepository {
     override suspend fun search(
         query: String,
+        page: Int,
+        pageSize: Int,
     ): Result<SearchResult, DataError> {
+        val pagination = Pagination.PaginationRequest.newBuilder()
+            .setPage(page)
+            .setPageSize(pageSize)
+            .build()
+
         val request = SearchRequest.newBuilder()
             .setQuery(query)
+            .setPagination(pagination)
             .build()
 
         return try {

@@ -43,7 +43,7 @@ class SelectCityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            dataStoreRepository.getCity()
+            dataStoreRepository.getCityFlow()
                 .collect(::updateCity)
         }
         val cities = listOf(parisCity, londonCity)

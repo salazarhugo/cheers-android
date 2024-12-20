@@ -21,6 +21,12 @@ fun relativeTimeFormatterMilli(
     )
 }
 
+const val JUST_NOW_MILLIS = 2 * 1000L
+
+fun isJustNow(timeMillis: Long): Boolean {
+    return (Date().time - timeMillis) < JUST_NOW_MILLIS
+}
+
 @Composable
 fun relativeTimeFormatter(
     seconds: Long,
@@ -33,7 +39,7 @@ fun relativeTimeFormatter(
         val elapsedMinutes = elapsedSeconds / 60
 
         val res = when {
-            elapsedSeconds < 2 -> "just now"
+            elapsedSeconds < (JUST_NOW_MILLIS / 1000) -> "just now"
             elapsedSeconds <= 60 -> "$elapsedSeconds s"
             elapsedSeconds <= 60 * 60 -> "${elapsedMinutes}m"
             elapsedSeconds <= 60 * 60 * 24 -> "${elapsedSeconds / (60 * 60)}h"

@@ -78,10 +78,13 @@ class PartyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun feedParty(
+        city: String,
         page: Int,
         pageSize: Int
     ): Flow<List<Party>> {
-        return partyDao.feedParty().map { it.asExternalModel() }
+        return partyDao.feedParty(
+            city = city,
+        ).map { it.asExternalModel() }
     }
 
     override suspend fun fetchFeedParty(
@@ -95,7 +98,6 @@ class PartyRepositoryImpl @Inject constructor(
             .setCity(city)
             .build()
 
-        println(request)
         return try {
             val response = service.feedParty(request)
             val parties = response.itemsList.map {

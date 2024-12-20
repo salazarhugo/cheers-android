@@ -31,7 +31,7 @@ fun PartyHeader(
     onAnswersClick: () -> Unit,
 ) {
     val activity = LocalActivity.current
-    val gmmIntentUri = Uri.parse("geo:${party.longitude},${party.latitude}?q=${party.address}")
+    val gmmIntentUri = Uri.parse("geo:0,0?q=${party.latitude},${party.longitude}(${party.name})")
     val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
 
     PartyBannerComponent(

@@ -1,5 +1,7 @@
 package com.salazar.cheers.feature.map.ui.dialogs
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +16,6 @@ import androidx.compose.material.icons.filled.ShareLocation
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,32 +28,52 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.theme.GreenGoogle
+import com.salazar.cheers.core.ui.ui.Username
+import com.salazar.cheers.core.util.isJustNow
+import com.salazar.cheers.data.map.UserLocation
+import com.salazar.cheers.shared.util.LocalActivity
 
 
 @Composable
 fun UserMapDialog(
-    userLocation: com.salazar.cheers.data.map.UserLocation?,
+    userLocation: UserLocation?,
     modifier: Modifier = Modifier,
     onClose: () -> Unit = {},
-    onChatClick: (String) -> Unit = {},
+    onChatClick: (UserLocation) -> Unit = {},
+    onUserClick: (String) -> Unit,
 ) {
     if (userLocation == null)
         return
+
+    val gmmIntentUri =
+        Uri.parse("geo:0,0?q=${userLocation.latitude},${userLocation.longitude}(${userLocation.name.ifBlank { userLocation.username }})")
+    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+    val activity = LocalActivity.current
 
     UserLocationItem(
         modifier = modifier,
         userLocation = userLocation,
         onClose = onClose,
-        onChatClick = onChatClick,
+        onChatClick = {
+            onChatClick(userLocation)
+        },
+        onDirectionsClick = {
+            activity.startActivity(mapIntent)
+        },
+        onUserClick = {
+            onUserClick(userLocation.username)
+        }
     )
 }
 
 @Composable
 fun UserLocationItem(
     modifier: Modifier = Modifier,
-    userLocation: com.salazar.cheers.data.map.UserLocation,
+    userLocation: UserLocation,
     onClose: () -> Unit,
     onChatClick: (String) -> Unit,
+    onDirectionsClick: () -> Unit,
+    onUserClick: () -> Unit,
 ) {
     Column {
         Row(
@@ -66,24 +87,25 @@ fun UserLocationItem(
                 AvatarComponent(
                     avatar = userLocation.picture,
                     size = 64.dp,
+                    onClick = onUserClick,
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    if (userLocation.name.isNotBlank())
-                        Text(
-                            text = userLocation.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
+                    Username(
+                        username = userLocation.name.ifBlank { userLocation.username },
+                        verified = userLocation.verified,
+                        onClick = onUserClick,
+                    )
                     val annotatedString = buildAnnotatedString {
-                        append(userLocation.locationName)
+                        append("Last active ")
                         val timestamp =
                             com.salazar.cheers.core.util.relativeTimeFormatter(seconds = userLocation.lastUpdated).text
-                        if (timestamp == "just now") {
+                        if (isJustNow(userLocation.lastUpdated * 1000)) {
                             withStyle(style = SpanStyle(color = GreenGoogle)) {
                                 append(timestamp)
                             }
                         } else {
-                            append(timestamp)
+                            append("$timestamp ago")
                         }
                     }
 
@@ -102,21 +124,31 @@ fun UserLocationItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             FilledTonalButton(
+                modifier = Modifier.weight(1f),
                 onClick = { onChatClick(userLocation.id) },
             ) {
-                Icon(Icons.Default.ChatBubble, contentDescription = null)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChatBubble,
+                        contentDescription = "Chat icon",
+                    )
+                    Text(text = "Chat")
+                }
             }
             FilledTonalButton(
-                onClick = {},
+                onClick = onDirectionsClick,
             ) {
-                Icon(Icons.Default.ShareLocation, contentDescription = null)
-//                Text(
-//                    text = stringResource(id = R.string.share_live),
-//                )
+                Icon(
+                    imageVector = Icons.Default.ShareLocation,
+                    contentDescription = "Share icon",
+                )
             }
         }
     }
@@ -127,7 +159,7 @@ fun UserLocationItem(
 private fun UserMapDialogPreview() {
     CheersPreview {
         UserMapDialog(
-            userLocation = com.salazar.cheers.data.map.UserLocation(
+            userLocation = UserLocation(
                 id = "",
                 picture = "",
                 username = "cheers",
@@ -139,6 +171,7 @@ private fun UserMapDialogPreview() {
                 longitude = 0.0,
             ),
             modifier = Modifier,
+            onUserClick = {},
         )
     }
 }

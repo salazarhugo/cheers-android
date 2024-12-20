@@ -6,33 +6,41 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.map.screens.map.MapRoute
+import kotlinx.serialization.Serializable
 
-const val mapNavigationRoute = "map_route"
+@Serializable
+data object MapScreen
+
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/map"
+    "${Constants.DEEPLINK_BASE_URL}/map"
 
 fun NavController.navigateToMap(navOptions: NavOptions? = null) {
-    this.navigate(mapNavigationRoute, navOptions)
+    navigate(
+        route = MapScreen,
+        navOptions = navOptions,
+    )
 }
 
 fun NavGraphBuilder.mapScreen(
     navigateBack: () -> Unit,
     navigateToMapSettings: () -> Unit,
     navigateToCreatePost: () -> Unit,
-    navigateToChatWithUserId: (UserItem) -> Unit,
+    navigateToChat: (UserItem) -> Unit,
+    navigateToOtherProfile: (String) -> Unit,
 ) {
-    composable(
-        route = mapNavigationRoute,
+    composable<MapScreen>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            navDeepLink<MapScreen>(basePath = DEEP_LINK_URI_PATTERN)
         ),
     ) {
         MapRoute(
             navigateBack = navigateBack,
             navigateToCreatePost = navigateToCreatePost,
             navigateToMapSettings = navigateToMapSettings,
-            navigateToChatWithUserId = {},
+            navigateToChatWithUserId = navigateToChat,
+            navigateToOtherProfile = navigateToOtherProfile,
         )
     }
 }

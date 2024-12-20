@@ -78,7 +78,7 @@ class ChatViewModel @Inject constructor(
         } else {
             val user = chatScreen.user!!
             val channel = ChatChannel(
-                name = user.name,
+                name = user.name.ifBlank { user.username },
                 verified = user.verified,
                 picture = user.picture,
                 otherUserId = user.id,
@@ -147,7 +147,10 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            val result = sendMessageUseCase(roomId = channelId, text = text)
+            val result = sendMessageUseCase(
+                roomId = channelId,
+                text = text,
+            )
             when (result) {
                 is Result.Error -> updateErrorMessage(result.error.name)
                 else -> {}

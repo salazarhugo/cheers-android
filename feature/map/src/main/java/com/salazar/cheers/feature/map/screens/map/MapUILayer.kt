@@ -1,5 +1,10 @@
 package com.salazar.cheers.feature.map.screens.map
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,11 +29,18 @@ import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
+import com.salazar.cheers.data.map.UserLocation
+import com.salazar.cheers.data.map.cheersUserLocation
+import com.salazar.cheers.data.map.cheersUserLocationList
 
 @Composable
 fun MapUILayer(
+    city: String,
     zoom: Double,
     isPublic: Boolean,
+    userLocation: UserLocation,
+    friends: List<UserLocation>,
+    showMyLocationButton: Boolean,
     modifier: Modifier = Modifier,
     onMapUIAction: (MapUIAction) -> Unit,
     onZoomTo: (Double) -> Unit,
@@ -38,7 +50,9 @@ fun MapUILayer(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         MapTopBar(
-            modifier = Modifier.fillMaxWidth()
+            city = city,
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             isPublic = isPublic,
             onMapUIAction = onMapUIAction,
@@ -46,11 +60,15 @@ fun MapUILayer(
         MapSliderComponent(
             zoom = zoom,
             modifier = Modifier
+                .weight(1f)
                 .align(Alignment.End)
-                .padding(16.dp),
+                .padding(end = 8.dp),
             onValueChange = onZoomTo,
         )
         MapBottomBar(
+            friends = friends,
+            userLocation = userLocation,
+            showMyLocationButton = showMyLocationButton,
             onMapUIAction = onMapUIAction,
         )
     }
@@ -58,6 +76,7 @@ fun MapUILayer(
 
 @Composable
 fun MapTopBar(
+    city: String,
     isPublic: Boolean,
     modifier: Modifier = Modifier,
     onMapUIAction: (MapUIAction) -> Unit,
@@ -76,8 +95,8 @@ fun MapTopBar(
             onClick = { onMapUIAction(MapUIAction.OnPublicToggle) },
         )
         MapInfoBarComponent(
+            text = city,
             modifier = Modifier.weight(1f),
-            text = "Puiseux-en-France",
         )
         MapButton(
             icon = Icons.Default.Settings,
@@ -88,16 +107,47 @@ fun MapTopBar(
 
 @Composable
 fun MapBottomBar(
+    userLocation: UserLocation,
+    friends: List<UserLocation>,
+    showMyLocationButton: Boolean,
     onMapUIAction: (MapUIAction) -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        MapButton(
-            icon = Icons.Default.NearMe,
-            onClick = { onMapUIAction(MapUIAction.OnMyLocationClick) },
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            AnimatedVisibility(
+                visible = showMyLocationButton,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                MapButton(
+                    icon = Icons.Default.NearMe,
+                    onClick = { onMapUIAction(MapUIAction.OnMyLocationClick) },
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = friends.isNotEmpty(),
+            enter = slideInVertically(
+                initialOffsetY = { it / 2 },
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { it / 2 },
+            ),
+        ) {
+            MapFriendListComponent(
+                userLocation = userLocation,
+                friends = friends,
+                modifier = Modifier.fillMaxWidth(),
+                onUserClick = {
+                    onMapUIAction(MapUIAction.OnUserViewAnnotationClick(it))
+                }
+            )
+        }
     }
 }
 
@@ -124,13 +174,17 @@ fun MapButton(
 @ScreenPreviews
 @Composable
 private fun MapUiLayerPreview() {
-   CheersPreview {
-       MapUILayer(
-           zoom = 13.0,
-           isPublic = true,
-           modifier = Modifier.background(Color.Gray),
-           onMapUIAction = {},
-           onZoomTo = {},
-       )
-   }
+    CheersPreview {
+        MapUILayer(
+            zoom = 13.0,
+            isPublic = true,
+            modifier = Modifier.background(Color.Gray),
+            onMapUIAction = {},
+            onZoomTo = {},
+            showMyLocationButton = true,
+            friends = cheersUserLocationList,
+            city = "Dubai",
+            userLocation = cheersUserLocation,
+        )
+    }
 }

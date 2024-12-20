@@ -1,6 +1,7 @@
 package com.salazar.cheers.feature.map.screens.map
 
 import com.mapbox.geojson.FeatureCollection
+import com.salazar.cheers.Theme
 import com.salazar.cheers.core.Post
 
 sealed interface MapUiState {
@@ -9,6 +10,7 @@ sealed interface MapUiState {
     ): MapUiState
 
     data class Initialized(
+        val theme: Theme,
         val geojson: FeatureCollection?,
         val users: List<com.salazar.cheers.data.map.UserLocation>,
         val posts: List<Post>?,

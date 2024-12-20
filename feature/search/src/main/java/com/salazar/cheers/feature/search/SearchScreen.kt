@@ -58,7 +58,9 @@ import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
+import com.salazar.cheers.core.ui.components.UserItemListLoading
 import com.salazar.cheers.core.ui.item.party.PartyItem
+import com.salazar.cheers.core.ui.item.party.PartyItemListLoading
 import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.util.Utils.conditional
@@ -334,60 +336,68 @@ private fun LazyListScope.searchResult(
     onStoryClick: (String) -> Unit,
     onPartyClick: (String) -> Unit,
 ) {
-    when (searchResultState) {
-        SearchResultState.Loading -> {
-            item {
-                SearchLoadingScreen()
-            }
+    val isLoading = searchResultState is SearchResultState.Loading
+    val searchResult = (searchResultState as? SearchResultState.SearchResults)?.searchResult
+    val users = searchResult?.users
+    val parties = searchResult?.parties
+
+    if (users.isNullOrEmpty() && parties.isNullOrEmpty() && !isLoading) {
+        item {
+            SearchEmptyScreen(
+                query = query,
+            )
+        }
+    }
+
+    when (page) {
+        null -> {
+            parties(
+                isLoading = isLoading,
+                parties = parties,
+                onPartyClick = onPartyClick,
+            )
+            users(
+                isLoading = isLoading,
+                users = users,
+                onStoryClick = onStoryClick,
+                onUserClick = onUserClick,
+            )
         }
 
-        is SearchResultState.SearchResults -> {
-            val users = searchResultState.searchResult.users
-            val parties = searchResultState.searchResult.parties
+        0 -> {
+            parties(
+                isLoading = isLoading,
+                parties = parties,
+                onPartyClick = onPartyClick,
+            )
+        }
 
-            if (users.isEmpty() && parties.isEmpty()) {
-                item {
-                    SearchEmptyScreen(
-                        query = query,
-                    )
-                }
-            }
-
-            when (page) {
-                null -> {
-                    parties(
-                        parties = parties,
-                        onPartyClick = onPartyClick,
-                    )
-                    users(
-                        users = users,
-                        onStoryClick = onStoryClick,
-                        onUserClick = onUserClick,
-                    )
-                }
-                0 -> {
-                    parties(
-                        parties = parties,
-                        onPartyClick = onPartyClick,
-                    )
-                }
-                1 -> {
-                    users(
-                        users = users,
-                        onStoryClick = onStoryClick,
-                        onUserClick = onUserClick,
-                    )
-                }
-            }
+        1 -> {
+            users(
+                isLoading = isLoading,
+                users = users,
+                onStoryClick = onStoryClick,
+                onUserClick = onUserClick,
+            )
         }
     }
 }
 
 private fun LazyListScope.users(
-    users: List<UserItem>,
+    isLoading: Boolean,
+    users: List<UserItem>?,
     onUserClick: (UserItem) -> Unit,
     onStoryClick: (String) -> Unit,
 ) {
+    if (isLoading) {
+        item {
+            UserItemListLoading()
+        }
+        return
+    }
+
+    if (users.isNullOrEmpty()) return
+
     items(
         items = users,
         key = { it.id },
@@ -407,10 +417,18 @@ private fun LazyListScope.users(
 }
 
 private fun LazyListScope.parties(
-    parties: List<Party>,
+    isLoading: Boolean,
+    parties: List<Party>?,
     onPartyClick: (String) -> Unit,
 ) {
-    if (parties.isEmpty()) return
+    if (isLoading) {
+        item {
+            PartyItemListLoading()
+        }
+        return
+    }
+
+    if (parties.isNullOrEmpty()) return
 
     items(
         count = parties.size,

@@ -78,7 +78,11 @@ class SearchViewModel @Inject constructor(
     ) {
         updateSearchResultState(SearchResultState.Loading)
         viewModelScope.launch {
-            searchUseCases.searchUseCase(query)
+            searchUseCases.searchUseCase(
+                query = query,
+                page = 1,
+                pageSize = 10,
+            )
                 .collect { result ->
                     when (result) {
                         is Result.Error -> Unit

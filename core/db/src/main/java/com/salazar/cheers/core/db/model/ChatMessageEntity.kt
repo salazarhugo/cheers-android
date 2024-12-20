@@ -40,6 +40,10 @@ fun ChatMessageEntity.asExternalModel() = ChatMessage(
     isSender = isSender,
     hasLiked = hasLiked,
     senderProfilePictureUrl = senderProfilePictureUrl,
+    status = status,
+    type = type,
+    seenBy = seenBy,
+    likedBy = likedBy,
 )
 
 fun ChatMessage.asEntity(): ChatMessageEntity =
@@ -55,6 +59,10 @@ fun ChatMessage.asEntity(): ChatMessageEntity =
         isSender = isSender,
         hasLiked = hasLiked,
         senderProfilePictureUrl = senderProfilePictureUrl,
+        status = status,
+        type = type,
+        seenBy = seenBy,
+        likedBy = likedBy,
     )
 
 fun List<ChatMessageEntity>.asExternalModel() = this.map { it.asExternalModel() }

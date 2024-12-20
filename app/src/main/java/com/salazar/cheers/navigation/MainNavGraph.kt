@@ -11,6 +11,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -28,6 +29,7 @@ import com.salazar.cheers.feature.chat.ui.chats.ChatsSheetViewModel
 import com.salazar.cheers.feature.chat.ui.screens.chat.chatScreen
 import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithChannelId
 import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithUserItem
+import com.salazar.cheers.feature.chat.ui.screens.create_chat.CreateChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.createChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.navigateToCreateChat
 import com.salazar.cheers.feature.chat.ui.screens.messages.messagesScreen
@@ -265,7 +267,8 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
             navigateToMapSettings = navController::navigateToMapSettings,
             navigateToCreatePost = {},
-            navigateToChatWithUserId = navController::navigateToChatWithUserItem,
+            navigateToChat = navController::navigateToChatWithUserItem,
+            navigateToOtherProfile = navController::navigateToOtherProfile,
         )
 
         mapPostHistoryScreen(
@@ -277,7 +280,6 @@ fun NavGraphBuilder.mainNavGraph(
         mapSettingsScreen(
             navigateBack = navController::popBackStack,
         )
-
 
         bottomSheet("${MainDestinations.CHAT_CAMERA_ROUTE}/{roomId}") {
             ChatCameraRoute(
@@ -444,7 +446,12 @@ fun NavGraphBuilder.mainNavGraph(
 
         createChatScreen(
             navigateBack = navController::popBackStack,
-            navigateToChatWithChannelId = navController::navigateToChatWithChannelId,
+            navigateToChatWithChannelId = { chatID ->
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(route = CreateChatScreen, inclusive = true)
+                    .build()
+                navController.navigateToChatWithChannelId(chatID, navOptions)
+            },
         )
 
         chatScreen(
