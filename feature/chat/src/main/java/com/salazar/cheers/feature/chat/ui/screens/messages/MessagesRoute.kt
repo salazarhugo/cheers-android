@@ -39,6 +39,7 @@ fun MessagesRoute(
                 is RoomsUIAction.OnSearchInputChange -> messagesViewModel.onSearchInputChange(action.query)
                 is RoomsUIAction.OnUserClick -> navigateToOtherProfile(action.userId)
                 is RoomsUIAction.OnRoomClick -> navigateToChatWithChannelId(action.roomId)
+                is RoomsUIAction.OnFilterClick -> messagesViewModel.onFilterClick(action.filter)
                 else -> {}
             }
         }

@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.model.PartyID
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.profile.profile.ProfileRoute
 import kotlinx.serialization.Serializable
@@ -35,6 +36,7 @@ fun NavGraphBuilder.profileScreen(
     navigateToCheerscode: () -> Unit,
     navigateToNfc: () -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToParty: (PartyID) -> Unit,
 ) {
     composable<Profile>(
         deepLinks = listOf(
@@ -54,6 +56,7 @@ fun NavGraphBuilder.profileScreen(
             navigateToCheerscode = navigateToCheerscode,
             navigateToNfc = navigateToNfc,
             navigateToSettings = navigateToSettings,
+            navigateToParty = navigateToParty,
         )
     }
 }

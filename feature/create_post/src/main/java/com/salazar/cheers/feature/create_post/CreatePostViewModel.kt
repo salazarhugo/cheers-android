@@ -279,7 +279,7 @@ class CreatePostViewModel @Inject constructor(
 
         viewModelScope.launch {
             createPostUseCases.createPostUseCase(
-                "PHOTOS" to uiState.medias.filterIsInstance(Media.Image::class.java).map { it.uri.toString() }.toTypedArray(),
+                "PHOTOS" to uiState.medias.filterIsInstance<Media.Image>().map { it.uri.toString() }.toTypedArray(),
                 "AUDIO_URI" to localAudio?.uri.toString(),
                 "AUDIO_AMPLITUDES" to localAudio?.amplitudes?.toTypedArray(),
                 "POST_TYPE" to uiState.postType,

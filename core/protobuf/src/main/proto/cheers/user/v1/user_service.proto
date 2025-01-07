@@ -21,6 +21,12 @@ service UserService {
 
   rpc GetUserNode (GetUserNodeRequest) returns (GetUserNodeResponse);
 
+  rpc GetUserMe (GetUserMeRequest) returns (GetUserMeResponse) {
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  };
+
   rpc GetUser (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
       get: "/v1/users/{user_id}"
@@ -55,6 +61,7 @@ service UserService {
   rpc UnfollowUser (UnfollowUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v1/users/{user_id}/unfollow"
+      body: "*"
     };
   };
 
@@ -164,6 +171,10 @@ message GetUserNodeResponse {
   cheers.type.User user = 1;
 }
 
+message GetUserMeResponse {
+  cheers.type.User user = 1;
+}
+
 message GetUserResponse {
   cheers.type.User user = 1;
   int32 post_count = 2;
@@ -202,6 +213,9 @@ message GetUserNodeRequest {
   string user_id = 1;
 }
 
+message GetUserMeRequest {
+}
+
 message GetUserRequest {
   string user_id = 1;
 }
@@ -213,9 +227,13 @@ message UpdateUserRequest {
   string website = 4;
   string birthday = 5;
   string phone_number = 6;
-  string banner = 7;
+  repeated string banners = 7;
   string favourite_drink_id = 8;
   optional google.protobuf.FieldMask update_mask = 9;
+  cheers.type.Job job = 10;
+  cheers.type.Gender gender = 11;
+  int64 height = 12;
+  string education = 13;
 }
 
 message DeleteUserRequest {

@@ -21,7 +21,11 @@ message User {
   bool is_business_account = 14;
   bool is_admin = 15;
   bool is_moderator = 16;
-  string banner = 17;
+  repeated string banners = 17;
+  bool premium = 18;
+  Job job = 19;
+  int64 height = 20;
+  string education = 21;
 }
 
 message UserItem {
@@ -35,7 +39,8 @@ message UserItem {
   bool friend = 8;
   bool requested = 9;
   bool has_requested_viewer = 10;
-  string banner = 11;
+  repeated string banners = 11;
+  bool premium = 12;
 }
 
 enum StoryState {
@@ -49,3 +54,9 @@ enum Gender {
   MALE = 0;
   FEMALE = 1;
 }
+
+message Job {
+  string title = 1;
+  string company = 2;
+}
+

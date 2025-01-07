@@ -40,6 +40,7 @@ fun NavGraphBuilder.homeScreen(
     navigateToDeletePostDialog: (String) -> Unit,
     navigateToPartyDetail: (String) -> Unit,
     navigateToMap: () -> Unit = {},
+    navigateToMyParties: () -> Unit,
 ) {
     composable<Home>(
         deepLinks = listOf(
@@ -80,6 +81,7 @@ fun NavGraphBuilder.homeScreen(
             navigateToPartyDetail = navigateToPartyDetail,
             navigateToCreateParty = navigateToCreateParty,
             navigateToMap = navigateToMap,
+            navigateToMyParties = navigateToMyParties,
         )
     }
 }

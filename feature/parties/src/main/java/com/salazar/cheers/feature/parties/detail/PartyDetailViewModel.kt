@@ -9,9 +9,11 @@ import com.salazar.cheers.core.model.WatchStatus
 import com.salazar.cheers.core.ui.navigation.PartyDetailScreen
 import com.salazar.cheers.data.party.data.repository.PartyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,6 +66,9 @@ class PartyDetailViewModel @Inject constructor(
     private val viewModelState = MutableStateFlow(PartyDetailViewModelState(isLoading = true))
     private var partyId: String = partyDetailScreen.partyID
 
+    private val _sideEffect = Channel<String>(Channel.BUFFERED)
+    internal val sideEffect = _sideEffect.receiveAsFlow()
+
     val uiState = viewModelState
         .map { it.toUiState() }
         .stateIn(
@@ -96,16 +101,20 @@ class PartyDetailViewModel @Inject constructor(
 
     fun onWatchStatusChange(watchStatus: WatchStatus) {
         viewModelScope.launch {
-            partyRepository.setWatchStatus(
+            val result = partyRepository.setWatchStatus(
                 partyId = partyId,
                 watchStatus = watchStatus,
-            )
+            ).getOrNull() ?: return@launch
+            _sideEffect.send("Successfully updated answer.")
         }
     }
 
-    fun deleteParty() {
+    fun deleteParty(
+        onSuccess: () -> Unit,
+    ) {
         viewModelScope.launch {
-//            partyRepository.deleteParty(partyId = partyId)
+            partyRepository.deleteParty(partyId = partyId)
+            onSuccess()
         }
     }
 

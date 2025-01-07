@@ -14,31 +14,35 @@ import kotlinx.coroutines.launch
 fun PremiumRoute(
     viewModel: PremiumViewModel = hiltViewModel(),
     onBackPressed: () -> Unit = {},
+    navigateToWelcomeCheersPremium: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val state = rememberRefreshLayoutState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = LocalActivity.current
+    val success = uiState.success
 
-    when (uiState) {
-        PremiumUiState.SuccessPurchaseLoading -> SuccessPurchaseLoadingScreen()
-        is PremiumUiState.HasOffer -> {
-            LaunchedEffect(uiState.isRefreshing) {
-                if (!uiState.isRefreshing) {
-                    scope.launch {
-                        state.finishRefresh(true)
-                    }
-                }
+    LaunchedEffect(success) {
+        if (!success) return@LaunchedEffect
+        viewModel.updateSuccess(false)
+        navigateToWelcomeCheersPremium()
+    }
+
+    LaunchedEffect(uiState.isRefreshing) {
+        if (!uiState.isRefreshing) {
+            scope.launch {
+                state.finishRefresh(true)
             }
-
-            PremiumScreen(
-                uiState = uiState,
-                onBackPressed = onBackPressed,
-                onSubscribeClick = {
-                    viewModel.onSubscribeClick(activity)
-                },
-            )
         }
     }
+
+    PremiumScreen(
+        uiState = uiState,
+        onBackPressed = onBackPressed,
+        onSubscribeClick = {
+            viewModel.onSubscribeClick(activity)
+        },
+        onPlanClick = viewModel::onPlanClick,
+    )
 }

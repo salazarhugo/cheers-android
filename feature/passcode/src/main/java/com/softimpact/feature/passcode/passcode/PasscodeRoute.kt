@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.ui.modifier.gradientBackground
 import com.salazar.cheers.shared.util.LocalActivity
-import com.softimpact.feature.passcode.util.gradientBackground
 
 
 @Composable

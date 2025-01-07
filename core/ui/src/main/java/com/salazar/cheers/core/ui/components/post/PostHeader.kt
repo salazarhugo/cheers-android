@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
@@ -28,6 +29,7 @@ import java.util.Date
 
 @Composable
 fun PostHeader(
+    name: String,
     username: String,
     verified: Boolean,
     avatar: String,
@@ -51,6 +53,8 @@ fun PostHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AvatarComponent(
+                name = name,
+                username = username,
                 avatar = avatar,
                 size = 33.dp,
                 onClick = onUserClick,
@@ -106,13 +110,15 @@ fun PostHeader(
 @ComponentPreviews
 @Composable
 private fun PostHeaderPreview() {
+    val user = cheersUser
     CheersPreview {
         PostHeader(
-            username = "cheers",
-            verified = true,
-            avatar = "",
+            username = user.username,
+            verified = user.verified,
+            avatar = user.picture.orEmpty(),
             locationName = "Dubai",
             createTime = Date().time / 1000,
+            name = user.name,
         )
     }
 }

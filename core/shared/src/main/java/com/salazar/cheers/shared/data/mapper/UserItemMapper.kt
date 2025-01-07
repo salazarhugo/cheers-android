@@ -13,6 +13,7 @@ fun User.toUserItem(): com.salazar.cheers.core.model.UserItem {
         hasFollowed = followBack,
         username = username,
         verified = verified,
+        premium = premium,
         friend = friend,
         requested = requested,
     )
@@ -26,6 +27,7 @@ fun UserItem.toUserItem(): com.salazar.cheers.core.model.UserItem {
         hasFollowed = hasFollowed,
         username = username,
         verified = verified,
+        premium = premium,
         friend = friend,
         requested = requested,
     )
@@ -38,6 +40,7 @@ fun UserOuterClass.User.toUserItem(): com.salazar.cheers.core.model.UserItem {
         picture = picture,
         username = username,
         verified = verified,
+        premium = premium,
         requested = false,
         hasFollowed = false,
         friend = true,

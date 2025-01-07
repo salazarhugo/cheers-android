@@ -100,7 +100,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         builder.setContentIntent(pending)
 
         if (roomId != null) {
-            val uri = "${Constants.URI}/chat/${roomId}".toUri()
+            val uri = "${Constants.DEEPLINK_BASE_URL}/chat/${roomId}".toUri()
             val pending = setIntent(uri)
             builder.setContentIntent(pending)
         }

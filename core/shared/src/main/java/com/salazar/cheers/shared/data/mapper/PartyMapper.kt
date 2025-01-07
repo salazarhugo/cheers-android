@@ -42,7 +42,7 @@ private fun PrivacyOuterClass.Privacy.toPrivacy(): Privacy {
         PrivacyOuterClass.Privacy.FRIENDS -> Privacy.FRIENDS
         PrivacyOuterClass.Privacy.PRIVATE -> Privacy.PRIVATE
         PrivacyOuterClass.Privacy.PUBLIC -> Privacy.PUBLIC
-        PrivacyOuterClass.Privacy.GROUP -> Privacy.GROUP
+        PrivacyOuterClass.Privacy.GROUP -> Privacy.PRIVATE
         PrivacyOuterClass.Privacy.UNRECOGNIZED -> Privacy.PUBLIC
     }
 }

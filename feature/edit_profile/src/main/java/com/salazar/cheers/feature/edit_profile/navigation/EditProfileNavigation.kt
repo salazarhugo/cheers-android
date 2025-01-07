@@ -12,6 +12,8 @@ import com.salazar.cheers.feature.edit_profile.EditProfileRoute
 import com.salazar.cheers.feature.edit_profile.EditProfileViewModel
 import com.salazar.cheers.feature.edit_profile.editgender.editGenderScreen
 import com.salazar.cheers.feature.edit_profile.editgender.navigateToEditGender
+import com.salazar.cheers.feature.edit_profile.editjob.editJobScreen
+import com.salazar.cheers.feature.edit_profile.editjob.navigateToEditJob
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -38,9 +40,15 @@ fun NavGraphBuilder.editProfileGraph(
             navController = navController,
             navigateBack = navigateBack,
             navigateToGender = navController::navigateToEditGender,
+            navigateToJob = navController::navigateToEditJob,
         )
 
         editGenderScreen(
+            navController = navController,
+            navigateBack = navigateBack,
+        )
+
+        editJobScreen(
             navController = navController,
             navigateBack = navigateBack,
         )
@@ -54,6 +62,7 @@ fun NavGraphBuilder.editProfileRecapScreen(
     navController: NavController,
     navigateBack: () -> Unit,
     navigateToGender: () -> Unit,
+    navigateToJob: () -> Unit,
 ) {
     composable<EditProfileRecapScreen> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
@@ -66,6 +75,7 @@ fun NavGraphBuilder.editProfileRecapScreen(
             viewModel = viewModel,
             navigateBack = navigateBack,
             navigateToGender = navigateToGender,
+            navigateToJob = navigateToJob,
         )
     }
 }

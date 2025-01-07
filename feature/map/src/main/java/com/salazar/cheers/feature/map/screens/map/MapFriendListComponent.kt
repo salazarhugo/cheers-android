@@ -6,15 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,12 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.core.ui.theme.BlueCheers
 import com.salazar.cheers.data.map.UserLocation
 import com.salazar.cheers.data.map.cheersUserLocation
 import com.salazar.cheers.data.map.cheersUserLocationList
@@ -62,6 +56,8 @@ fun MapFriendListComponent(
                 AvatarComponent(
                     modifier = Modifier.animateItem(),
                     avatar = userLocation.picture,
+                    name = userLocation.name,
+                    username = userLocation.username,
                     onClick = { onUserClick(userLocation) },
                 )
             }
@@ -71,6 +67,8 @@ fun MapFriendListComponent(
                 AvatarComponent(
                     modifier = Modifier.animateItem(),
                     avatar = it.picture,
+                    name = it.name,
+                    username = it.username,
                     onClick = { onUserClick(it) },
                 )
             }
@@ -102,15 +100,11 @@ fun QuickFilter(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .background(BlueCheers)
-            ,
-            imageVector = Icons.Rounded.Star,
-            contentDescription = "Star icon",
-            tint = Color.White,
+        AvatarComponent(
+            avatar = "",
+            name = text,
+            size = 50.dp,
+            backgroundColor = MaterialTheme.colorScheme.surfaceDim,
         )
         Text(
             text = text,

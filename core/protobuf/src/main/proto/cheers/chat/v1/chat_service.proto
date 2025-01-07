@@ -5,6 +5,7 @@ package cheers.chat.v1;
 
 import "cheers/type/user/user.proto";
 import "google/api/annotations.proto";
+import "cheers/type/audio/audio.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/chat/v1;chat";
@@ -34,6 +35,7 @@ service ChatService {
   rpc DeleteRoom(DeleteRoomRequest) returns (DeleteRoomResponse) {
     option (google.api.http) = {
       delete: "/v1/chats/{room_id}"
+      body: "*"
     };
   }
 
@@ -69,6 +71,13 @@ service ChatService {
     };
   }
 
+  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) {
+    option (google.api.http) = {
+      delete: "/v1/chats/{room_id}/messages/{message_id}"
+      body: "*"
+    };
+  }
+
   rpc LikeMessage(LikeMessageReq) returns (Empty) {}
   rpc UnlikeMessage(LikeMessageReq) returns (Empty) {}
   rpc TypingChannel(stream TypingEvent) returns (stream TypingEvent) {}
@@ -97,11 +106,21 @@ message SendReadReceiptRequest {
   string room_id = 1;
 }
 
+message DeleteMessageRequest {
+  string message_id = 1;
+  string room_id = 2;
+}
+
+message DeleteMessageResponse {
+}
+
 message SendMessageRequest {
   string text = 1;
   string room_id = 2;
   string reply_to = 3;
   string client_id = 4;
+  repeated string media_ids = 5;
+  cheers.type.Audio audio = 6;
 }
 
 message SendMessageResponse {
@@ -238,6 +257,9 @@ message Room {
   bool last_message_seen = 17;
   int64 unread_message_count = 18;
   bool admin = 19;
+  int64 members_count = 20;
+  // if chat is DIRECT then it's the other user id
+  string other_user_id = 21;
 }
 
 enum MessageType {
@@ -271,6 +293,27 @@ message Message {
   }
   Status status = 11;
   int64 create_time = 12;
+  Message reply_to = 13;
+  repeated Media medias = 14;
+  cheers.type.Audio audio = 15;
+}
+
+message Media {
+  string accessibility_caption = 1;
+  MediaType media_type = 2;
+  repeated ImageVersion image_versions = 3;
+}
+
+message ImageVersion {
+  string url = 1;
+  string ref = 2;
+  int64 width = 3;
+  int64 height = 4;
+}
+
+enum MediaType {
+  MEDIA_IMAGE = 0;
+  MEDIA_VIDEO = 1;
 }
 
 message MessageItem {

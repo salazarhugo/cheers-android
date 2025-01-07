@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/filter;filter";
+
+message Filter {
+  string id = 1;
+  string name = 2;
+  string value = 3;
+  bool is_active = 4;
+}
+

@@ -23,7 +23,11 @@ import com.salazar.cheers.data.billing.api.ApiService
 import com.salazar.cheers.data.billing.response.RechargeCoinRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,12 +38,18 @@ class BillingRepository @Inject constructor(
     private val apiService: ApiService,
 ) : PurchasesUpdatedListener, PurchasesResponseListener {
 
+    private val _purchaseUpdateLiveData = Channel<List<Purchase>?>(Channel.BUFFERED)
+    val purchaseUpdateFlowData: Flow<List<Purchase>?> = _purchaseUpdateLiveData.receiveAsFlow()
+
     override fun onPurchasesUpdated(
         billingResult: BillingResult,
         purchases: MutableList<Purchase>?
     ) {
         Log.d("Billing", "On purchase updated $purchases")
         if (billingResult.responseCode == BillingResponseCode.OK && purchases != null) {
+            runBlocking {
+                _purchaseUpdateLiveData.send(purchases)
+            }
             for (purchase in purchases) {
                 handlePurchase(purchase)
             }
@@ -113,6 +123,8 @@ class BillingRepository @Inject constructor(
     }
 
     fun startConnection() {
+        if (billingClient.connectionState == BillingClient.ConnectionState.CONNECTED) return
+
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingResponseCode.OK) {
@@ -133,10 +145,9 @@ class BillingRepository @Inject constructor(
         userID: String,
         activity: Activity,
         productDetails: com.salazar.cheers.core.model.ProductDetails,
+        offerToken: String,
     ): Int {
         val productDetails = getProduct(productId = productDetails.id).getOrNull() ?: return -1
-        val offerToken =
-            productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return -1
 
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
@@ -145,9 +156,11 @@ class BillingRepository @Inject constructor(
                 .build()
         )
 
+        println("xxx $userID")
         val flowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(productDetailsParamsList)
             .setObfuscatedAccountId(userID)
+            .setObfuscatedProfileId(userID)
             .build()
 
         val responseCode = billingClient.launchBillingFlow(
@@ -242,5 +255,8 @@ class BillingRepository @Inject constructor(
 
         Log.e("BillingRepository", "product not found with id $productId")
         return Result.failure(NotFoundException())
+    }
+
+    fun listSubscriptions() {
     }
 }

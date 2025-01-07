@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -38,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.Post
@@ -48,9 +48,8 @@ import com.salazar.cheers.core.model.User
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.PrettyPanel
-import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
+import com.salazar.cheers.core.ui.ProfileHeaderCarousel
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
-import com.salazar.cheers.core.ui.components.favorite_drink.FavoriteDrinkComponent
 import com.salazar.cheers.core.ui.components.login_message.LoginMessageScreen
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
@@ -58,10 +57,9 @@ import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayo
 import com.salazar.cheers.core.ui.item.party.PartyItem
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.PrettyImage
-import com.salazar.cheers.feature.profile.ProfileItem
+import com.salazar.cheers.feature.profile.ProfileBody
 import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
 import com.salazar.cheers.feature.profile.ProfileSheetUIAction
-import com.salazar.cheers.feature.profile.ProfileTopBar
 import com.salazar.cheers.feature.profile.R
 import kotlinx.coroutines.launch
 
@@ -142,6 +140,7 @@ fun Profile(
             ProfileTopBar(
                 username = user.username,
                 verified = user.verified,
+                premium = user.premium,
                 onBackPressed = { onProfileUIAction(ProfileUIAction.OnBackPressed) },
                 onMenuClick = { navigateToProfileMoreSheet(user.username) },
                 onEditClick = { onProfileUIAction(ProfileUIAction.OnEditProfileClick) },
@@ -185,34 +184,14 @@ fun ProfileList(
     LazyColumn(
         state = listState,
     ) {
+        profileCarousel(
+            user = user,
+        )
 
-        item {
-            ProfileBannerAndAvatar(
-                modifier = Modifier.padding(16.dp),
-                banner = user.banner,
-                avatar = user.picture,
-                content = {
-                    if (drink != null) {
-                        FavoriteDrinkComponent(drink = drink)
-                    }
-                }
-            )
-        }
-        item {
-            val uriHandler = LocalUriHandler.current
-            ProfileItem(
-                user = user,
-                onWebsiteClick = { website ->
-                    var url = website
-                    if (!url.startsWith("https://"))
-                        url = "https://$url"
-                    uriHandler.openUri(url)
-                },
-                onStatClicked = {
-                    onProfileUIAction(ProfileUIAction.OnFriendListClick)
-                },
-            )
-        }
+        profileBody(
+            user = user,
+            onProfileUIAction = onProfileUIAction,
+        )
 
         stickyHeader {
             PrimaryTabRow(
@@ -256,7 +235,9 @@ fun ProfileList(
                         1 -> parties?.forEach {
                             PartyItem(
                                 party = it,
-                                onClick = {},
+                                onClick = {
+                                    onProfileUIAction(ProfileUIAction.OnPartyClick(it))
+                                },
                                 onMoreClick = {},
                             )
                         }
@@ -267,6 +248,34 @@ fun ProfileList(
             }
         }
     }
+}
+
+private fun LazyListScope.profileCarousel(
+    user: User,
+) {
+    item {
+        ProfileHeaderCarousel(
+            user = user,
+        )
+    }
+}
+
+private fun LazyListScope.profileBody(
+    user: User,
+    onProfileUIAction: (ProfileUIAction) -> Unit,
+) {
+    item {
+        ProfileBody(
+            user = user,
+            onFriendsClick = {
+                onProfileUIAction(ProfileUIAction.OnFriendListClick)
+            },
+            onWebsiteClick = {
+                onProfileUIAction(ProfileUIAction.OnLinkClick(it))
+            },
+        )
+    }
+
 }
 
 @Composable

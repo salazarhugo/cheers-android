@@ -8,14 +8,16 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import com.salazar.cheers.core.model.UserItem
+import com.salazar.cheers.core.util.Constants
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.reflect.typeOf
 
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/chat"
+    "${Constants.DEEPLINK_BASE_URL}/chat/{channelID}"
 
 @Serializable
 data class ChatScreen(
@@ -74,6 +76,14 @@ fun NavGraphBuilder.chatScreen(
     navigateToRoomDetails: (String) -> Unit,
 ) {
     composable<ChatScreen>(
+        deepLinks = listOf(
+            navDeepLink<ChatScreen>(
+                basePath = DEEP_LINK_URI_PATTERN,
+                typeMap = mapOf(
+                    typeOf<UserItem?>() to CustomNavType.UserItemType,
+                ),
+            )
+        ),
         typeMap = mapOf(
             typeOf<UserItem?>() to CustomNavType.UserItemType,
         ),

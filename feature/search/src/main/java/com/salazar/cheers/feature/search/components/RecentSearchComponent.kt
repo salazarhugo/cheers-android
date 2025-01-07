@@ -26,17 +26,25 @@ import com.salazar.cheers.core.model.toUserItem
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.ui.item.party.PartyItem
 
 @Composable
 internal fun RecentSearchComponent(
+    modifier: Modifier = Modifier,
     recentSearch: RecentSearch,
     onDeleteRecentUser: (RecentSearch) -> Unit,
     onClick: (RecentSearch) -> Unit,
 ) {
     when (recentSearch) {
-        is RecentSearch.Party -> Unit
+        is RecentSearch.Party -> {
+            PartyItem(
+                party = recentSearch.party,
+                onClick = { onClick(recentSearch) },
+            )
+        }
         is RecentSearch.User -> {
             UserItem(
+                modifier = modifier,
                 userItem = recentSearch.toUserItem(),
                 onClick = { onClick(recentSearch) },
                 content = {
@@ -54,6 +62,7 @@ internal fun RecentSearchComponent(
 
         is RecentSearch.Text -> {
             RecentTextSearch(
+                modifier = modifier,
                 text = recentSearch.text,
                 onClick = { onClick(recentSearch) },
                 onDeleteClick = { onDeleteRecentUser(recentSearch) },

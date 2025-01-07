@@ -3,6 +3,7 @@ package com.salazar.cheers.feature.parties
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Party
+import com.salazar.cheers.domain.feed_party.ListMyPartyFlowUseCase
 import com.salazar.cheers.domain.feed_party.ListPartyFeedFlowUseCase
 import com.salazar.cheers.domain.feed_party.ListPartyFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,12 +21,14 @@ data class PartiesUiState(
     val errorMessage: String = "",
     val query: String = "",
     val parties: List<Party>? = null,
+    val myParties: List<Party>? = null,
 )
 
 @HiltViewModel
 class PartiesViewModel @Inject constructor(
     private val listPartyFeedUseCase: ListPartyFeedUseCase,
     private val listPartyFeedFlowUseCase: ListPartyFeedFlowUseCase,
+    private val listMyPartyFlowUseCase: ListMyPartyFlowUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PartiesUiState(isLoading = true))
@@ -38,6 +41,9 @@ class PartiesViewModel @Inject constructor(
         )
 
     init {
+        viewModelScope.launch {
+            listMyPartyFlowUseCase().collect(::updateMyParties)
+        }
         viewModelScope.launch {
             listPartyFeedFlowUseCase().collect(::updateParties)
         }
@@ -64,6 +70,12 @@ class PartiesViewModel @Inject constructor(
     private fun updateError(message: String) {
         viewModelState.update {
             it.copy(errorMessage = message, isLoading = false)
+        }
+    }
+
+    private fun updateMyParties(parties: List<Party>?) {
+        viewModelState.update {
+            it.copy(myParties = parties, isLoading = false)
         }
     }
 

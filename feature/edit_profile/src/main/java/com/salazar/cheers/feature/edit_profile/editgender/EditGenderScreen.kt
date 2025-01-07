@@ -35,7 +35,7 @@ import com.salazar.cheers.core.ui.ui.Toolbar
 
 @Composable
 fun EditGenderScreen(
-    gender: Gender,
+    gender: Gender?,
     onGenderClick: (Gender) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -62,7 +62,7 @@ fun EditGenderScreen(
 
 @Composable
 fun EditGenderRadio(
-    gender: Gender,
+    gender: Gender?,
     onGenderClick: (Gender) -> Unit,
 ) {
     val genders = Gender.entries

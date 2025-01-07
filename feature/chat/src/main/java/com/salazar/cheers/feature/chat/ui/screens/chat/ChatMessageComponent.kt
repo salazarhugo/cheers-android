@@ -1,33 +1,54 @@
 package com.salazar.cheers.feature.chat.ui.screens.chat
 
+import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.LastBaseline
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
-import com.salazar.cheers.core.model.ChatMessage
-import com.salazar.cheers.core.model.MessageType
+import com.salazar.cheers.core.util.Utils.conditional
 import com.salazar.cheers.data.chat.models.mockMessage1
-import java.text.SimpleDateFormat
-import java.util.Date
+import kotlinx.coroutines.flow.collectLatest
+import kotlin.math.roundToInt
+
+enum class SwipeToReplyValue {
+    Resting,
+    Replying,
+}
 
 @Composable
-fun Message(
-    message: ChatMessage,
+fun ChatMessageComponent(
+    chatMessage: ChatMessage,
     modifier: Modifier = Modifier,
     isGroup: Boolean = false,
     seen: Boolean = false,
@@ -36,35 +57,97 @@ fun Message(
     onAuthorClick: (String) -> Unit = {},
     onLongClickMessage: (String) -> Unit = {},
     onDoubleTapMessage: (String) -> Unit = {},
+    onReply: () -> Unit,
 ) {
-    val isSender = message.isSender
-    val spaceBetweenAuthors = if (isLastMessageByAuthor) {
-        modifier.padding(top = 8.dp)
-    } else {
-        modifier
+    val haptic = LocalHapticFeedback.current
+    val density = LocalDensity.current
+    val isSender = chatMessage.isSender
+    val spaceBetweenAuthors = when (isLastMessageByAuthor) {
+        true -> modifier.padding(top = 8.dp)
+        false -> modifier
     }
-    val horizontalAlignment = if (isSender) {
-        Arrangement.End
-    } else {
-        Arrangement.Start
+    val horizontalAlignment = when (isSender) {
+        true -> Arrangement.End
+        false -> Arrangement.Start
+    }
+
+    val swipeToReplyState = AnchoredDraggableState(
+        initialValue = SwipeToReplyValue.Resting,
+        positionalThreshold = { distance: Float -> distance * 0.5f },
+        velocityThreshold = { with(density) { 100.dp.toPx() } },
+        snapAnimationSpec = tween(),
+        decayAnimationSpec = exponentialDecay(),
+    )
+
+    val anchors = remember(density) {
+        val replyOffset = with(density) {
+            if (chatMessage.isSender) {
+                -48.dp.toPx()
+            } else {
+                48.dp.toPx()
+            }
+        }
+        DraggableAnchors {
+            SwipeToReplyValue.Resting at 0f
+            SwipeToReplyValue.Replying at replyOffset
+        }
+    }
+    val messageOverscroll = ScrollableDefaults.overscrollEffect()
+
+    SideEffect {
+        swipeToReplyState.updateAnchors(anchors)
+    }
+
+    LaunchedEffect(swipeToReplyState) {
+        snapshotFlow { swipeToReplyState.settledValue }.collectLatest {
+            if (it == SwipeToReplyValue.Replying) {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onReply()
+                swipeToReplyState.animateTo(SwipeToReplyValue.Resting)
+            }
+        }
     }
 
     Row(
         modifier = spaceBetweenAuthors.fillMaxWidth(),
-        horizontalArrangement = horizontalAlignment
+        horizontalArrangement = horizontalAlignment,
+        verticalAlignment = Alignment.Bottom,
     ) {
-        if (isLastMessageByAuthor && !isSender && isGroup) {
-            AvatarComponent(
-                avatar = message.senderProfilePictureUrl,
-                size = 42.dp,
-            )
-        } else {
-            // Space under avatar
-//            Spacer(modifier = Modifier.width(74.dp))
+        if (isGroup) {
+            Spacer(modifier = Modifier.width(8.dp))
+            if (isFirstMessageByAuthor && !isSender) {
+                AvatarComponent(
+                    avatar = chatMessage.senderProfilePictureUrl,
+                    name = chatMessage.senderName,
+                    username = chatMessage.senderUsername,
+                    size = 36.dp,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+            } else {
+                // Space under avatar
+                Spacer(modifier = Modifier.width(36.dp))
+            }
         }
         AuthorAndTextMessage(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            message = message,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .anchoredDraggable(
+                    state = swipeToReplyState,
+                    orientation = Orientation.Horizontal,
+                    overscrollEffect = messageOverscroll,
+                )
+                .conditional(chatMessage.isSender.not()) {
+                    overscroll(messageOverscroll)
+                }
+                .offset {
+                    IntOffset(
+                        x = swipeToReplyState
+                            .requireOffset()
+                            .roundToInt(),
+                        y = 0,
+                    )
+                },
+            message = chatMessage,
             seen = seen,
             isFirstMessageByAuthor = isFirstMessageByAuthor,
             isLastMessageByAuthor = isLastMessageByAuthor,
@@ -86,75 +169,36 @@ fun AuthorAndTextMessage(
     onDoubleTapMessage: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isGroup = false
-    val isSender = message.isSender
-
     Column(modifier = modifier) {
-        if (isLastMessageByAuthor && !isSender && isGroup) {
-            AuthorNameTimestamp(
-                username = message.senderUsername,
-                createTime = message.createTime,
-            )
-        }
-        if (message.type == MessageType.TEXT)
-            ChatItemBubble(
-                message = message,
-                seen = seen,
-                authorClicked = authorClicked,
-                onLongClickMessage = onLongClickMessage,
-                onDoubleTapMessage = onDoubleTapMessage
-            )
-        else if (message.type == MessageType.IMAGE)
-            ImageMessageBubble(
-                message = message,
-                onLongClickMessage = onLongClickMessage,
-                onDoubleTapMessage = onDoubleTapMessage,
-            )
+        ChatItemBubble(
+            message = message,
+            seen = seen,
+            isFirstMessageByAuthor = isFirstMessageByAuthor,
+            isLastMessageByAuthor = isLastMessageByAuthor,
+            authorClicked = authorClicked,
+            onLongClickMessage = onLongClickMessage,
+            onDoubleTapMessage = onDoubleTapMessage
+        )
         if (isFirstMessageByAuthor) {
             // Last bubble before next author
             Spacer(modifier = Modifier.height(8.dp))
         } else {
             // Between bubbles
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
         }
-    }
-}
-
-@Composable
-private fun AuthorNameTimestamp(
-    username: String,
-    createTime: Long,
-) {
-    // Combine author and timestamp for a11y.
-    Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
-        Text(
-            text = username,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier
-                .alignBy(LastBaseline)
-                .paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        val formatter = SimpleDateFormat("HH:mm")
-        val date = Date(createTime)
-
-        Text(
-            text = formatter.format(date),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.alignBy(LastBaseline),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
 @ComponentPreviews
 @Composable
-private fun ChatMessagePreview() {
+private fun ChatMessagePreview(
+    @PreviewParameter(LoremIpsum::class) text: String
+) {
     CheersPreview {
-        Message(
-            message = mockMessage1,
+        ChatMessageComponent(
+            chatMessage = mockMessage1.copy(text = text.take(100)),
             modifier = Modifier.padding(16.dp),
+            onReply = {},
         )
     }
 }

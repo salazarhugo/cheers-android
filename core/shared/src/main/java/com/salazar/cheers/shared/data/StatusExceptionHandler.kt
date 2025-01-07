@@ -3,6 +3,7 @@ package com.salazar.cheers.shared.data
 import com.salazar.cheers.shared.util.result.DataError
 import io.grpc.Status
 import io.grpc.StatusException
+import java.io.IOException
 
 // StatusException is a wrapper around GRPC Status
 fun StatusException.toDataError(): DataError.Network {
@@ -24,6 +25,15 @@ fun StatusException.toDataError(): DataError.Network {
         Status.Code.UNAVAILABLE -> DataError.Network.UNKNOWN
         Status.Code.DATA_LOSS -> DataError.Network.UNKNOWN
         Status.Code.UNAUTHENTICATED -> DataError.Network.UNKNOWN
+        else -> DataError.Network.UNKNOWN
+    }
+}
+
+// StatusException is a wrapper around GRPC Status
+fun Exception.toDataError(): DataError {
+    return when (this) {
+        is StatusException -> this.toDataError()
+        is IOException -> DataError.Local.DISK_FULL
         else -> DataError.Network.UNKNOWN
     }
 }

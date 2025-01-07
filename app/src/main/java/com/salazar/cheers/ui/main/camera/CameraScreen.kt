@@ -146,6 +146,8 @@ fun CameraFooter(
         if (imageTaken)
             CameraFooterSendTo(
                 picture = uiState.user?.picture,
+                name = uiState.user?.name,
+                username = uiState.user?.username,
                 onPostClicked = onPostClicked,
                 onStoryClick = onStoryClick,
             )
@@ -157,6 +159,8 @@ fun CameraFooter(
 @Composable
 fun CameraFooterSendTo(
     picture: String?,
+    name: String?,
+    username: String?,
     onPostClicked: () -> Unit,
     onStoryClick: () -> Unit,
 ) {
@@ -172,6 +176,8 @@ fun CameraFooterSendTo(
             ) {
                 AvatarComponent(
                     avatar = picture,
+                    name = name,
+                    username = username,
                     size = ButtonDefaults.IconSize,
                 )
                 Spacer(Modifier.width(4.dp))

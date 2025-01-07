@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.RoomWarnings
+import com.salazar.cheers.core.model.Gender
 import com.salazar.cheers.core.model.StoryState
 import com.salazar.cheers.core.model.User
 import java.util.UUID
@@ -29,7 +30,7 @@ data class UserEntity(
     val email: String = "",
     val bio: String = "",
     val picture: String? = null,
-    val banner: String? = null,
+    val banner: List<String> = emptyList(),
     val website: String = "",
     val online: Boolean = false,
     val darkMode: Boolean = false,
@@ -45,6 +46,10 @@ data class UserEntity(
     @Embedded(
         prefix = "drink_",
     ) val favouriteDrink: DrinkEntity? = null,
+    val premium: Boolean = false,
+    val gender: Gender? = null,
+    val jobTitle: String = "",
+    val jobCompany: String = "",
 )
 
 fun UserEntity.asExternalModel() = User(
@@ -75,6 +80,10 @@ fun UserEntity.asExternalModel() = User(
     createTime = createTime,
     isBusinessAccount = isBusinessAccount,
     favouriteDrink = favouriteDrink?.asExternalModel(),
+    premium = premium,
+    gender = gender,
+    jobTitle = jobTitle,
+    jobCompany = jobCompany,
 )
 
 fun User.asEntity(): UserEntity {
@@ -106,6 +115,10 @@ fun User.asEntity(): UserEntity {
         createTime = createTime,
         isBusinessAccount = isBusinessAccount,
         favouriteDrink = favouriteDrink?.asEntity(),
+        premium = premium,
+        gender = gender,
+        jobTitle = jobTitle,
+        jobCompany = jobCompany,
     )
 }
 

@@ -3,13 +3,11 @@ package com.salazar.cheers.core.ui.modifier
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.components.shimmer.PlaceholderHighlight
@@ -18,16 +16,18 @@ import com.salazar.cheers.core.ui.components.shimmer.shimmer
 
 fun Modifier.cheersShimmer(
     isLoading: Boolean,
-    backgroundColor: Color = Color.Unspecified,
+    backgroundColor: Color = Color.DarkGray,
     shape: Shape = RoundedCornerShape(8.dp),
     showShimmerAnimation: Boolean = true
 ): Modifier = composed {
+
     val highlight = if (showShimmerAnimation) {
-        PlaceholderHighlight.shimmer(highlightColor = MaterialTheme.colorScheme.onTertiary)
+        PlaceholderHighlight.shimmer(highlightColor = backgroundColor.copy(alpha = 0.8f))
     } else {
         null
     }
-    val specifiedBackgroundColor = backgroundColor.takeOrElse { Color(0xFFDBD6D1).copy(0.6f) }
+    val specifiedBackgroundColor = backgroundColor.copy(0.2f)
+
     Modifier.placeholder(
         color = specifiedBackgroundColor,
         visible = isLoading,

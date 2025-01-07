@@ -321,7 +321,9 @@ fun CommentBottomBar(
                 onRemove = onDeleteReplyCommentClick,
             )
         }
-        HorizontalDivider()
+        HorizontalDivider(
+            thickness = 0.5.dp,
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

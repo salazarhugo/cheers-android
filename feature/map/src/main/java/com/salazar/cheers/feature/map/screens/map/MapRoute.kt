@@ -1,5 +1,3 @@
-@file:OptIn(MapboxExperimental::class)
-
 package com.salazar.cheers.feature.map.screens.map
 
 import android.Manifest
@@ -10,7 +8,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.salazar.cheers.core.model.UserItem

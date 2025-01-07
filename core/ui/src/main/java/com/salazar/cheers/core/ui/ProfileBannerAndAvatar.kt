@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.dialogs.AvatarDialog
 
@@ -30,6 +31,7 @@ import com.salazar.cheers.core.ui.dialogs.AvatarDialog
 fun ProfileBannerAndAvatar(
     banner: String?,
     avatar: String?,
+    name: String?,
     modifier: Modifier = Modifier,
     isEditable: Boolean = false,
     onBannerClick: () -> Unit = {},
@@ -41,6 +43,7 @@ fun ProfileBannerAndAvatar(
     if (openAlertDialog) {
         AvatarDialog(
             avatar = avatar,
+            name = name,
             onDismissRequest = {
                 openAlertDialog = false
             }
@@ -56,7 +59,7 @@ fun ProfileBannerAndAvatar(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp)),
                 banner = banner,
-                onClick = onBannerClick,
+                onEditClick = onBannerClick,
                 clickable = isEditable,
             )
             Row(
@@ -70,6 +73,7 @@ fun ProfileBannerAndAvatar(
         }
         AvatarComponent(
             avatar = avatar,
+            name = name,
             modifier = Modifier
                 .border(5.dp, MaterialTheme.colorScheme.background, CircleShape),
             size = 110.dp,
@@ -86,10 +90,12 @@ fun ProfileBannerAndAvatar(
 @Preview
 @Composable
 private fun ProfileBannerAndAvatarPreview() {
+    val user = cheersUserItem
     CheersPreview {
         ProfileBannerAndAvatar(
             modifier = Modifier.padding(16.dp),
-            avatar = "",
+            avatar = user.picture,
+            name = user.name,
             banner = "",
             content = {
                 CheersOutlinedButton(onClick = { /*TODO*/ }) {

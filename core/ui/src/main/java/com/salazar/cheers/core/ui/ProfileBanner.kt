@@ -1,14 +1,19 @@
 package com.salazar.cheers.core.ui
 
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +33,10 @@ fun ProfileBanner(
     banner: String? = null,
     clickable: Boolean = false,
     alpha: Float = 1f,
-    onClick: () -> Unit = {},
+    @FloatRange(from = 0.0, fromInclusive = false)
+    ratio: Float = 3 / 4f,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -37,8 +45,7 @@ fun ProfileBanner(
     ) {
         AsyncImage(
             modifier = Modifier
-                .aspectRatio(3f)
-                .alpha((alpha - 0.7f) / 0.3f)
+                .aspectRatio(ratio)
                 .blur(
                     radius = 50.dp,
                     edgeTreatment = BlurredEdgeTreatment.Unbounded
@@ -50,25 +57,40 @@ fun ProfileBanner(
 
         AsyncImage(
             modifier = Modifier
-                .aspectRatio(3f)
+                .aspectRatio(ratio)
                 .alpha((alpha - 0.7f) / 0.3f)
                 .background(Color.DarkGray)
                 .clickableIf(clickable) {
-                    onClick()
+                    onEditClick()
                 },
             model = banner,
             contentDescription = null,
             contentScale = ContentScale.Crop,
         )
         if (clickable) {
-            FilledTonalIconButton(
-                modifier = Modifier.padding(8.dp),
-                onClick = onClick,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                )
+            Row {
+                FilledTonalIconButton(
+                    modifier = Modifier.padding(8.dp),
+                    onClick = onEditClick,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit icon",
+                    )
+                }
+                FilledTonalIconButton(
+                    modifier = Modifier.padding(8.dp),
+                    onClick = onDeleteClick,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete icon",
+                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                    )
+                }
             }
         }
     }

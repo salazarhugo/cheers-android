@@ -11,7 +11,7 @@ internal data class EditProfileViewModelState(
     val isFollowing: Boolean = false,
     val done: Boolean = false,
     val profilePictureUri: Uri? = null,
-    val bannerUri: Uri? = null,
+    val bannerUri: List<Uri> = emptyList(),
     val drinks: List<Drink>? = null,
 ) {
     fun toUiState(): EditProfileUiState =

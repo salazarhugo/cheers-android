@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,7 +49,7 @@ fun DirectChatBar(
         center = false,
         navigationIcon = {
             IconButton(onClick = onNavIconPressed) {
-                Icon(Icons.Default.ArrowBack, "")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "")
             }
         },
         title = {
@@ -62,6 +62,7 @@ fun DirectChatBar(
             ) {
                 AvatarComponent(
                     avatar = picture,
+                    name = name,
                     modifier = Modifier.padding(3.dp),
                     size = 33.dp,
                 )

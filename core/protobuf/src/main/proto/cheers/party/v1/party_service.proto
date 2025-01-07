@@ -4,9 +4,11 @@ package cheers.party.v1;
 
 import "cheers/type/party/party.proto";
 import "cheers/type/user/user.proto";
+import "cheers/type/filter/filter.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "cheers/type/privacy/privacy.proto";
+import "cheers/type/pagination/pagination.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/party/v1;party";
@@ -74,6 +76,12 @@ service PartyService {
     };
   }
 
+  rpc ListInterested (ListInterestedRequest) returns (ListInterestedResponse) {
+    option (google.api.http) = {
+      get: "/v1/parties/{party_id}/interested"
+    };
+  }
+
   rpc ListGoing (ListGoingRequest) returns (ListGoingResponse) {
     option (google.api.http) = {
       get: "/v1/parties/{party_id}/going"
@@ -111,18 +119,29 @@ message TransferPartyResponse {
 }
 
 message ListPartyRequest {
-  int32 page = 1;
-  int32 page_size = 2;
+  cheers.type.PaginationRequest pagination = 1;
   string user_id = 3;
+  string filter = 4;
 }
 
 message ListPartyResponse {
   repeated PartyItem items = 1;
-  string next_page_token = 2;
+  cheers.type.PaginationResponse pagination = 2;
+  repeated cheers.type.Filter filters = 3;
+}
+
+message ListInterestedRequest {
+  string party_id = 1;
+  cheers.type.PaginationRequest pagination = 2;
+}
+
+message ListInterestedResponse {
+  repeated cheers.type.UserItem users = 1;
 }
 
 message ListGoingRequest {
   string party_id = 1;
+  cheers.type.PaginationRequest pagination = 2;
 }
 
 message ListGoingResponse {
@@ -148,6 +167,7 @@ message CreatePartyRequest {
   string location_name = 10;
   repeated string lineup = 11;
   repeated string music_genres = 12;
+  bool hide_guest_list = 13;
 }
 
 message Geolocation {
@@ -158,7 +178,7 @@ message Geolocation {
 }
 
 message CreatePartyResponse {
-  cheers.type.Party party = 1;
+  PartyItem item = 1;
 }
 
 message GetPartyRequest {
@@ -215,9 +235,7 @@ message DeletePartyResponse {
 
 message FeedPartyRequest {
   string parent = 1;
-  // Optional. The maximum number of Parties to return in the response.
-  int32 page_size = 2;
-  int32 page = 3;
+  cheers.type.PaginationRequest pagination = 2;
   string city = 4;
 }
 

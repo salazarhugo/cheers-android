@@ -1,6 +1,10 @@
 package com.salazar.cheers.core.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.salazar.cheers.core.db.model.ActivityEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -9,8 +13,8 @@ interface ActivityDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(activities: List<ActivityEntity>)
 
-    @Query("SELECT * FROM activity WHERE accountId = :accountId ORDER BY activity.createTime DESC")
-    suspend fun listActivity(accountId: String): List<ActivityEntity>
+    @Query("SELECT * FROM activity ORDER BY activity.createTime DESC")
+    fun listActivityFlow(): Flow<List<ActivityEntity>>
 
     @Query("SELECT COUNT(*) FROM activity WHERE accountId = :accountId AND acknowledged = 0")
     fun countUnreadActivity(accountId: String): Flow<Int>

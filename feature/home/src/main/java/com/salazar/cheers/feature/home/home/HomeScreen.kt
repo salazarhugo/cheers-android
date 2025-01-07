@@ -48,6 +48,7 @@ fun HomeScreen(
     onHomeUIAction: (HomeUIAction) -> Unit,
     navigateToPartyDetail: (String) -> Unit = {},
     navigateToCreateParty: () -> Unit = {},
+    navigateToMyParties: () -> Unit,
 ) {
     val selectedPage = uiState.selectedPage
     val state = rememberRefreshLayoutState()
@@ -143,7 +144,8 @@ fun HomeScreen(
                     navigateToCreateParty = navigateToCreateParty,
                     onChangeCityClick = {
                         showSelectCitySheet = true
-                    }
+                    },
+                    navigateToMyParties = navigateToMyParties,
                 )
             },
         )
@@ -222,6 +224,7 @@ private fun HomeScreenPreview() {
             uiState = HomeUiState(),
             initialSelectedTab = 0,
             onHomeUIAction = {},
+            navigateToMyParties = {},
         )
     }
 }

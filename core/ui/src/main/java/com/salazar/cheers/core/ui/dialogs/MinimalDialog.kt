@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
@@ -16,6 +17,7 @@ import com.salazar.cheers.core.ui.extensions.noRippleClickable
 @Composable
 fun AvatarDialog(
     avatar: String?,
+    name: String?,
     onDismissRequest: () -> Unit = {},
 ) {
     Dialog(
@@ -30,6 +32,7 @@ fun AvatarDialog(
         ) {
             AvatarComponent(
                 avatar = avatar,
+                name = name,
                 size = 220.dp,
             )
         }
@@ -40,6 +43,9 @@ fun AvatarDialog(
 @Composable
 private fun AvatarDialogPreview() {
     CheersPreview {
-        AvatarDialog(avatar = "")
+        AvatarDialog(
+            avatar = "",
+            name = cheersUserItem.name,
+        )
     }
 }

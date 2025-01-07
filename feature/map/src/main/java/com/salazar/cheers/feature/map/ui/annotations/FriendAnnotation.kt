@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
@@ -19,18 +20,19 @@ import java.util.Date
 @Composable
 fun FriendAnnotation(
     name: String,
+    username: String,
     modifier: Modifier = Modifier,
     picture: String? = null,
     isSelected: Boolean = false,
     lastUpdated: Long = Date().time / 1000,
     onClick: () -> Unit = {},
 ) {
-    val color = when(isSelected) {
+    val color = when (isSelected) {
         true -> BlueCheers
         false -> Color.White
     }
 
-    val size = when(isSelected) {
+    val size = when (isSelected) {
         true -> 140.dp
         false -> 100.dp
     }
@@ -44,11 +46,13 @@ fun FriendAnnotation(
                 .shadow(elevation = 9.dp, shape = CircleShape)
                 .border(2.dp, color, CircleShape),
             avatar = picture,
+            name = name,
+            username = username,
             onClick = onClick,
         )
         if (isSelected) {
             UserAnnotationText(
-                name = name,
+                name = name.ifBlank { username },
                 lastUpdated = lastUpdated,
             )
         }
@@ -58,9 +62,11 @@ fun FriendAnnotation(
 @ComponentPreviews
 @Composable
 private fun FriendAnnotationPreview() {
+    val user = cheersUser
     CheersPreview {
         FriendAnnotation(
-            name = "Hugo Salazar",
+            name = user.name,
+            username = user.username,
             modifier = Modifier,
             isSelected = true,
         )

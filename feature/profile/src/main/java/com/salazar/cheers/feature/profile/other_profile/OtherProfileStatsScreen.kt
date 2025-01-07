@@ -34,6 +34,7 @@ fun OtherProfileStatsScreen(
             OtherProfileTopBar(
                 username = uiState.username,
                 verified = uiState.verified,
+                premium = uiState.premium,
                 onBackPressed = onBackPressed
             )
         }

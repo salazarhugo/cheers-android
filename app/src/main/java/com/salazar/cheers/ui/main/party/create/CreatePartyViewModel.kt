@@ -198,5 +198,8 @@ class CreatePartyViewModel @Inject constructor(
     }
 
     fun onPrivacyChange(privacy: Privacy) {
+        viewModelState.update {
+            it.copy(privacy = privacy)
+        }
     }
 }

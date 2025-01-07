@@ -44,6 +44,7 @@ import com.salazar.cheers.data.repository.story.StoryRepository
 import com.salazar.cheers.data.repository.story.impl.StoryRepositoryImpl
 import com.salazar.cheers.data.ticket.TicketRepository
 import com.salazar.cheers.data.ticket.impl.TicketRepositoryImpl
+import com.salazar.cheers.data.user.UserRepository
 import com.salazar.cheers.data.user.account.AccountRepository
 import com.salazar.cheers.data.user.account.AccountRepositoryImpl
 import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
@@ -167,6 +168,14 @@ object AppModule {
         commentRepositoryImpl: com.salazar.cheers.data.friendship.FriendshipRepositoryImpl,
     ): com.salazar.cheers.data.friendship.FriendshipRepository {
         return commentRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(
+        userRepositoryImpl: com.salazar.cheers.data.user.UserRepositoryImpl,
+    ): UserRepository {
+        return userRepositoryImpl
     }
 
     @Provides

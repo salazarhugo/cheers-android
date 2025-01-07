@@ -4,6 +4,7 @@ package cheers.account.v1;
 
 
 import "google/api/annotations.proto";
+import "cheers/type/subscription/subscription.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/account/v1;account";
@@ -32,12 +33,25 @@ service AccountService {
   rpc DeleteAccount (DeleteAccountRequest) returns (DeleteAccountResponse) {
     option (google.api.http) = {
       delete: "/v1/accounts/{account_id}"
+      body: "*"
     };
   }
 
   rpc ListAccount (ListAccountRequest) returns (ListAccountResponse) {
     option (google.api.http) = {
       get: "/v1/accounts/list"
+    };
+  }
+
+  rpc ListSubscription (ListSubscriptionRequest) returns (ListSubscriptionResponse) {
+    option (google.api.http) = {
+      get: "/v1/accounts/subscriptions"
+    };
+  }
+
+  rpc ListSignInMethods (ListSignInMethodsRequest) returns (ListSignInMethodsResponse) {
+    option (google.api.http) = {
+      get: "/v1/accounts/login/methods"
     };
   }
 }
@@ -90,3 +104,25 @@ message ListAccountRequest {
 message ListAccountResponse {
   repeated Account accounts = 1;
 }
+
+message ListSubscriptionRequest {
+}
+
+message ListSubscriptionResponse {
+  repeated cheers.type.Subscription subscriptions = 1;
+}
+
+message ListSignInMethodsRequest {
+}
+
+message ListSignInMethodsResponse {
+  repeated SignInMethod method = 1;
+}
+
+message SignInMethod {
+  string name = 1;
+  string icon = 2;
+  bool enabled = 3;
+  int64 create_time = 4;
+}
+

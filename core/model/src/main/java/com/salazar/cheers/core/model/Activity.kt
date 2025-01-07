@@ -38,5 +38,5 @@ enum class ActivityType {
 }
 
 val emptyActivity = Activity()
-val followActivity = emptyActivity.copy(type = FRIEND_ADDED)
-val infoActivity = emptyActivity.copy(type = INFORMATION, text = "Your account has been verified.")
+val followActivity = emptyActivity.copy(type = FRIEND_ADDED, username = cheersUserItem.username)
+val infoActivity = emptyActivity.copy(type = INFORMATION, text = "Your account has been verified.", username = cheersUserItem.username)

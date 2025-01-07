@@ -13,10 +13,12 @@ data class ChatMessage(
     val isSender: Boolean = false,
     val hasLiked: Boolean = false,
     val senderProfilePictureUrl: String,
+    val images: List<String> = emptyList(),
     val likedBy: List<String> = emptyList(),
     val seenBy: List<String> = emptyList(),
     val type: MessageType = MessageType.TEXT,
     val status: ChatMessageStatus = ChatMessageStatus.UNRECOGNIZED,
+    val replyTo: ChatMessage? = null,
 )
 
 enum class ChatMessageStatus {
@@ -28,3 +30,19 @@ enum class ChatMessageStatus {
     FAILED,
     UNRECOGNIZED,
 }
+
+val EmptyChatMessage: ChatMessage = ChatMessage(
+    id = "",
+    roomId = "",
+    text = "",
+    photoUrl = "",
+    createTime = 0,
+    senderId = "",
+    senderName = "",
+    senderUsername = "",
+    isSender = false,
+    hasLiked = false,
+    senderProfilePictureUrl = "",
+    status = ChatMessageStatus.UNRECOGNIZED,
+    type = MessageType.TEXT,
+)

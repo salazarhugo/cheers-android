@@ -12,12 +12,14 @@ data class OtherProfileStatsScreen(
     val otherUserID: UserID,
     val username: String,
     val verified: Boolean,
+    val premium: Boolean,
 )
 
 fun NavController.navigateToOtherProfileStats(
     otherUserID: UserID,
     username: String,
     verified: Boolean,
+    premium: Boolean,
     navOptions: NavOptions? = null,
 ) {
     navigate(
@@ -25,6 +27,7 @@ fun NavController.navigateToOtherProfileStats(
             otherUserID = otherUserID,
             username = username,
             verified = verified,
+            premium = premium,
         ),
         navOptions = navOptions,
     )

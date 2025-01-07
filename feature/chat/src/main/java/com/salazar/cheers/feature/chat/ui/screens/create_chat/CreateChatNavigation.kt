@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.Constants
 import kotlinx.serialization.Serializable
 
@@ -24,7 +25,7 @@ fun NavController.navigateToCreateChat(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.createChatScreen(
     navigateBack: () -> Unit,
-    navigateToChatWithChannelId: (String) -> Unit,
+    navigateToChat: (UserItem) -> Unit,
 ) {
     composable<CreateChatScreen>(
         deepLinks = listOf(
@@ -39,7 +40,7 @@ fun NavGraphBuilder.createChatScreen(
     ) {
         CreateChatRoute(
             navigateBack = navigateBack,
-            navigateToChatWithChannelId = navigateToChatWithChannelId,
+            navigateToChat = navigateToChat,
         )
     }
 }

@@ -1,9 +1,18 @@
 package com.salazar.cheers.feature.parties.detail
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.ui.modifier.rememberFlowWithLifecycle
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @Composable
 fun PartyDetailRoute(
@@ -17,9 +26,28 @@ fun PartyDetailRoute(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val sideEffect = rememberFlowWithLifecycle(
+        flow = viewModel.sideEffect,
+        lifecycle = LocalLifecycleOwner.current.lifecycle,
+    )
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(sideEffect) {
+        sideEffect.onEach {
+            scope.launch {
+                val message = it
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    withDismissAction = true,
+                )
+            }
+        }.launchIn(this)
+    }
 
     if (uiState is PartyDetailUiState.HasParty) {
         PartyDetailScreen(
+            snackbarHostState = snackbarHostState,
             uiState = uiState,
             onMapClick = navigateToMap,
             onUserClicked = navigateToOtherProfile,
@@ -37,8 +65,9 @@ fun PartyDetailRoute(
                 navigateToEditParty(eventId)
             },
             onDeleteClick = {
-                viewModel.deleteParty()
-                navigateBack()
+                viewModel.deleteParty {
+                    navigateBack()
+                }
             },
             onGoingCountClick = {
                 val eventId = uiState.party.id
@@ -48,16 +77,13 @@ fun PartyDetailRoute(
                 val eventId = uiState.party.id
                 navigateToGuestList(eventId)
             },
-            onTicketingClick = {
-                navigateToTicketing(it)
-            },
+            onTicketingClick = navigateToTicketing,
             onAnswersClick = {
                 val eventId = uiState.party.id
                 navigateToGuestList(eventId)
             }
         )
-    }
-    else {
+    } else {
         PartyDetailLoadingScreen()
     }
 }

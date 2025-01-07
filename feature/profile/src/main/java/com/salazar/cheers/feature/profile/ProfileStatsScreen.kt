@@ -16,23 +16,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,19 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.UserItem
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.UserItem
-import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
-import com.salazar.cheers.core.ui.ui.Username
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.feature.profile.profile.ProfileUIAction
+import com.salazar.cheers.feature.profile.profile.ProfileTopBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,6 +52,7 @@ fun ProfileStatsScreen(
     uiState: ProfileStatsUiState,
     username: String,
     verified: Boolean,
+    premium: Boolean,
     onBackPressed: () -> Unit,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
@@ -72,6 +63,7 @@ fun ProfileStatsScreen(
         topBar = {
             ProfileTopBar(
                 username = username,
+                premium = premium,
                 verified = verified,
                 onBackPressed = onBackPressed,
             )
@@ -112,19 +104,10 @@ fun Tabs(
     )
     val scope = rememberCoroutineScope()
 
-    TabRow(
-        // Our selected tab is our current page
+    PrimaryTabRow(
         selectedTabIndex = pagerState.currentPage,
-        // Override the indicator, using the provided pagerTabIndicatorOffset modifier
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-            )
-        },
-//        backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
-        // Add tabs for all of our pages
         pages.forEachIndexed { index, title ->
             Tab(
                 text = {
@@ -275,42 +258,3 @@ fun SearchBar() {
         )
     }
 }
-
-@Composable
-fun ProfileTopBar(
-    username: String,
-    verified: Boolean,
-    onBackPressed: () -> Unit,
-    onMenuClick: () -> Unit = {},
-    onEditClick: () -> Unit = {},
-) {
-    TopAppBar(
-        title = {
-            Username(
-                username = username,
-                verified = verified,
-                textStyle = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Roboto
-                ),
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(Icons.Outlined.ArrowBack, "")
-            }
-        },
-        actions = {
-            IconButton(onClick = onEditClick) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = null,
-                )
-            }
-            IconButton(onClick = onMenuClick) {
-                Icon(Icons.Outlined.Menu, null)
-            }
-        }
-    )
-}
-

@@ -4,19 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.salazar.cheers.core.model.PartyID
 import com.salazar.cheers.core.model.RecentSearch
 
-/**
- * Stateful composable that displays the Navigation route for the Search screen.
- *
- * @param viewModel ViewModel that handles the business logic of this screen
- */
 @Composable
 fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel(),
     navigateToOtherProfile: (String) -> Unit,
     navigateToMap: () -> Unit,
-    navigateToParty: (partyID: String) -> Unit,
+    navigateToParty: (PartyID) -> Unit,
     onBackPressed: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -30,6 +26,10 @@ fun SearchRoute(
             viewModel.insertRecentUser(userItem)
             navigateToOtherProfile(userItem.username)
         },
+        onPartyClick = { party ->
+            viewModel.insertRecentParty(party)
+            navigateToParty(party.id)
+        },
         onRecentSearchClick = {
             when (it) {
                 is RecentSearch.Party -> navigateToParty(it.party.id)
@@ -41,6 +41,6 @@ fun SearchRoute(
         onMapClick = navigateToMap,
         onBackPressed = onBackPressed,
         onSearch = viewModel::onSearch,
-        onPartyClick = navigateToParty,
+        onClearRecentClick = viewModel::onClearRecent,
     )
 }

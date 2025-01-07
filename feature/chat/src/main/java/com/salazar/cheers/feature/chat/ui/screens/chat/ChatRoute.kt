@@ -20,26 +20,26 @@ import com.salazar.cheers.core.ui.ui.Permission
 
 @Composable
 fun ChatRoute(
-    chatViewModel: ChatViewModel = hiltViewModel(),
+    viewModel: ChatViewModel = hiltViewModel(),
     showSnackBar: (String) -> Unit,
     navigateBack: () -> Unit,
     navigateToOtherProfile: (String) -> Unit,
     navigateToRoomDetails: (String) -> Unit,
 ) {
-    val uiState by chatViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
             if (it != null) {
-                chatViewModel.sendImageMessage(listOf(it))
+                viewModel.updateImages(listOf(it))
             }
         }
 
     DisposableEffect(Unit) {
-        chatViewModel.startPresence()
-        chatViewModel.sendReadReceipt()
+        viewModel.startPresence()
+        viewModel.sendReadReceipt()
         onDispose {
-            chatViewModel.endPresence()
+            viewModel.endPresence()
         }
     }
 
@@ -56,11 +56,11 @@ fun ChatRoute(
         Permission(permission = Manifest.permission.RECORD_AUDIO) {
             Permission(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                 SideEffect {
-                    chatViewModel.startRecording()
+                    viewModel.startRecording()
                 }
                 DisposableEffect(Unit) {
                     onDispose {
-                        chatViewModel.stopRecording()
+                        viewModel.stopRecording()
                     }
                 }
             }
@@ -77,18 +77,19 @@ fun ChatRoute(
             uiState = uiState,
             onChatUIAction = { action ->
                 when (action) {
-                    is ChatUIAction.OnReplyMessage -> chatViewModel.onReplyMessage(action.message)
-                    is ChatUIAction.OnLikeClick -> chatViewModel.likeMessage(action.messageId)
-                    is ChatUIAction.OnUnLikeClick -> chatViewModel.unlikeMessage(action.messageId)
+                    is ChatUIAction.OnReplyMessage -> viewModel.onReplyMessage(action.message)
+                    is ChatUIAction.OnLikeClick -> viewModel.likeMessage(action.messageId)
+                    is ChatUIAction.OnUnLikeClick -> viewModel.unlikeMessage(action.messageId)
                     is ChatUIAction.OnSwipeRefresh -> TODO()
                     is ChatUIAction.OnUserClick -> navigateToOtherProfile(action.userId)
                     is ChatUIAction.OnBackPressed -> navigateBack()
-                    is ChatUIAction.OnUnSendMessage -> chatViewModel.unsendMessage(action.messageId)
-                    is ChatUIAction.OnSendTextMessage -> chatViewModel.sendTextMessage(action.text)
+                    is ChatUIAction.OnUnSendMessage -> viewModel.deleteChatMessage(action.messageId)
+                    is ChatUIAction.OnSendTextMessage -> viewModel.sendChatMessage(action.text)
                     is ChatUIAction.OnImageSelectorClick -> launcher.launch("image/*")
                     is ChatUIAction.OnCopyText -> TODO()
-                    is ChatUIAction.OnTextInputChange -> chatViewModel.onTextChanged(action.text)
+                    is ChatUIAction.OnTextInputChange -> viewModel.onTextChanged(action.text)
                     is ChatUIAction.OnRoomInfoClick -> navigateToRoomDetails(action.roomId)
+                    is ChatUIAction.OnLoadMoreChatMessages -> viewModel.onLoadMore(action.index)
                 }
             },
         )

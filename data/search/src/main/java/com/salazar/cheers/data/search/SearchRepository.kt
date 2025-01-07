@@ -20,4 +20,6 @@ interface SearchRepository {
 
     suspend fun deleteRecentSearch(search: RecentSearch): Result<Unit, DataError.Local>
 
+    suspend fun clearRecentSearch(): Result<Unit, DataError.Local>
+
 }

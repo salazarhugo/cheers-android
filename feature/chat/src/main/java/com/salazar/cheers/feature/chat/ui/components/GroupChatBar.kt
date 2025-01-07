@@ -1,31 +1,35 @@
 package com.salazar.cheers.feature.chat.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
+import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.feature.chat.R
 
 @Composable
 fun GroupChatBar(
     name: String,
-    members: Int,
+    membersCount: Int,
     picture: String?,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
@@ -50,31 +54,24 @@ fun GroupChatBar(
                     onTitleClick()
                 }
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current).data(data = picture)
-                            .apply(block = fun ImageRequest.Builder.() {
-                                transformations(CircleCropTransformation())
-                                error(R.drawable.default_profile_picture)
-                            }).build()
-                    ),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(33.dp)
-                        .padding(3.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
+                AvatarComponent(
+                    avatar = picture,
+                    name = name,
+                    modifier = Modifier.padding(3.dp),
+                    size = 33.dp,
                 )
                 Spacer(Modifier.width(8.dp))
                 Column {
                     // Place rouge
                     Text(
                         text = name,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                     // 6 members
                     Text(
-                        text = "$members members",
+                        text = pluralStringResource(com.salazar.cheers.core.ui.R.plurals.members, membersCount, membersCount),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

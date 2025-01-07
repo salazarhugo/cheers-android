@@ -2,6 +2,7 @@ package com.salazar.cheers.feature.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.RecentSearch
 import com.salazar.cheers.core.model.SearchResult
 import com.salazar.cheers.core.model.UserItem
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface SearchResultState {
+    data object Uninitialized : SearchResultState
     data object Loading : SearchResultState
     data class SearchResults(val searchResult: SearchResult) :
         SearchResultState
@@ -27,7 +29,7 @@ class SearchViewModel @Inject constructor(
     private val searchUseCases: SearchUseCases,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(SearchUiState(isLoading = true))
+    private val viewModelState = MutableStateFlow(SearchUiState(isLoading = false))
     private var searchJob: Job? = null
 
     val uiState = viewModelState
@@ -40,7 +42,6 @@ class SearchViewModel @Inject constructor(
     init {
         refreshSuggestions()
         updateRecentUser()
-        queryUsers(fetchFromRemote = false)
     }
 
     private fun updateRecentUser() {
@@ -66,6 +67,7 @@ class SearchViewModel @Inject constructor(
             it.copy(searchInput = searchInput, isLoading = true)
         }
         searchJob?.cancel()
+        if (searchInput.length <= 2) return
         searchJob = viewModelScope.launch {
             delay(500L)
             queryUsers(query = searchInput)
@@ -115,6 +117,13 @@ class SearchViewModel @Inject constructor(
     fun toggleFollow(username: String) {
     }
 
+    fun insertRecentParty(party: Party) {
+        viewModelScope.launch {
+            val recentSearch = RecentSearch.Party(party = party)
+            searchUseCases.createRecentUserUseCase(recentSearch)
+        }
+    }
+
     fun insertRecentUser(user: UserItem) {
         viewModelScope.launch {
             val recentSearch = RecentSearch.User(user = user)
@@ -136,6 +145,12 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             val recentSearch = RecentSearch.Text(text = query)
             searchUseCases.createRecentUserUseCase(recentSearch)
+        }
+    }
+
+    fun onClearRecent() {
+        viewModelScope.launch {
+            searchUseCases.clearRecentSearchUseCase()
         }
     }
 }

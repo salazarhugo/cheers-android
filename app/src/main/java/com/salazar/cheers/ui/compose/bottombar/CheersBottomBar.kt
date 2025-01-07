@@ -36,6 +36,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import com.salazar.cheers.core.data.internal.clearRippleConfiguration
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.feature.signin.SignInScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -62,6 +63,9 @@ fun CheersBottomBar(
 
     if (showAccountBottomSheet) {
         AccountBottomSheet(
+            navigateToLogin = {
+                onNavigate(SignInScreen)
+            },
             sheetState = sheetState,
             onDismiss = {
                 scope.launch {

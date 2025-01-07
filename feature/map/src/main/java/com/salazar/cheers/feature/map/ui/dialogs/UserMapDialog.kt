@@ -86,6 +86,8 @@ fun UserLocationItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AvatarComponent(
                     avatar = userLocation.picture,
+                    name = userLocation.name,
+                    username = userLocation.username,
                     size = 64.dp,
                     onClick = onUserClick,
                 )

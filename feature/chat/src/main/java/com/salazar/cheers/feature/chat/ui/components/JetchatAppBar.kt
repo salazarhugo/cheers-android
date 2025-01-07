@@ -3,11 +3,13 @@
 package com.salazar.cheers.feature.chat.ui.components
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CheersAppBar(
@@ -20,7 +22,7 @@ fun CheersAppBar(
     navigationIcon: @Composable () -> Unit = {}
 ) {
     val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-        containerColor = Color.Transparent,
+//        containerColor = Color.Transparent,
     )
     if (center)
         CenterAlignedTopAppBar(

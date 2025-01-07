@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Help
+import androidx.compose.material.icons.automirrored.outlined.FactCheck
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
@@ -29,9 +29,15 @@ fun PartyWatchStatusButton(
     modifier: Modifier = Modifier,
     watchStatus: WatchStatus,
     onGoingToggle: () -> Unit,
+    onInterestedClick: () -> Unit,
+    onGoingClick: () -> Unit,
 ) {
     val iconGoing =
-        if (watchStatus == WatchStatus.GOING) Icons.Rounded.Check else Icons.Outlined.HelpOutline
+        if (watchStatus == WatchStatus.GOING) {
+            Icons.Rounded.Check
+        } else {
+            Icons.Filled.Star
+        }
 
     if (watchStatus == WatchStatus.UNWATCHED) {
         Row(
@@ -41,10 +47,10 @@ fun PartyWatchStatusButton(
         ) {
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = onGoingToggle,
+                onClick = onInterestedClick,
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Star,
+                    imageVector = Icons.Outlined.StarOutline,
                     contentDescription = "Star icon",
                 )
                 Spacer(Modifier.width(8.dp))
@@ -54,10 +60,10 @@ fun PartyWatchStatusButton(
             }
             FilledTonalButton(
                 modifier = Modifier.weight(1f),
-                onClick = onGoingToggle,
+                onClick = onGoingClick,
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Help,
+                    imageVector = Icons.AutoMirrored.Outlined.FactCheck,
                     contentDescription = "Help icon",
                 )
                 Spacer(Modifier.width(8.dp))
@@ -95,6 +101,8 @@ private fun PartyWatchStatusButtonPreview() {
                 modifier = Modifier.fillMaxWidth(),
                 watchStatus = it,
                 onGoingToggle = {},
+                onInterestedClick = {},
+                onGoingClick = {},
             )
         }
     }

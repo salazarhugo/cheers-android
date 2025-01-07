@@ -16,12 +16,13 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
-    
     implementation(projects.core.model)
     implementation(projects.core.protobuf)
     implementation(projects.core.util)
     implementation(projects.core.shared)
     implementation(projects.core.db)
+
+    implementation(projects.data.post)
 
     // Firebase
     implementation(platform(libs.firebase.bom)) {

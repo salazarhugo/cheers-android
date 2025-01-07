@@ -1,11 +1,15 @@
 package com.salazar.cheers.core.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.salazar.cheers.core.db.model.ChatChannelEntity
 import com.salazar.cheers.core.db.model.ChatMessageEntity
-import com.salazar.cheers.core.model.MessageType
 import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.core.model.ChatType
+import com.salazar.cheers.core.model.MessageType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -33,6 +37,9 @@ interface ChatDao {
 
     @Query("DELETE FROM room WHERE id = :channelId")
     suspend fun deleteChannel(channelId: String)
+
+    @Query("DELETE FROM message WHERE id = :chatMessageID")
+    suspend fun deleteChatMessage(chatMessageID: String)
 
     @Query("DELETE FROM message WHERE roomId = :channelId")
     suspend fun deleteChannelMessages(channelId: String)
@@ -78,8 +85,18 @@ interface ChatDao {
     fun getChannelFlow(channelId: String): Flow<ChatChannelEntity?>
 
     @Transaction
-    @Query("SELECT * FROM room WHERE type = :direct AND members  LIKE '%' || :userId || '%' LIMIT 1")
-    fun getChatWithUser(userId: String, direct: ChatType = ChatType.DIRECT): ChatChannelEntity?
+    @Query(
+        """
+        SELECT * FROM room 
+        WHERE type = :direct 
+        AND otherUserId = :userId 
+        LIMIT 1
+    """
+    )
+    fun getChatWithUser(
+        userId: String,
+        direct: ChatType = ChatType.DIRECT,
+    ): ChatChannelEntity?
 
     @Query("UPDATE room SET status = :status WHERE id = :channelId")
     suspend fun setStatus(

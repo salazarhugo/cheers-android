@@ -2,17 +2,13 @@ package com.salazar.cheers.data.user.workers
 
 import android.content.ContentValues.TAG
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
-import com.salazar.cheers.core.util.StorageUtil
-import com.salazar.cheers.core.util.Utils
+import com.salazar.cheers.data.post.repository.MEDIA_URLS_KEY
 import com.salazar.cheers.data.user.R
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import dagger.assisted.Assisted
@@ -27,17 +23,16 @@ class UploadProfileBanner @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
 
-        val photoUriInput =
-            inputData.getString("PHOTO_URI") ?: return Result.failure()
+        val banners = inputData.getStringArray(MEDIA_URLS_KEY)
+            ?: return Result.failure()
 
         try {
-            val photoBytes = Utils.extractImage(Uri.parse(photoUriInput), applicationContext)
-
-            val task: Task<Uri> = StorageUtil.uploadProfileBanner(photoBytes)
-            val downloadUrl = Tasks.await(task)
-
             val user = userRepositoryImpl.getCurrentUser()
-            userRepositoryImpl.updateUserProfile(user.copy(banner = downloadUrl.toString()))
+
+            userRepositoryImpl.updateUserProfile(
+                user = user.copy(banner = banners.toList()),
+                updateMask = listOf("banners"),
+            )
 
             return Result.success()
         } catch (throwable: Throwable) {

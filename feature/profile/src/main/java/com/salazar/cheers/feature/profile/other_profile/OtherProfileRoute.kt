@@ -30,7 +30,7 @@ fun OtherProfileRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val state = rememberRefreshLayoutState()
-    val scope  = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(uiState.isRefreshing) {
         if (!uiState.isRefreshing) {
@@ -44,6 +44,7 @@ fun OtherProfileRoute(
         topBar = {
             OtherProfileTopBar(
                 username = uiState.username,
+                premium = (uiState as? OtherProfileUiState.HasUser)?.user?.premium ?: false,
                 verified = (uiState as? OtherProfileUiState.HasUser)?.user?.verified ?: false,
                 onBackPressed = navigateBack,
                 onCopyUrl = {},
@@ -56,30 +57,45 @@ fun OtherProfileRoute(
             onRefresh = viewModel::onSwipeRefresh,
             modifier = Modifier.padding(top = insets.calculateTopPadding()),
         ) {
-            when(uiState) {
+            when (uiState) {
                 is OtherProfileUiState.Loading -> LoadingScreen()
                 is OtherProfileUiState.NotFound -> {
                     UserNotFoundMessage(
                         modifier = Modifier.fillMaxSize()
                     )
                 }
+
                 is OtherProfileUiState.HasUser -> {
                     val user = (uiState as OtherProfileUiState.HasUser).user
                     OtherProfileScreen(
                         uiState = uiState as OtherProfileUiState.HasUser,
                         onOtherProfileUIAction = { action ->
-                            when(action) {
-                                is OtherProfileUIAction.OnSendFriendRequest -> viewModel.sendFriendRequest(action.userID)
-                                is OtherProfileUIAction.OnAcceptFriendRequest -> viewModel.acceptFriendRequest(action.userID)
-                                is OtherProfileUIAction.OnCancelFriendRequest -> viewModel.cancelFriendRequest(action.userID)
+                            when (action) {
+                                is OtherProfileUIAction.OnSendFriendRequest -> viewModel.sendFriendRequest(
+                                    action.userID
+                                )
+
+                                is OtherProfileUIAction.OnAcceptFriendRequest -> viewModel.acceptFriendRequest(
+                                    action.userID
+                                )
+
+                                is OtherProfileUIAction.OnCancelFriendRequest -> viewModel.cancelFriendRequest(
+                                    action.userID
+                                )
+
                                 is OtherProfileUIAction.OnPostClick -> navigateToPostDetail(action.postID)
                                 OtherProfileUIAction.OnBackPressed -> navigateBack()
                                 OtherProfileUIAction.OnEditProfileClick -> TODO()
-                                OtherProfileUIAction.OnFriendListClick -> navigateToOtherProfileStats(user)
+                                OtherProfileUIAction.OnFriendListClick -> navigateToOtherProfileStats(
+                                    user
+                                )
+
                                 OtherProfileUIAction.OnSendMessageClick -> navigateToChat(user.toUserItem())
                                 OtherProfileUIAction.OnSwipeRefresh -> viewModel.onSwipeRefresh()
                                 OtherProfileUIAction.OnGiftClick -> TODO()
-                                OtherProfileUIAction.OnFriendshipClick -> navigateToManageFriendship(user.id)
+                                OtherProfileUIAction.OnFriendshipClick -> navigateToManageFriendship(
+                                    user.id
+                                )
                             }
                         },
                     )

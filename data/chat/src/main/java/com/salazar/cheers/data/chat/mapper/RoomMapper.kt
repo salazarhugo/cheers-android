@@ -2,9 +2,9 @@ package com.salazar.cheers.data.chat.mapper
 
 import cheers.chat.v1.Room
 import com.salazar.cheers.core.model.ChatChannel
-import com.salazar.cheers.core.model.MessageType
 import com.salazar.cheers.core.model.ChatStatus
 import com.salazar.cheers.core.model.ChatType
+import com.salazar.cheers.core.model.MessageType
 
 fun Room.toChatChannel(): ChatChannel {
     return ChatChannel(
@@ -19,10 +19,12 @@ fun Room.toChatChannel(): ChatChannel {
         lastMessageTime = lastMessageTime,
         lastMessageType = MessageType.TEXT,
         status = status.toRoomStatus(),
-        members = membersList,
+        members = members10List,
         type = type.toRoomType(),
         ownerId = owner,
         unreadCount = unreadMessageCount.toInt(),
+        membersCount = membersCount20.toInt(),
+        otherUserId = otherUserId,
     )
 }
 

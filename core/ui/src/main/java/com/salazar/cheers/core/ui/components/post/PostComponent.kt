@@ -62,6 +62,7 @@ fun PostComponent(
                 .padding(top = 8.dp)
                 .padding(horizontal = 16.dp),
             username = post.username,
+            name = post.name,
             verified = post.verified,
             avatar = post.profilePictureUrl,
             locationName = post.locationName,

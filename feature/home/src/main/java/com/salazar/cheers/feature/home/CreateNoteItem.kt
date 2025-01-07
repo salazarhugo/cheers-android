@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.animations.Bounce
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
@@ -25,7 +26,9 @@ import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 
 @Composable
 fun CreateNoteItem(
+    name: String?,
     picture: String?,
+    username: String?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
@@ -45,6 +48,8 @@ fun CreateNoteItem(
             ) {
                 AvatarComponent(
                     avatar = picture,
+                    username = username,
+                    name = name,
                     modifier = avatarModifier,
                     size = 72.dp,
                     onClick = onClick,
@@ -69,9 +74,12 @@ fun CreateNoteItem(
 @ComponentPreviews
 @Composable
 private fun CreateNoteComponentPreview() {
+    val user = cheersUser
     CheersPreview {
         CreateNoteItem(
-            picture = null,
+            picture = user.picture,
+            name = user.name,
+            username = user.username,
         )
     }
 }

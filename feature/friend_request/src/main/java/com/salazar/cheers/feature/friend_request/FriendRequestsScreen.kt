@@ -17,14 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.AddFriendButton
 import com.salazar.cheers.core.ui.CheersOutlinedButton
 import com.salazar.cheers.core.ui.UserItem
 import com.salazar.cheers.core.ui.text.MyText
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
 import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.rememberSwipeToRefreshState
-import com.salazar.cheers.core.ui.AddFriendButton
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 
 @Composable
 fun FriendRequestsScreen(
@@ -79,7 +79,7 @@ fun FriendRequestList(
                 }
             )
         }
-        if (suggestions != null) {
+        if (!suggestions.isNullOrEmpty()) {
             item {
                 MyText(
                     text = "Suggested for you",

@@ -13,6 +13,7 @@ private val DarkColorPalette = darkColorScheme(
     background = Color(0xFF101010),
     surface = Color(0xFF101010),
     onSurface = Color.White,
+    outline = Color(0xFF2B3036),
 )
 
 private val LightColorPalette = lightColorScheme(

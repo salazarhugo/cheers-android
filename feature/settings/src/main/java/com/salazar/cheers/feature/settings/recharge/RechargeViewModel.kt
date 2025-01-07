@@ -70,7 +70,7 @@ class RechargeViewModel @Inject constructor(
         activity: Activity
     ) {
         viewModelScope.launch {
-            launchBillingFlowUseCase(activity, productDetails)
+            launchBillingFlowUseCase(activity, productDetails, "")
         }
     }
 

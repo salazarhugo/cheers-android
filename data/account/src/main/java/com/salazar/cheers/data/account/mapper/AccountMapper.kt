@@ -12,7 +12,7 @@ fun LoginResponse.toAccount(): Account {
             verified = verified ?: false,
             email = email.orEmpty(),
             picture = picture.orEmpty(),
-            banner = banner.orEmpty(),
+            banners = listOf(banner.orEmpty()),
         )
     }
 }

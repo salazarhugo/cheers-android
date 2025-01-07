@@ -15,10 +15,16 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,12 +34,14 @@ import com.salazar.cheers.core.util.numberFormatter
 import com.salazar.cheers.core.util.relativeTimeFormatter
 import com.salazar.cheers.feature.parties.ui.PartyDescription
 import com.salazar.cheers.feature.parties.ui.PartyLineup
+import com.salazar.cheers.feature.parties.ui.PartyManageSheet
 import com.salazar.cheers.feature.parties.ui.PartyMood
 import com.salazar.cheers.feature.parties.ui.PartyVenue
 import kotlinx.coroutines.launch
 
 @Composable
 fun PartyDetailScreen(
+    snackbarHostState: SnackbarHostState,
     uiState: PartyDetailUiState,
     onMapClick: () -> Unit,
     onUserClicked: (String) -> Unit,
@@ -46,29 +54,28 @@ fun PartyDetailScreen(
     onTicketingClick: (String) -> Unit,
     onAnswersClick: () -> Unit,
 ) {
-    val state = rememberModalBottomSheetState(true)
     val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSheet by remember { mutableStateOf(false) }
 
-//    ModalBottomSheetLayout(
-//        sheetState = state,
-//        sheetContent = {
-//            PartyManageSheet(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .systemBarsPadding(),
-//                onCopyLink = onCopyLink,
-//                onEditClick = onEditClick,
-//                onDeleteClick = onDeleteClick,
-//            )
-//        },
-//        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-//        sheetBackgroundColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
-//    )
-    Scaffold {
+    if (showSheet) {
+        PartyManageSheet(
+            sheetState = sheetState,
+            onCopyLink = onCopyLink,
+            onEditClick = onEditClick,
+            onDeleteClick = onDeleteClick,
+            onDismiss = {
+                showSheet = false
+            }
+        )
+    }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) {
         it
-        Box(
-//            modifier = Modifier.padding(it)
-        ) {
+        Box {
             when (uiState) {
                 is PartyDetailUiState.HasParty -> PartyDetail(
                     party = uiState.party,
@@ -76,7 +83,8 @@ fun PartyDetailScreen(
                     onUserClicked = onUserClicked,
                     onManageClick = {
                         scope.launch {
-                            state.show()
+                            showSheet = true
+                            sheetState.show()
                         }
                     },
                     onWatchStatusChange = onWatchStatusChange,

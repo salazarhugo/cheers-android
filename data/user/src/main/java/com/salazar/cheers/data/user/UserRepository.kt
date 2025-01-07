@@ -2,6 +2,7 @@ package com.salazar.cheers.data.user
 
 import android.net.Uri
 import com.salazar.cheers.core.model.CheckUsernameResult
+import com.salazar.cheers.core.model.Gender
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.UserStats
@@ -42,15 +43,21 @@ interface UserRepository {
 
     suspend fun updateUserProfile(
         user: User,
+        updateMask: List<String>? = null,
     ): Result<User>
 
     suspend fun updateUserProfile(
         picture: String? = null,
-        banner: String? = null,
+        banner: List<String>? = null,
         bio: String? = null,
         name: String? = null,
         website: String? = null,
         favouriteDrinkId: String? = null,
+        gender: Gender? = null,
+        jobTitle: String = "",
+        jobCompany: String = "",
+        education: String = "",
+        updateMask: List<String>? = null,
     ): Result<User>
 
     suspend fun getUsersWithListOfIds(ids: List<String>): List<User>
@@ -86,7 +93,7 @@ interface UserRepository {
     )
 
     fun uploadProfileBanner(
-        picture: Uri,
+        banners: List<Uri>,
     )
 
     suspend fun saveUserPicture(

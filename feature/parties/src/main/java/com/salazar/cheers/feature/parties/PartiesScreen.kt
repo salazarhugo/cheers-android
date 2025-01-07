@@ -37,6 +37,7 @@ fun PartiesScreen(
             modifier = Modifier.padding(top = it.calculateTopPadding()),
         ) {
             PartyList(
+                myParties = uiState.myParties,
                 isLoading = uiState.isLoading,
                 isLoadingMore = uiState.isLoadingMore,
                 parties = parties,
@@ -45,6 +46,7 @@ fun PartiesScreen(
                 onChangeCityClick = onChangeCityClick,
                 onCreatePartyClick = onCreatePartyClick,
                 onLoadMore = onLoadMore,
+                onMyPartiesClick = {},
             )
         }
     }

@@ -28,6 +28,7 @@ fun AccountBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
     onDismiss: () -> Unit = {},
+    navigateToLogin: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val account = uiState.account
@@ -48,7 +49,7 @@ fun AccountBottomSheet(
                     .padding(16.dp),
                 onClick = {
                     viewModel.onSignOut {
-                        onDismiss()
+                        navigateToLogin()
                     }
                 }
             ) {
@@ -58,7 +59,7 @@ fun AccountBottomSheet(
             }
         } else {
             LoginMessage(
-                onSignInClick = {},
+                onSignInClick = navigateToLogin,
                 onRegisterClick = {},
             )
         }

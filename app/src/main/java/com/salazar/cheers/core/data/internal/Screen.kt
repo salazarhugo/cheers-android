@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.salazar.cheers.R
 import com.salazar.cheers.feature.map.navigation.MapScreen
 import com.salazar.cheers.feature.parties.partiesNavigationRoute
+import com.salazar.cheers.ui.main.party.create.CreatePartyGraph
 
 sealed class Screen(
     val route: Any,
@@ -44,6 +45,13 @@ sealed class Screen(
         icon = Icons.Outlined.ChatBubbleOutline,
         selectedIcon = Icons.Filled.ChatBubble,
         label = R.string.chat,
+    )
+
+    data object CreateParty : Screen(
+        route = CreatePartyGraph,
+        icon = Icons.Outlined.AddBox,
+        selectedIcon = Icons.Outlined.AddBox,
+        label = R.string.search,
     )
 
     data object CreatePost : Screen(

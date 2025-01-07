@@ -69,6 +69,7 @@ fun DirectChatComponent(
         ) {
             AvatarComponent(
                 avatar = channel.picture,
+                name = channel.name,
                 size = 50.dp,
             )
             Spacer(modifier = Modifier.width(14.dp))

@@ -6,6 +6,8 @@ sealed class ProfileUIAction {
     data object OnEditProfileClick : ProfileUIAction()
     data object OnFriendListClick : ProfileUIAction()
     data class OnPostMoreClick(val postID: String) : ProfileUIAction()
+    data class OnLinkClick(val link: String) : ProfileUIAction()
     data class OnPostDetailsClick(val postID: String) : ProfileUIAction()
+    data class OnPartyClick(val partyID: String) : ProfileUIAction()
     data class OnUserClick(val userID: String) : ProfileUIAction()
 }

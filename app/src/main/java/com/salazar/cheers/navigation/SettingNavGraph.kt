@@ -7,8 +7,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.salazar.cheers.core.ui.ui.MainDestinations
 import com.salazar.cheers.core.ui.ui.SettingDestinations
+import com.salazar.cheers.feature.premium.navigation.PremiumWelcomeScreen
 import com.salazar.cheers.feature.premium.navigation.navigateToPremium
+import com.salazar.cheers.feature.premium.navigation.navigateToWelcomePremium
 import com.salazar.cheers.feature.premium.navigation.premiumScreen
+import com.salazar.cheers.feature.premium.navigation.premiumWelcomeScreen
+import com.salazar.cheers.feature.profile.navigation.navigateToProfile
 import com.salazar.cheers.feature.settings.SettingsNavGraph
 import com.salazar.cheers.feature.settings.SettingsScreen
 import com.salazar.cheers.feature.settings.language.languagesScreen
@@ -65,6 +69,21 @@ fun NavGraphBuilder.settingsNavGraph(
 
         premiumScreen(
             navigateBack = navController::popBackStack,
+            navigateToWelcomeCheersPremium = {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(route = MainNavGraph, inclusive = true)
+                    .build()
+                navController.navigateToWelcomePremium(navOptions = navOptions)
+            },
+        )
+
+        premiumWelcomeScreen(
+            navigateToProfile = {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(route = PremiumWelcomeScreen, inclusive = true)
+                    .build()
+                navController.navigateToProfile(navOptions = navOptions)
+            }
         )
 
         createPasscodeScreen(
@@ -73,7 +92,7 @@ fun NavGraphBuilder.settingsNavGraph(
                 val navOptions = NavOptions.Builder()
                     .setPopUpTo(SecurityScreen, inclusive = false)
                     .build()
-                navController.navigateToPasscodeSettings(navOptions =navOptions)
+                navController.navigateToPasscodeSettings(navOptions = navOptions)
             },
         )
 

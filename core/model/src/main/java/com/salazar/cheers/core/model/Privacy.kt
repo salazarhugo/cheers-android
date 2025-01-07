@@ -1,7 +1,6 @@
 package com.salazar.cheers.core.model
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Public
@@ -27,10 +26,5 @@ enum class Privacy(
         title = "Friends",
         subtitle = "Your friends on Cheers",
         icon = Icons.Filled.People,
-    ),
-    GROUP(
-        title = "Group",
-        subtitle = "Members of a group that you're in",
-        icon = Icons.Filled.Groups,
     ),
 }

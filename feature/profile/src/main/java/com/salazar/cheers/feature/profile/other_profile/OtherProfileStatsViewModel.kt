@@ -24,6 +24,7 @@ data class OtherProfileStatsUiState(
     val friends: List<UserItem>? = null,
     val username: String = "",
     val verified: Boolean = false,
+    val premium: Boolean = false,
 )
 
 
@@ -40,6 +41,7 @@ class OtherProfileStatsViewModel @Inject constructor(
             OtherProfileStatsUiState(
                 verified = args.verified,
                 username = args.username,
+                premium = args.premium,
             )
         )
 

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Reply
+import androidx.compose.material.icons.automirrored.outlined.Reply
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
@@ -31,10 +31,10 @@ fun SwipeableMessage(
     content: @Composable RowScope.() -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
+
     SwipeToDismissBox(
         state = state,
-        modifier = Modifier
-            .padding(vertical = Dp(1f)),
+        modifier = Modifier,
         enableDismissFromEndToStart = true,
         backgroundContent = {
             val alignment = Alignment.CenterEnd
@@ -54,7 +54,7 @@ fun SwipeableMessage(
                     contentAlignment = alignment
                 ) {
                     Icon(
-                        Icons.Outlined.Reply,
+                        Icons.AutoMirrored.Outlined.Reply,
                         modifier = Modifier.scale(scale),
                         contentDescription = null,
                     )

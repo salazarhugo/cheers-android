@@ -32,6 +32,7 @@ fun HomeRoute(
     navigateToMap: () -> Unit = {},
     navigateToDeletePostDialog: (String) -> Unit,
     navigateToPartyDetail: (String) -> Unit,
+    navigateToMyParties: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
@@ -57,6 +58,7 @@ fun HomeRoute(
         initialSelectedTab = appSettings.selectedHomeTab,
         navigateToPartyDetail = navigateToPartyDetail,
         navigateToCreateParty = navigateToCreateParty,
+        navigateToMyParties = navigateToMyParties,
         onHomeUIAction = { action ->
             when (action) {
                 is HomeUIAction.OnActivityClick -> onActivityClick()

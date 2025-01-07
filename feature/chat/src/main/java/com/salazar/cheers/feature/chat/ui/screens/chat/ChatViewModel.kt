@@ -17,9 +17,10 @@ import com.salazar.cheers.data.chat.websocket.ChatEvent
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.domain.get_chat.GetChatFlowUseCase
 import com.salazar.cheers.domain.seen_room.SeenRoomUseCase
+import com.salazar.cheers.domain.send_message.DeleteMessageUseCase
+import com.salazar.cheers.domain.send_message.ListChatMessagesUseCase
 import com.salazar.cheers.domain.send_message.SendMessageUseCase
 import com.salazar.cheers.feature.chat.data.GetChatChannelUseCase
-import com.salazar.cheers.shared.util.Resource
 import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -46,6 +47,8 @@ class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
     private val getChatChannelUseCase: GetChatChannelUseCase,
     private val getChatFlowUseCase: GetChatFlowUseCase,
+    private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val listChatMessagesUseCase: ListChatMessagesUseCase,
 ) : ViewModel() {
 
     private val chatScreen = statsHandle.toRoute<ChatScreen>(
@@ -84,7 +87,9 @@ class ChatViewModel @Inject constructor(
                 otherUserId = user.id,
                 type = ChatType.DIRECT,
             )
-            updateChatChannel(channel)
+            viewModelState.update {
+                it.copy(channel = channel)
+            }
             viewModelScope.launch {
                 getChatChannelUseCase(user.id).collect(::updateChatChannel)
             }
@@ -110,46 +115,28 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendImageMessage(images: List<Uri>) {
-        val channel = uiState.value.channel
-        if (channel != null)
-            viewModelScope.launch {
-//                chatRepository.sendImage(channel.id, images)
-            }
+    fun updateImages(images: List<Uri>) {
+        viewModelState.update {
+            it.copy(images = images)
+        }
     }
 
-    suspend fun createGroupChat(): Resource<String> {
-//        val user = userRepository.getUserFlow(userID).first()
-//        val user = UserItem.newBuilder()
-        return Resource.Error("")
-//        return chatRepository.getOrCreateGroupChat(user.username, listOf(userID))
-    }
+    fun sendChatMessage(text: String) {
+        val replyTo = uiState.value.replyMessage?.id
+        val images = uiState.value.images
 
-    fun sendTextMessage(text: String) {
         // Reset Reply Message
         onReplyMessage(null)
+        updateImages(emptyList())
 
         viewModelScope.launch {
-            var channelId = uiState.value.channel?.id!!
-            if (!hasChannel) {
-                val result = createGroupChat()
-                when (result) {
-                    is Resource.Success -> {
-//                        channelId = result.data
-//                        loadChannel(result.data)
-                    }
-
-                    is Resource.Error -> {
-                        updateErrorMessage(result.message)
-                    }
-
-                    else -> {}
-                }
-            }
+            val channelId = uiState.value.channel?.id!!
 
             val result = sendMessageUseCase(
-                roomId = channelId,
+                chatChannelID = channelId,
                 text = text,
+                replyTo = replyTo,
+                images = images,
             )
             when (result) {
                 is Result.Error -> updateErrorMessage(result.error.name)
@@ -172,8 +159,13 @@ class ChatViewModel @Inject constructor(
         listenChatMessages(chatChannel.id)
     }
 
-    fun unsendMessage(messageId: String) {
-        // TODO Unsend message
+    fun deleteChatMessage(chatMessageID: String) {
+        viewModelScope.launch {
+            deleteMessageUseCase(
+                chatID = chatID,
+                chatMessageID = chatMessageID,
+            )
+        }
     }
 
     fun onTextChanged(textState: TextFieldValue) {
@@ -185,6 +177,8 @@ class ChatViewModel @Inject constructor(
 
         if (isTyping.not())
             return
+
+        val chatID = uiState.value.channel?.id ?: return
 
         if (typingJob?.isActive == true) {
             typingJob?.cancel()
@@ -241,8 +235,6 @@ class ChatViewModel @Inject constructor(
         viewModelState.update {
             it.copy(replyMessage = message)
         }
-        // Jump to bottom
-        // Open keyboard
     }
 
     fun updateIsRecording(isRecording: Boolean) {
@@ -291,5 +283,21 @@ class ChatViewModel @Inject constructor(
         recorder = null
         updateIsRecording(false)
 //        readRecordings()
+    }
+
+    fun onLoadMore(lastLoadedIndex: Int) {
+        val chatChannelID = uiState.value.channel?.id ?: return
+        val nextItemIndex = lastLoadedIndex + 1
+        val nextPage = nextItemIndex / 10 + 1
+
+        viewModelState.update { it.copy(isLoadingMore = true) }
+
+        viewModelScope.launch {
+            listChatMessagesUseCase(
+                chatChannelID = chatChannelID,
+                page = nextPage,
+            )
+            viewModelState.update { it.copy(isLoadingMore = false) }
+        }
     }
 }

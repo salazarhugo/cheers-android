@@ -6,7 +6,7 @@ import com.salazar.cheers.core.model.UserSuggestion
 
 data class SearchUiState(
     val name: String = "",
-    val searchResultState: SearchResultState = SearchResultState.Loading,
+    val searchResultState: SearchResultState = SearchResultState.Uninitialized,
     val suggestions: List<UserSuggestion> = emptyList(),
     val recentSearch: List<RecentSearch> = emptyList(),
     val isLoading: Boolean = false,

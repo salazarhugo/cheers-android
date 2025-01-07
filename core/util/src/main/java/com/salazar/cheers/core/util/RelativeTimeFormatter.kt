@@ -1,10 +1,15 @@
 package com.salazar.cheers.core.util
 
 import android.text.format.DateUtils
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -109,7 +114,10 @@ fun dateTimeFormatter(
     startTimestamp: Long,
     endTimestamp: Long = 0L,
 ): AnnotatedString {
+    val color = MaterialTheme.colorScheme.onBackground
+
     val now = System.currentTimeMillis() / 1000
+    val isPast = endTimestamp < now
     val isOngoing = (startTimestamp < now) && (endTimestamp > now)
 
     return buildAnnotatedString {
@@ -117,9 +125,15 @@ fun dateTimeFormatter(
 
         val time = SimpleDateFormat("HH:mm").format(date)
 
+        if (isPast) {
+            val res = SimpleDateFormat("EEE dd MMM yyyy", Locale.getDefault()).format(date)
+            appendWithSeparator("Finished", res, color)
+            return@buildAnnotatedString
+        }
+
         if (isOngoing) {
             val timeLeft = relativeTimeFormatter(endTimestamp)
-            append("Ongoing | $timeLeft left")
+            appendWithSeparator("OnGoing", "$timeLeft left", color)
             return@buildAnnotatedString
         }
 
@@ -128,7 +142,8 @@ fun dateTimeFormatter(
             return@buildAnnotatedString
         }
 
-        if (DateUtils.isToday(startTimestamp * 1000 - DateUtils.DAY_IN_MILLIS)) {
+        val isTomorrow = DateUtils.isToday(startTimestamp * 1000 - DateUtils.DAY_IN_MILLIS)
+        if (isTomorrow) {
             append("${stringResource(id = R.string.tomorrow)}, $time")
             return@buildAnnotatedString
         }
@@ -143,4 +158,12 @@ fun dateTimeFormatter(
         append(res)
         return@buildAnnotatedString
     }
+}
+
+private fun AnnotatedString.Builder.appendWithSeparator(a: String, b: String, color: Color) {
+    append(a)
+    withStyle(style = SpanStyle(color = color, fontWeight = FontWeight.Bold)) {
+        append(" | ")
+    }
+    append(b)
 }

@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.theme.Roboto
@@ -22,6 +23,7 @@ import com.salazar.cheers.core.ui.ui.Username
 internal fun OtherProfileTopBar(
     username: String,
     verified: Boolean,
+    premium: Boolean,
     modifier: Modifier = Modifier,
     onCopyUrl: () -> Unit = {},
     onManageFriendship: () -> Unit = {},
@@ -35,6 +37,7 @@ internal fun OtherProfileTopBar(
             Username(
                 username = username,
                 verified = verified,
+                premium = premium,
                 textStyle = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontFamily = Roboto
@@ -68,10 +71,12 @@ internal fun OtherProfileTopBar(
 @ComponentPreviews
 @Composable
 private fun OtherProfileTopBarPreview() {
+    val user = cheersUser
     CheersPreview {
         OtherProfileTopBar(
-            username = "cheers",
-            verified = true,
+            username = user.username,
+            verified = user.verified,
+            premium = user.premium,
             modifier = Modifier,
         )
     }

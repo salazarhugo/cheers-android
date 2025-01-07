@@ -56,7 +56,7 @@ fun VerifiedComponent(
 
 @ComponentPreviews
 @Composable
-fun VerifiedComponentPreview() {
+private fun VerifiedComponentPreview() {
     CheersPreview {
         VerifiedComponent(
             modifier = Modifier.padding(16.dp),

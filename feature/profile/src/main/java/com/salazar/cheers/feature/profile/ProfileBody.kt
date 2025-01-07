@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -22,11 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.User
+import com.salazar.cheers.core.model.cheersUser
+import com.salazar.cheers.core.ui.CheersPreview
 
 @Composable
-fun ProfileHeader(
+fun ProfileBody(
     user: User,
     onFriendsClick: () -> Unit,
     onWebsiteClick: (String) -> Unit,
@@ -36,10 +38,6 @@ fun ProfileHeader(
             .fillMaxWidth()
             .padding(16.dp),
     ) {
-        ProfileName(
-            name = user.name,
-            isBusinessAccount = user.isBusinessAccount,
-        )
         ProfileBio(
             bio = user.bio,
         )
@@ -67,38 +65,6 @@ fun ProfileHeader(
 }
 
 @Composable
-fun ProfileFriends() {
-
-}
-
-
-@Composable
-fun ProfileName(
-    name: String,
-    isBusinessAccount: Boolean,
-) {
-    if (name.isBlank())
-        return
-    Spacer(Modifier.height(4.dp))
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        if (isBusinessAccount) {
-            Icon(
-                imageVector = Icons.Default.Business,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
-            )
-        }
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-        )
-    }
-}
-
-@Composable
 fun ProfileBio(
     bio: String
 ) {
@@ -107,7 +73,8 @@ fun ProfileBio(
     Spacer(Modifier.height(8.dp))
     Text(
         text = bio,
-        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.W700,
     )
 }
 
@@ -136,6 +103,18 @@ fun ProfileWebsite(
                 fontWeight = FontWeight.Normal
             ),
             onClick = { onClick(website) },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileBodyPreview() {
+    CheersPreview {
+        ProfileBody(
+            user = cheersUser,
+            onFriendsClick = {},
+            onWebsiteClick = {},
         )
     }
 }

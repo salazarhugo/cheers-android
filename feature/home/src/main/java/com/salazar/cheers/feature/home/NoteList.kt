@@ -16,6 +16,8 @@ import com.salazar.cheers.core.model.Note
 @Composable
 fun NoteList(
     picture: String?,
+    username: String?,
+    name: String?,
     notes: List<Note>,
     modifier: Modifier = Modifier,
     onCreateNoteClick: () -> Unit,
@@ -39,6 +41,8 @@ fun NoteList(
         item {
             if (viewerNote == null) {
                 CreateNoteItem(
+                    name = name,
+                    username = username,
                     picture = picture,
                     onClick = onCreateNoteClick,
                 )

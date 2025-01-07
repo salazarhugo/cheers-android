@@ -12,6 +12,7 @@ import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.friendship.v1.ListFriendRequest
 import cheers.notification.v1.CreateRegistrationTokenRequest
 import cheers.notification.v1.NotificationServiceGrpcKt
+import cheers.type.UserOuterClass
 import cheers.user.v1.BlockUserRequest
 import cheers.user.v1.CheckUsernameRequest
 import cheers.user.v1.CreateUserRequest
@@ -23,6 +24,7 @@ import cheers.user.v1.SearchUserRequest
 import cheers.user.v1.UpdateUserRequest
 import cheers.user.v1.UserServiceGrpcKt
 import com.google.firebase.auth.FirebaseAuth
+import com.google.protobuf.FieldMask
 import com.salazar.cheers.core.db.dao.UserDao
 import com.salazar.cheers.core.db.dao.UserItemDao
 import com.salazar.cheers.core.db.dao.UserStatsDao
@@ -34,9 +36,12 @@ import com.salazar.cheers.core.model.UserID
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.UserStats
 import com.salazar.cheers.core.model.UserSuggestion
+import com.salazar.cheers.data.post.repository.MEDIA_URI_KEY
+import com.salazar.cheers.data.post.repository.UploadMediaWorker
 import com.salazar.cheers.data.user.workers.UploadProfileBanner
 import com.salazar.cheers.data.user.workers.UploadProfilePicture
 import com.salazar.cheers.shared.data.mapper.toCheckUsernameResult
+import com.salazar.cheers.shared.data.mapper.toGenderPb
 import com.salazar.cheers.shared.data.mapper.toUser
 import com.salazar.cheers.shared.data.mapper.toUserItem
 import com.salazar.cheers.shared.util.Resource
@@ -242,6 +247,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserProfile(
         user: User,
+        updateMask: List<String>?,
     ): Result<User> {
         return updateUserProfile(
             picture = user.picture,
@@ -249,28 +255,46 @@ class UserRepositoryImpl @Inject constructor(
             bio = user.bio,
             name = user.name,
             website = user.website,
+            updateMask = updateMask,
         )
     }
 
     override suspend fun updateUserProfile(
         picture: String?,
-        banner: String?,
+        banner: List<String>?,
         bio: String?,
         name: String?,
         website: String?,
         favouriteDrinkId: String?,
+        gender: com.salazar.cheers.core.model.Gender?,
+        jobTitle: String,
+        jobCompany: String,
+        education: String,
+        updateMask: List<String>?,
     ): Result<User> {
         return try {
-            val request = UpdateUserRequest.newBuilder()
+            val job = UserOuterClass.Job.newBuilder()
+                .setTitle(jobTitle)
+                .setCompany(jobCompany)
+                .build()
+
+            var request = UpdateUserRequest.newBuilder()
                 .setPicture(picture)
-                .setBanner(banner)
+                .addAllBanners(banner)
                 .setBio(bio)
                 .setName(name)
                 .setWebsite(website)
                 .setFavouriteDrinkId(favouriteDrinkId.orEmpty())
-                .build()
+                .setGender(gender.toGenderPb())
+                .setEducation(education)
+                .setJob(job)
 
-            val response = userService.updateUser(request)
+            if (!updateMask.isNullOrEmpty()) {
+                request = request
+                    .setUpdateMask(FieldMask.newBuilder().addAllPaths(updateMask).build())
+            }
+
+            val response = userService.updateUser(request.build())
             val user = response.toUser()
             userDao.insert(user.asEntity())
             Result.success(user)
@@ -451,19 +475,24 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun uploadProfileBanner(
-        picture: Uri,
+        banners: List<Uri>,
     ) {
-        val uploadWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadProfileBanner>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(
-                    workDataOf(
-                        "PHOTO_URI" to picture.toString(),
-                    )
+        val uploadMediaWorkRequest = OneTimeWorkRequestBuilder<UploadMediaWorker>().apply {
+            setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            setInputData(
+                workDataOf(
+                    MEDIA_URI_KEY to banners.map { it.toString() }.toTypedArray(),
                 )
-            }
-                .build()
-        workManager.enqueue(uploadWorkRequest)
+            )
+        }.build()
+        val uploadWorkRequest = OneTimeWorkRequestBuilder<UploadProfileBanner>().apply {
+            setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+        }.build()
+
+        workManager
+            .beginWith(uploadMediaWorkRequest)
+            .then(uploadWorkRequest)
+            .enqueue()
     }
 
     override suspend fun saveUserPicture(

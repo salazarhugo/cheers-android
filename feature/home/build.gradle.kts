@@ -47,9 +47,6 @@ dependencies {
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)
 
-    // Confetti
-    implementation(libs.konfetti.compose)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

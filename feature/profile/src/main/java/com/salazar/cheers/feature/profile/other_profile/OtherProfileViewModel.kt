@@ -17,7 +17,6 @@ import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.feature.profile.navigation.OtherProfileScreen
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -198,9 +197,9 @@ class OtherProfileViewModel @Inject constructor(
 
     private fun refreshUserParties() {
         val otherUserId = viewModelState.value.user?.id ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            partyRepository.listParty(userId = otherUserId)
-                .collect(::updateParties)
-        }
+//        viewModelScope.launch(Dispatchers.IO) {
+//            partyRepository.listPartyFlow(userId = otherUserId)
+//                .collect(::updateParties)
+//        }
     }
 }

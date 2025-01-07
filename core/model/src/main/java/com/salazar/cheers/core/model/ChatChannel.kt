@@ -21,9 +21,9 @@ data class ChatChannel(
     val ownerId: String = "",
     val pinned: Boolean = false,
     val unreadCount: Int = 0,
+    val membersCount: Int = 0,
 )
 
-// Yuliia <3>
 enum class ChatStatus {
     EMPTY,
     OPENED,

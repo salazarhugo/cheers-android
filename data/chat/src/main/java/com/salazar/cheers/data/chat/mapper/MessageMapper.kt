@@ -4,8 +4,8 @@ import cheers.chat.v1.Message
 import cheers.chat.v1.MessageItem
 import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.model.ChatMessageStatus
-import com.salazar.cheers.data.chat.models.ImageMessage
 import com.salazar.cheers.core.model.MessageType
+import com.salazar.cheers.data.chat.models.ImageMessage
 
 fun MessageItem.toTextMessage(): ChatMessage {
     return message.toTextMessage().copy(
@@ -27,6 +27,8 @@ fun Message.toTextMessage(): ChatMessage {
         photoUrl = picture,
         type = MessageType.TEXT,
         status = status.toChatMessageStatus(),
+        replyTo = if (hasReplyTo()) replyTo.toTextMessage() else null,
+        images = mediasList.mapNotNull { it.imageVersionsList.firstOrNull()?.url },
     )
 }
 

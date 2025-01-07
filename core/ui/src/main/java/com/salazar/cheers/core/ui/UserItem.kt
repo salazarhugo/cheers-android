@@ -42,6 +42,8 @@ fun UserItem(
         ) {
             AvatarComponent(
                 avatar = userItem.picture,
+                name = userItem.name,
+                username = userItem.username,
                 onClick = {
                     onClick(userItem.username)
                 }

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,13 +42,13 @@ import com.salazar.cheers.core.model.coronaExtraDrink
 import com.salazar.cheers.core.model.emptyDrink
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.MyTopAppBar
-import com.salazar.cheers.core.ui.ProfileBannerAndAvatar
+import com.salazar.cheers.core.ui.ProfileHeaderCarousel
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
 import com.salazar.cheers.core.ui.item.SettingItem
 import com.salazar.cheers.core.ui.item.SettingTitle
+import com.salazar.cheers.core.ui.ui.CheersOutlinedTextField
 import com.salazar.cheers.core.ui.ui.LoadingScreen
-import com.salazar.cheers.feature.edit_profile.editdrink.EditProfileDrink
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,11 +59,13 @@ fun EditProfileScreen(
     onUsernameChanged: (String) -> Unit = {},
     onWebsiteChanged: (String) -> Unit = {},
     onSelectImage: (Uri?) -> Unit = {},
-    onSelectBanner: (Uri?) -> Unit = {},
+    onSelectBanner: (List<Uri>) -> Unit,
     onDismiss: () -> Unit = {},
     onSave: () -> Unit = {},
     onDrinkClick: (Drink) -> Unit = {},
     onGenderClick: () -> Unit,
+    onJobClick: () -> Unit,
+    onDeleteBanner: (String) -> Unit,
 ) {
     var showSelectDrinkSheet by remember { mutableStateOf(false) }
     val drinkSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -91,13 +94,13 @@ fun EditProfileScreen(
                     onSelectImage = onSelectImage,
                     onSelectBanner = onSelectBanner,
                     photoUri = uiState.profilePictureUri,
-                    bannerUri = uiState.bannerUri,
                     onAddDrinkClick = {
                         scope.launch {
                             showSelectDrinkSheet = true
                             drinkSheetState.expand()
                         }
                     },
+                    onDeleteBanner = onDeleteBanner,
                 )
                 EditProfileBody(
                     user = uiState.user,
@@ -106,6 +109,7 @@ fun EditProfileScreen(
                     onWebsiteChanged = onWebsiteChanged,
                     onUsernameChange = onUsernameChanged,
                     onGenderClick = onGenderClick,
+                    onJobClick = onJobClick,
                 )
             }
         }
@@ -132,10 +136,10 @@ fun EditProfileScreen(
 fun EditProfileHeader(
     user: User,
     photoUri: Uri?,
-    bannerUri: Uri?,
     onSelectImage: (Uri?) -> Unit,
-    onSelectBanner: (Uri?) -> Unit,
+    onSelectBanner: (List<Uri>) -> Unit,
     onAddDrinkClick: () -> Unit,
+    onDeleteBanner: (String) -> Unit,
 ) {
     val openDialog = remember { mutableStateOf(false) }
 
@@ -147,7 +151,7 @@ fun EditProfileHeader(
 
     val bannerLauncher =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickVisualMedia(),
+            contract = ActivityResultContracts.PickMultipleVisualMedia(),
             onResult = { uri -> onSelectBanner(uri) }
         )
 
@@ -159,13 +163,14 @@ fun EditProfileHeader(
     ) {
 
         val photo = photoUri?.toString() ?: user.picture
-        val banner = bannerUri?.toString() ?: user.banner
 
-        ProfileBannerAndAvatar(
-            isEditable = true,
-            modifier = Modifier.padding(16.dp),
-            banner = banner,
-            avatar = photo,
+        ProfileHeaderCarousel(
+            user = user.copy(
+                banner = user.banner,
+                picture = photo,
+            ),
+            editable = true,
+            modifier = Modifier,
             onAvatarClick = {
                 launcher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -176,12 +181,7 @@ fun EditProfileHeader(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             },
-            content = {
-                EditProfileDrink(
-                    drink = user.favouriteDrink,
-                    onClick = onAddDrinkClick,
-                )
-            }
+            onDeleteBannerClick = onDeleteBanner,
         )
     }
 
@@ -217,7 +217,10 @@ fun EditProfileBody(
     onUsernameChange: (String) -> Unit,
     onWebsiteChanged: (String) -> Unit,
     onGenderClick: () -> Unit,
+    onJobClick: () -> Unit,
 ) {
+    val gender = user.gender
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -225,7 +228,7 @@ fun EditProfileBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        OutlinedTextField(
+        CheersOutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -240,39 +243,41 @@ fun EditProfileBody(
                 onNameChanged(it)
             },
         )
-        OutlinedTextField(
+        CheersOutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
                     text = "Username",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             value = user.username,
             onValueChange = { onUsernameChange(it) },
-            enabled = true,
+            readOnly = true,
+            enabled = false,
+            shape = MaterialTheme.shapes.medium,
         )
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
                     text = "Email",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             value = user.email,
             onValueChange = {},
             enabled = false,
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledContainerColor = MaterialTheme.colorScheme.outline,
+                disabledBorderColor = MaterialTheme.colorScheme.outline,
+//                disabledLabelColor = MaterialTheme.colorScheme.outline,
+            ),
+            shape = MaterialTheme.shapes.medium,
         )
-        OutlinedTextField(
+        CheersOutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
                     text = "Website",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             value = user.website,
@@ -281,12 +286,12 @@ fun EditProfileBody(
                     onWebsiteChanged(it)
             },
         )
-        OutlinedTextField(
+        CheersOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp),
             label = {
-                Text("Bio", style = MaterialTheme.typography.labelMedium)
+                Text("Bio")
             },
             value = user.bio,
             onValueChange = {
@@ -301,12 +306,15 @@ fun EditProfileBody(
         title = "Work",
         icon = Icons.Outlined.Work,
         trailingContent = {
-            Text(
-                text = user.work,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
+            if (user.jobTitle.isNotBlank()) {
+                Text(
+                    text = user.jobTitle + " at " + user.jobCompany,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        },
+        onClick = onJobClick,
     )
     SettingItem(
         title = "Education",
@@ -323,11 +331,13 @@ fun EditProfileBody(
         title = "Gender",
         icon = Icons.Outlined.PersonOutline,
         trailingContent = {
-            Text(
-                text = user.gender.value,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            if (gender != null) {
+                Text(
+                    text = gender.value,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         },
         onClick = onGenderClick,
     )
@@ -365,7 +375,7 @@ private fun EditProfileScreenPreview() {
         EditProfileScreen(
             uiState = EditProfileUiState.HasPosts(
                 user = cheersUser,
-                bannerUri = null,
+                bannerUri = emptyList(),
                 done = false,
                 errorMessages = emptyList(),
                 isFollowing = false,
@@ -374,6 +384,9 @@ private fun EditProfileScreenPreview() {
                 drinks = listOf(emptyDrink, coronaExtraDrink)
             ),
             onGenderClick = {},
+            onJobClick = {},
+            onSelectBanner = {},
+            onDeleteBanner = {},
         )
     }
 }

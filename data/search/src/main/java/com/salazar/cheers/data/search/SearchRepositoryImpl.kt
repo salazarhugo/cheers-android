@@ -67,4 +67,13 @@ class SearchRepositoryImpl @Inject constructor(
             Result.Error(DataError.Local.DISK_FULL)
         }
     }
+
+    override suspend fun clearRecentSearch(): Result<Unit, DataError.Local> {
+        return try {
+            cheersDao.clearRecentUser()
+            Result.Success(Unit)
+        } catch (e: IOException) {
+            Result.Error(DataError.Local.DISK_FULL)
+        }
+    }
 }

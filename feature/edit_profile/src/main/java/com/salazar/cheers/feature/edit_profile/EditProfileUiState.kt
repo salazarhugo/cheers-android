@@ -11,7 +11,7 @@ sealed interface EditProfileUiState {
     val done: Boolean
     val user: User
     val profilePictureUri: Uri?
-    val bannerUri: Uri?
+    val bannerUri: List<Uri>
     val drinks: List<Drink>
 
     data class HasPosts(
@@ -21,7 +21,7 @@ sealed interface EditProfileUiState {
         override val user: User,
         override val done: Boolean,
         override val profilePictureUri: Uri?,
-        override val bannerUri: Uri?,
+        override val bannerUri: List<Uri>,
         override val drinks: List<Drink>,
     ) : EditProfileUiState
 }

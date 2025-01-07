@@ -17,6 +17,7 @@ class LaunchBillingFlowUseCase @Inject constructor(
     suspend operator fun invoke(
         activity: android.app.Activity,
         productDetails: ProductDetails,
+        offerToken: String,
     ): Int = withContext(dispatcher) {
         val userID = getAccountUseCase().first()?.id ?: return@withContext -1
 
@@ -24,6 +25,7 @@ class LaunchBillingFlowUseCase @Inject constructor(
             activity = activity,
             userID = userID,
             productDetails = productDetails,
+            offerToken = offerToken,
         )
     }
 }

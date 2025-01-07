@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package cheers.type;
+
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/subscription;subscription";
+
+message Subscription {
+  string purchase_token = 1;
+  string subscription_id = 2;
+  string user_id = 3;
+  bool is_active = 4;
+  string name = 5;
+}
+

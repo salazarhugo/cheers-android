@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.edit_profile.editgender
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -35,6 +36,18 @@ fun NavGraphBuilder.editGenderScreen(
         deepLinks = listOf(
             navDeepLink<EditGenderScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        }
     ) { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
             navController.getBackStackEntry(EditProfileGraph)

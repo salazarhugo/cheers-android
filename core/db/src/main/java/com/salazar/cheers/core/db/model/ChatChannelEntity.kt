@@ -30,6 +30,7 @@ data class ChatChannelEntity(
     val ownerId: String = "",
     val pinned: Boolean = false,
     val unreadCount: Int = 0,
+    val membersCount: Int = 0,
 )
 
 fun ChatChannelEntity.asExternalModel() = ChatChannel(
@@ -53,6 +54,7 @@ fun ChatChannelEntity.asExternalModel() = ChatChannel(
     pinned = pinned,
     unreadCount = unreadCount,
     verified = verified,
+    membersCount = membersCount,
 )
 
 fun ChatChannel.asEntity(): ChatChannelEntity =
@@ -77,6 +79,7 @@ fun ChatChannel.asEntity(): ChatChannelEntity =
         pinned = pinned,
         unreadCount = unreadCount,
         verified = verified,
+        membersCount = membersCount,
     )
 
 fun List<ChatChannelEntity>.asExternalModel() = this.map { it.asExternalModel() }

@@ -72,6 +72,7 @@ fun CommentItem(
             AvatarComponent(
                 modifier = Modifier.padding(top = 4.dp),
                 avatar = comment.avatar,
+                username = comment.username,
                 size = 36.dp
             )
             Column(

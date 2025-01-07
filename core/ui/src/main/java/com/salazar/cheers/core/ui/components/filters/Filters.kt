@@ -1,6 +1,10 @@
 package com.salazar.cheers.core.ui.components.filters
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
@@ -11,6 +15,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -37,22 +42,26 @@ fun Filters(
             val selected = filter.selected
 
             FilterChip(
-                modifier = Modifier.animateContentSize(),
+                modifier = Modifier
+                    .animateItem(),
                 selected = selected,
                 onClick = {
-                    onFilterClick(filter)
+                    onFilterClick(filter.copy(selected = !selected))
                 },
+                shape = MaterialTheme.shapes.medium,
                 label = { Text(text = filter.name) },
-                leadingIcon = if (selected) {
-                    {
+                leadingIcon = {
+                    AnimatedVisibility(
+                        visible = selected,
+                        enter = fadeIn() + expandHorizontally(),
+                        exit = fadeOut() + shrinkHorizontally(),
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Done,
                             contentDescription = "Done icon",
                             modifier = Modifier.size(FilterChipDefaults.IconSize)
                         )
                     }
-                } else {
-                    null
                 },
             )
         }

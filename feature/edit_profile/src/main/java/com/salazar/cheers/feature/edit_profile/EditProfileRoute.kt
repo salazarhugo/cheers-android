@@ -8,6 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun EditProfileRoute(
     navigateBack: () -> Unit,
     navigateToGender: () -> Unit,
+    navigateToJob: () -> Unit,
     viewModel: EditProfileViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -27,5 +28,7 @@ fun EditProfileRoute(
         },
         onDrinkClick = viewModel::selectDrink,
         onGenderClick = navigateToGender,
+        onJobClick = navigateToJob,
+        onDeleteBanner = viewModel::onDeleteBanner,
     )
 }

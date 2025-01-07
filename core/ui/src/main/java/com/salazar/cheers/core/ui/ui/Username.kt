@@ -21,6 +21,7 @@ import com.salazar.cheers.core.ui.modifier.clickableNullable
 fun Username(
     modifier: Modifier = Modifier,
     username: String,
+    premium: Boolean = false,
     verified: Boolean = false,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     color: Color = Color.Unspecified,
@@ -42,6 +43,12 @@ fun Username(
                 textStyle = textStyle,
             )
         }
+        if (premium) {
+            Spacer(Modifier.width(4.dp))
+            PremiumComponent(
+                textStyle = textStyle,
+            )
+        }
     }
 }
 
@@ -52,6 +59,7 @@ fun UsernamePreview() {
         Username(
             username = "hugolsalazar",
             verified = true,
+            premium = true,
         )
     }
 }

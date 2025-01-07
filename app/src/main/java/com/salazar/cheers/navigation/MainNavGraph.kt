@@ -64,6 +64,8 @@ import com.salazar.cheers.feature.notifications.navigation.navigateToNotificatio
 import com.salazar.cheers.feature.notifications.navigation.notificationsScreen
 import com.salazar.cheers.feature.parties.detail.navigateToPartyDetail
 import com.salazar.cheers.feature.parties.detail.partyDetailScreen
+import com.salazar.cheers.feature.parties.myparties.myPartiesScreen
+import com.salazar.cheers.feature.parties.myparties.navigateToMyParties
 import com.salazar.cheers.feature.parties.navigateToParties
 import com.salazar.cheers.feature.parties.partiesScreen
 import com.salazar.cheers.feature.post_likes.navigateToPostLikes
@@ -224,6 +226,16 @@ fun NavGraphBuilder.mainNavGraph(
             }
         )
 
+        myPartiesScreen(
+            navigateBack = navController::popBackStack,
+            navigateToPartyMoreSheet = {},
+            navigateToPartyDetail = navController::navigateToPartyDetail,
+            navigateToTickets = navController::navigateToTickets,
+            navigateToCreateParty = {
+                navController.navigate(MainDestinations.CREATE_PARTY_ROUTE)
+            }
+        )
+
         dialog(
             route = "${MainDestinations.DIALOG_DELETE_STORY}/{storyID}",
         ) {
@@ -261,6 +273,7 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToPartyDetail = navController::navigateToPartyDetail,
             navigateToCreateParty = navController::navigateToCreateParty,
             navigateToMap = navController::navigateToMap,
+            navigateToMyParties = navController::navigateToMyParties,
         )
 
         mapScreen(
@@ -367,6 +380,7 @@ fun NavGraphBuilder.mainNavGraph(
                     otherUserID = user.id,
                     username = user.username,
                     verified = user.verified,
+                    premium = user.premium,
                 )
             },
             navigateToManageFriendship = { userID ->
@@ -433,6 +447,7 @@ fun NavGraphBuilder.mainNavGraph(
                 navActions = appState.navActions,
                 username = username,
                 verified = verified,
+                premium = false,
             )
         }
 
@@ -446,11 +461,14 @@ fun NavGraphBuilder.mainNavGraph(
 
         createChatScreen(
             navigateBack = navController::popBackStack,
-            navigateToChatWithChannelId = { chatID ->
+            navigateToChat = {
                 val navOptions = NavOptions.Builder()
                     .setPopUpTo(route = CreateChatScreen, inclusive = true)
                     .build()
-                navController.navigateToChatWithChannelId(chatID, navOptions)
+                navController.navigateToChatWithUserItem(
+                    userItem = it,
+                    navOptions = navOptions,
+                )
             },
         )
 
@@ -487,6 +505,7 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToCheerscode = navController::navigateToCheerscode,
             navigateToNfc = {},
             navigateToSettings = navController::navigateToSettings,
+            navigateToParty = navController::navigateToPartyDetail,
         )
 
         cheersCodeScreen(

@@ -19,6 +19,7 @@ dependencies {
     implementation(projects.core.protobuf)
     implementation(projects.core.shared)
     implementation(projects.data.account)
+    implementation(projects.data.post)
     implementation(projects.core.db)
 
     implementation(libs.androidx.core.ktx)
@@ -26,15 +27,22 @@ dependencies {
     implementation(libs.material)
 
     // OkHttp BOM
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))
+    implementation(platform(libs.okhttp3.bom))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation(libs.retrofit.converter.gson)
 
     // Moshi
     implementation(libs.converter.moshi)
     implementation(libs.moshi)
     ksp(libs.moshi.kotlin.codegen)
+
+    // Work Manager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.work.multiprocess)
+    kapt(libs.androidx.hilt.compiler)
+    kapt(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

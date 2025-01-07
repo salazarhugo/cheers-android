@@ -30,6 +30,7 @@ internal fun CurrentUserAnnotation(
     name: String,
     modifier: Modifier = Modifier,
     picture: String? = null,
+    username: String? = null,
     ghostMode: Boolean = false,
     isSelected: Boolean = false,
     lastUpdated: Long = Date().time / 1000,
@@ -81,11 +82,13 @@ internal fun CurrentUserAnnotation(
                     .padding(4.dp),
                 size = 46.dp,
                 avatar = pictureUrl,
+                name = name,
+                username = username,
                 onClick = onClick,
             )
         }
         UserAnnotationText(
-            name = name,
+            name = "Me",
             lastUpdated = lastUpdated,
         )
     }

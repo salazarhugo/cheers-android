@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.search
 
+import com.salazar.cheers.domain.search.ClearRecentSearchUseCase
 import com.salazar.cheers.domain.search.CreateRecentUserUseCase
 import com.salazar.cheers.domain.search.DeleteRecentSearchUseCase
 import com.salazar.cheers.domain.search.GetRecentSearchUseCase
@@ -12,4 +13,5 @@ data class SearchUseCases @Inject constructor(
     val getRecentSearchUseCase: GetRecentSearchUseCase,
     val createRecentUserUseCase: CreateRecentUserUseCase,
     val deleteRecentSearchUseCase: DeleteRecentSearchUseCase,
+    val clearRecentSearchUseCase: ClearRecentSearchUseCase,
 )

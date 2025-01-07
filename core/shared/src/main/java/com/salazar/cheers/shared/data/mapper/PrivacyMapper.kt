@@ -8,6 +8,5 @@ fun Privacy.toPrivacyPb(): PrivacyOuterClass.Privacy {
         Privacy.PRIVATE -> PrivacyOuterClass.Privacy.PRIVATE
         Privacy.PUBLIC -> PrivacyOuterClass.Privacy.PUBLIC
         Privacy.FRIENDS -> PrivacyOuterClass.Privacy.FRIENDS
-        Privacy.GROUP -> PrivacyOuterClass.Privacy.GROUP
     }
 }

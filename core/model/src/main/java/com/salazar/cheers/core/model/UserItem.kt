@@ -12,4 +12,5 @@ data class UserItem(
     val hasFollowed: Boolean = false,
     val friend: Boolean = false,
     val requested: Boolean = false,
+    val premium: Boolean = false,
 )

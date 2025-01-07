@@ -82,12 +82,19 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-
-    fun onSelectBanner(bannerUri: Uri?) {
-        if (bannerUri == null)
-            return
+    fun onDeleteBanner(banner: String) {
         viewModelState.update {
-            it.copy(bannerUri = bannerUri)
+            val banners = it.user?.banner?.toMutableList() ?: return@update it
+            banners.remove(banner)
+            val newUser = it.user.copy(banner = banners)
+            it.copy(user = newUser)
+        }
+    }
+
+    fun onSelectBanner(bannerUri: List<Uri>) {
+        viewModelState.update {
+            val newUser = it.user?.copy(banner = bannerUri.map { it.toString() })
+            it.copy(user = newUser)
         }
     }
 
@@ -128,10 +135,14 @@ class EditProfileViewModel @Inject constructor(
             updateProfileUseCase(
                 picture = user.picture,
                 name = user.name,
-                banner = user.banner,
+                banners = user.banner,
                 website = user.website,
                 bio = user.bio,
                 favouriteDrinkId = user.favouriteDrink?.id,
+                gender = user.gender,
+                jobTitle = user.jobTitle,
+                jobCompany = user.jobCompany,
+                education = user.education,
             )
             viewModelState.update {
                 it.copy(done = true, isLoading = false)
@@ -142,7 +153,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun uploadBanner() {
-        val banner = viewModelState.value.bannerUri ?: return
+        val banner = uiState.value.user.banner.map { Uri.parse(it) }
 
         viewModelScope.launch {
             userRepositoryImpl.uploadProfileBanner(banner)
@@ -160,6 +171,18 @@ class EditProfileViewModel @Inject constructor(
     fun updateGender(gender: Gender) {
         viewModelState.update {
             it.copy(user = it.user?.copy(gender = gender))
+        }
+    }
+
+    fun onJobTitleChange(jobTitle: String) {
+        viewModelState.update {
+            it.copy(user = it.user?.copy(jobTitle = jobTitle))
+        }
+    }
+
+    fun onJobCompanyChange(jobCompany: String) {
+        viewModelState.update {
+            it.copy(user = it.user?.copy(jobCompany = jobCompany))
         }
     }
 }

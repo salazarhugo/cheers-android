@@ -1,4 +1,4 @@
-package com.salazar.cheers.feature.home.home
+package com.salazar.cheers.core.ui.animations
 
 import nl.dionsegijn.konfetti.core.Angle
 import nl.dionsegijn.konfetti.core.Party

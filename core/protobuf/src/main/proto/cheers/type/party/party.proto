@@ -32,4 +32,6 @@ message Party {
   repeated string lineup = 19;
   repeated string music_genres = 20;
   int64 update_time = 21;
+  // whether everyone can access the guest list
+  bool hide_guestlist = 22;
 }

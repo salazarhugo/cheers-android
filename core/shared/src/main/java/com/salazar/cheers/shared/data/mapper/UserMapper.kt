@@ -1,7 +1,9 @@
 package com.salazar.cheers.shared.data.mapper
 
+import cheers.type.UserOuterClass
 import cheers.user.v1.GetUserResponse
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.Gender
 import com.salazar.cheers.core.model.RecentSearch
 import com.salazar.cheers.core.model.User
 
@@ -29,7 +31,7 @@ fun GetUserResponse.toUser(): User {
     )
 }
 
-fun cheers.type.UserOuterClass.User.toUser(
+fun UserOuterClass.User.toUser(
     drink: Drink? = null,
 ): User {
     return User().copy(
@@ -37,7 +39,7 @@ fun cheers.type.UserOuterClass.User.toUser(
         name = name,
         username = username,
         picture = picture,
-        banner = banner,
+        banner = bannersList,
         verified = verified,
         phoneNumber = phoneNumber,
         email = email,
@@ -47,5 +49,26 @@ fun cheers.type.UserOuterClass.User.toUser(
         createTime = createTime,
         isBusinessAccount = isBusinessAccount,
         favouriteDrink = drink,
+        premium = premium,
+        gender = gender.toGender(),
+        jobTitle = job.title,
+        jobCompany = job.company
     )
+}
+
+fun UserOuterClass.Gender.toGender(): Gender {
+    return when(this) {
+        UserOuterClass.Gender.MALE -> Gender.MALE
+        UserOuterClass.Gender.FEMALE -> Gender.FEMALE
+        UserOuterClass.Gender.UNRECOGNIZED -> Gender.OTHER
+    }
+}
+
+fun Gender?.toGenderPb(): UserOuterClass.Gender {
+    return when(this) {
+        Gender.MALE -> UserOuterClass.Gender.MALE
+        Gender.FEMALE -> UserOuterClass.Gender.FEMALE
+        Gender.OTHER -> UserOuterClass.Gender.MALE
+        null -> UserOuterClass.Gender.MALE
+    }
 }

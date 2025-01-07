@@ -45,8 +45,8 @@ import com.salazar.cheers.core.ui.FriendButton
 import com.salazar.cheers.core.ui.PostCaption
 import com.salazar.cheers.core.ui.StaticMap
 import com.salazar.cheers.core.ui.UserItem
-import com.salazar.cheers.core.ui.components.post.PostMedia
 import com.salazar.cheers.core.ui.components.post.PostHeader
+import com.salazar.cheers.core.ui.components.post.PostMedia
 import com.salazar.cheers.core.ui.item.LikeButton
 import com.salazar.cheers.core.ui.theme.Roboto
 import java.util.Date
@@ -177,6 +177,7 @@ fun Post(
 
             item {
                 PostHeader(
+                    name = post.name,
                     isPublic = post.privacy == Privacy.PUBLIC.name,
                     username = post.username,
                     verified = post.verified,

@@ -1,22 +1,33 @@
 package com.salazar.cheers.data.chat.repository
 
+import android.net.Uri
 import cheers.chat.v1.GetRoomIdReq
 import cheers.chat.v1.RoomId
-import cheers.chat.v1.SendMessageResponse
-import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.ChatChannel
 import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.model.ChatStatus
-import com.salazar.cheers.shared.util.result.Result
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.shared.util.result.DataError
+import com.salazar.cheers.shared.util.result.Result
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface ChatRepository {
+    val chatFiltersFlow: MutableStateFlow<ChatFilter>
+
     fun getUnreadChatCount(): Flow<Int>
+
+    fun updateChatFilter(chatFilter: ChatFilter): Unit
 
     suspend fun sendReadReceipt(chatID: String): Result<Unit, DataError.Network>
 
     fun pinRoom(roomId: String)
+
+    suspend fun fetchChatMessages(
+        chatChannelID: String,
+        page: Int,
+        pageSize: Int,
+    ): Result<Unit, DataError>
 
     suspend fun listMessages(channelId: String): Flow<List<ChatMessage>>
 
@@ -50,20 +61,27 @@ interface ChatRepository {
         status: ChatStatus,
     )
 
-//    suspend fun sendImage(
-//        channelId: String,
-//        images: List<Uri>
-//    ): LiveData<WorkInfo>
+    suspend fun enqueueChatMessage(
+        chatChannelID: String,
+        text: String,
+        images: List<Uri>,
+        replyTo: String?,
+    ): Result<Unit, DataError.Network>
 
-    suspend fun sendImageMessage(
-        channelId: String,
-        photoUrl: String
-    ): SendMessageResponse
+    suspend fun sendChatMessageLocal(
+        chatMessage: ChatMessage,
+    ): Result<Unit, DataError.Local>
 
-    suspend fun sendMessage(
-        roomId: String,
-        message: ChatMessage,
+    suspend fun sendChatMessage(
+        chatChannelID: String,
+        chatMessage: ChatMessage,
+        replyTo: String?,
     ): Result<ChatMessage, DataError.Network>
+
+    suspend fun deleteChatMessage(
+        chatID: String,
+        chatMessageID: String,
+    ): Result<Unit, DataError.Network>
 
     suspend fun addToken(token: String)
 

@@ -1,5 +1,6 @@
 package com.salazar.cheers.core.db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.salazar.cheers.core.model.ChatMessage
@@ -22,29 +23,36 @@ data class ChatMessageEntity(
     val isSender: Boolean = false,
     val hasLiked: Boolean = false,
     val senderProfilePictureUrl: String,
+    val images: List<String> = emptyList(),
     val likedBy: List<String> = emptyList(),
     val seenBy: List<String> = emptyList(),
     val type: MessageType = MessageType.TEXT,
     val status: ChatMessageStatus = ChatMessageStatus.UNRECOGNIZED,
+    @Embedded(prefix = "replyTo_")
+    val replyToEntity: ChatMessageReplyToEntity? = null,
 )
 
-fun ChatMessageEntity.asExternalModel() = ChatMessage(
-    id = id,
-    roomId = roomId,
-    text = text,
-    photoUrl = photoUrl,
-    createTime = createTime,
-    senderId = senderId,
-    senderName = senderName,
-    senderUsername = senderUsername,
-    isSender = isSender,
-    hasLiked = hasLiked,
-    senderProfilePictureUrl = senderProfilePictureUrl,
-    status = status,
-    type = type,
-    seenBy = seenBy,
-    likedBy = likedBy,
-)
+fun ChatMessageEntity.asExternalModel(): ChatMessage {
+    return ChatMessage(
+        id = id,
+        roomId = roomId,
+        text = text,
+        photoUrl = photoUrl,
+        createTime = createTime,
+        senderId = senderId,
+        senderName = senderName,
+        senderUsername = senderUsername,
+        isSender = isSender,
+        hasLiked = hasLiked,
+        senderProfilePictureUrl = senderProfilePictureUrl,
+        status = status,
+        type = type,
+        seenBy = seenBy,
+        likedBy = likedBy,
+        replyTo = replyToEntity.toChatMessage(),
+        images = images,
+    )
+}
 
 fun ChatMessage.asEntity(): ChatMessageEntity =
     ChatMessageEntity(
@@ -63,6 +71,8 @@ fun ChatMessage.asEntity(): ChatMessageEntity =
         type = type,
         seenBy = seenBy,
         likedBy = likedBy,
+        replyToEntity = replyTo.toChatMessageEntity(),
+        images = images,
     )
 
 fun List<ChatMessageEntity>.asExternalModel() = this.map { it.asExternalModel() }

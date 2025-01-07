@@ -21,6 +21,9 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.data.billing)
 
+    // Confetti
+    implementation(libs.konfetti.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

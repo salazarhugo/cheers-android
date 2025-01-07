@@ -23,4 +23,7 @@ interface CheersDao {
 
     @Delete
     suspend fun deleteRecentUser(search: RecentSearchEntity)
+
+    @Query("DELETE FROM recent_searches")
+    suspend fun clearRecentUser()
 }

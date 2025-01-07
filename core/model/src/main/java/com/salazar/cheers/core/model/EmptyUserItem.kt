@@ -29,12 +29,16 @@ val cheersUser = User(
     username = "cheers",
     name = "Cheers Social",
     verified = true,
+    premium = true,
     picture = null,
     friend = true,
     requested = false,
     gender = Gender.MALE,
-    work = "Software Engineer",
+    jobTitle = "Software Engineer",
+    jobCompany = "Google",
     education = "University of Toronto",
+    bio = "Cheers is a social media platform for Cheers users.",
+    website = "https://cheers.com",
 )
 
 val cheersUserItemList = List(20) {

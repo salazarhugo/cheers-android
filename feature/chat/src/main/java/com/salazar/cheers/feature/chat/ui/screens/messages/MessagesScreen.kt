@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,8 +35,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.ChatChannel
-import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.components.UserItemListLoading
+import com.salazar.cheers.core.ui.components.filters.Filters
 import com.salazar.cheers.core.ui.components.message.MessageComponent
 import com.salazar.cheers.core.ui.theme.Roboto
 import com.salazar.cheers.core.ui.ui.SwipeToRefresh
@@ -89,15 +88,10 @@ fun Tabs(
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-        CheersSearchBar(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            searchInput = uiState.searchInput,
-            onSearchInputChanged = { onRoomsUIAction(RoomsUIAction.OnSearchInputChange(it)) },
-            placeholder = {
-                Text("Search")
-            },
-            leadingIcon = {
-                Icon(Icons.Outlined.Search, contentDescription = null)
+        Filters(
+            filters = uiState.filters,
+            onFilterClick = {
+                onRoomsUIAction(RoomsUIAction.OnFilterClick(it))
             },
         )
 

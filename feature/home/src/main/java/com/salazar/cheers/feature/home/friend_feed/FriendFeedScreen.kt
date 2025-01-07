@@ -226,6 +226,8 @@ private fun LazyListScope.notes(
     item {
         NoteList(
             picture = uiState.account?.picture,
+            username = uiState.account?.username,
+            name = uiState.account?.name,
             notes = uiState.notes,
             modifier = Modifier.animateItem(),
             onCreateNoteClick = { onHomeUIAction(HomeUIAction.OnCreateNoteClick) },

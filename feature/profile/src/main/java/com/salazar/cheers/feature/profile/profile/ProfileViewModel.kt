@@ -3,16 +3,17 @@ package com.salazar.cheers.feature.profile.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
+import com.salazar.cheers.domain.feed_party.ListMyPartyFlowUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -24,6 +25,7 @@ class ProfileViewModel @Inject constructor(
     private val userRepositoryImpl: UserRepositoryImpl,
     private val postRepository: PostRepository,
     private val listPostUseCase: ListPostUseCase,
+    private val listMyPartyFlowUseCase: ListMyPartyFlowUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))
@@ -44,6 +46,9 @@ class ProfileViewModel @Inject constructor(
         }
         refreshUser()
         refreshUserPosts()
+        viewModelScope.launch {
+            listMyPartyFlowUseCase().collect(::updateMyParties)
+        }
     }
 
     fun onSwipeRefresh() {
@@ -58,6 +63,12 @@ class ProfileViewModel @Inject constructor(
     private fun updateIsRefreshing(isRefreshing: Boolean) {
         viewModelState.update {
             it.copy(isRefreshing = isRefreshing)
+        }
+    }
+
+    private fun updateMyParties(parties: List<Party>) {
+        viewModelState.update {
+            it.copy(parties = parties)
         }
     }
 

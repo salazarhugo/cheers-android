@@ -2,6 +2,8 @@ package com.salazar.cheers.feature.chat.ui.components
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
@@ -12,9 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.salazar.cheers.core.ui.CheersPreview
+import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 
 private enum class Visibility {
     VISIBLE,
@@ -64,8 +68,18 @@ fun JumpToBottom(
     }
 }
 
-@Preview
+@ScreenPreviews()
 @Composable
 fun JumpToBottomPreview() {
-    JumpToBottom(enabled = true, onClicked = {})
+    CheersPreview {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            JumpToBottom(
+                enabled = true,
+                onClicked = {},
+            )
+        }
+    }
 }

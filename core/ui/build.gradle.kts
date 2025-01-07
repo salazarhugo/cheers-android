@@ -73,6 +73,9 @@ dependencies {
     // Accompanist Permissions
     implementation(libs.accompanist.permissions)
 
+    // Confetti
+    implementation(libs.konfetti.compose)
+
     implementation(project(mapOf("path" to ":core:protobuf")))
     implementation(libs.kotlinx.serialization.json)
 

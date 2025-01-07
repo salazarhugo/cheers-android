@@ -25,8 +25,11 @@ import androidx.compose.material.icons.outlined.MotionPhotosOff
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -58,6 +61,7 @@ import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
 import com.salazar.cheers.core.ui.components.post.PostDrink
 import com.salazar.cheers.core.ui.components.post.PostHeader
 import com.salazar.cheers.core.ui.components.post.PostMedia
+import com.salazar.cheers.core.ui.components.row.CoreRowItem
 import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import com.salazar.cheers.core.ui.ui.ErrorMessage
@@ -177,6 +181,7 @@ fun CreatePostScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
+                    name = account.name,
                     username = account.username,
                     verified = account.verified,
                     avatar = account.picture,
@@ -236,13 +241,16 @@ fun CreatePostScreen(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-            HorizontalDivider()
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
             EndDateSection(
                 endDate = Date(),
                 onEndDateChange = {},
             )
-            HorizontalDivider()
-
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
             SelectLocationComponent(
                 location = location,
                 locationResults = locationResults.orEmpty(),
@@ -257,8 +265,15 @@ fun CreatePostScreen(
                     onCreatePostUIAction(CreatePostUIAction.OnSelectLocation(null))
                 },
             )
-
-            HorizontalDivider()
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
+            MoreOptionsItem(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                onClick = {
+                    onCreatePostUIAction(CreatePostUIAction.OnMoreOptionsClick)
+                },
+            )
             SwitchPreference(
                 text = "Turn off notifications",
                 icon = {
@@ -272,7 +287,9 @@ fun CreatePostScreen(
                     onCreatePostUIAction(CreatePostUIAction.OnNotificationChange(!it))
                 },
             )
-            HorizontalDivider()
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
             SwitchPreference(
                 text = "Turn off liking",
                 icon = {
@@ -449,6 +466,34 @@ fun PrivacyComponent(
             )
         }
     }
+}
+
+@Composable
+fun MoreOptionsItem(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    CoreRowItem(
+        modifier = modifier,
+        title = "More options",
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.MoreHoriz,
+                contentDescription = "More icon",
+            )
+        },
+        onClick = onClick,
+        trailingIcon = {
+            IconButton(
+                onClick = onClick
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ChevronRight,
+                    contentDescription = null,
+                )
+            }
+        }
+    )
 }
 
 @Composable

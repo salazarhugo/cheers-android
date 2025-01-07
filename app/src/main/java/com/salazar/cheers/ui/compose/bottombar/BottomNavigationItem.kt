@@ -42,7 +42,7 @@ sealed class BottomNavigationItem(
     )
 
     data object CreatePost : BottomNavigationItem(
-        screen = Screen.CreatePost,
+        screen = Screen.CreateParty,
         icon = {
             CreateBottomNavigationIcon(isSelected = false)
         },

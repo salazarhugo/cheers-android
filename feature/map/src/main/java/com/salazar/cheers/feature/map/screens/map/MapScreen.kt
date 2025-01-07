@@ -149,7 +149,8 @@ fun CurrentUserViewAnnotation(
         options = options,
     ) {
         CurrentUserAnnotation(
-            name = "Me",
+            name = userLocation.name,
+            username = userLocation.username,
             picture = userLocation.picture,
             ghostMode = ghostMode,
             isSelected = isSelected,
@@ -175,7 +176,8 @@ fun AddFriendViewAnnotation(
     ) {
         FriendAnnotation(
             isSelected = isSelected,
-            name = userLocation.name.ifBlank { userLocation.username },
+            username = userLocation.username,
+            name = userLocation.name,
             picture = userLocation.picture,
             lastUpdated = userLocation.lastUpdated,
             onClick = onClick,

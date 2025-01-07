@@ -10,6 +10,7 @@ import com.salazar.cheers.core.model.Theme
 import com.salazar.cheers.core.model.UserPreference
 import com.salazar.cheers.data.account.Account
 import com.salazar.cheers.data.account.AccountRepository
+import com.salazar.cheers.data.billing.BillingRepository
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.data.user.UserRepositoryImpl
@@ -67,6 +68,7 @@ class CheersViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val dataStoreRepository: DataStoreRepository,
     private val updateIdTokenUseCase: UpdateIdTokenUseCase,
+    private val billingRepository: BillingRepository,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(
@@ -134,10 +136,6 @@ class CheersViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-//            initWebSocket(auth.currentUser!!)
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
             chatRepository.getUnreadChatCount().collect { unreadChatCount ->
                 viewModelState.update {
                     it.copy(unreadChatCount = unreadChatCount)
@@ -146,6 +144,7 @@ class CheersViewModel @Inject constructor(
         }
 
         initWebsocket()
+        billingRepository.startConnection()
     }
 
 

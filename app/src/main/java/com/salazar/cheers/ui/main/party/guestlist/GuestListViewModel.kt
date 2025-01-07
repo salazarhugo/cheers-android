@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.data.party.data.repository.PartyRepository
+import com.salazar.cheers.shared.util.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GuestListUiState(
-    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val errorMessage: String = "",
     val interested: List<UserItem>? = null,
     val going: List<UserItem>? = null,
@@ -28,7 +29,13 @@ class GuestListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val guestListScreen = savedStateHandle.toRoute<GuestListScreen>()
-    private val viewModelState = MutableStateFlow(GuestListUiState(isLoading = true))
+    private val viewModelState = MutableStateFlow(GuestListUiState(isRefreshing = false))
+
+    val goingState =
+        MutableStateFlow<GuestListGoingState>(GuestListGoingState.Loading)
+
+    val interestedState =
+        MutableStateFlow<GuestListGoingState>(GuestListGoingState.Loading)
 
     val uiState = viewModelState
         .stateIn(
@@ -42,28 +49,36 @@ class GuestListViewModel @Inject constructor(
     }
 
     private fun load() {
+        viewModelState.update { it.copy(isRefreshing = true) }
         viewModelScope.launch {
-//            partyRepository.interestedList(eventId = guestListScreen.partyID)?.let {
-//                updateInterested(users = it)
-//            }
+            interestedState.update { GuestListGoingState.Loading }
+            val result = partyRepository.listInterested(partyID = guestListScreen.partyID)
+            when (result) {
+                is Result.Error -> {}
+                is Result.Success -> updateInterested(users = result.data)
+            }
         }
 
         viewModelScope.launch {
-//            partyRepository.goingList(eventId = eventId)?.let {
-//                updateGoing(users = it)
-//            }
+            goingState.update { GuestListGoingState.Loading }
+            val result = partyRepository.listGoing(partyID = guestListScreen.partyID)
+            when (result) {
+                is Result.Error -> {}
+                is Result.Success -> updateGoing(users = result.data)
+            }
+            viewModelState.update { it.copy(isRefreshing = false) }
         }
     }
 
-    private fun updateInterested(users: List<com.salazar.cheers.core.model.UserItem>) {
-        viewModelState.update {
-            it.copy(interested = users)
+    private fun updateInterested(users: List<UserItem>) {
+        interestedState.update {
+            GuestListGoingState.Users(users)
         }
     }
 
-    private fun updateGoing(users: List<com.salazar.cheers.core.model.UserItem>) {
-        viewModelState.update {
-            it.copy(going = users)
+    private fun updateGoing(users: List<UserItem>) {
+        goingState.update {
+            GuestListGoingState.Users(users)
         }
     }
 

@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.salazar.cheers.data.account.AccountRepository
 import com.salazar.cheers.data.account.mapper.toAccount
 import com.salazar.cheers.data.auth.AuthRepository
+import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.data.user.datastore.StoreUserEmail
 import com.salazar.cheers.domain.get_id_token.GetIdTokenUseCase
 import com.salazar.cheers.shared.di.IODispatcher
@@ -18,6 +19,7 @@ class SignInCheersUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val storeUserEmail: StoreUserEmail,
     private val getIdTokenUseCase: GetIdTokenUseCase,
+    private val webSocketManager: ChatWebSocketManager,
 ) {
     // requires firebase sign in
     suspend operator fun invoke(): Result<Boolean> = withContext(ioDispatcher) {

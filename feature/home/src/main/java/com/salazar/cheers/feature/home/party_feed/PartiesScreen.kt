@@ -9,13 +9,16 @@ fun PartyFeedScreen(
     isLoading: Boolean,
     isLoadingMore: Boolean,
     parties: List<Party>?,
+    myParties: List<Party>?,
     onPartyClicked: (String) -> Unit,
     onMoreClick: (String) -> Unit,
     onChangeCityClick: () -> Unit,
     onCreatePartyClick: () -> Unit,
     onLoadMore: (Int) -> Unit,
+    onMyPartiesClick: () -> Unit,
 ) {
     PartyList(
+        myParties = myParties,
         isLoading = isLoading,
         isLoadingMore = isLoadingMore,
         parties = parties,
@@ -24,5 +27,6 @@ fun PartyFeedScreen(
         onChangeCityClick = onChangeCityClick,
         onCreatePartyClick = onCreatePartyClick,
         onLoadMore = onLoadMore,
+        onMyPartiesClick = onMyPartiesClick,
     )
 }

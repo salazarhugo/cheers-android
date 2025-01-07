@@ -104,6 +104,8 @@ fun NoteItem(
             }
             AvatarComponent(
                 avatar = note.picture,
+                username = note.username,
+                name = note.name,
                 modifier = Modifier
                     .offset(x = 0.dp, y = -(avatarHalf).dp)
                     .align(Alignment.TopStart)

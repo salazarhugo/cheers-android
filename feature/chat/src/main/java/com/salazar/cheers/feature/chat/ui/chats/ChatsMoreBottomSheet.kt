@@ -55,7 +55,7 @@ internal fun ChatsMoreBottomSheet(
                 color = MaterialTheme.colorScheme.onBackground,
             )
             HorizontalDivider()
-            if (chat.type == ChatType.GROUP)
+            if (chat.type == ChatType.GROUP) {
                 Item(
                     text = "Leave",
                     icon = Icons.AutoMirrored.Outlined.ExitToApp,
@@ -66,9 +66,10 @@ internal fun ChatsMoreBottomSheet(
                         }
                     },
                 )
-            if (chat.admin)
+            }
+            if (!(chat.type == ChatType.GROUP && !chat.admin)) {
                 Item(
-                    text = "Delete Group",
+                    text = "Delete",
                     icon = Icons.Outlined.Delete,
                     red = true,
                     onClick = {
@@ -77,16 +78,7 @@ internal fun ChatsMoreBottomSheet(
                         }
                     },
                 )
-            Item(
-                text = "Delete Chats",
-                icon = Icons.Outlined.Delete,
-                red = false,
-                onClick = {
-                    viewModel.deleteChats(chat.id) {
-                        onDismissRequest()
-                    }
-                },
-            )
+            }
             Item(text = "Mute messages", icon = Icons.Outlined.NotificationsOff)
             Item(text = "Mute call notifications", icon = Icons.Outlined.NotificationsOff)
         }

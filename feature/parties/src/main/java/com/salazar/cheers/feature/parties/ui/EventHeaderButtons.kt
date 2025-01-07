@@ -76,6 +76,12 @@ fun PartyHeaderButtons(
                     expanded = true
                 },
                 modifier = Modifier.weight(1f),
+                onInterestedClick = {
+                    onWatchStatusChange(WatchStatus.INTERESTED)
+                },
+                onGoingClick = {
+                    onWatchStatusChange(WatchStatus.GOING)
+                },
             )
             Spacer(Modifier.width(8.dp))
             DropdownMenu(
@@ -86,7 +92,10 @@ fun PartyHeaderButtons(
             ) {
                 DropdownMenuItem(
                     text = { Text("Interested") },
-                    onClick = { onWatchStatusChange(WatchStatus.INTERESTED) },
+                    onClick = {
+                        onWatchStatusChange(WatchStatus.INTERESTED)
+                        expanded = false
+                    },
                     leadingIcon = {
                         Icon(
                             Icons.Rounded.Star,
@@ -96,7 +105,10 @@ fun PartyHeaderButtons(
                     trailingIcon = {
                         RadioButton(
                             selected = watchStatus == WatchStatus.INTERESTED,
-                            onClick = { onWatchStatusChange(WatchStatus.INTERESTED) }
+                            onClick = {
+                                onWatchStatusChange(WatchStatus.INTERESTED)
+                                expanded = false
+                            }
                         )
                     },
                 )

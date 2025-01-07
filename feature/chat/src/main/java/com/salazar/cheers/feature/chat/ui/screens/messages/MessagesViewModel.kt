@@ -3,11 +3,15 @@ package com.salazar.cheers.feature.chat.ui.screens.messages
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.ChatChannel
+import com.salazar.cheers.core.model.Filter
+import com.salazar.cheers.data.chat.repository.ChatFilter
 import com.salazar.cheers.data.chat.repository.ChatRepository
 import com.salazar.cheers.data.chat.websocket.ChatWebSocketManager
 import com.salazar.cheers.data.chat.websocket.WebsocketState
 import com.salazar.cheers.domain.list_chats.ListChatsUseCase
 import com.salazar.cheers.domain.pin_room.PinRoomUseCase
+import com.salazar.cheers.domain.update_chat_filter.GetChatFiltersUseCase
+import com.salazar.cheers.domain.update_chat_filter.UpdateChatFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,6 +27,8 @@ class MessagesViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val pinRoomUseCase: PinRoomUseCase,
     private val listChatsUseCase: ListChatsUseCase,
+    private val updateChatFilterUseCase: UpdateChatFilterUseCase,
+    private val getChatFiltersUseCase: GetChatFiltersUseCase,
 ) : ViewModel() {
 
     private val viewModelState =
@@ -38,6 +44,9 @@ class MessagesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            getChatFiltersUseCase().collect(::updateFilters)
+        }
+        viewModelScope.launch {
             listChatsUseCase().collect(::updateRooms)
         }
         viewModelScope.launch {
@@ -49,6 +58,12 @@ class MessagesViewModel @Inject constructor(
     private fun listenWebsocket() {
         viewModelScope.launch {
             webSocketManager.websocketState.collect(::updateWebsocketState)
+        }
+    }
+
+    private fun updateFilters(filters: List<Filter>) {
+        viewModelState.update {
+            it.copy(filters = filters)
         }
     }
 
@@ -87,6 +102,22 @@ class MessagesViewModel @Inject constructor(
     fun onRoomPin(roomId: String) {
         viewModelScope.launch {
             pinRoomUseCase(roomId = roomId)
+        }
+    }
+
+    fun onFilterClick(filter: Filter) {
+        val chatFilter = when (filter.name) {
+            "All" -> ChatFilter.NONE
+            "Groups" -> ChatFilter.GROUPS
+            "Unreplied" -> ChatFilter.UNREPLIED
+            else -> ChatFilter.NONE
+        }
+        viewModelScope.launch {
+            updateChatFilterUseCase(chatFilter = chatFilter)
+        }
+
+        viewModelState.update {
+            it.copy(selectedFilter = filter)
         }
     }
 }

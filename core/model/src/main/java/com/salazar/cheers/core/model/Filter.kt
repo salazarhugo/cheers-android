@@ -6,9 +6,9 @@ import androidx.compose.runtime.Immutable
 data class Filter(
     val id: String,
     val name: String,
+    val value: String = "",
     val selected: Boolean,
 )
-
 
 const val ALL_FILTER_ID = "ALL_FILTER_ID"
 const val INFO_FILTER_ID = "INFO_FILTER_ID"

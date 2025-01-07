@@ -72,6 +72,7 @@ internal fun ActivityItem(
                 else -> {
                     AvatarComponent(
                         avatar = activity.avatar,
+                        username = activity.username,
                         size = 46.dp,
                         onClick = {
                             onActivityUIAction(ActivityUIAction.OnUserClick(userId = activity.username))
