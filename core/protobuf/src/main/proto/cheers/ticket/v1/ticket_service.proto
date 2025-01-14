@@ -31,6 +31,7 @@ service TicketService {
   rpc DeleteTicket (DeleteTicketRequest) returns (DeleteTicketResponse) {
     option (google.api.http) = {
       delete: "/v1/tickets/{ticket_id}"
+      body: "*"
     };
   }
 

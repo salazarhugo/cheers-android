@@ -6,9 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.salazar.cheers.core.ui.ui.CheersNavigationActions
 import com.salazar.cheers.core.ui.ui.LoadingScreen
-import com.salazar.cheers.core.util.Utils.getActivity
+import com.salazar.cheers.shared.util.LocalActivity
 import kotlinx.coroutines.delay
 
 @Composable
@@ -17,6 +16,7 @@ fun RechargeRoute(
     navigateBack: () -> Unit,
 ) {
     val uiState by rechargeViewModel.uiState.collectAsStateWithLifecycle()
+    val activity = LocalActivity.current
     val context = LocalContext.current
     val recharges = uiState.productDetails
 
@@ -26,20 +26,18 @@ fun RechargeRoute(
         rechargeViewModel.refreshSkuDetails()
     }
 
-    if (recharges == null)
+    if (recharges == null) {
         LoadingScreen()
-    else
+    } else {
         RechargeScreen(
             onRecharge = {
-                val activity = context.getActivity()
-                if (activity != null) {
-                    rechargeViewModel.onProductClick(it, activity = activity)
-                    rechargeViewModel.updateIsLoading(true)
-                }
+                rechargeViewModel.onProductClick(it, activity = activity)
+                rechargeViewModel.updateIsLoading(true)
             },
             recharges = recharges,
             onBackPressed = navigateBack,
             coins = uiState.coins
         )
+    }
 }
 

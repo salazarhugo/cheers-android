@@ -3,10 +3,10 @@ syntax = "proto3";
 package cheers.user.v1;
 
 import "cheers/type/user/user.proto";
+import "cheers/type/drink/drink.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/api/annotations.proto";
-import "cheers/drink/v1/drink_service.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/user/v1;user";
@@ -186,7 +186,7 @@ message GetUserResponse {
   bool requested = 8;
   bool has_requested_viewer = 9;
   int32 friends_count = 10;
-  optional cheers.drink.v1.Drink drink = 11;
+  optional cheers.type.Drink drink = 11;
 }
 
 message BlockUserRequest {

@@ -32,6 +32,7 @@ data class PostEntity(
     val liked: Boolean = false,
     val drinkId: String = String(),
     val drinkName: String = String(),
+    val drinkColor: String = String(),
     val drinkPicture: String = String(),
     val comments: Int = 0,
     val shares: Int = 0,
@@ -53,6 +54,8 @@ data class PostEntity(
     val canLike: Boolean = true,
     val canComment: Boolean = true,
     val canShare: Boolean = true,
+    val hasMentions: Boolean = false,
+    val mentionAvatars: List<String> = emptyList(),
 )
 
 fun PostEntity.asExternalModel() = Post(
@@ -72,6 +75,7 @@ fun PostEntity.asExternalModel() = Post(
     liked = liked,
     drinkId = drinkId,
     drinkName = drinkName,
+    drinkColor = drinkColor,
     drinkPicture = drinkPicture,
     comments = comments,
     shares = shares,
@@ -93,6 +97,8 @@ fun PostEntity.asExternalModel() = Post(
     canComment = canComment,
     canLike = canLike,
     canShare = canShare,
+    hasMentions = hasMentions,
+    mentionAvatars = mentionAvatars,
 )
 
 fun Post.asEntity(): PostEntity {
@@ -113,6 +119,7 @@ fun Post.asEntity(): PostEntity {
         liked = liked,
         drinkId = drinkId,
         drinkName = drinkName,
+        drinkColor = drinkColor,
         drinkPicture = drinkPicture,
         comments = comments,
         shares = shares,
@@ -134,6 +141,8 @@ fun Post.asEntity(): PostEntity {
         canComment = canComment,
         canLike = canLike,
         canShare = canShare,
+        hasMentions = hasMentions,
+        mentionAvatars = mentionAvatars,
     )
 }
 

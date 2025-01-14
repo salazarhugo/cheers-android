@@ -12,39 +12,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.ChipGroup
-import com.salazar.cheers.core.ui.theme.Roboto
+import com.salazar.cheers.core.ui.components.searchbar.SearchBarComponent
 import com.salazar.cheers.core.ui.theme.Typography
 import com.salazar.cheers.core.ui.ui.LoadingScreen
+import com.salazar.cheers.core.ui.ui.Toolbar
 import com.salazar.cheers.core.ui.ui.UserProfilePicture
 import com.salazar.cheers.core.ui.ui.Username
 
@@ -79,17 +65,18 @@ fun AddPeopleScreen(
             ChipInput(
                 selectedUsers = selectedUsers,
             )
-            SearchTextInput(
+            SearchBarComponent(
+                modifier = Modifier.fillMaxWidth(),
                 searchInput = uiState.searchInput,
-                selectedUsers = uiState.selectedUsers,
                 onSearchInputChanged = viewModel::onSearchInputChanged,
             )
-            if (uiState.users != null)
+            if (uiState.users != null) {
                 Users(
                     users = uiState.users!!,
                     selectedUsers = selectedUsers,
                     onSelectUser = onSelectUser,
                 )
+            }
         }
     }
 }
@@ -99,17 +86,15 @@ fun AddPeopleTopBar(
     onDismiss: () -> Unit,
     onDone: () -> Unit
 ) {
-    TopAppBar(title = { Text("Add people", fontWeight = FontWeight.Bold, fontFamily = Roboto) },
-        navigationIcon = {
-            IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, contentDescription = null)
-            }
-        },
+    Toolbar(
+        title = "Add people",
+        onBackPressed = onDismiss,
         actions = {
             TextButton(onClick = onDone) {
-                Text("DONE")
+                Text("Done")
             }
-        })
+        }
+    )
 }
 
 @Composable
@@ -127,9 +112,9 @@ fun Users(
 
 @Composable
 fun UserCard(
-    user: com.salazar.cheers.core.model.UserItem,
+    user: UserItem,
     selected: Boolean,
-    onSelectUser: (com.salazar.cheers.core.model.UserItem) -> Unit,
+    onSelectUser: (UserItem) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -143,8 +128,12 @@ fun UserCard(
             UserProfilePicture(picture = user.picture)
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                if (user.name.isNotBlank())
-                    Text(text = user.name, style = Typography.bodyMedium)
+                if (user.name.isNotBlank()) {
+                    Text(
+                        text = user.name,
+                        style = Typography.bodyMedium,
+                    )
+                }
                 Username(
                     username = user.username,
                     verified = user.verified,
@@ -162,33 +151,6 @@ fun UserCard(
             ),
         )
     }
-}
-
-@Composable
-fun SearchTextInput(
-    searchInput: String,
-    selectedUsers: List<com.salazar.cheers.core.model.UserItem>,
-    onSearchInputChanged: (String) -> Unit,
-) {
-    TextField(
-        value = searchInput,
-        leadingIcon = { Icon(Icons.Filled.Search, "Search icon") },
-        modifier = Modifier.fillMaxWidth(),
-        onValueChange = onSearchInputChanged,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Search
-        ),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-        keyboardActions = KeyboardActions(onSearch = {
-        }),
-        placeholder = { Text("Search") }
-    )
 }
 
 @Composable

@@ -56,8 +56,7 @@ class RechargeViewModel @Inject constructor(
             listInAppProductUseCase()
                 .onSuccess { productDetails ->
                     viewModelState.update {
-                        // sortedBy { it.oneTimePurchaseOfferDetails?.priceAmountMicros }
-                        it.copy(productDetails = productDetails)
+                        it.copy(productDetails = productDetails.sortedBy { it.formattedPrice })
                     }
                 }.onFailure {
                     it.printStackTrace()

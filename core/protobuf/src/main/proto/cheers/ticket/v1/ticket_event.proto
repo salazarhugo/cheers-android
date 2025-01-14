@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package cheers.ticket.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/ticket/v1;ticket";
+
+import "cheers/ticket/v1/ticket_service.proto";
+import "cheers/type/user/user.proto";
+
+message TicketEvent {
+  oneof event {
+    CreateTicket create = 1;
+    UpdateTicket update = 2;
+    DeleteTicket delete = 3;
+  };
+}
+
+message CreateTicket {
+  Ticket ticket = 1;
+  cheers.type.UserItem user = 2;
+}
+
+message UpdateTicket {
+  Ticket ticket = 1;
+  cheers.type.UserItem user = 2;
+}
+
+message DeleteTicket {
+  Ticket ticket = 1;
+  cheers.type.UserItem user = 2;
+}

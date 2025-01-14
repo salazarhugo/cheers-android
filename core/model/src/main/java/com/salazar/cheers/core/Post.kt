@@ -23,6 +23,7 @@ data class Post(
     val liked: Boolean = false,
     val drinkId: String = String(),
     val drinkName: String = String(),
+    val drinkColor: String = String(),
     val drinkPicture: String = String(),
     val comments: Int = 0,
     val shares: Int = 0,
@@ -44,5 +45,7 @@ data class Post(
     val canLike: Boolean = true,
     val canComment: Boolean = true,
     val canShare: Boolean = true,
+    val hasMentions: Boolean = false,
+    val mentionAvatars: List<String> = emptyList(),
 )
 

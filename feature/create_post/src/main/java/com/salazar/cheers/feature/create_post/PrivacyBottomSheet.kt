@@ -46,7 +46,7 @@ fun PrivacyBottomSheet(
                 modifier = Modifier.padding(horizontal = 16.dp),
             ) {
                 Text(
-                    text = "Event privacy",
+                    text = "Privacy",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(12.dp)
                 )

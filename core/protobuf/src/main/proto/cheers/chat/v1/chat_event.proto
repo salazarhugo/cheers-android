@@ -16,7 +16,6 @@ message ChatEvent {
 
 message CreateMessage {
   cheers.chat.v1.Message message = 1;
-  cheers.type.UserItem sender = 2;
-  repeated cheers.type.UserItem members = 3;
+  repeated string members = 3;
   cheers.chat.v1.Room room = 4;
 }

@@ -12,12 +12,19 @@ message CommentEvent {
   oneof event {
     CreatedComment created = 1;
     DeletedComment deleted = 2;
+    LikedComment liked = 3;
   };
+}
+
+message LikedComment {
+  string comment_id = 1;
+  string user_id = 2;
 }
 
 message CreatedComment {
   cheers.comment.v1.Comment comment = 1;
   cheers.type.UserItem user = 2;
+  repeated string mentions = 3;
 }
 
 message DeletedComment {

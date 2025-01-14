@@ -20,6 +20,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.shared)
     implementation(projects.core.db)
+    implementation(projects.core.protobuf)
 
     implementation(projects.data.user)
     api(projects.data.account)

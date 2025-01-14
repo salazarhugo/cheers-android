@@ -32,6 +32,8 @@ import com.salazar.cheers.feature.chat.ui.screens.chat.navigateToChatWithUserIte
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.CreateChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.createChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.navigateToCreateChat
+import com.salazar.cheers.feature.chat.ui.screens.mediapreview.mediaPreviewScreen
+import com.salazar.cheers.feature.chat.ui.screens.mediapreview.navigateToMediaPreview
 import com.salazar.cheers.feature.chat.ui.screens.messages.messagesScreen
 import com.salazar.cheers.feature.chat.ui.screens.messages.navigateToMessages
 import com.salazar.cheers.feature.chat.ui.screens.room.chatInfoScreen
@@ -44,8 +46,11 @@ import com.salazar.cheers.feature.comment.replies.navigateToReplies
 import com.salazar.cheers.feature.comment.replies.repliesScreen
 import com.salazar.cheers.feature.create_note.createNoteScreen
 import com.salazar.cheers.feature.create_note.navigateToCreateNote
-import com.salazar.cheers.feature.create_post.createPostScreen
+import com.salazar.cheers.feature.create_post.createPostGraph
+import com.salazar.cheers.feature.create_post.drink.createDrinkScreen
 import com.salazar.cheers.feature.create_post.navigateToCreatePost
+import com.salazar.cheers.feature.drink.drinkScreen
+import com.salazar.cheers.feature.drink.navigateToDrink
 import com.salazar.cheers.feature.edit_profile.navigation.editProfileGraph
 import com.salazar.cheers.feature.edit_profile.navigation.navigateToEditProfile
 import com.salazar.cheers.feature.friend_list.friendListScreen
@@ -146,6 +151,10 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
 
+        createDrinkScreen(
+            navigateBack = navController::popBackStack,
+        )
+
         ticketsScreen(
             navigateBack = navController::popBackStack,
             navigateToTicketDetails = navController::navigateToTicketDetails,
@@ -211,9 +220,9 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
         )
 
-        createPostScreen(
+        createPostGraph(
+            navController = navController,
             navigateBack = navController::popBackStack,
-            navigateToCamera = {},
         )
 
         partiesScreen(
@@ -274,6 +283,11 @@ fun NavGraphBuilder.mainNavGraph(
             navigateToCreateParty = navController::navigateToCreateParty,
             navigateToMap = navController::navigateToMap,
             navigateToMyParties = navController::navigateToMyParties,
+            navigateToDrink = navController::navigateToDrink,
+        )
+
+        drinkScreen(
+            navigateBack = navController::popBackStack,
         )
 
         mapScreen(
@@ -476,11 +490,16 @@ fun NavGraphBuilder.mainNavGraph(
             navigateBack = navController::popBackStack,
             navigateToOtherProfile = navController::navigateToOtherProfile,
             navigateToRoomDetails = navController::navigateToChatInfo,
+            navigateToMediaPreview = navController::navigateToMediaPreview,
         )
 
         chatInfoScreen(
             navigateBack = navController::popBackStack,
             navigateToOtherProfile = navController::navigateToOtherProfile,
+        )
+
+        mediaPreviewScreen(
+            navigateBack = navController::popBackStack,
         )
 
         editProfileGraph(

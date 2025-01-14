@@ -1,12 +1,19 @@
 package com.salazar.cheers.shared.data.mapper
 
-import cheers.drink.v1.Drink
+import cheers.type.DrinkOuterClass
 
-fun Drink.toDrink(): com.salazar.cheers.core.model.Drink {
+
+fun DrinkOuterClass.Drink.toDrink(): com.salazar.cheers.core.model.Drink {
     return com.salazar.cheers.core.model.Drink(
         id = id,
         name = name,
-        category = category,
+        userID = userId,
+        brand = brand,
+        price = price.toInt(),
+        description = description,
         icon = icon,
+        color = color,
+        privacy = privacy.toPrivacy(),
+        rarity = rarity.toRarity(),
     )
 }

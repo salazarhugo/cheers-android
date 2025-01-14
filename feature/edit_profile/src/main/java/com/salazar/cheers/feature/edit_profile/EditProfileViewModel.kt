@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Gender
 import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.cheers.domain.list_drink.ListDrinkUseCase
+import com.salazar.cheers.domain.list_drink.ListDrinkFlowUseCase
 import com.salazar.cheers.domain.update_profile.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class EditProfileViewModel @Inject constructor(
     private val userRepositoryImpl: UserRepositoryImpl,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    private val listDrinkUseCase: ListDrinkUseCase,
+    private val listDrinkFlowUseCase: ListDrinkFlowUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(EditProfileViewModelState(isLoading = true))
@@ -44,11 +44,8 @@ class EditProfileViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            listDrinkUseCase().collect { result ->
-                result.onSuccess(::updateDrinks)
-                    .onFailure {
-                    }
-            }
+            listDrinkFlowUseCase()
+                .collect(::updateDrinks)
         }
     }
 
@@ -67,7 +64,6 @@ class EditProfileViewModel @Inject constructor(
                 id = String(),
                 name = "",
                 icon = "",
-                category = "",
             )
         )
         viewModelState.update {

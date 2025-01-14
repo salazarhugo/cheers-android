@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.domain.list_friend.ListMyFriendsUseCase
+import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,13 +49,29 @@ class AddPeopleViewModel @Inject constructor(
 
     private fun refreshFriends(query: String = "") {
         viewModelScope.launch {
-            //listFriendUseCase().collect(::updateUsers)
+            listFriendUseCase().collect(::updateUsers)
         }
     }
 
-    private fun updateUsers(users: List<com.salazar.cheers.core.model.UserItem>?) {
-        viewModelState.update {
-            it.copy(users = users)
+    private fun updateUsers(users: Resource<List<UserItem>>) {
+        when (users) {
+            is Resource.Error -> {
+                viewModelState.update {
+                    it.copy(isLoading = false, errorMessages = listOf())
+                }
+            }
+
+            is Resource.Loading -> {
+                viewModelState.update {
+                    it.copy(isLoading = true)
+                }
+            }
+
+            is Resource.Success -> {
+                viewModelState.update {
+                    it.copy(isLoading = false, users = users.data)
+                }
+            }
         }
     }
 }

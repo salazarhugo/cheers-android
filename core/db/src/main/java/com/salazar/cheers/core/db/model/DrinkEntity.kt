@@ -3,6 +3,9 @@ package com.salazar.cheers.core.db.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.model.Rarity
+import com.salazar.cheers.core.model.UserID
 
 @Entity(
     tableName = "drinks",
@@ -12,14 +15,28 @@ data class DrinkEntity(
     val id: String,
     val name: String,
     val icon: String,
-    val category: String,
+    val price: Int = 0,
+    val lastUsed: Long,
+    val userID: UserID = UserID(),
+    val brand: String = "",
+    val color: String = "",
+    val description: String = "",
+    val privacy: Privacy = Privacy.PRIVATE,
+    val rarity: Rarity = Rarity.DEFAULT,
 )
 
 fun DrinkEntity.asExternalModel() = Drink(
     id = id,
     name = name,
     icon = icon,
-    category = category,
+    price = price,
+    lastUsed = lastUsed,
+    userID = userID,
+    brand = brand,
+    description = description,
+    privacy = privacy,
+    color = color,
+    rarity = rarity,
 )
 
 fun Drink.asEntity(): DrinkEntity =
@@ -27,7 +44,14 @@ fun Drink.asEntity(): DrinkEntity =
         id = id,
         name = name,
         icon = icon,
-        category = category,
+        price = price,
+        lastUsed = lastUsed,
+        userID = userID,
+        brand = brand,
+        description = description,
+        privacy = privacy,
+        color = color,
+        rarity = rarity,
     )
 
 fun List<DrinkEntity>.asExternalModel() = this.map { it.asExternalModel() }

@@ -134,7 +134,10 @@ class PremiumViewModel @Inject constructor(
     fun onSubscribeClick(
         activity: android.app.Activity,
     ) {
-        val productDetails = ProductDetails(id = "cheers_premium")
+        val productDetails = ProductDetails(
+            id = "cheers_premium",
+            type = BillingClient.ProductType.SUBS,
+        )
         val offerToken = uiState.value.selectedPlan?.offerToken ?: return
 
         viewModelScope.launch {

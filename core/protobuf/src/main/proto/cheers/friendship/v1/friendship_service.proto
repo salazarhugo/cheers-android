@@ -5,6 +5,7 @@ package cheers.friendship.v1;
 
 import "google/api/annotations.proto";
 import "cheers/type/user/user.proto";
+import "cheers/user/v1/user_service.proto";
 
 option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/friendship/v1;friendship";
@@ -40,6 +41,15 @@ service FriendshipService {
   }
 
   /*
+    Get friend list of a specific user
+   */
+  rpc ListFriendIds(ListFriendIdsRequest) returns (ListFriendIdsResponse) {
+    option (google.api.http) = {
+      get: "/v1/friendships/ids"
+    };
+  }
+
+  /*
     Get friend requests list of a specific user
    */
   rpc ListFriendRequests(ListFriendRequestsRequest) returns (ListFriendRequestsResponse) {
@@ -54,6 +64,7 @@ service FriendshipService {
   rpc DeleteFriendRequest(DeleteFriendRequestRequest) returns (DeleteFriendRequestResponse) {
     option (google.api.http) = {
       delete: "/v1/friendships/request"
+      body: "*"
     };
   }
 
@@ -63,6 +74,7 @@ service FriendshipService {
   rpc DeleteFriend(DeleteFriendRequest2) returns (DeleteFriendResponse) {
     option (google.api.http) = {
       delete: "/v1/friendships"
+      body: "*"
     };
   }
 }
@@ -79,6 +91,11 @@ message DeleteFriendRequestRequest {
 }
 
 message DeleteFriendRequestResponse {
+  cheers.user.v1.GetUserResponse friend = 1;
+}
+
+message ListFriendIdsResponse {
+  repeated string ids = 1;
 }
 
 message ListFriendResponse {
@@ -91,6 +108,10 @@ message DeleteFriendRequest2 {
 }
 
 message DeleteFriendResponse {
+}
+
+message ListFriendIdsRequest {
+  string user_id = 1;
 }
 
 message ListFriendRequest {

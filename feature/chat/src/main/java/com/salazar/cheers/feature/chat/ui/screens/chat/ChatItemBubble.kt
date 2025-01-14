@@ -34,19 +34,16 @@ import com.salazar.cheers.data.chat.models.mockMessage1
 import java.text.SimpleDateFormat
 import java.util.Date
 
-private val ChatBubbleStartShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
-private val ChatBubbleEndShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
-
 @Composable
 fun ChatItemBubble(
     message: ChatMessage,
     modifier: Modifier = Modifier,
-    seen: Boolean = false,
     isFirstMessageByAuthor: Boolean = true,
     isLastMessageByAuthor: Boolean = true,
     authorClicked: (String) -> Unit = {},
     onLongClickMessage: (String) -> Unit = {},
     onDoubleTapMessage: (String) -> Unit = {},
+    onMediaClick: (String) -> Unit = {},
 ) {
     val isSender = message.isSender
     val replyToChatMessage = message.replyTo
@@ -114,8 +111,7 @@ fun ChatItemBubble(
                 if (message.images.isNotEmpty()) {
                     ChatImageComponent(
                         message = message,
-                        onLongClickMessage = {},
-                        onDoubleTapMessage = {},
+                        onClick = onMediaClick,
                     )
                 }
                 Row(

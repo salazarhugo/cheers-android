@@ -62,6 +62,7 @@ class CreatePostWorker @AssistedInject constructor(
             .setLikesEnabled(likesEnabled)
             .setCommentsEnabled(commentsEnabled)
             .setSharesEnabled(shareEnabled)
+            .addAllTagUsers(tagUserIds.toList())
             .setNotificationsEnabled(notify)
 
         Log.d("CreatePostWorker", drinkID.toString())

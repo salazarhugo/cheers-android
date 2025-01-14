@@ -36,6 +36,7 @@ data class CreatePostUiState(
     val currentDrink: Drink? = null,
     val account: Account? = null,
     val isAudioPlaying: Boolean = false,
+    val friends: List<UserItem> = emptyList(),
     val audioProgress: Float = 0f,
 )
 

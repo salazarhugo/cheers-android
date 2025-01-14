@@ -51,13 +51,13 @@ fun ChatMessageComponent(
     chatMessage: ChatMessage,
     modifier: Modifier = Modifier,
     isGroup: Boolean = false,
-    seen: Boolean = false,
     isFirstMessageByAuthor: Boolean = true,
     isLastMessageByAuthor: Boolean = true,
     onAuthorClick: (String) -> Unit = {},
     onLongClickMessage: (String) -> Unit = {},
     onDoubleTapMessage: (String) -> Unit = {},
     onReply: () -> Unit,
+    onMediaClick: (String) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
@@ -148,12 +148,12 @@ fun ChatMessageComponent(
                     )
                 },
             message = chatMessage,
-            seen = seen,
             isFirstMessageByAuthor = isFirstMessageByAuthor,
             isLastMessageByAuthor = isLastMessageByAuthor,
             authorClicked = onAuthorClick,
             onLongClickMessage = onLongClickMessage,
             onDoubleTapMessage = onDoubleTapMessage,
+            onMediaClick = onMediaClick,
         )
     }
 }
@@ -161,23 +161,23 @@ fun ChatMessageComponent(
 @Composable
 fun AuthorAndTextMessage(
     message: ChatMessage,
-    seen: Boolean,
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean,
     authorClicked: (String) -> Unit,
     onLongClickMessage: (String) -> Unit,
     onDoubleTapMessage: (String) -> Unit,
+    onMediaClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         ChatItemBubble(
             message = message,
-            seen = seen,
             isFirstMessageByAuthor = isFirstMessageByAuthor,
             isLastMessageByAuthor = isLastMessageByAuthor,
             authorClicked = authorClicked,
             onLongClickMessage = onLongClickMessage,
-            onDoubleTapMessage = onDoubleTapMessage
+            onDoubleTapMessage = onDoubleTapMessage,
+            onMediaClick = onMediaClick,
         )
         if (isFirstMessageByAuthor) {
             // Last bubble before next author
@@ -199,6 +199,7 @@ private fun ChatMessagePreview(
             chatMessage = mockMessage1.copy(text = text.take(100)),
             modifier = Modifier.padding(16.dp),
             onReply = {},
+            onMediaClick = {},
         )
     }
 }

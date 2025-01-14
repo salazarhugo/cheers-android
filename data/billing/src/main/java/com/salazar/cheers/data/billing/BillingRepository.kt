@@ -9,24 +9,17 @@ import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.ConsumeParams
-import com.android.billingclient.api.ConsumeResult
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
-import com.salazar.cheers.data.billing.api.ApiService
-import com.salazar.cheers.data.billing.response.RechargeCoinRequest
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -35,7 +28,6 @@ import javax.inject.Singleton
 @Singleton
 class BillingRepository @Inject constructor(
     application: Application,
-    private val apiService: ApiService,
 ) : PurchasesUpdatedListener, PurchasesResponseListener {
 
     private val _purchaseUpdateLiveData = Channel<List<Purchase>?>(Channel.BUFFERED)
@@ -50,9 +42,6 @@ class BillingRepository @Inject constructor(
             runBlocking {
                 _purchaseUpdateLiveData.send(purchases)
             }
-            for (purchase in purchases) {
-                handlePurchase(purchase)
-            }
         } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
             // TODO Handle an error caused by a user cancelling the purchase flow.
         } else {
@@ -64,11 +53,6 @@ class BillingRepository @Inject constructor(
         billingResult: BillingResult,
         purchases: MutableList<Purchase>
     ) {
-        if (billingResult.responseCode == BillingResponseCode.OK) {
-            for (purchase in purchases) {
-                handlePurchase(purchase)
-            }
-        }
     }
 
     private var billingClient = BillingClient.newBuilder(application)
@@ -81,46 +65,6 @@ class BillingRepository @Inject constructor(
                 .build(),
         )
         .build()
-
-    private suspend fun verifyPurchase(purchase: Purchase): Boolean {
-        val request = RechargeCoinRequest(
-            packageName = purchase.packageName,
-            productId = purchase.products[0],
-            purchaseToken = purchase.purchaseToken,
-        )
-
-        return try {
-            val response = apiService.rechargeCoins(request = request)
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
-    private fun handlePurchase(purchase: Purchase) {
-        if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED || purchase.isAcknowledged) {
-            return
-        }
-
-        GlobalScope.launch {
-            verifyPurchase(purchase = purchase)
-            consumePurchase(purchaseToken = purchase.purchaseToken)
-        }
-    }
-
-    private suspend fun consumePurchase(purchaseToken: String): ConsumeResult {
-        val consumeParams =
-            ConsumeParams.newBuilder()
-                .setPurchaseToken(purchaseToken)
-                .build()
-
-        val consumeResult = withContext(Dispatchers.IO) {
-            billingClient.consumePurchase(consumeParams)
-        }
-
-        return consumeResult
-    }
 
     fun startConnection() {
         if (billingClient.connectionState == BillingClient.ConnectionState.CONNECTED) return
@@ -144,19 +88,21 @@ class BillingRepository @Inject constructor(
     suspend fun launchBillingFlow(
         userID: String,
         activity: Activity,
-        productDetails: com.salazar.cheers.core.model.ProductDetails,
+        productDetailsParam: com.salazar.cheers.core.model.ProductDetails,
         offerToken: String,
     ): Int {
-        val productDetails = getProduct(productId = productDetails.id).getOrNull() ?: return -1
+        val productDetails = getProduct(
+            productId = productDetailsParam.id,
+            productType = productDetailsParam.type,
+        ).getOrNull() ?: return -1
 
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
                 .setProductDetails(productDetails)
-                .setOfferToken(offerToken)
+                .also { if (offerToken.isNotEmpty()) it.setOfferToken(offerToken) }
                 .build()
         )
 
-        println("xxx $userID")
         val flowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(productDetailsParamsList)
             .setObfuscatedAccountId(userID)
@@ -232,10 +178,11 @@ class BillingRepository @Inject constructor(
 
     private suspend fun getProduct(
         productId: String,
+        productType: String = BillingClient.ProductType.SUBS,
     ): Result<ProductDetails> {
         val product = QueryProductDetailsParams.Product.newBuilder()
             .setProductId(productId)
-            .setProductType(BillingClient.ProductType.SUBS)
+            .setProductType(productType)
             .build()
 
         val params = QueryProductDetailsParams.newBuilder()

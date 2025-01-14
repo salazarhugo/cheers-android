@@ -1,11 +1,10 @@
 package com.salazar.cheers.core.ui.components.select_drink
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,15 +14,16 @@ import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
-import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
-import com.salazar.cheers.core.ui.theme.GreySheet
 
 @Composable
 fun SelectDrinkScreen(
+    searchInput: String = "",
     drinks: List<Drink>,
     modifier: Modifier = Modifier,
     onClick: (Drink) -> Unit = {},
+    onCreateDrinkClick: () -> Unit = {},
+    onSearchInputChanged: (String) -> Unit = {},
 ) {
     val state = rememberRefreshLayoutState()
 
@@ -31,10 +31,12 @@ fun SelectDrinkScreen(
         modifier = modifier,
         topBar = {
             CheersSearchBar(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                searchInput = "",
-                onSearchInputChanged = {
-                },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp)
+                ,
+                searchInput = searchInput,
+                onSearchInputChanged = onSearchInputChanged,
                 placeholder = {
                     Text("Search drink")
                 },
@@ -43,17 +45,16 @@ fun SelectDrinkScreen(
                 },
             )
         },
-        containerColor = if (!isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else GreySheet,
     ) { insets ->
-        PullToRefreshComponent(
-            state = state,
-            onRefresh = {},
-            modifier = Modifier.padding(top = insets.calculateTopPadding()),
+        Column(
+            modifier = Modifier
+                .padding(insets),
         ) {
             DrinkList(
                 drinks = drinks,
                 modifier = Modifier,
                 onClick = onClick,
+                onCreateDrinkClick = onCreateDrinkClick,
             )
         }
     }
@@ -69,13 +70,11 @@ private fun SelectDrinkScreenPreview() {
                     id = String(),
                     name = "Heineiken",
                     icon = String(),
-                    category = String(),
                 ),
                 Drink(
                     id = String(),
                     name = "1664",
                     icon = String(),
-                    category = String(),
                 ),
             ),
             modifier = Modifier,

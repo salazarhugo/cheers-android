@@ -1,9 +1,7 @@
 package com.salazar.cheers.shared.data.mapper
 
 import cheers.party.v1.PartyItem
-import cheers.type.PrivacyOuterClass
 import com.salazar.cheers.core.model.Party
-import com.salazar.cheers.core.model.Privacy
 
 fun PartyItem.toParty(): Party {
     return Party().copy(
@@ -37,12 +35,3 @@ fun PartyItem.toParty(): Party {
     )
 }
 
-private fun PrivacyOuterClass.Privacy.toPrivacy(): Privacy {
-    return when (this) {
-        PrivacyOuterClass.Privacy.FRIENDS -> Privacy.FRIENDS
-        PrivacyOuterClass.Privacy.PRIVATE -> Privacy.PRIVATE
-        PrivacyOuterClass.Privacy.PUBLIC -> Privacy.PUBLIC
-        PrivacyOuterClass.Privacy.GROUP -> Privacy.PRIVATE
-        PrivacyOuterClass.Privacy.UNRECOGNIZED -> Privacy.PUBLIC
-    }
-}

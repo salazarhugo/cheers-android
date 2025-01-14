@@ -27,8 +27,8 @@ import coil.request.ImageRequest
 import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.emptyDrink
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
-import com.salazar.cheers.core.ui.modifier.carousel
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
+import com.salazar.cheers.core.ui.modifier.carousel
 import kotlinx.coroutines.launch
 
 
@@ -39,8 +39,7 @@ fun CarouselDrinks(
     modifier: Modifier = Modifier,
     onBeverageClick: (Drink) -> Unit = {},
 ) {
-    if (drinks.isEmpty())
-        return
+    if (drinks.isEmpty()) return
     val scope = rememberCoroutineScope()
     val currentPage = pagerState.currentPage
 

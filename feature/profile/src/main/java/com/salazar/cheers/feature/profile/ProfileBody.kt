@@ -73,8 +73,8 @@ fun ProfileBio(
     Spacer(Modifier.height(8.dp))
     Text(
         text = bio,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.W700,
+        style = MaterialTheme.typography.bodyLarge,
+//        fontWeight = FontWeight.W700,
     )
 }
 

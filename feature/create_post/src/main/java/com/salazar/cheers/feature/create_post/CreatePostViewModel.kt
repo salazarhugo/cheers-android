@@ -34,7 +34,7 @@ class CreatePostViewModel @Inject constructor(
     private val audioPlayer: AndroidAudioPlayer,
 ) : ViewModel() {
 
-    private val createPost = savedStateHandle.toRoute<CreatePost>()
+    private val createPost = savedStateHandle.toRoute<CreatePostGraph>()
     private val viewModelState = MutableStateFlow(CreatePostUiState(isLoading = false))
 
     val uiState = viewModelState
@@ -45,10 +45,6 @@ class CreatePostViewModel @Inject constructor(
         )
 
     init {
-        createPost.photoUri?.let {
-//            addPhoto(Uri.parse(it))
-        }
-
         viewModelScope.launch {
             audioPlayer.isPlayingFlow.collect(::updateIsAudioPlaying)
         }
@@ -68,16 +64,6 @@ class CreatePostViewModel @Inject constructor(
             val location = createPostUseCases.getLastKnownLocationUseCase() ?: return@launch
             updateLocationPoint(Point.fromLngLat(location.longitude, location.latitude))
         }
-
-        viewModelScope.launch {
-            createPostUseCases.listDrinkUseCase().collect { result ->
-                result.onSuccess { drinks ->
-                    updateDrinks(drinks)
-                }.onFailure {
-                    updateErrorMessage(it.localizedMessage)
-                }
-            }
-        }
     }
 
 
@@ -85,20 +71,6 @@ class CreatePostViewModel @Inject constructor(
         val audio = uiState.value.audio ?: return
         viewModelScope.launch(Dispatchers.IO) {
             audioPlayer.playLocalAudio(audio)
-        }
-    }
-
-    private fun updateDrinks(drinks: List<Drink>) {
-        val emptyDrink = listOf(
-            Drink(
-                id = String(),
-                name = "",
-                icon = "",
-                category = "",
-            )
-        )
-        viewModelState.update {
-            it.copy(drinks = emptyDrink + drinks)
         }
     }
 
@@ -183,6 +155,12 @@ class CreatePostViewModel @Inject constructor(
     fun toggleNotify(notify: Boolean) {
         viewModelState.update {
             it.copy(notify = notify)
+        }
+    }
+
+    private fun updateFriends(friends: List<UserItem>) {
+        viewModelState.update {
+            it.copy(friends = friends)
         }
     }
 

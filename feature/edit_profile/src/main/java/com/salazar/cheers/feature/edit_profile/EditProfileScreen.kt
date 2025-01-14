@@ -118,7 +118,6 @@ fun EditProfileScreen(
 
     if (showSelectDrinkSheet) {
         SelectDrinkBottomSheet(
-            drinks = drinks,
             sheetState = drinkSheetState,
             onClick = onDrinkClick,
             onDismiss = {

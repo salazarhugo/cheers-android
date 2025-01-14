@@ -11,7 +11,8 @@ import java.util.Locale
 fun ProductDetails.toProductDetails(): com.salazar.cheers.core.model.ProductDetails {
     return com.salazar.cheers.core.model.ProductDetails(
         id = productId,
-        name = title,
+        name = name,
+        type = productType,
         description = description,
         formattedPrice = oneTimePurchaseOfferDetails?.formattedPrice,
         offers = subscriptionOfferDetails?.map { it.toSubscriptionOfferDetails() },

@@ -12,6 +12,7 @@ message UserEvent {
     CreateUser create = 1;
     FollowUser follow = 2;
     UpdateUser update = 3;
+    DeleteUser delete = 4;
   };
 }
 
@@ -26,4 +27,8 @@ message UpdateUser {
 message FollowUser {
   cheers.type.User user = 1;
   cheers.type.User followed_user = 2;
+}
+
+message DeleteUser {
+  string user_id = 1;
 }

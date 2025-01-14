@@ -13,6 +13,7 @@ import cheers.post.v1.FeedPostRequest
 import cheers.post.v1.LikePostRequest
 import cheers.post.v1.ListMapPostRequest
 import cheers.post.v1.ListPostLikesRequest
+import cheers.post.v1.ListPostMentionsRequest
 import cheers.post.v1.ListPostRequest
 import cheers.post.v1.PostServiceGrpcKt
 import cheers.post.v1.UnlikePostRequest
@@ -98,7 +99,30 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun listPostLikes(postID: String): Flow<List<UserItem>> {
+    fun listPostMentions(postID: String): Flow<List<UserItem>> {
+        return flow {
+            val remoteUserPosts = try {
+                val request = ListPostMentionsRequest.newBuilder()
+                    .setPostId(postID)
+                    .build()
+
+                val response = postService.listPostMentions(request)
+                val users = response.usersList.map {
+                    it.toUserItem()
+                }
+                users
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+
+            remoteUserPosts?.let { users ->
+                emit(users)
+            }
+        }
+    }
+
+    fun listPostLikes(postID: String): Flow<List<UserItem>> {
         return flow {
             val remoteUserPosts = try {
                 val request = ListPostLikesRequest.newBuilder()

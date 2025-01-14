@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package cheers.subscription.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/subscription/v1;subscription";
+
+import "cheers/type/subscription/subscription.proto";
+
+message SubscriptionEvent {
+  oneof event {
+    SubscriptionCreated create = 1;
+    SubscriptionDeleted delete = 2;
+  };
+}
+
+// Created refers to active state (purchased)
+message SubscriptionCreated{
+  cheers.type.Subscription subscription = 1;
+}
+
+// Deleted refers to un-active state (cancelled, paused, revoked...)
+message SubscriptionDeleted {
+  cheers.type.Subscription subscription = 1;
+}

@@ -6,7 +6,6 @@ import com.salazar.cheers.domain.get_account.GetAccountIdUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
 class ListMyPartyFlowUseCase @Inject constructor(
@@ -18,15 +17,12 @@ class ListMyPartyFlowUseCase @Inject constructor(
         pageSize: Int = 10,
     ): Flow<List<Party>> {
         val userID = getAccountIdUseCase().firstOrNull() ?: return emptyFlow()
-        val filtersFlow = partyRepository.filtersFlow
 
-        return filtersFlow.flatMapLatest { filter ->
-            partyRepository.listPartyFlow(
-                filter = filter,
-                userId = userID,
-                page = page,
-                pageSize = pageSize,
-            )
-        }
+        return partyRepository.listPartyFlow(
+            filter = "hosting",
+            userId = userID,
+            page = page,
+            pageSize = pageSize,
+        )
     }
 }

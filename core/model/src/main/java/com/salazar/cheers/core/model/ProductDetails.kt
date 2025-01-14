@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 data class ProductDetails(
     val id: String = "",
     val name: String = "",
+    val type: String = "",
     val description: String = "",
     val formattedPrice: String? = null,
     val offers: List<SubscriptionOfferDetails>? = null,

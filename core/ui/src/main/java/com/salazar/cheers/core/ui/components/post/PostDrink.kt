@@ -33,25 +33,33 @@ fun PostDrink(
     drink: String,
     picture: String,
     modifier: Modifier = Modifier,
-    borderColor: Color? = null,
-    isPremium: Boolean = false,
+    colorString: String? = null,
     onClick: () -> Unit = {},
 ) {
     if (drink.isBlank() || picture.isBlank())
         return
 
-    val color = borderColor
-        ?: when (isPremium) {
-            true -> MaterialTheme.colorScheme.surfaceTint
-            false -> MaterialTheme.colorScheme.outline
-        }
+    val lightBlue = Color(0xFFADD8E6)
+    val a = MaterialTheme.colorScheme.surfaceContainer
+    val color = try {
+        if (colorString.isNullOrBlank()) a
+        else Color(android.graphics.Color.parseColor(colorString))
+    } catch (e: Exception) {
+        lightBlue
+    }
+
+    val borderThickness = if (color == lightBlue) 1.dp else 2.dp
 
     Row(
         modifier = modifier
-            .clickable { onClick() }
             .clip(RoundedCornerShape(8.dp))
-            .border(width = 1.dp, color = color, RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable { onClick() }
+            .border(
+                width = borderThickness,
+                color = color,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .background(color.copy(alpha = 0.5f))
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -76,6 +84,17 @@ fun PostDrink(
     }
 }
 
+// https://www.pinterest.com/pin/csgo-infographics--851321135793804442/
+enum class PremiumLevel {
+    COMMON,
+    UNCOMMON,
+    RARE,
+    MYTHICAL,
+    LEGENDARY,
+    ANCIENT,
+    EXCEEDINGLY_RARE,
+    IMMORTAL,
+}
 
 @ComponentPreviews
 @Composable
@@ -110,7 +129,7 @@ fun PostDrinkBeerPreview() {
             PostDrink(
                 drink = "Beer",
                 picture = "wf",
-                borderColor = it,
+                colorString = "",
             )
         }
     }

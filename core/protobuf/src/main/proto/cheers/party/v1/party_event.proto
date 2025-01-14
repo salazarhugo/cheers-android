@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package cheers.party.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/party/v1;party";
+
+import "cheers/party/v1/party_service.proto";
+import "cheers/type/user/user.proto";
+import "cheers/type/party/party.proto";
+
+message PartyEvent {
+  oneof event {
+    CreateParty create = 1;
+    DeleteParty delete = 2;
+  };
+}
+
+message CreateParty {
+  cheers.type.Party party = 1;
+  cheers.type.UserItem user = 2;
+  bool send_notification_to_friends = 3;
+}
+
+message DeleteParty {
+  cheers.type.Party party = 1;
+}

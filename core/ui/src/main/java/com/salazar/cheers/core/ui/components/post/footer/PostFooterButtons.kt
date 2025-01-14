@@ -25,9 +25,9 @@ fun PostFooterButtons(
     canComment: Boolean,
     canShare: Boolean,
     modifier: Modifier = Modifier,
-    onLike: () -> Unit = {},
-    onCommentClick: () -> Unit = {},
-    onShareClick: () -> Unit = {},
+    onLike: () -> Unit,
+    onCommentClick: () -> Unit,
+    onShareClick: () -> Unit,
 ) {
     if (!canLike && !canComment && !canShare) return
 
@@ -71,6 +71,9 @@ private fun PostFooterButtonsPreview() {
             canComment = true,
             canShare = true,
             hasViewerLiked = true,
+            onLike = {},
+            onCommentClick = {},
+            onShareClick = {},
         )
     }
 }

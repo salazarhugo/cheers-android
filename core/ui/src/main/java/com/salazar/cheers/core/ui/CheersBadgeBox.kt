@@ -16,9 +16,11 @@ import com.salazar.cheers.core.ui.theme.StrongRed
 @Composable
 fun CheersBadgeBox(
     count: Int,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Box(
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         content()

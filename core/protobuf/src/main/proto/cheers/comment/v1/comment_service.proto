@@ -32,6 +32,7 @@ service CommentService {
   rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
     option (google.api.http) = {
       delete: "/v1/comments"
+      body: "*"
     };
   }
 

@@ -121,6 +121,12 @@ message SendMessageRequest {
   string client_id = 4;
   repeated string media_ids = 5;
   cheers.type.Audio audio = 6;
+  oneof attachment {
+    string post_id = 7;
+    string party_id = 8;
+    string note_id = 9;
+    string user_id = 10;
+  }
 }
 
 message SendMessageResponse {

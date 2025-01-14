@@ -257,10 +257,14 @@ object AppModule {
     fun provideNoteServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): NoteServiceGrpcKt.NoteServiceCoroutineStub {
         return NoteServiceGrpcKt
             .NoteServiceCoroutineStub(managedChannel)
-            .withInterceptors(tokenInterceptor)
+            .withInterceptors(
+                loggerInterceptor,
+                tokenInterceptor,
+            )
     }
 
     @Provides
@@ -268,10 +272,14 @@ object AppModule {
     fun provideDrinkServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): DrinkServiceGrpcKt.DrinkServiceCoroutineStub {
         return DrinkServiceGrpcKt
             .DrinkServiceCoroutineStub(managedChannel)
-            .withInterceptors(tokenInterceptor)
+            .withInterceptors(
+                loggerInterceptor,
+                tokenInterceptor,
+            )
     }
 
     @Provides
@@ -283,8 +291,10 @@ object AppModule {
     ): LocationServiceGrpcKt.LocationServiceCoroutineStub {
         return LocationServiceGrpcKt
             .LocationServiceCoroutineStub(managedChannel)
-            .withInterceptors(loggerInterceptor)
-            .withInterceptors(tokenInterceptor)
+            .withInterceptors(
+                loggerInterceptor,
+                tokenInterceptor,
+            )
     }
 
     @Provides
@@ -292,11 +302,14 @@ object AppModule {
     fun provideAccountServiceCoroutineStub(
         managedChannel: ManagedChannel,
         tokenInterceptor: TokenInterceptor,
+        loggerInterceptor: LoggerInterceptor,
     ): AccountServiceGrpcKt.AccountServiceCoroutineStub {
         return AccountServiceGrpcKt
             .AccountServiceCoroutineStub(managedChannel)
-            .withInterceptors(tokenInterceptor)
-            .withInterceptors()
+            .withInterceptors(
+                loggerInterceptor,
+                tokenInterceptor,
+            )
     }
 
     @Provides

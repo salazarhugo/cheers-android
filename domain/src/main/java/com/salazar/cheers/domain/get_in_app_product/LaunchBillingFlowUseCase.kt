@@ -24,7 +24,7 @@ class LaunchBillingFlowUseCase @Inject constructor(
         return@withContext repository.launchBillingFlow(
             activity = activity,
             userID = userID,
-            productDetails = productDetails,
+            productDetailsParam = productDetails,
             offerToken = offerToken,
         )
     }

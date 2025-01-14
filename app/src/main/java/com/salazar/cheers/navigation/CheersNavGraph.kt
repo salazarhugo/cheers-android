@@ -17,11 +17,12 @@ import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.navigation.PartyDetailScreen
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatScreen
 import com.salazar.cheers.feature.chat.ui.screens.create_chat.CreateChatScreen
+import com.salazar.cheers.feature.chat.ui.screens.mediapreview.MediaPreviewScreen
 import com.salazar.cheers.feature.chat.ui.screens.room.ChatInfoScreen
 import com.salazar.cheers.feature.comment.comments.PostCommentsScreen
 import com.salazar.cheers.feature.comment.replies.RepliesScreen
 import com.salazar.cheers.feature.create_note.CreateNoteScreen
-import com.salazar.cheers.feature.create_post.CreatePost
+import com.salazar.cheers.feature.create_post.CreatePostGraph
 import com.salazar.cheers.feature.edit_profile.navigation.EditProfileGraph
 import com.salazar.cheers.feature.settings.SettingsNavGraph
 import com.salazar.cheers.ui.CheersAppState
@@ -51,7 +52,7 @@ fun CheersNavGraph(
         AuthNavGraph,
         SettingsNavGraph,
         CreatePartyGraph,
-        CreatePost(),
+        CreatePostGraph,
         ChatScreen(),
         CreateChatScreen,
         PostCommentsScreen(),
@@ -61,6 +62,7 @@ fun CheersNavGraph(
         CreateNoteScreen,
         PartyDetailScreen(""),
         ChatInfoScreen(""),
+        MediaPreviewScreen(""),
         Passcode,
     )
 

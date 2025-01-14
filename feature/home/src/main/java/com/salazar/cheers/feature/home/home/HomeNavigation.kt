@@ -41,6 +41,7 @@ fun NavGraphBuilder.homeScreen(
     navigateToPartyDetail: (String) -> Unit,
     navigateToMap: () -> Unit = {},
     navigateToMyParties: () -> Unit,
+    navigateToDrink: (String) -> Unit,
 ) {
     composable<Home>(
         deepLinks = listOf(
@@ -82,6 +83,7 @@ fun NavGraphBuilder.homeScreen(
             navigateToCreateParty = navigateToCreateParty,
             navigateToMap = navigateToMap,
             navigateToMyParties = navigateToMyParties,
+            navigateToDrink = navigateToDrink,
         )
     }
 }

@@ -25,6 +25,7 @@ fun ChatRoute(
     navigateBack: () -> Unit,
     navigateToOtherProfile: (String) -> Unit,
     navigateToRoomDetails: (String) -> Unit,
+    navigateToMediaPreview: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -80,16 +81,17 @@ fun ChatRoute(
                     is ChatUIAction.OnReplyMessage -> viewModel.onReplyMessage(action.message)
                     is ChatUIAction.OnLikeClick -> viewModel.likeMessage(action.messageId)
                     is ChatUIAction.OnUnLikeClick -> viewModel.unlikeMessage(action.messageId)
-                    is ChatUIAction.OnSwipeRefresh -> TODO()
+                    is ChatUIAction.OnSwipeRefresh -> {}
                     is ChatUIAction.OnUserClick -> navigateToOtherProfile(action.userId)
                     is ChatUIAction.OnBackPressed -> navigateBack()
                     is ChatUIAction.OnUnSendMessage -> viewModel.deleteChatMessage(action.messageId)
                     is ChatUIAction.OnSendTextMessage -> viewModel.sendChatMessage(action.text)
                     is ChatUIAction.OnImageSelectorClick -> launcher.launch("image/*")
-                    is ChatUIAction.OnCopyText -> TODO()
+                    is ChatUIAction.OnCopyText -> {}
                     is ChatUIAction.OnTextInputChange -> viewModel.onTextChanged(action.text)
                     is ChatUIAction.OnRoomInfoClick -> navigateToRoomDetails(action.roomId)
                     is ChatUIAction.OnLoadMoreChatMessages -> viewModel.onLoadMore(action.index)
+                    is ChatUIAction.OnMediaClick -> navigateToMediaPreview(action.media)
                 }
             },
         )

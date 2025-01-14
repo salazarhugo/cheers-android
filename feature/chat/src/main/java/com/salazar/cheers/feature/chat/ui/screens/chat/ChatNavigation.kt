@@ -74,6 +74,7 @@ fun NavGraphBuilder.chatScreen(
     navigateBack: () -> Unit,
     navigateToOtherProfile: (String) -> Unit,
     navigateToRoomDetails: (String) -> Unit,
+    navigateToMediaPreview: (String) -> Unit,
 ) {
     composable<ChatScreen>(
         deepLinks = listOf(
@@ -105,6 +106,7 @@ fun NavGraphBuilder.chatScreen(
             navigateToOtherProfile = navigateToOtherProfile,
             showSnackBar = {},
             navigateToRoomDetails = navigateToRoomDetails,
+            navigateToMediaPreview = navigateToMediaPreview,
         )
     }
 }

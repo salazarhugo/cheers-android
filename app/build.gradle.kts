@@ -97,6 +97,7 @@ dependencies {
     implementation(projects.feature.comment)
     implementation(projects.feature.postLikes)
     implementation(projects.feature.premium)
+    implementation(projects.feature.drink)
 
     implementation(projects.domain)
 

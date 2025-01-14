@@ -83,12 +83,15 @@ fun AudioRecorderScreen(
                 isRecording = isRecording,
                 onRecordClick = {
                     if (isRecording) {
-                        audioRecorder.stop()
-                        viewModel.onStopRecording(file)
+                        if (audioRecorder.stop()) {
+                            viewModel.onStopRecording(file)
+                            isRecording = false
+                        }
                     } else  {
-                        audioRecorder.start(file)
+                        if (audioRecorder.start(file)) {
+                            isRecording = true
+                        }
                     }
-                    isRecording = !isRecording
                 },
                 onDoneClick = {
                     if (localAudio != null) {

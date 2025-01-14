@@ -7,6 +7,7 @@ option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/type/post;post
 
 import "cheers/type/privacy/privacy.proto";
 import "cheers/type/audio/audio.proto";
+import "cheers/type/drink/drink.proto";
 
 message Post {
   string id = 1;
@@ -32,6 +33,16 @@ message Post {
   int64 last_comment_create_time = 20;
   Audio audio = 21;
   bool notifications_enabled = 23;
+  bool has_mentions = 24;
+  repeated PostMention mentions = 25;
+}
+
+message PostMention {
+  string user_id = 1;
+  string username = 2;
+  string name = 3;
+  string picture = 4;
+  bool verified = 5;
 }
 
 message PostMedia {
@@ -50,12 +61,6 @@ message ImageVersion {
 enum MediaType {
   IMAGE = 0;
   VIDEO = 1;
-}
-
-message Drink {
-  string id = 1;
-  string name = 2;
-  string icon = 3;
 }
 
 enum PostRatio {

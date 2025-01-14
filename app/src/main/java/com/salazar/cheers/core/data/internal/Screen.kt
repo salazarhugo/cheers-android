@@ -55,7 +55,7 @@ sealed class Screen(
     )
 
     data object CreatePost : Screen(
-        route = com.salazar.cheers.feature.create_post.CreatePost(),
+        route = com.salazar.cheers.feature.create_post.CreatePostGraph,
         icon = Icons.Outlined.AddBox,
         selectedIcon = Icons.Outlined.AddBox,
         label = R.string.search,

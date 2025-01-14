@@ -1,6 +1,10 @@
 package com.salazar.cheers.core.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.salazar.cheers.core.db.model.DrinkEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +23,7 @@ interface DrinkDao {
         insert(drinks = drinks)
     }
 
-    @Query("SELECT * FROM drinks ORDER BY name ASC")
+    @Query("SELECT * FROM drinks ORDER BY lastUsed DESC")
     fun listDrinks(): Flow<List<DrinkEntity>>
 
     @Query("SELECT * FROM drinks WHERE id = :drinkID")

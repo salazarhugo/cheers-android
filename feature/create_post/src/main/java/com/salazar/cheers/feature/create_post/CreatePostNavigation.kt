@@ -1,55 +1,67 @@
 package com.salazar.cheers.feature.create_post
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
-import com.salazar.cheers.core.util.Constants
+import androidx.navigation.navigation
+import com.salazar.cheers.feature.create_post.adddrink.createPostAddDrinkScreen
+import com.salazar.cheers.feature.create_post.adddrink.navigateToCreatePostAddDrink
+import com.salazar.cheers.feature.create_post.addlocation.createPostAddLocationScreen
+import com.salazar.cheers.feature.create_post.addlocation.navigateToCreatePostAddLocation
+import com.salazar.cheers.feature.create_post.addpeople.createPostAddPeopleScreen
+import com.salazar.cheers.feature.create_post.addpeople.navigateToCreatePostAddPeople
+import com.salazar.cheers.feature.create_post.drink.navigateToCreateDrink
+import com.salazar.cheers.feature.create_post.moreoptions.createPostMoreOptionsScreen
+import com.salazar.cheers.feature.create_post.moreoptions.navigateToCreatePostMoreOptions
+import com.salazar.cheers.feature.create_post.recap.CreatePostRecap
+import com.salazar.cheers.feature.create_post.recap.createPostScreenRecap
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreatePost(
-    val photoUri: String? = null,
-)
-
-private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/createPost"
+data object CreatePostGraph
 
 fun NavController.navigateToCreatePost(
-    photoUri: String? = null,
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
-        route = CreatePost(photoUri = photoUri),
+        route = CreatePostGraph,
         navOptions = navOptions,
     )
 }
 
-fun NavGraphBuilder.createPostScreen(
+fun NavGraphBuilder.createPostGraph(
+    navController: NavController,
     navigateBack: () -> Unit,
-    navigateToCamera: () -> Unit,
 ) {
-    composable<CreatePost>(
-        deepLinks = listOf(
-            navDeepLink<CreatePost>(basePath = DEEP_LINK_URI_PATTERN),
-        ),
-        enterTransition = {
-            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Up)
-        },
-        exitTransition = {
-            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
-        },
-        popEnterTransition = {
-            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
-        },
-        popExitTransition = {
-            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Down)
-        }
+    navigation<CreatePostGraph>(
+        startDestination = CreatePostRecap,
     ) {
-        CreatePostRoute(
+        createPostScreenRecap(
+            navController = navController,
             navigateBack = navigateBack,
-            navigateToCamera = navigateToCamera,
+            navigateToMoreOptions = navController::navigateToCreatePostMoreOptions,
+            navigateToAddLocation = navController::navigateToCreatePostAddLocation,
+            navigateToAddPeople = navController::navigateToCreatePostAddPeople,
+            navigateToCreateDrink = navController::navigateToCreateDrink,
+            navigateToCamera = {},
+            navigateToAddDrink = navController::navigateToCreatePostAddDrink,
+        )
+        createPostAddDrinkScreen(
+            navController = navController,
+            navigateBack = navigateBack,
+            navigateToCreateDrink = navController::navigateToCreateDrink,
+        )
+        createPostAddPeopleScreen(
+            navController = navController,
+            navigateBack = navigateBack,
+        )
+        createPostAddLocationScreen(
+            navController = navController,
+            navigateBack = navigateBack,
+        )
+        createPostMoreOptionsScreen(
+            navController = navController,
+            navigateBack = navigateBack,
         )
     }
 }

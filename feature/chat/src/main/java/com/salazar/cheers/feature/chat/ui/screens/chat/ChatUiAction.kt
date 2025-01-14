@@ -7,6 +7,7 @@ sealed class ChatUIAction {
     data object OnBackPressed : ChatUIAction()
     data object OnSwipeRefresh : ChatUIAction()
     data object OnImageSelectorClick : ChatUIAction()
+    data class OnMediaClick(val media: String) : ChatUIAction()
     data class OnTextInputChange(val text: TextFieldValue) : ChatUIAction()
     data class OnLoadMoreChatMessages(val index: Int) : ChatUIAction()
     data class OnCopyText(val text: String) : ChatUIAction()

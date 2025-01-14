@@ -8,20 +8,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.CheersBadgeBox
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 import com.salazar.cheers.core.ui.components.location.LocationComponent
@@ -34,15 +27,13 @@ internal fun HomeTopBar(
     currentCity: String,
     pagerState: PagerState,
     homeSelectedPage: HomeSelectedPage,
-    unreadChatCount: Int,
     collapsedFraction: Float,
     notificationCount: Int,
-    onSearchClick: () -> Unit,
     onActivityClick: () -> Unit,
-    onChatClick: () -> Unit,
     onCameraClick: () -> Unit,
     onCityClick: () -> Unit,
     onMapClick: () -> Unit,
+    onMyPartiesClick: () -> Unit,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val icon = when (isDarkTheme) {
@@ -82,35 +73,14 @@ internal fun HomeTopBar(
                 }
             },
             actions = {
-                IconButton(onClick = onCameraClick) {
-                    Icon(
-                        imageVector = Icons.Outlined.CameraAlt,
-                        contentDescription = "Notification icon"
-                    )
-                }
-                CheersBadgeBox(count = notificationCount) {
-                    IconButton(onClick = onActivityClick) {
-                        Icon(
-                            imageVector = Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Notification icon"
-                        )
-                    }
-                }
-
-//                CheersBadgeBox(count = unreadChatCount) {
-//                    IconButton(onClick = onChatClick) {
-//                        Icon(
-//                            imageVector = Icons.Outlined.ChatBubbleOutline,
-//                            contentDescription = null,
-//                        )
-//                    }
-//                }
-                IconButton(onClick = onMapClick) {
-                    Icon(
-                        imageVector = Icons.Outlined.Map,
-                        contentDescription = null,
-                    )
-                }
+                HomeTopBarActions(
+                    homeSelectedPage = homeSelectedPage,
+                    onCameraClick = onCameraClick,
+                    onMapClick = onMapClick,
+                    onActivityClick = onActivityClick,
+                    onMyPartiesClick = onMyPartiesClick,
+                    notificationCount = notificationCount,
+                )
             },
         )
         HomeScreenHeader(
@@ -133,16 +103,14 @@ private fun HomeTopBarPreview() {
         HomeTopBar(
             currentCity = "Paris",
             pagerState = rememberPagerState { 2 },
-            unreadChatCount = 2,
             collapsedFraction = 0f,
             notificationCount = 0,
-            onSearchClick = {},
-            onChatClick = {},
             onActivityClick = {},
             homeSelectedPage = HomeSelectedPage.FRIENDS,
             onCityClick = {},
             onMapClick = {},
             onCameraClick = {},
+            onMyPartiesClick = {},
         )
     }
 }
@@ -154,16 +122,14 @@ private fun HomeTopBarCollapsedPreview() {
         HomeTopBar(
             currentCity = "Paris",
             pagerState = rememberPagerState { 2 },
-            unreadChatCount = 3,
             homeSelectedPage = HomeSelectedPage.FRIENDS,
             collapsedFraction = 1f,
             notificationCount = 0,
-            onSearchClick = {},
-            onChatClick = {},
             onActivityClick = {},
             onCityClick = {},
             onMapClick = {},
             onCameraClick = {},
+            onMyPartiesClick = {},
         )
     }
 }

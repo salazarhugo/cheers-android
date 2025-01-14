@@ -24,10 +24,10 @@ fun PostFooter(
     canComment: Boolean,
     canShare: Boolean,
     modifier: Modifier = Modifier,
-    onLikeClick: () -> Unit = {},
-    onLikeCountClick: () -> Unit = {},
-    onCommentClick: () -> Unit = {},
-    onShareClick: () -> Unit = {},
+    onLikeClick: () -> Unit,
+    onLikeCountClick: () -> Unit,
+    onCommentClick: () -> Unit,
+    onShareClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -78,6 +78,10 @@ private fun PostFooterPreview(
             commentText = text,
             commentUsername = cheersUserItem.username,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            onLikeClick = {},
+            onLikeCountClick = {},
+            onCommentClick = {},
+            onShareClick = {},
         )
     }
 }

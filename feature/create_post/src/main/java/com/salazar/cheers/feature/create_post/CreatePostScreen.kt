@@ -10,21 +10,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Bloodtype
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.HeartBroken
-import androidx.compose.material.icons.outlined.MotionPhotosOff
-import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.SportsBar
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material3.HorizontalDivider
@@ -55,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.model.Drink
 import com.salazar.cheers.core.model.Media
 import com.salazar.cheers.core.model.Privacy
+import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
@@ -62,7 +58,6 @@ import com.salazar.cheers.core.ui.components.post.PostDrink
 import com.salazar.cheers.core.ui.components.post.PostHeader
 import com.salazar.cheers.core.ui.components.post.PostMedia
 import com.salazar.cheers.core.ui.components.row.CoreRowItem
-import com.salazar.cheers.core.ui.components.select_drink.SelectDrinkBottomSheet
 import com.salazar.cheers.core.ui.extensions.noRippleClickable
 import com.salazar.cheers.core.ui.ui.ErrorMessage
 import com.salazar.cheers.core.util.audio.LocalAudio
@@ -90,13 +85,10 @@ fun CreatePostScreenStateful(
         audioProgress = uiState.audioProgress,
         onUploadPost = onUploadPost,
         medias = uiState.medias,
-        notificationEnabled = uiState.notify,
         isLoading = uiState.isLoading,
         location = uiState.location,
         locationResults = uiState.locationResults,
-        likesEnabled = uiState.likesEnabled,
-        commentsEnabled = uiState.commentsEnabled,
-        shareEnabled = uiState.shareEnabled,
+        selectedUsers = uiState.selectedTagUsers,
     )
 }
 
@@ -104,6 +96,7 @@ fun CreatePostScreenStateful(
 fun CreatePostScreen(
     caption: String,
     privacy: Privacy,
+    selectedUsers: List<UserItem>,
     modifier: Modifier = Modifier,
     errorMessage: String? = null,
     selectedDrink: Drink? = null,
@@ -115,22 +108,13 @@ fun CreatePostScreen(
     account: Account? = null,
     medias: List<Media> = emptyList(),
     drinks: List<Drink> = emptyList(),
-    notificationEnabled: Boolean,
-    likesEnabled: Boolean,
-    commentsEnabled: Boolean,
-    shareEnabled: Boolean,
     isLoading: Boolean = false,
     onUploadPost: () -> Unit = {},
     onCreatePostUIAction: (CreatePostUIAction) -> Unit = {},
 ) {
     val enabled =
         caption.isNotEmpty() || medias.isNotEmpty() // || uiState.drinkState.currentPage > 0
-    val drinkState = rememberPagerState {
-        drinks.size
-    }
-    var showSelectDrinkSheet by remember { mutableStateOf(false) }
     var showAudioRecorderDialog by remember { mutableStateOf(false) }
-    val drinkSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val audioSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
@@ -181,6 +165,7 @@ fun CreatePostScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
+                    drinkName = selectedDrink?.name,
                     name = account.name,
                     username = account.username,
                     verified = account.verified,
@@ -217,15 +202,10 @@ fun CreatePostScreen(
             CreatePostButtons(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
                 onAddImageClick = {
                     onCreatePostUIAction(CreatePostUIAction.OnGalleryClick)
-                },
-                onAddDrinkClick = {
-                    scope.launch {
-                        showSelectDrinkSheet = true
-                        drinkSheetState.expand()
-                    }
                 },
                 onMicrophoneClick = {
                     scope.launch {
@@ -238,15 +218,28 @@ fun CreatePostScreen(
                 PostDrink(
                     drink = selectedDrink.name,
                     picture = selectedDrink.icon,
+                    colorString = selectedDrink.color,
                     modifier = Modifier.padding(16.dp),
                 )
             }
             HorizontalDivider(
                 thickness = 0.5.dp,
             )
-            EndDateSection(
-                endDate = Date(),
-                onEndDateChange = {},
+            AddDrinkItem(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                onClick = {
+                    onCreatePostUIAction(CreatePostUIAction.OnAddDrinkClick)
+                },
+            )
+            HorizontalDivider(
+                thickness = 0.5.dp,
+            )
+            AddPeopleItem(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                users = selectedUsers,
+                navigateToTagUser = {
+                    onCreatePostUIAction(CreatePostUIAction.OnAddPeopleClick)
+                },
             )
             HorizontalDivider(
                 thickness = 0.5.dp,
@@ -274,61 +267,6 @@ fun CreatePostScreen(
                     onCreatePostUIAction(CreatePostUIAction.OnMoreOptionsClick)
                 },
             )
-            SwitchPreference(
-                text = "Turn off notifications",
-                icon = {
-                    Icon(
-                        imageVector = Icons.Outlined.NotificationsOff,
-                        contentDescription = "Notifications off"
-                    )
-                },
-                checked = !notificationEnabled,
-                onCheckedChange = {
-                    onCreatePostUIAction(CreatePostUIAction.OnNotificationChange(!it))
-                },
-            )
-            HorizontalDivider(
-                thickness = 0.5.dp,
-            )
-            SwitchPreference(
-                text = "Turn off liking",
-                icon = {
-                    Icon(
-                        imageVector = Icons.Outlined.HeartBroken,
-                        contentDescription = "Likes off"
-                    )
-                },
-                checked = !likesEnabled,
-                onCheckedChange = {
-                    onCreatePostUIAction(CreatePostUIAction.OnEnableLikesChange(it.not()))
-                },
-            )
-            SwitchPreference(
-                text = "Turn off commenting",
-                icon = {
-                    Icon(
-                        imageVector = Icons.Outlined.MotionPhotosOff,
-                        contentDescription = "Comments off",
-                    )
-                },
-                checked = !commentsEnabled,
-                onCheckedChange = {
-                    onCreatePostUIAction(CreatePostUIAction.OnEnableCommentsChange(it.not()))
-                },
-            )
-            SwitchPreference(
-                text = "Turn off sharing",
-                checked = !shareEnabled,
-                icon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.Send,
-                        contentDescription = "Sharing off",
-                    )
-                },
-                onCheckedChange = {
-                    onCreatePostUIAction(CreatePostUIAction.OnEnableShareChange(it.not()))
-                },
-            )
         }
     }
 
@@ -345,23 +283,6 @@ fun CreatePostScreen(
             onDone = {
                 onCreatePostUIAction(CreatePostUIAction.OnAddAudio(it))
             }
-        )
-    }
-
-    if (showSelectDrinkSheet) {
-        SelectDrinkBottomSheet(
-            drinks = drinks,
-            sheetState = drinkSheetState,
-            onClick = { drink ->
-                onCreatePostUIAction(CreatePostUIAction.OnSelectDrink(drink))
-            },
-            onDismiss = {
-                scope.launch {
-                    drinkSheetState.hide()
-                }.invokeOnCompletion {
-                    showSelectDrinkSheet = false
-                }
-            },
         )
     }
 }
@@ -382,10 +303,7 @@ private fun CreatePostScreenPreview() {
                 name = "Cheers Social",
             ),
             privacy = Privacy.FRIENDS,
-            commentsEnabled = true,
-            shareEnabled = true,
-            likesEnabled = true,
-            notificationEnabled = true,
+            selectedUsers = emptyList(),
         )
     }
 }
@@ -493,34 +411,6 @@ fun MoreOptionsItem(
                 )
             }
         }
-    )
-}
-
-@Composable
-fun NameSection(
-    name: String,
-    onNameChanged: (String) -> Unit,
-) {
-    TextField(
-        value = name,
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .offset(y = 4.dp),
-        onValueChange = { onNameChanged(it) },
-        singleLine = false,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done
-        ),
-        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-        placeholder = {
-            Text(text = "Name", fontSize = 13.sp)
-        },
-        trailingIcon = { }
     )
 }
 
@@ -640,32 +530,72 @@ fun SelectedLocation(
 }
 
 @Composable
-fun AddPeople(
-    users: List<com.salazar.cheers.core.model.UserItem>,
+fun AddDrinkItem(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    CoreRowItem(
+        modifier = modifier,
+        title = "Add drink",
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.SportsBar,
+                contentDescription = "Beer icon",
+            )
+        },
+        onClick = onClick,
+        trailingIcon = {
+            IconButton(
+                onClick = onClick,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ChevronRight,
+                    contentDescription = null, // decorative
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun AddPeopleItem(
+    modifier: Modifier = Modifier,
+    users: List<UserItem>,
     navigateToTagUser: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .clickable { navigateToTagUser() }
-            .padding(15.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = "Add friends",
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
-        )
-        if (users.size == 1)
-            Text(text = users[0].username, style = MaterialTheme.typography.labelLarge)
-        else if (users.size > 1)
-            Text(
-                text = "${users.size} friends",
-                style = MaterialTheme.typography.labelLarge
+    CoreRowItem(
+        modifier = modifier,
+        title = "Add people",
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.Person,
+                contentDescription = "Person icon",
             )
-        else
-            Icon(Icons.Outlined.People, contentDescription = null)
-    }
+        },
+        onClick = navigateToTagUser,
+        trailingIcon = {
+            val text = when (users.size) {
+                0 -> null
+                1 -> users.first().username
+                else -> "${users.size} friends"
+            }
+            if (!text.isNullOrBlank()) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            IconButton(
+                onClick = navigateToTagUser,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ChevronRight,
+                    contentDescription = null,
+                )
+            }
+        }
+    )
 }
 
 @Composable

@@ -4,7 +4,6 @@ import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
 import java.io.FileOutputStream
 
@@ -21,23 +20,35 @@ class AndroidAudioRecorder(
         } else MediaRecorder()
     }
 
-    override fun start(outputFile: File) {
-        createRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile(FileOutputStream(outputFile).fd)
-            setAudioEncodingBitRate(192000)
-            prepare()
-            start()
+    override fun start(outputFile: File): Boolean {
+        return try {
+            createRecorder().apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                setOutputFile(FileOutputStream(outputFile).fd)
+                setAudioEncodingBitRate(192000)
+                prepare()
+                start()
+                recorder = this
+            }
 
-            recorder = this
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 
-    override fun stop() {
-        recorder?.stop()
-        recorder?.reset()
-        recorder = null
+    override fun stop(): Boolean {
+        return try {
+            recorder?.stop()
+            recorder?.reset()
+            recorder = null
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 }

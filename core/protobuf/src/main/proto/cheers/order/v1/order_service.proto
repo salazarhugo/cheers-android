@@ -33,6 +33,7 @@ service OrderService {
   rpc DeleteOrder (DeleteOrderRequest) returns (DeleteOrderResponse) {
     option (google.api.http) = {
       delete: "/v1/orders/{order_id}"
+      body: "*"
     };
   }
 

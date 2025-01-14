@@ -37,7 +37,6 @@ internal fun ChatItem(
             modifier = Modifier,
             chatMessage = chatMessage,
             isGroup = isGroup,
-            seen = index == 0 && seen,
             onAuthorClick = { name -> navigateToProfile(name) },
             onLongClickMessage = {
                 expanded = true
@@ -48,6 +47,9 @@ internal fun ChatItem(
             onReply = {
                 onChatUIAction(ChatUIAction.OnReplyMessage(chatMessage))
             },
+            onMediaClick = {
+                onChatUIAction(ChatUIAction.OnMediaClick(it))
+            }
         )
 
         OnMessageLongClickDialog(

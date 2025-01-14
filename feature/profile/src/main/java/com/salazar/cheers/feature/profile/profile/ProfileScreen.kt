@@ -48,13 +48,13 @@ import com.salazar.cheers.core.model.User
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
 import com.salazar.cheers.core.ui.PrettyPanel
-import com.salazar.cheers.core.ui.ProfileHeaderCarousel
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.core.ui.components.login_message.LoginMessageScreen
 import com.salazar.cheers.core.ui.components.post.PostComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.PullToRefreshComponent
 import com.salazar.cheers.core.ui.components.pull_to_refresh.rememberRefreshLayoutState
 import com.salazar.cheers.core.ui.item.party.PartyItem
+import com.salazar.cheers.core.ui.profileCarousel
 import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.ui.PrettyImage
 import com.salazar.cheers.feature.profile.ProfileBody
@@ -247,16 +247,6 @@ fun ProfileList(
                 }
             }
         }
-    }
-}
-
-private fun LazyListScope.profileCarousel(
-    user: User,
-) {
-    item {
-        ProfileHeaderCarousel(
-            user = user,
-        )
     }
 }
 

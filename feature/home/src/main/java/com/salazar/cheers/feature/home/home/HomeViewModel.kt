@@ -27,7 +27,6 @@ import com.salazar.cheers.data.user.datastore.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -126,11 +125,9 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val page = dataStoreRepository.getSelectedHomeTab()
+            dataStoreRepository.getSelectedHomeTab()
                 .map { HomeSelectedPage.getByPage(it) }
-                .firstOrNull()
-
-            updateSelectedPage(page ?: HomeSelectedPage.FRIENDS)
+                .collect(::updateSelectedPage)
         }
     }
 

@@ -22,9 +22,16 @@ service PostService {
     };
   };
 
+  rpc ListPostMentions (ListPostMentionsRequest) returns (ListPostMentionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/{post_id}/mentions"
+    };
+  };
 
   rpc GetPost (GetPostRequest) returns (GetPostResponse);
+
   rpc GetPostItem (GetPostItemRequest) returns (PostResponse);
+
   rpc UpdatePost (UpdatePostRequest) returns (PostResponse);
 
   rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty) {
@@ -115,6 +122,17 @@ message CreatePostRequest {
   bool notifications_enabled = 10;
   repeated string media_ids = 11;
   cheers.type.Audio audio = 12;
+  repeated string tag_users = 13;
+}
+
+message ListPostMentionsRequest {
+  string post_id = 1;
+}
+
+message ListPostMentionsResponse {
+  // max 20 mentions per post
+  repeated cheers.type.UserItem users = 1;
+  // No pagination needed
 }
 
 message GetPostRequest {

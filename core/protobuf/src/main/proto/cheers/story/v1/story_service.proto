@@ -8,7 +8,7 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 option java_multiple_files = true;
-option go_package = "github.com/salazarhugo/cheers1/go/gen/cheers/story/v1;story";
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/story/v1;story";
 
 service StoryService {
   rpc CreateStory (CreateStoryRequest) returns (StoryResponse);

@@ -48,7 +48,6 @@ fun HomeScreen(
     onHomeUIAction: (HomeUIAction) -> Unit,
     navigateToPartyDetail: (String) -> Unit = {},
     navigateToCreateParty: () -> Unit = {},
-    navigateToMyParties: () -> Unit,
 ) {
     val selectedPage = uiState.selectedPage
     val state = rememberRefreshLayoutState()
@@ -80,19 +79,15 @@ fun HomeScreen(
                 currentCity = uiState.currentCity,
                 pagerState = pagerState,
                 homeSelectedPage = selectedPage,
-                unreadChatCount = uiState.unreadChatCounter,
                 collapsedFraction = collapsedFraction,
-                onSearchClick = {
-                    onHomeUIAction(HomeUIAction.OnSearchClick)
-                },
                 notificationCount = uiState.notificationCount,
                 onActivityClick = { onHomeUIAction(HomeUIAction.OnActivityClick) },
-                onChatClick = { onHomeUIAction(HomeUIAction.OnChatClick) },
                 onCityClick = {
                     showSelectCitySheet = true
                 },
                 onMapClick = { onHomeUIAction(HomeUIAction.OnMapClick) },
                 onCameraClick = { onHomeUIAction(HomeUIAction.OnCameraClick) },
+                onMyPartiesClick = { onHomeUIAction(HomeUIAction.OnMyPartiesClick) },
             )
         },
         floatingActionButton = {
@@ -145,7 +140,9 @@ fun HomeScreen(
                     onChangeCityClick = {
                         showSelectCitySheet = true
                     },
-                    navigateToMyParties = navigateToMyParties,
+                    navigateToMyParties = {
+                        onHomeUIAction(HomeUIAction.OnMyPartiesClick)
+                    },
                 )
             },
         )
@@ -224,7 +221,6 @@ private fun HomeScreenPreview() {
             uiState = HomeUiState(),
             initialSelectedTab = 0,
             onHomeUIAction = {},
-            navigateToMyParties = {},
         )
     }
 }

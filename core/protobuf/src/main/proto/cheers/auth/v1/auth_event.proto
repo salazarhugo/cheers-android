@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package cheers.auth.v1;
+
+option java_multiple_files = true;
+option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/auth/v1;auth";
+
+message AuthEvent {
+  oneof event {
+    CreatedAuth created = 1;
+    DeletedAuth deleted = 2;
+  };
+}
+
+message CreatedAuth {
+  string uid = 1;
+  string email = 2;
+}
+
+message DeletedAuth {
+  string uid = 1;
+  string email = 2;
+}

@@ -25,6 +25,7 @@ fun PostResponse.toPost(): Post {
         comments = commentCount.toInt(),
         drinkId = post.drink.id,
         drinkName = post.drink.name,
+        drinkColor = post.drink.color,
         drinkPicture = post.drink.icon,
         drunkenness = post.drunkenness.toInt(),
         latitude = post.latitude,
@@ -36,6 +37,8 @@ fun PostResponse.toPost(): Post {
         canComment = post.commentsEnabled,
         canLike = post.likesEnabled,
         canShare = post.sharesEnabled,
+        hasMentions = post.hasMentions,
+        mentionAvatars = post.mentionsList.map { it.picture },
     )
 }
 
@@ -59,6 +62,7 @@ fun PostResponse.asEntity(): PostEntity {
         comments = commentCount.toInt(),
         drinkId = post.drink.id,
         drinkName = post.drink.name,
+        drinkColor = post.drink.color,
         drinkPicture = post.drink.icon,
         drunkenness = post.drunkenness.toInt(),
         latitude = post.latitude,
@@ -70,5 +74,7 @@ fun PostResponse.asEntity(): PostEntity {
         canComment = post.commentsEnabled,
         canLike = post.likesEnabled,
         canShare = post.sharesEnabled,
+        hasMentions = post.hasMentions,
+        mentionAvatars = post.mentionsList.map { it.picture },
     )
 }

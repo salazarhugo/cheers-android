@@ -1,8 +1,8 @@
 package com.salazar.cheers.core.ui.components.row
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -18,7 +18,7 @@ fun AddLocationItem(
         title = "Add location",
         icon = {
             Icon(
-                imageVector = Icons.Rounded.LocationOn,
+                imageVector = Icons.Outlined.LocationOn,
                 contentDescription = "Location icon",
             )
         },

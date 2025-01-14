@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material.icons.outlined.Mic
-import androidx.compose.material.icons.outlined.SportsBar
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +19,6 @@ import com.salazar.cheers.core.ui.annotations.ComponentPreviews
 @Composable
 fun CreatePostButtons(
     modifier: Modifier = Modifier,
-    onAddDrinkClick: () -> Unit = {},
     onMicrophoneClick: () -> Unit = {},
     onAddImageClick: () -> Unit = {},
 ) {
@@ -29,12 +27,6 @@ fun CreatePostButtons(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Bounce(onBounce = onAddDrinkClick) {
-            Icon(
-                imageVector = Icons.Outlined.SportsBar,
-                contentDescription = null,
-            )
-        }
         Bounce(onBounce = onAddImageClick) {
             Icon(
                 imageVector = Icons.Outlined.AddPhotoAlternate,

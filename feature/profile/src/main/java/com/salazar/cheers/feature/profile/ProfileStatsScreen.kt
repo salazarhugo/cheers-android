@@ -151,7 +151,7 @@ fun Tabs(
 
 @Composable
 fun Followers(
-    followers: List<com.salazar.cheers.core.model.UserItem>?,
+    followers: List<UserItem>?,
     onUserClicked: (username: String) -> Unit,
     onStoryClick: (username: String) -> Unit,
 ) {
@@ -159,7 +159,10 @@ fun Followers(
         LoadingScreen()
     } else
         LazyColumn {
-            items(followers, key = { it.id }) { follower ->
+            items(
+                items = followers,
+                key = { it.id },
+            ) { follower ->
                 UserItem(
                     userItem = follower,
                     onClick = onUserClicked,

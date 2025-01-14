@@ -3,6 +3,7 @@ package com.salazar.cheers.core.ui.components.post
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
@@ -13,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -24,9 +26,12 @@ import com.salazar.cheers.core.model.cheersUserItem
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.PostCaption
 import com.salazar.cheers.core.ui.annotations.ComponentPreviews
+import com.salazar.cheers.core.ui.components.multi_avatar.MultiAvatarComponent
 import com.salazar.cheers.core.ui.components.playback.PlaybackComponent
 import com.salazar.cheers.core.ui.components.post.footer.PostFooter
+import com.salazar.cheers.core.ui.components.post.mentions.MentionsBottomSheet
 import com.salazar.cheers.core.ui.components.post.more.PostMoreBottomSheet
+import com.salazar.cheers.core.ui.components.share.ShareBottomSheet
 import com.salazar.cheers.core.util.playback.AudioState
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -43,10 +48,13 @@ fun PostComponent(
     onCommentClick: () -> Unit = {},
     onDetailsClick: () -> Unit = {},
     onMoreClick: () -> Unit = {},
+    onDrinkClick: (String) -> Unit = {},
     navigateToDeleteDialog: () -> Unit = {},
 ) {
+    var showShareBottomSheet by remember { mutableStateOf(false) }
+    var showMentionBottomSheet by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
-    val drinkSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(
         pageCount = { post.photos.size },
@@ -63,6 +71,7 @@ fun PostComponent(
                 .padding(horizontal = 16.dp),
             username = post.username,
             name = post.name,
+            drinkName = post.drinkName,
             verified = post.verified,
             avatar = post.profilePictureUrl,
             locationName = post.locationName,
@@ -104,11 +113,29 @@ fun PostComponent(
                 onClick = onAudioClick,
             )
         }
-        PostDrink(
-            drink = post.drinkName,
-            picture = post.drinkPicture,
+        Row(
             modifier = Modifier.padding(horizontal = 16.dp),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            PostDrink(
+                drink = post.drinkName,
+                picture = post.drinkPicture,
+                colorString = post.drinkColor,
+                onClick = {
+                    onDrinkClick(post.drinkId)
+                },
+            )
+            if (post.hasMentions) {
+                MultiAvatarComponent(
+                    avatars = post.mentionAvatars,
+                    modifier = modifier,
+                    onClick = {
+                        showMentionBottomSheet = true
+                    }
+                )
+            }
+        }
         PostFooter(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,19 +150,44 @@ fun PostComponent(
             onLikeClick = onLikeClick,
             onLikeCountClick = onLikeCountClick,
             onCommentClick = onCommentClick,
-            onShareClick = { },
+            onShareClick = {
+                showShareBottomSheet = true
+            },
             commentText = post.lastCommentText,
             commentUsername = post.lastCommentUsername,
         )
     }
 
+    if (showMentionBottomSheet) {
+        MentionsBottomSheet(
+            postID = post.id,
+            sheetState = sheetState,
+            onDismissRequest = {
+                showMentionBottomSheet = false
+            },
+            onUserClick = onUserClick,
+        )
+    }
+    if (showShareBottomSheet) {
+        ShareBottomSheet(
+            link = "",
+            sheetState = sheetState,
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    showShareBottomSheet = false
+                }
+            },
+        )
+    }
     if (showBottomSheet) {
         PostMoreBottomSheet(
             isAuthor = post.isAuthor,
-            sheetState = drinkSheetState,
+            sheetState = sheetState,
             onDismissRequest = {
                 scope.launch {
-                    drinkSheetState.hide()
+                    sheetState.hide()
                 }.invokeOnCompletion {
                     showBottomSheet = false
                 }

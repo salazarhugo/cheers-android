@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Filter
 import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.data.party.data.repository.PartyRepository
-import com.salazar.cheers.domain.feed_party.ListMyPartyFlowUseCase
+import com.salazar.cheers.domain.feed_party.ListPartyFlowUseCase
 import com.salazar.cheers.domain.feed_party.ListPartyUseCase
 import com.salazar.cheers.shared.util.result.getOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ data class MyPartiesUiState(
 
 @HiltViewModel
 class MyPartiesViewModel @Inject constructor(
-    private val listMyPartyFlowUseCase: ListMyPartyFlowUseCase,
+    private val listMyPartyFlowUseCase: ListPartyFlowUseCase,
     private val listPartyUseCase: ListPartyUseCase,
     private val partyRepository: PartyRepository,
 ) : ViewModel() {

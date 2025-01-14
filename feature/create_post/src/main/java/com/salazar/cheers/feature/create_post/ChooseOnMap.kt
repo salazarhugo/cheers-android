@@ -11,13 +11,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -187,7 +187,9 @@ fun ChooseOnMapAppBar(
 ) {
     TopAppBar(
         title = {
-            Column {
+            Column(
+                modifier = Modifier.padding(vertical = 8.dp),
+            ) {
                 Text(
                     text = "Choose post location",
                     fontWeight = FontWeight.Bold,
@@ -206,7 +208,7 @@ fun ChooseOnMapAppBar(
             }
         },
         actions = {
-            Button(
+            TextButton(
                 onClick = {
                     val center = mapView.mapboxMap.cameraState.center
                     val zoom = mapView.mapboxMap.cameraState.zoom

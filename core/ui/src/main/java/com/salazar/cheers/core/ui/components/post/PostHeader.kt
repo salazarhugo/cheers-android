@@ -17,7 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.model.cheersUser
 import com.salazar.cheers.core.ui.CheersPreview
@@ -33,6 +37,7 @@ fun PostHeader(
     username: String,
     verified: Boolean,
     avatar: String,
+    drinkName: String? = null,
     modifier: Modifier = Modifier,
     createTime: Long = Date().time / 1000,
     locationName: String? = null,
@@ -62,12 +67,28 @@ fun PostHeader(
             Column(
                 modifier = Modifier.padding(horizontal = 8.dp),
             ) {
+                val trailingText = if (drinkName.isNullOrBlank()) {
+                    null
+                } else {
+                    buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Medium)) {
+                            append("is drinking ")
+                        }
+                        withStyle(
+                            style = SpanStyle(fontWeight = FontWeight.Bold)
+                        ) {
+                            append(drinkName)
+                        }
+                    }
+                }
                 Username(
                     username = username,
                     verified = verified,
                     textStyle = MaterialTheme.typography.bodyMedium,
                     color = color,
                     onClick = onUserClick,
+                    trailingText = trailingText,
+                    maxLines = 2,
                 )
                 if (!locationName.isNullOrBlank()) {
                     Text(

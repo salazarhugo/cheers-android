@@ -6,6 +6,8 @@ import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.domain.feed_party.ListMyPartyFlowUseCase
 import com.salazar.cheers.domain.feed_party.ListPartyFeedFlowUseCase
 import com.salazar.cheers.domain.feed_party.ListPartyFeedUseCase
+import com.salazar.cheers.domain.feed_party.ListPartyUseCase
+import com.salazar.cheers.shared.util.result.getOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,6 +31,7 @@ class PartiesViewModel @Inject constructor(
     private val listPartyFeedUseCase: ListPartyFeedUseCase,
     private val listPartyFeedFlowUseCase: ListPartyFeedFlowUseCase,
     private val listMyPartyFlowUseCase: ListMyPartyFlowUseCase,
+    private val listPartyUseCase: ListPartyUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(PartiesUiState(isLoading = true))
@@ -46,6 +49,9 @@ class PartiesViewModel @Inject constructor(
         }
         viewModelScope.launch {
             listPartyFeedFlowUseCase().collect(::updateParties)
+        }
+        viewModelScope.launch {
+            listPartyUseCase().getOrNull()
         }
         onSwipeToRefresh()
     }

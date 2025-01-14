@@ -301,6 +301,9 @@ private fun LazyListScope.posts(
             },
             navigateToDeleteDialog = {
                 onHomeUIAction(HomeUIAction.OnDeletePostClick(post.id))
+            },
+            onDrinkClick = {
+                onHomeUIAction(HomeUIAction.OnDrinkClick(it))
             }
         )
     }

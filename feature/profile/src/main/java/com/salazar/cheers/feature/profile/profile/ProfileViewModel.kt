@@ -7,7 +7,7 @@ import com.salazar.cheers.core.model.Party
 import com.salazar.cheers.core.model.User
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
-import com.salazar.cheers.domain.feed_party.ListMyPartyFlowUseCase
+import com.salazar.cheers.domain.feed_party.ListPartyFlowUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +25,7 @@ class ProfileViewModel @Inject constructor(
     private val userRepositoryImpl: UserRepositoryImpl,
     private val postRepository: PostRepository,
     private val listPostUseCase: ListPostUseCase,
-    private val listMyPartyFlowUseCase: ListMyPartyFlowUseCase,
+    private val listMyPartyFlowUseCase: ListPartyFlowUseCase,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(ProfileViewModelState(isLoading = true))

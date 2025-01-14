@@ -10,3 +10,13 @@ fun Privacy.toPrivacyPb(): PrivacyOuterClass.Privacy {
         Privacy.FRIENDS -> PrivacyOuterClass.Privacy.FRIENDS
     }
 }
+
+fun PrivacyOuterClass.Privacy.toPrivacy(): Privacy {
+    return when (this) {
+        PrivacyOuterClass.Privacy.FRIENDS -> Privacy.FRIENDS
+        PrivacyOuterClass.Privacy.PRIVATE -> Privacy.PRIVATE
+        PrivacyOuterClass.Privacy.PUBLIC -> Privacy.PUBLIC
+        PrivacyOuterClass.Privacy.GROUP -> Privacy.PRIVATE
+        PrivacyOuterClass.Privacy.UNRECOGNIZED -> Privacy.PUBLIC
+    }
+}

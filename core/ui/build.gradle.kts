@@ -26,6 +26,7 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
 
+    implementation(projects.domain)
     implementation(projects.data.party)
     implementation(projects.data.post)
 

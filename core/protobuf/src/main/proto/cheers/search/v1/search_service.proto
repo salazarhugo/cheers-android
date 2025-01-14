@@ -12,6 +12,12 @@ option java_multiple_files = true;
 option go_package = "github.com/salazarhugo/cheers1/gen/go/cheers/search/v1;search";
 
 service SearchService {
+  rpc SearchPublic (SearchPublicRequest) returns (SearchPublicResponse) {
+    option (google.api.http) = {
+      post: "/v1/search/public"
+      body: "*"
+    };
+  };
   rpc Search (SearchRequest) returns (SearchResponse) {
     option (google.api.http) = {
       post: "/v1/search"
@@ -20,7 +26,13 @@ service SearchService {
   };
 }
 
-message SearchResponse {
+message SearchPublicRequest {
+  string query = 1;
+  SearchType type = 2;
+  cheers.type.PaginationRequest pagination = 3;
+}
+
+message SearchPublicResponse {
   repeated cheers.type.UserItem users = 1;
   repeated cheers.party.v1.PartyItem events = 2;
 }
@@ -29,6 +41,13 @@ message SearchRequest {
   string query = 1;
   SearchType type = 2;
   cheers.type.PaginationRequest pagination = 3;
+  repeated string filters = 4;
+  repeated string sorters = 5;
+}
+
+message SearchResponse {
+  repeated cheers.type.UserItem users = 1;
+  repeated cheers.party.v1.PartyItem events = 2;
 }
 
 enum SearchType {

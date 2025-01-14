@@ -33,6 +33,7 @@ fun HomeRoute(
     navigateToDeletePostDialog: (String) -> Unit,
     navigateToPartyDetail: (String) -> Unit,
     navigateToMyParties: () -> Unit,
+    navigateToDrink: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
@@ -58,7 +59,6 @@ fun HomeRoute(
         initialSelectedTab = appSettings.selectedHomeTab,
         navigateToPartyDetail = navigateToPartyDetail,
         navigateToCreateParty = navigateToCreateParty,
-        navigateToMyParties = navigateToMyParties,
         onHomeUIAction = { action ->
             when (action) {
                 is HomeUIAction.OnActivityClick -> onActivityClick()
@@ -67,6 +67,7 @@ fun HomeRoute(
                 is HomeUIAction.OnPostLikesClick -> navigateToPostLikes(action.postID)
                 is HomeUIAction.OnSearchClick -> navigateToParties() //navigateToCamera()
                 is HomeUIAction.OnStoryClick -> {}
+                is HomeUIAction.OnDrinkClick -> navigateToDrink(action.drinkID)
                 is HomeUIAction.OnStoryFeedClick -> {}
                 is HomeUIAction.OnUserClick -> navigateToUser(action.userID)
                 is HomeUIAction.OnPostClick -> onPostClick(action.postID)
@@ -94,6 +95,7 @@ fun HomeRoute(
                 is HomeUIAction.OnSelectPage -> viewModel.updatePage(action.page)
                 HomeUIAction.OnMapClick -> navigateToMap()
                 HomeUIAction.OnCameraClick -> navigateToCamera()
+                HomeUIAction.OnMyPartiesClick -> navigateToMyParties()
                 else -> Unit
             }
         }
