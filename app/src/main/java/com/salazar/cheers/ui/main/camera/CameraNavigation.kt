@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.camera
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -26,6 +27,7 @@ fun NavController.navigateToCamera(
 
 fun NavGraphBuilder.cameraScreen(
     navigateBack: () -> Unit,
+    navigateToCreatePost: (Uri) -> Unit,
 ) {
     composable<CameraScreen>(
         deepLinks = listOf(
@@ -46,6 +48,7 @@ fun NavGraphBuilder.cameraScreen(
     ) {
         CameraRoute(
             navigateBack = navigateBack,
+            navigateToCreatePost = navigateToCreatePost,
         )
     }
 }

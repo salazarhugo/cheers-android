@@ -5,10 +5,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
 
 const val partiesNavigationRoute = "parties_route"
-private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/parties"
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/parties"
 
 fun NavController.navigateToParties(navOptions: NavOptions? = null) {
     this.navigate(partiesNavigationRoute, navOptions)

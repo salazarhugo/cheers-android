@@ -113,7 +113,7 @@ fun CreatePostScreen(
     onCreatePostUIAction: (CreatePostUIAction) -> Unit = {},
 ) {
     val enabled =
-        caption.isNotEmpty() || medias.isNotEmpty() // || uiState.drinkState.currentPage > 0
+        caption.isNotEmpty() || medias.isNotEmpty() || selectedDrink != null
     var showAudioRecorderDialog by remember { mutableStateOf(false) }
     val audioSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -247,7 +247,7 @@ fun CreatePostScreen(
             SelectLocationComponent(
                 location = location,
                 locationResults = locationResults.orEmpty(),
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier,
                 onMapClick = {
                     onCreatePostUIAction(CreatePostUIAction.OnLocationClick)
                 },

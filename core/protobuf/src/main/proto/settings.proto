@@ -27,4 +27,5 @@ message Settings {
   bool auto_location_enabled = 10;
   string city = 11;
   int32 selected_home_tab = 12;
+  int32 coins_balance = 13;
 }

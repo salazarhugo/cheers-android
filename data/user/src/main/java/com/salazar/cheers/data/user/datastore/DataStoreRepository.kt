@@ -57,8 +57,18 @@ class DataStoreRepository @Inject constructor(
         return userPreferencesFlow.map { it.passcodeEnabled }
     }
 
+    fun getCoinsBalance(): Flow<Int> {
+        return userPreferencesFlow.map { it.coinsBalance }
+    }
+
     fun getUsername(): Flow<String> {
         return userPreferencesFlow.map { it.username }
+    }
+
+    suspend fun updateCoinsBalance(coinsBalance: Int) {
+        settingsStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setCoinsBalance(coinsBalance).build()
+        }
     }
 
     suspend fun updateSelectedHomeTab(selectedHomeTab: Int) {

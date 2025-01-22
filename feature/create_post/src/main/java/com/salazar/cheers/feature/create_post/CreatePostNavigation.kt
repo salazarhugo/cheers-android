@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.create_post
 
+import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -21,6 +22,17 @@ import kotlinx.serialization.Serializable
 data object CreatePostGraph
 
 fun NavController.navigateToCreatePost(
+    picture: Uri?,
+    navOptions: NavOptions? = null,
+) {
+    navigateToCreatePost(navOptions = navOptions)
+//    this.navigate(
+//        route = CreatePostGraph(uri = picture.toString()),
+//        navOptions = navOptions,
+//    )
+}
+
+fun NavController.navigateToCreatePost(
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
@@ -32,6 +44,7 @@ fun NavController.navigateToCreatePost(
 fun NavGraphBuilder.createPostGraph(
     navController: NavController,
     navigateBack: () -> Unit,
+    onRewardedAdClick: () -> Unit,
 ) {
     navigation<CreatePostGraph>(
         startDestination = CreatePostRecap,
@@ -50,6 +63,7 @@ fun NavGraphBuilder.createPostGraph(
             navController = navController,
             navigateBack = navigateBack,
             navigateToCreateDrink = navController::navigateToCreateDrink,
+            onRewardedAdClick = onRewardedAdClick,
         )
         createPostAddPeopleScreen(
             navController = navController,

@@ -157,6 +157,7 @@ class SignInViewModel @Inject constructor(
                             return@collect
                         }
                         updateErrorMessage(it.message)
+                        updateIsGoogleLoading(false)
                     }
                     is Resource.Loading -> {
                         updateIsLoading(it.isLoading)

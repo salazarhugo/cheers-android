@@ -29,12 +29,11 @@ fun ChatRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-            if (it != null) {
-                viewModel.updateImages(listOf(it))
-            }
-        }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+        if (it == null) return@rememberLauncherForActivityResult
+
+        viewModel.updateImages(listOf(it))
+    }
 
     DisposableEffect(Unit) {
         viewModel.startPresence()
@@ -71,9 +70,9 @@ fun ChatRoute(
     NoScreenshot()
 
     val channel = uiState.channel
-    if (channel == null)
+    if (channel == null) {
         LoadingScreen()
-    else {
+    } else {
         ChatScreen(
             uiState = uiState,
             onChatUIAction = { action ->

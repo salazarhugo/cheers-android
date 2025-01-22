@@ -5,10 +5,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
 
 const val POST_ID = "postID"
 const val postLikesNavigationRoute = "post_likes_route/{$POST_ID}"
-private const val DEEP_LINK_URI_PATTERN = "https://maparty.app/post/{${POST_ID}/likes"
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/post/{${POST_ID}}/likes"
 
 fun NavController.navigateToPostLikes(
     postID: String,

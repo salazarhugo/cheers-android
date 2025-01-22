@@ -13,6 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import cheers.media.v1.UploadMediaRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
@@ -21,13 +22,13 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 const val MEDIA_URI_KEY = "MEDIA_URI"
+const val MEDIA_TYPE_KEY = "MEDIA_TYPE"
 const val MEDIA_URLS_KEY = "MEDIA_URLS"
 
 @HiltWorker
 class UploadMediaWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val postRepository: PostRepository,
     private val mediaRepository: MediaRepository,
 ) : CoroutineWorker(appContext, params) {
 
@@ -35,31 +36,42 @@ class UploadMediaWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val medias = inputData.getStringArray(MEDIA_URI_KEY)
             ?: return Result.failure()
+        val mediaTypeStr = inputData.getString(MEDIA_TYPE_KEY)
+            ?: return Result.failure()
+        val mediaType = UploadMediaRequest.MediaType.valueOf(mediaTypeStr)
 
         try {
-            val uploadIds = mutableListOf<String>()
+            val uploadUrls = mutableListOf<String>()
 
             coroutineScope {
                 medias.toList().forEach { photoUri ->
+                    if (photoUri.startsWith("https://")) {
+                        uploadUrls.add(photoUri)
+                        return@forEach
+                    }
+
                     val photoBytes = extractImage(Uri.parse(photoUri))
                     launch {
-                        val media = mediaRepository.uploadMedia(photoBytes).getOrNull()
+                        val media = mediaRepository.uploadMedia(
+                            type = mediaType,
+                            bytes = photoBytes,
+                        ).getOrNull()
                         val mediaID = media?.url
                         if (mediaID != null) {
-                            uploadIds.add(mediaID)
+                            uploadUrls.add(mediaID)
                         }
                     }
                 }
             }
 
             val outputData = workDataOf(
-                MEDIA_URLS_KEY to uploadIds.toTypedArray(),
+                MEDIA_URLS_KEY to uploadUrls.toTypedArray(),
             )
 
             return Result.success(outputData)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
-            Log.e(TAG, "Error uploading post")
+            Log.e(TAG, "Error uploading media.")
             return Result.failure()
         }
     }

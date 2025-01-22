@@ -1,5 +1,6 @@
 package com.salazar.cheers.feature.signin
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -28,6 +29,18 @@ fun NavGraphBuilder.signInScreen(
         deepLinks = listOf(
             navDeepLink<SignInScreen>(basePath = DEEP_LINK_URI_PATTERN),
         ),
+        enterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        exitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left)
+        },
+        popEnterTransition = {
+            slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
+        popExitTransition = {
+            slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right)
+        },
     ) {
         SignInRoute(
             navigateToHome = navigateToHome,

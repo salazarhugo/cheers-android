@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import cheers.friendship.v1.FriendshipServiceGrpcKt
 import cheers.friendship.v1.ListFriendRequest
@@ -36,6 +35,7 @@ import com.salazar.cheers.core.model.UserID
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.model.UserStats
 import com.salazar.cheers.core.model.UserSuggestion
+import com.salazar.cheers.data.post.repository.MEDIA_TYPE_KEY
 import com.salazar.cheers.data.post.repository.MEDIA_URI_KEY
 import com.salazar.cheers.data.post.repository.UploadMediaWorker
 import com.salazar.cheers.data.user.workers.UploadProfileBanner
@@ -250,7 +250,7 @@ class UserRepositoryImpl @Inject constructor(
         updateMask: List<String>?,
     ): Result<User> {
         return updateUserProfile(
-            picture = user.picture,
+            picture = user.picture.orEmpty(),
             banner = user.banner,
             bio = user.bio,
             name = user.name,
@@ -260,7 +260,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateUserProfile(
-        picture: String?,
+        picture: String,
         banner: List<String>?,
         bio: String?,
         name: String?,
@@ -461,17 +461,24 @@ class UserRepositoryImpl @Inject constructor(
     override fun uploadProfilePicture(
         picture: Uri,
     ) {
-        val uploadWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<UploadProfilePicture>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(
-                    workDataOf(
-                        "PHOTO_URI" to picture.toString(),
-                    )
+        val uploadMediaWorkRequest = OneTimeWorkRequestBuilder<UploadMediaWorker>().apply {
+            setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            setInputData(
+                workDataOf(
+                    MEDIA_URI_KEY to listOf(picture.toString()).toTypedArray(),
+                    MEDIA_TYPE_KEY to "AVATAR",
                 )
-            }
-                .build()
-        workManager.enqueue(uploadWorkRequest)
+            )
+        }.build()
+
+        val uploadAvatarRequest = OneTimeWorkRequestBuilder<UploadProfilePicture>().apply {
+            setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+        }.build()
+
+        workManager
+            .beginWith(uploadMediaWorkRequest)
+            .then(uploadAvatarRequest)
+            .enqueue()
     }
 
     override fun uploadProfileBanner(
@@ -482,6 +489,7 @@ class UserRepositoryImpl @Inject constructor(
             setInputData(
                 workDataOf(
                     MEDIA_URI_KEY to banners.map { it.toString() }.toTypedArray(),
+                    MEDIA_TYPE_KEY to "BANNER",
                 )
             )
         }.build()

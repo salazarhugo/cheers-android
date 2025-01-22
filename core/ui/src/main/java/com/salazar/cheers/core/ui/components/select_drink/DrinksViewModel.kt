@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salazar.cheers.core.model.Drink
+import com.salazar.cheers.domain.get_coins_balance.GetCoinsBalanceFlowUseCase
 import com.salazar.cheers.domain.get_coins_balance.GetCoinsBalanceUseCase
 import com.salazar.cheers.domain.list_drink.ListDrinkFlowUseCase
 import com.salazar.cheers.domain.list_drink.ListDrinkUseCase
@@ -29,6 +30,7 @@ data class DrinksUiState(
 @HiltViewModel
 class DrinksViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val getCoinsBalanceFlowUseCase: GetCoinsBalanceFlowUseCase,
     private val getCoinsBalanceUseCase: GetCoinsBalanceUseCase,
     private val listDrinkFlowUseCase: ListDrinkFlowUseCase,
     private val listDrinkUseCase: ListDrinkUseCase,
@@ -51,15 +53,24 @@ class DrinksViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val coins = getCoinsBalanceUseCase()
-            viewModelState.update {
-                it.copy(coinsBalance = coins)
-            }
+            getCoinsBalanceFlowUseCase()
+                .collect(::updateCoins)
         }
+
+        viewModelScope.launch {
+            getCoinsBalanceUseCase()
+        }
+
         viewModelScope.launch {
             listDrinkUseCase(
                 query = "",
             ).getOrNull()
+        }
+    }
+
+    private fun updateCoins(coins: Int) {
+        viewModelState.update {
+            it.copy(coinsBalance = coins)
         }
     }
 

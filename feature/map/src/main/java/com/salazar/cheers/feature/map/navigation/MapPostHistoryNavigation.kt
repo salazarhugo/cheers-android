@@ -5,11 +5,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.feature.map.ui.MapPostHistoryRoute
 
 const val mapPostHistoryNavigationRoute = "map_post_history_route"
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/map_post_history"
+    "${Constants.DEEPLINK_BASE_URL}/map/history"
 
 fun NavController.navigateToMapPostHistory(navOptions: NavOptions? = null) {
     this.navigate(mapPostHistoryNavigationRoute, navOptions)

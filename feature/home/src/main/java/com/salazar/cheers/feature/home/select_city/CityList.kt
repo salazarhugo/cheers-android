@@ -29,21 +29,25 @@ fun CityList(
                 onClick = onToggleNearby,
             )
         }
-        if (!isNearbyEnabled) {
-            items(
-                items = cities,
-            ) { city ->
-                val selected = city.name == currentCity
-
-                CityComponent(
-                    city = city,
-                    selected = selected,
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        onClick(city)
-                    },
-                )
+        items(
+            items = cities,
+        ) { city ->
+            val selected = when (isNearbyEnabled) {
+                true -> false
+                false -> city.name == currentCity
             }
+
+            CityComponent(
+                city = city,
+                selected = selected,
+                modifier = Modifier
+                    .animateItem()
+                    .fillMaxWidth()
+                ,
+                onClick = {
+                    onClick(city)
+                },
+            )
         }
     }
 }

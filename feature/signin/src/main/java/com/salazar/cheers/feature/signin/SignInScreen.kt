@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -75,85 +77,107 @@ fun SignInScreen(
             targetState = true
         }
     }
+
     val image = when (isSystemInDarkTheme()) {
         true -> R.drawable.cheers_logo_white
         false -> R.drawable.cheers_logo
     }
 
     val density = LocalDensity.current
-    AnimatedVisibility(
-        visibleState = state,
-        enter = slideInHorizontally(
-            initialOffsetX = { with(density) { +400.dp.roundToPx() } }
-        ) + fadeIn(
-            initialAlpha = 0.3f
-        ),
-        exit = slideOutHorizontally() + fadeOut()
+
+    Scaffold(
+        bottomBar = {
+            if (uiState.isLoading) return@Scaffold
+            Footer(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .height(86.dp),
+                isLoading = uiState.isGoogleLoading,
+            )
+        }
     ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding(),
+        AnimatedVisibility(
+            modifier = Modifier.padding(it),
+            visibleState = state,
+            enter = slideInHorizontally(
+                initialOffsetX = { with(density) { +400.dp.roundToPx() } }
+            ) + fadeIn(
+                initialAlpha = 0.3f
+            ),
+            exit = slideOutHorizontally() + fadeOut()
         ) {
             Column(
+                verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(22.dp)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+                    .fillMaxSize()
+                    .systemBarsPadding(),
             ) {
-                AnimatedLogo()
-                Spacer(modifier = Modifier.height(30.dp))
-
-                AnimatedVisibility(
-                    visible = uiState.isPasskeyEnabled && !uiState.isGoogleLoading,
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(22.dp)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    Column {
-                        UsernameTextField(
-                            username= uiState.username,
-                            isLoading = uiState.isLoading,
-                            onUsernameChanged = onUsernameChanged,
-                            onDoneClick = onSignInClick,
+                    AnimatedLogo()
+
+                    Spacer(modifier = Modifier.height(60.dp))
+
+                    AnimatedVisibility(
+                        visible = uiState.isPasskeyEnabled && !uiState.isGoogleLoading,
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            UsernameTextField(
+                                username = uiState.username,
+                                isLoading = uiState.isLoading,
+                                onUsernameChanged = onUsernameChanged,
+                                onDoneClick = onSignInClick,
+                            )
+                            LoginButton(
+                                isLoading = uiState.isLoading,
+                                signInWithEmailPassword = {
+                                    onSignInClick(uiState.username)
+                                },
+                            )
+                        }
+                    }
+                    if (!uiState.isGoogleLoading && !uiState.isLoading) {
+                        TextButton(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = navigateToSignUp,
+                        ) {
+                            Text(text = "Create new account")
+                        }
+                        ErrorMessage(
+                            errorMessage = uiState.errorMessage,
+                            paddingValues = PaddingValues(vertical = 8.dp)
                         )
-                        Spacer(Modifier.height(8.dp))
-                        LoginButton(
-                            isLoading = uiState.isLoading,
-                            signInWithEmailPassword = {
-                                onSignInClick(uiState.username)
-                            },
+                        TextDivider(
+                            modifier = Modifier.padding(vertical = 16.dp),
+                            dayString = "OR",
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = !uiState.isLoading,
+                    ) {
+                        GoogleButton(
+                            isLoading = uiState.isGoogleLoading,
+                            text = "Continue with Google",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .height(40.dp),
+                            onClicked = onGoogleClick,
                         )
                     }
                 }
-                AnimatedVisibility(
-                    visible = !uiState.isLoading,
-                ) {
-                    GoogleButton(
-                        isLoading = uiState.isGoogleLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        onClicked = onGoogleClick,
-                    )
-                }
-                ErrorMessage(
-                    errorMessage = uiState.errorMessage,
-                    paddingValues = PaddingValues(vertical = 8.dp)
-                )
-                TextDivider(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    dayString = "OR",
-                )
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = navigateToSignUp,
-                ) {
-                    Text(text = "Register")
-                }
             }
-            Footer()
         }
     }
 }
@@ -209,26 +233,31 @@ fun LoginButton(
 
 @Composable
 fun Footer(
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
     ) {
-        HorizontalDivider()
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Center,
+        AnimatedVisibility(
+            visible = !isLoading,
         ) {
-            val image = when (isSystemInDarkTheme()) {
-                true -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_white
-                false -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_black
+            HorizontalDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                val image = when (isSystemInDarkTheme()) {
+                    true -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_white
+                    false -> com.salazar.cheers.core.ui.R.drawable.fido_alliance_black
+                }
+                Image(
+                    painter = painterResource(id = image),
+                    contentDescription = "fido alliance",
+                )
             }
-            Image(
-                painter = painterResource(id = image),
-                contentDescription = "fido alliance",
-            )
         }
     }
 }

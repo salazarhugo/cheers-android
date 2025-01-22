@@ -1,10 +1,7 @@
 package com.salazar.cheers.ui
 
 import android.view.WindowManager
-import androidx.activity.SystemBarStyle
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -13,19 +10,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.salazar.cheers.Language
 import com.salazar.cheers.Theme
-import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.CheersViewModel
-import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.core.ui.theme.CheersTheme
+import com.salazar.cheers.core.ui.ui.LoadingScreen
 import com.salazar.cheers.core.util.Utils.setLocale
+import com.salazar.cheers.navigation.CheersNavGraph
 import com.salazar.cheers.shared.util.LocalActivity
 
 
 @Composable
 fun CheersApp(
     darkTheme: Boolean,
-    appState: CheersAppState = rememberCheersAppState()
+    appState: CheersAppState = rememberCheersAppState(),
+    onRewardedAdClick: () -> Unit,
 ) {
     val cheersViewModel = hiltViewModel<CheersViewModel>()
     val uiState: CheersUiState by cheersViewModel.uiState.collectAsStateWithLifecycle()
@@ -47,6 +45,7 @@ fun CheersApp(
                 CheersNavGraph(
                     uiState = uiState,
                     appState = appState,
+                    onRewardedAdClick = onRewardedAdClick,
                 )
             }
         }

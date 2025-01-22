@@ -27,6 +27,8 @@ fun OtherProfileRoute(
     navigateToOtherProfileStats: (User) -> Unit,
     navigateToManageFriendship: (String) -> Unit,
     navigateToChat: (UserItem) -> Unit,
+    navigateToPostLikes: (String) -> Unit,
+    navigateToUserProfile: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val state = rememberRefreshLayoutState()
@@ -96,6 +98,11 @@ fun OtherProfileRoute(
                                 OtherProfileUIAction.OnFriendshipClick -> navigateToManageFriendship(
                                     user.id
                                 )
+
+                                is OtherProfileUIAction.OnLikeClick -> viewModel.onLikeClick(action.post)
+                                is OtherProfileUIAction.OnCommentClick -> navigateToComments(action.postID)
+                                is OtherProfileUIAction.OnLikeCountClick -> navigateToPostLikes(action.postID)
+                                is OtherProfileUIAction.OnUserClick -> navigateToUserProfile(action.userID)
                             }
                         },
                     )

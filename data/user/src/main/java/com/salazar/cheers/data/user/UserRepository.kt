@@ -47,7 +47,7 @@ interface UserRepository {
     ): Result<User>
 
     suspend fun updateUserProfile(
-        picture: String? = null,
+        picture: String = "",
         banner: List<String>? = null,
         bio: String? = null,
         name: String? = null,

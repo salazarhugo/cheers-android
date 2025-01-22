@@ -241,7 +241,8 @@ class PartyRepositoryImpl @Inject constructor(
         userId: String,
     ): Flow<List<Party>> {
         val partyEntities = when (filter) {
-            "hosting" -> partyDao.listPartyByUserID(userId = userId)
+            "other" -> partyDao.listPartyByUserID(userId = userId)
+            "hosting" -> partyDao.listUpcomingPartyByUserID(userId = userId)
             "interested" -> partyDao.listPartyByWatchStatus(watchStatus = WatchStatus.INTERESTED)
             "going" -> partyDao.listPartyByWatchStatus(watchStatus = WatchStatus.GOING)
             "past" -> partyDao.listPastPartyByUserId(userId = userId)

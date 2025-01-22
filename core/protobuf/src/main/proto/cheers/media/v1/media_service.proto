@@ -19,7 +19,15 @@ service MediaService {
 message UploadMediaRequest {
   bytes chunk = 1;
   int64 upload_id = 2;
-  string media_type = 3;
+  enum MediaType {
+    NONE = 0;
+    POST = 1;
+    AVATAR = 2;
+    BANNER = 3;
+    PARTY = 4;
+    CHAT = 5;
+  }
+  MediaType media_type = 3;
   int64 upload_media_width = 4;
   int64 upload_media_height = 5;
 }

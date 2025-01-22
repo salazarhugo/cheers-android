@@ -14,12 +14,7 @@ fun CreatePostAddLocationRoute(
 
     CreatePostAddLocationScreen(
         onSelectLocation = { point, zoom ->
-            viewModel.updateLocationPoint(point)
-            viewModel.getLocationName(
-                point.longitude(),
-                point.latitude(),
-                zoom,
-            )
+            viewModel.updateLocationPoint(point, zoom)
             navigateBack()
         },
         navigateBack = navigateBack,

@@ -45,15 +45,21 @@ fun HomeRoute(
         viewModel.initNativeAdd(context = context)
     }
 
+    if (uiState.isSignedIn == false) {
+        LaunchedEffect(Unit) { navigateToSignIn() }
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         RequestPermission(
             permission = Manifest.permission.POST_NOTIFICATIONS,
         )
     }
+
     RequestPermission(
         permission = Manifest.permission.ACCESS_FINE_LOCATION,
         onGranted = viewModel::onLocationPermissionGranted,
     )
+
     HomeScreen(
         uiState = uiState,
         initialSelectedTab = appSettings.selectedHomeTab,

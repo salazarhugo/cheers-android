@@ -58,7 +58,9 @@
 
         </provider>
 
-        <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
+        <meta-data
+            android:name="asset_statements"
+            android:resource="@string/asset_statements" />
         <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -135,15 +137,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="cheers.social"
-                    android:scheme="https" />
-                <data
-                    android:host="maparty.app"
-                    android:scheme="https" />
-                <data
-                    android:host="cheers-a275e.firebaseapp.com"
-                    android:scheme="https" />
+                <data android:scheme="https" />
+                <data android:host="cheers.social" />
+                <data android:scheme="https" />
+                <data android:host="cheers-a275e.firebaseapp.com" />
             </intent-filter>
         </activity>
 

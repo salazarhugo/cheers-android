@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -22,8 +23,8 @@ android {
         applicationId = "com.salazar.cheers"
         minSdk = 31
         targetSdk = 35
-        versionCode = 79
-        versionName = "1.0.0-079"
+        versionCode = 82
+        versionName = "1.0.0-082"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
     }
@@ -116,6 +117,7 @@ dependencies {
     implementation(projects.data.search)
     implementation(projects.data.map)
     implementation(projects.data.chat)
+    implementation(projects.data.ads)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

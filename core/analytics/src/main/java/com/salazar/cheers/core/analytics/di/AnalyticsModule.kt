@@ -1,8 +1,8 @@
 package com.salazar.cheers.core.analytics.di
 
-import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.salazar.cheers.core.analytics.AnalyticsHelper
 import com.salazar.cheers.core.analytics.FirebaseAnalyticsHelper
 import dagger.Binds

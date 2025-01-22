@@ -1,13 +1,22 @@
 package com.salazar.cheers.feature.create_note
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.salazar.cheers.core.ui.CheersSearchBar
 import com.salazar.cheers.core.ui.ShareButton
@@ -38,11 +47,12 @@ fun CreateNoteScreen(
                 },
                 enabled = text.length in 1..60,
             )
-        }
+        },
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
+                .imePadding()
                 .padding(16.dp),
         ) {
             Spacer(modifier = Modifier.height(16.dp))

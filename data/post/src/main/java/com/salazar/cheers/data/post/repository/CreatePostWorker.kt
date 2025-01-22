@@ -12,6 +12,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import cheers.media.v1.UploadMediaRequest
 import cheers.post.v1.CreatePostRequest
 import cheers.type.AudioOuterClass.Audio
 import com.salazar.cheers.core.PostType
@@ -92,7 +93,10 @@ class CreatePostWorker @AssistedInject constructor(
                         photos.toList().forEach { photoUri ->
                             val photoBytes = extractImage(Uri.parse(photoUri))
                             launch {
-                                val media = mediaRepository.uploadMedia(photoBytes).getOrNull()
+                                val media = mediaRepository.uploadMedia(
+                                    bytes = photoBytes,
+                                    type = UploadMediaRequest.MediaType.POST,
+                                ).getOrNull()
                                 val mediaID = media?.id
                                 if (mediaID != null) {
                                     uploadIds.add(mediaID)

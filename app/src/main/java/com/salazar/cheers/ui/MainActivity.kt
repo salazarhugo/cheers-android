@@ -25,15 +25,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.gms.ads.MobileAds
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.android.ump.ConsentDebugSettings
-import com.google.android.ump.ConsentInformation
-import com.google.android.ump.ConsentRequestParameters
-import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -42,6 +37,8 @@ import com.salazar.cheers.core.analytics.AnalyticsHelper
 import com.salazar.cheers.core.analytics.LocalAnalyticsHelper
 import com.salazar.cheers.core.ui.CheersUiState
 import com.salazar.cheers.core.ui.CheersViewModel
+import com.salazar.cheers.data.ads.AdsConsentManager
+import com.salazar.cheers.data.ads.AdsManager
 import com.salazar.cheers.shared.util.LocalActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -55,7 +52,6 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
 
     private val updateType = AppUpdateType.IMMEDIATE
-    private lateinit var consentInformation: ConsentInformation
     private var isMobileAdsInitializeCalled = AtomicBoolean(false)
 
     @Inject
@@ -69,6 +65,12 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
 
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper
+
+    @Inject
+    lateinit var adsManager: AdsManager
+
+    @Inject
+    lateinit var adsConsentManager: AdsConsentManager
 
     private val viewModel: CheersViewModel by viewModels()
 
@@ -123,16 +125,21 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
                 CheersApp(
                     appState = appState,
                     darkTheme = darkTheme,
+                    onRewardedAdClick = {
+                        adsManager.showRewardedAd(this)
+                    }
                 )
             }
         }
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
-        userConsentPolicy()
-        if (consentInformation.canRequestAds()) {
-            initializeMobileAdsSdk()
-        }
+        adsConsentManager.gatherUserConsent(this, {
+            if (adsConsentManager.canRequestAds) {
+                adsManager.init(this)
+            }
+        })
+        adsManager.init(this)
     }
 
     override fun onResume() {
@@ -179,43 +186,6 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    private fun userConsentPolicy() {
-        val debugSettings = ConsentDebugSettings.Builder(this)
-            .addTestDeviceHashedId("8DB645BA1C4E36F115428DBFA0C0CAFE")
-            .build()
-
-        // Set tag for underage of consent. false means users are not underage.
-        val params = ConsentRequestParameters.Builder()
-            .setConsentDebugSettings(debugSettings)
-            .setTagForUnderAgeOfConsent(false)
-            .build()
-
-        consentInformation = UserMessagingPlatform.getConsentInformation(this)
-        consentInformation.requestConsentInfoUpdate(
-            this,
-            params,
-            {
-                UserMessagingPlatform.loadAndShowConsentFormIfRequired(this@MainActivity) { loadAndShowError ->
-                    // Consent has been gathered.
-                    if (consentInformation.canRequestAds()) {
-                        initializeMobileAdsSdk()
-                    }
-                }
-            },
-            { requestConsentError ->
-                // Consent gathering failed.
-                Log.w(
-                    "MainActivity",
-                    String.format(
-                        "%s: %s",
-                        requestConsentError.errorCode,
-                        requestConsentError.message
-                    ),
-                )
-            },
-        )
-    }
-
     override fun onStart() {
         super.onStart()
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -244,14 +214,6 @@ class MainActivity : ComponentActivity(), FirebaseAuth.AuthStateListener {
         ) {
             viewModel.onNewMessage()
         }
-    }
-
-    private fun initializeMobileAdsSdk() {
-        if (isMobileAdsInitializeCalled.getAndSet(true)) {
-            return
-        }
-        MobileAds.initialize(this)
-//        initializeAds(this)
     }
 
     override fun onAuthStateChanged(p0: FirebaseAuth) {

@@ -3,8 +3,9 @@
     ExperimentalLayoutApi::class
 )
 
-package com.salazar.cheers.feature.chat.ui.components
+package com.salazar.cheers.feature.chat.ui.components.bottombar
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -16,14 +17,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -35,8 +34,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Reply
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.AlternateEmail
 import androidx.compose.material.icons.outlined.Duo
 import androidx.compose.material.icons.outlined.InsertPhoto
@@ -76,19 +73,15 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salazar.cheers.core.model.ChatMessage
 import com.salazar.cheers.core.ui.FunctionalityNotAvailablePanel
-import com.salazar.cheers.core.ui.components.avatar.AvatarComponent
 import com.salazar.cheers.feature.chat.R
 import com.salazar.cheers.feature.chat.ui.screens.chat.ChatUIAction
 
@@ -111,6 +104,7 @@ enum class EmojiStickerSelector {
 @Composable
 fun UserInputPreview() {
     ChatBottomBar(
+        images = emptyList(),
         onMessageSent = {},
         onImageSelectorClick = {},
         onChatUIAction = {},
@@ -122,6 +116,7 @@ fun ChatBottomBar(
     textState: TextFieldValue = TextFieldValue(),
     inputFocusRequester: FocusRequester = remember { FocusRequester() },
     replyMessage: ChatMessage? = null,
+    images: List<Uri>,
     onMessageSent: (String) -> Unit,
     onImageSelectorClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,6 +125,7 @@ fun ChatBottomBar(
     onChatUIAction: (ChatUIAction) -> Unit,
     micInteractionSource: MutableInteractionSource = MutableInteractionSource(),
 ) {
+    val canSendMessage = textState.text.isNotBlank() or images.isNotEmpty()
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
     val dismissKeyboard = { currentInputSelector = InputSelector.NONE }
 
@@ -153,7 +149,11 @@ fun ChatBottomBar(
 
     Surface(tonalElevation = 2.dp) {
         Column(modifier = modifier) {
-            ReplyMessage(
+            ChatBottomBarAttachments(
+                images = images,
+                onChatUIAction = onChatUIAction,
+            )
+            BottomBarReply(
                 message = replyMessage,
                 onChatUIAction = onChatUIAction,
             )
@@ -186,7 +186,7 @@ fun ChatBottomBar(
             )
             UserInputSelector(
                 onSelectorChange = { currentInputSelector = it },
-                sendMessageEnabled = textState.text.isNotBlank(),
+                sendMessageEnabled = canSendMessage,
                 onMessageSent = {
                     onMessageSent(textState.text)
                     // Reset text field and close keyboard
@@ -219,73 +219,6 @@ private fun TextFieldValue.addText(newString: String): TextFieldValue {
     )
 
     return this.copy(text = newText, selection = newSelection)
-}
-
-@Composable
-fun ReplyMessage(
-    message: ChatMessage?,
-    onChatUIAction: (ChatUIAction) -> Unit,
-) {
-    if (message == null) return
-
-    val nameOrUsername = message.senderName.ifBlank { message.senderUsername }
-
-    Surface(tonalElevation = 8.dp) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Reply,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                AvatarComponent(
-                    avatar = message.photoUrl,
-                    name = message.senderName,
-                    username = message.senderUsername,
-                    modifier = Modifier
-                        .padding(start = 8.dp),
-                    size = 36.dp,
-                )
-                Spacer(Modifier.width(8.dp))
-                Column {
-                    if (nameOrUsername.isNotBlank()) {
-                        Text(
-                            text = nameOrUsername,
-                            color = MaterialTheme.colorScheme.primary,
-                            style = TextStyle(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                    Text(
-                        text = message.text.ifBlank { "Photo" }.orEmpty(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-            IconButton(
-                onClick = {
-                    onChatUIAction(ChatUIAction.OnReplyMessage(null))
-                },
-                modifier = Modifier
-                    .padding(start = 32.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                )
-            }
-        }
-    }
 }
 
 @Composable

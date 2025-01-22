@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.salazar.cheers.core.ui.animations.Animate
 
 @Preview(showBackground = true)
 @Composable
@@ -33,21 +32,21 @@ fun ChipGroup(
         LazyRow(
         ) {
             items(users) {
-                Animate {
-                    SuggestionChip(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        onClick = {
-                            onSelectedChanged(it)
-                        },
-                        shape = MaterialTheme.shapes.medium,
-                        label = {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
-                    )
-                }
+                SuggestionChip(
+                    modifier = Modifier
+                        .animateItem()
+                        .padding(horizontal = 4.dp),
+                    onClick = {
+                        onSelectedChanged(it)
+                    },
+                    shape = MaterialTheme.shapes.medium,
+                    label = {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                )
             }
         }
     }

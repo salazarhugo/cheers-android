@@ -15,9 +15,8 @@ internal fun LocationResultsComponent(
     modifier: Modifier = Modifier,
     onLocationClick: (String) -> Unit = {},
 ) {
-    if (results.isEmpty()) {
-        return
-    }
+    if (results.isEmpty()) return
+
     LocationResult(
         results = results,
         modifier = modifier,

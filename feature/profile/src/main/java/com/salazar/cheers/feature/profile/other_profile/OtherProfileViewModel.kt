@@ -12,6 +12,7 @@ import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.accept_friend_request.AcceptFriendRequestUseCase
 import com.salazar.cheers.domain.cancel_friend_request.CancelFriendRequestUseCase
+import com.salazar.cheers.domain.list_post.ListPostFlowUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
 import com.salazar.cheers.feature.profile.navigation.OtherProfileScreen
@@ -69,6 +70,7 @@ class OtherProfileViewModel @Inject constructor(
     private val cancelFriendRequestUseCase: CancelFriendRequestUseCase,
     private val acceptFriendRequestUseCase: AcceptFriendRequestUseCase,
     private val listPostUseCase: ListPostUseCase,
+    private val listPostFlowUseCase: ListPostFlowUseCase,
 ) : ViewModel() {
     val args = savedStateHandle.toRoute<OtherProfileScreen>()
     val username = args.username
@@ -92,10 +94,15 @@ class OtherProfileViewModel @Inject constructor(
         viewModelScope.launch {
             userRepositoryImpl.getUserFlow(userIdOrUsername = username).collect { user ->
                 updateUser(user)
-//                refreshUserParties()
+                refreshUserPosts()
+                refreshUserParties()
             }
         }
         onSwipeRefresh()
+        viewModelScope.launch {
+            listPostFlowUseCase(username)
+                .collect(::updatePosts)
+        }
     }
 
     private fun refreshUser() {
@@ -109,18 +116,6 @@ class OtherProfileViewModel @Inject constructor(
             }
             updateIsRefreshing(false)
         }
-    }
-
-    fun getRoomId(onSuccess: (String) -> Unit) {
-        val otherUserId = viewModelState.value.user?.id ?: return
-
-//        viewModelScope.launch {
-//            onSuccess(
-//                chatRepository.getRoomId(
-//                    GetRoomIdReq.newBuilder().setRecipientId(otherUserId).build()
-//                ).roomId
-//            )
-//        }
     }
 
     fun onSwipeRefresh() {
@@ -187,19 +182,36 @@ class OtherProfileViewModel @Inject constructor(
         }
     }
 
-    private fun refreshUserPosts() {
+    fun onLoadMorePost(lastLoadedIndex: Int) {
+        val nextItemIndex = lastLoadedIndex + 1
+        val nextPage = nextItemIndex / 10 + 1
+
+        refreshUserPosts(page = nextPage)
+    }
+
+    private fun refreshUserPosts(page: Int = 1) {
+        val otherUserId = viewModelState.value.user?.id ?: return
         viewModelScope.launch {
-            listPostUseCase(username).collect {
-                updatePosts(it)
-            }
+            listPostUseCase(
+                page = page,
+                userId = otherUserId,
+            )
         }
     }
 
     private fun refreshUserParties() {
         val otherUserId = viewModelState.value.user?.id ?: return
-//        viewModelScope.launch(Dispatchers.IO) {
-//            partyRepository.listPartyFlow(userId = otherUserId)
-//                .collect(::updateParties)
-//        }
+        viewModelScope.launch() {
+            partyRepository.listPartyFlow(
+                filter = "other",
+                userId = otherUserId,
+            ).collect(::updateParties)
+        }
+    }
+
+    fun onLikeClick(post: Post) {
+        viewModelScope.launch {
+            postRepository.toggleLike(post = post)
+        }
     }
 }

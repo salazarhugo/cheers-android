@@ -35,6 +35,7 @@ import com.softimpact.feature.passcode.passcode.Passcode
 fun CheersNavGraph(
     uiState: CheersUiState.Initialized,
     appState: CheersAppState,
+    onRewardedAdClick: () -> Unit,
 ) {
     val passcodeEnabled = uiState.settings.passcodeEnabled
 
@@ -107,6 +108,7 @@ fun CheersNavGraph(
             mainNavGraph(
                 appState = appState,
                 appSettings = uiState.settings,
+                onRewardedAdClick = onRewardedAdClick,
             )
 
             passcodeNavGraph(

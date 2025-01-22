@@ -8,6 +8,7 @@ import com.salazar.cheers.core.model.User
 import com.salazar.cheers.data.post.repository.PostRepository
 import com.salazar.cheers.data.user.UserRepositoryImpl
 import com.salazar.cheers.domain.feed_party.ListPartyFlowUseCase
+import com.salazar.cheers.domain.list_post.ListPostFlowUseCase
 import com.salazar.cheers.domain.list_post.ListPostUseCase
 import com.salazar.cheers.shared.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val userRepositoryImpl: UserRepositoryImpl,
     private val postRepository: PostRepository,
+    private val listPostFlowUseCase: ListPostFlowUseCase,
     private val listPostUseCase: ListPostUseCase,
     private val listMyPartyFlowUseCase: ListPartyFlowUseCase,
 ) : ViewModel() {
@@ -48,6 +50,9 @@ class ProfileViewModel @Inject constructor(
         refreshUserPosts()
         viewModelScope.launch {
             listMyPartyFlowUseCase().collect(::updateMyParties)
+        }
+        viewModelScope.launch {
+            listPostFlowUseCase().collect(::updatePosts)
         }
     }
 
@@ -108,9 +113,9 @@ class ProfileViewModel @Inject constructor(
 
     private fun refreshUserPosts() {
         viewModelScope.launch {
-            listPostUseCase().collect {
-                updatePosts(it)
-            }
+            listPostUseCase(
+                page = 1,
+            )
         }
     }
 

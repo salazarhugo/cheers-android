@@ -7,9 +7,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.salazar.cheers.core.ui.navigation.PartyDetailScreen
+import com.salazar.cheers.core.util.Constants
 
 private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/party/{partyID}"
+    "${Constants.DEEPLINK_BASE_URL}/party/{partyID}"
 
 fun NavController.navigateToPartyDetail(
     partyID: String,

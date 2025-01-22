@@ -32,7 +32,7 @@ import com.salazar.cheers.core.model.ChatType
 import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.annotations.ScreenPreviews
 import com.salazar.cheers.data.chat.models.mockMessage1
-import com.salazar.cheers.feature.chat.ui.components.ChatBottomBar
+import com.salazar.cheers.feature.chat.ui.components.bottombar.ChatBottomBar
 import com.salazar.cheers.feature.chat.ui.components.ChatPresenceIndicator
 import kotlinx.coroutines.launch
 
@@ -122,6 +122,7 @@ fun ChatScreen(
                 inputFocusRequester = inputFocusRequester,
                 textState = uiState.textState,
                 replyMessage = uiState.replyMessage,
+                images = uiState.images,
                 onMessageSent = {
                     onChatUIAction(ChatUIAction.OnSendTextMessage(it))
                 },

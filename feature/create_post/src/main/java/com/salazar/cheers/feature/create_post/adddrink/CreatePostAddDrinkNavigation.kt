@@ -31,6 +31,7 @@ fun NavGraphBuilder.createPostAddDrinkScreen(
     navController: NavController,
     navigateBack: () -> Unit,
     navigateToCreateDrink: () -> Unit,
+    onRewardedAdClick: () -> Unit,
 ) {
     composable<CreatePostAddDrinkScreen>(
         deepLinks = listOf(
@@ -59,6 +60,7 @@ fun NavGraphBuilder.createPostAddDrinkScreen(
             navigateBack = navigateBack,
             viewModel = viewModel,
             onCreateDrinkClick = navigateToCreateDrink,
+            onRewardedAdClick = onRewardedAdClick,
         )
     }
 }

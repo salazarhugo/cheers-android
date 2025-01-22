@@ -9,6 +9,7 @@ import com.salazar.cheers.domain.get_notification_counter.GetNotificationCounter
 import com.salazar.cheers.domain.get_unread_chat_counter.GetUnreadChatCounterUseCase
 import com.salazar.cheers.domain.list_suggestions.ListSuggestionsUseCase
 import com.salazar.cheers.domain.send_friend_request.SendFriendRequestUseCase
+import com.salazar.cheers.domain.usecase.CheckAlreadySignedInUseCase
 import javax.inject.Inject
 
 
@@ -22,4 +23,5 @@ data class HomeUseCases @Inject constructor(
     val sendFriendRequest: SendFriendRequestUseCase,
     val getAccountUseCase: GetAccountUseCase,
     val getCurrentCurrentCity: GetCurrentCityFlowUseCase,
+    val checkAlreadySignedInUseCase: CheckAlreadySignedInUseCase,
 )

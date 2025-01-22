@@ -13,11 +13,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.salazar.cheers.core.model.Media
+import com.salazar.cheers.core.ui.CheersPreview
 import com.salazar.cheers.core.ui.MediaCarouselComponent
 
 
@@ -31,7 +34,9 @@ fun NativeAdView(
     val headlineViewId by remember { mutableIntStateOf(View.generateViewId()) }
     val callToActionViewId by remember { mutableIntStateOf(View.generateViewId()) }
     val adViewId by remember { mutableIntStateOf(View.generateViewId()) }
-
+    val mediaView = MediaView(context).apply {
+        this.mediaContent = ad.mediaContent
+    }
     AndroidView(
         modifier = modifier,
         factory = {
@@ -49,6 +54,7 @@ fun NativeAdView(
                 addView(bodyView)
                 addView(headlineView)
                 addView(callToActionView)
+                addView(mediaView)
             }
         },
         update = { view ->
@@ -60,6 +66,7 @@ fun NativeAdView(
 
             view.callToActionView = callToActionView
             view.headlineView = headlineView
+            view.mediaView = mediaView
 
             headlineView.setContent {
                 NativeAdHeader(
@@ -111,5 +118,16 @@ private fun NativeAdPost(
                 onClick = onCallToActionClick,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun NativeAdPostPreview() {
+    CheersPreview {
+//        NativeAdView(
+//            modifier = Modifier.padding(16.dp),
+//            ad = NativeAd(),
+//        )
     }
 }

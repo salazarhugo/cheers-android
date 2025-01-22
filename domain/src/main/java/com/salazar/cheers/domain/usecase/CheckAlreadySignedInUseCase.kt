@@ -15,6 +15,7 @@ class CheckAlreadySignedInUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
 ) {
     suspend operator fun invoke(): Boolean = withContext(ioDispatcher) {
-        return@withContext authRepository.checkIfAlreadySignedIn() && accountRepository.isConnected()
+        return@withContext authRepository.checkIfAlreadySignedIn() &&
+                accountRepository.isConnected()
     }
 }

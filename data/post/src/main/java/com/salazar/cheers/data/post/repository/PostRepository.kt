@@ -25,10 +25,11 @@ import com.salazar.cheers.core.model.Privacy
 import com.salazar.cheers.core.model.UserItem
 import com.salazar.cheers.core.util.Constants
 import com.salazar.cheers.shared.data.mapper.toUserItem
+import com.salazar.cheers.shared.data.toDataError
 import com.salazar.cheers.shared.util.Resource
+import com.salazar.cheers.shared.util.result.DataError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -62,7 +63,7 @@ class PostRepository @Inject constructor(
     }
 
     fun getPostFeedFlow(): Flow<List<Post>> {
-        return postDao.getPostFeed().map {posts ->
+        return postDao.getPostFeed().map { posts ->
             posts.map { it.asExternalModel() }
         }
     }
@@ -71,31 +72,34 @@ class PostRepository @Inject constructor(
         postDao.update(post = post.asEntity())
     }
 
-    suspend fun listPost(userIdOrUsername: String): Flow<List<Post>> {
-        return flow {
-            emit(postDao.getUserPosts(userIdOrUsername).first().asExternalModel())
+    fun listPostFlow(userIdOrUsername: String): Flow<List<Post>> {
+        return postDao.getUserPosts(userIdOrUsername)
+            .map { it.asExternalModel() }
+    }
 
-            val remoteUserPosts = try {
-                val request = ListPostRequest.newBuilder()
-                    .setPage(1)
-                    .setPageSize(9)
-                    .setUsername(userIdOrUsername)
-                    .build()
+    suspend fun listPost(
+        page: Int,
+        pageSize: Int = 30,
+        userIdOrUsername: String,
+    ): com.salazar.cheers.shared.util.result.Result<Unit, DataError> {
+        return try {
+            val request = ListPostRequest.newBuilder()
+                .setPage(page)
+                .setPageSize(pageSize)
+                .setUsername(userIdOrUsername)
+                .build()
 
-                val response = postService.listPost(request)
-                val posts = response.postsList.map {
-                    it.toPost()
-                }
-                posts
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
+            val response = postService.listPost(request)
+            val posts = response.postsList.map {
+                it.toPost()
             }
+            postDao.insertUserPosts(posts.map { it.asEntity() })
 
-            remoteUserPosts?.let {
-                postDao.insertUserPosts(it.map { it.asEntity() })
-                emitAll(postDao.getUserPosts(userIdOrUsername).map { it.asExternalModel() })
-            }
+
+            com.salazar.cheers.shared.util.result.Result.Success(Unit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            com.salazar.cheers.shared.util.result.Result.Error(e.toDataError())
         }
     }
 

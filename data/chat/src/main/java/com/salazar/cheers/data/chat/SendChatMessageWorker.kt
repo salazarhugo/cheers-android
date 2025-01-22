@@ -9,6 +9,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import cheers.media.v1.UploadMediaRequest
 import com.salazar.cheers.core.model.ChatMessageStatus
 import com.salazar.cheers.core.model.EmptyChatMessage
 import com.salazar.cheers.data.chat.repository.ChatRepository
@@ -46,7 +47,10 @@ class SendChatMessageWorker @AssistedInject constructor(
                 photos.toList().forEach { photoUri ->
                     val photoBytes = extractImage(Uri.parse(photoUri))
                     launch {
-                        val media = mediaRepository.uploadMedia(photoBytes).getOrNull()
+                        val media = mediaRepository.uploadMedia(
+                            bytes = photoBytes,
+                            type = UploadMediaRequest.MediaType.CHAT,
+                        ).getOrNull()
                         val mediaUrl = media?.url
                         if (mediaUrl != null) {
                             uploadUrls.add(mediaUrl)

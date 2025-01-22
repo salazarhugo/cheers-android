@@ -19,12 +19,12 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.CarouselState
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
-import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -50,70 +50,82 @@ fun ProfileHeaderCarousel(
     user: User,
     modifier: Modifier = Modifier,
     editable: Boolean = false,
-    onBannerClick: () -> Unit = {},
+    selectedBannerIndex: Int = 0,
+    onBannerClick: (index: Int) -> Unit = {},
     onAvatarClick: () -> Unit = {},
     onDeleteBannerClick: (String) -> Unit = {},
 ) {
-    val items = user.banner
     val avatar = user.picture
     val avatarSize = 110.dp
     val bannerCornerSize = 16.dp
     val bannerShape = RoundedCornerShape(bannerCornerSize)
     val avatarOffset = avatarSize / 2 - bannerCornerSize
+    val items = if (editable) {
+        user.banner + listOf("")
+    } else {
+        user.banner
+    }
 
-    if (items.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .clip(shape = RoundedCornerShape(16.dp)),
-        ) {
-            ProfileBanner(
-                modifier = Modifier,
-                banner = "",
-                onEditClick = onBannerClick,
-                clickable = editable,
-                ratio = 1f,
-                onDeleteClick = {}
-            )
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-            ) {
-                AvatarComponent(
-                    avatar = avatar,
-                    name = user.name,
-                    modifier = Modifier
-                        .border(5.dp, MaterialTheme.colorScheme.background, CircleShape),
-                    size = 110.dp,
-                    onClick = {
-//                        if (isEditable.not()) {
-//                            openAlertDialog = true
+//    if (items.isEmpty()) {
+//        Box(
+//            modifier = Modifier
+//                .padding(horizontal = 16.dp)
+//                .clip(shape = RoundedCornerShape(16.dp)),
+//        ) {
+//            ProfileBanner(
+//                modifier = Modifier,
+//                banner = "",
+//                onEditClick = {
+//                    onBannerClick(0)
+//                },
+//                clickable = editable,
+//                ratio = 1f,
+//                onDeleteClick = {}
+//            )
+//            Row(
+//                modifier = Modifier
+//                    .align(Alignment.BottomStart)
+//            ) {
+//                AvatarComponent(
+//                    avatar = avatar,
+//                    name = user.name,
+//                    modifier = Modifier
+//                        .offset(y = avatarOffset)
+//                        .border(6.dp, MaterialTheme.colorScheme.background, CircleShape),
+//                    size = avatarSize,
+//                    onClick = {
+////                        if (isEditable.not()) {
+////                            openAlertDialog = true
+////                        }
+//                        onAvatarClick()
+//                    },
+//                )
+//                ProfileName(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .drawWithContent {
+//                            drawRect(
+//                                brush = Brush.verticalGradient(
+//                                    colors = listOf(Color.Transparent, Color.Black),
+//                                ),
+//                            )
+//                            drawContent()
 //                        }
-                        onAvatarClick()
-                    },
-                )
-                ProfileName(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .drawWithContent {
-                            drawRect(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, Color.Black),
-                                ),
-                            )
-                            drawContent()
-                        }
-                        .padding(32.dp),
-                    name = user.name,
-                    jobCompany = user.jobCompany,
-                    jobTitle = user.jobTitle,
-                    education = user.education,
-                    isBusinessAccount = user.isBusinessAccount,
-                )
+//                        .padding(32.dp),
+//                    name = user.name,
+//                    jobCompany = user.jobCompany,
+//                    jobTitle = user.jobTitle,
+//                    education = user.education,
+//                    isBusinessAccount = user.isBusinessAccount,
+//                )
+//            }
+//        }
+//    } else {
+        val state = remember(items) {
+            CarouselState(currentItem = selectedBannerIndex) {
+                items.size
             }
         }
-    } else {
-        val state = rememberCarouselState() { items.size }
         Box(
             modifier = Modifier.padding(bottom = avatarOffset),
             contentAlignment = Alignment.BottomStart,
@@ -124,8 +136,8 @@ fun ProfileHeaderCarousel(
                 preferredItemWidth = 500.dp,
                 itemSpacing = 8.dp,
                 contentPadding = PaddingValues(horizontal = 16.dp)
-            ) { i ->
-                val item = items.getOrNull(i) ?: return@HorizontalMultiBrowseCarousel
+            ) { index ->
+                val item = items.getOrNull(index) ?: return@HorizontalMultiBrowseCarousel
 
                 Box(
                     modifier = Modifier
@@ -134,7 +146,9 @@ fun ProfileHeaderCarousel(
                     ProfileBanner(
                         modifier = Modifier,
                         banner = item,
-                        onEditClick = onBannerClick,
+                        onEditClick = {
+                            onBannerClick(index)
+                        },
                         clickable = editable,
                         ratio = 1f,
                         onDeleteClick = {
@@ -180,8 +194,7 @@ fun ProfileHeaderCarousel(
                     modifier = Modifier
 //                        .align(Alignment.BottomStart)
                         .padding(horizontal = 8.dp)
-                        .padding(bottom = 16.dp)
-                    ,
+                        .padding(bottom = 16.dp),
                     name = user.name,
                     jobCompany = user.jobCompany,
                     jobTitle = user.jobTitle,
@@ -190,7 +203,7 @@ fun ProfileHeaderCarousel(
                 )
             }
         }
-    }
+//    }
 }
 
 @Preview

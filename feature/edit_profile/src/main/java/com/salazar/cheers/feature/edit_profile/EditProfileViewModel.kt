@@ -87,9 +87,18 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun onSelectBanner(bannerUri: List<Uri>) {
+    fun onSelectBanner(bannerUri: Uri?, index: Int) {
+        if (bannerUri == null) return
+
         viewModelState.update {
-            val newUser = it.user?.copy(banner = bannerUri.map { it.toString() })
+            val updatedBanners = it.user?.banner?.toMutableList() ?: return@update it
+            if (index >= updatedBanners.size) {
+                updatedBanners += listOf(bannerUri.toString())
+            } else {
+                updatedBanners[index] = bannerUri.toString()
+            }
+
+            val newUser = it.user.copy(banner = updatedBanners)
             it.copy(user = newUser)
         }
     }

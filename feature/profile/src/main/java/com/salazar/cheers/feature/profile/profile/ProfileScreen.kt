@@ -18,15 +18,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ViewList
-import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.Celebration
+import androidx.compose.material.icons.outlined.SportsBar
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,7 +33,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,6 +56,7 @@ import com.salazar.cheers.feature.profile.ProfileBody
 import com.salazar.cheers.feature.profile.ProfileMoreBottomSheet
 import com.salazar.cheers.feature.profile.ProfileSheetUIAction
 import com.salazar.cheers.feature.profile.R
+import com.salazar.cheers.feature.profile.other_profile.profileTabs
 import kotlinx.coroutines.launch
 
 @Composable
@@ -172,8 +168,7 @@ fun ProfileList(
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val tabs = listOf(
-        Icons.AutoMirrored.Outlined.ViewList,
-        Icons.Default.GridView,
+        Icons.Outlined.SportsBar,
         Icons.Outlined.Celebration
     )
     val pagerState = rememberPagerState(
@@ -193,31 +188,10 @@ fun ProfileList(
             onProfileUIAction = onProfileUIAction,
         )
 
-        stickyHeader {
-            PrimaryTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                contentColor = MaterialTheme.colorScheme.onBackground,
-            ) {
-                tabs.forEachIndexed { index, icon ->
-                    val selected = pagerState.currentPage == index
-                    Tab(
-                        icon = {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                tint = if (selected) MaterialTheme.colorScheme.onBackground else Color.LightGray
-                            )
-                        },
-                        selected = selected,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                    )
-                }
-            }
-        }
+        profileTabs(
+            tabs = tabs,
+            pagerState = pagerState,
+        )
 
         item {
             HorizontalPager(

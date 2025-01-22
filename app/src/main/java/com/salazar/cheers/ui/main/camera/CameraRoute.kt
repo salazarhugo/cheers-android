@@ -1,5 +1,6 @@
 package com.salazar.cheers.ui.main.camera
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 fun CameraRoute(
     cameraViewModel: CameraViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
+    navigateToCreatePost: (Uri) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -84,8 +86,8 @@ fun CameraRoute(
 //                navActions.navigateToHome()
             },
             onPostClicked = {
-//                if (uiState.imageUri != null)
-//                    navActions.navigateToCreatePostSheetWithPhotoUri(uiState.imageUri.toString())
+                val uri = uiState.imageUri ?: return@CameraScreen
+                navigateToCreatePost(uri)
             },
             onCameraUIAction = { cameraUIAction ->
                 when (cameraUIAction) {

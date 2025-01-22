@@ -8,6 +8,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.salazar.cheers.core.model.User
 import com.salazar.cheers.data.post.repository.MEDIA_URLS_KEY
 import com.salazar.cheers.data.user.R
 import com.salazar.cheers.data.user.UserRepositoryImpl
@@ -27,10 +28,8 @@ class UploadProfileBanner @AssistedInject constructor(
             ?: return Result.failure()
 
         try {
-            val user = userRepositoryImpl.getCurrentUser()
-
             userRepositoryImpl.updateUserProfile(
-                user = user.copy(banner = banners.toList()),
+                user = User().copy(banner = banners.toList()),
                 updateMask = listOf("banners"),
             )
 

@@ -40,6 +40,8 @@ fun NavGraphBuilder.otherProfileScreen(
     navigateToOtherProfileStats: (User) -> Unit,
     navigateToManageFriendship: (String) -> Unit,
     navigateToChat: (UserItem) -> Unit,
+    navigateToPostLikes: (String) -> Unit,
+    navigateToUserProfile: (String) -> Unit,
 ) {
     composable<OtherProfileScreen>(
         deepLinks = listOf(
@@ -65,6 +67,8 @@ fun NavGraphBuilder.otherProfileScreen(
             navigateToManageFriendship = navigateToManageFriendship,
             navigateToOtherProfileStats = navigateToOtherProfileStats,
             navigateToChat = navigateToChat,
+            navigateToPostLikes = navigateToPostLikes,
+            navigateToUserProfile = navigateToUserProfile,
         )
     }
 }

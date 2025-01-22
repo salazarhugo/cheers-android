@@ -9,8 +9,6 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.salazar.cheers.core.Post
@@ -129,7 +127,22 @@ class HomeViewModel @Inject constructor(
                 .map { HomeSelectedPage.getByPage(it) }
                 .collect(::updateSelectedPage)
         }
+        checkIfAlreadySignedIn()
     }
+
+    private fun checkIfAlreadySignedIn() {
+        viewModelScope.launch {
+            val signedIn = homeUseCases.checkAlreadySignedInUseCase()
+            updateIsSignedIn(signedIn)
+        }
+    }
+
+    private fun updateIsSignedIn(isSignedIn: Boolean) {
+        viewModelState.update {
+            it.copy(isSignedIn = isSignedIn)
+        }
+    }
+
 
     private fun collectAudioState() {
         viewModelScope.launch {
@@ -253,9 +266,6 @@ class HomeViewModel @Inject constructor(
     }
 
     fun initNativeAdd(context: Context) {
-        val configuration = RequestConfiguration.Builder()
-            .setTestDeviceIds(listOf("2C6292E9B3EBC9CF72C85D55627B6D2D")).build()
-        MobileAds.setRequestConfiguration(configuration)
         val adLoader = AdLoader.Builder(context, "ca-app-pub-7182026441345500/3409583237")
             .forNativeAd { ad: NativeAd ->
                 setNativeAd(ad)

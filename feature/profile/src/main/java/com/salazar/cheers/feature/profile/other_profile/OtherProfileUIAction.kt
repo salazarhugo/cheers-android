@@ -1,5 +1,8 @@
 package com.salazar.cheers.feature.profile.other_profile
 
+import com.salazar.cheers.core.Post
+import com.salazar.cheers.core.model.UserID
+
 sealed class OtherProfileUIAction {
     data object OnSwipeRefresh : OtherProfileUIAction()
     data object OnBackPressed : OtherProfileUIAction()
@@ -12,4 +15,8 @@ sealed class OtherProfileUIAction {
     data class OnSendFriendRequest(val userID: String): OtherProfileUIAction()
     data class OnCancelFriendRequest(val userID: String): OtherProfileUIAction()
     data class OnAcceptFriendRequest(val userID: String): OtherProfileUIAction()
+    data class OnLikeClick(val post: Post): OtherProfileUIAction()
+    data class OnUserClick(val userID: UserID): OtherProfileUIAction()
+    data class OnLikeCountClick(val postID: String): OtherProfileUIAction()
+    data class OnCommentClick(val postID: String): OtherProfileUIAction()
 }

@@ -2,6 +2,7 @@ package com.salazar.cheers.feature.create_post.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.LocationOn
@@ -30,18 +31,18 @@ internal fun SelectLocationComponent(
 ) {
     if (location.isNullOrBlank()) {
         AddLocationItem(
-            modifier = modifier,
+            modifier = Modifier.padding(horizontal = 16.dp),
             onClick = onMapClick,
         )
         LocationResultsComponent(
-            modifier = modifier,
+            modifier = Modifier,
             results = locationResults,
             onLocationClick = onLocationClick,
         )
     } else {
         LocationItem(
             location = location,
-            modifier = modifier,
+            modifier = Modifier.padding(horizontal = 16.dp),
             onDeleteLocation = onDeleteLocation,
         )
     }

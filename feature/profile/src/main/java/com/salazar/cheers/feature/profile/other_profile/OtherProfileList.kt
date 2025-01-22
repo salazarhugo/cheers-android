@@ -10,9 +10,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ViewList
-import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.outlined.Celebration
+import androidx.compose.material.icons.outlined.SportsBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
@@ -48,8 +47,7 @@ fun OtherProfileList(
 ) {
     val userID = user.id
     val tabs = listOf(
-        Icons.AutoMirrored.Outlined.ViewList,
-        Icons.Default.GridView,
+        Icons.Outlined.SportsBar,
         Icons.Outlined.Celebration
     )
     val pagerState = rememberPagerState(
@@ -94,7 +92,7 @@ fun OtherProfileList(
         }
 
         if (user.friend || user.isBusinessAccount) {
-            separator(
+            profileTabs(
                 tabs = tabs,
                 pagerState = pagerState,
             )
@@ -102,6 +100,18 @@ fun OtherProfileList(
                 posts = posts,
                 parties = parties,
                 pagerState = pagerState,
+                onLikeClick =  {
+                    onOtherProfileUIAction(OtherProfileUIAction.OnLikeClick(it))
+                },
+                onUserClick = {
+                    onOtherProfileUIAction(OtherProfileUIAction.OnUserClick(it))
+                },
+                onCommentClick = {
+                    onOtherProfileUIAction(OtherProfileUIAction.OnCommentClick(it))
+                },
+                onLikeCountClick = {
+                    onOtherProfileUIAction(OtherProfileUIAction.OnLikeCountClick(it))
+                }
             )
         }
     }
@@ -129,7 +139,7 @@ fun LazyListScope.avatar(
     }
 }
 
-fun LazyListScope.separator(
+fun LazyListScope.profileTabs(
     tabs: List<ImageVector>,
     pagerState: PagerState,
 ) {
@@ -166,6 +176,10 @@ fun LazyListScope.postsAndParties(
     posts: List<Post>?,
     parties: List<Party>?,
     pagerState: PagerState,
+    onLikeClick: (Post) -> Unit = {},
+    onCommentClick: (String) -> Unit = {},
+    onUserClick: (String) -> Unit = {},
+    onLikeCountClick: (String) -> Unit = {},
 ) {
     item {
         HorizontalPager(
@@ -175,9 +189,19 @@ fun LazyListScope.postsAndParties(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 when (page) {
-                    0 -> posts?.forEach { postFeed ->
+                    0 -> posts?.forEach { post ->
                         PostComponent(
-                            post = postFeed,
+                            post = post,
+                            onLikeClick = {
+                                onLikeClick(post)
+                            },
+                            onCommentClick = {
+                                onCommentClick(post.id)
+                            },
+                            onLikeCountClick = {
+                                onLikeCountClick(post.id)
+                            },
+                            onUserClick = onUserClick,
                         )
                     }
 

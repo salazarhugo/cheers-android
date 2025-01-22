@@ -24,6 +24,7 @@ fun CreatePostAddDrinkRoute(
     onCreateDrinkClick: () -> Unit,
     viewModel: CreatePostViewModel,
     drinksViewModel: DrinksViewModel = hiltViewModel(),
+    onRewardedAdClick: () -> Unit,
 ) {
     val uiState2 by drinksViewModel.uiState.collectAsStateWithLifecycle()
     var showRechargeBottomSheet by remember { mutableStateOf(false) }
@@ -69,7 +70,8 @@ fun CreatePostAddDrinkRoute(
             sheetState = sheetState,
             onDismiss = {
                 showRechargeBottomSheet = false
-            }
+            },
+            onRewardedAdClick = onRewardedAdClick,
         )
     }
 }

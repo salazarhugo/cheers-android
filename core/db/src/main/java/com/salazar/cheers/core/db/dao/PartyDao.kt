@@ -35,6 +35,15 @@ interface PartyDao{
     @Query("""
         SELECT * FROM events 
         WHERE hostId = :userId 
+        ORDER BY events.startDate ASC
+        """)
+    fun listPartyByUserID(
+        userId: UserID,
+    ): Flow<List<PartyEntity>>
+
+    @Query("""
+        SELECT * FROM events 
+        WHERE hostId = :userId 
         AND endDate < :now
         ORDER BY events.startDate ASC
         """)
@@ -49,7 +58,7 @@ interface PartyDao{
         AND endDate > :now
         ORDER BY events.startDate ASC
         """)
-    fun listPartyByUserID(
+    fun listUpcomingPartyByUserID(
         userId: UserID,
         now: Long = Date().time / 1000,
     ): Flow<List<PartyEntity>>

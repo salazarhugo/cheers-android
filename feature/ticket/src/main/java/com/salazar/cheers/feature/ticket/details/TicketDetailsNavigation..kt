@@ -5,11 +5,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.salazar.cheers.core.util.Constants
 
 const val TICKET_ID = "ticketID"
 const val ticketDetailsNavigationRoute = "ticket_route/{$TICKET_ID}"
-private const val DEEP_LINK_URI_PATTERN =
-    "https://maparty.app/ticket/$TICKET_ID"
+private const val DEEP_LINK_URI_PATTERN = "${Constants.DEEPLINK_BASE_URL}/ticket/{${TICKET_ID}}"
 
 fun NavController.navigateToTicketDetails(
     ticketID: String,

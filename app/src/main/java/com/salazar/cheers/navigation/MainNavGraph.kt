@@ -131,6 +131,7 @@ data object MainNavGraph
 fun NavGraphBuilder.mainNavGraph(
     appSettings: Settings,
     appState: CheersAppState,
+    onRewardedAdClick: () -> Unit,
 ) {
     val navController = appState.navController
 
@@ -223,6 +224,7 @@ fun NavGraphBuilder.mainNavGraph(
         createPostGraph(
             navController = navController,
             navigateBack = navController::popBackStack,
+            onRewardedAdClick = onRewardedAdClick,
         )
 
         partiesScreen(
@@ -316,6 +318,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         cameraScreen(
             navigateBack = navController::popBackStack,
+            navigateToCreatePost = navController::navigateToCreatePost,
         )
 
         composable("${MainDestinations.TICKETING_ROUTE}/{eventId}") {
@@ -403,8 +406,10 @@ fun NavGraphBuilder.mainNavGraph(
                 }
             },
             navigateToPostDetail = {},
-            navigateToComments = {},
+            navigateToComments = navController::navigateToPostComments,
             navigateToChat = navController::navigateToChatWithUserItem,
+            navigateToPostLikes = navController::navigateToPostLikes,
+            navigateToUserProfile = navController::navigateToOtherProfile,
         )
 
         partyDetailScreen(

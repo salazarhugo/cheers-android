@@ -35,7 +35,13 @@ class CreatePostViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val createPost = savedStateHandle.toRoute<CreatePostGraph>()
-    private val viewModelState = MutableStateFlow(CreatePostUiState(isLoading = false))
+    private val viewModelState = MutableStateFlow(
+        CreatePostUiState(
+            isLoading = false,
+//            medias = if (createPost.uri != null) listOf(Media.Image(createPost.uri))
+//            else emptyList(),
+        )
+    )
 
     val uiState = viewModelState
         .stateIn(
@@ -94,7 +100,7 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun getLocationName(
+    private fun getLocationName(
         longitude: Double,
         latitude: Double,
         zoom: Double,
@@ -105,7 +111,7 @@ class CreatePostViewModel @Inject constructor(
                 latitude = latitude,
                 zoom = zoom,
             )
-            when(result) {
+            when (result) {
                 is Result.Error -> {}
                 is Result.Success -> {
                     viewModelState.update {
@@ -188,10 +194,15 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun updateLocationPoint(point: Point) {
+    fun updateLocationPoint(point: Point, zoom: Double = 10.0) {
         viewModelState.update {
             it.copy(locationPoint = point)
         }
+        getLocationName(
+            point.longitude(),
+            point.latitude(),
+            zoom,
+        )
     }
 
     fun updateLocation(location: String?) {
@@ -257,7 +268,8 @@ class CreatePostViewModel @Inject constructor(
 
         viewModelScope.launch {
             createPostUseCases.createPostUseCase(
-                "PHOTOS" to uiState.medias.filterIsInstance<Media.Image>().map { it.uri.toString() }.toTypedArray(),
+                "PHOTOS" to uiState.medias.filterIsInstance<Media.Image>().map { it.uri.toString() }
+                    .toTypedArray(),
                 "AUDIO_URI" to localAudio?.uri.toString(),
                 "AUDIO_AMPLITUDES" to localAudio?.amplitudes?.toTypedArray(),
                 "POST_TYPE" to uiState.postType,

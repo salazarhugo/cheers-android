@@ -36,4 +36,5 @@ data class HomeUiState(
     val audioPostID: String = String(),
     val audioState: AudioState = AudioState(),
     val showFloatingActionButton: Boolean = false,
+    val isSignedIn: Boolean? = null,
 )

@@ -12,6 +12,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import cheers.media.v1.UploadMediaRequest
 import cheers.party.v1.CreatePartyRequest
 import cheers.party.v1.Geolocation
 import com.salazar.cheers.R
@@ -92,7 +93,10 @@ class CreatePartyWorker @AssistedInject constructor(
             if (bannerUri?.isNotBlank() == true) {
                 val photoBytes = extractImage(Uri.parse(bannerUri))
                 val media =
-                    mediaRepository.uploadMedia(photoBytes).getOrNull() ?: return Result.failure()
+                    mediaRepository.uploadMedia(
+                        bytes = photoBytes,
+                        type = UploadMediaRequest.MediaType.PARTY,
+                    ).getOrNull() ?: return Result.failure()
                 request.setBannerUrl(media.url)
             }
 

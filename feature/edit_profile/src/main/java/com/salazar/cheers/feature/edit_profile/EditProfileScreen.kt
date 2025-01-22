@@ -28,6 +28,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,7 +60,7 @@ fun EditProfileScreen(
     onUsernameChanged: (String) -> Unit = {},
     onWebsiteChanged: (String) -> Unit = {},
     onSelectImage: (Uri?) -> Unit = {},
-    onSelectBanner: (List<Uri>) -> Unit,
+    onSelectBanner: (Uri?, Int) -> Unit,
     onDismiss: () -> Unit = {},
     onSave: () -> Unit = {},
     onDrinkClick: (Drink) -> Unit = {},
@@ -136,7 +137,7 @@ fun EditProfileHeader(
     user: User,
     photoUri: Uri?,
     onSelectImage: (Uri?) -> Unit,
-    onSelectBanner: (List<Uri>) -> Unit,
+    onSelectBanner: (Uri?, Int) -> Unit,
     onAddDrinkClick: () -> Unit,
     onDeleteBanner: (String) -> Unit,
 ) {
@@ -147,15 +148,16 @@ fun EditProfileHeader(
             contract = ActivityResultContracts.PickVisualMedia(),
             onResult = { uri -> onSelectImage(uri) }
         )
-
+    var selectedBannerIndex by remember { mutableIntStateOf(0) }
     val bannerLauncher =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickMultipleVisualMedia(),
-            onResult = { uri -> onSelectBanner(uri) }
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri -> onSelectBanner(uri, selectedBannerIndex) }
         )
 
-    if (openDialog.value)
+    if (openDialog.value) {
         EditProfilePhotoDialog(openDialog)
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -164,6 +166,7 @@ fun EditProfileHeader(
         val photo = photoUri?.toString() ?: user.picture
 
         ProfileHeaderCarousel(
+            selectedBannerIndex = selectedBannerIndex,
             user = user.copy(
                 banner = user.banner,
                 picture = photo,
@@ -176,6 +179,7 @@ fun EditProfileHeader(
                 )
             },
             onBannerClick = {
+                selectedBannerIndex = it
                 bannerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
@@ -384,7 +388,7 @@ private fun EditProfileScreenPreview() {
             ),
             onGenderClick = {},
             onJobClick = {},
-            onSelectBanner = {},
+            onSelectBanner = {_, _ ->},
             onDeleteBanner = {},
         )
     }

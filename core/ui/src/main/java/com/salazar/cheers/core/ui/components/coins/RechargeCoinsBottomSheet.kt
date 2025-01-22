@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MonetizationOn
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ fun RechargeCoinsBottomSheet(
     viewModel: RechargeCoinsViewModel = hiltViewModel(),
     sheetState: SheetState = rememberModalBottomSheetState(),
     onDismiss: () -> Unit = {},
+    onRewardedAdClick: () -> Unit,
 ) {
     val activity = LocalActivity.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -62,6 +64,7 @@ fun RechargeCoinsBottomSheet(
             onProductClick = {
                 viewModel.onProductClick(it, activity = activity)
             },
+            onRewardedAdClick = onRewardedAdClick
         )
     }
 }
@@ -71,12 +74,14 @@ fun RechargeCoinsScreen(
     uiState: RechargeUiState,
     modifier: Modifier = Modifier,
     onProductClick: (ProductDetails) -> Unit,
+    onRewardedAdClick: () -> Unit,
 ) {
     RechargeScreen(
         modifier = modifier,
         coins = uiState.coins,
         recharges = uiState.productDetails ?: emptyList(),
         onRecharge = onProductClick,
+        onRewardedAdClick = onRewardedAdClick
     )
 }
 
@@ -92,6 +97,7 @@ private fun RechargeCoinsBottomSheetPreview() {
             ),
             modifier = Modifier,
             onProductClick = {},
+            onRewardedAdClick = {},
         )
     }
 }
@@ -102,6 +108,7 @@ fun RechargeScreen(
     onRecharge: (ProductDetails) -> Unit,
     recharges: List<ProductDetails>,
     modifier: Modifier = Modifier,
+    onRewardedAdClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -129,6 +136,14 @@ fun RechargeScreen(
             recharges = recharges,
             onRecharge = onRecharge,
         )
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            onClick = onRewardedAdClick,
+        ) {
+            Text(text ="Watch Ad for 5 coins")
+        }
     }
 }
 

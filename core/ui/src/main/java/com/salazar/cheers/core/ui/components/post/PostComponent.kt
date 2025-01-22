@@ -113,27 +113,31 @@ fun PostComponent(
                 onClick = onAudioClick,
             )
         }
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            PostDrink(
-                drink = post.drinkName,
-                picture = post.drinkPicture,
-                colorString = post.drinkColor,
-                onClick = {
-                    onDrinkClick(post.drinkId)
-                },
-            )
-            if (post.hasMentions) {
-                MultiAvatarComponent(
-                    avatars = post.mentionAvatars,
-                    modifier = modifier,
-                    onClick = {
-                        showMentionBottomSheet = true
-                    }
-                )
+        if (post.drinkId.isNotBlank() || post.hasMentions) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (post.drinkId.isNotBlank()) {
+                    PostDrink(
+                        drink = post.drinkName,
+                        picture = post.drinkPicture,
+                        colorString = post.drinkColor,
+                        onClick = {
+                            onDrinkClick(post.drinkId)
+                        },
+                    )
+                }
+                if (post.hasMentions) {
+                    MultiAvatarComponent(
+                        avatars = post.mentionAvatars,
+                        modifier = modifier,
+                        onClick = {
+                            showMentionBottomSheet = true
+                        }
+                    )
+                }
             }
         }
         PostFooter(

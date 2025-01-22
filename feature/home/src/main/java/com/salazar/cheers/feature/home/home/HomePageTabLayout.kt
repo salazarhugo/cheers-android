@@ -1,4 +1,5 @@
 package com.salazar.cheers.feature.home.home
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -73,7 +74,8 @@ private fun HomePageTabLayout(
         containerColor = Color.Transparent,
         tabs = {
             tabs.forEachIndexed { tabIndex, tabTitle ->
-                val a = if (tabTitle == selectedTab) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground
+                val a =
+                    if (tabTitle == selectedTab) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground
                 val textColor =
                     animateColorAsState(targetValue = a, label = "")
 
@@ -91,14 +93,36 @@ private fun HomePageTabLayout(
                         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                         text = tabTitle,
                         color = textColor.value,
-                        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 24.sp, fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            lineHeight = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
                         textAlign = TextAlign.Center,
                         onTextLayout = { textLayoutResult ->
-                            tabWidths[tabIndex] = with(density) { textLayoutResult.size.width.toDp() }
+                            tabWidths[tabIndex] =
+                                with(density) { textLayoutResult.size.width.toDp() }
                         },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
+                    if (tabIndex == 1) {
+                        Text(
+                            modifier = Modifier,
+                            text = "BETA",
+                            color = textColor.value.copy(alpha = 0.5f),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                lineHeight = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            textAlign = TextAlign.Center,
+                            onTextLayout = { textLayoutResult ->
+                                tabWidths[tabIndex] =
+                                    with(density) { textLayoutResult.size.width.toDp() }
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
         },
